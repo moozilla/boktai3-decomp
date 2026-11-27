@@ -1,8 +1,6 @@
 #include "global.h"
+#include "ui/books/collection_display_resources.h"
 
-struct CollectionRes {
-    u32 w[8];
-};
 struct CollectionPos {
     u16 x, y, z, pad;
 };
@@ -26,7 +24,7 @@ extern const u32 gUnk_08614054[];
 extern const u32 gUnk_0861407C[];
 extern const u32 gUnk_086140A4[];
 
-struct CollectionRes *ScriptProc_Start(u32, u32);
+struct CollectionDisplayResources *ScriptProc_Start(u32, u32);
 void ResourceHeader_Relocate(void *, void *);
 void AnimSprite_InitLinked(void *, void *, int, int, int, int, int, void *);
 s32 CollectionBook_IsComplete(void);
@@ -38,14 +36,14 @@ void CpuSet(const void *, void *, u32);
 
 void sub_0821358C(u8 *m)
 {
-    struct CollectionRes *res;
+    struct CollectionDisplayResources *res;
     struct CollectionPos pos;
     s32 i;
     u16 k;
     u32 k2;
 
     res = ScriptProc_Start(0xcb05, 0xe2ab);
-    *(struct CollectionRes *)(m + 0x24) = *res;
+    *(struct CollectionDisplayResources *)(m + 0x24) = *res;
     ResourceHeader_Relocate(m + 0x24, res);
     AnimSprite_InitLinked(m + 0x64, m + 0x24, 0x57, 0x10, 0, 0, 0, 0);
     AnimSprite_InitLinked(m + 0xc4, m + 0x24, 0x58, 0x10, 0, 0, 0, 0);
@@ -63,7 +61,7 @@ void sub_0821358C(u8 *m)
     }
     AnimSprite_InitLinked(m + 0x184, m + 0x24, 0x59, 0x10, 0, 0, 0, 0);
     res = ScriptProc_Start(0xcb05, 0x530d);
-    *(struct CollectionRes *)(m + 0x44) = *res;
+    *(struct CollectionDisplayResources *)(m + 0x44) = *res;
     ResourceHeader_Relocate(m + 0x44, res);
     AnimSprite_InitLinked(m + 0x364, m + 0x44, 0x50, 0x10, 0, 0, 0, 0);
     pos.x = 0x28;
