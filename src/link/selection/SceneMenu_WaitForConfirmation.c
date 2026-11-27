@@ -1,29 +1,19 @@
 #include "global.h"
 #include "link/selection/link_selection_mode.h"
+#include "link/selection/link_selection_prompt.h"
 #define SceneMenu_SetState LinkSession_SetState
-struct SceneMenu {
-    u8 pad0[0x1A];
-    u16 count;
-    u8 pad1C[0x14];
-    u32 timer;
-    u8 pad34[0xA];
-    u16 flags;
-    u16 *input;
-    u32 field44;
-    u32 state;
-};
-u8 LinkSession_ConsumeStateEntry(struct SceneMenu *);
-void LinkSession_BeginShutdown(struct SceneMenu *, void (*)(void));
-void LinkSession_SetState(struct SceneMenu *, u32, void (*)(void));
+u8 LinkSession_ConsumeStateEntry(struct LinkSelectionPrompt *);
+void LinkSession_BeginShutdown(struct LinkSelectionPrompt *, void (*)(void));
+void LinkSession_SetState(struct LinkSelectionPrompt *, u32, void (*)(void));
 void ScriptPanel_OpenTextWindow(void);
 void LinkSession_WaitForCompletionFlag(void);
-static inline u16 ReadInput(struct SceneMenu *p, s32 i)
+static inline u16 ReadInput(struct LinkSelectionPrompt *p, s32 i)
 {
     if (i < 0)
         return 0xFFFF;
     return p->input[i];
 }
-s32 SceneMenu_WaitForConfirmation(struct SceneMenu *p)
+s32 SceneMenu_WaitForConfirmation(struct LinkSelectionPrompt *p)
 {
     s32 completed, i;
     LinkSession_ConsumeStateEntry(p);
