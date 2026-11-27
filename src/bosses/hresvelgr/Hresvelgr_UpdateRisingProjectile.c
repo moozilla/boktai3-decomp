@@ -1,5 +1,6 @@
 #include "global.h"
 #include "scene/collision/contact_position.h"
+#include "bosses/vanargand/vanargand_parts.h"
 // confidence=low: launches a moving projectile and approaches the elevated rest position.
 struct Action {
     u8 state, pad[3];
@@ -69,12 +70,6 @@ static inline void PolarVector(struct ContactPosition *out, u32 angle, s32 magni
     value = gUnk_086149C4[angle] * magnitude;
     out->z = SignedShift(value, 12);
 }
-static inline void SetVector(struct ContactPosition *p, s32 x, s32 y, s32 z)
-{
-    p->x = x;
-    p->y = y;
-    p->z = z;
-}
 static inline void CopyVector(struct ContactPosition *out, struct ContactPosition *source)
 {
     *out = *source;
@@ -105,7 +100,7 @@ void Hresvelgr_UpdateRisingProjectile(struct Hresvelgr *actor)
             break;
         case 1:
             if (!action->frame) {
-                SetVector(&actor->target, saved->position.x, 832, saved->position.z);
+                Vanargand_SetVector(&actor->target, saved->position.x, 832, saved->position.z);
                 Hresvelgr_SetAnimation(actor, actor->animation, actor->animationData, 0, 1, 4);
                 action->frame++;
             }

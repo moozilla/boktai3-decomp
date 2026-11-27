@@ -1,6 +1,7 @@
 #include "global.h"
 #include "engine/engine.h"
 #include "scene/collision/contact_position.h"
+#include "scene/terrain/terrain_sampling.h"
 struct HresvelgrMotionFlags {
     u8 unknown0[6];
     u16 flags;
@@ -45,16 +46,9 @@ struct HresvelgrTerrain {
     u16 rows[1];
 };
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
-static inline s32 cellIndex(struct ContactPosition *pos)
-{
-    s32 x = pos->x >> 8, z = pos->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        return 0;
-    return gTerrainMap->rows[z] + x;
-}
 static inline s32 groundHeight(struct ContactPosition *position)
 {
-    s32 index = cellIndex(position), height;
+    s32 index = Terrain_GetCellIndex(position), height;
     u8 *cell = TerrainModifiers_FindCellOverride(index, 1);
     u32 kind;
     if (cell)

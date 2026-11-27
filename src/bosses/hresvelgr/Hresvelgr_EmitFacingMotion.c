@@ -5,6 +5,7 @@
 #include "engine/heap.h"
 #include "engine/resource_registry.h"
 #include "scene/collision/contact_position.h"
+#include "bosses/vanargand/vanargand_parts.h"
 
 /* Tentative: emit a motion entry from a randomized point ahead or behind the actor. */
 
@@ -60,13 +61,6 @@ static inline void MotionPolar(struct ContactPosition *out, s32 angle, s32 radiu
     out->x = Scale(gUnk_086149C4[(angle + 64) & 255] * radius);
     out->y = 0;
     out->z = Scale(gUnk_086149C4[angle & 255] * radius);
-}
-static inline void Difference(struct ContactPosition *out, struct ContactPosition *a,
-                              struct ContactPosition *b)
-{
-    out->x = a->x - b->x;
-    out->y = a->y - b->y;
-    out->z = a->z - b->z;
 }
 static inline void Normalize(struct ContactPosition *v, s32 speed)
 {
@@ -139,6 +133,6 @@ void Hresvelgr_SetPartApproachMotion(struct ActorReaction *actor, s32 radius, s3
         struct ContactPosition *target = actor->parts[part];
         Add(&offset, target, &offset);
     }
-    Difference(&actor->velocity, &offset, &actor->position);
+    Vanargand_Difference(&actor->velocity, &offset, &actor->position);
     Normalize(&actor->velocity, speed);
 }

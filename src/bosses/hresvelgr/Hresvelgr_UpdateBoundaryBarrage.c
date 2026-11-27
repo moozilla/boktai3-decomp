@@ -3,6 +3,7 @@
 
 #include "bosses/hresvelgr/boss_action_state.h"
 #include "engine/engine.h"
+#include "bosses/vanargand/vanargand_parts.h"
 void Hresvelgr_SetAnimation(void *, void *, void *, u32, u32, u32);
 void Actor_SetHeadingVelocity(void *, u32);
 void Hresvelgr_SpawnProjectile(void *, u32, u32);
@@ -36,12 +37,6 @@ static inline s32 RandomValue(const u16 *table)
     gRandomIndex = (gRandomIndex + 1) & 1023;
     offset = gRandomIndex * 2;
     return *(const u16 *)((u32)table + offset);
-}
-static inline void SetVector(struct ContactPosition *p, s32 x, s32 y, s32 z)
-{
-    p->x = x;
-    p->y = y;
-    p->z = z;
 }
 static inline void SetActorPosition(struct SceneVec *p, s32 x, s32 y, s32 z)
 {
@@ -114,7 +109,7 @@ void Hresvelgr_UpdateBoundaryBarrage(struct HresvelgrTravelActor *actor, u32 tic
                     s32 rawZ = RandomValue(table);
                     s32 pz = actor->position.z;
                     u32 height;
-                    SetVector(&pos, px + x - 256, 0x2000, pz + ((rawZ >> 3) % 512) - 256);
+                    Vanargand_SetVector(&pos, px + x - 256, 0x2000, pz + ((rawZ >> 3) % 512) - 256);
                     height = Terrain_SampleHeight(&pos) - 256;
                     if (height <= 0x6ff)
                         Hresvelgr_SpawnProjectile(&pos, 0, 1);

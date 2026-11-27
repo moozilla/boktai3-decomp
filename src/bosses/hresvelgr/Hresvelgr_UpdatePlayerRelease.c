@@ -4,6 +4,8 @@
 #include "engine/engine.h"
 #include "player/player.h"
 #include "scene/collision/contact_position.h"
+#include "bosses/vanargand/vanargand_parts.h"
+#include "scene/terrain/terrain_sampling.h"
 
 // confidence=low: moves a requested player position and eventually restores player control.
 struct Action {
@@ -55,24 +57,11 @@ static inline u32 PlayerHasFlag(struct Player *p, u32 mask)
 {
     return p->statusFlags & mask;
 }
-static inline void SetVector(struct ContactPosition *p, s32 x, s32 y, s32 z)
-{
-    p->x = x;
-    p->y = y;
-    p->z = z;
-}
 static inline void AddVector(struct ContactPosition *out, struct ContactPosition *a, struct ContactPosition *b)
 {
     out->x = b->x + a->x;
     out->y = b->y + a->y;
     out->z = b->z + a->z;
-}
-static inline s32 CellIndex(struct ContactPosition *p)
-{
-    s32 x = p->x >> 8, z = p->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        return 0;
-    return gTerrainMap->rows[z] + x;
 }
 static inline u8 *CellProperties(s32 cell)
 {
@@ -83,7 +72,7 @@ static inline u8 *CellProperties(s32 cell)
 }
 static inline s32 Height(struct ContactPosition *p)
 {
-    u8 *cell = CellProperties(CellIndex(p));
+    u8 *cell = CellProperties(Terrain_GetCellIndex(p));
     u32 shape = *cell >> 4;
     s32 height = (*cell & 15) << 8;
     switch (shape) {
@@ -119,7 +108,7 @@ static inline void FindReleaseTarget(void *object, struct ContactPosition *out)
     struct Hresvelgr *actor = object;
     u32 blockedMask = 0x81;
     if (out) {
-        s32 cell = CellIndex(&actor->position);
+        s32 cell = Terrain_GetCellIndex(&actor->position);
         if (!((*((u16 *)(CellProperties(cell) + 2))) & blockedMask)) {
             *out = actor->position;
             out->x = (out->x & (~255)) + 128;
@@ -137,7 +126,7 @@ static inline void FindReleaseTarget(void *object, struct ContactPosition *out)
                 }
             }
 
-            SetVector(out, 0xb54, 0, 0xb54);
+            Vanargand_SetVector(out, 0xb54, 0, 0xb54);
         }
     }
 }
@@ -186,7 +175,7 @@ void Hresvelgr_UpdatePlayerRelease(struct Hresvelgr *actor, u32 tick)
         case 2:
             if (!action->frame) {
                 Hresvelgr_SelectPlayerAnimation(actor, 1);
-                SetVector(&saved->step, 0, 72, 0);
+                Vanargand_SetVector(&saved->step, 0, 72, 0);
                 FindReleaseTarget(saved, &saved->target);
                 action->frame = 1;
             }
@@ -199,7 +188,7 @@ void Hresvelgr_UpdatePlayerRelease(struct Hresvelgr *actor, u32 tick)
                 u32 smallMask = 31;
                 u8 x = rawX & smallMask;
                 s32 z = ((s32)ParticleRandom_ReadDirectSample(table) >> 3) & smallMask;
-                SetVector(&delta, x - 16, 0, z - 16);
+                Vanargand_SetVector(&delta, x - 16, 0, z - 16);
                 actor->velocity = saved->step;
                 saved->step.y--;
                 if (tick & 1)
@@ -229,7 +218,7 @@ void Hresvelgr_UpdatePlayerRelease(struct Hresvelgr *actor, u32 tick)
                 const u16 *table = gRandomTable;
                 s32 x = ((s32)ParticleRandom_ReadDirectSample(table) >> 3) & 31;
                 s32 z = ((s32)ParticleRandom_ReadDirectSample(table) >> 3) & 31;
-                SetVector(&delta, x - 16, 0, z - 16);
+                Vanargand_SetVector(&delta, x - 16, 0, z - 16);
                 if (tick & 1)
                     HresvelgrMotion_CreateWithDelta(&saved->renderPosition, &delta,
                                                 ((s32)ParticleRandom_ReadSample(table) >> 5) % 4,

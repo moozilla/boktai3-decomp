@@ -1,5 +1,6 @@
 #include "global.h"
 #include "scene/collision/contact_position.h"
+#include "bosses/vanargand/vanargand_parts.h"
 struct OffsetActor {
     u8 pad0[0x54];
     struct ContactPosition position, motion;
@@ -7,13 +8,6 @@ struct OffsetActor {
     struct ContactPosition target;
 };
 s32 Math_StepTowardTarget(s32, s32, s32);
-static inline void Difference(struct ContactPosition *out, struct ContactPosition *a,
-                              struct ContactPosition *b)
-{
-    out->x = a->x - b->x;
-    out->y = a->y - b->y;
-    out->z = a->z - b->z;
-}
 void OffsetActor_StepTowardTarget(struct OffsetActor *p)
 {
     struct ContactPosition v;
@@ -25,5 +19,5 @@ void OffsetActor_StepTowardTarget(struct OffsetActor *p)
     out->x = x;
     out->y = y;
     out->z = z;
-    Difference(&p->motion, &v, &p->position);
+    Vanargand_Difference(&p->motion, &v, &p->position);
 }
