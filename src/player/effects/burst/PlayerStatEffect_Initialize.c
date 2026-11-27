@@ -1,31 +1,25 @@
+#include "player/effects/orbit_effect.h"
 #define PlayerStatEffect_SetPhase PlayerBurst_SetStateCallback
 #include "global.h"
 #include "player/player.h"
 #include "engine/engine.h"
-struct PlayerStatEffect {
-    u8 task[0x18];
-    struct Player *player;
-    u8 unknown1C[0xD8];
-    u16 step;
-    u16 targetStat;
-};
-void PlayerTransition_LoadAnimation(struct PlayerStatEffect *);
-void PlayerTransition_InitCollider(struct PlayerStatEffect *);
-void PlayerBurst_InitializeParticles(struct PlayerStatEffect *);
-void PlayerOrbitEffect_UpdateIntro(struct PlayerStatEffect *);
-void PlayerBurst_SetStateCallback(struct PlayerStatEffect *, void (*)(struct PlayerStatEffect *));
+void PlayerTransition_LoadAnimation(struct PlayerOrbitEffect *);
+void PlayerTransition_InitCollider(struct PlayerOrbitEffect *);
+void PlayerBurst_InitializeParticles(struct PlayerOrbitEffect *);
+void PlayerOrbitEffect_UpdateIntro(struct PlayerOrbitEffect *);
+void PlayerBurst_SetStateCallback(struct PlayerOrbitEffect *, void (*)(struct PlayerOrbitEffect *));
 s32 Div(s32, s32);
-s32 PlayerStatEffect_Initialize(struct PlayerStatEffect *p, struct Player *player)
+s32 PlayerStatEffect_Initialize(struct PlayerOrbitEffect *p, struct Player *player)
 {
-    p->player = player;
+    p->owner = player;
     PlayerTransition_LoadAnimation(p);
     PlayerTransition_InitCollider(p);
     PlayerBurst_InitializeParticles(p);
     PlayerBurst_SetStateCallback(p, PlayerOrbitEffect_UpdateIntro);
     gEngineFlags |= 1;
-    p->targetStat = p->player->currentStatA >> 1;
-    if (p->targetStat == 0)
-        p->targetStat = 1;
-    p->step = Div(p->player->currentStatA - p->targetStat, 72) + 1;
+    p->targetStatA = p->owner->currentStatA >> 1;
+    if (p->targetStatA == 0)
+        p->targetStatA = 1;
+    p->recoveryStep = Div(p->owner->currentStatA - p->targetStatA, 72) + 1;
     return 0;
 }
