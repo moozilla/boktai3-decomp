@@ -6,15 +6,9 @@
 #include "player/cues/player_cue.h"
 #include "player/player_slot_status.h"
 #include "link/session/link_session_state.h"
+#include "scene/collision/scene_actor_damage_visibility.h"
 
 extern struct AreaEffectLinkState *gLinkSession;
-
-static inline s32 LocalPlayer(void)
-{
-    if (!gLinkSession)
-        return -1;
-    return gLinkSession->localPlayer;
-}
 
 static inline u32 Busy(struct Player *p)
 {
@@ -62,7 +56,7 @@ s32 Player_ApplyTerrainDamage(struct Player *p)
     }
     flash = 0;
     if (p->particleEmissionCount) {
-        s32 bit = LocalPlayer();
+        s32 bit = SceneActorDamage_LocalPlayer();
         if (((s16)p->lastContactFlags >> bit) & 1)
             flash = 1;
     }
