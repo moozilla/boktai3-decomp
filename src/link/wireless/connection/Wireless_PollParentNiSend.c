@@ -21,7 +21,7 @@ void Wireless_PollParentNiSend(struct Engine *p)
         int state = slots[*slot]->send.state;
         if (state == 0x26) {
             if (p->onSend)
-                Callback_InvokeActor((u8 *)p + 0xB8, p->onSend);
+                Callback_InvokeActor(p->niSend, p->onSend);
             lost = slots[*slot]->send.bmSlotOrg ^ slots[*slot]->send.bmSlot;
             rfu_clearSlot(4, *slot);
             p->niFlags &= ~2;
