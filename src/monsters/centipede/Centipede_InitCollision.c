@@ -1,5 +1,5 @@
 #include "global.h"
-#include "recovered/packed_centipede_halfwords_layout.h"
+#include "monsters/centipede/packed_centipede_halfwords_layout.h"
 struct Z {
     struct PackedCentipedeHalfwords a, b;
 };

@@ -3,7 +3,7 @@
 #include "engine/video/display_animation.h"
 #include "engine/video/display_sprite_playback.h"
 #include "scene/terrain/terrain_cell_probe.h"
-#include "recovered/particle_emission_vector_layout.h"
+#include "effects/particles/particle_emission_vector_layout.h"
 
 /* Tentative: animate a pooled effect, integrate its velocity and stop it at terrain. */
 struct SceneColliderEffect {

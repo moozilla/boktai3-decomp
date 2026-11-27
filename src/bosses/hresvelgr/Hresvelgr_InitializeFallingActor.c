@@ -1,6 +1,6 @@
 #include "global.h"
 #include "scene/collision/contact_position.h"
-#include "recovered/fragment_effect_sprite_layout.h"
+#include "effects/bursts/fragment_effect_sprite_layout.h"
 struct HresvelgrMotion {
     u8 unknown0[0x18];
     struct FragmentEffectSprite sprite;

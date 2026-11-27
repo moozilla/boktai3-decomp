@@ -1,5 +1,5 @@
 #include "monsters/armor/scene_combat_actor.h"
-#include "recovered/contact_sample_vector_layout.h"
+#include "scene/collision/contact_sample_vector_layout.h"
 
 s32 Script_GetValue(void);
 s32 Script_SeekToKeyword(u32);

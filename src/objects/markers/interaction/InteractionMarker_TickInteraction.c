@@ -1,5 +1,5 @@
 #include "objects/markers/interaction_marker.h"
-#include "recovered/script_call_arguments_layout.h"
+#include "script/script_call_arguments_layout.h"
 void InteractionMarker_TickInteraction(struct InteractionMarker *marker)
 {
     if (marker->height > 1)

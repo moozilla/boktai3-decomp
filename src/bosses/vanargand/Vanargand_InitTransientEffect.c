@@ -1,6 +1,6 @@
 #include "global.h"
 #include "scene/collision/contact_position.h"
-#include "recovered/fragment_effect_sprite_layout.h"
+#include "effects/bursts/fragment_effect_sprite_layout.h"
 
 struct VanargandTransientEffect {
     u8 task[0x18];

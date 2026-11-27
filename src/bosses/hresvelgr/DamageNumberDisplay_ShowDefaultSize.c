@@ -1,5 +1,5 @@
 #include "global.h"
-#include "recovered/contact_reaction_vector_layout.h"
+#include "scene/collision/contact_reaction_vector_layout.h"
 /* DamageNumberDisplay_ShowDefaultSize: Shows a damage number using a fixed size vector of 32 by zero by 32 */
 
 void DamageNumberDisplay_Show(u32, u32, u32, u32, struct ContactReactionVector *, u32);

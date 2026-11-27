@@ -1,5 +1,5 @@
 #include "global.h"
-#include "effects/bursts/charged_burst/pair33_a_layout.h"
+#include "effects/bursts/pair33_a_layout.h"
 void ChargedBurst_InitCoreEffect(u8 *);
 void ChargedBurst_InitParticles(u8 *);
 void ChargedBurst_InitCollider(u8 *, u32, u32, u32);

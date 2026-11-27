@@ -1,6 +1,6 @@
 #include "monsters/muspell_head.h"
 #include "objects/hazards/animated_hazard.h"
-#include "recovered/contact_sample_vector_layout.h"
+#include "scene/collision/contact_sample_vector_layout.h"
 u32 MuspellHead_UpdateProjectileAttack(void *);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void Sound_PlaySong(u32);

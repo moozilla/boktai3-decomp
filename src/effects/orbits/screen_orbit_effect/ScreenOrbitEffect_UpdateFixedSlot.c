@@ -1,9 +1,9 @@
 #include "global.h"
 #include "engine/video/render.h"
-#include "effects/orbits/screen_orbit_effect/orbit_vec_layout.h"
+#include "effects/orbits/orbit_vec_layout.h"
 #include "scene/actor/scene_actor_control_phase.h"
-#include "effects/orbits/screen_orbit_effect/orbit_slot_layout.h"
-#include "effects/orbits/screen_orbit_effect/orbit_owner_layout.h"
+#include "effects/orbits/orbit_slot_layout.h"
+#include "effects/orbits/orbit_owner_layout.h"
 // confidence=low: projects the source and positions a timed icon around the screen center.
 extern const s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);

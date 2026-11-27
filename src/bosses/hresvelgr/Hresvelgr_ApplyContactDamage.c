@@ -2,7 +2,7 @@
 #include "engine/engine_globals.h"
 #include "engine/ram.h"
 #include "scene/collision/packed_contact_vector.h"
-#include "recovered/contact_reaction_vector_layout.h"
+#include "scene/collision/contact_reaction_vector_layout.h"
 
 struct DamageTransform {
     u8 unk_00[0xc];

@@ -26,7 +26,7 @@
 #include "scene/collision/scene_actor_delayed_response.h"
 #include "scene/actor/scene_actor_init_actor.h"
 #include "scene/motion/scene_actor_chase_shared.h"
-#include "recovered/packed_centipede_halfwords_layout.h"
+#include "monsters/centipede/packed_centipede_halfwords_layout.h"
 
 void Golem_CenterPositionInCell(struct ContactPosition *position)
 {

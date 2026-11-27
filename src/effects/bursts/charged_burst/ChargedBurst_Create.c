@@ -1,5 +1,5 @@
 #include "global.h"
-#include "effects/bursts/charged_burst/pair33_a_layout.h"
+#include "effects/bursts/pair33_a_layout.h"
 u8 *Task_Create(u32, u32);
 void Task_SetCallbacks(u8 *, void (*)(u8 *), void (*)(u8 *));
 void Task_Kill(u8 *);

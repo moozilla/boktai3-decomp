@@ -1,6 +1,6 @@
 #include "global.h"
-#include "objects/items/sprite_drop/small_callback_entry_layout.h"
-#include "objects/items/sprite_drop/small_callback_pool_layout.h"
+#include "objects/items/small_callback_entry_layout.h"
+#include "objects/items/small_callback_pool_layout.h"
 s32 Callback_InvokeActor(void *, void *);
 s32 CallbackPool_InvokeActiveSmall(struct SmallCallbackPool *pool)
 {

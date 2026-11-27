@@ -1,6 +1,6 @@
 #include "global.h"
 #include "engine/ram.h"
-#include "effects/scene/actor_effects/active_list_layout.h"
+#include "effects/scene/active_list_layout.h"
 struct EffectGroupEntry {
     u8 state, fadeTimer;
     u16 frame;

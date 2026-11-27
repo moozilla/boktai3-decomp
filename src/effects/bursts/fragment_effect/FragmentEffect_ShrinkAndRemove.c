@@ -1,7 +1,7 @@
 #include "scene/collision/contact_swarm.h"
 #include "engine/ram.h"
 #include "player/cutscene/player_cue_sequence.h"
-#include "recovered/fragment_effect_sprite_layout.h"
+#include "effects/bursts/fragment_effect_sprite_layout.h"
 #include "effects/bursts/spiral_burst.h"
 struct Fragment {
     u32 flags;

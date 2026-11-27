@@ -4,7 +4,7 @@
 #include "engine/ram.h"
 #include "engine/engine_globals.h"
 #include "scene/collision/packed_contact_vector.h"
-#include "recovered/script_call_arguments_layout.h"
+#include "script/script_call_arguments_layout.h"
 
 extern u8 *gGameState;
 

@@ -1,5 +1,5 @@
 #include "objects/warp_circle/warp_circle.h"
-#include "recovered/script_call_arguments_layout.h"
+#include "script/script_call_arguments_layout.h"
 s32 Script_Call(u32, struct ScriptCallArguments *);
 void WarpCircle_EmitScriptParticles(struct WarpCircle *actor)
 {

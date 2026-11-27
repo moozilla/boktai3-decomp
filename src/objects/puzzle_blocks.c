@@ -3,7 +3,7 @@
 #include "objects/scene_object.h"
 #include "engine/ram.h"
 #include "engine/math/monster_particle_random.h"
-#include "recovered/script_call_arguments_layout.h"
+#include "script/script_call_arguments_layout.h"
 
 static inline void scatter(u16 *coordinate, const u16 *sample)
 {

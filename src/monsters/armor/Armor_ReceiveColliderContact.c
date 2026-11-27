@@ -1,6 +1,6 @@
 #include "global.h"
 #include "scene/collision/contact_collider.h"
-#include "recovered/script_call_arguments_layout.h"
+#include "script/script_call_arguments_layout.h"
 struct ArmorContactOwner {
     u8 pad0[0xB18];
     u32 actorId;

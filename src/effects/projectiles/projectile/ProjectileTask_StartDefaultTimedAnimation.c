@@ -1,5 +1,5 @@
 #include "global.h"
-#include "effects/projectiles/projectile/projectile_event_query_layout.h"
+#include "effects/projectiles/projectile_event_query_layout.h"
 void Projectile_SetUpdateCallback(void *, void *);
 void ProjectileTask_OnDefaultTimedAnimation(void);
 s32 ProjectileTask_StartDefaultTimedAnimation(struct ProjectileEventQuery *p)

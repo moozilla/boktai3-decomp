@@ -1,5 +1,5 @@
 #include "objects/markers/saved_position_marker.h"
-#include "recovered/script_call_arguments_layout.h"
+#include "script/script_call_arguments_layout.h"
 void SavedPositionMarker_TickInteraction(struct SavedPositionMarker *marker)
 {
     if (marker->height > 1)

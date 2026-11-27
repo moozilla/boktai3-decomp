@@ -2,7 +2,7 @@
 #include "engine/engine.h"
 #include "effects/projectiles/pursuing_actor.h"
 #include "engine/ram.h"
-#include "recovered/contact_sample_vector_layout.h"
+#include "scene/collision/contact_sample_vector_layout.h"
 
 void PursuingActor_CreateHomingSlash(const struct ContactSampleVector *, s32, s32, s32, s32, s32,
                                      s32, s32, s32, s32, s32);

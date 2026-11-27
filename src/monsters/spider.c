@@ -32,7 +32,7 @@
 #include "monsters/scene_actor_init_graphics.h"
 #include "monsters/scene_actor_init_body.h"
 #include "bosses/vanargand/vanargand_projectiles.h"
-#include "recovered/packed_centipede_halfwords_layout.h"
+#include "monsters/centipede/packed_centipede_halfwords_layout.h"
 
 inline static u8 blocked2048(u8 *c)
 {

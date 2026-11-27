@@ -1,5 +1,5 @@
 #include "global.h"
-#include "recovered/script_call_arguments_layout.h"
+#include "script/script_call_arguments_layout.h"
 #include "objects/floor_switch/floor_switch_layout.h"
 void Script_Call(u32, struct ScriptCallArguments *);
 static inline void fill(struct FloorSwitch *p, s32 *values)

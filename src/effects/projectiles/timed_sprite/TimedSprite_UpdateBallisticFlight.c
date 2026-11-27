@@ -1,7 +1,7 @@
 #include "global.h"
 #include "engine/engine_globals.h"
 #include "player/cutscene/player_cue_sequence.h"
-#include "recovered/particle_emission_vector_layout.h"
+#include "effects/particles/particle_emission_vector_layout.h"
 #include "engine/video/display_sequence.h"
 struct Projectile {
     u32 flags;

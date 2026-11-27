@@ -1,4 +1,4 @@
-#include "recovered/fragment_effect_sprite_layout.h"
+#include "effects/bursts/fragment_effect_sprite_layout.h"
 #define SpriteParticle_GetOrCreatePool SceneSpriteBurst_EnsureSingleton
 #define gSpriteParticlePool            gSpriteGroup
 #include "global.h"

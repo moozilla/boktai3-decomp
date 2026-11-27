@@ -1,5 +1,5 @@
 #include "global.h"
-#include "recovered/contact_reaction_vector_layout.h"
+#include "scene/collision/contact_reaction_vector_layout.h"
 
 /* Tentative layout of a Vanargand half's damage and state fields. */
 struct PairedSceneHalf {

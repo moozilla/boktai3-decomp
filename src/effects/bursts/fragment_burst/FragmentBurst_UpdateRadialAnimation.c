@@ -1,7 +1,7 @@
 #include "global.h"
 #include "engine/video/display_sequence.h"
 #include "scene/collision/contact_position.h"
-#include "effects/bursts/fragment_burst/fragment_sprite_layout.h"
+#include "effects/bursts/fragment_sprite_layout.h"
 
 struct FragmentBurst {
     struct FragmentSprite sprites[4];

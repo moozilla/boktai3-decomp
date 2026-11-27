@@ -1,7 +1,7 @@
 #include "engine/engine.h"
 #include "engine/ram.h"
 #include "scene/collision/packed_contact_vector.h"
-#include "recovered/particle_emission_vector_layout.h"
+#include "effects/particles/particle_emission_vector_layout.h"
 struct HazardSprite {
     u32 flags;
     u8 pad4[3], priority;

@@ -3,7 +3,7 @@
 #include "engine/engine.h"
 #include "engine/ram.h"
 #include "engine/video/render.h"
-#include "recovered/fragment_effect_sprite_layout.h"
+#include "effects/bursts/fragment_effect_sprite_layout.h"
 
 struct FragmentSequence {
     const u16 *commands;

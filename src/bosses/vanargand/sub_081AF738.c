@@ -1,5 +1,5 @@
 #include "global.h"
-#include "recovered/contact_reaction_vector_layout.h"
+#include "scene/collision/contact_reaction_vector_layout.h"
 void DamageNumberDisplay_Show(u32, u32, u32, u32, struct ContactReactionVector *, u32);
 static inline void Vec_Set(struct ContactReactionVector *v, s16 x, s16 y, s16 z)
 {

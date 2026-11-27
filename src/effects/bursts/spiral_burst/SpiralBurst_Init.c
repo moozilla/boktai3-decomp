@@ -1,5 +1,5 @@
 #include "global.h"
-#include "effects/bursts/spiral_burst/pair47_layout.h"
+#include "effects/bursts/pair47_layout.h"
 void SpiralBurst_InitParticles(u8 *);
 void SpiralBurst_InitCollider(u8 *);
 s32 Div(s32, s32);

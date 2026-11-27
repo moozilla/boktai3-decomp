@@ -1,5 +1,5 @@
 #include "scene/collision/packed_contact_vector.h"
-#include "recovered/particle_emission_vector_layout.h"
+#include "effects/particles/particle_emission_vector_layout.h"
 #define gSineTable gUnk_086149C4
 #include "global.h"
 struct RatatoskFacing {

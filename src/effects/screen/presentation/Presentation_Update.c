@@ -1,7 +1,7 @@
 #include "effects/screen/presentation_sequence.h"
 #include "engine/video/render.h"
 #include "engine/input.h"
-#include "recovered/script_call_arguments_layout.h"
+#include "script/script_call_arguments_layout.h"
 // Provisional name: Presentation_Update
 void Anim_LoadKeyframe(void *, void *, s32, s32);
 void Anim_SetKeyframes(void *, void *, s32, s32, s32);

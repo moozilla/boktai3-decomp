@@ -1,7 +1,7 @@
 #include "global.h"
 #include "player/player.h"
 #include "engine/video/render.h"
-#include "recovered/contact_sample_vector_layout.h"
+#include "scene/collision/contact_sample_vector_layout.h"
 
 /* confidence=low: Initialize the Count actor from script options and create its visual and contact objects. */
 

@@ -1,5 +1,5 @@
 #include "global.h"
-#include "effects/bursts/spiral_burst/pair47_layout.h"
+#include "effects/bursts/pair47_layout.h"
 u8 *Task_Create(u32, u32);
 void Task_SetCallbacks(u8 *, void (*)(u8 *), void (*)(u8 *));
 void Task_Kill(u8 *);

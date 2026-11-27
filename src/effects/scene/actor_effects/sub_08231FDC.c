@@ -1,6 +1,6 @@
 #include "global.h"
 #include "engine/video/render.h"
-#include "effects/scene/actor_effects/effect_group_layout.h"
+#include "effects/scene/effect_group_layout.h"
 
 // confidence=low: projects the owner's position to the screen, then runs each of four parts'
 // state handlers from a table and places the active parts relative to that screen point.

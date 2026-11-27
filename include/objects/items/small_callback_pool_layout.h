@@ -2,7 +2,7 @@
 #define GUARD_INCLUDE_OBJECTS_ITEMS_SPRITE_DROP_SMALL_CALLBACK_POOL_LAYOUT_H
 
 #include "global.h"
-#include "objects/items/sprite_drop/small_callback_entry_layout.h"
+#include "objects/items/small_callback_entry_layout.h"
 
 struct SmallCallbackPool {
     u8 pad0[0x18];

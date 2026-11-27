@@ -1,6 +1,6 @@
 #include "monsters/cannons/vulcan_cannon_worker.h"
 #include "objects/hazards/animated_hazard.h"
-#include "recovered/contact_sample_vector_layout.h"
+#include "scene/collision/contact_sample_vector_layout.h"
 s32 Div(s32, s32);
 static inline void subtract(struct SceneVec *v, struct SceneVec *a, struct SceneVec *b)
 {

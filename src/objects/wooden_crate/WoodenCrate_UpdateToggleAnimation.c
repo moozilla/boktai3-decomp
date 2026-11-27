@@ -3,7 +3,7 @@
 #include "engine/video/display_sprite_playback.h"
 #include "scene/collision/contact_actor.h"
 #include "engine/ram.h"
-#include "recovered/script_call_arguments_layout.h"
+#include "script/script_call_arguments_layout.h"
 struct WoodenCrate {
     struct ContactSwarmSprite sprite;
     struct DisplaySequenceState animation;

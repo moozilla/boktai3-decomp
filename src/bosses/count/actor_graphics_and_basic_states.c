@@ -10,7 +10,7 @@
 #include "engine/math/hit_spark_random.h"
 #include "bosses/state_actor_action_entry.h"
 #include "scene/collision/contact_position.h"
-#include "recovered/contact_reaction_vector_layout.h"
+#include "scene/collision/contact_reaction_vector_layout.h"
 #include "scene/collision/packed_contact_vector.h"
 
 int SceneActorGraphics_GetResourceId(struct StateActor *p)

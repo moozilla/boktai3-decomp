@@ -1,5 +1,5 @@
 #include "global.h"
-#include "effects/scene/actor_effects/effect_group_entry_layout.h"
+#include "effects/scene/effect_group_entry_layout.h"
 struct EffectGroup {
     u8 active, unknown1[2], count;
     u8 unknown4[8];

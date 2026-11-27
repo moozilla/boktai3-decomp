@@ -1,4 +1,4 @@
-#include "effects/bursts/fragment_burst/fragment_sprite_layout.h"
+#include "effects/bursts/fragment_sprite_layout.h"
 #define SpriteGroup_CallCompletion FragmentBurst_RunCompletionScript
 #include "global.h"
 struct SpriteGroup {
