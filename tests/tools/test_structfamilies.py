@@ -347,6 +347,40 @@ int X(struct R *r, struct Q *q) { return r->old + q->old; }
             with self.assertRaisesRegex(merge.Holdout, "initializer"):
                 merge.rewrite_unit(old_text, old, new, Path("include/s.h"), "struct S")
 
+    def test_shorter_record_rewrite_requires_opt_in_and_uses_measured_fields(self):
+        path = "src/r.c"
+        old_text = "struct R { unsigned old; };\nint F(struct R *p) { return p->old + sizeof(p); }\n"
+        old = measure(old_text, path)[f"{path}:struct R"]
+        new = measure("struct S { unsigned state, tail; };", "include/s.h")["include/s.h:struct S"]
+        with patch.object(lm, "preprocess", return_value=parse(old_text, path)[0]):
+            with self.assertRaisesRegex(merge.Holdout, "size/alignment"):
+                merge.rewrite_unit(old_text, old, new, Path("include/s.h"), "struct S")
+            result = merge.rewrite_unit(old_text, old, new, Path("include/s.h"), "struct S", allow_prefix=True)
+        self.assertIn("int F(struct S *p) { return p->state + sizeof(p); }", result)
+
+    def test_shorter_record_rewrite_refuses_extent_dependent_uses(self):
+        path = "src/r.c"
+        record = "struct R { unsigned old; }; typedef struct R Alias;\n"
+        old = measure(record, path)[f"{path}:struct R"]
+        new = measure("struct S { unsigned state, tail; };", "include/s.h")["include/s.h:struct S"]
+        for use in (
+            "unsigned F(Alias *p) { return sizeof(Alias); }",
+            "unsigned F(Alias *p) { return sizeof(*p); }",
+            "unsigned F(void) { Alias item; return item.old; }",
+            "unsigned F(void) { Alias items[2]; return items[1].old; }",
+            "unsigned F(Alias *p) { return p[1].old; }",
+            "unsigned F(Alias *p) { return (p + 1)->old; }",
+            "unsigned F(Alias *p) { p += 1; return p->old; }",
+            "unsigned F(Alias *p) { return (++p)->old; }",
+            "unsigned F(Alias *p, Alias *q, int c) { return (c ? p : q)[1].old; }",
+            "unsigned F(Alias *p, Alias *q) { return p - q; }",
+        ):
+            with self.subTest(use=use):
+                text = record + use
+                with patch.object(lm, "preprocess", return_value=parse(text, path)[0]):
+                    with self.assertRaisesRegex(merge.Holdout, "uses the private extent"):
+                        merge.rewrite_unit(text, old, new, Path("include/s.h"), "struct S", allow_prefix=True)
+
     def test_union_preserves_deliberate_overlays(self):
         text = TYPES + "union W { unsigned word; u16 halves[2]; };\n"
         views = [next(iter(measure(text, f"src/{i}.c").values())) for i in range(2)]

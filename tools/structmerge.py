@@ -18,6 +18,7 @@ import layoutmerge as lm
 import ramlayout
 import struct_evidence as evidence
 import structfamilies as families
+from pycparser import c_ast
 from pycparser.c_parser import ParseError
 
 
@@ -292,9 +293,83 @@ def member_edits(text, pre, refs, view, mapping, span):
     return edits
 
 
-def rewrite_unit(text, old, new, header, spell):
+class PrefixUses(evidence.References):
+    """Reject uses that depend on the private record's complete size."""
+
+    def __init__(self, ast, tu, view):
+        self.key = view["id"]
+        super().__init__(ast, tu, view["file"])
+
+    def reject(self, node, use):
+        raise Holdout(f"line {node.coord.line} uses the private extent ({use})")
+
+    def check_type(self, node, decl):
+        t = self.resolve(decl)
+        if evidence.record_of(self.tu, t) == self.key:
+            self.reject(node, "record by value")
+        if isinstance(t, (c_ast.ArrayDecl, c_ast.FuncDecl)):
+            self.check_type(node, t.type)
+        if isinstance(t, c_ast.PtrDecl) and isinstance(self.resolve(t.type), c_ast.ArrayDecl):
+            self.check_type(node, t.type)
+
+    def visit_FuncDef(self, node):
+        self.visit(node.decl)
+        super().visit_FuncDef(node)
+
+    def visit_Decl(self, node):
+        self.check_type(node, node.type)
+        super().visit_Decl(node)
+
+    def visit_Typename(self, node):
+        self.check_type(node, node.type)
+        self.generic_visit(node)
+
+    def visit_FuncDecl(self, node):
+        self.check_type(node, node.type)
+        self.generic_visit(node)
+
+    def pointer(self, expr):
+        t = self.resolve(self.expr_type(expr))
+        if t is not None:
+            return self.pointee(t) == self.key
+        if isinstance(expr, c_ast.StructRef):
+            # An unresolved member might itself hold a pointer to this record.
+            return self.pointer(expr.name)
+        if isinstance(expr, c_ast.FuncCall):
+            t = self.resolve(self.expr_type(expr.name))
+            if isinstance(t, c_ast.PtrDecl):
+                t = self.resolve(t.type)
+            return isinstance(t, c_ast.FuncDecl) and self.pointee(t.type) == self.key
+        if isinstance(expr, c_ast.UnaryOp):
+            return expr.op in {"++", "--", "p++", "p--"} and self.pointer(expr.expr)
+        return any(self.pointer(child) for _, child in expr.children())
+
+    def visit_ArrayRef(self, node):
+        if self.pointer(node.name) or self.pointer(node.subscript):
+            self.reject(node, "record subscript")
+        self.generic_visit(node)
+
+    def visit_BinaryOp(self, node):
+        if node.op in {"+", "-"} and (self.pointer(node.left) or self.pointer(node.right)):
+            self.reject(node, "scaled pointer arithmetic")
+        self.generic_visit(node)
+
+    def visit_Assignment(self, node):
+        if node.op in {"+=", "-="} and self.pointer(node.lvalue):
+            self.reject(node, "scaled pointer assignment")
+        self.generic_visit(node)
+
+    def visit_UnaryOp(self, node):
+        if node.op in {"++", "--", "p++", "p--", "*"} and self.pointer(node.expr):
+            self.reject(node, "pointer update or whole-record dereference")
+        self.generic_visit(node)
+
+
+def rewrite_unit(text, old, new, header, spell, *, allow_prefix=False):
     """Replace one file-scope declaration and the member uses bound to it."""
-    if (old["size"], old["align"]) != (new["size"], new["align"]):
+    prefix = (allow_prefix and old["kind"] == new["kind"] == "struct"
+              and old["size"] < new["size"] and old["align"] == new["align"])
+    if not prefix and (old["size"], old["align"]) != (new["size"], new["align"]):
         raise Holdout(f"private size/alignment {old['size']:#x}/{old['align']} differs from shared "
                       f"{new['size']:#x}/{new['align']}")
     spans = [r for r in inline_twins.records(text) if r.kind == old["kind"]
@@ -312,7 +387,7 @@ def rewrite_unit(text, old, new, header, spell):
     same_sequence = [(m["name"], type_key(m)) for m in old["members"]] == [
         (m["name"], type_key(m)) for m in new["members"]]
     edits = []
-    if not same_sequence or any(name != new_name for name, new_name in mapping.items()):
+    if prefix or not same_sequence or any(name != new_name for name, new_name in mapping.items()):
         pre = lm.preprocess(old["file"])
         if pre is None:
             raise Holdout("preprocessing failed")
@@ -324,7 +399,7 @@ def rewrite_unit(text, old, new, header, spell):
             raise Holdout(f"body parse failed: {error}")
         if not same_sequence and has_initializers(ast, tu, old["id"], old["file"]):
             raise Holdout("aggregate initializer needs a positional layout review")
-        refs = evidence.References(ast, tu, old["file"])
+        refs = PrefixUses(ast, tu, old) if prefix else evidence.References(ast, tu, old["file"])
         edits = member_edits(text, pre, refs, old, mapping, span)
     replacement = f"typedef {spell} {span.name};\n" if span.typedef else ""
     edits.append((span.start, span.end, replacement))
@@ -446,7 +521,7 @@ def convert(catalog, family, args):
                 raise Holdout("source changed since scan; rescan the tree")
             if len(items) != 1:
                 raise Holdout("multiple family declarations in one unit need joint scope review")
-            proposals[rel] = rewrite_unit(text, items[0], new, header, spell)
+            proposals[rel] = rewrite_unit(text, items[0], new, header, spell, allow_prefix=args.allow_prefix)
             if not args.apply:
                 print(f"PROPOSED {rel}")
         except (Holdout, OSError) as exc:
@@ -506,6 +581,8 @@ def main(argv=None):
     ap.add_argument("--name", help="new shared tag")
     ap.add_argument("--header", type=Path, help="new header path below include/")
     ap.add_argument("--use-shared", help="reuse a related existing type instead of generating a header")
+    ap.add_argument("--allow-prefix", action="store_true",
+                    help="allow shorter pointer-only struct views after reviewing evidence of object identity")
     ap.add_argument("-j", type=int, default=2, help="parallel header-dependent checks")
     args = ap.parse_args(argv)
     if args.j < 1 or args.use_shared and (args.name or args.header):
