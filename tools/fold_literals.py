@@ -18,8 +18,8 @@ Two shapes are folded, each with its declaration alone on its line:
     u32 mask;  ...  mask = 0x40;     (a bare declaration, then one literal assignment)
 
 The value must fit the local's type (`u8 x = 0x1FF` would change the value), except a negative
-or `~` literal of an unsigned local whose read is an operand of `&`, `|` or `^`, where the
-conversion is the same. Not folded: a read under `sizeof`, a negative literal after `+` or `-`
+or `~` literal of an unsigned word whose read is an operand of `&`, `|` or `^`, where the
+word's bits are the same. Not folded: a read under `sizeof`, a negative literal after `+` or `-`
 (that is `subtract-negative`'s form), a local declared twice in the function, anything inside
 `#ifdef NONMATCHING` or a macro, and a fold that gives the linter a new finding (`off = 0x8D0`
 read as `(u8 *)p + off` would become a raw-offset error). Locals the linter excuses with
@@ -31,6 +31,8 @@ import argparse
 import os
 import re
 import sys
+from collections import defaultdict
+from dataclasses import dataclass
 
 TOOLS = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, TOOLS)
@@ -50,11 +52,10 @@ ASSIGN = r"^[ \t]*{0}\s*=\s*(" + LIT + r")\s*;[ \t]*\n"
 
 def value(lit):
     s = re.sub(r"\s+", "", lit).rstrip("uUlL")
-    if s.startswith("~"):
-        return ~int(s[1:], 0)
-    if s.startswith("-"):
-        return -int(s[1:], 0)
-    return int(s, 0)
+    op = s[0] if s.startswith(("~", "-")) else ""
+    digits = s[len(op):]
+    v = int(digits, 16 if digits.lower().startswith("0x") else 8 if digits.startswith("0") else 10)
+    return ~v if op == "~" else -v if op == "-" else v
 
 
 def type_range(decl_type):
@@ -79,13 +80,30 @@ def address_or_size(before):
     return re.search(r"(?:^|[(,=?:;{}]|\breturn)\s*&$", before) is not None
 
 
-def candidates(text, rel=None, every=False):
-    """[(new text, description)] for each single-use literal local the linter warns about (EVERY:
-    also a local read more than once, the literal written at every read)."""
+@dataclass(frozen=True)
+class Fold:
+    name: str
+    literal: str
+    uses: tuple
+    edits: tuple
+    description: str
+    number: int | None = None
+
+
+def edit_text(text, edits):
+    for start, end, replacement in sorted(edits, reverse=True):
+        text = text[:start] + replacement + text[end:]
+    return text
+
+
+def folds(text, rel=None, every=False, *, sites=None):
+    """Map linter offsets to individual folds, or all reads of a binding with EVERY."""
     code = keepcheck.blank_comments(text)
     drafts = keepcheck.draft_ranges(text)
-    warned = {s.line for s in concessions.sites(text, rel, kinds=("literal-local", "const-local")) if not s.excused}
-    out = []
+    if sites is None:
+        sites = concessions.sites(text, rel, kinds=("literal-local", "const-local"), split_locals=True)
+    warned = {s.offset for s in sites if not s.excused}
+    out = {}
     for fstart, fend, fname in keepcheck.function_spans(text):
         if keepcheck.in_ranges(fstart, drafts):
             continue
@@ -93,7 +111,8 @@ def candidates(text, rel=None, every=False):
             indent, dtype, base, name, lit = d.groups()
             if base in ("return", "goto", "case", "else") or dtype.split()[-1] == name:
                 continue
-            line = decl_line = text.count("\n", 0, d.start()) + 1
+            line = text.count("\n", 0, d.start()) + 1
+            offsets = {d.start(4)}
             body_end = concessions._scope_end(code, d.end())
             cut = [(d.start(), d.end())]
             if lit is None:  # u32 mask; ... mask = 0x40;
@@ -104,12 +123,13 @@ def candidates(text, rel=None, every=False):
                 if not a or a.start(1) < first[0]:
                     continue
                 line = text.count("\n", 0, a.start()) + 1
+                offsets.add(first[0])
                 lit = a.group(1)
                 cut.append((a.start(), a.end()))
                 lo = a.end()
             else:
                 lo = d.end()
-            if line not in warned and decl_line not in warned:  # const-local warns at the declaration
+            if not offsets & warned:  # const-local warns at the declaration
                 continue
             uses = reads(code, name, lo, body_end)
             if not uses or (len(uses) != 1 and not every) \
@@ -118,7 +138,10 @@ def candidates(text, rel=None, every=False):
             if re.search(r"\b(?:\w+\s+)+\**\s*%s\s*[=;,\[)]" % re.escape(name), code[fstart:fend].replace(
                     code[d.start():d.end()], "", 1)):
                 continue  # declared again (shadowed) or a parameter of the same name
-            v = value(lit)
+            try:
+                v = value(lit)
+            except ValueError:
+                continue
             rng = type_range(dtype)
             if rng is None:
                 continue
@@ -133,7 +156,7 @@ def candidates(text, rel=None, every=False):
                 if not rng[0] <= v <= rng[1]:
                     bitwise = re.search(r"(?:[&|^]=?)$", before) and not before.endswith(("&&", "||")) \
                         or re.match(r"[&|^](?![&|])", after)
-                    if not (negative and rng[0] == 0 and bitwise):
+                    if not (negative and rng == (0, 0xFFFFFFFF) and bitwise):
                         ok = False
                         break
                 if address_or_size(before):
@@ -144,14 +167,118 @@ def candidates(text, rel=None, every=False):
                     break
             if not ok:
                 continue
-            new = text
-            for use in sorted(uses, reverse=True):
-                new = new[:use] + re.sub(r"\s+", "", lit) + new[use + len(name):]
-            for a, b in sorted(cut, reverse=True):
-                new = new[:a] + new[b:]
+            edits = [(a, b, "") for a, b in cut]
+            edits.extend((use, use + len(name), re.sub(r"\s+", "", lit)) for use in uses)
             where = "its one use" if len(uses) == 1 else f"its {len(uses)} uses"
-            out.append((new, f"{rel}:{line}: {name} = {lit} folded into {where} in {fname}"))
+            fold = Fold(name, lit, tuple(uses), tuple(sorted(edits)),
+                        f"{rel}:{line}: {name} = {lit} folded into {where} in {fname}")
+            for offset in sorted(offsets & warned):
+                out[offset] = fold
     return out
+
+
+def grouped_folds(text, rel, offsets, *, resolve_constant=None):
+    """Plan remaining literal bindings in grouped declarations or sibling scopes."""
+    code = keepcheck.blank_comments(text)
+    declarations = list(concessions._local_declarations(code))
+    bindings = defaultdict(list)
+    for group in declarations:
+        for name, pos, _, _ in group:
+            bindings[name].append(pos)
+    out = {}
+    for group in declarations:
+        first = group[0][1]
+        start = max(code.rfind(c, 0, first) for c in "\n;{}") + 1
+        dtype = code[start:first].strip()
+        if not re.fullmatch(r"(?:(?:register|const)\s+)*(?:(?:signed|unsigned)\s+)?\w+", dtype):
+            continue
+        bounds = type_range(dtype)
+        if bounds is None:
+            continue
+        end = group[-1][2]
+        limit = concessions._scope_end(code, end)
+        for index, (name, pos, stop, initialized) in enumerate(group):
+            previous = group[index - 1][2] if index else first
+            if initialized is False or (previous != pos and not code[previous:pos].isspace()):
+                continue
+            if initialized and pos not in offsets:
+                continue
+            shadows = [(offset, concessions._scope_end(code, offset))
+                       for offset in bindings[name] if stop <= offset < limit]
+            uses = [use for use in reads(code, name, stop, limit)
+                    if not any(begin <= use < finish for begin, finish in shadows)]
+            if not uses:
+                continue
+            if len(group) == 1:
+                cuts = [(start, stop, "")]
+            elif index == len(group) - 1:
+                cuts = [(previous - 1, stop - 1, "")]
+            else:
+                cuts = [(pos, stop, "")]
+            key = pos
+            if initialized:
+                lit = re.fullmatch(r"\s*=\s*(.+?)\s*", code[pos + len(name):stop - 1], re.S)
+                # The declarator itself and any following declarator's read
+                # stay in the same scope. Replacing the latter is safe.
+            else:
+                at = uses[0]
+                if at not in offsets and pos not in offsets:
+                    continue
+                if (code[end:at].rstrip()[-1:] not in ("", ";", "}") or
+                        concessions._scope_end(code, at) != limit or
+                        re.search(r"\bgoto\b", code[end:at])):
+                    continue
+                lit = re.match(r"\s*=(?!=)\s*([^;{}]+?)\s*;", code[at + len(name):limit])
+                if not lit:
+                    continue
+                cuts.append((at, at + len(name) + lit.end(), ""))
+                uses = uses[1:]
+                key = pos if pos in offsets else at
+            if not lit or not uses or key not in offsets:
+                continue
+            literal = lit[1].strip()
+            numeric = re.fullmatch(LIT, literal)
+            if numeric:
+                try:
+                    number = value(literal)
+                except ValueError:
+                    continue
+            elif (resolve_constant and concessions._is_constant_arg(literal)
+                  and not re.search(r"(?m)^[ \t]*#", code[pos:limit])
+                  and not any(pos <= declaration < limit
+                              for token in re.findall(r"\b[A-Za-z_]\w*\b", literal)
+                              for declaration in bindings[token])):
+                number = resolve_constant(literal)
+            else:
+                number = None
+            if number is None:
+                continue
+            if not numeric or not bounds[0] <= number <= bounds[1]:
+                # Write the same converted value even when the literal has
+                # a different width or signedness from the local.
+                ctype = re.sub(r"\b(?:const|register)\s+", "", dtype)
+                replacement = f"(({ctype})({literal}))"
+            else:
+                replacement = re.sub(r"\s+", "", literal)
+            for use in uses:
+                before = code[:use].rstrip()
+                after = code[use + len(name):].lstrip()
+                if (address_or_size(before) or re.search(r"(?:\+\+|--)$", before)
+                        or re.match(r"(?:[-+*/%&|^]|<<|>>)?=(?!=)|\+\+|--", after)
+                        or re.match(r"\s*#", code[code.rfind("\n", 0, use) + 1:use])
+                        or (replacement.startswith("-") and before.endswith(("+", "-")))):
+                    break
+            else:
+                edits = cuts + [(use, use + len(name), replacement) for use in uses]
+                line = code.count("\n", 0, key) + 1
+                out[key] = Fold(name, literal, tuple(uses), tuple(sorted(edits)),
+                                f"{rel}:{line}: fold {name} at its {len(uses)} reads", number)
+    return out
+
+
+def candidates(text, rel=None, every=False):
+    """[(new text, description)] for the folds selected by this tool."""
+    return [(edit_text(text, fold.edits), fold.description) for fold in folds(text, rel, every).values()]
 
 
 def adds_concession(old, new, rel):

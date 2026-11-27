@@ -56,6 +56,10 @@ the README badges. Use `python3 tools/progress.py` for the current figures and
 | Report | every function in one of ~490 subsystem units under 11 categories plus Libraries ([REPORT_SUBSYSTEMS.md](REPORT_SUBSYSTEMS.md)); main-only CI publishes to decomp.dev |
 | Source port | 249 randomized checkpoint movies match the ROM after the wasm ABI repair and with the pending source return patches applied together. Run `make port-verify` for the short recorded suite. [Conformance evidence and pending source repairs](../notes/autopilot-port-conformance_2026-11-26.md). |
 
+The [plain literal probe](../notes/plainprobe_2026-11-27.md) records independent stock-compiler
+verdicts and typed ROM flag order by field. Its load-first single-use controls show
+why a direct-expression mismatch alone needs a ROM check before an accessor is recovered.
+
 Recent (details in [docs/history/](history/README.md) and the notes they link):
 
 * **2026-11-22 to 23, Claude warning run** (PRs 1056 to 1060): subsystem workers recover
