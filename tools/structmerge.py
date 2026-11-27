@@ -543,7 +543,7 @@ def rewrite_unit(text, old, new, header, spell, *, allow_prefix=False):
 
 def rewrite_records(text, targets, header, *, allow_prefix=False):
     """Plan each record's edits against the original translation unit."""
-    spans = inline_twins.records(text)
+    spans = inline_twins.records(text, tagged_typedefs=True)
     drafts = keepcheck.draft_ranges(text)
     mask = keepcheck.blank_comments(text)
     edits = []

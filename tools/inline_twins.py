@@ -133,7 +133,9 @@ RECORD_TAIL = re.compile(
 )
 
 
-def records(text, path=""):
+def records(text, path="", *, tagged_typedefs=False):
+    """File-scope records. `typedef struct T {...} U;` spells two names; only the
+    struct tools, which rewrite both, ask for it with TAGGED_TYPEDEFS."""
     code = blank_comments(text)
     out = []
     for m in RECORD.finditer(code):
@@ -143,7 +145,7 @@ def records(text, path=""):
             continue
         typedef, kind, tag = bool(m.group(1)), m.group(2), m.group(3)
         if typedef:
-            if not tail["alias"]:
+            if not tail["alias"] or (tag and not tagged_typedefs):
                 continue
             name = tail["alias"]
         else:
