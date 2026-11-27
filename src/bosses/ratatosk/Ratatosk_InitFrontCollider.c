@@ -1,8 +1,6 @@
+#include "scene/collision/packed_contact_vector.h"
 #define gSineTable gUnk_086149C4
 #include "global.h"
-struct ColliderVector {
-    s32 x : 16, y : 16, z : 16, pad : 16;
-};
 struct RatatoskPosition {
     s16 x, y, z, pad;
 };
@@ -39,7 +37,7 @@ void Ratatosk_InitFrontCollider(struct Ratatosk *p)
 {
     struct RatatoskFacing *facing = &p->facing;
     void *collider = p->frontCollider;
-    struct ColliderVector size, offset;
+    struct PackedContactVector size, offset;
     struct RatatoskPosition pos;
     size.x = 96;
     size.y = 128;

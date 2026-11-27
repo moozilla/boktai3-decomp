@@ -2,10 +2,8 @@
 #include "engine/math/monster_particle_random.h"
 #include "engine/engine.h"
 #include "scene/collision/contact_actor.h"
+#include "scene/collision/packed_contact_vector.h"
 
-struct DebrisVelocity {
-    s32 x : 16, y : 16, z : 16, pad : 16;
-};
 struct ChargedBurst {
     u8 unknown0[0x18];
     struct ContactPosition position;
@@ -58,7 +56,7 @@ void ChargedBurst_EmitTerminalDebris(struct ChargedBurst *object)
     if (++object->timer > 15) {
         u32 height = object->height;
         if (height > TerrainHeight(&object->position)) {
-            struct DebrisVelocity velocity, extent;
+            struct PackedContactVector velocity, extent;
             const u16 *table = gRandomTable;
             u32 sample;
             sample = ParticleRandom_ReadDirectSample(table);

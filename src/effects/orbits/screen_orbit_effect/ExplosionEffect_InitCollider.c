@@ -1,14 +1,13 @@
 #include "global.h"
-struct Vec {
-    s32 x : 16, y : 16, z : 16;
-};
-void Collider_Init(u8 *, u32, u32, u32, u32, struct Vec *, struct Vec *);
+#include "scene/collision/packed_contact_vector.h"
+void Collider_Init(u8 *, u32, u32, u32, u32, struct PackedContactVector *,
+                   struct PackedContactVector *);
 void Collider_SetAttackProperties(u8 *, s32, s32, s32, s32, s32);
 void Collider_SetCallback(u8 *, u32, u8 *);
 void ExplosionEffect_InitCollider(u8 *owner, u8 *emitter, u32 flag, s32 duration, s32 arg4,
                                   s32 arg5, s32 arg6)
 {
-    struct Vec scale, offset;
+    struct PackedContactVector scale, offset;
     u32 type;
     scale.x = 128;
     scale.y = 128;

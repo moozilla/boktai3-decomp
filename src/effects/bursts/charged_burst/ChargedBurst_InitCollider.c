@@ -1,15 +1,14 @@
 #include "global.h"
-struct Vec339 {
-    u32 x : 16, y : 16, z : 16;
-};
-void Collider_Init(u8 *, s32, s32, s32, s32, struct Vec339 *, struct Vec339 *);
+#include "scene/collision/packed_contact_vector.h"
+void Collider_Init(u8 *, s32, s32, s32, s32, struct PackedContactVector *,
+                   struct PackedContactVector *);
 void Collider_SetAttackProperties(u8 *, s32, s32, s32, s32, s32);
 void Collider_SetCallback(u8 *, void *, u8 *);
 void Collider_SetPosition(u8 *, u8 *, s32);
 void ChargedBurst_InitCollider(u8 *p, u32 id, s32 a, s32 b)
 {
-    struct Vec339 scale;
-    struct Vec339 position;
+    struct PackedContactVector scale;
+    struct PackedContactVector position;
     u8 *q = p + 0x20;
     scale.x = 100;
     scale.y = 100;

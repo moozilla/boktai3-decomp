@@ -1,10 +1,8 @@
 #include "global.h"
 #include "engine/engine_globals.h"
 #include "engine/ram.h"
+#include "scene/collision/packed_contact_vector.h"
 
-struct PackedVector {
-    s32 x : 16, y : 16, z : 16, pad : 16;
-};
 struct ShortVector {
     s16 x, y, z, pad;
 };
@@ -82,7 +80,7 @@ static inline s32 nextRandom(const u16 *table)
 }
 static inline void spawnSparks(struct HresvelgrDamage *p)
 {
-    struct PackedVector size;
+    struct PackedContactVector size;
     s32 angle, count, speed;
     const u16 *table;
     size.x = 256;
@@ -127,7 +125,7 @@ static inline void emitDebris(void *emitter)
     int i;
 
     for (i = 0; i < 2; i++) {
-        struct PackedVector delta = {0};
+        struct PackedContactVector delta = {0};
         const u16 *table = gRandomTable;
         delta.x = (nextRandom(table) & 15) - 8;
         delta.y = nextRandom(table) & 7;

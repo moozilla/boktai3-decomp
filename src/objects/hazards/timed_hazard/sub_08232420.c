@@ -1,10 +1,8 @@
 #include "engine/engine.h"
 #include "engine/ram.h"
+#include "scene/collision/packed_contact_vector.h"
 struct HazardVec {
     s16 x, y, z, pad;
-};
-struct HazardPackedVec {
-    s32 x : 16, y : 16, z : 16, pad : 16;
 };
 struct HazardSprite {
     u32 flags;
@@ -48,7 +46,7 @@ static inline struct Cell *getCell(s32 index)
 }
 s32 sub_08232420(s32 id, s32 flags, s32 delay, s32 health, struct HazardVec *position)
 {
-    struct HazardPackedVec size, offset;
+    struct PackedContactVector size, offset;
     struct TimedHazard *p;
     struct HazardVec *pos;
     void *resource;
@@ -150,7 +148,7 @@ int Script_GetValue(void);
 // Provisional name: TimedHazard_CreateFromScript (hidden function, confidence low)
 s32 sub_0823269C(void)
 {
-    struct HazardPackedVec position;
+    struct PackedContactVector position;
     s32 id, flags, delay, health;
     id = Script_GetKeywordValue('t', 0);
     flags = Script_GetKeywordValue('f', 0);

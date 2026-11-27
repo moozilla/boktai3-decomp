@@ -1,8 +1,6 @@
 #include "global.h"
 #include "engine/ram.h"
-struct PackedVec {
-    s32 x : 16, y : 16, z : 16, pad : 16;
-};
+#include "scene/collision/packed_contact_vector.h"
 struct DropEntry {
     u8 pad0[0x1C];
     u32 renderFlags;
@@ -25,8 +23,9 @@ struct DropManager *SpriteDrop_CreateManager(void);
 s32 Terrain_GetCellClearance(void *);
 void SpriteDrop_UpdateEntry(struct DropEntry *);
 void SpriteDrop_OnExpire(struct DropEntry *);
-void SpatialIndex_InitEntry(void *, struct PackedVec *, struct PackedVec *, struct PackedVec *, s32,
-                            s32, s32, s32, s32, void (*)(struct DropEntry *), struct DropEntry *);
+void SpatialIndex_InitEntry(void *, struct PackedContactVector *, struct PackedContactVector *,
+                            struct PackedContactVector *, s32, s32, s32, s32, s32,
+                            void (*)(struct DropEntry *), struct DropEntry *);
 u32 Anim_SetSequence(void *, void *, u32, u32, u32);
 
 #define E (m->entries[i])
@@ -43,7 +42,7 @@ s32 sub_081160CC(s32 x, s32 y, s32 kind)
         m = gCompactParticlePool;
     for (i = 0; i < 16; i++) {
         if (!E.active) {
-            struct PackedVec size, offset, position;
+            struct PackedContactVector size, offset, position;
             s32 clearance, duration;
             struct DropEntry *e;
             E.x = x << 3;

@@ -1,7 +1,5 @@
 #include "global.h"
-struct SparkParticleExtent {
-    s32 x : 16, y : 16, z : 16, padding : 16;
-};
+#include "scene/collision/packed_contact_vector.h"
 struct SparkParticleSource {
     u8 unknown[0x94];
     u8 position[8];
@@ -9,7 +7,7 @@ struct SparkParticleSource {
 void SparkParticle_Spawn(void *, s32, void *, s32, s32, s32, s32, s32);
 void SparkParticleSource_Emit(struct SparkParticleSource *source)
 {
-    struct SparkParticleExtent extent;
+    struct PackedContactVector extent;
     extent.x = 160;
     extent.y = 0;
     extent.z = 160;

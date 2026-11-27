@@ -1,11 +1,9 @@
 #include "global.h"
 #include "engine/engine.h"
-struct MotionPackedVector {
-    s32 x : 16, y : 16, z : 16;
-};
+#include "scene/collision/packed_contact_vector.h"
 void Hresvelgr_InitializeMotionCollider(u8 *p)
 {
-    struct MotionPackedVector size, offset;
+    struct PackedContactVector size, offset;
     size.x = 64;
     size.y = 64;
     size.z = 64;

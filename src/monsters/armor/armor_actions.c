@@ -3,6 +3,7 @@
 #include "player/player.h"
 #include "engine/ram.h"
 #include "engine/engine_globals.h"
+#include "scene/collision/packed_contact_vector.h"
 
 extern u8 *gGameState;
 
@@ -387,18 +388,15 @@ struct ArmorTargetFacingActor {
     u8 state, timer;
 };
 
-struct ArmorTargetFacingActorPackedPosition {
-    u32 x : 16, y : 16, z : 16, unused : 16;
-};
 
-s32 Terrain_ApplyBlocked(void *, void *, struct ArmorTargetFacingActorPackedPosition *);
+s32 Terrain_ApplyBlocked(void *, void *, struct PackedContactVector *);
 
 u32 NavMesh_SteerCardinal(void *, void *, u32, u32);
 
 
 void Armor_UpdateTargetFacing(struct ArmorTargetFacingActor *p)
 {
-    struct ArmorTargetFacingActorPackedPosition pos;
+    struct PackedContactVector pos;
     if ((p->timer & 3) == 0) {
         u8 *target = gGameState;
         pos.x = *(u16 *)(target + 0x30);

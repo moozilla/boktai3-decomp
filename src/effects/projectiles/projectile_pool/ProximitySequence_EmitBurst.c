@@ -3,6 +3,7 @@
 #include "engine/video/display_animation.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
+#include "scene/collision/packed_contact_vector.h"
 struct ProximitySequence {
     u8 pad0[0x3c];
     struct SceneVec position;
@@ -22,11 +23,6 @@ void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void *SpriteEffectController_Create(void *, void *, u32, u32, u32, u32, u32, u32, u32, u32, u32,
                                     u32, s32, s32, u32, s32, u32, u32);
 
-struct BurstVelocity {
-    s32 x : 16;
-    s32 y : 16;
-    s32 z : 16;
-};
 static inline s32 ProximitySequence_NextSpread(const u16 *table)
 {
     u32 offset;
@@ -46,7 +42,7 @@ static inline void ProximitySequence_RaiseOrigin(struct SceneVec *p)
 s32 ProximitySequence_EmitBurst(struct ProximitySequence *p)
 {
     struct SceneVec position;
-    struct BurstVelocity velocity;
+    struct PackedContactVector velocity;
     u32 attributes, palette;
     s32 random, base;
     ProximitySequence_CopyPosition(&position, &p->position);

@@ -1,11 +1,6 @@
 #include "global.h"
 #include "engine/ram.h"
-struct CollisionPoint {
-    s32 x : 16;
-    s32 y : 16;
-    s32 z : 16;
-    s32 pad : 16;
-};
+#include "scene/collision/packed_contact_vector.h"
 struct Col {
     u8 pad0[0x1C];
     u32 renderFlags;
@@ -51,7 +46,7 @@ s32 sub_08115AC8(s32 x, s32 y, s32 type, s32 hp)
     }
     for (i = 0; i < 48; i++) {
         if (!m->entries[i].st.active) {
-            struct CollisionPoint pos, size, offset;
+            struct PackedContactVector pos, size, offset;
             s32 range, seq, flip;
             s32 clearance;
             m->entries[i].st.x = x << 3;
