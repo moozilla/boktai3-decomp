@@ -1,40 +1,28 @@
-#define Sprite_SetOffsets Effect_SetOrigin
-#include "global.h"
-struct SpriteGroupEntry {
-    u8 sprite[0x28];
-    u8 active;
-    u8 unknown29[7];
-};
-struct SpriteGroup {
-    u8 unknown0[0x40];
-    u32 state;
-    void *resource;
-    struct SpriteGroupEntry entries[4];
-};
+#include "effects/projectiles/timed_effect_manager.h"
 void *AnimData_FindEntry(s32);
 void ParticleSprite_Initialize(void *, void *, u32);
 void Effect_SetOrigin(void *, s32, s32);
 void SpriteDrawable_SelectTileFrame(void *, void *, u32);
 void Effect_SetPalette(void *, u32);
-void SpriteGroup_InitFourSprites(struct SpriteGroup *p, u32 animation)
+void SpriteGroup_InitFourSprites(struct TimedEffectManager *manager, u32 animation)
 {
     u8 *active;
-    struct SpriteGroupEntry *entry;
+    struct TimedEffectTrail *entry;
     s32 i;
     s32 offset;
-    p->state = 0;
-    p->resource = AnimData_FindEntry(0x1C1E);
+    manager->nextTrail = 0;
+    manager->trailResource = AnimData_FindEntry(0x1C1E);
     offset = -4;
-    active = &p->entries[0].active;
-    entry = p->entries;
+    active = &manager->effects[0].active;
+    entry = manager->effects;
     i = 3;
     do {
-        ParticleSprite_Initialize(entry, p->resource, 1);
+        ParticleSprite_Initialize(entry, manager->trailResource, 1);
         Effect_SetOrigin(entry, offset, offset);
-        SpriteDrawable_SelectTileFrame(entry, p->resource, animation);
+        SpriteDrawable_SelectTileFrame(entry, manager->trailResource, animation);
         Effect_SetPalette(entry, 1);
         *active = 0;
-        active += 0x30;
+        active += sizeof(*entry);
         ++entry;
         --i;
     } while (i >= 0);

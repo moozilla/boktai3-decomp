@@ -1,18 +1,8 @@
-#include "global.h"
-struct SceneNpcMotion {
-    u8 unknown0[0x34];
-    s16 x, y, z;
-};
-struct SceneNpc {
-    u8 unknown0[0x26];
-    s16 variant;
-    u8 unknown28[0x5c - 0x28];
-    struct SceneNpcMotion motion;
-};
+#include "npc/story_character/scene_character.h"
 void SceneNpc_SetKindMotionVector(struct SceneNpc *p, s32 kind)
 {
     s32 height;
-    struct SceneNpcMotion *motion;
+    struct SceneActorBody *body;
     switch (kind) {
         case 19:
         case 20:
@@ -24,7 +14,7 @@ void SceneNpc_SetKindMotionVector(struct SceneNpc *p, s32 kind)
             height = 200;
             break;
         case 29: {
-            s32 variant = p->variant;
+            s32 variant = p->effects.tag;
             height = 400;
             if (variant != 1)
                 break;
@@ -36,8 +26,8 @@ void SceneNpc_SetKindMotionVector(struct SceneNpc *p, s32 kind)
             height = 400;
             break;
     }
-    motion = &p->motion;
-    motion->x = 0;
-    motion->y = height;
-    motion->z = 0;
+    body = &p->body;
+    body->positionOffset.x = 0;
+    body->positionOffset.y = height;
+    body->positionOffset.z = 0;
 }

@@ -1,35 +1,20 @@
-#include "global.h"
-struct S {
-    u8 f[1];
-    u8 b1;
-    u8 f2[5];
-    u8 b7;
-    u8 b8;
-    u8 b9;
-    u8 f3[6];
-    u32 w10;
-    u8 f4[4];
-    u8 b18;
-    u8 f5[0xd4 - 0x19];
-    u8 d4[1];
-};
-void Actor_PlayAnimationEntry(void *, u32, u32, u32, u32);
-s32 DisplayAnimation_TestFinished(void *);
-void StoryCharacter_RunEntryAnimSequence(u32 a, struct S *p, s32 a2)
+#include "npc/manager/scene_actor_lifecycle.h"
+s32 DisplayAnimation_TestFinished(struct DisplayAnimation *);
+void StoryCharacter_RunEntryAnimSequence(u32 a, struct SceneActor *p, s32 a2)
 {
-    if (p->b9 != 0) {
-        p->b9 = 0;
-        p->b7 = 0;
+    if (p->animationEntered != 0) {
+        p->animationEntered = 0;
+        p->finished = 0;
         Actor_PlayAnimationEntry(p, 0, 2, 0, 4);
-        p->b18 = 0;
-        p->w10 = 0;
+        p->animationPhase = 0;
+        p->stateFrame = 0;
     }
-    switch (p->b18) {
+    switch (p->animationPhase) {
         case 0: {
             u32 r1;
-            if (p->w10 <= 10)
+            if (p->stateFrame <= 10)
                 break;
-            switch (p->b1) {
+            switch (p->variant) {
                 case 4:
                 case 5:
                 case 6:
@@ -65,20 +50,20 @@ void StoryCharacter_RunEntryAnimSequence(u32 a, struct S *p, s32 a2)
                     break;
             }
             Actor_PlayAnimationEntry(p, r1, 2, 0, 4);
-            p->b18++;
+            p->animationPhase++;
             break;
         }
         case 1:
-            if (DisplayAnimation_TestFinished(p->d4) != 0) {
+            if (DisplayAnimation_TestFinished(&p->drawable.common) != 0) {
                 u32 zero = 0;
                 Actor_PlayAnimationEntry(p, zero, 2, 0, 4);
-                p->b18++;
-                p->w10 = zero;
+                p->animationPhase++;
+                p->stateFrame = zero;
             }
             break;
         case 2:
             if (a2 > 10) {
-                p->b7 = 1;
+                p->finished = 1;
             }
             break;
     }

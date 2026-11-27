@@ -1,34 +1,23 @@
-#include "global.h"
+#include "npc/otenko/otenko_actor.h"
 
-struct SceneNpc {
-    u8 unknown0[7];
-    u8 phaseComplete, unknown8, phaseEntered;
-    u8 unknownA[4];
-    u16 flags;
-    u32 frame, unknown14;
-    u8 phase;
-    u8 unknown19[0x2CB];
-    void *callback;
-};
-s32 Callback_InvokeActor(void *, void *);
-void Otenko_UpdateBlinkPhase(void *unused, struct SceneNpc *npc)
+void Otenko_UpdateBlinkPhase(void *unused, struct OtenkoActor *npc)
 {
-    if (npc->phaseEntered) {
-        npc->phaseEntered = 0;
-        npc->phaseComplete = 0;
-        npc->phase = 1;
+    if (npc->animationEntered) {
+        npc->animationEntered = 0;
+        npc->done = 0;
+        npc->animationPhase = 1;
     }
-    if ((u8)Callback_InvokeActor(npc, npc->callback) != 1) {
-        if (npc->phase > 16)
-            npc->phaseComplete = 1;
+    if ((u8)Callback_InvokeActor(npc, npc->animationCallback) != 1) {
+        if (npc->animationPhase > 16)
+            npc->done = 1;
         else {
-            if (npc->phase & 1) {
+            if (npc->animationPhase & 1) {
                 u32 mask = 0x100;
-                npc->flags = mask | npc->flags;
+                npc->displayFlags = mask | npc->displayFlags;
             }
-            if (npc->frame > npc->phase) {
-                npc->frame = 0;
-                npc->phase = npc->phase + 1;
+            if (npc->stateFrame > npc->animationPhase) {
+                npc->stateFrame = 0;
+                npc->animationPhase = npc->animationPhase + 1;
             }
         }
     }

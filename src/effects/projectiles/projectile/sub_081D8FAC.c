@@ -1,10 +1,10 @@
-#include "global.h"
+#include "effects/projectiles/projectile_task.h"
 
-u32 Projectile_UpdateTimedRemoval(u8 *p)
+u32 Projectile_UpdateTimedRemoval(struct Task4E01Projectile *projectile)
 {
     u32 two = 2;
-    *(u32 *)(p + 4) |= two;
-    if (*(u32 *)p >= *(u16 *)(p + 0x1A)) {
+    projectile->flags |= two;
+    if (projectile->frame >= projectile->params.lifetime) {
         return 2;
     }
     return 0;

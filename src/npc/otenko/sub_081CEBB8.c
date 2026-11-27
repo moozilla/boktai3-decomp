@@ -1,15 +1,14 @@
-#include "global.h"
-void Trigger_ConsumePending(u8 *, u32);
-void Otenko_UpdateAnimation23(u8 *a, u8 *b)
+#include "npc/story_character/state_actor.h"
+void Otenko_UpdateAnimation23(void *context, struct StateActor *p)
 {
-    if (b[8]) {
-        b[8] = 0;
-        b[7] = 0;
-        b[5] = 0x17;
+    if (p->enterCommand) {
+        p->enterCommand = 0;
+        p->done = 0;
+        p->nextState = 0x17;
     }
-    if (b[7]) {
-        b[5] = 1;
-        Trigger_ConsumePending(b + 0x168, 1);
+    if (p->done) {
+        p->nextState = 1;
+        Trigger_ConsumePending(p->receiver, 1);
     }
-    *(u32 *)(b + 0x14) += 1;
+    p->timer += 1;
 }

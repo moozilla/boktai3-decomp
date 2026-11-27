@@ -1,17 +1,16 @@
-#include "global.h"
+#include "npc/story_character/scene_character.h"
 
-void Actor_PlayAnimationEntry(void *, u32, u32, u32, u32);
-s32 DisplayAnimation_TestFinished(void *);
+s32 DisplayAnimation_TestFinished(struct DisplayAnimation *);
 
-void StoryCharacter_UpdateFacingAnimation(u32 a, u8 *b, u32 c)
+void StoryCharacter_UpdateFacingAnimation(u32 a, struct SceneNpc *actor, u32 c)
 {
     u32 anim;
-    s16 *p = (s16 *)(b + 0x20);
-    if (b[9]) {
-        b[9] = 0;
-        b[7] = 0;
-        if (p[3] == 1) {
-            switch (b[1]) {
+    struct SceneCharacterEffects *effects = &actor->effects;
+    if (actor->animationEntered) {
+        actor->animationEntered = 0;
+        actor->done = 0;
+        if (effects->tag == 1) {
+            switch (actor->kind) {
                 case 4:
                 case 5:
                 case 6:
@@ -48,9 +47,9 @@ void StoryCharacter_UpdateFacingAnimation(u32 a, u8 *b, u32 c)
                     anim = 0;
                     break;
             }
-            Actor_PlayAnimationEntry(b, anim, 1, 1, 4);
+            Actor_PlayAnimationEntry(actor, anim, 1, 1, 4);
         } else {
-            switch (b[1]) {
+            switch (actor->kind) {
                 case 4:
                 case 5:
                 case 6:
@@ -87,16 +86,13 @@ void StoryCharacter_UpdateFacingAnimation(u32 a, u8 *b, u32 c)
                     anim = 0;
                     break;
             }
-            Actor_PlayAnimationEntry(b, anim, 0, 1, 4);
+            Actor_PlayAnimationEntry(actor, anim, 0, 1, 4);
         }
-        {
-            u32 zero = 0;
-            b[0x18] = zero;
-            *(u32 *)(b + 0x10) = zero;
-        }
+        actor->animationPhase = 0;
+        actor->stateFrame = 0;
     } else {
-        if (p[3] == 1) {
-            switch (b[1]) {
+        if (effects->tag == 1) {
+            switch (actor->kind) {
                 case 4:
                 case 5:
                 case 6:
@@ -133,9 +129,9 @@ void StoryCharacter_UpdateFacingAnimation(u32 a, u8 *b, u32 c)
                     anim = 0;
                     break;
             }
-            Actor_PlayAnimationEntry(b, anim, 1, 1, 1);
+            Actor_PlayAnimationEntry(actor, anim, 1, 1, 1);
         } else {
-            switch (b[1]) {
+            switch (actor->kind) {
                 case 4:
                 case 5:
                 case 6:
@@ -172,9 +168,9 @@ void StoryCharacter_UpdateFacingAnimation(u32 a, u8 *b, u32 c)
                     anim = 0;
                     break;
             }
-            Actor_PlayAnimationEntry(b, anim, 0, 1, 1);
+            Actor_PlayAnimationEntry(actor, anim, 0, 1, 1);
         }
     }
-    if (DisplayAnimation_TestFinished(b + 0xd4))
-        b[7] = 1;
+    if (DisplayAnimation_TestFinished(&actor->display))
+        actor->done = 1;
 }

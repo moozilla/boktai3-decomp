@@ -1,37 +1,35 @@
 #include "effects/projectiles/timed_effect.h"
+#include "effects/projectiles/projectile_task.h"
 #include "player/player.h"
 #include "engine/engine.h"
 #include "scene/motion/scene_actor_terrain.h"
 
 /* TimedEffect_OnContact.c */
-struct TimedEffectCollision {
-    u8 unknown00[0xA];
-    u16 flags;
-};
 
 void Projectile_SetUpdateCallback(void *, void *);
 void ProjectileTask_SpawnImpactChildren(void);
 void Boss_FinalExplosions(void);
 void ProjectileTask_StartTerminalAnimation(void *);
 
-void TimedEffect_OnContact(struct TimedEffectCollision *self,
-                                 struct TimedEffectCollision *other, struct TimedEffect *entry)
+void TimedEffect_OnContact(struct ContactCollider *self,
+                                 struct ContactCollider *other, void *owner)
 {
+    struct TimedEffect *entry = owner;
     struct TimedEffectConfig *config = &entry->config;
-    struct TimedEffectCollision *o;
+    struct ContactCollider *o;
     struct TimedEffect *e;
 
     if (config->type == 3) {
-        (*(&entry))->config.flags |= 0x80;
+        entry->config.flags |= 0x80;
         Projectile_SetUpdateCallback(config, ProjectileTask_SpawnImpactChildren);
     } else if (config->type != 8) {
         if (config->type == 9) {
             Projectile_SetUpdateCallback(config, Boss_FinalExplosions);
         } else {
             e = entry;
-            if ((self->flags & 1) || (other->flags & 1)) {
+            if ((self->contactFlags & 1) || (other->contactFlags & 1)) {
                 o = other;
-                if (!(o->flags & 0x20)) {
+                if (!(o->contactFlags & 0x20)) {
                     e->config.flags |= 0x80;
                     ProjectileTask_StartTerminalAnimation(e);
                 }
@@ -42,18 +40,6 @@ void TimedEffect_OnContact(struct TimedEffectCollision *self,
 
 /* sub_081DA0B4.c */
 
-struct TimedEffectInitView {
-    u32 frame;
-    u8 pad4[0xC];
-    u32 velocity[2];
-    struct TimedEffectConfig config;
-    u8 graphics[0x1C];
-    u8 sprite[0x2C];
-    u8 collider[0x190 - 0xB8];
-    u32 field190;
-    u8 pad194[0x1A8 - 0x194];
-    s32 index;
-};
 void Projectile_InitializeParams(void *);
 void Sprite_InitUnlinked(void *, void *, u32);
 void Collider_SetCallback(void *, void *, void *);
@@ -64,30 +50,31 @@ static inline void FillWords(u32 *dst, int ctl, u32 *src)
     CpuSet(src, dst, ctl);
 }
 
-void TimedEffect_InitEntry(void *manager, struct TimedEffectInitView *entry, s32 index)
+void TimedEffect_InitEntry(void *manager, struct Task4E01Projectile *entry, s32 index)
 {
-    struct TimedEffectConfig *config = &entry->config;
+    struct Task4E01Params *config = &entry->params;
     void *collider;
+    // concession-ok(const-local): CpuSet reads this fixed-source word by address.
     u32 zero;
     u32 *vel;
 
     Projectile_InitializeParams(config);
     entry->frame = 0;
-    entry->field190 = 0;
-    entry->index = index;
-    vel = entry->velocity;
+    entry->runtime.restarted = 0;
+    entry->runtime.index = index;
+    vel = (u32 *)&entry->velocity;
     zero = 0;
     FillWords(vel, 0x05000002, &zero);
-    AnimData_Load(entry->graphics, config->graphics);
-    Sprite_InitUnlinked(entry->sprite, entry->graphics, 1);
-    collider = entry->collider;
-    if (entry->config.flags & 0x8000)
-        Collider_Init(collider, 0, 0x2101, 0, 16, &entry->config.bounds, &entry->config.offset);
+    AnimData_Load(&entry->graphics, config->sprite[0]);
+    Sprite_InitUnlinked(&entry->sprite, &entry->graphics, 1);
+    collider = entry->colliders;
+    if (entry->params.flags & 0x8000)
+        Collider_Init(collider, 0, 0x2101, 0, 16, &entry->params.bounds, &entry->params.offset);
     else
-        Collider_Init(collider, 0, 0x2101, 0, 1, &entry->config.bounds, &entry->config.offset);
+        Collider_Init(collider, 0, 0x2101, 0, 1, &entry->params.bounds, &entry->params.offset);
     Collider_SetCallback(collider, TimedEffect_OnContact, entry);
-    Collider_SetAttackProperties(collider, config->resourceId, config->cost, config->mode,
-                                 config->contactFlags, config->option);
+    Collider_SetAttackProperties(collider, config->damage[2], config->damage[3], config->damage[0],
+                                 config->damage[1], config->damage[4]);
 }
 
 /* sub_081DA178.c */
@@ -362,7 +349,7 @@ s32 TimedEffect_InitManager(struct TimedEffectManager *manager, s32 count)
     manager->activeMask = 0;
     entry = manager->entries;
     for (i = 0; i < manager->capacity;) {
-        TimedEffect_InitEntry(manager, (struct TimedEffectInitView *)entry, i);
+        TimedEffect_InitEntry(manager, (struct Task4E01Projectile *)entry, i);
         i++;
         entry += 0x1AC;
     }

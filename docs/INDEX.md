@@ -242,7 +242,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/history/2026-11-17.md](../docs/history/2026-11-17.md) | 2026-11-17 | #compiler #depin #matching #phase3 #round13 #round15 #structs | 3 |
 | [docs/history/2026-11-20.md](../docs/history/2026-11-20.md) | 2026-11-20 | #actors #compiler #matching #monsters #phase3 #scene #scene-actors #tooling #wireless | 2 |
 | [docs/history/2026-11-25.md](../docs/history/2026-11-25.md) | Work log, 2026-11-25 | #actors #assets #compiler #hardware #matching #menu #phase3 #process #scene #tooling | 5 |
-| [docs/history/2026-11-26.md](../docs/history/2026-11-26.md) | Work log, 2026-11-26 | #actors #autopilot #bosses #camera #compiler #matching #menu #monster #monsters #phase3 #port #scene #scripts #terrain #tooling #tools #types #verification | 21 |
+| [docs/history/2026-11-26.md](../docs/history/2026-11-26.md) | Work log, 2026-11-26 | #actors #autopilot #bosses #camera #compiler #effects #matching #menu #monster #monsters #phase3 #port #scene #scripts #terrain #tooling #tools #types #verification | 23 |
 | [docs/history/HANDOFF_2026-10-23.md](../docs/history/HANDOFF_2026-10-23.md) | Handoff: current state and how to continue | #process | 14 |
 | [docs/history/MANAGER_HANDOFF_2026-10-19.md](../docs/history/MANAGER_HANDOFF_2026-10-19.md) | Manager handoff (2026-10-19) | #process #tooling | 6 |
 | [docs/history/README.md](../docs/history/README.md) | Handoff history |  | 17 |
@@ -298,7 +298,10 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/codex-medium.md](../notes/codex-medium.md) | Codex medium worker: task 080D6FDC | #matching #scene-actor #terrain #mummy #dog | 476 |
 | [notes/codex-monster-continuation_2026-11-26.md](../notes/codex-monster-continuation_2026-11-26.md) | Monster route, control, and sprite follow-up | #monsters #types #phase3 #matching | 7 |
 | [notes/codex-monster-layout-cleanup_2026-11-26.md](../notes/codex-monster-layout-cleanup_2026-11-26.md) | Golem, Dog, Axe and Axe Armor layouts | #monsters #types #phase3 #matching | 3 |
+| [notes/codex-platform-and-otenko-recovery_2026-11-26.md](../notes/codex-platform-and-otenko-recovery_2026-11-26.md) | Moving platform and Otenko source recovery | #actors #types #matching #phase3 | 3 |
+| [notes/codex-projectile-task-recovery_2026-11-26.md](../notes/codex-projectile-task-recovery_2026-11-26.md) | Timed projectile and trail source recovery | #effects #types #matching #phase3 | 2 |
 | [notes/codex-remaining-monsters_2026-11-26.md](../notes/codex-remaining-monsters_2026-11-26.md) | Remaining monster state and type recovery | #monster #types #matching #phase3 | 13 |
+| [notes/codex-story-character-recovery_2026-11-26.md](../notes/codex-story-character-recovery_2026-11-26.md) | Story character layouts and state resets | #actors #types #matching #phase3 | 3 |
 | [notes/collision-process-pairs-round9.md](../notes/collision-process-pairs-round9.md) | Collision_ProcessPairs |  | 0 |
 | [notes/compiler-debugger-2026-10-23.md](../notes/compiler-debugger-2026-10-23.md) | Compiler debugger: first session (2026-10-23) | #matching #tooling #regalloc | 12 |
 | [notes/contact-actor-pool_2026-10-14.md](../notes/contact-actor-pool_2026-10-14.md) | Contact actor pool setup and display (tentative) | *#actors* | 7 |

@@ -1,20 +1,14 @@
-#include "global.h"
+#include "objects/moving_platforms/named_object.h"
 
-struct S {
-    u8 filler[0xb6];
-    u16 h;
-    u8 filler2[0xdc - 0xb8];
-    u32 k;
-};
 void TetherActor_AddStatusFlags(u32, u32);
 void TetherActor_RemoveStatusFlags(u32);
 
-void MovingPlatform_UpdateTetherFollowFlags(struct S *s)
+void MovingPlatform_UpdateTetherFollowFlags(struct NamedObject *object)
 {
-    if ((u16)(s->h - 3) > 1) {
-        TetherActor_AddStatusFlags(7, s->k);
+    if ((u16)(object->state - 3) > 1) {
+        TetherActor_AddStatusFlags(7, object->name);
     } else {
-        TetherActor_AddStatusFlags(3, s->k);
+        TetherActor_AddStatusFlags(3, object->name);
         TetherActor_RemoveStatusFlags(4);
     }
 }

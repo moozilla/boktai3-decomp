@@ -1,21 +1,20 @@
-#include "global.h"
+#include "npc/story_character/scene_character.h"
 struct Vec081CBE30 {
     s16 x, y, z, pad;
 };
-void Actor_PlayAnimationEntry(u8 *, u32, u32, u32, u32);
-s32 DisplayAnimation_TestFinished(void *);
+s32 DisplayAnimation_TestFinished(struct DisplayAnimation *);
 void TimedSpriteEffect_Create(struct Vec081CBE30 *, s32, s32, s32, s32, s32, s32, s32, s32);
 /* Three-phase attack: play the wind-up, spawn an effect above the actor on
  * frame 15, then the follow-through after 0x56 frames. */
-void StoryCharacter_UpdateDelayedAttackEffect(u8 *a, u8 *b, s32 inputFrame)
+void StoryCharacter_UpdateDelayedAttackEffect(u8 *a, struct SceneNpc *actor, s32 inputFrame)
 {
     s32 frame = inputFrame;
     u32 anim;
     s32 state;
-    if (b[9]) {
-        b[9] = 0;
-        b[7] = 0;
-        switch (b[1]) {
+    if (actor->animationEntered) {
+        actor->animationEntered = 0;
+        actor->done = 0;
+        switch (actor->kind) {
             case 4:
             case 5:
             case 6:
@@ -54,21 +53,18 @@ void StoryCharacter_UpdateDelayedAttackEffect(u8 *a, u8 *b, s32 inputFrame)
                 break;
         }
 
-        Actor_PlayAnimationEntry(b, anim, 2, 1, 4);
-        {
-            u32 zero = 0;
-            b[0x18] = zero;
-            *((u32 *)(b + 0x10)) = zero;
-        }
+        Actor_PlayAnimationEntry(actor, anim, 2, 1, 4);
+        actor->animationPhase = 0;
+        actor->stateFrame = 0;
     }
-    state = b[0x18];
+    state = actor->animationPhase;
     switch (state) {
         case 0:
             if (frame == 15) {
-                s16 *p = (s16 *)(b + 0x68);
-                s32 x = *p++;
-                s32 y = *p++;
-                s32 z = *p;
+                const s16 *coords = (const s16 *)&actor->body.position;
+                s32 x = *coords++;
+                s32 y = *coords++;
+                s32 z = *coords;
                 struct Vec081CBE30 v;
                 s16 *q = (s16 *)&v;
                 s32 vx = x - 0x20;
@@ -79,13 +75,13 @@ void StoryCharacter_UpdateDelayedAttackEffect(u8 *a, u8 *b, s32 inputFrame)
                 q[2] = vz;
                 TimedSpriteEffect_Create(&v, 0xA0, 0x20, 1, 1, state, state, state, state);
             }
-            if (DisplayAnimation_TestFinished(b + 0xd4))
-                b[0x18] = 1;
+            if (DisplayAnimation_TestFinished(&actor->display))
+                actor->animationPhase = 1;
             break;
         case 1:
-            if ((*((u32 *)(b + 0x10))) > 0x56) {
-                b[0x18] = 2;
-                switch (b[1]) {
+            if ((actor->stateFrame) > 0x56) {
+                actor->animationPhase = 2;
+                switch (actor->kind) {
                     case 4:
                     case 5:
                     case 6:
@@ -124,12 +120,12 @@ void StoryCharacter_UpdateDelayedAttackEffect(u8 *a, u8 *b, s32 inputFrame)
                         break;
                 }
 
-                Actor_PlayAnimationEntry(b, anim, 2, 1, 4);
+                Actor_PlayAnimationEntry(actor, anim, 2, 1, 4);
             }
             break;
         case 2:
-            if (DisplayAnimation_TestFinished(b + 0xd4))
-                b[7] = 1;
+            if (DisplayAnimation_TestFinished(&actor->display))
+                actor->done = 1;
             break;
     }
 }

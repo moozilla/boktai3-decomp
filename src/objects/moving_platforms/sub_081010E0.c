@@ -3,16 +3,12 @@
 #include "player/player.h"
 #include "objects/moving_platforms/named_object_flags.h"
 #include "objects/moving_platforms/named_object.h"
-struct LiftPlayer {
-    u8 pad[0x30];
-    struct ContactPosition position;
-};
-u32 Player_TestAttachmentFlags(struct LiftPlayer *, u32);
-void Player_SetPositionAndSave(struct LiftPlayer *, struct ContactPosition *);
-static inline void Delta(struct LiftPlayer **player, struct ContactPosition *out,
+u32 Player_TestAttachmentFlags(struct Player *, u32);
+void Player_SetPositionAndSave(struct Player *, struct ContactPosition *);
+static inline void Delta(struct Player **player, struct ContactPosition *out,
                          struct ContactPosition *from)
 {
-    struct ContactPosition *to = &(*player)->position;
+    struct SceneVec *to = &(*player)->position;
     out->x = to->x - from->x;
     out->y = to->y - from->y;
     out->z = to->z - from->z;
@@ -33,7 +29,7 @@ void MovingPlatform_UpdateVerticalTravel(struct NamedObject *object)
 {
     struct ContactPosition delta;
     Memory_Clear(&object->motion, 8);
-    Delta(&(*(struct LiftPlayer **)gPlayers), &delta, &object->body.position);
+    Delta(gPlayers, &delta, &object->body.position);
     if (object->stage) {
         MovingPlatformActor_PlayMovementSound(object);
         object->stage = 0;
@@ -46,10 +42,10 @@ void MovingPlatform_UpdateVerticalTravel(struct NamedObject *object)
         if (object->upperHeight > object->body.position.y)
             return;
         object->body.position.y = object->upperHeight;
-        if (Player_TestAttachmentFlags((*(struct LiftPlayer **)gPlayers), 1)) {
-            delta = (*(struct LiftPlayer **)gPlayers)->position;
-            ((struct ContactPosition *)&delta)->y = object->body.position.y;
-            Player_SetPositionAndSave((*(struct LiftPlayer **)gPlayers), &delta);
+        if (Player_TestAttachmentFlags(gPlayers[0], 1)) {
+            delta = *(const struct ContactPosition *)&gPlayers[0]->position;
+            delta.y = object->body.position.y;
+            Player_SetPositionAndSave(gPlayers[0], &delta);
             MovingPlatform_EnableFlags(0x100, object);
             object->motion.y = 0;
         }
@@ -62,10 +58,10 @@ void MovingPlatform_UpdateVerticalTravel(struct NamedObject *object)
         if (object->lowerHeight < object->body.position.y)
             return;
         object->body.position.y = object->lowerHeight;
-        if (Player_TestAttachmentFlags((*(struct LiftPlayer **)gPlayers), 1)) {
-            delta = (*(struct LiftPlayer **)gPlayers)->position;
-            ((struct ContactPosition *)&delta)->y = object->body.position.y;
-            Player_SetPositionAndSave((*(struct LiftPlayer **)gPlayers), &delta);
+        if (Player_TestAttachmentFlags(gPlayers[0], 1)) {
+            delta = *(const struct ContactPosition *)&gPlayers[0]->position;
+            delta.y = object->body.position.y;
+            Player_SetPositionAndSave(gPlayers[0], &delta);
             MovingPlatform_EnableFlags(0x100, object);
             object->motion.y = 0;
         }

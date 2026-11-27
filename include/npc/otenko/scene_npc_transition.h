@@ -1,7 +1,9 @@
 #ifndef GUARD_SCENE_NPC_TRANSITION_H
 #define GUARD_SCENE_NPC_TRANSITION_H
 
-#include "scene/collision/contact_position.h"
+#include "engine/task.h"
+#include "engine/video/sprite.h"
+#include "scene/scene_animation.h"
 
 struct TransitionMotion {
     struct ContactPosition position;
@@ -15,12 +17,18 @@ struct TransitionParticle {
     struct TransitionMotion motion;
 };
 struct TransitionEffect {
-    u8 unknown0[0x60];
+    struct Task task;
+    struct DisplaySequenceSprite sprite;
+    struct SceneAnimation animation;
     struct ContactPosition origin;
-    u8 unknown68[0x10];
+    s32 frame;
+    u32 state;
+    s32 stateFrame;
+    u32 enter;
     void *graphics;
     struct TransitionParticle particles[8];
 };
+typedef char TransitionEffectSizeCheck[sizeof(struct TransitionEffect) == 0x1FC ? 1 : -1];
 void Otenko_SpawnTransitionParticle(struct TransitionEffect *effect, s32 angle);
 void Otenko_UpdateTransitionParticles(struct TransitionEffect *effect);
 

@@ -1,21 +1,12 @@
-#include "global.h"
-struct S {
-    u8 pad[7];
-    u8 b;
-    u8 gap[6];
-    u16 h;
-    u32 n;
-    u8 gap2[0x2cc - 0x14];
-    void (*fn)(void *, void *, u32);
-};
-u32 Otenko_OnStateUpdate(void *a, struct S *p)
+#include "npc/otenko/otenko_actor.h"
+u32 Otenko_OnStateUpdate(void *a, struct OtenkoActor *p)
 {
     u32 n;
     void (*fn)(void *, void *, u32);
-    p->h = 0;
-    p->b = 0;
-    n = p->n++;
-    fn = p->fn;
+    p->displayFlags = 0;
+    p->done = 0;
+    n = p->stateFrame++;
+    fn = (void (*)(void *, void *, u32))p->stateCallback;
     if (fn)
         fn(a, p, n);
     return 0;

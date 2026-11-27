@@ -554,6 +554,8 @@ include/monsters/tentacle_actor/tentacle_segment_animation.h,include/monsters/ce
 include/monsters/tentacle_body/tentacle_body.h,include/monsters/centipede/centipede_body.h,renamed moved with its unit,include/monsters/tentacle/tentacle_body.h,include/monsters/centipede/tentacle_body.h
 include/monsters/vorn/vorn.h,include/monsters/vorn/vorn.h,beside its unit,,
 include/monsters/vulcan_cannon/vulcan_cannon_worker.h,include/monsters/cannons/vulcan_cannon_worker.h,beside its unit,,
+include/npc/otenko/otenko_actor.h,include/npc/otenko/otenko_actor.h,beside its Otenko script and projection users,,
+include/npc/story_character/scene_character.h,include/npc/story_character/scene_character.h,beside its story character script users,,
 include/other/callback_pool/callback_pool.h,include/objects/loot_deposits/callback_pool.h,Pass 4: beside its documented owner,,include/objects/actor_group/callback_pool.h
 include/other/registry_selection/registry_selection_menu.h,include/ui/world_map.h,with its reviewed owner; original basename registry_selection_menu.h,include/ui/widgets/indicator_selection.h,
 include/other/scene_terrain_probe/scene_moving_particle.h,include/effects/particles/scene_moving_particle.h,beside its unit,,

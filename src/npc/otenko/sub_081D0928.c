@@ -1,44 +1,14 @@
-#include "global.h"
+#include "npc/otenko/otenko_actor.h"
 
-#include "effects/screen/background_controller.h"
 #include "scene/collision/contact_position.h"
 #include "engine/math/monster_particle_random.h"
 
-struct Camera {
-    u8 pad[0x44];
-    s32 x;
-};
 extern const s16 gUnk_086149C4[];
 void Actor_UpdateVisibilityAndShadow(u32, u8 *);
 void Palette_InterpolateBanks(void *, void *, void *, s32, s32);
 void *SpriteEffectController_Create(const struct ContactPosition *, const struct ContactPosition *,
                                     s32, u32, u32, u32, u32, u32, u32, u32, u32, u32, s32, s32, s32,
                                     s32, s32, s32);
-struct SceneNpcEffectState {
-    u8 unknown0[0xC];
-    u8 active, attached;
-    s16 paletteFrame;
-};
-struct SceneNpcEffect {
-    u8 unknown0[6];
-    u8 state;
-    u8 unknown7[5];
-    u16 flags, displayFlags;
-    u8 unknown10[0x10];
-    struct SceneNpcEffectState effect;
-    u8 unknown30[0x68 - 0x30];
-    struct ContactPosition position;
-    u8 unknown70[0x90 - 0x70];
-    u16 size[2];
-    u8 unknown94[0x160 - 0x94];
-    struct ContactPosition *displayPosition;
-    u8 unknown164[0x1cc - 0x164];
-    u8 palette[0x20];
-    u8 unknown1ec[0x300 - 0x1ec];
-    s32 projected[3];
-    u8 unknown30c[0x328 - 0x30c];
-    s32 height;
-};
 struct ParticleSampleOrigin {
     u32 value;
 };
@@ -55,64 +25,62 @@ static inline u32 IsEmissionFrame(u8 frame, u32 mask)
         return 0;
     return frame < 128;
 }
-s32 Otenko_OnStateEffectUpdate(u32 context, u8 *actor)
+s32 Otenko_OnStateEffectUpdate(u32 context, struct OtenkoActor *actor)
 {
     u32 work = context;
-    u8 *p = actor;
-    u8 *effectData = p + 0x20;
-    struct SceneNpcEffect *npc = (void *)p;
-    struct SceneNpcEffectState *fx = &npc->effect;
-    if (effectData[0xd] != 0) {
-        s32 *pos;
+    struct OtenkoActor *npc = actor;
+    struct OtenkoEffectState *fx = &npc->effect;
+    if (fx->attached != 0) {
+        struct ScenePoolVec32 *pos;
         struct ContactPosition *dst;
         s32 height;
-        fx->active = 1;
-        pos = (s32 *)(p + 0x300);
-        dst = npc->displayPosition;
-        height = npc->height;
-        dst->x = (pos[0] >> 12) - gSceneCamera->x;
-        dst->y = ((pos[2] + (pos[1] + height)) >> 12) + 0x60;
-        dst->z = pos[2] >> 12;
+        fx->projected = 1;
+        pos = &npc->projection.position;
+        dst = (struct ContactPosition *)npc->display.position;
+        height = npc->projection.height;
+        dst->x = (pos->x >> 12) - gSceneCamera->x;
+        dst->y = ((pos->z + (pos->y + height)) >> 12) + 0x60;
+        dst->z = pos->z >> 12;
         {
-            u16 *w = npc->size;
-            u16 height;
+            s16 *w = &npc->body.positionOffset.x;
+            s16 height;
             *w = 4;
             w++;
             height = 0xFFE8;
             *w = height;
         }
-        npc->position = *npc->displayPosition;
-        npc->position.z = 0;
+        npc->body.position = *(const struct ContactPosition *)npc->display.position;
+        npc->body.position.z = 0;
         {
             u32 m = 0x200;
             npc->displayFlags = m | npc->displayFlags;
         }
     }
-    Actor_UpdateVisibilityAndShadow(work, p);
-    if (!fx->active && npc->state <= 0x10) {
+    Actor_UpdateVisibilityAndShadow(work, (u8 *)npc);
+    if (!fx->projected && npc->prevState <= 0x10) {
         u32 m = 0x402;
         npc->displayFlags = m | npc->displayFlags;
     }
     {
         u32 m = 4;
-        if ((m & (*((u16 *)(p + 0xc)))) != 0) {
+        if ((m & (npc->commandFlags)) != 0) {
             s32 t;
-            if ((*((s16 *)(effectData + 0xe))) <= 0x3f) {
+            if ((fx->paletteFrame) <= 0x3f) {
                 u8 *g = gPaletteBankData;
                 void *s1 = g + 0x2AE0;
                 void *s2 = g + 0x2B00;
-                void *d = p + 0x1CC;
-                Palette_InterpolateBanks(d, s1, s2, *((s16 *)(effectData + 0xe)), 6);
+                void *d = npc->workPalette;
+                Palette_InterpolateBanks(d, s1, s2, fx->paletteFrame, 6);
             } else {
                 u8 *g = gPaletteBankData;
                 void *s1 = g + 0x2AE0;
                 void *s2 = g + 0x2B00;
-                void *d = p + 0x1CC;
-                Palette_InterpolateBanks(d, s1, s2, 0x80 - (*((s16 *)(effectData + 0xe))), 6);
+                void *d = npc->workPalette;
+                Palette_InterpolateBanks(d, s1, s2, 0x80 - (fx->paletteFrame), 6);
             }
-            t = ((*((u16 *)(effectData + 0xe))) + 1) & 0x7f;
-            *((u16 *)(effectData + 0xe)) = t;
-            if (effectData[0xd] != 0) {
+            t = (((u16)fx->paletteFrame) + 1) & 0x7f;
+            fx->paletteFrame = t;
+            if (fx->attached != 0) {
                 work = 3;
                 if (!IsEmissionFrame(t, work))
                     return 0;
@@ -120,12 +88,12 @@ s32 Otenko_OnStateEffectUpdate(u32 context, u8 *actor)
                     u32 sheet = 0x1c1e, sequence = 0xd43f;
                     struct ContactPosition position;
                     struct ContactPosition velocityStorage;
-                    s32 *projected = (s32 *)(p + 0x300);
+                    struct ScenePoolVec32 *projected = &npc->projection.position;
                     struct ContactPosition *pos = &position;
-                    s32 height = *((s32 *)(p + 0x328));
-                    pos->x = (projected[0] >> 12) - gSceneCamera->x;
-                    pos->y = ((projected[2] + (projected[1] + height)) >> 12) + 0x60;
-                    pos->z = projected[2] >> 12;
+                    s32 height = npc->projection.height;
+                    pos->x = (projected->x >> 12) - gSceneCamera->x;
+                    pos->y = ((projected->z + (projected->y + height)) >> 12) + 0x60;
+                    pos->z = projected->z >> 12;
                     {
                         struct ParticleSampleOrigin origin, saved;
                         struct ContactPosition *velocityArgument;
@@ -149,7 +117,7 @@ s32 Otenko_OnStateEffectUpdate(u32 context, u8 *actor)
                         verticalScale = gUnk_086149C4[angle];
                         velocity->y = Truncate(verticalScale * speed);
                         zero = 0;
-                        velocity->z = zero;
+                        velocity->z = 0;
                         life = (((s32)ParticleRandom_ReadRelativeSample(
                                      saved.value, (const u16 *)RANDOM_TABLE_ADDR) >>
                                  4) &

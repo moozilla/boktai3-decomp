@@ -1,26 +1,13 @@
-#include "global.h"
-struct S {
-    u8 f[1];
-    u8 b1;
-    u8 f2[5];
-    u8 b7;
-    u8 b8;
-    u8 b9;
-    u8 g[0x18 - 0xa];
-    u8 b18;
-    u8 g2[0xd4 - 0x19];
-    u8 d4[1];
-};
-void Actor_PlayAnimationEntry(void *, u32, u32, u32, u32);
-s32 DisplayAnimation_TestFinished(void *);
+#include "npc/manager/scene_actor_lifecycle.h"
+s32 DisplayAnimation_TestFinished(struct DisplayAnimation *);
 
-void StoryCharacter_UpdateTwoStageAnimation(u32 a, struct S *p)
+void StoryCharacter_UpdateTwoStageAnimation(u32 a, struct SceneActor *p)
 {
     u32 r;
-    if (p->b9 != 0) {
-        p->b9 = 0;
-        p->b7 = 0;
-        switch (p->b1) {
+    if (p->animationEntered != 0) {
+        p->animationEntered = 0;
+        p->finished = 0;
+        switch (p->variant) {
             case 5:
             case 6:
             case 7:
@@ -58,12 +45,12 @@ void StoryCharacter_UpdateTwoStageAnimation(u32 a, struct S *p)
                 break;
         }
         Actor_PlayAnimationEntry(p, r, 2, 1, 4);
-        p->b18 = 0;
+        p->animationPhase = 0;
     }
-    if (DisplayAnimation_TestFinished(p->d4)) {
-        if (p->b18 == 0) {
-            p->b18++;
-            switch (p->b1) {
+    if (DisplayAnimation_TestFinished(&p->drawable.common)) {
+        if (p->animationPhase == 0) {
+            p->animationPhase++;
+            switch (p->variant) {
                 case 5:
                 case 6:
                 case 7:
@@ -102,7 +89,7 @@ void StoryCharacter_UpdateTwoStageAnimation(u32 a, struct S *p)
             }
             Actor_PlayAnimationEntry(p, r, 2, 1, 4);
         } else {
-            p->b7 = 1;
+            p->finished = 1;
         }
     }
 }

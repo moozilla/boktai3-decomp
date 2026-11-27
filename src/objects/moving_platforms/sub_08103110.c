@@ -216,7 +216,7 @@ void MovingPlatform_CreateFromScript(void)
         MovingPlatform_EnableFlags(8, e);
         gPlayers[0]->shadow[1] |= 1;
         cell = SceneActorTerrain_GetCellIndex(&e->body.position);
-        TerrainModifiers_RegisterCell(e->registration, cell, 0, e->body.position.y >> 8, 0xFF, 4);
+        TerrainModifiers_RegisterCell(&e->registration, cell, 0, e->body.position.y >> 8, 0xFF, 4);
         MovingPlatform_EnableFlags(1, e);
         Player_SetPositionAndSave(gPlayers[0], &e->body.position);
         if (follow == 2) {

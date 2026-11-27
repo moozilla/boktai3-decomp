@@ -95,7 +95,7 @@ struct SceneActor {
     u8 commandEntered, animationEntered, flashing, enabled;
     u8 unknownC[2];
     u16 flags;
-    u8 unknown10[4];
+    u32 stateFrame;
     u32 ticks;
     u8 animationPhase, facing4, facing8, direction;
     u16 defaultPaletteBank, paletteBank;
