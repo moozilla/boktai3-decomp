@@ -2,11 +2,10 @@
 #include "engine/math/monster_particle_random.h"
 #include "engine/engine_globals.h"
 #include "engine/ram.h"
+#include "bosses/sabata/converging_particles.h"
 // Cleanup: remove the angle register hint while retaining exact codegen.
 /* Tentative role: periodically spawn an inward-moving effect in a four-slot ring. */
-typedef struct Point {
-    u16 x, pad2, y, pad6;
-} Point;
+typedef struct ConvergingParticlePoint Point;
 typedef struct Effect {
     u32 flags;
     u8 pad4[0x14];
