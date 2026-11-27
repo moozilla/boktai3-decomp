@@ -16,7 +16,7 @@ void Wireless_SetStatus(int);
 int sub_082238F0(int);
 void Wireless_ResetRemoteInputHistory(struct Engine *p)
 {
-    u16 *history = (u16 *)((u8 *)p + 0xEA);
+    u16 *history = &p->previousSentInput;
     int bits;
     int i;
     {
