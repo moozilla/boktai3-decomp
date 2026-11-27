@@ -26,10 +26,10 @@ int Wireless_PollParentNiReceive(struct Engine *p)
     if (state == 0x46) {
         void *callback = p->onReceive;
         if (callback)
-            Callback_InvokeActor((u8 *)p + 0xC4, callback);
+            Callback_InvokeActor(p->niReceive, callback);
         rfu_clearSlot(8, *slot);
     } else if ((u16)(state - 0x47) <= 1) {
-        void *callback = *(void **)((u8 *)p + 0x384);
+        void *callback = p->onReceiveFailure;
         if (callback)
             sub_08249238(callback);
     }
