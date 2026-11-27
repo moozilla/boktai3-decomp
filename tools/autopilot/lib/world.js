@@ -581,12 +581,12 @@ exports.breakBlock = function* (block, opts = {}) {
 // moved freely with the D-pad over 11 entries; A on an entry runs its script (stages.json
 // doors with "hub": index). hub() is the live menu or null.
 exports.hub = () => {
-  // a town map (Registry3F74, 11 entries) or San Miguel's gate (RegistrySelection,
+  // a town map (Registry3F74, 11 entries) or San Miguel's gate (WorldMapMenu,
   // src/ui/world_map.c, 9 entries with enabled flags)
   const t = exports.tasks().find((x) => !x.dead && (x.update === 'TownMap_OnUpdate' || x.update === 'WorldMap_OnUpdate'));
   if (!t) return null;
   const sel = t.update === 'WorldMap_OnUpdate';
-  const menu = g.at(Number(t.task), sel ? 'struct RegistrySelectionMenu' : 'struct RegistryChoiceMenu');
+  const menu = g.at(Number(t.task), sel ? 'struct WorldMapMenu' : 'struct RegistryChoiceMenu');
   const ptr = sel ? menu.selectionCursor : menu.cursor;
   const cursor = ptr ? g.at(Number(ptr.$addr ?? ptr), 'struct MenuCursor') : null;
   // ready: the cursor reads input (src/ui/widgets/menu_cursor.c MenuCursor_UpdateInput)

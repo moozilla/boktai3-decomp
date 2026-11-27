@@ -1,12 +1,12 @@
 // The shop's Shop_TickController invokes the active callback in
-// SceneInventoryLifecycleView.action. Its purchase phase reads category and
+// ShopLifecycleView.action. Its purchase phase reads category and
 // the saved grid selection (Shop_TickPurchaseTransition, 08062414).
 exports.shopState = () => {
   const t = exports.tasks().find((task) => !task.dead && task.update === 'Shop_TickController');
   if (!t) return null;
   const address = Number(t.task);
-  const panel = g.at(address, 'struct SceneInventoryTail');
-  const action = g.u32(address + 0x1cf8);
+  const panel = g.at(address, 'struct ShopTail');
+  const { action } = g.at(address, 'struct ShopLifecycleView');
   const grid = panel.grid;
   return { address, callback: g.name(action), mode: panel.mode, category: panel.category,
     page: panel.page, selection: grid.selection, savedSelection: grid.savedSelection, choice: panel.choiceState };
