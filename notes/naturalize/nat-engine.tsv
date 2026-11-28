@@ -678,3 +678,4 @@ src/system/save/Terrain_GetFloorHeightFromScript.c	Terrain_GetFloorHeightFromScr
 src/system/save/Terrain_GetFloorKindFromScript.c	Terrain_GetFloorKindFromScript	contrived	contrived	7	coordinate words built with a mask variable and the cell pointer reused to hold x: bitfield and plain stores rotate registers
 src/system/save/Terrain_GetCellWordFromScript.c	Terrain_GetCellWordFromScript	contrived	contrived	7	same coordinate-word construction as the floor kind query
 src/system/save/Script_TeleportToCell.c	Script_TeleportToCell	contrived	contrived	2	pointer alias to the position for the slope adjustment; direct member reads change the load order
+src/system/save/SavedVariables_CaptureVariableValues.c	SavedVariables_CaptureVariableValues	contrived	natural	1	
