@@ -1680,75 +1680,12 @@ void ImpactParticleGroup_SpawnRadial(s32, s32, void *, s32, s32, s32, s32, s32, 
 
 void TutorialOtenko_UpdateBlinkBurstDisappearance(struct ActorAnimController *p)
 {
-    struct DisplaySequenceSprite *o;
-    struct DisplaySequenceState *a;
-    const u16 *entry;
-    u32 flag;
-    u8 done;
+    s32 i;
     if (take(p)) {
         p->state = 13;
         Anim_SetSequence(&p->anim, p->arg, 13, 0, 0);
         AnimData_SelectPaletteBank(p->effect, 346);
-        o = &p->obj;
-        a = &p->anim;
-        entry = a->commands + a->index;
-        o->frame = *entry >> 6;
-        {
-            union DisplaySequenceControl control;
-            u32 bit, first;
-            control.raw = a->flags;
-            bit = 1;
-            first = (u8)(control.raw & bit);
-            if (first != (((*entry & 0x30) >> 4) & bit))
-                o->flags |= 4;
-            else
-                o->flags &= ~4;
-        }
-        {
-            union DisplaySequenceControl control;
-            u32 bit, first;
-            control.raw = a->flags;
-            bit = 2;
-            first = (u8)(control.raw & bit);
-            if (first != (((*entry & 0x30) >> 4) & bit))
-                o->flags |= 8;
-            else
-                o->flags &= ~8;
-        }
-        if (++a->elapsed >= a->duration) {
-            a->elapsed = 0;
-            if (a->flags & 4) {
-                if (a->index == 0) {
-                    if (a->flags & 8) {
-                        a->elapsed = a->duration;
-                    } else {
-                        a->index = a->frameCount - 1;
-                    }
-                    done = 1;
-                } else {
-                    a->index--;
-                    done = 0;
-                }
-            } else {
-                if (++a->index >= a->frameCount) {
-                    if ((u8)(a->flags & 8)) {
-                        a->elapsed = a->duration;
-                        a->index = a->frameCount - 1;
-                        done = 1;
-                    } else {
-                        a->index = 0;
-                        done = 1;
-                    }
-                } else
-                    done = 0;
-            }
-            entry = a->commands + a->index;
-            a->frameWeight = frame_factor(*entry);
-            a->duration = (a->frameWeight * a->speed) >> 6;
-            if (!a->duration)
-                a->duration = 1;
-        } else
-            done = 0;
+        DisplaySequence_StepSprite(&p->obj, &p->anim);
         p->blinkTimer = 0;
         p->blinkInterval = 15;
     }
@@ -1783,22 +1720,15 @@ void TutorialOtenko_UpdateBlinkBurstDisappearance(struct ActorAnimController *p)
             ActorShadow_Disable(p->p2);
             p->obj.flags |= 1;
             TutorialOtenko_SetState(p, 1, 2);
-            {
-                u32 active = 4;
-                register void (*fn)(void *, void *) = TutorialOtenko_OnInteractionChildUpdate;
-                u8 reset = 1;
+            for (i = 0; i < 16; i++) {
                 struct ActorChildCallbackView *child =
-                    (struct ActorChildCallbackView *)&p->children[0].fn;
-                u32 extraFlags = 0;
-                s32 i;
-                for (i = 15; i >= 0; i--) {
-                    union DisplaySequenceControl control;
-                    control.raw = child->flags;
-                    if (active & control.raw) {
-                        child->fn = fn;
-                        child->flags = reset | control.raw | extraFlags;
-                    }
-                    child++;
+                    (struct ActorChildCallbackView *)&p->children[i].fn;
+                if (child->flags & 4) {
+                    void (*fn)(void *, void *) =
+                        (void (*)(void *, void *))TutorialOtenko_OnInteractionChildUpdate;
+                    u8 one = 1;
+                    child->fn = fn;
+                    child->flags |= one;
                 }
             }
         }
