@@ -1,4 +1,3 @@
-#define Player_TestResetFlags Player_GetControlFlags
 #include "global.h"
 #include "player/player.h"
 void Obj_StepPosition(void *);
