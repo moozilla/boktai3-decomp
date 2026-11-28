@@ -32,7 +32,7 @@ void SceneActorTarget_ApplyResetCommand(struct ChaseActor *actor, const u16 *arg
             if (!(actor->base.behaviorFlags & bit))
                 return;
         }
-            SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags, 3);
+            actor->base.behaviorFlags &= ~3;
             SceneActorRegistry_ResetRouteAndColliders((void *)actor);
             MonsterInit_SetState(actor, 3, 0, 0);
             SceneActorTerrain_InstallControl(actor, actor->base.onHidden, 12);
