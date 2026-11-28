@@ -10,8 +10,7 @@ void Ratatosk_UpdateEightDirectionAnimation(struct Ratatosk *p, s32 frame)
     if (p->actionChanged) {
         p->actionChanged = 0;
         if (p->locked) {
-            int angle = p->savedAngle;
-            Ratatosk_SetFacing(p, angle);
+            Ratatosk_SetFacing(p, p->savedAngle);
         }
         SceneActors_StartEightDirectionAnimation(p, p->animationData, p->animation, 2, 1, 1, 4);
     } else
