@@ -77,15 +77,15 @@ void PositionedEffect_InitRadialAttackColliders(struct VanargandPairAttack *acto
     struct PositionedPackedVector size;
     union PositionedColliderOffset offset;
     struct ContactCollider *collider;
-    s32 angle, i;
+    s32 i;
+
     size.x = 128;
     size.y = 128;
     size.z = 128;
     offset.bits.y = 0;
     collider = actor->radialColliders;
     for (i = 0; i < 2; i++) {
-        angle = 240 + i * 96;
-        Vanargand_MakeRadialVector(&offset.vector, angle & 255, 416);
+        Vanargand_MakeRadialVector(&offset.vector, (240 + i * 96) & 255, 416);
         Collider_Init(collider, 0, 0x2001, 0, 16, &size, &offset);
         Collider_SetCallback(collider, PositionedEffect_OnAttackContact, actor);
         Collider_SetAttackProperties(collider, actor->parameter584, 80, 0, 0, 30);

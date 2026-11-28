@@ -283,3 +283,4 @@ src/bosses/vanargand/Vanargand_ResetPaletteTransition.c	Vanargand_ResetPaletteTr
 src/bosses/vanargand/Vanargand_BlendPaletteBanks.c	Vanargand_BlendPaletteBanks	contrived	natural	1	
 src/bosses/vanargand/positioned_effect.c	PositionedEffect_InitAttackCollider	machine-shaped	natural	1	
 src/bosses/vanargand/positioned_effect.c	PositionedEffect_InitContactCollider	machine-shaped	natural	4	u8 direction local: ROM loads the constant before forming the field address
+src/bosses/vanargand/positioned_effect.c	PositionedEffect_InitRadialAttackColliders	near-natural	natural	3	
