@@ -1,35 +1,21 @@
 #include "global.h"
-struct S {
-    u8 p0[0x170];
-    u8 *pc;
-    u8 p1[0x20];
-    s16 n;
-    s16 pad;
-    s16 d[8];
-};
+#include "monsters/cannons/vulcan_cannon_worker.h"
 void Script_SetPc(u8 *);
 u8 *Script_GetPc(void);
 s32 Script_GetValue(void);
-void VulcanCannon_ReadScriptValueList(struct S *p)
+void VulcanCannon_ReadScriptValueList(struct VulcanCannon *p)
 {
     s32 i;
-    s16 *d;
-    s16 *np;
-    Script_SetPc(p->pc);
+
+    Script_SetPc(p->delayScript);
     i = 0;
     if (Script_GetPc() != 0) {
-        s32 v = Script_GetValue();
-        np = &p->n;
-        *np = v;
-        if (*np > 8)
-            *np = 8;
-        if (*np != 0 && i < *np) {
-            d = p->d;
-            do {
-                *d = Script_GetValue();
-                d++;
-                i++;
-            } while (i < p->n);
+        p->delayCount = Script_GetValue();
+        if (p->delayCount > 8)
+            p->delayCount = 8;
+        if (p->delayCount != 0) {
+            for (; i < p->delayCount; i++)
+                p->delays[i] = Script_GetValue();
         }
     }
 }

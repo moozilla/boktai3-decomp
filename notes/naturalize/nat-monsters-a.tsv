@@ -477,3 +477,4 @@ src/monsters/axe/axe.c	Axe_Init	minor	minor	0	large initializer written through 
 src/monsters/axe_armor/AxeArmor_RecordDefeat.c	AxeArmor_RecordDefeat	minor	minor	0	H() halfword view of the game state counters
 src/monsters/cannons/vulcan/VulcanCannon_InitCollider.c	VulcanCannon_InitCollider	contrived	natural	4	
 src/monsters/cannons/vulcan/VulcanCannon_ApplyHitReaction.c	VulcanCannon_ApplyHitReaction	contrived	natural	3	
+src/monsters/cannons/vulcan/VulcanCannon_ReadScriptValueList.c	VulcanCannon_ReadScriptValueList	contrived	natural	3	
