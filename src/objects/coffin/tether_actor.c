@@ -777,9 +777,8 @@ void TetherActor_BlendPalette(struct TetherActor *s)
     } while (++i <= 15);
 }
 
-void TetherActor_SelectPalette(struct TetherActor *input, u32 index)
+void TetherActor_SelectPalette(struct TetherActor *actor, u32 index)
 {
-    struct TetherActor *actor = input;
     struct DisplayAnimation *display = &actor->display.animation;
     if (display->kind == 2)
         DisplayAnimation_SelectPaletteBank(display, 408);
@@ -789,20 +788,15 @@ void TetherActor_SelectPalette(struct TetherActor *input, u32 index)
         struct DisplayAnimation *savedDisplay;
         u16 *buffer;
         u16 *destination;
-        s32 remaining;
+        s32 i;
         DisplayAnimation_SelectPaletteBank(display, index + 0x283);
         sourceField = &actor->display.colors.palette;
         savedDisplay = display;
         buffer = actor->palette;
         source = *sourceField;
         destination = buffer;
-        remaining = 15;
-        do {
-            *destination = *source;
-            ++source;
-            ++destination;
-            --remaining;
-        } while (remaining >= 0);
+        for (i = 0; i < 16; i++)
+            *destination++ = *source++;
         DisplayAnimation_SetTileSource(savedDisplay, (u32)buffer);
     }
 }
