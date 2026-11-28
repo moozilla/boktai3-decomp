@@ -129,11 +129,8 @@ void TimeResult_Update(struct ChallengeTimeResult *result)
 void TimeResult_Destroy(struct ChallengeTimeResult *result)
 {
     s32 i;
-    struct AnimSprite *e = result->digits;
-    for (i = 5; i >= 0; i--) {
-        Anim_Remove(e);
-        e++;
-    }
+    for (i = 0; i < 6; i++)
+        Anim_Remove(&result->digits[i]);
     Anim_Remove(&result->category);
     Anim_Remove(&result->label);
 }
