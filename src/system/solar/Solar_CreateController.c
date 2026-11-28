@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine/ram.h"
+#include "system/solar/solar_measurement_task.h"
 void *Task_Create(u32, u32);
 void Task_SetCallbacks(void *, void (*)(void), void (*)(void));
 s32 Solar_InitController(void *);
@@ -12,7 +13,7 @@ void *Solar_CreateController(void)
     void *p;
     if (gSolarController != 0)
         return (void *)gSolarController;
-    p = Task_Create(5, 0x30);
+    p = Task_Create(5, sizeof(struct SolarController));
     if (p != 0) {
         Task_SetCallbacks(p, Solar_UpdateTask, Solar_DestroyController);
         if (Solar_InitController(p) < 0) {
