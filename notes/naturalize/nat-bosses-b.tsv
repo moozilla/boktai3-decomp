@@ -47,3 +47,4 @@ src/bosses/ratatosk/Ratatosk_UpdateOrbitingParticlePose.c	Ratatosk_UpdateOrbitin
 src/bosses/ratatosk/Ratatosk_UpdateLongTimedPose.c	Ratatosk_UpdateLongTimedPose	minor	natural	2	
 src/bosses/ratatosk/Ratatosk_UpdateTimedPose.c	Ratatosk_UpdateTimedPose	minor	minor	2	actor alias stays: ROM keeps a second copy
 src/bosses/ratatosk/Ratatosk_UpdateTimedPoseVariant.c	Ratatosk_UpdateTimedPoseVariant	minor	minor	2	actor alias stays: ROM keeps a second copy
+src/bosses/ratatosk/SceneActor_BeginTimedAnimation.c	SceneActor_BeginTimedAnimation	minor	minor	6	actor alias and one flag accessor stay
