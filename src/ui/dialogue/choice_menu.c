@@ -348,7 +348,6 @@ s32 ChoiceMenu_Initialize(struct ChoiceMenu *p, void *window, s32 stringBase, s3
     struct AnimSpriteResource *resource;
     struct SceneInputPackedPosition position;
     s32 initial;
-    u16 *palette;
     gChoiceMenu = p;
     resource = ScriptProc_Start(0xCB05, 0x530D);
     if (!resource)
@@ -381,10 +380,9 @@ s32 ChoiceMenu_Initialize(struct ChoiceMenu *p, void *window, s32 stringBase, s3
     position.z = 0;
     AnimSprite_InitLinked(&p->leftCursor, &p->resource, 73, 17, 0, 0, 60, &position);
     AnimSprite_InitLinked(&p->rightCursor, &p->resource, 74, 17, 0, 0, 60, &position);
-    palette = p->palette;
-    Memory_Copy(palette, p->leftCursor.palette, 32);
-    p->leftCursor.palette = palette;
-    p->rightCursor.palette = palette;
+    Memory_Copy(p->palette, p->leftCursor.palette, 32);
+    p->leftCursor.palette = p->palette;
+    p->rightCursor.palette = p->palette;
     if (p->window) {
         ChoiceMenu_LayoutText(p, p->window);
         ChoiceMenu_Select(p, p->selected);
