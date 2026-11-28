@@ -307,3 +307,4 @@ src/ui/dialogue/text_interpreter/TextState_GetNumberWidth.c	TextState_GetNumberW
 src/ui/dialogue/text_interpreter/TextState_ClearSelectedChoices.c	TextState_ClearSelectedChoices	minor	natural	1	
 src/ui/dialogue/text_interpreter/TextState_RunSelectedProcedures.c	TextState_RunSelectedProcedures	minor	natural	2	
 src/ui/dialogue/text_interpreter/TextState_RenderNextGlyph.c	TextState_RenderNextGlyph	contrived	minor	5	shift pair around the high-bit test; high and low byte locals
+src/ui/dialogue/text_interpreter/TextState_MeasureStringLine.c	TextState_MeasureStringLine	contrived	minor	8	shift pair around the high-bit test; tag parsing expanded in place (not the out-of-line parser)

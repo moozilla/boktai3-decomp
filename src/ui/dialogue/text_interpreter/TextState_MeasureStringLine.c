@@ -1,22 +1,18 @@
-#include "global.h"
-struct Vm {
-    u8 pad0[0x38];
-    u8 text[64];
-    u8 pad78[0x98];
-    const u8 *strings[16];
-};
+#include "ui/dialogue/message_window.h"
 int Text_ComparePrefix(const u8 *, const u8 *, int);
 int Text_ParseDecimal(const u8 *, int);
-int TextState_GetNumberWidth(struct Vm *, int);
+int TextState_GetNumberWidth(struct MessagePlaybackState *, int);
 u16 Text_DecodeGlyphEscape(const u8 *);
 const u8 *Text_FindChar(const u8 *, u8);
 extern const u8 gUnk_0824DDF4[];
-int TextState_MeasureStringLine(struct Vm *p, int index)
+int TextState_MeasureStringLine(struct MessagePlaybackState *state, int index)
 {
-    const u8 *s = p->strings[index];
-    int n = 0;
-    while (1) {
-        u32 c = *s;
+    const u8 *text = state->strings[index];
+    int width = 0;
+    u32 c;
+
+    for (;;) {
+        c = *text;
         c <<= 24;
         if ((s32)c >= 0) {
             c >>= 24;
@@ -24,60 +20,62 @@ int TextState_MeasureStringLine(struct Vm *p, int index)
                 break;
             if (c == '\n')
                 break;
-            if (*s == '<') {
-                const u8 *q;
-                s++;
-                if (!*s)
-                    return n;
-                q = s;
-                if (!Text_ComparePrefix(s, gUnk_0824DDF4, 3)) {
-                    int has = 0;
+            if (*text == '<') {
+                const u8 *end;
+
+                text++;
+                if (!*text)
+                    return width;
+                end = text;
+                if (!Text_ComparePrefix(text, gUnk_0824DDF4, 3)) {
+                    int hasValue = 0;
                     int length = 0;
-                    u8 *text;
-                    c = *q;
-                    text = p->text;
-                    while (c != '>') {
+                    int number;
+
+                    while (*end != '>') {
                         int ch;
-                        if (!c) {
-                            q++;
+
+                        if (!*end) {
+                            end++;
                             break;
                         }
-                        ch = *q;
+                        ch = *end;
                         if (ch == '=')
-                            has = 1;
-                        else if (has)
-                            text[length++] = ch;
-                        q++;
-                        c = *q;
+                            hasValue = 1;
+                        else if (hasValue)
+                            state->tag.value[length++] = ch;
+                        end++;
                     }
-                    text[length] = 0;
-                    if (has && length)
-                        index = Text_ParseDecimal(text, length);
+                    state->tag.value[length] = 0;
+                    if (hasValue && length)
+                        number = Text_ParseDecimal(state->tag.value, length);
                     else
-                        index = 0;
-                    n += TextState_GetNumberWidth(p, index);
-                    Text_FindChar(q, '>');
-                } else
-                    Text_FindChar(s, '>');
-                if (!*s)
+                        number = 0;
+                    width += TextState_GetNumberWidth(state, number);
+                    Text_FindChar(end, '>');
+                } else {
+                    Text_FindChar(text, '>');
+                }
+                if (!*text)
                     break;
-            } else if (*s == 0x1F) {
-                u32 code = (u16)Text_DecodeGlyphEscape(s);
+            } else if (*text == 0x1F) {
+                u16 code = Text_DecodeGlyphEscape(text);
+
                 if (code == 0xFFFF)
-                    n += 2;
+                    width += 2;
                 else if (code & 0xFF00)
-                    n += 2;
+                    width += 2;
                 else
-                    n++;
-                s += 2;
+                    width++;
+                text += 2;
             } else {
-                n++;
-                s++;
+                width++;
+                text++;
             }
         } else {
-            n += 2;
-            s += 2;
+            width += 2;
+            text += 2;
         }
     }
-    return n;
+    return width;
 }
