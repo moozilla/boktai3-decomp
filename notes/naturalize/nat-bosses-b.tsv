@@ -123,3 +123,4 @@ src/bosses/ratatosk/Ratatosk_UpdateScriptedMode.c	Ratatosk_UpdateScriptedMode	co
 src/bosses/ratatosk/Ratatosk_UpdateBehavior.c	Ratatosk_UpdateBehavior	contrived	natural	1	
 src/bosses/ratatosk/Ratatosk_UpdateCombatMode.c	Ratatosk_UpdateCombatMode	natural	natural	0	
 src/bosses/ratatosk/Ratatosk_OnDamageCollision.c	Ratatosk_OnDamageCollision	contrived	minor	7	second actor alias, motion and contactFlags locals stay (ROM load order); flag accessors keep the mask loaded first
+src/bosses/ratatosk/Ratatosk_InitBodyCollider.c	Ratatosk_InitBodyCollider	contrived	natural	1	
