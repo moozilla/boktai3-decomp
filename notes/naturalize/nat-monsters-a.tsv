@@ -89,3 +89,4 @@ src/monsters/armor/actor_controller_transitions.c	ActorController_UpdatePaletteA
 src/monsters/armor/actor_controller_transitions.c	ActorController_UpdateLayeredAnimationTransition	contrived	natural	12	
 src/monsters/armor/actor_controller_transitions.c	DirectionalActor_UpdateSequence	contrived	natural	1	
 src/monsters/armor/ActorController_UpdateLayeredMid.c	ActorController_UpdateLayeredMid	contrived	natural	16	
+src/monsters/armor/Armor_SelectTimedAttack.c	Armor_SelectTimedAttack	contrived	minor	1	

@@ -38,9 +38,8 @@ void Armor_SelectTimedAttack(struct ArmorDecisionActor *p)
     s32 dx, dy, dz, ax, ay, az;
     u32 mode;
     u8 *decision;
-    s16 *cooldown = &p->attackCooldown;
-    if (*cooldown > 0)
-        --*cooldown;
+    if (p->attackCooldown > 0)
+        --p->attackCooldown;
     if (p->phase != 255 && p->behavior != 2 && p->behavior != 19)
         return;
     dx = gGameState->x - p->x;
