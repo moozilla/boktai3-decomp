@@ -178,3 +178,5 @@ src/ui/title/name_entry.c	NameEntry_EraseCharacter	minor	minor	3	goto draw stays
 src/ui/title/name_entry.c	NameEntry_Destroy	contrived	minor	3	literal mask 3 passed to Bg_DisableDisplay
 src/ui/title/name_entry.c	NameEntry_Update	contrived	minor	3	session reset keeps the v value and slot pointer: member stores skip the gGameState reloads (14 insns)
 src/ui/title/name_entry.c	NameEntry_Initialize	minor	natural	1	-
+src/ui/title/name_entry.c	NameEntryParams_SetFromScript	minor	minor	1	ScreenParams328 casts stay: gNamePlaceholderScript is a shared u32 array; a local pointer is 16 insns off
+src/ui/title/name_entry.c	NameEntry_Create	natural	natural	0	-
