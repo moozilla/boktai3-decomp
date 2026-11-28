@@ -481,3 +481,4 @@ src/ui/hud/stage_icon/StageIconDisplay_InitAnimations.c	StageIconDisplay_InitAni
 src/ui/hud/stage_icon/StageIconDisplay_Initialize.c	StageIconDisplay_Initialize	fudged	natural	1	
 src/ui/hud/stage_icon/StageIconDisplay_Create.c	StageIconDisplay_Create	fudged	natural	1	
 src/ui/hud/stage_icon/StageIconDisplay_InitFromScript.c	StageIconDisplay_InitFromScript	fudged	natural	1	
+src/ui/hud/stage_icon/StageIconDisplay_CreateFromScript.c	StageIconDisplay_CreateFromScript	fudged	natural	1	
