@@ -218,3 +218,4 @@ src/bosses/sabata/Sabata_SpawnBobbingFormation.c	Sabata_SpawnBobbingFormation	co
 src/bosses/sabata/sub_0817B2DC.c	sub_0817B2DC	contrived	partial	7	kept do/while command loop, globals/zero/mode temporaries and per-field pointers in case 1
 src/bosses/sabata/sub_0817AEC8.c	sub_0817AEC8	machine-shaped	machine-shaped	4	kept split table address, sine pointer masking and offset pointer: plain table forms change the literal loading
 src/bosses/sabata/ActorEffect_UpdateIdleScript.c	ActorEffect_UpdateIdleScript	machine-shaped	machine-shaped	4	kept actor alias and argument/mask temporaries (evaluation order)
+src/bosses/sabata/combat_commands.c	ActorEffect_StepTurn	machine-shaped	natural	14	minor: animation constant local

@@ -30,46 +30,38 @@ s32 ActorEffect_StepTurn(struct SabataActorState *actor, s32 frame, s32 start, s
                 return 1;
             if (step > 4)
                 return 0;
-            if ((step == 0) || (step == 3)) {
+            if (step == 0 || step == 3) {
                 direction = &actor->body.direction;
                 *direction += 32;
-            } else
-                goto subtract;
+            } else {
+                direction = &actor->body.direction;
+                *direction -= 32;
+            }
+            update_facing(actor, direction);
             break;
-
         case 1: {
             s32 quarter = period >> 2;
-            if ((remainder != 0) && (remainder != quarter))
+            if (remainder != 0 && remainder != quarter)
                 return 0;
-        }
-            if ((step == 4) && (remainder == 0))
+            if (step == 4 && remainder == 0)
                 return 1;
             if (step > 4)
                 return 0;
-            if ((step == 0) || (step == 3)) {
+            if (step == 0 || step == 3) {
                 direction = &actor->body.direction;
                 *direction += 32;
-            } else
-                goto subtract;
+            } else {
+                direction = &actor->body.direction;
+                *direction -= 32;
+            }
+            update_facing(actor, direction);
             break;
-
-        default:
-            goto animate;
+        }
     }
-
-    goto facing;
-subtract:
-    direction = &actor->body.direction;
-    *direction -= 32;
-
-facing:
-    update_facing(actor, direction);
-
-animate: {
-    u32 animation = 1;
-    actor->state = animation;
-}
-
+    {
+        u32 animation = 1;
+        actor->state = animation;
+    }
     return 0;
 }
 
