@@ -269,3 +269,4 @@ src/link/player/Player_UpdateDefeatSequence.c	Player_UpdateDefeatSequence	contri
 src/link/player/Player_UpdateStumble.c	Player_UpdateStumble	minor	natural	2	
 src/link/player/Player_UpdateChargeSpin.c	Player_UpdateChargeSpin	contrived	minor	2	secondary sprite viewed through its draw-flags field
 src/link/player/Player_RestartAnimation.c	Player_RestartAnimation	contrived	minor	1	secondary sprite viewed through its draw-flags field
+src/link/player/Player_GetAdjustedMovementInterval.c	Player_GetAdjustedMovementInterval	minor	natural	1	
