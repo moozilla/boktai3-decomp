@@ -1,22 +1,29 @@
 #include "global.h"
-#include "engine/engine.h"
 #include "engine/ram.h"
-s32 TextWindowManager_OnUpdate(void *);
-s32 TextWindowManager_OnDestroy(void *);
-s32 TextWindowManager_Init(void *);
-void *TextWindowManager_Create(void)
+#include "ui/dialogue/text_window.h"
+#include "ui/dialogue/text_window_manager.h"
+
+void *Task_Create(int, int);
+void Task_SetCallbacks(void *, void (*)(void *), void (*)(void *));
+void Task_Kill(void *);
+int TextWindowManager_OnUpdate(struct WindowManager *);
+int TextWindowManager_OnDestroy(struct WindowManager *);
+int TextWindowManager_Init(struct WindowManager *);
+
+struct WindowManager *TextWindowManager_Create(void)
 {
-    void *p = gWindowManager;
-    if (!p) {
-        p = Task_Create(12, 0x20);
-        if (p) {
-            Task_SetCallbacks(p, (void (*)(void *))TextWindowManager_OnUpdate,
+    struct WindowManager *manager = (void *)gWindowManager;
+
+    if (!manager) {
+        manager = Task_Create(12, sizeof(struct WindowManager));
+        if (manager) {
+            Task_SetCallbacks(manager, (void (*)(void *))TextWindowManager_OnUpdate,
                               (void (*)(void *))TextWindowManager_OnDestroy);
-            if (TextWindowManager_Init(p) < 0) {
-                Task_Kill(p);
+            if (TextWindowManager_Init(manager) < 0) {
+                Task_Kill(manager);
                 return 0;
             }
         }
     }
-    return p;
+    return manager;
 }
