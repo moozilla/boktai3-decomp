@@ -1,24 +1,19 @@
 #include "effects/feathers/feather_effect_pool.h"
-#include "engine/ram.h"
-
-u8 *Task_Create(u32, u32);
-void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
-s32 FeatherEffectPool_Init(u8 *);
-void Task_Kill(u8 *);
-void FeatherEffectPool_DestroyTask(void);
+#include "engine/engine.h"
 
 struct FeatherPool *FeatherEffectPool_GetOrCreate(void)
 {
-    void *p;
-    if (gFadingSpritePool != 0)
+    struct FeatherPool *pool;
+
+    if (gFadingSpritePool != NULL)
         return gFadingSpritePool;
-    p = Task_Create(0x8, 0xcbc);
-    if (p != 0) {
-        Task_SetCallbacks(p, FeatherEffectPool_UpdateTask, FeatherEffectPool_DestroyTask);
-        if (FeatherEffectPool_Init(p) < 0) {
-            Task_Kill(p);
-            return 0;
+    pool = (struct FeatherPool *)Task_Create(8, sizeof(*pool));
+    if (pool != NULL) {
+        Task_SetCallbacks(&pool->task, FeatherEffectPool_UpdateTask, FeatherEffectPool_DestroyTask);
+        if (FeatherEffectPool_Init(pool) < 0) {
+            Task_Kill(&pool->task);
+            return NULL;
         }
     }
-    return p;
+    return pool;
 }
