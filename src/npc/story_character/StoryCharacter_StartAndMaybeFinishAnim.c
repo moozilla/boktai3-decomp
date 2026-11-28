@@ -1,23 +1,13 @@
-#include "global.h"
-struct S {
-    u8 f0[1];
-    u8 b1;
-    u8 f2[5];
-    u8 b7;
-    u8 b8;
-    u8 b9;
-    u8 f3[0x18 - 0xa];
-    u8 b18;
-};
-void Actor_PlayAnimationEntry(void *, u32, u32, u32, u32);
-void StoryCharacter_StartAndMaybeFinishAnim(u32 a, struct S *p, s32 a2)
+#include "npc/manager/scene_actor_lifecycle.h"
+#include "npc/story_character/npc_tag_layout.h"
+void StoryCharacter_StartAndMaybeFinishAnim(u32 a, struct SceneActor *p, s32 a2)
 {
-    u8 *base20 = (u8 *)p + 0x20;
-    if (p->b9 != 0) {
+    struct NpcTag *tag = (struct NpcTag *)p->unknown20;
+    if (p->animationEntered != 0) {
         u32 animId;
-        p->b9 = 0;
-        p->b7 = 0;
-        switch (p->b1) {
+        p->animationEntered = 0;
+        p->finished = 0;
+        switch (p->variant) {
             case 4:
             case 5:
             case 6:
@@ -52,18 +42,14 @@ void StoryCharacter_StartAndMaybeFinishAnim(u32 a, struct S *p, s32 a2)
                 break;
         }
         Actor_PlayAnimationEntry(p, animId, 2, 0, 6);
-        {
-            u32 zero = 0;
-            u16 v = 0x96 << 1;
-            *(u16 *)(base20 + 2) = v;
-            p->b18 = zero;
-        }
+        tag->height = 300;
+        p->animationPhase = 0;
     }
     if (a2 != 1)
         return;
     {
         u32 animId;
-        switch (p->b1) {
+        switch (p->variant) {
             case 4:
             case 5:
             case 6:
@@ -99,5 +85,5 @@ void StoryCharacter_StartAndMaybeFinishAnim(u32 a, struct S *p, s32 a2)
         }
         Actor_PlayAnimationEntry(p, animId, 0, 0, 3);
     }
-    p->b7 = 1;
+    p->finished = 1;
 }

@@ -177,3 +177,4 @@ src/npc/story_character/StoryCharacter_RunEntryAnimSequence.c	StoryCharacter_Run
 src/npc/story_character/StoryCharacter_ApproachTargetPose.c	StoryCharacter_ApproachTargetPose	contrived	natural	1	
 src/npc/story_character/StoryCharacter_SpawnRaisedEffect.c	StoryCharacter_SpawnRaisedEffect	contrived	minor	8	effects word pointer into the unnamed 0x20 block and a target pointer: ROM keeps both addresses
 src/npc/story_character/StoryCharacter_RunPaletteFlashSequence.c	StoryCharacter_RunPaletteFlashSequence	contrived	natural	2	
+src/npc/story_character/StoryCharacter_StartAndMaybeFinishAnim.c	StoryCharacter_StartAndMaybeFinishAnim	contrived	natural	2	
