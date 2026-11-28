@@ -1,4 +1,5 @@
 #include "effects/floating_item_effect.h"
+#include "engine/math/monster_particle_random.h"
 
 enum FloatingEffectState {
     FLOATING_EFFECT_BOB,
@@ -134,11 +135,6 @@ void FloatingEffect_ShrinkAway(struct LinkedWidgetSet *manager, struct FloatingE
     }
 }
 
-static inline u32 FloatingEffect_RandomAt(const u16 *table, u16 index)
-{
-    return table[index];
-}
-
 void FloatingEffect_RiseAndSettle(struct LinkedWidgetSet *manager, struct FloatingEffect *effect)
 {
     if (effect->entered) {
@@ -147,32 +143,22 @@ void FloatingEffect_RiseAndSettle(struct LinkedWidgetSet *manager, struct Floati
     }
     if (effect->mode == 3) {
         if (effect->timer <= 3)
-            effect->position.y += 0x40;
+            effect->position.y += 64;
         else
             effect->position.y -= 4;
-    } else if (effect->timer <= 4)
-        effect->position.y += 0x40;
-    else
+    } else if (effect->timer <= 4) {
+        effect->position.y += 64;
+    } else {
         effect->position.y -= 8;
+    }
     FloatingEffect_Project(effect);
-    if ((effect->mode == 3) && (effect->timer > 3)) {
-        const u16 *table = gRandomTable;
-        u32 *seed = &gRandomIndex;
-        u16 index = *seed + 1;
-        index &= 0x3FF;
-        *seed = index;
-        {
-            u32 bits = FloatingEffect_RandomAt(table, index);
-            s32 x = (u16)effect->sprite.position.x - 1;
-            effect->sprite.position.x = x + (bits & 3);
-        }
-        index = (index + 1) & 0x3FF;
-        *seed = index;
-        {
-            u32 bits = FloatingEffect_RandomAt(table, index);
-            s32 y = (u16)effect->sprite.position.y - 1;
-            effect->sprite.position.y = y + (bits & 3);
-        }
+    if (effect->mode == 3 && effect->timer > 3) {
+        int bits;
+
+        bits = ParticleRandom_ReadDirectSample(gRandomTable);
+        effect->sprite.position.x += (bits & 3) - 1;
+        bits = ParticleRandom_ReadDirectSample(gRandomTable);
+        effect->sprite.position.y += (bits & 3) - 1;
     }
     if (effect->mode == 3) {
         if (effect->timer <= 8)
