@@ -6,14 +6,11 @@ static inline u8 SceneActorContacts_AreDisabled(void)
         return 1;
     return 0;
 }
-struct SceneActorContactNode *SceneActorContacts_SelectForActor(struct ChaseActor *argument,
-                                                                u32 kindMaskArgument)
+struct SceneActorContactNode *SceneActorContacts_SelectForActor(struct ChaseActor *actor,
+                                                                u32 kindMask)
 {
-    struct ChaseActor *actor = argument;
-    u32 kindMask = kindMaskArgument;
     struct ChaseActor *owner = actor;
     struct SceneActorContactManager *manager;
-
     struct SceneActorContactNode *node, *best;
     s32 distance;
     s32 selectionStatus;
@@ -26,14 +23,13 @@ struct SceneActorContactNode *SceneActorContacts_SelectForActor(struct ChaseActo
     selectionStatus = -1;
     node = manager->head;
     tracking = &owner->base.tracking;
-    while (node) {
+    for (; node; node = node->next) {
         if ((node->flags & 1) && node->object && (node->kind & kindMask) &&
             SceneActorContacts_CanSelectNode(node) &&
             SceneActorContacts_EvaluateCandidate(node, actor, &distance)) {
             best = node;
             selectionStatus = (s32)best;
         }
-        node = node->next;
     }
     if (selectionStatus >= 0) {
         switch (best->kind) {
