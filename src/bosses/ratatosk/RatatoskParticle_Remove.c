@@ -1,19 +1,13 @@
 #include "global.h"
-struct A {
-    u8 p0[0x18];
-    u32 w18;
-    u8 p1[0xb1c - 0x1c];
-    s32 cnt;
-};
-struct B {
-    u8 p[0x2c];
-    u32 w2c;
-};
+#include "bosses/ratatosk/ratatosk_small_particle.h"
+#include "engine/ram.h"
+
 void Sprite_Remove(void *);
-void RatatoskParticle_Remove(struct A *a, struct B *b, u32 n)
+
+void RatatoskParticle_Remove(struct ParticlePool *pool, struct Particle *e, u32 slot)
 {
-    a->cnt--;
-    b->w2c |= 1;
-    Sprite_Remove(&b->w2c);
-    a->w18 &= ~(1 << n);
+    pool->activeCount--;
+    e->sprite.flags |= 1;
+    Sprite_Remove(&e->sprite);
+    pool->mask &= ~(1 << slot);
 }
