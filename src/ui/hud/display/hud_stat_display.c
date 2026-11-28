@@ -65,10 +65,9 @@ void Hud_InitSelectionBounds(u32 level, u32 color)
 
 s32 Hud_GetMinimum(s32 first, s32 second)
 {
-    s32 minimum = second;
-    if (first <= minimum)
-        minimum = first;
-    return minimum;
+    if (first <= second)
+        return first;
+    return second;
 }
 
 void Hud_DrawStatRatio(void *unused, s32 style, s32 divisor, s32 count, s32 numerator,
