@@ -527,28 +527,25 @@ void MessageWindow_UpdateFastPlayback(struct MessageWindow *window)
     else
         state->skip = window->skipFlags;
     if (state->pc) {
-        if (!state->stream && !*((u8 *)state->pc)) {
+        if (!state->stream && !*state->pc) {
             window->pageAdvanceTimer = 0;
             MessageWindow_SetPlayback(window, MessageWindow_UpdatePageAdvance);
             if (!window->autoAdvance && !window->pageAdvanceDelay)
                 window->animSprite.flags &= ~1;
-            goto done;
-        } else {
-            state->characterTimer = 0;
-            state->instant = 1;
-            if (TextState_StepPlayback(state) && state->complete)
-                MessageWindow_SetPlayback(window, MessageWindow_ClearTextCompletion);
+            return;
         }
+        state->characterTimer = 0;
+        state->instant = 1;
+        if (TextState_StepPlayback(state) && state->complete)
+            MessageWindow_SetPlayback(window, MessageWindow_ClearTextCompletion);
     }
     if (window->callback != MessageWindow_ClearTextCompletion && !window->autoAdvance &&
         window->fastPlayback) {
-        u16 mask = gPadState[0] & 2;
-        if (!mask) {
+        if (!(gPadState[0] & B_BUTTON)) {
             MessageWindow_SetPlayback(window, MessageWindow_UpdateNormalPlayback);
-            window->fastPlayback = mask;
+            window->fastPlayback = 0;
         }
     }
-done:;
 }
 
 void MessageWindow_UpdateNormalPlayback(struct MessageWindow *window)
