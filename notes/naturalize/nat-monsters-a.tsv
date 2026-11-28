@@ -205,3 +205,13 @@ src/monsters/armor/Armor_RetractPartStretch.c	Armor_RetractPartStretch	contrived
 src/monsters/armor/Armor_UpdatePartWaveXReturn.c	Armor_UpdatePartWaveXReturn	contrived	contrived	0	parked one shared by two byte stores and a flag OR: register choice
 src/monsters/armor/Armor_UpdatePartWaveZReturn.c	Armor_UpdatePartWaveZReturn	contrived	contrived	0	parked one shared by two byte stores and a flag OR: register choice
 src/monsters/armor/Armor_InitPartOrbitTimer.c	Armor_InitPartOrbitTimer	contrived	natural	3	
+src/monsters/armor/Armor_UpdatePartDescent.c	Armor_UpdatePartDescent	minor	minor	0	byte-offset member address
+src/monsters/armor/Armor_UpdatePartPaletteRestore.c	Armor_UpdatePartPaletteRestore	natural	natural	0	
+src/monsters/armor/Armor_InitPartDescent.c	Armor_InitPartDescent	natural	natural	0	
+src/monsters/armor/Armor_IsSequenceIncomplete.c	Armor_IsSequenceIncomplete	natural	natural	0	
+src/monsters/armor/SpriteColliderGroup_ActivateParts.c	SpriteColliderGroup_ActivateParts	minor	minor	0	parts array viewed through a cast inside the loop
+src/monsters/armor/SpriteColliderGroup_ResetActiveParts.c	SpriteColliderGroup_ResetActiveParts	minor	minor	0	parts array viewed through a cast inside the loop
+src/monsters/armor/Armor_OnPartStateSound.c	Armor_OnPartStateSound	minor	minor	0	byte pointer signature or temp
+src/monsters/armor/Armor_AcceleratePartTurn.c	Armor_AcceleratePartTurn	minor	minor	0	byte pointer signature or temp
+src/monsters/armor/Armor_UpdatePartLungeDelay.c	Armor_UpdatePartLungeDelay	minor	minor	0	byte pointer signature or temp
+src/monsters/armor/Armor_AcceleratePartReturnTurn.c	Armor_AcceleratePartReturnTurn	minor	minor	0	byte pointer signature or temp
