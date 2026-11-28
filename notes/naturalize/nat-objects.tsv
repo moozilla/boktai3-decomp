@@ -376,3 +376,4 @@ src/objects/ice_boulders.c	IceBoulder_AnimateRemoval	natural	natural	0
 src/objects/ice_boulders.c	IceBoulderPool_InitManager	natural	natural	0	
 src/objects/ice_boulders.c	IceBoulderPool_Create	natural	natural	0	
 src/objects/ice_boulders.c	IceBoulderPool_ResetInstance	natural	natural	0	
+src/objects/interaction_prompts.c	InteractionPrompt_InitSlot	minor	natural	3	

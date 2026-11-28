@@ -21,25 +21,23 @@ u32 InteractionPrompt_ConsumeEntered(struct DirectionalController *p)
     return r;
 }
 
-s32 InteractionPrompt_InitSlot(struct DirectionalManager *manager,
-                                   struct DirectionalController *p, s32 index)
+s32 InteractionPrompt_InitSlot(struct DirectionalManager *manager, struct DirectionalController *p,
+                               s32 index)
 {
     void *animation = &p->graphics;
-    s32 r;
-    if (AnimData_Load(animation, 0xA850) != 0) {
-        struct DisplaySequenceSprite *q = &p->drawable;
-        Sprite_Init(q, animation, 1);
-        q->frame = 1;
-        p->drawable.priority = 2;
-        r = 0;
-    } else
-        r = -1;
-    return r;
+    struct DisplaySequenceSprite *sprite;
+    if (AnimData_Load(animation, 0xA850) == 0)
+        return -1;
+    sprite = &p->drawable;
+    Sprite_Init(sprite, animation, 1);
+    sprite->frame = 1;
+    p->drawable.priority = 2;
+    return 0;
 }
 
 /* Finds the enabled controller with the given script id; optionally returns its slot index. */
-struct DirectionalController *
-InteractionPrompt_FindByScriptId(struct DirectionalManager *manager, s32 id, s32 *index)
+struct DirectionalController *InteractionPrompt_FindByScriptId(struct DirectionalManager *manager,
+                                                               s32 id, s32 *index)
 {
     struct DirectionalController *e;
     s32 i;
@@ -66,7 +64,7 @@ u32 InteractionPrompt_SetMarkerFadeLevel(struct DirectionalController *p, u32 le
 
 /* Places the controller and its marker around the given point. */
 u32 InteractionPrompt_SetPosition(struct DirectionalManager *manager,
-                                      struct DirectionalController *p, const struct SceneVec *in)
+                                  struct DirectionalController *p, const struct SceneVec *in)
 {
     struct DisplaySequenceSprite *q = &p->drawable;
     p->position.x = in->x;
@@ -163,7 +161,7 @@ static inline u8 facingAllowed(u32 facing, s32 a, s32 b, s32 c)
 }
 
 s32 InteractionPrompt_CheckApproach(struct DirectionalManager *manager,
-                                        struct DirectionalController *p)
+                                    struct DirectionalController *p)
 {
     InteractionPrompt_ConsumeEntered(p);
     if (manager->actor) {
@@ -199,7 +197,7 @@ done:
 }
 
 s32 InteractionPrompt_CheckInput(struct DirectionalManager *manager,
-                                     struct DirectionalController *p, s32 index)
+                                 struct DirectionalController *p, s32 index)
 {
     InteractionPrompt_ConsumeEntered(p);
     if (manager->actor) {
@@ -244,7 +242,7 @@ done:
 }
 
 s32 InteractionPrompt_CheckRemaining(struct DirectionalManager *manager,
-                                         struct DirectionalController *p)
+                                     struct DirectionalController *p)
 {
     InteractionPrompt_ConsumeEntered(p);
     if (manager->actor) {
