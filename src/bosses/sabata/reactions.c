@@ -520,9 +520,7 @@ void Sabata_UpdateDelayedFinish(struct SabataActorState *actor)
             }
             if (actor->pendingAction > 120) {
                 ProximityVolume_SetPosition(actor->proximityVolume, &actor->body.position);
-                {
-                    Sabata_EnterSequenceStep(actor, 2);
-                }
+                Sabata_EnterSequenceStep(actor, 2);
             }
             break;
         case 2: {
