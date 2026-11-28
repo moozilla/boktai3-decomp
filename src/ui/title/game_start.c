@@ -293,17 +293,16 @@ s32 GameStart_Init(struct GameStart *p)
     u32 layers;
     struct GameStartPos pos;
     void *res;
+    void *bg;
     s32 i;
     Bg_ClearTilemap(0);
     BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0);
     Bg_ClearTilemap(2);
     BgGfx_LoadTilemapSimple(2, 0, 0, 0, 0);
     Bg_ClearTilemap(3);
-    {
-        void *bg = ScriptProc_Start(0xc091, 0x3536);
-        layers = 4;
-        Bg_SetupLayers(2, 0, bg, 0, 0, 1, &layers);
-    }
+    bg = ScriptProc_Start(0xc091, 0x3536);
+    layers = 4;
+    Bg_SetupLayers(2, 0, bg, 0, 0, 1, &layers);
     BgGfx_LoadTilemapSimple(3, 0, 0, 0, 0);
     CpuSet(((struct GameStartPalette *)ScriptProc_Start(0x92b3, 0x204))->colors, gBgPaletteBuffer,
            0x100);
@@ -317,22 +316,12 @@ s32 GameStart_Init(struct GameStart *p)
                           0);
     p->decoration.flags |= 1;
     p->decoration.position.x = 0;
-    {
-        s16 *targetY = &p->decoration.position.y;
-        s32 k1 = 0xffe0;
-        *targetY = k1;
-    }
-    {
-        res = ScriptProc_Start(0xcb05, 0x530d);
-    }
+    p->decoration.position.y = -0x20;
+    res = ScriptProc_Start(0xcb05, 0x530d);
     ResourceHeader_Relocate((u8 *)&p->titleResource, res);
     AnimSprite_InitLinked((u8 *)&p->title, (u8 *)&p->titleResource, 0x8a, 0x10, 0, 0, 0, 0);
     p->title.position.x = 0;
-    {
-        s16 *targetY = &p->title.position.y;
-        s32 valueY = 0xfff8;
-        *targetY = valueY;
-    }
+    p->title.position.y = -8;
     AnimData_Load(&p->cursorGraphics, 0x593a);
     Sprite_Init((u8 *)&p->cursor, &p->cursorGraphics, 0x11);
     p->cursor.position.x = 0x18;
@@ -364,18 +353,11 @@ s32 GameStart_Init(struct GameStart *p)
     else
         Menu_StartFadeIn(3);
     if (gListMenuParameters.b == 0) {
-        u8 *name = gAnimPanelSavedSelections;
-        u8 *slot = gNameEntrySavedState;
-        u8 *end = name;
-        s32 blank = 0x41;
-        u8 *q = name + 0x17;
-        do {
-            *q = blank;
-            q--;
-        } while (((s32)q) >= ((s32)end));
-        name[0x18] = 0;
-        slot[0] = 4;
-        slot[1] = 0;
+        for (i = 0; i < 0x18; i++)
+            gAnimPanelSavedSelections[i] = 0x41;
+        gAnimPanelSavedSelections[0x18] = 0;
+        gNameEntrySavedState[0] = 4;
+        gNameEntrySavedState[1] = 0;
         if (gListMenuParameters.b == 0) {
             p->saveIndex = GameStart_LoadAvailableSave(p);
             Sound_PlaySong(0xb3);
