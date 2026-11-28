@@ -328,3 +328,6 @@ src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateAlternateFormChange	con
 src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateFormChange	minor	natural	4	-
 src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateSpiralMotion	minor	natural	2	-
 src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateSideWalkTarget	minor	minor	20	PlayerCue_FaceSideWalkAngle helper (its facing/heading pointers fix the address-then-copy order)
+src/player/cutscene/player_cue_actions.c	Player_RestartAnimationFromResource	natural	natural	0	-
+src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateSideDeparture	natural	natural	1	-
+src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateSideArrival	minor	minor	8	phase passed to FoldSideFacing and the flip-mask step as the known zero (reuses the register)

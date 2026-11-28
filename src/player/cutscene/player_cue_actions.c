@@ -1921,8 +1921,8 @@ void PlayerCue_UpdateSideDeparture(struct Player *player)
 
 void PlayerCue_UpdateSideArrival(struct Player *player)
 {
-    u32 phase = player->tetherPhase;
-    switch ((s16)phase) {
+    s16 phase = player->tetherPhase;
+    switch (phase) {
         case 0:
             if (!player->tetherFrame) {
                 FoldSideFacing(player, phase);
