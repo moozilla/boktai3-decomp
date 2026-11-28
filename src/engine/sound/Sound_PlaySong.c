@@ -1,16 +1,9 @@
 #include "global.h"
+#include "gba/m4a_internal.h"
 #include "engine/video/render.h"
 #include "engine/ram.h"
-struct Song {
-    u32 p;
-    u16 ms, me;
-};
-extern struct Song gSongTable[];
-struct MP {
-    u32 a, b, c;
-};
-extern struct MP gUnk_082643EC[];
 void m4aSongNumStart(u16);
+
 void Sound_PlaySong(u32 n)
 {
     if ((gEnginePauseFlags & 6) == 0)

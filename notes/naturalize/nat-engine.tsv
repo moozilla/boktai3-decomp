@@ -88,3 +88,4 @@ src/engine/math/sub_08221AB8.c	sub_08221AB8	natural	natural	0
 src/engine/sound/Sound_IsSongPlaying.c	Sound_IsSongPlaying	contrived	natural	1	
 src/engine/sound/Sound_PauseChannel12.c	Sound_PauseChannel12	minor	natural	1	
 src/engine/sound/Sound_SetChannel10Tempo.c	Sound_SetChannel10Tempo	minor	natural	1	
+src/engine/sound/Sound_PlaySong.c	Sound_PlaySong	minor	natural	1	
