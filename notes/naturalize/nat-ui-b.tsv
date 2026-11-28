@@ -217,3 +217,4 @@ src/ui/title/password_menu.c	PasswordDisplay_SetParametersFromScript	natural	nat
 src/ui/title/password_menu.c	PasswordDisplay_Create	natural	natural	0	-
 src/ui/title/game_start.c	GameStart_LoadAvailableSave	contrived	natural	4	-
 src/ui/title/game_start.c	GameStart_Update	contrived	minor	4	state value (0) still written to pulseTimer: a literal loads another register
+src/ui/title/game_start.c	GameStart_Destroy	contrived	minor	1	literal mask 3 passed to Bg_DisableDisplay

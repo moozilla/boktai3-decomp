@@ -275,27 +275,15 @@ void GameStart_Update(struct GameStart *p)
 void GameStart_Destroy(struct GameStart *p)
 {
     s32 i;
-    struct AnimSprite *q;
-    struct AnimSprite *a, *b;
-    u16 *r = &gDispCntShadow;
-    s32 m = 4;
-    *r = *r & -m;
-    q = &p->levelDigits[0];
-    for (i = 1; i >= 0; i--) {
-        Anim_Remove(q);
-        q++;
-    }
-    a = &p->decoration;
-    b = &p->background;
-    q = &p->timeDigits[0];
-    for (i = 4; i >= 0; i--) {
-        Anim_Remove(q);
-        q++;
-    }
+    Bg_DisableDisplay(3);
+    for (i = 0; i < 2; i++)
+        Anim_Remove(&p->levelDigits[i]);
+    for (i = 0; i < 5; i++)
+        Anim_Remove(&p->timeDigits[i]);
     Sprite_Remove(&p->cursor);
     Anim_Remove(&p->title);
-    Anim_Remove(a);
-    Anim_Remove(b);
+    Anim_Remove(&p->decoration);
+    Anim_Remove(&p->background);
 }
 
 // Tentative: sets up the Game Start screen (backgrounds, widgets, cursor sprite, save state).
