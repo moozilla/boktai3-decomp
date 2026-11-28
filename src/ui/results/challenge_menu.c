@@ -279,10 +279,8 @@ void ChallengeMenu_InitBackgrounds(struct ChallengeMenu *menu)
 void ChallengeMenu_LoadPalette(struct ChallengeMenu *menu)
 {
     struct ChallengeMenuPalette *resource = ScriptProc_Start(0x92B3, 0x204);
-    u16 **destination = &menu->paletteSource;
-    u16 *colors = resource->colors;
-    *destination = colors;
-    CpuSet(colors, gBgPaletteBuffer, 0x04000028);
+    menu->paletteSource = resource->colors;
+    CpuSet(menu->paletteSource, gBgPaletteBuffer, 0x04000028);
 }
 
 void ChallengeMenu_SetGroupIcon(struct ChallengeMenu *menu)

@@ -63,3 +63,4 @@ src/ui/results/challenge_menu.c	ChallengeMenu_ConsumeStateEntry	minor	natural	3
 src/ui/results/challenge_menu.c	ChallengeMenu_UpdateWidgets	contrived	minor	6	position pointer: separate member stores compute the address twice
 src/ui/results/challenge_menu.c	ChallengeMenu_Destroy	contrived	natural	1	
 src/ui/results/challenge_menu.c	ChallengeMenu_InitBackgrounds	contrived	natural	1	
+src/ui/results/challenge_menu.c	ChallengeMenu_LoadPalette	minor	natural	1	
