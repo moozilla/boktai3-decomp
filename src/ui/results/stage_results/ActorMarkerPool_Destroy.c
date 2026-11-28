@@ -8,5 +8,6 @@ s32 ActorMarkerPool_Destroy(void)
     s32 i;
     for (i = 0; i <= 7; i++)
         ActorMarkerPool_RemoveMarker(i);
-    return gPanelSpritePool = 0;
+    gPanelSpritePool = 0;
+    return 0;
 }
