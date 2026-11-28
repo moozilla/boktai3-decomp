@@ -579,3 +579,4 @@ src/ui/hud/display/sub_081782AC.c	sub_081782AC	fudged	natural	1
 src/ui/hud/display/Hud_RegisterTimer.c	Hud_RegisterTimer	fudged	natural	1	
 src/ui/hud/display/Hud_ClearTimer.c	Hud_ClearTimer	fudged	natural	1	
 src/ui/hud/display/sub_08178474.c	sub_08178474	fudged	natural	1	
+src/ui/hud/display/SceneHud_RefreshControls.c	SceneHud_RefreshControls	fudged	partial	2	owner local before storing the action owner; gFieldHud u8* casts
