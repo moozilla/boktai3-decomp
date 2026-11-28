@@ -2,12 +2,7 @@
 #include "ui/pause/scene_hud_display.h"
 #include "engine/ram.h"
 #include "player/player.h"
-
-struct SceneHudOwnerSource {
-    u8 unknown0[0x18];
-    s16 index;
-};
-extern struct SceneHudOwnerSource *gLinkSession;
+#include "link/session/link_session_state.h"
 
 void Hud_LoadLayoutResources(struct SceneHudState *);
 void SceneHud_InitGameplayResources(struct SceneHudState *);
@@ -16,33 +11,26 @@ static inline s32 OwnerIndex(void)
 {
     if (!gLinkSession)
         return -1;
-    return gLinkSession->index;
+    return gLinkSession->localPlayer;
 }
-s32 SceneHud_InitializeOwner(struct SceneHudState *s)
+s32 SceneHud_InitializeOwner(struct SceneHudState *hud)
 {
-    s32 index;
-    u32 offset;
-    struct Player *owner;
-    int one;
-    s->initializationFlag = 0;
+    struct Player *player;
+    hud->initializationFlag = 0;
     Bg_SetPriority(0, 0);
-    index = OwnerIndex();
-    s->actionOwnerIndex = index;
-    offset = 0xA5C;
-    *(u16 *)((u8 *)s + offset) = 0;
+    hud->actionOwnerIndex = OwnerIndex();
+    hud->initializationState = 0;
     {
-        u8 idx = s->actionOwnerIndex;
-        owner = gPlayers[idx];
+        u8 index = hud->actionOwnerIndex;
+        player = gPlayers[index];
     }
-    s->actionOwner = owner;
-    Hud_LoadLayoutResources(s);
-    SceneHud_InitGameplayResources(s);
-    SceneHud_RefreshGameplayDisplay(s);
-    s->previousCueGroup = 255;
-    s->previousCueSelection = -1;
-    one = 1;
-    offset = 0xA5F;
-    *(s8 *)((u8 *)s + offset) = -one;
-    (*(struct SceneHudState **)&gFieldHud) = s;
+    hud->actionOwner = player;
+    Hud_LoadLayoutResources(hud);
+    SceneHud_InitGameplayResources(hud);
+    SceneHud_RefreshGameplayDisplay(hud);
+    hud->previousCueGroup = 255;
+    hud->previousCueSelection = -1;
+    hud->previousPage = -1;
+    gFieldHud = (u8 *)hud;
     return 0;
 }

@@ -596,3 +596,7 @@ src/ui/hud/display/Hud_Destroy.c	Hud_Destroy	fudged	natural	1
 src/ui/hud/display/Hud_UpdateWithCallback.c	Hud_UpdateWithCallback	fudged	natural	3	player local before storing the action owner
 src/ui/hud/display/Hud_CreateEngineFlagVariant.c	Hud_CreateEngineFlagVariant	fudged	natural	2	
 src/ui/hud/display/SceneHud_DestroyOwner.c	SceneHud_DestroyOwner	fudged	partial	1	OwnerWidgetsEnabled 0/1 predicate
+src/ui/hud/display/SceneHud_RefreshGameplayDisplay.c	SceneHud_RefreshGameplayDisplay	natural	natural	0	
+src/ui/hud/display/SceneHud_InitActionIcons.c	SceneHud_InitActionIcons	natural	natural	0	
+src/ui/hud/display/SceneHud_InitGameplayResources.c	SceneHud_InitGameplayResources	natural	natural	0	
+src/ui/hud/display/SceneHud_InitializeOwner.c	SceneHud_InitializeOwner	fudged	partial	7	u8 index block before gPlayers load (truncation register)
