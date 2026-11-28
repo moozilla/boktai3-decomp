@@ -1,7 +1,6 @@
 #include "global.h"
 #include "link/link_script_panel.h"
 
-#define ScriptPanel_SetSelection LinkSession_SetMenuRequest
 u8 LinkSession_ConsumeStateEntry(struct LinkScriptPanel *);
 void LinkSession_SetState(struct LinkScriptPanel *, u32, void (*)(void));
 void LinkSession_SetMenuRequest(u32);
@@ -18,7 +17,7 @@ s32 ScriptPanel_ConfirmSelection(struct LinkScriptPanel *p)
     if (p->counter > 10)
         LinkSession_SetMenuRequest(3);
     if (p->selection == 3) {
-        Script_Call(p->script, 0);
+        Script_Call(p->script, NULL);
         LinkSession_SetState(p, 2, ScriptPanel_PollSelection);
         p->selection = 0;
         return 0;

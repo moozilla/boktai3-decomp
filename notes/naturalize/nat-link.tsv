@@ -48,3 +48,5 @@ src/link/lobby/LinkLobbyPanel_Create.c	LinkLobbyPanel_Create	natural	natural	0
 src/link/lobby/LinkLobbyPanel_ResetInstance.c	LinkLobbyPanel_ResetInstance	natural	natural	0	
 src/link/lobby/LinkLobbyPanel_Close.c	LinkLobbyPanel_Close	natural	natural	0	
 src/link/menu/ScriptPanel_PollSelection.c	ScriptPanel_PollSelection	contrived	contrived	28	partial: pointer-copy local q, do/while init with |= 0xFFFF and pointer retry loop stay; each alone moves p between r4 and r5 (ROM keeps a second copy of p in r5 for the retry branch)
+src/link/menu/ScriptPanel_OpenTextWindow.c	ScriptPanel_OpenTextWindow	natural	natural	0	
+src/link/menu/ScriptPanel_ConfirmSelection.c	ScriptPanel_ConfirmSelection	minor	natural	1	two return 0 paths stay (single return branches differently)
