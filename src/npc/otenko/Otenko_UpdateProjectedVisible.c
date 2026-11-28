@@ -1,21 +1,20 @@
-#include "global.h"
-#include "npc/story_character/state_actor.h"
+#include "npc/otenko/otenko_actor.h"
 
-void GroundEffect_EnableProjection(void *);
-s32 Actor_PlayAnimationEntry(void *, s32, s32, s32, s32);
+void GroundEffect_EnableProjection(struct SceneGroundEffect *);
 s32 Player_GetHorizontalVelocity(s32);
-void Otenko_UpdateProjectedVisible(void *unused, struct StateActor *p)
+
+void Otenko_UpdateProjectedVisible(void *unused, struct OtenkoActor *npc)
 {
-    if (p->enter) {
-        p->enter = 0;
-        p->done = 0;
-        GroundEffect_EnableProjection(p->groundEffect);
-        Actor_PlayAnimationEntry(p, 0, 1, 0, 4);
+    if (npc->animationEntered) {
+        npc->animationEntered = 0;
+        npc->done = 0;
+        GroundEffect_EnableProjection(&npc->groundEffect);
+        Actor_PlayAnimationEntry(npc, 0, 1, 0, 4);
     }
     {
         u32 m = 0x100;
-        p->displayFlags = m | p->displayFlags;
+        npc->displayFlags = m | npc->displayFlags;
     }
-    p->counter300 += Player_GetHorizontalVelocity(0);
-    p->animationCallback(p);
+    npc->projection.position.x += Player_GetHorizontalVelocity(0);
+    npc->animationCallback(npc);
 }
