@@ -1174,36 +1174,26 @@ void Ivy_InitControlPresets(struct ChaseActor *actor)
 
 void SceneActorControl_UpdateAnimationTransition(struct ChaseActor *actor, s32 frame);
 
+// scope: put SceneActorControl_BeginSoundTransition begin
 s32 SceneActorControl_BeginSoundTransition(struct ChaseActor *actor)
 {
-    u16 *flags;
-    u16 suppressed;
-    u32 offset;
-    u32 value;
-    s32 result;
+    s32 started;
+
     if (actor->base.reactionSoundVariant == 0)
         Sound_PlaySong(0x211);
     else
         Sound_PlaySong(0x13E);
-    {
-        u32 mask = 0x100;
-        offset = 0x2D4;
-        flags = &actor->base.motionFlags;
-        value = *flags;
-        suppressed = mask & value;
-    }
-    if (!suppressed) {
+    if (!Chase_MotionFlags(actor, 0x100)) {
         SceneActorChase_SetState(actor, 3, 0, 0);
         SceneActorChase_SetControl(actor, SceneActorControl_UpdateAnimationTransition, 0x2B);
-        result = 1;
+        started = 1;
     } else {
-        u32 mask = ~0x20;
-        mask &= value;
-        *flags = mask;
-        result = 0;
+        SceneActorChase_ClearMotionFlagComponent(actor, 0x20);
+        started = 0;
     }
-    return result;
+    return started;
 }
+// scope: put SceneActorControl_BeginSoundTransition end
 
 /* Ivy release (tentative): once per capture (context flag 1), and when context flag 2 says the
  * player is held, puts the player back on the centre of the actor's terrain cell facing the
