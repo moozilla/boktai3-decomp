@@ -367,3 +367,4 @@ src/ui/game_over/game_over.c	GameOver_UpdateLetterTransforms	fudged	partial	16	i
 src/ui/game_over/game_over.c	GameOver_ShowGraphics	fudged	natural	1	
 src/ui/game_over/game_over.c	GameOver_InitOverlay	fudged	natural	1	
 src/ui/game_over/game_over.c	GameOver_StartFromScript	fudged	natural	1	
+src/ui/game_over/game_over.c	GameOver_TryBeginClose	fudged	natural	1	

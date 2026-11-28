@@ -246,11 +246,10 @@ void GameOver_TryBeginClose(struct GameOver *panel)
     if (Engine_PauseBits(0x400)) {
         GameOver_ShowGraphics(panel);
         Hud_SetMode(7);
-        if ((u8)(gPlayers[0]->tetherMode - 0x21) <= 1) {
+        if (gPlayers[0]->tetherMode == 0x21 || gPlayers[0]->tetherMode == 0x22)
             panel->costIndex = 1;
-        } else {
+        else
             ScreenTransition_SendCommand(3, 5, 4, 4, 4, 0x1FFF, 2);
-        }
         panel->closeState = 1;
     }
 }
