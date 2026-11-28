@@ -701,3 +701,6 @@ src/minigames/result_game/ResultGame_Update.c	ResultGame_Update	contrived	natura
 src/minigames/result_game/ResultGame_UpdatePlayerMarker.c	ResultGame_UpdatePlayerMarker	contrived	natural	1	
 src/minigames/result_game/ResultGame_ScoreAlignment.c	ResultGame_ScoreAlignment	contrived	natural	2	score kept in an int local and clamped in each branch
 src/minigames/result_game/ResultGame_HandlePress.c	ResultGame_HandlePress	contrived	natural	2	
+src/minigames/result_game/ResultGame_TrackTarget.c	ResultGame_TrackTarget	natural	natural	0	
+src/minigames/result_game/ResultGame_ScorePress.c	ResultGame_ScorePress	natural	natural	0	
+src/minigames/result_game/ResultGame_TimedPress.c	ResultGame_TimedPress	natural	natural	0	
