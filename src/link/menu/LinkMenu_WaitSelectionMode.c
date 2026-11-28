@@ -1,6 +1,5 @@
 #include "global.h"
 #include "scene/areas/area_effect_link.h"
-#include "link/selection/link_selection_mode.h"
 s32 LinkSession_CheckSessionReady(void *);
 void LinkSession_BeginShutdown(void *, void (*)(void));
 void LinkSession_SetState(void *, u32, void (*)(void));
