@@ -29,7 +29,7 @@ void Time_ShowRegionMenu(struct RegionMenu *menu)
     s32 first = 1;
     s32 row = 0;
     s32 i;
-    menu->skipped = row;
+    menu->skipped = 0;
     Menu_EraseRect(4, 7, 0x14, 10);
     for (i = 0; i < menu->count; i++) {
         if (menu->entries[i].group == menu->page) {

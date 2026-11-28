@@ -411,3 +411,4 @@ src/system/clock/time_palette.c	TimePalette_GetSourceIndex	natural	natural
 src/system/clock/time_palette.c	TimePalette_UpdateTransition	natural	natural		
 src/system/clock/time_palette.c	TimePalette_InitTransition	natural	natural		
 src/system/clock/region_menu.c	Time_OnLoadSave	natural	natural	1	
+src/system/clock/region_menu.c	Time_ShowRegionMenu	minor	natural	1	
