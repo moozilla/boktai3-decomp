@@ -4,10 +4,9 @@ void PlayerBurst_UpdateShutdown(struct PlayerOrbitEffect *);
 
 void PlayerTransition_StepReveal(struct PlayerOrbitEffect *p)
 {
-    u16 *ticks = &p->phaseFrame;
-    if (*ticks == 0) {
+    if (p->phaseFrame == 0) {
         Sound_PlaySong(0x1b0);
-        (*ticks)++;
+        p->phaseFrame++;
     }
     gPlayers[0]->animation.flags |= 1;
     ActorShadow_Enable(gPlayers[0]->shadow);

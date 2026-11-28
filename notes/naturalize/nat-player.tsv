@@ -522,3 +522,4 @@ src/player/effects/attack/PlayerAttackEffect_EmitPaletteThreeTrail.c	PlayerAttac
 src/player/effects/attack/PlayerAttackEffect_EmitPaletteFourTrail.c	PlayerAttackEffect_EmitPaletteFourTrail	contrived	contrived	2	unchanged: shift12/shift_distance/mask8 helpers (plain forms change register choice)
 src/player/effects/attack/PlayerAttackEffect_Initialize.c	PlayerAttackEffect_Initialize	natural	natural	0	-
 src/player/effects/attack/PlayerAttackEffect_UpdateParticles.c	PlayerAttackEffect_UpdateParticles	contrived	contrived	5	unchanged: one constant local, motion pointer, sprite reference wrapper all steer allocation
+src/player/effects/burst/PlayerTransition_StepReveal.c	PlayerTransition_StepReveal	minor	natural	1	-
