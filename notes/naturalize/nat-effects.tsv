@@ -274,3 +274,4 @@ src/effects/orbits/homing_effect.c	sub_0800B2F4	natural	natural	0
 src/effects/orbits/homing_effect.c	EffectManager_ConvertHomingToDrift	natural	natural	0	
 src/effects/orbits/homing_effect.c	EffectParticle_UpdateNone	natural	natural	0	
 src/effects/orbits/homing_effect.c	EffectParticle_UpdateDriftAroundActor	contrived	contrived	48	inline copy of the frame step, sprite alias and angle temporaries: register allocation; angle clamp and alias removal change the output
+src/effects/orbits/homing_effect.c	EffectParticle_UpdateDriftBeforeHoming	contrived	contrived	48	inline copy of the frame step, sprite alias and angle temporaries: register allocation; angle clamp and alias removal change the output
