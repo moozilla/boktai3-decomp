@@ -548,3 +548,4 @@ src/ui/town/solar_bank/SolarBank_SetState.c	SolarBank_SetState	contrived	natural
 src/ui/town/solar_bank/SolarBank_BeginClosing.c	SolarBank_BeginClosing	contrived	natural	1	
 src/ui/town/solar_bank/SolarBank_UpdateOpening.c	SolarBank_UpdateOpening	contrived	natural	1	
 src/ui/town/solar_bank/SpriteMenu_UpdateTimedFade.c	SpriteMenu_UpdateTimedFade	contrived	natural	1	
+src/ui/town/solar_bank/SolarBank_UpdateExitDelay.c	SolarBank_UpdateExitDelay	contrived	natural	1	

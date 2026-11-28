@@ -1,15 +1,15 @@
 #include "global.h"
+#include "ui/town/solar_bank_panel.h"
 void Script_Call(u32, u32);
-void Task_Kill(u8 *);
-void SolarBank_UpdateExitDelay(u8 *p)
+void Task_Kill(void *);
+void SolarBank_UpdateExitDelay(struct SolarBankPanel *panel)
 {
-    u16 *c = (u16 *)(p + 0x70c);
-    (*c)++;
-    if (*c > 0x1f) {
-        u32 v = *(u32 *)(p + 0x6fc);
-        if (v) {
-            Script_Call(v, 0);
-            Task_Kill(p);
+    panel->timer++;
+    if (panel->timer > 0x1f) {
+        u32 script = panel->completionScript;
+        if (script) {
+            Script_Call(script, 0);
+            Task_Kill(panel);
         }
     }
 }
