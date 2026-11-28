@@ -541,22 +541,6 @@ void SceneActors_StopBackgroundFlash(struct SceneGraphicsActor *actor)
     BackgroundFlash_BeginDisappearance(actor->graphics.backgroundFlash);
     actor->graphics.backgroundFlashFlag = 0;
 }
-struct ReactionActor {
-    u8 pad0[0x90];
-    u32 timer;
-    u8 pad94[8];
-    u32 flags;
-    u8 padA0[2];
-    u8 reset;
-    u8 padA3;
-    u32 pending;
-    u8 facing, facing8, requested, state;
-    u8 active, actionReset, action, finished, entered, changed;
-    u8 padB2[0x12];
-    u32 actionTimer;
-    u8 padC8[0x38];
-    void (*callback)(void *);
-};
 void SceneActors_UpdateShrinkingReaction(void *, int);
 void SceneActors_UpdateKnockbackReaction(void *, int);
 void sub_08027214(void *, int);
@@ -564,16 +548,15 @@ void WirelessGame_AddItem(void *, s32);
 
 // confidence=low: damage handler: 0 shows the damage number and starts the shrinking reaction
 // (wireless games may award an item when hit from the front), 2 starts a knockback, 1 a death.
-s32 sub_08022B18(struct ReactionActor *p, s32 kind, s32 damage)
+s32 sub_08022B18(struct StateActor *p, s32 kind, s32 damage)
 {
-    u8 *actor = (u8 *)p;
-    u8 *sprite = (u8 *)p + 0x48;
+    struct SceneGraphicsActor *actor = (struct SceneGraphicsActor *)p;
+    struct SceneActorBody *body = &((struct SceneGraphicsActor *)p)->body;
     s32 result = 1;
     switch (kind) {
         case 0: {
             s32 shown = damage;
-            if (((struct SceneGraphicsActor *)p)->graphics.stepTableKind == 1 &&
-                (*(u8 **)gPlayers)[0x418] != 2) {
+            if (((struct SceneGraphicsActor *)p)->graphics.stepTableKind == 1 && gPlayers[0]->actionMode != 2) {
                 shown = 0;
                 result = 0;
             }
@@ -582,54 +565,40 @@ s32 sub_08022B18(struct ReactionActor *p, s32 kind, s32 damage)
                 size.x = 0x20;
                 size.y = 0;
                 size.z = 0x20;
-                DamageNumberDisplay_Show(actor + 0x1cc, shown, 0, sprite + 0xc, &size, 1);
+                DamageNumberDisplay_Show(&actor->overlayCollider, shown, 0, &body->position, &size,
+                                         1);
             }
-            {
-                if (SceneActorState_TestFlags((struct StateActor *)p, 0x100000))
-                    SceneActors_StopBackgroundFlash((struct StateActor *)actor);
-            }
-            SceneActorState_StartAction((struct StateActor *)p, 1, 0, 0);
-            SceneActorState_EnterAction((struct StateActor *)p, SceneActors_UpdateShrinkingReaction,
-                                        0x16);
+            if (SceneActorState_TestFlags(p, 0x100000))
+                SceneActors_StopBackgroundFlash(actor);
+            SceneActorState_StartAction(p, 1, 0, 0);
+            SceneActorState_EnterAction(p, SceneActors_UpdateShrinkingReaction, 0x16);
             if (gEngineFlags & 0x1000) {
-                u8 *position = sprite + 0xc;
-                if (WirelessGame_TryAddCyclingItem(position)) {
-                    s32 d =
-                        actor[0x20e] - Math_Atan2(*(s16 *)(sprite + 0xc) - gGameState->positionX,
-                                                  *(s16 *)(sprite + 0x10) - gGameState->positionZ);
-                    if (d < 0)
-                        d = -d;
-                    if (d <= 0x20)
-                        WirelessGame_AddItem(position, 0);
+                if (WirelessGame_TryAddCyclingItem(&body->position)) {
+                    s32 difference = actor->overlayCollider.direction -
+                                     Math_Atan2(body->position.x - gGameState->positionX,
+                                                body->position.z - gGameState->positionZ);
+                    if (difference < 0)
+                        difference = -difference;
+                    if (difference <= 0x20)
+                        WirelessGame_AddItem(&body->position, 0);
                 }
             }
             break;
         }
         case 2:
-            SceneActorState_StartAction((struct StateActor *)p, 1, 0, 1);
-            SceneActorState_EnterAction((struct StateActor *)p, SceneActors_UpdateKnockbackReaction,
-                                        0x17);
-            {
-                u8 v = sprite[9] + 0x80;
-                ((struct SceneGraphicsActor *)p)->hitAngle = v;
-            }
+            SceneActorState_StartAction(p, 1, 0, 1);
+            SceneActorState_EnterAction(p, SceneActors_UpdateKnockbackReaction, 0x17);
+            ((struct SceneGraphicsActor *)p)->hitAngle = body->direction + 0x80;
             break;
-        case 1: {
-            {
-                u8 v = (*(u8 **)((u8 *)p + 0x10c))[0x2d];
-                ((struct SceneGraphicsActor *)p)->hitAngle = v;
-            }
-            {
-                SceneActorState_SetFlags((struct StateActor *)p, 2);
-            }
-            SceneActorState_StartAction((struct StateActor *)p, 1, 0, 3);
-            SceneActorState_EnterAction((struct StateActor *)p, sub_08027214, 0x19);
+        case 1:
+            ((struct SceneGraphicsActor *)p)->hitAngle = actor->damageSource[0x2D];
+            SceneActorState_SetFlags(p, 2);
+            SceneActorState_StartAction(p, 1, 0, 3);
+            SceneActorState_EnterAction(p, sub_08027214, 0x19);
             break;
-        }
     }
     return result;
 }
-
 void SceneActorState_StepTableByte(struct StateActor *p, const u8 *tbl)
 {
     u16 *cur = &((struct SceneGraphicsActor *)p)->graphics.stepTableValue;
