@@ -247,7 +247,7 @@ void SpriteController_UpdateStopped(struct ContactImpactEffect *controller)
 void SpriteController_AnimateGrowing(struct ContactImpactEffect *p)
 {
     s32 duration = 8;
-    s32 scale = Fixed8_Interpolate(38, 64, duration, p->timer);
+    s32 scale = Fixed8_Interpolate(38, 64, 8, p->timer);
 
     p->sprite.scaleX = scale;
     p->sprite.scaleY = scale;
@@ -262,7 +262,7 @@ void SpriteController_AnimateGrowing(struct ContactImpactEffect *p)
 void SpriteController_AnimateShrinking(struct ContactImpactEffect *p)
 {
     s32 duration = 8;
-    s32 scale = Fixed8_Interpolate(64, 38, duration, p->timer);
+    s32 scale = Fixed8_Interpolate(64, 38, 8, p->timer);
 
     p->sprite.scaleX = scale;
     p->sprite.scaleY = scale;
