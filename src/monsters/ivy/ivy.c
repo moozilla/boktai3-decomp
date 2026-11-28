@@ -1925,16 +1925,12 @@ extern const s32 gUnk_0860641C[];
 void Armor_PlacePrimaryCollider(struct PhaseObject *actor)
 {
     struct ContactPackedVector position;
-    s16 *xp;
-    const s32 *radius;
-    s32 slot;
-    const s32 *table;
+    s32 slot = Mod(actor->frame, 3);
+    const s16 *x = &actor->position.x;
+    const s32 *table = gUnk_0860641C;
+    const s32 *radius = table + slot;
 
-    slot = Mod(actor->frame, 3);
-    xp = &actor->position.x;
-    table = gUnk_0860641C;
-    radius = table + slot;
-    position.x = *xp + *radius;
+    position.x = *x + *radius;
     position.y = actor->target->position.y + 220;
     position.z = actor->position.z + *radius;
     Collider_SetPosition(&actor->colliderB, &position, 0);
