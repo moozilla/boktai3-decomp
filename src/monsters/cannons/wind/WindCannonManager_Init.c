@@ -8,12 +8,8 @@ u32 WindCannonManager_Init(struct FanCannonManager *a)
     gFanCannonManager = a;
     a->occupiedSlots = 0;
     e = a->slots;
-    i = 0;
-    do {
+    for (i = 0; i < 8; i++, e++)
         WindCannonManager_InitSlot(a, e, i);
-        i++;
-        e++;
-    } while (i <= 7);
     gForceDirectionMode = 0;
     return 0;
 }
