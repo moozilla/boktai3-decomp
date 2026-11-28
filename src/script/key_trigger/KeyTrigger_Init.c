@@ -1,20 +1,6 @@
 #include "global.h"
 #include "engine/engine.h"
-
-struct Args08197F68 {
-    u16 count;
-    s32 *values;
-    s32 buf[8];
-};
-struct Task08197F68 {
-    u8 pad0[0x18];
-    u32 channel;
-    void *script1;
-    void *script2;
-    u16 keys;
-    u16 flags;
-    struct Args08197F68 args;
-};
+#include "script/key_trigger.h"
 
 s32 KeyTrigger_Init(struct Task08197F68 *t)
 {
