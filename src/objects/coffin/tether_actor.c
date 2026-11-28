@@ -642,26 +642,17 @@ void TetherActor_UpdateShake(struct TetherActor *actor)
     ++actor->shakeFrame;
 }
 
-void TetherActor_EmitDirectionalEffect(struct TetherActor *input)
+void TetherActor_EmitDirectionalEffect(struct TetherActor *actor)
 {
-    struct TetherActor *actor = input;
     u32 angle = ((actor->heading + 1) & 7) * 32;
-    const s16 *sourceTable = gUnk_086149C4;
-    const s16 *table;
-    s32 rawX;
-    s32 scaledX;
-    s32 scaledZ;
     struct ContactPackedVector position, velocity, size;
-    rawX = sourceTable[(angle + 64) & 255] * 100;
-    table = sourceTable;
-    scaledX = scaleEmission(rawX);
-    position.x = actor->position.x + scaledX;
+
+    position.x = actor->position.x + scaleEmission(gUnk_086149C4[(angle + 64) & 255] * 100);
     position.y = actor->position.y;
-    scaledZ = scaleEmission(table[angle & 255] * 100);
-    position.z = actor->position.z + scaledZ;
-    velocity.x = scaleEmission(table[(angle + 64) & 255] * 10);
+    position.z = actor->position.z + scaleEmission(gUnk_086149C4[angle & 255] * 100);
+    velocity.x = scaleEmission(gUnk_086149C4[(angle + 64) & 255] * 10);
     velocity.y = 0;
-    velocity.z = scaleEmission(table[angle & 255] * 10);
+    velocity.z = scaleEmission(gUnk_086149C4[angle & 255] * 10);
     size.x = 32;
     size.y = 0;
     size.z = 32;

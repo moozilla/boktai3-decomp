@@ -49,3 +49,4 @@ src/objects/coffin/tether_actor.c	TetherActor_RemoveSegments	minor	natural	1
 src/objects/coffin/tether_actor.c	TetherActor_CreateAuxiliarySprite	minor	minor	4	graphics/sprite pointers kept: ROM forms them around the load call
 src/objects/coffin/tether_actor.c	TetherActor_RemoveAuxiliarySprite	minor	natural	1	
 src/objects/coffin/tether_actor.c	TetherActor_UpdateShake	minor	natural	1	
+src/objects/coffin/tether_actor.c	TetherActor_EmitDirectionalEffect	contrived	natural	1	
