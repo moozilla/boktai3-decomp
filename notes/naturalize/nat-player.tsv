@@ -10,3 +10,5 @@ src/player/appearance/character_model.c	PaletteFlash_SelectPalette	minor	natural
 src/player/appearance/character_model.c	Character_UpdateTimedEffect	natural	natural	0	-
 src/player/appearance/character_model.c	ActorSprite_InitPartDrawings	contrived	minor	11	position pointer to the stack struct (without it agbcc keeps the 6-byte struct in registers); (u8)animation casts give the ROM's second register copy
 src/player/appearance/character_model.c	CharacterPreview_PositionParts	minor	natural	1	-
+src/player/appearance/character_model.c	ScenePalette_RefreshOnFlags	natural	natural	0	-
+src/player/appearance/character_model.c	CharacterModel_SetComponentKeyframes	minor	natural	1	-

@@ -316,12 +316,11 @@ void ScenePalette_RefreshOnFlags(struct ScenePoolActor *actor, struct CharacterP
 void CharacterModel_SetComponentKeyframes(struct ScenePoolActor *actor,
                                           struct CharacterPreviewModel *model)
 {
-    s32 partIndex = 0;
-    do {
+    s32 i;
+    for (i = 0; i < 5; i++) {
         u32 animation;
         struct ModifierDisplayObject *part;
-        struct ModifierGraphicsResource *resource;
-        switch (partIndex) {
+        switch (i) {
             case 0:
                 animation = actor->bodyAnimation;
                 break;
@@ -339,12 +338,10 @@ void CharacterModel_SetComponentKeyframes(struct ScenePoolActor *actor,
                 animation = 0;
                 break;
         }
-        part = &model->view.parts[partIndex];
-        resource = &model->resource;
-        Anim_SetKeyframes(part, resource, animation, 1, 0);
-        Anim_Step(part, resource);
-        partIndex++;
-    } while (partIndex <= 4);
+        part = &model->view.parts[i];
+        Anim_SetKeyframes(part, &model->resource, animation, 1, 0);
+        Anim_Step(part, &model->resource);
+    }
 }
 
 void CharacterModel_UpdateAccessoryAnimations(struct CharacterPreviewModel *model)
