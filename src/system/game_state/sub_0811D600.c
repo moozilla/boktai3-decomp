@@ -1,13 +1,12 @@
 #include "global.h"
 #include "system/game_state/game_state.h"
 
-void sub_0811D600(u32 a, u32 b)
+void sub_0811D600(u32 challenge, u32 rank)
 {
-    if (a <= 0xb && b <= 5) {
-        u8 *g = gGameState;
-        if (*(s16 *)(g + a * 2 + 0x800) == -1)
-            *(s16 *)(g + a * 2 + 0x800) = b;
-        else if (*(s16 *)(g + a * 2 + 0x800) > (s32)b)
-            *(s16 *)(g + a * 2 + 0x800) = b;
+    if (challenge <= 11 && rank <= 5) {
+        if (*(challenge + gGameState->unk800) == -1)
+            *(challenge + gGameState->unk800) = rank;
+        else if (*(challenge + gGameState->unk800) > (s32)rank)
+            *(challenge + gGameState->unk800) = rank;
     }
 }
