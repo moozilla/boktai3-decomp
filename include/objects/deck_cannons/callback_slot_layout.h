@@ -3,16 +3,17 @@
 
 #include "global.h"
 #include "scene/collision/contact_position.h"
+#include "scene/collision/contact_collider.h"
 
 struct CallbackSlot {
-    u32 update;
-    u32 destroy;
+    void (*update)(struct CallbackSlot *);
+    void (*destroy)(struct CallbackSlot *);
     u8 animation[0x1C]; /* confidence=low */
     u32 flags; /* confidence=low */
     u8 pad28[0x18];
     struct ContactPosition position; /* confidence=low */
     u8 pad48[0x8];
-    u8 collider[0x54];
+    struct ContactCollider collider;
     struct ContactPosition savedPosition; /* confidence=low */
     void *owner;
     u16 colors[16]; /* confidence=low */

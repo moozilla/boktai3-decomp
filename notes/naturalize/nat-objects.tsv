@@ -178,3 +178,4 @@ src/objects/coffin/tether_presentation.c	ScenePaletteFade_UpdateBlend	natural	na
 src/objects/coffin/tether_presentation.c	ScenePaletteFade_UpdateHold	natural	natural	0	
 src/objects/coffin/tether_presentation.c	ScenePaletteFade_Update	natural	natural	0	
 src/objects/coffin/tether_presentation.c	ScenePaletteFade_Destroy	natural	natural	0	
+src/objects/deck_cannons/DeckCannon_UpdateCannon.c	DeckCannon_UpdateCannon	contrived	natural	1	state table typed from the unnamed gUnk_0824F6C8

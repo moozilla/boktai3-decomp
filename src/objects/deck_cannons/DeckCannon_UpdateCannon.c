@@ -1,12 +1,10 @@
 #include "global.h"
+#include "objects/deck_cannons/deck_cannon_battery.h"
 
-extern const u8 gUnk_0824F6C8[];
-void Callback_InvokeActor(u8 *, u32);
-void Collider_SetPosition(u8 *, u8 *, u32);
+extern void (*const gUnk_0824F6C8[])(struct CallbackSlot *);
 
-void DeckCannon_UpdateCannon(u8 *p)
+void DeckCannon_UpdateCannon(struct CallbackSlot *cannon)
 {
-    const u32 *tbl = (const u32 *)gUnk_0824F6C8;
-    Callback_InvokeActor(p, tbl[*(p + 0xD3)]);
-    Collider_SetPosition(p + 0x50, p + 0x40, 0);
+    Callback_InvokeActor(cannon, gUnk_0824F6C8[cannon->state]);
+    Collider_SetPosition(&cannon->collider, &cannon->position, 0);
 }
