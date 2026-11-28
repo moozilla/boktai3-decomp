@@ -126,13 +126,10 @@ void InterruptsAndVideo_WaitForVBlank(void);
 void InterruptsAndVideo_WaitFrames(u16 frames)
 {
     u16 savedInterruptMasterEnable = REG_IME;
-    u16 i;
+
     REG_IME = 1;
-    i = frames - 1;
-    while (i != 0xFFFF) {
+    while (frames--)
         InterruptsAndVideo_WaitForVBlank();
-        i--;
-    }
     REG_IME = savedInterruptMasterEnable;
 }
 

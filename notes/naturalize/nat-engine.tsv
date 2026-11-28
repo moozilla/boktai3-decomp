@@ -187,3 +187,4 @@ src/engine/video/display_animation.c	DisplayAnimation_SetTileSource	natural	natu
 src/engine/video/wrapped_tilemap_cells.c	SceneTilemap_GetWrappedCell	minor	minor	4	stepwise pointer adds: a single expression reassociates
 src/engine/video/interrupts_video.c	InterruptsAndVideo_InitRuntime	contrived	minor	30	interrupts local holds INTR_FLAG_GAMEPAK: a direct store routes the constant through another register
 src/engine/video/interrupts_video.c	InterruptsAndVideo_Initialize	contrived	natural	1	
+src/engine/video/interrupts_video.c	InterruptsAndVideo_WaitFrames	minor	natural	1	
