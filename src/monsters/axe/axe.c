@@ -1203,10 +1203,8 @@ void SceneActorControl_UpdateHoverHeight(struct ChaseActor *actor)
 {
     struct Axe *context = actor->base.context;
     if (!(SceneActorChase_QueryMotionFlags(actor, 0x8000))) {
-        s32 height = Scale(gHoverSineTable[context->hoverPhase] << 5);
-        struct Player *player = gPlayers[0];
-        u32 y = height + 220;
-        y += (u16)player->position.y;
+        u32 y = (Scale(gHoverSineTable[context->hoverPhase] << 5)) + 220;
+        y += (u16)gPlayers[0]->position.y;
         actor->base.body.position.y = y;
         context->auxiliarySprite.position.y = y;
         context->hoverPhase += 2;
