@@ -357,13 +357,11 @@ void CharacterModel_UpdatePairedAnimations(struct CharacterPreviewModel *model)
     Anim_Step(&model->view.parts[4], &model->resource);
 }
 
-void CharacterModel_RemoveAnimations(struct ModifierDisplayObject *part)
+void CharacterModel_RemoveAnimations(struct ModifierDisplayObject *parts)
 {
-    s32 partIndex = 4;
-    do {
-        Anim_Remove(part);
-        part++;
-    } while (--partIndex >= 0);
+    s32 i;
+    for (i = 0; i < 5; i++)
+        Anim_Remove(&parts[i]);
 }
 
 void CharacterModel_SetAnimationFlags(struct CharacterPreviewModel *model, u32 mask)
