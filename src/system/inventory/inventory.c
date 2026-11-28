@@ -33,7 +33,7 @@ void Inventory_InitializeSelectionGrid(struct SceneInputGrid *grid, s32 identity
     grid->kind = kind;
     for (i = 0; i < 4; i++)
         for (j = 0; j < 9; j++)
-            grid->cells[j][i] |= 0xFFu;
+            grid->cells[j][i] = 0xFF;
     if (identity) {
         for (i = 0; i < 4; i++)
             for (j = 0; j < 4; j++)
