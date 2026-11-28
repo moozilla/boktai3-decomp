@@ -1669,19 +1669,16 @@ void SceneCharacter_UpdatePhaseWindowWaitState(struct SceneActorManager *manager
 void SceneCharacter_UpdatePathResumeState(struct SceneActorManager *manager,
                                           struct SceneActor *actor)
 {
-    int close;
     if (actor->commandEntered) {
         actor->commandEntered = 0;
         actor->finished = 0;
         actor->action = 13;
     }
-    close = SceneActor_HasNearbyTarget(manager, actor);
-    if (close) {
+    if (SceneActor_HasNearbyTarget(manager, actor)) {
         SceneCharacter_InterruptForTarget(actor);
     } else {
-        if (actor->finished) {
+        if (actor->finished)
             SceneCharacter_EnterState(actor, SceneCharacter_GetPathNodeState(actor));
-        }
         actor->ticks++;
     }
 }
