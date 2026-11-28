@@ -497,3 +497,4 @@ src/system/game_state/GameState_MoveSlotEntry.c	GameState_MoveSlotEntry	contrive
 src/system/game_state/SolarFruit_ClearEquippedSlot.c	SolarFruit_ClearEquippedSlot	contrived	natural	1	
 src/system/game_state/sub_0822EB14.c	sub_0822EB14	contrived	natural	1	
 src/system/game_state/SolarFruit_Command.c	SolarFruit_Command	contrived	natural	1	
+src/system/game_state/sub_0822E764.c	sub_0822E764	contrived	minor	1	s16 store through unk50; index-first array form
