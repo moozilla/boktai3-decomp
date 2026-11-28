@@ -6,22 +6,15 @@ void SceneActorContacts_SetDistanceGate(struct ChaseActor *actor,
 {
     flags &= 6;
     if (flags) {
-        u32 result;
-        if (!threshold && !mode)
-            goto yes;
-        result = SceneActorChase_TrackingFlags(&actor->base.tracking, 4);
-        if (result)
-            goto yes;
-        if (mode == 2)
-            goto write;
-        if (metric > threshold)
-            goto write;
-    yes:
-        result = 1;
-    write:
-        do {
-            gate->enabled = result;
-        } while (0);
+        if (!threshold && !mode) {
+            gate->enabled = 1;
+        } else {
+            u32 result = SceneActorChase_TrackingFlags(&actor->base.tracking, 4);
+            if (result || (mode != 2 && metric <= threshold))
+                gate->enabled = 1;
+            else
+                gate->enabled = result;
+        }
     } else {
         gate->enabled = flags;
     }
