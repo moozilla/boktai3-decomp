@@ -536,3 +536,4 @@ src/system/inventory/inventory.c	Inventory_BeginItemEffect	contrived	contrived	0
 src/system/inventory/Inventory_GetItemPackedState.c	Inventory_GetItemPackedState	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
 src/system/inventory/Inventory_SetItemPackedState.c	Inventory_SetItemPackedState	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
 src/system/inventory/Inventory_GetItemStateValue.c	Inventory_GetItemStateValue	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
+src/system/inventory/Inventory_SetItemStateValue.c	Inventory_SetItemStateValue	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
