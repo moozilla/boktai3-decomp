@@ -296,3 +296,4 @@ src/ui/dialogue/text_interpreter/TextState_GetPlayerSpeakerLabel.c	TextState_Get
 src/ui/dialogue/text_interpreter/TextState_GetPairSpeakerLabel.c	TextState_GetPairSpeakerLabel	natural	natural	0	
 src/ui/dialogue/text_interpreter/TextState_ParseTagValue.c	TextState_ParseTagValue	contrived	natural	40	
 src/ui/dialogue/text_interpreter/TextState_ProcessTag.c	TextState_ProcessTag	contrived	minor	60	name copied through an int that is then zeroed before the last compare; speaker stored through an s8 pointer; delay temp; tag reassigned before return
+src/ui/dialogue/text_interpreter/TextState_StepPlayback.c	TextState_StepPlayback	contrived	natural	1	
