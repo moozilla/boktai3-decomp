@@ -83,3 +83,4 @@ src/bosses/count/actor_graphics_and_basic_states.c	SceneActorState_WaitForDelaye
 src/bosses/count/actor_graphics_and_basic_states.c	SceneActorAnimation_UpdateDirectionalCallback	contrived	natural	2	
 src/bosses/count/actor_graphics_and_basic_states.c	SceneActorAnimation_UpdateEightDirectionCallback	contrived	natural	7	plain if/else sequence choice; typed animation fields
 src/bosses/count/actor_graphics_and_basic_states.c	sub_08023FE8	contrived	minor	4	ContactPosition and actor body fields replace fake views; flags accessor stays (mask loads before word); stack position read through a pointer (register allocation)
+src/bosses/count/SceneActorAnimation_TransitionVariant.c	SceneActorAnimation_TransitionVariant	contrived	natural	40	one plain return-style sequence selector replaces three helpers (a ternary or in-place preset moves the constant load; per-branch sequence locals needed for registers)
