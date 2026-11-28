@@ -710,17 +710,18 @@ void Hud_DrawDecimalDigits(s32 value, s32 divisor, s32 x, s32 y, s32 alternateSt
 
 void Hud_FillDigitCells(s32 count, u32 x, u32 y, s32 sign)
 {
-    s32 tile = 1;
+    s32 tile;
     u16 *cell;
     s32 i;
-    if (sign >= 0) {
+    if (sign < 0)
+        tile = 1;
+    else if (sign == 0)
+        tile = 0x20;
+    else
         tile = 0x30;
-        if (sign == 0)
-            tile = 0x20;
-    }
     cell = Hud_GetTilemapCell(0, x, y);
     for (i = 0; i < count; i++)
-        *cell++ = (u16)(tile | 0xF000);
+        *cell++ = tile | 0xF000;
 }
 
 void Hud_DrawActiveStatValue(s32 x1, s32 y1, s32 x2, s32 y2, s32 style, s32 mode)
