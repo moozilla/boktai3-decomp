@@ -12,7 +12,7 @@ void Player_EmitPeriodicParticles(struct Player *p)
         else
             p->particleCadenceCounter += 2;
         if (p->particleCadenceCounter > 15) {
-            if ((u8)(p->actionMode - 3) <= 1) {
+            if (p->actionMode == 3 || p->actionMode == 4) {
                 position = *(struct ContactPackedVector *)&p->colliderPosition;
                 spread.x = 32;
                 spread.y = 32;
