@@ -491,3 +491,4 @@ src/ui/town/shop/Shop_BeginConsumableSelection.c	Shop_BeginConsumableSelection	n
 src/ui/town/shop/Shop_BeginReposition.c	Shop_BeginReposition	natural	natural	0	
 src/ui/town/shop/Shop_UpdateMixedCatalogCategory.c	Shop_UpdateMixedCatalogCategory	minor	minor	2	u32 return type with no return value: void differs in register use
 src/ui/town/shop/Shop_ConfirmEquipmentAction.c	Shop_ConfirmEquipmentAction	minor	natural	1	
+src/ui/town/shop/Shop_ConfirmItemAction.c	Shop_ConfirmItemAction	minor	natural	1	
