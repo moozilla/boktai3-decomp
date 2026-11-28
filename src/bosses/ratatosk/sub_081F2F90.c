@@ -35,22 +35,21 @@ s32 sub_081F2FBC(struct Ratatosk *self)
     return selected;
 }
 
-s32 sub_081F2FE8(u8 *p)
+s32 sub_081F2FE8(struct Ratatosk *self)
 {
-    s32 idx = -1;
-    u32 best = 0;
-    s32 i = 0;
-    u8 *q = p + 0xD24;
-    do {
-        u32 v = ((u32 *)q)[1] + ((u32 *)q)[0];
-        if (v >= best) {
-            best = v;
-            idx = i;
+    s32 selected = -1;
+    u32 maximum = 0;
+    s32 i;
+
+    for (i = 0; i < 9; i++) {
+        u32 total = self->orbPoints[i].distance + self->orbPoints[i].anchorDistance;
+
+        if (total >= maximum) {
+            maximum = total;
+            selected = i;
         }
-        q += 0x18;
-        i++;
-    } while (i <= 8);
-    return idx;
+    }
+    return selected;
 }
 
 struct RatatoskPoint *sub_081F3018(u8 *p, s16 *pos)
