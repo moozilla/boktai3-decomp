@@ -771,14 +771,13 @@ int NidhoggrDuel_ApplyPendingDamage(struct GridAttackActor *p)
     int damage, special;
     struct GridAttackPacked size;
     {
-        int *damagePtr = &p->damage;
-        damage = *damagePtr;
+        damage = p->damage;
         {
             u8 *specialPtr = &p->special;
             int value;
             value = *specialPtr;
             special = value;
-            *damagePtr = 0;
+            p->damage = 0;
             *specialPtr = 0;
         }
     }
