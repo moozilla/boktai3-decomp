@@ -617,3 +617,4 @@ src/system/inventory/sub_0822DFA0.c	sub_0822DFA0	natural	natural	0
 src/system/inventory/Inventory_CanAssignEquipment.c	Inventory_CanAssignEquipment	natural	natural	0	
 src/system/save/Palette_GetStateBlendIndices.c	Palette_GetStateBlendIndices	contrived	natural	1	
 src/system/save/sub_0822797C.c	sub_0822797C	minor	natural	1	
+src/system/save/Background_ClearVisibilityFlagFromScript.c	Background_ClearVisibilityFlagFromScript	contrived	natural	1	

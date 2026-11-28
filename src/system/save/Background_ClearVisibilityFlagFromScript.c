@@ -1,9 +1,11 @@
 #include "global.h"
 #include "engine/video/render.h"
+#include "gba/io_reg.h"
 u32 Script_GetValue(void);
 void Background_ClearVisibilityFlagFromScript(void)
 {
-    u16 n = Script_GetValue();
-    u32 m = (0x1000000u << n) >> 16;
-    gDispCntShadow = gDispCntShadow & ~m;
+    u16 layer = Script_GetValue();
+    u16 mask = DISPCNT_BG0_ON << layer;
+
+    gDispCntShadow &= ~mask;
 }
