@@ -363,3 +363,24 @@ src/scene/actor/scene_actors.c	SceneActors_StartDirectionalAnimation	contrived	n
 src/scene/actor/scene_actors.c	SceneActors_StartEightDirectionAnimation	contrived	natural	4	-
 src/scene/actor/scene_actors.c	SceneActors_UpdateAnimation	minor	natural	1	-
 src/scene/actor/scene_actors.c	SceneActors_SpawnAmbientParticle	contrived	minor	5	z coordinate through a u16 pointer: a direct member read changes one instruction
+src/scene/actor/scene_actors.c	SceneActors_Register	natural	natural	0	-
+src/scene/actor/scene_actors.c	SceneActors_Unregister	natural	natural	0	-
+src/scene/actor/scene_actors.c	SceneActors_GetBySlot	natural	natural	0	-
+src/scene/actor/scene_actors.c	SceneActors_ApplyDamage	natural	natural	0	-
+src/scene/actor/scene_actors.c	SceneActors_Initialize	natural	natural	0	-
+src/scene/actor/scene_actors.c	SceneActors_Destroy	natural	natural	0	-
+src/scene/actor/scene_actors.c	SceneActors_SetHealth	natural	natural	0	-
+src/scene/actor/scene_actors.c	SceneActors_SetDamageCallback	natural	natural	0	-
+src/scene/actor/scene_actors.c	SceneActors_SetShake	natural	natural	0	-
+src/scene/actor/scene_actors.c	SceneActors_StartAnimation	natural	natural	0	-
+src/scene/actor/scene_actors.c	SceneActors_StartUnmirroredAnimation	natural	natural	0	-
+src/scene/actor/scene_actors.c	SceneActors_UpdateTargetMetrics	natural	natural	0	-
+src/scene/actor/scene_actors.c	SceneActors_RunStateCallback	natural	natural	0	-
+src/scene/actor/scene_actors.c	SceneActors_SetEventScripts	natural	natural	0	-
+src/scene/actor/scene_actors.c	SceneActors_RunFirstEventScript	natural	natural	0	-
+src/scene/actor/scene_actors.c	SceneActors_RunSecondEventScript	natural	natural	0	-
+src/scene/actor/scene_actors.c	SceneActors_CopyAvailablePosition	natural	natural	0	-
+src/scene/actor/scene_actors.c	SceneActors_GetAvailablePosition	natural	natural	0	-
+src/scene/actor/scene_actors.c	SceneActors_ConfigureEffect	natural	natural	0	-
+src/scene/actor/scene_actors.c	SceneActors_ScriptSetEffects	natural	natural	0	-
+src/scene/actor/scene_actors.c	SceneActors_UpdateEffects	minor	minor	0	flag helper calls with literal masks: plain |= and &= reorder the load
