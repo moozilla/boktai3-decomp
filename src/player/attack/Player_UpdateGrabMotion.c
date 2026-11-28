@@ -5,11 +5,6 @@
 #include "objects/scene_object.h"
 #include "player/player_status_flags.h"
 #include "player/player_slot_status.h"
-#include "engine/video/display_sequence_inline.h"
-
-struct PlayerGrabHalf {
-    u16 value : 16;
-};
 
 struct PlayerGrabPos {
     s16 x, y, z;
@@ -53,32 +48,6 @@ u32 Sqrt(u32);
 s32 Div(s32, s32);
 s32 Player_ScaleLevelValue(s32, s32);
 
-struct PlayerGrabGrabContext {
-    u8 unknown0[0xA88];
-    void *particlePool;
-    struct SceneVec origin, destination;
-    u16 duration, returnSpeed;
-    u8 heading;
-};
-#define PlayerGrab_Context(p) ((struct PlayerGrabGrabContext *)(p))
-
-struct PlayerGrabCoordinates {
-    u8 unknown0[0x10C];
-    s16 x, y, z;
-};
-struct PlayerGrabStoredCoordinates {
-    u8 unknown0[0xA8C];
-    s16 x, y, z;
-};
-struct PlayerGrabPlanarVelocity {
-    u8 unknown0[0x490];
-    u16 x;
-    u8 unknown492[2];
-    u16 z;
-};
-#define PlayerGrab_Coordinates(p)       ((struct PlayerGrabCoordinates *)(p))
-#define PlayerGrab_StoredCoordinates(p) ((struct PlayerGrabStoredCoordinates *)(p))
-#define PlayerGrab_PlanarVelocity(p)    ((struct PlayerGrabPlanarVelocity *)(p))
 static inline u16 PlayerGrab_GetFrame(struct Player *p)
 {
     return p->tetherFrame;
@@ -170,15 +139,12 @@ void Player_UpdateGrabMotion(struct Player *p)
         Sound_PlaySong(0x39E);
         AnimSprite_Show(&p->secondaryAnimation);
         p->secondaryAnimation.position = p->animation.position;
-        {
-            u16 resource = p->animation.paletteBank;
-            p->secondaryAnimation.paletteBank = resource;
-        }
+        p->secondaryAnimation.paletteBank = p->animation.paletteBank;
         p->secondaryAnimation.palette = p->animation.palette;
         p->movementStart = p->position;
         Player_SetPendingCallback(p, Player_OnGrabMotionExit);
-        if (PlayerGrab_Context(p)->particlePool == 0)
-            PlayerGrab_Context(p)->particlePool = ParticlePool_Create();
+        if (p->unkA88[0] == 0)
+            p->unkA88[0] = (u32)ParticlePool_Create();
         if (gEngineFlags & 0x1000)
             WirelessGame_ResetCyclingItemLatch();
         Player_EmitQueuedEffects(p);
@@ -188,12 +154,7 @@ void Player_UpdateGrabMotion(struct Player *p)
     p->statusFlags = Player_ReadStatusBits(&p->statusFlags, ~0x4000) | 0x60000;
     switch (p->tetherPhase) {
         case 0: {
-            u16 v = p->tetherFrame;
-            struct PlayerGrabHalf mask;
-            s32 low;
-            mask.value = 7;
-            low = DisplaySequence_MaskCommand(v, mask.value);
-            if (low < mask.value - (v >> 3))
+            if ((p->tetherFrame & 7) < 7 - (p->tetherFrame >> 3))
                 PlayerAnimation_SelectSecondaryKeyframes(
                     p, ActorVariant_GetTableValue(p->actionMode, 0), 0x40);
             else
@@ -220,14 +181,14 @@ void Player_UpdateGrabMotion(struct Player *p)
         case 1: {
             struct PlayerGrabTarget *t;
             s32 dx = PlayerGrab_TargetPosition((struct PlayerGrabTarget *)gPlayerPendingActor)->x -
-                     PlayerGrab_Coordinates(p)->x;
+                     p->secondaryAnimation.position.x;
             s32 dy;
             s32 dz;
             s32 angle;
             dy = PlayerGrab_TargetPosition((struct PlayerGrabTarget *)gPlayerPendingActor)->y -
-                 PlayerGrab_Coordinates(p)->y;
+                 p->secondaryAnimation.position.y;
             dz = PlayerGrab_TargetPosition((struct PlayerGrabTarget *)gPlayerPendingActor)->z -
-                 PlayerGrab_Coordinates(p)->z;
+                 p->secondaryAnimation.position.z;
             angle = Math_Atan2(dx, dz);
             if (dx * dx + dz * dz + dy * dy <= 0x8FF) {
                 t = (*(struct PlayerGrabTarget **)&gPlayerPendingActor);
@@ -246,51 +207,32 @@ void Player_UpdateGrabMotion(struct Player *p)
                         (*(struct PlayerGrabTarget **)&gPlayerPendingActor) = 0;
                         Player_SetActionPhase(p, 5);
                     } else {
-                        s32 base;
-                        s32 octantMask;
-                        s32 angleMask;
-                        s32 quarter;
-                        {
-                            s32 adjusted = angle + 0x20;
-                            s32 facing;
-                            angleMask = 255;
-                            adjusted &= angleMask;
-                            facing = (adjusted >> 6) * 2 + 3;
-                            octantMask = 7;
-                            facing &= octantMask;
-                            p->facing = facing;
-                        }
+                        p->facing = (((angle + 0x20) & 0xFF) >> 6) * 2 + 3 & 7;
                         if (!((*(struct PlayerGrabTarget **)&gPlayerPendingActor)->flags & 0x10))
                             ((u8 *)(*(struct PlayerGrabTarget **)&gPlayerPendingActor)->body)[9] =
-                                ((p->facing + 5) & octantMask) << 5;
-                        base = ((angle + 0x60) & angleMask) >> 6;
-                        quarter = base;
-                        PlayerGrab_SetFacing(p, quarter);
+                                ((p->facing + 5) & 7) << 5;
+                        PlayerGrab_SetFacing(p, ((angle + 0x60) & 0xFF) >> 6);
                         PlayerAnimation_SelectSecondaryKeyframes(p, 0xF0, 0x40);
                         Player_SetActionPhase(p, 2);
                     }
                 }
             } else {
-                s32 quarter;
                 if (dy > 0x18)
-                    PlayerGrab_Coordinates(p)->y += 0x18;
+                    p->secondaryAnimation.position.y += 0x18;
                 else if (dy < -0x18)
-                    PlayerGrab_Coordinates(p)->y -= 0x18;
-                PlayerGrab_Coordinates(p)->x += PlayerGrab_Fx12(PlayerGrab_Sin(angle + 0x40) * 24);
-                PlayerGrab_Coordinates(p)->z += PlayerGrab_Fx12(PlayerGrab_Sin(angle) * 24);
-                {
-                    s32 facing = ((((angle + 0x20) & 0xFF) >> 6) * 2 + 3) & 7;
-                    p->facing = facing;
-                }
-                quarter = (((angle + 0x60) & 0xFF) >> 6);
-                PlayerGrab_SetFacing(p, quarter);
+                    p->secondaryAnimation.position.y -= 0x18;
+                p->secondaryAnimation.position.x +=
+                    PlayerGrab_Fx12(PlayerGrab_Sin(angle + 0x40) * 24);
+                p->secondaryAnimation.position.z += PlayerGrab_Fx12(PlayerGrab_Sin(angle) * 24);
+                p->facing = ((((angle + 0x20) & 0xFF) >> 6) * 2 + 3) & 7;
+                PlayerGrab_SetFacing(p, ((angle + 0x60) & 0xFF) >> 6);
                 PlayerAnimation_SelectSecondaryKeyframes(p, 0xEE, 0x40);
                 p->tetherFrame++;
                 if (p->tetherFrame > 0x59)
                     Player_SetActionPhase(p, 6);
             }
-            ParticlePool_EmitTriple((void *)PlayerGrab_Context(p)->particlePool,
-                                    &p->secondaryAnimation.position, (angle + 0x80) & 0xFF, 1);
+            ParticlePool_EmitTriple((void *)p->unkA88[0], &p->secondaryAnimation.position,
+                                    (angle + 0x80) & 0xFF, 1);
             return;
         }
         case 2: {
@@ -380,38 +322,34 @@ void Player_UpdateGrabMotion(struct Player *p)
             struct PlayerGrabPos vec;
             u8 *headingField;
             if (h == 0) {
-                u8 heading = p->unk2D;
-                PlayerGrab_Context(p)->heading = heading;
+                p->targetOrbitAngle = p->unk2D;
                 Sound_PlaySong(0x4F6);
                 Sound_PlaySong(0x576);
             }
             h = PlayerGrab_GetFrame(p);
             if (h > 5) {
                 u32 radius;
-                PlayerGrab_Context(p)->heading += 0x12 + (h >> 1);
+                p->targetOrbitAngle += 0x12 + (h >> 1);
                 radius = PlayerGrab_GetFrame(p) + 0x4B;
-                PlayerGrab_Polar(&vec, PlayerGrab_Context(p)->heading, radius * 2);
+                PlayerGrab_Polar(&vec, p->targetOrbitAngle, radius * 2);
             } else if (h == 5) {
-                PlayerGrab_Context(p)->heading += 0x40;
-                PlayerGrab_Polar(&vec, PlayerGrab_Context(p)->heading,
-                                 (PlayerGrab_GetFrame(p) >> 1) + 0x14);
+                p->targetOrbitAngle += 0x40;
+                PlayerGrab_Polar(&vec, p->targetOrbitAngle, (PlayerGrab_GetFrame(p) >> 1) + 0x14);
             } else {
-                PlayerGrab_Polar(&vec, PlayerGrab_Context(p)->heading, (h >> 1) + 0x28);
+                PlayerGrab_Polar(&vec, p->targetOrbitAngle, (h >> 1) + 0x28);
             }
-            PlayerGrab_Coordinates(p)->x += vec.x;
-            PlayerGrab_Coordinates(p)->z += vec.z;
-            PlayerGrab_Coordinates(p)->x += PlayerGrab_PlanarVelocity(p)->x;
-            PlayerGrab_Coordinates(p)->z += PlayerGrab_PlanarVelocity(p)->z;
-            ParticlePool_EmitTriple((void *)PlayerGrab_Context(p)->particlePool,
-                                    &p->secondaryAnimation.position,
-                                    (PlayerGrab_Context(p)->heading + 0xA0) & 0xFF, 1);
+            p->secondaryAnimation.position.x += vec.x;
+            p->secondaryAnimation.position.z += vec.z;
+            p->secondaryAnimation.position.x += p->lockedVelocity.x;
+            p->secondaryAnimation.position.z += p->lockedVelocity.z;
+            ParticlePool_EmitTriple((void *)p->unkA88[0], &p->secondaryAnimation.position,
+                                    (p->targetOrbitAngle + 0xA0) & 0xFF, 1);
             {
-                u8 heading = PlayerGrab_Context(p)->heading;
+                u8 heading = p->targetOrbitAngle;
                 headingField = &p->heading;
                 *headingField = heading;
             }
-            PlayerGrab_SetFacingAt(p, headingField,
-                                   ((PlayerGrab_Context(p)->heading + 0x60) >> 6) & 3);
+            PlayerGrab_SetFacingAt(p, headingField, ((p->targetOrbitAngle + 0x60) >> 6) & 3);
             PlayerAnimation_SelectSecondaryKeyframes(p, 0xEE, 0x40);
             if ((p->tetherFrame & 3) == 0)
                 TemporaryAnimationPool_CreateEntry(&p->secondaryAnimation, 0x10, 0x200,
@@ -440,22 +378,22 @@ void Player_UpdateGrabMotion(struct Player *p)
             s32 angle;
             Player_AddControlFlags(p, 8);
             if (p->tetherFrame == 0) {
-                s32 dx = PlayerGrab_StoredCoordinates(p)->x - PlayerGrab_Coordinates(p)->x;
-                s32 dz = PlayerGrab_StoredCoordinates(p)->z - PlayerGrab_Coordinates(p)->z;
+                s32 dx = p->movementStart.x - p->secondaryAnimation.position.x;
+                s32 dz = p->movementStart.z - p->secondaryAnimation.position.z;
                 s32 speed = Div((u32)((u16)Sqrt(dx * dx + dz * dz)) << 4, 12);
                 speed = PlayerGrab_Fx4(speed);
-                PlayerGrab_Context(p)->returnSpeed = speed;
+                p->cueSpeed = speed;
                 p->actionEighteenParameter = 0x16F;
                 p->actionEighteenDuration = 0x20;
             }
             Player_UpdateFacingSide(p);
             PlayerAnimation_SelectSecondaryKeyframes(p, 0xE9, 0x40);
-            angle = Math_Atan2(PlayerGrab_StoredCoordinates(p)->x - PlayerGrab_Coordinates(p)->x,
-                               PlayerGrab_StoredCoordinates(p)->z - PlayerGrab_Coordinates(p)->z);
-            PlayerGrab_Coordinates(p)->x +=
-                PlayerGrab_Fx12(PlayerGrab_Sin(angle + 0x40) * PlayerGrab_Context(p)->returnSpeed);
-            PlayerGrab_Coordinates(p)->z +=
-                PlayerGrab_Fx12(PlayerGrab_Sin(angle) * PlayerGrab_Context(p)->returnSpeed);
+            angle = Math_Atan2(p->movementStart.x - p->secondaryAnimation.position.x,
+                               p->movementStart.z - p->secondaryAnimation.position.z);
+            p->secondaryAnimation.position.x +=
+                PlayerGrab_Fx12(PlayerGrab_Sin(angle + 0x40) * p->cueSpeed);
+            p->secondaryAnimation.position.z +=
+                PlayerGrab_Fx12(PlayerGrab_Sin(angle) * p->cueSpeed);
             p->terrainRecoveryCounter =
                 PlayerGrab_Fx12(PlayerGrab_Sin((p->tetherFrame + 4) << 3) << 6);
             p->tetherFrame++;
