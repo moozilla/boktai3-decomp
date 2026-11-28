@@ -1,15 +1,9 @@
-#include "global.h"
-struct P {
-    u8 f[0x71C2];
-    u8 a[0x1a];
-    u8 b[0x1a];
-    u8 c[0x1a];
-    u8 d[0x1a];
-};
-void SceneAnimation_SetSlotState(struct P *p, s32 i, s32 v)
+#include "bosses/nidhoggr/nidhoggr_animation.h"
+
+void SceneAnimation_SetSlotState(struct Nidhoggr *boss, s32 i, s32 state)
 {
-    p->a[i] = v;
-    p->b[i] = 0;
-    p->c[i] = 0;
-    p->d[i] = 0;
+    boss->partState[i] = state;
+    boss->rowInitFlag[i] = 0;
+    boss->rowCounter[i] = 0;
+    boss->rowDoneFlag[i] = 0;
 }
