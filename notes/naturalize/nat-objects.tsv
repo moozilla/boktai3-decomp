@@ -93,3 +93,11 @@ src/objects/coffin/tether_actor.c	TetherActor_GetParameter	minor	natural	2
 src/objects/coffin/tether_actor.c	TetherActor_BeginDetachedState	minor	natural	1	
 src/objects/coffin/tether_actor.c	TetherActor_BeginDisplayPositionState	minor	natural	1	
 src/objects/coffin/tether_actor.c	TetherActor_GetStatusFlags	minor	natural	2	
+src/objects/coffin/tether_actor.c	TetherActor_IsStateOne	natural	natural	0	
+src/objects/coffin/tether_actor.c	TetherActor_SetParameter	natural	natural	0	
+src/objects/coffin/tether_actor.c	TetherActor_TestStatusFlags	natural	natural	0	
+src/objects/coffin/tether_actor.c	TetherActor_GetStatusTag	natural	natural	0	
+src/objects/coffin/tether_actor.c	TetherActor_AddStatusFlags	natural	natural	0	
+src/objects/coffin/tether_actor.c	TetherActor_BeginKindFourStateNine	natural	natural	0	
+src/objects/coffin/tether_actor.c	TetherActor_BeginKindFourStateTen	natural	natural	0	
+src/objects/coffin/tether_actor.c	TetherActor_GetRequestStatus	minor	natural	1	

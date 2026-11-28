@@ -1452,12 +1452,9 @@ u32 TetherActor_RequestKindNineAction(u32 a, u32 b)
 u8 TetherActor_GetRequestStatus(void)
 {
     struct TetherActor *p = gTetherActor;
-    u8 r;
-    if (p)
-        r = p->requestStatus;
-    else
-        r = 0;
-    return r;
+    if (!p)
+        return 0;
+    return p->requestStatus;
 }
 
 u8 TetherActor_GetRequestMode(void)
