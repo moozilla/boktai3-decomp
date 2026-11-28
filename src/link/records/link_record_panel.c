@@ -163,24 +163,18 @@ void LinkRecordPanel_CreateTextWindows(struct LinkRecordPanel *owner)
 
 void LinkRecordPanel_StartDescriptions(struct LinkRecordPanel *owner)
 {
-    struct AreaEffectLinkState *sel = gLinkSession;
-    if (sel != 0 && sel->unavailable == 1 &&
-        (void *)&((struct LinkRecordPayload *)sel->sessionData)->peers[0] != 0) {
-        s32 *w = &owner->leftWindow;
-        TextWindow_SetScript(*w, owner->namesScript);
-        TextWindow_Refresh(*w, 0);
-        TextWindow_SetString(*w, 1,
-                             ((struct LinkRecordPayload *)sel->sessionData)->peers[0].displayName);
-        TextWindow_StartPlayback(*w);
-        sel = gLinkSession;
-        if (sel != 0 && sel->unavailable == 1 &&
-            (void *)&((struct LinkRecordPayload *)sel->sessionData)->peers[1] != 0) {
-            w = &owner->rightWindow;
-            TextWindow_SetScript(*w, owner->namesScript);
-            TextWindow_Refresh(*w, 1);
-            TextWindow_SetString(
-                *w, 2, ((struct LinkRecordPayload *)sel->sessionData)->peers[1].displayName);
-            TextWindow_StartPlayback(*w);
+    struct LinkTimeRecord *peer = getPeer(0);
+    if (peer != NULL) {
+        TextWindow_SetScript(owner->leftWindow, owner->namesScript);
+        TextWindow_Refresh(owner->leftWindow, 0);
+        TextWindow_SetString(owner->leftWindow, 1, peer->displayName);
+        TextWindow_StartPlayback(owner->leftWindow);
+        peer = getPeer(1);
+        if (peer != NULL) {
+            TextWindow_SetScript(owner->rightWindow, owner->namesScript);
+            TextWindow_Refresh(owner->rightWindow, 1);
+            TextWindow_SetString(owner->rightWindow, 2, peer->displayName);
+            TextWindow_StartPlayback(owner->rightWindow);
         }
     }
 }

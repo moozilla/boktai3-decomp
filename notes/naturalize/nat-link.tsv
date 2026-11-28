@@ -306,3 +306,6 @@ src/link/records/LinkPanelSlots_ResetInstance.c	LinkPanelSlots_ResetInstance	nat
 src/link/records/LinkPanelSlots_Close.c	LinkPanelSlots_Close	natural	natural	0	
 src/link/records/link_record_panel.c	LinkRecordPanel_LoadBackground	natural	natural	0	
 src/link/records/link_record_panel.c	LinkRecordPanel_DrawTime	minor	natural	1	
+src/link/records/link_record_panel.c	LinkRecordPanel_DrawPeerTimes	natural	natural	0	
+src/link/records/link_record_panel.c	LinkRecordPanel_CreateTextWindows	natural	natural	0	
+src/link/records/link_record_panel.c	LinkRecordPanel_StartDescriptions	contrived	natural	2	
