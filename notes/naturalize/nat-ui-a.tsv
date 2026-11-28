@@ -553,3 +553,4 @@ src/ui/hud/display/Hud_BeginSavedBlend.c	Hud_BeginSavedBlend	fudged	natural	2
 src/ui/hud/display/SceneHud_CanOpenFromStart.c	SceneHud_CanOpenFromStart	natural	natural	0	
 src/ui/hud/display/Hud_RemoveMenuGraphics.c	Hud_RemoveMenuGraphics	fudged	natural	3	
 src/ui/hud/display/sub_08176F70.c	sub_08176F70	fudged	partial	10	dead initial = 1 write, defaults zero and ClearPosition helper (zero register lifetimes); position/w locals in the fourth loop
+src/ui/hud/display/Hud_LoadLayoutResources.c	Hud_LoadLayoutResources	fudged	natural	2	
