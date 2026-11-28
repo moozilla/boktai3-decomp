@@ -665,3 +665,19 @@ src/bosses/nidhoggr/duel_minions.c	NidhoggrDuelMinionPool_Destroy	minor	natural	
 src/bosses/nidhoggr/duel_minions.c	NidhoggrDuelMinionPool_Initialize	minor	natural	1	for loop over the actors
 src/bosses/nidhoggr/duel_minions.c	NidhoggrDuelMinionPool_SpawnActor	contrived	contrived	6	resource and frame passed directly now; owner/position aliases and collider pointers stay: saved-register choice
 src/bosses/nidhoggr/duel_minions.c	NidhoggrDuelMinionPool_BeginAllDeaths	minor	natural	1	for loop over the actors
+src/bosses/nidhoggr/duel_minions.c	NidhoggrDuelMinionPool_GetActiveCount	natural	natural	0	
+src/bosses/nidhoggr/duel_orbs.c	NidhoggrDuelOrb_UpdateInactive	natural	natural	0	
+src/bosses/nidhoggr/duel_orbs.c	NidhoggrDuelOrb_UpdateExpanding	natural	natural	0	
+src/bosses/nidhoggr/duel_orbs.c	NidhoggrDuelOrb_UpdateContracting	natural	natural	0	
+src/bosses/nidhoggr/duel_orbs.c	NidhoggrDuelOrb_Destroy	natural	natural	0	
+src/bosses/nidhoggr/duel_orbs.c	NidhoggrDuelOrb_Initialize	natural	natural	0	
+src/bosses/nidhoggr/duel_orbs.c	NidhoggrDuelOrb_Create	natural	natural	0	
+src/bosses/nidhoggr/duel_bursts.c	NidhoggrDuelBurst_RandomParticleFrame	natural	natural	0	
+src/bosses/nidhoggr/duel_bursts.c	NidhoggrDuelBurst_Destroy	natural	natural	0	
+src/bosses/nidhoggr/duel_bursts.c	NidhoggrDuelBurst_Create	natural	natural	0	
+src/bosses/nidhoggr/duel_bursts.c	NidhoggrDuelBurst_SetEnabled	natural	natural	0	
+src/bosses/nidhoggr/duel_bursts.c	NidhoggrDuelBurst_GetEnabled	natural	natural	0	
+src/bosses/nidhoggr/Nidhoggr_StepPoolAnimation.c	Nidhoggr_StepPoolAnimation	natural	natural	0	
+src/bosses/nidhoggr/NidhoggrEffect_InitPool.c	NidhoggrEffect_InitPool	contrived	natural	0	for loops over pool position words and both slot arrays
+src/bosses/nidhoggr/Nidhoggr_ClearEffectPools.c	Nidhoggr_ClearEffectPools	contrived	natural	0	pool struct argument instead of raw 0xA24 offset; for loops
+src/bosses/nidhoggr/NidhoggrEffect_UpdatePool.c	NidhoggrEffect_UpdatePool	minor	minor	0	for loop over small effects; the stride-stepped motion/position pointers stay: indexing large[i] changes the loop strength reduction
