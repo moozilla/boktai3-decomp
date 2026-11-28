@@ -495,3 +495,4 @@ src/system/game_state/GameState_InsertUniqueListEntry.c	GameState_InsertUniqueLi
 src/system/game_state/SolarFruit_GetInventorySlot.c	SolarFruit_GetInventorySlot	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
 src/system/game_state/GameState_MoveSlotEntry.c	GameState_MoveSlotEntry	contrived	natural	1	
 src/system/game_state/SolarFruit_ClearEquippedSlot.c	SolarFruit_ClearEquippedSlot	contrived	natural	1	
+src/system/game_state/sub_0822EB14.c	sub_0822EB14	contrived	natural	1	
