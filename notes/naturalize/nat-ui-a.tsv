@@ -142,3 +142,4 @@ src/ui/books/forging_book/sub_0821290C.c	sub_0821290C	contrived	natural	1	falls 
 src/ui/books/forging_book/CollectionBook_GetPageEntryCount.c	CollectionBook_GetPageEntryCount	natural	natural	1	
 src/ui/books/forging_book/CollectionBook_SetEntryCollected.c	CollectionBook_SetEntryCollected	contrived	natural	1	
 src/ui/books/forging_book/CollectionBook_IsEntryCollected.c	CollectionBook_IsEntryCollected	minor	natural	1	
+src/ui/books/forging_book/CollectionBook_SetEntryCollectedFromScript.c	CollectionBook_SetEntryCollectedFromScript	minor	natural	1	
