@@ -197,3 +197,4 @@ src/monsters/popbud/ProjectileEmitter_EmitAttackFrame.c	ProjectileEmitter_EmitAt
 src/monsters/popbud/Combat_SpawnDirectionalProjectile.c	Combat_SpawnDirectionalProjectile	minor	natural	1	polar/add inline helpers
 src/monsters/popbud/Popbud_Create.c	Popbud_Create	natural	natural	0	
 src/monsters/popbud/Popbud_OnTaskDestroy.c	Popbud_OnTaskDestroy	minor	minor	0	raw +0x24: s32 tail return needs Sprite_Remove declared s32
+src/monsters/screamer/Screamer_HandleDefeat.c	Screamer_HandleDefeat	contrived	minor	2	counter casts for fields missing from game_state.h

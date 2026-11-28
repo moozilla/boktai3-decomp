@@ -1,9 +1,12 @@
-#include "script/script_utility.h"
-#include "monsters/screamer/screamer_state.h"
 #include "global.h"
+#include "engine/engine.h"
+#include "monsters/screamer/screamer_state.h"
+#include "script/script_utility.h"
+#include "system/game_state/game_state.h"
+
 void Bestiary_UnlockEntry(s32);
 void Player_AddExperience(s32);
-#define H(p, n) (*(s16 *)((u8 *)(p) + (n)))
+
 static inline s32 clamp(s32 v)
 {
     if (v > 9999)
@@ -12,32 +15,39 @@ static inline s32 clamp(s32 v)
         v = 0;
     return v;
 }
-void Screamer_HandleDefeat(struct ScreamerState *p)
+/* Capped at 9999; the comparison reads the counter as signed. */
+static inline void IncrementCounter(u16 *value)
+{
+    *value = (s16)*value < 9999 ? *value + 1 : 9999;
+}
+
+void Screamer_HandleDefeat(struct ScreamerState *screamer)
 {
     s32 values[8];
-    struct ScriptUtilityArguments m;
-    u32 q = p->f214;
-    if (q) {
-        values[0] = p->sprite.position.x;
-        values[1] = p->sprite.position.y;
-        values[2] = p->sprite.position.z;
-        values[3] = p->f208;
-        values[4] = p->f20C;
-        values[5] = p->f210;
-        values[6] = p->f200;
-        values[7] = (s32)p->f1F8;
-        m.count = 8;
-        m.values = values;
-        Script_Call(q, &m);
+    struct ScriptUtilityArguments args;
+    u32 script = screamer->f214;
+
+    if (script) {
+        values[0] = screamer->sprite.position.x;
+        values[1] = screamer->sprite.position.y;
+        values[2] = screamer->sprite.position.z;
+        values[3] = screamer->f208;
+        values[4] = screamer->f20C;
+        values[5] = screamer->f210;
+        values[6] = screamer->f200;
+        values[7] = (s32)screamer->f1F8;
+        args.count = 8;
+        args.values = values;
+        Script_Call(script, &args);
     }
     Bestiary_UnlockEntry(33);
-    if (p->f200 & 1) {
+    if (screamer->f200 & 1) {
         u16 flags;
-        Player_AddExperience(p->f1F0);
-        H(gGameState, 0x87C) = H(gGameState, 0x87C) < 9999 ? H(gGameState, 0x87C) + 1 : 9999;
-        H(gGameState, 0x538) = H(gGameState, 0x538) < 9999 ? H(gGameState, 0x538) + 1 : 9999;
-        flags = p->f1E8;
-        H(gGameState, 0x56A) = H(gGameState, 0x56A) < 9999 ? H(gGameState, 0x56A) + 1 : 9999;
+        Player_AddExperience(screamer->f1F0);
+        IncrementCounter(&gGameState->counter87C);
+        IncrementCounter(&gGameState->counter538);
+        flags = screamer->f1E8;
+        IncrementCounter(&gGameState->counter56A);
         if (flags & 0x80) {
             gGameState->targetFlagBonuses[0] = clamp(gGameState->targetFlagBonuses[0] + 1);
         } else if (flags & 0x100) {
