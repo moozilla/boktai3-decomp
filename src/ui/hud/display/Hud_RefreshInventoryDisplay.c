@@ -1,14 +1,15 @@
 #include "global.h"
 #include "engine/ram.h"
-void sub_08168850(void *);
-void SceneHud_UpdateSecondaryWidgets(void *);
-void SceneHud_RefreshWidgetVisibility(void *);
+#include "ui/pause/scene_hud_display.h"
+void sub_08168850(struct SceneHudState *);
+void SceneHud_UpdateSecondaryWidgets(struct SceneHudState *);
+void SceneHud_RefreshWidgetVisibility(struct SceneHudState *);
 void Hud_RefreshInventoryDisplay(void)
 {
-    if (gFieldHud && *(u32 *)(gFieldHud + 0xa40)) {
-        sub_08168850(gFieldHud);
-        SceneHud_UpdateSecondaryWidgets(gFieldHud);
-        if (gFieldHud[0xa5e] <= 2)
-            SceneHud_RefreshWidgetVisibility(gFieldHud);
+    if (gFieldHud && ((struct SceneHudState *)gFieldHud)->actionOwner) {
+        sub_08168850((struct SceneHudState *)gFieldHud);
+        SceneHud_UpdateSecondaryWidgets((struct SceneHudState *)gFieldHud);
+        if (((struct SceneHudState *)gFieldHud)->controlMode <= 2)
+            SceneHud_RefreshWidgetVisibility((struct SceneHudState *)gFieldHud);
     }
 }
