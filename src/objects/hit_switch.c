@@ -265,69 +265,45 @@ void SceneBody_Init(struct SceneActorBody *, u32, struct ContactPosition *, u32,
 
 void TerrainOverlay_QueueAddActor(struct SceneActorBody *);
 
-void HitSwitch_InitEntryFromScript(struct HitSwitchManager *input)
+void HitSwitch_InitEntryFromScript(struct HitSwitchManager *manager)
 {
-    struct HitSwitchManager *manager = input;
-    struct HitSwitchEntry *entry;
-    struct ContactPosition *world;
+    struct HitSwitchEntry *entry = &manager->entries[manager->count];
     struct SpriteRenderResource *animation;
     struct DisplaySequenceSprite *sprite;
-    u32 present;
-    entry = &manager->entries[manager->count];
-    {
-        u32 found = Script_SeekToKeyword('n');
-        if (found)
-            entry->collisionId = Script_GetValue();
-        else
-            entry->collisionId = found;
-    }
-    present = Script_SeekToKeyword('p');
-    if (present) {
+    u32 resource;
+
+    if (Script_SeekToKeyword('n'))
+        entry->collisionId = Script_GetValue();
+    else
+        entry->collisionId = 0;
+    if (Script_SeekToKeyword('p')) {
         entry->world.x = Script_GetValue();
         entry->world.y = Script_GetValue();
         entry->world.z = Script_GetValue();
-        world = &entry->world;
     } else {
-        entry->world.x = present;
-        entry->world.y = present;
-        entry->world.z = present;
-        world = &entry->world;
+        entry->world.x = 0;
+        entry->world.y = 0;
+        entry->world.z = 0;
     }
-    {
-        s32 x = (s16)(u16)world->x >> 8;
-        s32 z = (s16)(u16)world->z >> 8;
-        u32 index;
-        if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-            index = 0;
-        else
-            index = gTerrainMap->rows[z] + x;
-        entry->cellIndex = index;
-    }
+    entry->cellIndex = SceneActorTerrain_GetCellIndex(&entry->world);
     if (Script_SeekToKeyword('t'))
         entry->kind = Script_GetValue();
     else
         entry->kind = 0;
-    {
-        u32 kind = entry->kind;
-        u32 resource;
-        resource = 0xD166;
-        if (kind == 0)
-            resource = 0xC3C3;
-        sprite = &entry->sprite;
-        animation = &entry->animation;
-        AnimData_Load(animation, resource);
-        Sprite_Init(sprite, animation, 0);
-        sprite->priority = 3;
-    }
+    resource = entry->kind == 0 ? 0xC3C3 : 0xD166;
+    sprite = &entry->sprite;
+    animation = &entry->animation;
+    AnimData_Load(animation, resource);
+    Sprite_Init(sprite, animation, 0);
+    sprite->priority = 3;
     if (Script_SeekToKeyword('r') && Script_GetValue())
         sprite->flags |= 4;
-    sprite->position = *world;
+    sprite->position = entry->world;
     if (Script_SeekToKeyword('h')) {
         entry->bodyEnabled = Script_GetValue();
         if (entry->bodyEnabled) {
-            struct SceneActorBody *body = &entry->body;
-            SceneBody_Init(body, entry->collisionId, &sprite->position, 0, 7, entry);
-            TerrainOverlay_QueueAddActor(body);
+            SceneBody_Init(&entry->body, entry->collisionId, &sprite->position, 0, 7, entry);
+            TerrainOverlay_QueueAddActor(&entry->body);
         }
     } else
         entry->bodyEnabled = 0;
@@ -336,36 +312,19 @@ void HitSwitch_InitEntryFromScript(struct HitSwitchManager *input)
         entry->requiredHits = Script_GetValue();
     else
         entry->requiredHits = 10;
-    {
-        u32 period = Script_SeekToKeyword('W');
-        if (period)
-            period = Script_GetValue();
-        {
-            u16 *bobPeriod = &entry->bobPeriod;
-            *bobPeriod = period;
-        }
-    }
+    if (Script_SeekToKeyword('W'))
+        entry->bobPeriod = Script_GetValue();
+    else
+        entry->bobPeriod = 0;
     HitSwitch_InitCollider(entry);
-    {
-        u8 *cooldown = &entry->hitCooldown;
-        *cooldown = 0;
-    }
-    {
-        u32 found = Script_SeekToKeyword('s');
-        if (found)
-            entry->completed = Script_GetValue();
-        else
-            entry->completed = found;
-    }
+    entry->hitCooldown = 0;
+    if (Script_SeekToKeyword('s'))
+        entry->completed = Script_GetValue();
+    else
+        entry->completed = 0;
     if (entry->completed) {
-        u16 *state;
-        u32 flags, mask;
         HitSwitch_RegisterCompletedCell(entry);
-        state = &entry->collider.flags;
-        flags = *state;
-        mask = 4;
-        mask |= flags;
-        *state = mask;
+        entry->collider.flags |= 4;
         sprite->frame = 2;
         if (entry->kind == 0) {
             sprite->priority = 2;
@@ -388,10 +347,7 @@ void HitSwitch_InitEntryFromScript(struct HitSwitchManager *input)
         entry->tag = -1;
         entry->completedScriptId = 0;
     }
-    {
-        u32 count = manager->count + 1;
-        manager->count = count;
-    }
+    manager->count++;
 }
 
 struct HitSwitchManager *HitSwitch_CreateManager(void)
