@@ -1,10 +1,8 @@
 #include "global.h"
+#include "objects/deck_cannons/deck_cannon_battery.h"
 
-void Collider_Remove(u8 *);
-u32 Sprite_Remove(u8 *);
-
-void DeckCannon_DestroyProjectile(u8 *p)
+void DeckCannon_DestroyProjectile(struct DeckCannonShot *shot)
 {
-    Collider_Remove(p + 0x60);
-    Sprite_Remove(p + 0x24);
+    Collider_Remove(&shot->collider);
+    Sprite_Remove(&shot->sprite);
 }
