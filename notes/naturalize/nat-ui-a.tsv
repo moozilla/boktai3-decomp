@@ -437,3 +437,22 @@ src/ui/hud/hud_tilemaps.c	SceneHud_HideFourDigits	fudged	natural	3
 src/ui/hud/field_hud.c	FieldHud_UpdateTimeDigits	fudged	natural	1	
 src/ui/hud/field_hud.c	NumericDisplay_InitializeWidgets	fudged	natural	1	
 src/ui/hud/field_hud.c	FieldHud_InitializeNumber	fudged	natural	1	
+src/ui/hud/hud_tilemaps.c	SceneHud_DrawCenteredMeter	fudged	fudged	8	unchanged: offset and two source pointers reproduce the strength reduction; indexed forms differ in register count
+src/ui/hud/hud_tilemaps.c	SceneHud_GetMapCell	natural	natural	0	
+src/ui/hud/hud_tilemaps.c	SceneHud_DrawClock	natural	natural	0	
+src/ui/hud/hud_tilemaps.c	SceneHud_DrawNumericStatus	natural	natural	0	
+src/ui/hud/hud_tilemaps.c	SceneHud_SetKeyframePaletteBank	natural	natural	0	
+src/ui/hud/hud_tilemaps.c	SceneHud_UpdateFeaturePalettes	natural	natural	0	
+src/ui/hud/field_hud.c	MeterDisplay_InitializeWidgets	fudged	fudged	20	unchanged: zero local and flags pointer set the loop-init order (i, zero, pointer); closest variant is one instruction order off
+src/ui/hud/field_hud.c	FieldHud_OnUnusedUpdate	natural	natural	0	
+src/ui/hud/field_hud.c	FieldHud_OnUnusedCleanup	natural	natural	0	
+src/ui/hud/field_hud.c	Background_GetWrappedTileEntry	natural	natural	0	
+src/ui/hud/field_hud.c	FieldHud_UpdateGaugePalette	natural	natural	0	
+src/ui/hud/field_hud.c	FieldHud_RefreshGaugeIndex	natural	natural	0	
+src/ui/hud/field_hud.c	FieldHud_UpdateNumberDisplay	natural	natural	0	
+src/ui/hud/field_hud.c	ViewportGauge_ComputeFill	natural	natural	0	
+src/ui/hud/field_hud.c	Palette_InitColorTransition	natural	natural	0	
+src/ui/hud/field_hud.c	FieldHud_InitializeGauge	natural	natural	0	
+src/ui/hud/field_hud.c	MeterDisplay_UpdateOwnerMeters	natural	natural	0	
+src/ui/hud/field_hud.c	FieldHud_UpdateWidgets	natural	natural	0	
+src/ui/hud/field_hud.c	FieldHud_InitializeWidgets	natural	natural	0	
