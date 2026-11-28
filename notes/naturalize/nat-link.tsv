@@ -314,3 +314,5 @@ src/link/records/link_record_panel.c	LinkRecordPanel_InitializeEntryValues	natur
 src/link/records/link_record_panel.c	LinkRecordPanel_InitializeWidgets	natural	natural	0	
 src/link/records/link_record_panel.c	LinkRecordPanel_PositionWidgets	natural	natural	0	
 src/link/records/link_record_panel.c	LinkRecordPanel_InitializePreviews	minor	minor	3	validSelection goto inline stays (shared with record menus)
+src/link/records/link_record_panel.c	LinkRecordPanel_HideDisplay	natural	natural	0	
+src/link/records/link_record_panel.c	LinkRecordPanel_RemoveWidgets	minor	natural	1	

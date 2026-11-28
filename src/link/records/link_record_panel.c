@@ -294,13 +294,10 @@ void LinkRecordPanel_HideDisplay(struct LinkRecordPanel *owner)
 
 void LinkRecordPanel_RemoveWidgets(struct LinkRecordPanel *owner)
 {
-    struct AnimSprite *q = owner->widgets;
     s32 i;
 
-    for (i = 6; i >= 0; i--) {
-        Anim_Remove(q);
-        q++;
-    }
+    for (i = 0; i < 7; i++)
+        Anim_Remove(&owner->widgets[i]);
 }
 
 void LinkRecordPanel_ShowDialogue(void)
