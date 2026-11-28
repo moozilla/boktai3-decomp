@@ -11,115 +11,102 @@ u32 Script_GetValueSafe(void);
 void Ooze_InitAttackCollider(void *);
 void Ooze_ReadScriptValueList(void *);
 void Ooze_UpdateAttackDelay(void);
-static inline u32 Ooze_StepInitialAnimation(struct DisplaySequenceSprite *sprite,
-                                            struct DisplaySequenceState *state)
-{
-    return PlayerCue_StepSequenceEnded((void *)sprite, state);
-}
-
-static inline void Ooze_OffsetBodyPosition(struct SceneVec *position, s32 facing)
-{
-    if (!facing)
-        position->x += 128;
-    else
-        position->z += 128;
-}
-s32 Ooze_InitializeFromScript(struct Ooze *p, void *parent)
+s32 Ooze_InitializeFromScript(struct Ooze *ooze, void *parent)
 {
     struct SceneVec position;
+    u32 facing;
     if (Script_SeekToKeyword('p')) {
-        p->initialPosition.x = Script_GetValue();
-        p->initialPosition.y = Script_GetValue();
-        p->initialPosition.z = Script_GetValue();
+        ooze->initialPosition.x = Script_GetValue();
+        ooze->initialPosition.y = Script_GetValue();
+        ooze->initialPosition.z = Script_GetValue();
     }
     if (Script_SeekToKeyword('a')) {
-        p->extentX = Script_GetValue();
-        p->extentY = Script_GetValue();
-        p->extentZ = Script_GetValue();
+        ooze->extentX = Script_GetValue();
+        ooze->extentY = Script_GetValue();
+        ooze->extentZ = Script_GetValue();
     } else {
-        p->extentX = 30;
-        p->extentY = 10;
-        p->extentZ = 30;
+        ooze->extentX = 30;
+        ooze->extentY = 10;
+        ooze->extentZ = 30;
     }
     if (Script_SeekToKeyword('i'))
-        p->interval = Script_GetValue();
+        ooze->interval = Script_GetValue();
     else
-        p->interval = 60;
+        ooze->interval = 60;
     if (Script_SeekToKeyword('t'))
-        p->variant = Script_GetValue();
+        ooze->variant = Script_GetValue();
     if (Script_SeekToKeyword('r'))
-        p->delayScript = (void *)Script_GetValueSafe();
+        ooze->delayScript = (void *)Script_GetValueSafe();
     if (Script_SeekToKeyword('w')) {
-        p->attackDelay = Script_GetValue();
-        p->repeatLimit = Script_GetValue();
-        if (p->repeatLimit == 0)
-            p->repeatLimit = 1;
-        if (p->repeatLimit == 1)
-            p->repeatAttack = 0;
+        ooze->attackDelay = Script_GetValue();
+        ooze->repeatLimit = Script_GetValue();
+        if (ooze->repeatLimit == 0)
+            ooze->repeatLimit = 1;
+        if (ooze->repeatLimit == 1)
+            ooze->repeatAttack = 0;
         else
-            p->repeatAttack = 1;
+            ooze->repeatAttack = 1;
     } else {
-        p->attackDelay = 30;
-        p->repeatAttack = 1;
-        p->repeatLimit = 3;
+        ooze->attackDelay = 30;
+        ooze->repeatAttack = 1;
+        ooze->repeatLimit = 3;
     }
     if (Script_SeekToKeyword('h')) {
-        p->facing = Script_GetValue();
-        {
-            u32 facing = (u16)(p->facing = (p->facing - 1) / 2);
-            if (facing <= 3) {
-                switch (facing) {
-                    case 0:
-                    case 1:
-                        p->facing = 0;
-                        break;
-                    case 2:
-                    case 3:
-                        p->facing = 1;
-                        break;
-                    default:
-                        p->facing = 1;
-                        break;
-                }
-            } else
-                p->facing = 1;
-        }
+        ooze->facing = Script_GetValue();
+        facing = (u16)(ooze->facing = (ooze->facing - 1) / 2);
+        if (facing <= 3) {
+            switch (facing) {
+                case 0:
+                case 1:
+                    ooze->facing = 0;
+                    break;
+                case 2:
+                case 3:
+                default:
+                    ooze->facing = 1;
+                    break;
+            }
+        } else
+            ooze->facing = 1;
     } else
-        p->facing = 0;
+        ooze->facing = 0;
     if (Script_SeekToKeyword('S'))
-        p->solid = Script_GetValue();
-    p->parent = parent;
-    AnimData_Load(&p->graphics, 0x7e7d);
-    Sprite_Init(&p->sprite, &p->graphics, 0x201);
-    p->sprite.position = p->initialPosition;
-    AnimData_SelectPaletteBank(&p->graphics, 0x1c3);
-    p->resource = ScriptProc_Start(0x922e, 0x5184);
-    Anim_SetSequence(&p->sequence, p->resource, 0x22, (u8)p->facing, 8);
-    Ooze_StepInitialAnimation(&p->sprite, &p->sequence);
-    if (p->variant == 0) {
-        p->idleSequence = 0x22;
-        p->startSequence = 0x23;
-        p->holdSequence = 0x24;
-        p->endSequence = 0x25;
+        ooze->solid = Script_GetValue();
+    ooze->parent = parent;
+    AnimData_Load(&ooze->graphics, 0x7e7d);
+    Sprite_Init(&ooze->sprite, &ooze->graphics, 0x201);
+    ooze->sprite.position = ooze->initialPosition;
+    AnimData_SelectPaletteBank(&ooze->graphics, 0x1c3);
+    ooze->resource = ScriptProc_Start(0x922e, 0x5184);
+    Anim_SetSequence(&ooze->sequence, ooze->resource, 0x22, (u8)ooze->facing, 8);
+    PlayerCue_StepSequenceEnded(&ooze->sprite, &ooze->sequence);
+    if (ooze->variant == 0) {
+        ooze->idleSequence = 0x22;
+        ooze->startSequence = 0x23;
+        ooze->holdSequence = 0x24;
+        ooze->endSequence = 0x25;
     } else {
-        p->idleSequence = 0x1e;
-        p->startSequence = 0x1f;
-        p->holdSequence = 0x20;
-        p->endSequence = 0x21;
+        ooze->idleSequence = 0x1e;
+        ooze->startSequence = 0x1f;
+        ooze->holdSequence = 0x20;
+        ooze->endSequence = 0x21;
     }
-    Ooze_InitAttackCollider(p);
-    if (p->delayScript)
-        Ooze_ReadScriptValueList(p);
-    if (p->solid) {
-        SceneVec_Copy(&position, (struct SceneVec *)&p->sprite.position);
-        if (p->variant == 1) {
-            Ooze_OffsetBodyPosition(&position, p->facing);
+    Ooze_InitAttackCollider(ooze);
+    if (ooze->delayScript)
+        Ooze_ReadScriptValueList(ooze);
+    if (ooze->solid) {
+        SceneVec_Copy(&position, (struct SceneVec *)&ooze->sprite.position);
+        if (ooze->variant == 1) {
+            if (!ooze->facing)
+                position.x += 128;
+            else
+                position.z += 128;
         }
-        SceneBody_Init(p->body, p->parent, &position, 0, 4, p);
-        SceneBody_SetSprite(p->body, &p->sprite);
-        TerrainOverlay_QueueAddActor(p->body);
+        SceneBody_Init(ooze->body, ooze->parent, &position, 0, 4, ooze);
+        SceneBody_SetSprite(ooze->body, &ooze->sprite);
+        TerrainOverlay_QueueAddActor(ooze->body);
     }
-    p->state = Ooze_UpdateAttackDelay;
+    ooze->state = Ooze_UpdateAttackDelay;
 #ifdef UBFIX
     // falls off the end with r0 left over from its last statement; the creator only tests
     // < 0, and this initializer has no failure path here

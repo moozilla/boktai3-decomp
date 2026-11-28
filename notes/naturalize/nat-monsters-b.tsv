@@ -162,3 +162,4 @@ src/monsters/muspell_head/MuspellHead_ApplyHitReaction.c	MuspellHead_ApplyHitRea
 src/monsters/muspell_head/MuspellHead_TryProjectileAttack.c	MuspellHead_TryProjectileAttack	minor	natural	4	sample stays ContactSampleVector (packed s32 bitfield writes)
 src/monsters/muspell_head/MuspellHead_InitializeFromScript.c	MuspellHead_InitializeFromScript	contrived	natural	30	
 src/monsters/ooze/Ooze_BeginAttack.c	Ooze_BeginAttack	minor	natural	4	collider pointer in case 1
+src/monsters/ooze/Ooze_InitializeFromScript.c	Ooze_InitializeFromScript	contrived	minor	12	heading is folded to a quadrant through a u32 copy and a redundant range test before the switch
