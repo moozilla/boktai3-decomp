@@ -580,3 +580,4 @@ src/ui/town/storage/Storage_InitSlotMapping.c	Storage_InitSlotMapping	contrived	
 src/ui/town/storage/Storage_FindEquippedItemSlot.c	Storage_FindEquippedItemSlot	contrived	natural	6	
 src/ui/town/storage/Storage_TickCategorySelection.c	Storage_TickCategorySelection	contrived	natural	1	
 src/ui/town/storage/Storage_SetCategoryPalette.c	Storage_SetCategoryPalette	minor	natural	1	
+src/ui/town/storage/Storage_ResetCategoryPalette.c	Storage_ResetCategoryPalette	minor	natural	1	

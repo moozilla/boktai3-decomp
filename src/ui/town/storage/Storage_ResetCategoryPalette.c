@@ -1,16 +1,11 @@
 #include "global.h"
 #include "ui/widgets/scene_input.h"
-#define gScenePaletteBanks gPaletteBankData
-struct StorageCategoryMenu {
-    u8 unknown0[0x13F8];
-    struct AnimSprite categoryWidget;
-    struct AnimSprite targetWidget;
-};
-void Storage_ResetCategoryPalette(struct StorageCategoryMenu *p)
+#include "ui/town/storage_screen.h"
+void Storage_ResetCategoryPalette(struct StorageScreen *screen)
 {
     u16 *palette = (u16 *)(gPaletteBankData + 0x7540);
-    p->categoryWidget.palette = palette;
-    p->categoryWidget.paletteBank = 0x3AA;
-    p->targetWidget.palette = palette;
-    p->targetWidget.paletteBank = 0x3AA;
+    screen->labels[0].palette = palette;
+    screen->labels[0].paletteBank = 0x3AA;
+    screen->labels[1].palette = palette;
+    screen->labels[1].paletteBank = 0x3AA;
 }
