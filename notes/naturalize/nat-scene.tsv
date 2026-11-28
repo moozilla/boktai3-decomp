@@ -411,3 +411,6 @@ src/scene/actor/placement/SceneActorPlacement_ResetActorState.c	SceneActorPlacem
 src/scene/actor/placement/SceneActorPlacement_ResetToPathPoint.c	SceneActorPlacement_ResetToPathPoint	contrived	minor	4	flag mask helper and flags pointer: plain &= ~4 loads the field before the mask
 src/scene/actor/placement/SceneActorPlacement_ConsumeCallbackFlag.c	SceneActorPlacement_ConsumeCallbackFlag	minor	natural	2	-
 src/scene/actor/placement/SceneActorPlacement_ConsumeShakeFlags.c	SceneActorPlacement_ConsumeShakeFlags	contrived	contrived	8	random index block and coordinate local: plain index updates and += reload the coordinate
+src/scene/actor/placement/SceneActorPlacement_PlayVariantEventSound.c	SceneActorPlacement_PlayVariantEventSound	minor	minor	0	unsigned long long flag test: a plain & 4 drops the widened test
+src/scene/actor/placement/SceneActorPlacement_PlayCategoryEventSound.c	SceneActorPlacement_PlayCategoryEventSound	minor	minor	0	parked mask and flag pointer: a plain test loads the field before the mask
+src/scene/actor/placement/SceneActorEffects_AdvanceSteps.c	SceneActorEffects_AdvanceSteps	contrived	minor	2	countdown do-while: a for loop counting up compiles differently

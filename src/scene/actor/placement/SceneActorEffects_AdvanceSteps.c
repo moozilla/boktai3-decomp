@@ -1,13 +1,13 @@
-#include "global.h"
+#include "scene/actor/scene_actor_effects.h"
 
-void EffectGroup_FadeFirstActive(u8 *);
+void EffectGroup_FadeFirstActive(void *);
 
-void SceneActorEffects_AdvanceSteps(u8 *p, s32 n)
+void SceneActorEffects_AdvanceSteps(struct SceneActorEffectsView *actor, s32 count)
 {
-    if (p[0x47c] == 1 && n > 0) {
-        s32 i = n;
+    if (actor->effect.kind == 1 && count > 0) {
+        s32 i = count;
         do {
-            EffectGroup_FadeFirstActive(p + 0x47c);
+            EffectGroup_FadeFirstActive(&actor->effect);
         } while (--i != 0);
     }
 }
