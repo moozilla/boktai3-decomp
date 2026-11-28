@@ -431,3 +431,4 @@ src/scene/actor/placement/SceneActorScript_ApplyTargetResetCommand.c	SceneActorS
 src/scene/actor/placement/SceneActorControl_RestoreInactiveDefaults.c	SceneActorControl_RestoreInactiveDefaults	contrived	contrived	0	masked-zero local reused as the stored value: a combined flag test reloads the flags
 src/scene/actor/reaction/SceneActorContacts_CanSelectNode.c	SceneActorContacts_CanSelectNode	contrived	natural	3	-
 src/scene/actor/reaction/SceneActorContacts_FindNodeByKind.c	SceneActorContacts_FindNodeByKind	contrived	natural	6	-
+src/scene/actor/reaction/SceneActorContacts_ContainsActiveNode.c	SceneActorContacts_ContainsActiveNode	contrived	natural	2	-
