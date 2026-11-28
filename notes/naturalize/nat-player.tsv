@@ -600,3 +600,4 @@ src/player/gun/Player_UpdateAttachedEntryPosition.c	Player_UpdateAttachedEntryPo
 src/player/gun/Player_SpawnSelectedAttackProjectile.c	Player_SpawnSelectedAttackProjectile	contrived	natural	20	-
 src/player/gun/Player_UpdateSelectedAttackCharge.c	Player_UpdateSelectedAttackCharge	contrived	natural	4	-
 src/player/gun/Player_OnChargedAttackExit.c	Player_OnChargedAttackExit	contrived	natural	1	-
+src/player/gun/Player_ReleaseActionEffectOnExit.c	Player_ReleaseActionEffectOnExit	contrived	natural	1	-
