@@ -1,4 +1,5 @@
 #include "global.h"
+#include "gba/io_reg.h"
 extern u8 gRtcDateTime[];
 u8 Clock_EncodeBcd(u8);
 u8 Clock_CalculateWeekday(s32, s32, s32);
@@ -21,22 +22,20 @@ u32 sub_08229180(s32 a, s32 b, s32 c, s32 d, s32 e, s32 f)
     gRtcDateTime[6] = Clock_EncodeBcd((u8)f);
     gRtcDateTime[7] = 0;
     result = 0;
-    i = 0;
     Solar_PauseMeasurement();
-    while (i <= 4) {
+    for (i = 0; i < 5; i++) {
         u16 old;
-        *(vu16 *)0x04000208 = 0;
-        old = *(vu16 *)0x04000200;
-        *(vu16 *)0x04000200 = 0;
+        REG_IME = 0;
+        old = REG_IE;
+        REG_IE = 0;
         Clock_BeginRtcAccess();
         result = (u8)Rtc_WriteDateTime(gRtcDateTime);
         Clock_EndRtcAccess();
-        *(vu16 *)0x04000200 = old;
-        *(vu16 *)0x04000208 = 1;
+        REG_IE = old;
+        REG_IME = 1;
         if (result == 1)
             break;
         Clock_WaitCycles(200);
-        i++;
     }
     Solar_ResumeMeasurement();
     return result;
