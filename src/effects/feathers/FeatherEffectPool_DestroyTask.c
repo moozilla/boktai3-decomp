@@ -1,39 +1,16 @@
-#include "global.h"
-#include "engine/ram.h"
+#include "effects/feathers/feather_effect_pool.h"
+#include "engine/engine.h"
 
-void Sprite_Remove(void *);
-
-static inline u8 Tst(u32 *m, s32 i)
+u32 FeatherEffectPool_DestroyTask(struct FeatherPool *pool)
 {
-    if (*m & (1 << i))
-        return TRUE;
-    return FALSE;
-}
+    s32 i;
 
-struct E {
-    u8 a[4];
-    u8 on;
-    u8 b[0xA0 - 5];
-};
-struct S {
-    u8 pad[0x38];
-    u32 mask;
-    struct E e[20];
-};
-
-u32 FeatherEffectPool_DestroyTask(struct S *b)
-{
-    s32 i = 0;
-    struct E *e = b->e;
-    for (; i < 20; e++, i++) {
-        if (Tst(&b->mask, i)) {
-            if (e->on)
-                Sprite_Remove(e);
+    for (i = 0; i < 20; i++) {
+        if (FeatherPool_IsUsed(pool, i)) {
+            if (pool->slots[i].sprite.linked)
+                Sprite_Remove(&pool->slots[i].sprite);
         }
     }
-    {
-        u32 z = 0;
-        gFadingSpritePool = z;
-    }
+    gFadingSpritePool = NULL;
     return 0;
 }
