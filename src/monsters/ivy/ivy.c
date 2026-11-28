@@ -156,7 +156,7 @@ static inline void Ivy_Facing(struct ChaseActor *actor, u8 *quadrant, u8 *flip)
 static inline void Ivy_EnableCollider(struct ContactCollider *collider)
 {
     collider->flags |= 4;
-    collider->flags &= 0xFFF7;
+    collider->flags &= ~8;
 }
 
 static inline s32 Ivy_GetElapsed(struct DisplaySequenceState *sequence)
@@ -166,14 +166,14 @@ static inline s32 Ivy_GetElapsed(struct DisplaySequenceState *sequence)
 
 static inline void Ivy_DisableCollider(struct ContactCollider *collider)
 {
-    collider->flags &= 0xFFFB;
+    collider->flags &= ~4;
     collider->flags |= 8;
 }
 
 static inline void Ivy_DisableContact(struct ChaseActor *actor)
 {
     Ivy_DisableCollider(&actor->base.colliderA);
-    SceneActorChase_ClearFlagComponent((void *)&actor->base.placementFlags, 0x800);
+    HalfwordFlags_Clear(&actor->base.placementFlags, 0x800);
 }
 
 struct IvyFrameIndex {
@@ -189,22 +189,20 @@ static inline struct IvyFrameIndex Ivy_ReadFrame(struct DisplaySequenceState *se
 
 void Ivy_UpdateGrabAttack(struct ChaseActor *actor)
 {
-    struct DisplaySequenceState *anim;
+    struct DisplaySequenceState *anim =
+        &((struct SceneActorControlMotionDrawable *)actor->base.drawable)->sequence;
     struct SceneActorBody *target;
     struct ContactPosition pos;
     u8 quadrant, flip;
-    u32 started;
 
-    anim = &((struct SceneActorControlMotionDrawable *)actor->base.drawable)->sequence;
-    started = SceneActorReaction_TakePrepared(actor);
-    if (started)
+    if (SceneActorReaction_TakePrepared(actor))
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 5);
     if (anim->index == 3 && anim->elapsed == 0)
         Sound_PlaySong(0x1DD);
 
     if (Ivy_ReadFrame(anim).index == 3 && Ivy_GetElapsed(anim) > 6) {
         actor->base.colliderA.flags |= 4;
-        actor->base.colliderA.flags &= 0xFFF7;
+        actor->base.colliderA.flags &= ~8;
         MonsterInit_SetMotionFlags(actor, 0x800);
         if (Ivy_FindAdjacentTarget(actor, 0)) {
             SceneActorChase_SetControl(actor, Ivy_UpdateHold, 0x25);
@@ -219,20 +217,20 @@ void Ivy_UpdateGrabAttack(struct ChaseActor *actor)
                 Player_BeginPositionRequest((void *)gPlayers[target->mode], (void *)&pos, 0, 0,
                                             flip, 0, 0, 0, 0);
             } else if (target->mode == 4) {
-                struct ChaseActor *t = target->owner;
-                t->base.colliderA.responseValue = 0;
-                SceneActorTerrain_ClearCollisionTimers((void *)t);
-                SceneActorChase_ClearMotionFlagComponent(t, 0x20);
-                SceneActorReaction_ApplyHitResponse(t, 0, (void *)&pos, 0, flip, 0);
+                struct ChaseActor *victim = target->owner;
+                victim->base.colliderA.responseValue = 0;
+                SceneActorTerrain_ClearCollisionTimers((void *)victim);
+                HalfwordFlags_Clear(&victim->base.motionFlags, 0x20);
+                SceneActorReaction_ApplyHitResponse(victim, 0, (void *)&pos, 0, flip, 0);
             }
             {
                 struct Ivy *context = actor->base.context;
-                u32 mask = 2;
+                u32 mask = IVY_CAPTURE_HOLDS_PLAYER;
                 context->captureFlags |= mask;
             }
             return;
         }
-    } else if (Ivy_ReadFrame(anim).index <= 1) {
+    } else if (anim->index <= 1) {
         Ivy_DisableContact(actor);
     } else {
         Ivy_EnableCollider(&actor->base.colliderA);
