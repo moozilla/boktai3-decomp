@@ -126,18 +126,13 @@ void ScrollingDialogue_UpdatePlayback(struct ScrollingDialogue *dialogue)
 
 int ScrollingDialogue_Show(struct ScrollingDialogue *dialogue)
 {
-    u8 *active = &dialogue->active;
-    int result;
-    if (!*active) {
-        dialogue->ticks = 0;
-        ScrollingDialogue_ResetPlayback(dialogue, 1);
-        gVBlankDialogueState = 1;
-        *active = 1;
-        result = 0;
-    } else {
-        result = -1;
-    }
-    return result;
+    if (dialogue->active)
+        return -1;
+    dialogue->ticks = 0;
+    ScrollingDialogue_ResetPlayback(dialogue, 1);
+    gVBlankDialogueState = 1;
+    dialogue->active = 1;
+    return 0;
 }
 
 int ScrollingDialogue_Hide(struct ScrollingDialogue *dialogue)
