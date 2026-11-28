@@ -4,46 +4,23 @@ struct Tag {
     int hasValue, length;
     u8 text[64];
 };
-const u8 *TextState_ParseTagValue(struct Tag *p, const u8 *s)
+const u8 *TextState_ParseTagValue(struct Tag *tag, const u8 *text)
 {
     int n;
-    int first;
-    u8 *text;
-    p->hasValue = 0;
-    p->length = 0;
-    n = 0;
-    first = *s;
-    if (first == '>') {
-        goto done;
-    }
-    text = p->text;
-    if (!first) {
-        goto done;
-    }
-    /* do-while(0) only keeps agbcc's block layout */
-    do {
-        int length;
-        int c = *s;
-        if (c == '=') {
-            first = 1;
-            p->hasValue = first;
-        } else if (p->hasValue) {
-            length = p->length;
-            text[length] = c;
-            p->length = length + 1;
-        }
-        n++;
-        s++;
-        if (n > 63) {
-            break;
-        }
-        first = *s;
-        if (first == '>') {
-            break;
-        }
-    } while (first);
-done:
-    p->text[p->length] = 0;
+    u8 c;
 
-    return s;
+    tag->hasValue = 0;
+    tag->length = 0;
+    for (n = 0; *text != '>' && *text;) {
+        if ((c = *text) == '=')
+            tag->hasValue = TRUE;
+        else if (tag->hasValue)
+            tag->text[tag->length++] = c;
+        n++;
+        text++;
+        if (n > 63)
+            break;
+    }
+    tag->text[tag->length] = 0;
+    return text;
 }

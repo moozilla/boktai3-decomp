@@ -294,3 +294,4 @@ src/ui/dialogue/text_interpreter/Text_ComparePrefix.c	Text_ComparePrefix	natural
 src/ui/dialogue/text_interpreter/Text_FindChar.c	Text_FindChar	natural	natural	0	
 src/ui/dialogue/text_interpreter/TextState_GetPlayerSpeakerLabel.c	TextState_GetPlayerSpeakerLabel	natural	natural	0	
 src/ui/dialogue/text_interpreter/TextState_GetPairSpeakerLabel.c	TextState_GetPairSpeakerLabel	natural	natural	0	
+src/ui/dialogue/text_interpreter/TextState_ParseTagValue.c	TextState_ParseTagValue	contrived	natural	40	
