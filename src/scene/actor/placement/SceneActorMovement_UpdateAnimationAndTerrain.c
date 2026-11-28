@@ -25,18 +25,14 @@ static inline void SceneActorMotion_SetFlags(struct ChaseActor *actor, u32 bits)
     *field = value;
 }
 
-static inline u32 SceneActorMotion_StepSequence(struct SceneActorAnimationSequenceDrawable *drawable,
-                                                struct DisplaySequenceState *input,
-                                                u32 firstFlipMask)
+static inline u32
+SceneActorMotion_StepSequence(struct SceneActorAnimationSequenceDrawable *drawable,
+                              struct DisplaySequenceState *input, u32 firstFlipMask)
 {
     struct SceneActorAnimationSequenceDrawable *sprite = drawable;
     struct DisplaySequenceState *state = input;
     const u16 *command;
-    {
-        u32 offset = DisplaySequence_GetIndex(state) << 1;
-        const u16 *table = drawable->sequence.commands;
-        command = (const u16 *)((u32)table + offset);
-    }
+    command = drawable->sequence.commands + DisplaySequence_GetIndex(state);
     return PlayerCue_AdvanceCommand((struct ContactSwarmSprite *)sprite, state, command,
                                     firstFlipMask);
 }
@@ -69,9 +65,8 @@ static inline u16 SceneActorMotion_Elapsed(struct ChaseActor *actor)
             &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence);
     return ((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile.elapsed;
 }
-s32 SceneActorMovement_UpdateAnimationAndTerrain(struct ChaseActor *object)
+s32 SceneActorMovement_UpdateAnimationAndTerrain(struct ChaseActor *actor)
 {
-    struct ChaseActor *actor = (void *)object;
     struct ContactCollider *collider;
     struct ContactPosition *position;
     struct ContactPosition center, delta;
@@ -92,10 +87,10 @@ s32 SceneActorMovement_UpdateAnimationAndTerrain(struct ChaseActor *object)
                 SceneActorMotion_StepSequence(drawable, &drawable->sequence, enabledBit);
         } else {
             void *drawable = actor->base.drawable;
-            struct DisplayKeyframeState *state = (void *)((u8 *)drawable + 0x20);
+            struct DisplayKeyframeState *state =
+                &((struct SceneActorAnimationTileDrawable *)drawable)->tile;
             s32 ended = Anim_Step(state, drawable);
-            u8 bits = (enabledBit & state->status);
-            if (bits || ended)
+            if ((state->status & 1) || ended)
                 actor->base.restart = enabledBit;
         }
     }
@@ -135,7 +130,7 @@ s32 SceneActorMovement_UpdateAnimationAndTerrain(struct ChaseActor *object)
         u16 *currentCell;
         s32 cell;
         category = actor->base.category;
-        if (SceneActorTerrain_ExcludesCategory(category))
+        if (SceneActorTerrain_ExcludesCategory(actor->base.category))
             goto done;
         currentCell = &actor->base.terrainCell;
         cell = *currentCell;
