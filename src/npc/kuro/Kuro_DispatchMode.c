@@ -1,9 +1,8 @@
-#include "global.h"
+#include "npc/story_character/state_actor.h"
 
-extern u32 gUnk_086125F0[];
-void sub_08249240(u32, u8 *, u32);
+extern void (*const gUnk_086125F0[])(void *ctx, struct StateActor *actor);
 
-void Kuro_DispatchMode(u32 a, u8 *b)
+void Kuro_DispatchMode(void *ctx, struct StateActor *actor)
 {
-    sub_08249240(a, b, gUnk_086125F0[b[4]]);
+    gUnk_086125F0[actor->state](ctx, actor);
 }
