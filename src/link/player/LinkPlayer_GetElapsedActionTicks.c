@@ -1,9 +1,8 @@
 #include "global.h"
+#include "player/player.h"
 
-s32 LinkPlayer_GetElapsedActionTicks(u8 *p)
+/* The link player counts action ticks in facingChangeEffects. */
+s32 LinkPlayer_GetElapsedActionTicks(struct Player *p)
 {
-    s32 r = p[0x4F4];
-    r -= p[0x4F5];
-    r += 0x100;
-    return r & 0xFF;
+    return (p->facingChangeEffects - p->savedEffectTick + 0x100) & 0xFF;
 }
