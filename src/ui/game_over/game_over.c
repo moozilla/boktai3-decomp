@@ -221,7 +221,7 @@ void GameOver_InitOverlay(struct GameOver *panel)
         position.z = 0;
         AnimSprite_InitCleared(&panel->overlay, &panel->overlayResource, 0x4B, 0x1091, 0, 0, 60,
                            &position);
-        CpuSet(panel->overlay.palette, panel->overlayPalette, 0x04000008);
+        CpuCopy32(panel->overlay.palette, panel->overlayPalette, sizeof(panel->overlayPalette));
         panel->overlay.paletteBank = 0x3AA;
         panel->overlay.palette = panel->overlayPalette;
         panel->choice = 0;
