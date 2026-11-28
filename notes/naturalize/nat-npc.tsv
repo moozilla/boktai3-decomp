@@ -389,3 +389,4 @@ src/npc/otenko/Otenko_SetBehaviorFourFromScript.c	Otenko_SetBehaviorFourFromScri
 src/npc/otenko/Otenko_RequestRigAction.c	Otenko_RequestRigAction	contrived	natural	2	
 src/npc/otenko/Otenko_StopFromScript.c	Otenko_StopFromScript	minor	minor	1	mode and callback locals: agbcc materializes the state before the stage stores
 src/npc/otenko/Otenko_SpawnTransitionParticle.c	Otenko_SpawnTransitionParticle	contrived	contrived	25	manual motion stride and do-while (a for loop moves the induction-variable step after the particle step), split halfword table pointer and per-axis random temporaries (plain RANDOM_NEXT changes register order)
+src/npc/otenko/Otenko_UpdateTransitionParticles.c	Otenko_UpdateTransitionParticles	contrived	natural	9	

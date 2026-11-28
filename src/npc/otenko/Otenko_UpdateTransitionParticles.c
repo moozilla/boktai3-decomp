@@ -1,17 +1,14 @@
 #include "npc/otenko/scene_npc_transition.h"
+#include "engine/math/math_shift.h"
 
 extern const s16 gUnk_086149C4[];
 void SpriteDrawable_SelectTileFrame(void *, void *, s32);
 
-static inline s32 Scale12(s32 value)
-{
-    return value >= 0 ? value >> 12 : -(-value >> 12);
-}
 static inline void MakeVelocity(struct ContactPosition *out, s32 angle, s32 speed)
 {
-    out->x = Scale12(speed * gUnk_086149C4[(angle + 64) & 255]);
+    out->x = Math_ShiftTowardZero(speed * gUnk_086149C4[(angle + 64) & 255], 12);
     out->y = 0;
-    out->z = Scale12(speed * gUnk_086149C4[angle & 255]);
+    out->z = Math_ShiftTowardZero(speed * gUnk_086149C4[angle & 255], 12);
 }
 static inline void AddVelocity(struct ContactPosition *velocity, struct ContactPosition *position)
 {
@@ -22,35 +19,22 @@ static inline void AddVelocity(struct ContactPosition *velocity, struct ContactP
 void Otenko_UpdateTransitionParticles(struct TransitionEffect *effect)
 {
     struct ContactPosition velocity;
-    struct ContactPosition *delta = &velocity;
-    struct TransitionParticle *particle = effect->particles;
-    u8 *age = &particle->motion.age;
-    struct TransitionMotion *motion = &particle->motion;
-    struct TransitionParticle *drawable = particle;
-    s32 count = 7;
-    do {
-        if (motion->active) {
-            if (motion->angle >= 0) {
-                MakeVelocity(&velocity, motion->angle, 15);
-                AddVelocity(delta, &motion->position);
+    s32 i;
+    for (i = 0; i < 8; i++) {
+        struct TransitionParticle *particle = &effect->particles[i];
+        if (particle->motion.active) {
+            if (particle->motion.angle >= 0) {
+                MakeVelocity(&velocity, particle->motion.angle, 15);
+                AddVelocity(&velocity, &particle->motion.position);
             }
-            motion->verticalVelocity--;
-            motion->position.y += motion->verticalVelocity;
-            if (motion->age == 8)
-                SpriteDrawable_SelectTileFrame(drawable, effect->graphics, 3);
-            {
-                u32 nextAge = *age + 1;
-                *age = nextAge;
-                nextAge &= 255;
-                if (nextAge >= motion->lifetime) {
-                    particle->flags |= 1;
-                    motion->active = 0;
-                }
+            particle->motion.verticalVelocity--;
+            particle->motion.position.y += particle->motion.verticalVelocity;
+            if (particle->motion.age == 8)
+                SpriteDrawable_SelectTileFrame(particle, effect->graphics, 3);
+            if (++particle->motion.age >= particle->motion.lifetime) {
+                particle->flags |= 1;
+                particle->motion.active = 0;
             }
         }
-        particle++;
-        age += sizeof(*particle);
-        motion = (struct TransitionMotion *)((u8 *)motion + sizeof(*particle));
-        drawable++;
-    } while (--count >= 0);
+    }
 }
