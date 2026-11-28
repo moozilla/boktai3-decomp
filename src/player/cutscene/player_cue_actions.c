@@ -2691,8 +2691,8 @@ void PlayerCue_UpdateTargetDash(struct Player *player)
         player->cueSpeed = 0x32;
         gUnk_0200051C = 0;
         gUnk_02000524 = 0;
-        (*(struct ContactPosition *)&player->movementStart) =
-            (*(struct ContactPosition *)&player->position);
+        *(struct ContactPosition *)&player->movementStart =
+            *(struct ContactPosition *)&player->position;
         player->secondaryAnimation.position = player->animation.position;
         ClearAnimationFlags(&player->secondaryAnimation, 1);
         Player_SetPendingCallback(player, Player_OnTargetMotionExit);
@@ -2829,8 +2829,7 @@ void PlayerCue_UpdateTargetDash(struct Player *player)
             deltaZ = player->position.z - player->secondaryAnimation.position.z;
             angle = Math_Atan2(deltaX, deltaZ);
             if (deltaX * deltaX + deltaZ * deltaZ <= 0xE0F) {
-                player->secondaryAnimation.position =
-                    (*(struct ContactPosition *)&player->position);
+                player->secondaryAnimation.position = *(struct ContactPosition *)&player->position;
                 Player_SetActionPhase(player, 4);
             } else {
                 player->secondaryAnimation.position.x +=

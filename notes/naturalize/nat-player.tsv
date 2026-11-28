@@ -339,3 +339,5 @@ src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateAlternateFade	minor	nat
 src/player/cutscene/player_cue_actions.c	Player_UpdateStateMotionCue	contrived	minor	3	flag accessor helpers (mask loaded before the flag word)
 src/player/cutscene/player_cue_actions.c	Player_UpdateTimedChargeAction	contrived	minor	11	signed frame rate held in an s32 before the accumulate
 src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateTimedChargePulse	contrived	natural	1	-
+src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateStandDiagonalB	natural	natural	0	-
+src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateTargetDash	minor	minor	17	secondary animation, data and frame locals (inline start helper loads the frame first); case 2 keyframe pointer
