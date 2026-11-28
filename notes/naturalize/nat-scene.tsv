@@ -17,3 +17,4 @@ src/scene/actor/actor_ability.c	ModifierAction_InitializeSecondary	minor	minor	0
 src/scene/actor/actor_ability.c	Modifier_InitSourceInfo	minor	minor	0	secondary record viewed through (void *)&stats field: needs shared actor_stats.h nesting
 src/scene/actor/actor_emitter.c	ActorEmitter_TryEmit	contrived	minor	1	raw owner offsets (animation state) and local struct views
 src/scene/actor/actor_emitter.c	ActorEmitter_TryEmitLow	contrived	minor	1	raw owner offsets (animation state) and local struct views
+src/scene/actor/actor_emitter.c	ActorEmitter_TryEmitPair	contrived	minor	1	raw owner offsets (animation state) and local struct views
