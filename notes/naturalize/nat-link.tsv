@@ -10,3 +10,4 @@ src/link/encoded_records/EncodedRecord_DecodeAlternateFields.c	EncodedRecord_Dec
 src/link/encoded_records/EncodedRecord_EncodeAlternateFields.c	EncodedRecord_EncodeAlternateFields	contrived	natural	1	session view cast stays (gSessionState is a byte pointer)
 src/link/handshake/LinkHandshake_ResetInstance.c	LinkHandshake_ResetInstance	natural	natural	0	
 src/link/handshake/SlotMonitor_CheckTimeout.c	SlotMonitor_CheckTimeout	minor	natural	2	
+src/link/handshake/LinkHandshake_AdvanceTimeout.c	LinkHandshake_AdvanceTimeout	contrived	natural	1	
