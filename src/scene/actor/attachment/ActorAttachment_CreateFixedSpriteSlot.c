@@ -33,6 +33,11 @@ ActorAttachment_CreateFixedSpriteSlot(struct ContactPosition *anchor, void *upda
     struct ActorAttachmentManagerView *existing;
     struct ActorAttachmentManagerView *manager;
     struct ActorAttachmentSlotView *slot;
+    struct ContactSwarmSprite *sprite;
+    void *graphics;
+    void *sequence;
+    s32 xOffset, zOffset;
+
     existing = gActorAttachmentManager;
     if (!existing) {
         manager = ActorAttachment_CreateManager();
@@ -59,52 +64,46 @@ ActorAttachment_CreateFixedSpriteSlot(struct ContactPosition *anchor, void *upda
     slot->anchor = anchor;
     slot->source = source;
     slot->followActor = follow;
+    zOffset = 0;
+    xOffset = 0;
+    sprite = &slot->sprite;
+    graphics = ActorAttachment_GetSpriteGraphics(manager, slot->kind);
+    Sprite_Init(sprite, graphics, 0);
+    if (slot->action == 255) {
+        slot->offset = ActorAttachment_GetFollow(slot)->offset;
+    } else {
+        ActorAttachment_GetActionOffset(
+            slot->resourceKind, slot->action,
+            ((struct ActorAttachmentFollowView *)slot->followActor)->direction, &xOffset, &zOffset,
+            slot->source);
+        slot->offset.x = xOffset;
+        slot->offset.y = 0;
+        slot->offset.z = zOffset;
+    }
+    sprite->flags |= 1;
+    if (ActorAttachment_IsAlternateMode())
+        sprite->flags |= 0x10;
+    sprite->priority = 1;
+    slot->sequences[0].sequenceId = 255;
+    switch (slot->kind) {
+        case 0:
+            sequence = ((struct ActorAttachmentManagerResources *)manager)->sequenceA;
+            break;
+        case 2:
+        case 3:
+            sequence = ((struct ActorAttachmentManagerResources *)manager)->sequenceB;
+            break;
+        case 1:
+        case 4:
+        case 5:
+        default:
+            sequence = NULL;
+            break;
+    }
+    Anim_SetSequence(&slot->sequences[0], sequence, slot->frame, 0, 0);
     {
-        struct ContactSwarmSprite *sprite;
-        void *graphics;
-        void *sequence;
-        s32 xOffset, zOffset;
-        zOffset = 0;
-        xOffset = 0;
-        sprite = &slot->sprite;
-        graphics = ActorAttachment_GetSpriteGraphics(manager, slot->kind);
-        Sprite_Init(sprite, graphics, 0);
-        if (slot->action == 255) {
-            slot->offset = ActorAttachment_GetFollow(slot)->offset;
-        } else {
-            ActorAttachment_GetActionOffset(
-                slot->resourceKind, slot->action,
-                ((struct ActorAttachmentFollowView *)slot->followActor)->direction, &xOffset,
-                &zOffset, slot->source);
-            slot->offset.x = xOffset;
-            slot->offset.y = 0;
-            slot->offset.z = zOffset;
-        }
-        sprite->flags |= 1;
-        if (ActorAttachment_IsAlternateMode())
-            sprite->flags |= 0x10;
-        sprite->priority = 1;
-        slot->sequences[0].sequenceId = 255;
-        switch (slot->kind) {
-            case 0:
-                sequence = ((struct ActorAttachmentManagerResources *)manager)->sequenceA;
-                break;
-            case 2:
-            case 3:
-                sequence = ((struct ActorAttachmentManagerResources *)manager)->sequenceB;
-                break;
-            case 1:
-            case 4:
-            case 5:
-            default:
-                sequence = NULL;
-                break;
-        }
-        Anim_SetSequence(&slot->sequences[0], sequence, slot->frame, 0, 0);
-        {
-            struct ContactSwarmSprite *placed = &slot->sprite;
-            placed->position = *anchor;
-        }
+        struct ContactSwarmSprite *placed = &slot->sprite;
+        placed->position = *anchor;
     }
     slot->active48 = 1;
     return slot;

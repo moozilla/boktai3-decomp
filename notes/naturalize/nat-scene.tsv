@@ -185,3 +185,4 @@ src/scene/actor/attachment/ActorAttachment_IsUnavailable.c	ActorAttachment_IsUna
 src/scene/actor/attachment/ActorAttachment_ReleaseAll.c	ActorAttachment_ReleaseAll	minor	natural	1	occupied predicate kept
 src/scene/actor/attachment/ActorAttachment_UpdateFromDescriptor.c	ActorAttachment_UpdateFromDescriptor	contrived	natural	12	Flags_MaskedWord: plain test loads the field before the mask
 src/scene/actor/attachment/ActorAttachment_CreateSpriteSlot.c	ActorAttachment_CreateSpriteSlot	minor	minor	8	existing/manager pair, placed-sprite block, startFrame, slot->followActor reread and the parked 0x80 bit are all needed
+src/scene/actor/attachment/ActorAttachment_CreateFixedSpriteSlot.c	ActorAttachment_CreateFixedSpriteSlot	minor	minor	5	existing/manager pair, placed-sprite block and the parked mode bit are needed (shared with the other sprite slot creators)
