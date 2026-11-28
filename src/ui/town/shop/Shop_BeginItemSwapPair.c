@@ -1,18 +1,12 @@
 #include "ui/town/shop_actions.h"
+#include "system/game_state/game_state.h"
 u32 Selection_GetDisplayFrame(s32);
 void Shop_BeginItemSwapPair(struct ShopActionView *panel)
 {
     struct SceneInputPosition starts[2], targets[2];
     u32 enabled[2], frames[2], attributes[2];
-    s32 i = 0;
-    u32 *enabledBase = enabled;
-    u32 *frameBase = frames;
-    u32 *attributeBase = attributes;
-    struct SceneInputPosition *targetBase = targets;
-    u32 *attributeOut = attributeBase;
-    u32 *frameOut = frameBase;
-    u32 *enabledOut = enabledBase;
-    for (; i < 2; enabledOut++, i++) {
+    s32 i;
+    for (i = 0; i < 2; i++) {
         u32 slot;
         s32 id;
         if (i == 0)
@@ -22,16 +16,16 @@ void Shop_BeginItemSwapPair(struct ShopActionView *panel)
         ((struct ShopActionFlagsView *)panel)->widgets[slot + 5].flags |= 1;
         id = Inventory_GetItemId(slot);
         if (id >= 0)
-            *enabledOut = 1;
+            enabled[i] = 1;
         else
-            *enabledOut = 0;
-        *frameOut++ = Selection_GetDisplayFrame(id);
-        *attributeOut++ = 0x373;
+            enabled[i] = 0;
+        frames[i] = Selection_GetDisplayFrame(id);
+        attributes[i] = 0x373;
         SceneInput_GetGridPosition(&starts[i], slot);
     }
     for (i = 0; i < 2; i++)
-        targetBase[i] = starts[1 - i];
-    SceneInput_BeginPairTransition(&((struct ShopTransitionView *)panel)->pair,
-                                   enabledBase, starts, targetBase, frameBase, attributeBase, 12);
+        targets[i] = starts[1 - i];
+    SceneInput_BeginPairTransition(&((struct ShopTransitionView *)panel)->pair, enabled, starts,
+                                   targets, frames, attributes, 12);
     Sound_PlaySong(0x38A);
 }
