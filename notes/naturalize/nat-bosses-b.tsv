@@ -66,3 +66,29 @@ src/bosses/ratatosk/SceneActors_UpdateTimedDirectionalAnimation.c	SceneActors_Up
 src/bosses/ratatosk/sub_081F62A8.c	sub_081F62A8	contrived	contrived	9	actor alias and local facing wrapper stay: they set the register allocation
 src/bosses/ratatosk/SceneActors_FireTrackingProjectileSpread.c	SceneActors_FireTrackingProjectileSpread	contrived	minor	9	angle step stays in a u16, target pointer used twice
 src/bosses/ratatosk/Ratatosk_InitRequestedState.c	Ratatosk_InitRequestedState	contrived	natural	1	
+src/bosses/ratatosk/Ratatosk_FireTrackingShot.c	Ratatosk_FireTrackingShot	contrived	contrived	5	unchanged: s8 parked 5 and actor alias are needed for the ROM's second actor register
+src/bosses/ratatosk/SceneActor_UpdateState29Command.c	SceneActor_UpdateState29Command	natural	natural	0	
+src/bosses/ratatosk/SceneActor_UpdateState2Command.c	SceneActor_UpdateState2Command	natural	natural	0	
+src/bosses/ratatosk/SceneActor_UpdateState3Command.c	SceneActor_UpdateState3Command	natural	natural	0	
+src/bosses/ratatosk/SceneActor_UpdateState18Command.c	SceneActor_UpdateState18Command	natural	natural	0	
+src/bosses/ratatosk/SceneActor_UpdateState15Command.c	SceneActor_UpdateState15Command	natural	natural	0	
+src/bosses/ratatosk/SceneActor_UpdateState21Command.c	SceneActor_UpdateState21Command	natural	natural	0	
+src/bosses/ratatosk/SceneActor_UpdateState26Command.c	SceneActor_UpdateState26Command	natural	natural	0	
+src/bosses/ratatosk/SceneActor_UpdateState27Command.c	SceneActor_UpdateState27Command	natural	natural	0	
+src/bosses/ratatosk/SceneActor_UpdateState22Command.c	SceneActor_UpdateState22Command	natural	natural	0	
+src/bosses/ratatosk/SceneActor_UpdateState28Command.c	SceneActor_UpdateState28Command	natural	natural	0	
+src/bosses/ratatosk/SceneActor_UpdateState32Command.c	SceneActor_UpdateState32Command	natural	natural	0	
+src/bosses/ratatosk/SceneActor_UpdateState33Command.c	SceneActor_UpdateState33Command	natural	natural	0	
+src/bosses/ratatosk/SceneActor_UpdateState34Command.c	SceneActor_UpdateState34Command	natural	natural	0	
+src/bosses/ratatosk/SceneActor_UpdateState28AndReturnCommand.c	SceneActor_UpdateState28AndReturnCommand	natural	natural	0	
+src/bosses/ratatosk/SceneActor_UpdateState13Then29Command.c	SceneActor_UpdateState13Then29Command	natural	natural	0	
+src/bosses/ratatosk/SceneActor_UpdateState14AndReturnCommand.c	SceneActor_UpdateState14AndReturnCommand	natural	natural	0	
+src/bosses/ratatosk/SceneActor_UpdateState30AndRestartCommand.c	SceneActor_UpdateState30AndRestartCommand	natural	natural	0	
+src/bosses/ratatosk/SceneActor_UpdateState31AndRestartCommand.c	SceneActor_UpdateState31AndRestartCommand	natural	natural	0	
+src/bosses/ratatosk/Ratatosk_UpdateTriggerState35.c	Ratatosk_UpdateTriggerState35	natural	natural	0	
+src/bosses/ratatosk/Ratatosk_UpdateTriggerState36.c	Ratatosk_UpdateTriggerState36	natural	natural	0	
+src/bosses/ratatosk/Ratatosk_RunStateCallback.c	Ratatosk_RunStateCallback	natural	natural	0	
+src/bosses/ratatosk/Ratatosk_BeginInterruptState.c	Ratatosk_BeginInterruptState	natural	natural	0	
+src/bosses/ratatosk/Ratatosk_UpdatePointEffectAnimation.c	Ratatosk_UpdatePointEffectAnimation	minor	minor	4	one mask-parameter flag accessor stays: mask loaded before the field
+src/bosses/ratatosk/Ratatosk_UpdateShrinkingAnimation.c	Ratatosk_UpdateShrinkingAnimation	minor	minor	4	two mask-parameter flag accessors and a local animation view stay: mask loaded before the field
+src/bosses/ratatosk/SceneActor_UpdateState1Command.c	SceneActor_UpdateState1Command	contrived	natural	3	== TRUE kept: the compiler compares the entry result with 1
