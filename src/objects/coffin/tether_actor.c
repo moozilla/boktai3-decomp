@@ -2146,76 +2146,39 @@ void TetherActor_UpdateIdleState(struct TetherActor *p)
 
 void TetherActor_BlockPlayerAcrossTerrain(struct TetherActor *actor)
 {
-    u8 *properties = cellProperties(
-        cellIndex_0804B6A4(gPlayers[0]->position.x >> 8, gPlayers[0]->position.z >> 8));
-    u32 attributes = *(u16 *)(properties + 2);
-    struct ContactPosition *position;
+    u32 attributes;
     s32 playerCell;
     s32 actorCell;
-    s32 rowStride;
-    attributes &= 1;
-    position = &actor->position;
-    if (attributes == 0) {
-        const struct ContactPosition *playerPosition =
-            (const struct ContactPosition *)&gPlayers[0]->position;
-        struct TetherActor *self = actor;
-        s32 playerHeight = surfaceHeight(playerPosition);
-        s32 height, difference;
-        {
-            struct ContactPosition *heightPosition = &self->position;
-            s32 x = heightPosition->x >> 8, z = heightPosition->z >> 8;
-            u8 *properties;
-            u32 surface;
-            position = heightPosition;
-            actor = self;
-            properties = cellProperties(cellIndex_0804B6A4(x, z));
-            surface = *properties >> 4;
-            height = (*properties & 15) << 8;
-            switch (surface) {
-                case 1:
-                    height -= (u8)heightPosition->z;
-                    break;
-                case 2:
-                    height -= (u8)heightPosition->x;
-                    break;
-            }
-        }
-        difference = playerHeight - height;
+    s32 playerHeight;
+    s32 difference;
+    const struct ContactPosition *playerPosition;
+    struct ContactPosition *position;
+    attributes = ((u16 *)SceneActorTerrain_GetCell(
+        SceneActorTerrain_GetCellIndex((struct ContactPosition *)&gPlayers[0]->position)))[1];
+    if (!(attributes & 1)) {
+        playerPosition = (const struct ContactPosition *)&gPlayers[0]->position;
+        playerHeight = SceneActorTerrain_GetHeight(SceneActorTerrain_GetCellIndex(playerPosition),
+                                                   playerPosition);
+        position = &actor->position;
+        difference = playerHeight - SceneActorTerrain_GetHeight(
+                                        SceneActorTerrain_GetCellIndex(position), position);
         if (difference < 0)
             difference = -difference;
         if (difference <= 255)
             return;
     }
-    {
-        s32 x;
-        s32 z;
-        u32 raw;
-        raw = (u16)gPlayers[0]->position.x;
-        x = (s16)raw >> 8;
-        raw = (u16)gPlayers[0]->position.z;
-        z = (s16)raw >> 8;
-        playerCell = cellIndex_0804B6A4(x, z);
-        raw = (u16)position->x;
-        x = (s16)raw >> 8;
-        raw = (u16)position->z;
-        z = (s16)raw >> 8;
-        actorCell = cellIndex_0804B6A4(x, z);
-    }
+    playerCell = SceneActorTerrain_GetCellIndex((struct ContactPosition *)&gPlayers[0]->position);
+    actorCell = SceneActorTerrain_GetCellIndex(&actor->position);
     if (actorCell == playerCell + 1) {
-        gPlayers[0]->position.x = ((position->x >> 8) << 8) + 2;
-        return;
-    }
-    if (actorCell == playerCell - 1) {
-        gPlayers[0]->position.x = (((position->x >> 8) + 1) << 8) - 2;
-        return;
-    }
-    rowStride = *(s16 *)(gTerrainMap->cells + 4);
-    if (actorCell == playerCell + rowStride)
+        gPlayers[0]->position.x = ((actor->position.x >> 8) << 8) + 2;
+    } else if (actorCell == playerCell - 1) {
+        gPlayers[0]->position.x = (((actor->position.x >> 8) + 1) << 8) - 2;
+    } else if (actorCell == playerCell + SceneActorTerrain_Width()) {
         gPlayers[0]->position.z = ((actor->position.z >> 8) << 8) + 2;
-    else if (actorCell == playerCell - rowStride)
+    } else if (actorCell == playerCell - SceneActorTerrain_Width()) {
         gPlayers[0]->position.z = (((actor->position.z >> 8) + 1) << 8) - 2;
-    else {
-        gPlayers[0]->position.x = position->x;
+    } else {
+        gPlayers[0]->position.x = actor->position.x;
         gPlayers[0]->position.z = actor->position.z;
     }
 }
