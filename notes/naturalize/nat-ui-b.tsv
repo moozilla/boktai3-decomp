@@ -605,3 +605,4 @@ src/ui/town/storage/Storage_RefreshCategoryWidgets.c	Storage_RefreshCategoryWidg
 src/ui/town/storage/Storage_RebuildGrid.c	Storage_RebuildGrid	contrived	natural	6	
 src/ui/town/storage/Storage_SetGridFlags.c	Storage_SetGridFlags	contrived	natural	1	
 src/ui/town/storage/Storage_InitSelectionGrid.c	Storage_InitSelectionGrid	contrived	minor	2	repeat zero local
+src/ui/town/storage/Storage_UpdateCursorPosition.c	Storage_UpdateCursorPosition	contrived	natural	2	
