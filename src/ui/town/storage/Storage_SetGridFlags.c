@@ -1,13 +1,10 @@
 #include "global.h"
+#include "ui/widgets/scene_input_grid.h"
 
-struct S {
-    u8 f[7];
-    u8 v;
-};
-void Storage_RebuildGrid(struct S *);
+void Storage_RebuildGrid(struct SceneInputGrid *);
 
-void Storage_SetGridFlags(struct S *p, u8 v)
+void Storage_SetGridFlags(struct SceneInputGrid *grid, u8 flags)
 {
-    p->v = v;
-    Storage_RebuildGrid(p);
+    grid->flags = flags;
+    Storage_RebuildGrid(grid);
 }
