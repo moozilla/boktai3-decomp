@@ -196,11 +196,7 @@ s32 InteractionPrompt_CheckInput(struct DirectionalManager *manager,
 {
     InteractionPrompt_ConsumeEntered(p);
     if (manager->actor) {
-        if (PlayerSlot_ReadStatus(0, 6))
-            goto failed;
-        if (!(gPlayerSlotStatus[0] & 1))
-            goto failed;
-        {
+        if (!PlayerSlot_ReadStatus(0, 6) && (gPlayerSlotStatus[0] & 1)) {
             s32 dx = p->position.x - manager->position.x, dz = p->position.z - manager->position.z;
             u32 distance = dx * dx + dz * dz;
             u32 direction = (((u16)Math_Atan2(dx, dz) + 112) >> 5) & 7;
@@ -224,15 +220,13 @@ s32 InteractionPrompt_CheckInput(struct DirectionalManager *manager,
                             InteractionPrompt_SetState(p, 2);
                             InteractionPrompt_SelectTarget(manager, index);
                         }
-                        goto done;
+                        return 0;
                     }
                 }
             }
         }
     }
-failed:
     InteractionPrompt_SetState(p, 0);
-done:
     return 0;
 }
 

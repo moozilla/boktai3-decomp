@@ -378,3 +378,4 @@ src/objects/ice_boulders.c	IceBoulderPool_Create	natural	natural	0
 src/objects/ice_boulders.c	IceBoulderPool_ResetInstance	natural	natural	0	
 src/objects/interaction_prompts.c	InteractionPrompt_InitSlot	minor	natural	3	
 src/objects/interaction_prompts.c	InteractionPrompt_CheckApproach	contrived	minor	1	repeated facing test remains
+src/objects/interaction_prompts.c	InteractionPrompt_CheckInput	contrived	minor	2	repeated facing test remains
