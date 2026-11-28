@@ -568,3 +568,4 @@ src/system/inventory/Inventory_RollIcePopStick.c	Inventory_RollIcePopStick	contr
 src/system/inventory/sub_0822D2E0.c	sub_0822D2E0	minor	natural	1	
 src/system/inventory/Inventory_ResetConsumables.c	Inventory_ResetConsumables	minor	natural	1	
 src/system/inventory/Inventory_ResetValuables.c	Inventory_ResetValuables	minor	natural	1	
+src/system/inventory/Inventory_ResetItemsFromScript.c	Inventory_ResetItemsFromScript	minor	natural	1	
