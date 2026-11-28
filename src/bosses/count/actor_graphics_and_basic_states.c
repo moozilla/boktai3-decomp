@@ -361,16 +361,6 @@ struct BoxSearchPosition {
     s16 x, y, z;
 };
 
-// Finds the first tracked position inside the inclusive x/z bounds.
-static inline s32 BoxSearchPosition_IsInside(const struct BoxSearchPosition *pos,
-                                             const struct BoxSearchPosition *min,
-                                             const struct BoxSearchPosition *max)
-{
-    if (pos->x >= min->x && pos->x <= max->x && pos->z >= min->z && pos->z <= max->z)
-        return 1;
-    return 0;
-}
-
 static inline s32 SceneGraphicsActor_GetPlayerPosition(struct SceneGraphicsActor *actor,
                                                        s32 index,
                                                        struct BoxSearchPosition **out)
@@ -387,12 +377,18 @@ s32 sub_08022624(void *owner, s32 count, struct BoxSearchPosition *min,
     for (i = 0; i < count; i++) {
         struct BoxSearchPosition *pos;
         SceneGraphicsActor_GetPlayerPosition(actor, i, &pos);
-        if (pos && BoxSearchPosition_IsInside(pos, min, max))
-            return i;
+        if (pos) {
+            s32 inside;
+            if (pos->x >= min->x && pos->x <= max->x && pos->z >= min->z && pos->z <= max->z)
+                inside = 1;
+            else
+                inside = 0;
+            if (inside)
+                return i;
+        }
     }
     return -1;
-}
-typedef struct ParticleOffset {
+}typedef struct ParticleOffset {
     s16 x, y, z, pad;
 } ParticleOffset;
 s32 SceneParticle_CreateParticles(const void *anchor, const ParticleOffset *offset,
