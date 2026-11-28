@@ -386,7 +386,7 @@ src/monsters/centipede/Centipede_OnSegmentAttackCollision.c	Centipede_OnSegmentA
 src/monsters/centipede/Centipede_ResetRouteHistory.c	Centipede_ResetRouteHistory	natural	natural	0	
 src/monsters/centipede/Centipede_RecordVisitedRoute.c	Centipede_RecordVisitedRoute	natural	natural	0	
 src/monsters/centipede/Centipede_UpdatePendingVelocity.c	Centipede_UpdatePendingVelocity	natural	natural	0	
-src/monsters/centipede/Centipede_Create.c	Centipede_Create	natural	natural	0	
+src/monsters/centipede/Centipede_Create.c	Centipede_Create	natural	natural	0	fails tools/check.py (56 bytes at 0x08004194) without any change from this branch; left as on main
 src/monsters/dragon_puppy/DragonPuppy_UpdateAttackRecovery.c	DragonPuppy_UpdateAttackRecovery	natural	natural	0	
 src/monsters/dragon_puppy/DragonPuppy_UpdateAttackWindup.c	DragonPuppy_UpdateAttackWindup	natural	natural	0	
 src/monsters/dragon_puppy/DragonPuppy_Create.c	DragonPuppy_Create	natural	natural	0	
