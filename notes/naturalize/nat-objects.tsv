@@ -334,3 +334,5 @@ src/objects/hazards/timed_hazard/TimedHazard_LinkInstance.c	TimedHazard_LinkInst
 src/objects/hazards/timed_hazard/TimedHazard_UnlinkInstance.c	TimedHazard_UnlinkInstance	minor	natural	1	
 src/objects/hazards/timed_hazard/ColliderSprite_Destroy.c	ColliderSprite_Destroy	contrived	natural	2	
 src/objects/hazards/timed_hazard/sub_08232420.c	sub_08232420	contrived	natural	1	
+src/objects/hazards/timed_hazard/sub_08232420.c	sub_0823269C	natural	natural	0	
+src/objects/hazards/timed_hazard/TimedHazard_UpdateActivationDelay.c	TimedHazard_UpdateActivationDelay	minor	minor	4	shared active local: a literal reloads the constant for the second store
