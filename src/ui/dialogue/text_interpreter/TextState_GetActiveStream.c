@@ -1,32 +1,20 @@
 #include "global.h"
-struct P {
-    u8 pad[7];
-    u8 k;
-    u8 pad2[0x14];
-    u32 v[5];
-};
-u32 TextState_GetActiveStream(struct P *p)
+#include "ui/dialogue/text_state.h"
+
+const u8 *TextState_GetActiveStream(struct TextState *state)
 {
-    u32 r;
-    switch (p->k) {
+    switch (state->style) {
         case 0:
-            r = p->v[0];
-            break;
+            return state->pc;
         case 1:
-            r = p->v[1];
-            break;
+            return state->streams[0];
         case 2:
-            r = p->v[2];
-            break;
+            return state->streams[1];
         case 3:
-            r = p->v[3];
-            break;
+            return state->streams[2];
         case 4:
-            r = p->v[4];
-            break;
+            return state->streams[3];
         default:
-            r = 0;
-            break;
+            return 0;
     }
-    return r;
 }
