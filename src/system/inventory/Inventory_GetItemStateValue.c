@@ -1,6 +1,6 @@
-#include "global.h"
-extern u8 *gGameState;
+#include "system/game_state/game_state.h"
+
 u32 Inventory_GetItemStateValue(u32 i)
 {
-    return *(u16 *)(gGameState + i * 2 + 0x100) & 0x7FFF;
+    return *(i + gGameState->table100) & 0x7FFF;
 }

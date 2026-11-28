@@ -535,3 +535,4 @@ src/system/inventory/inventory.c	SceneHud_ApplyTimedSceneMode	natural	natural	0
 src/system/inventory/inventory.c	Inventory_BeginItemEffect	contrived	contrived	0	fake whole-object structs: naming the HUD fields at 0x4870..0x4872 needs the ui header scene_hud_display.h, which is not this area
 src/system/inventory/Inventory_GetItemPackedState.c	Inventory_GetItemPackedState	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
 src/system/inventory/Inventory_SetItemPackedState.c	Inventory_SetItemPackedState	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
+src/system/inventory/Inventory_GetItemStateValue.c	Inventory_GetItemStateValue	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
