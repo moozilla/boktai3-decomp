@@ -1,68 +1,39 @@
-#include "global.h"
-#include "engine/video/render.h"
-extern s16 gUnk_086149C4[];
+#include "effects/healing/healing_effect.h"
+#include "engine/engine.h"
+#include "engine/engine_pause_flags.h"
+#include "engine/math/math_shift.h"
+#include "engine/ram.h"
+
 s32 Div(s32, s32);
-void Sound_PlaySong(u32);
 void MusicSlots_StopAllAndRetainResumable(void);
-void HealthRestoreEffect_StartParticleBurst(u8 *);
-void HealthRestoreEffect_UpdateShake(u8 *);
-struct HealthRestoreEntry {
-    u8 unk00[0x24];
-    u32 spriteFlags;
-    u8 unk28[0x14];
-    u16 screenX, screenY;
-    u8 unk40[0x10];
-    u8 scale[2];
-    u8 unk52[0x2A];
-    s16 targetX, targetY;
-    u8 unk80[4];
-    s16 startX, startY;
-    u8 unk88[0x1E8];
-    u16 timer, unk272;
-    void (*callback)(u8 *);
-};
-static inline s32 scale12(s32 v)
-{
-    if (v >= 0)
-        v = v >> 12;
-    else
-        v = -((-v) >> 12);
-    return v;
-}
+
 // confidence=low: the 16-frame entry of the health restore effect. Stops the music, then slides
 // the sprite from its start to its target position with a sine bob; afterwards it starts the
 // shake.
-void sub_08234DC8(struct HealthRestoreEntry *p)
+void sub_08234DC8(struct HealthRestoreEffect *effect)
 {
-    s32 y;
-    long long scaleTimer;
-    s32 nextFrame;
-    if (p->timer == 0) {
+    if (effect->timer == 0) {
         MusicSlots_StopAllAndRetainResumable();
-        {
-            s32 four = 4;
-            gEnginePauseFlags |= four;
-        }
-    } else if (p->timer == 1) {
+        Engine_SetPauseFlags(4);
+    } else if (effect->timer == 1) {
         Sound_PlaySong(0xE6);
-        p->spriteFlags &= ~1;
+        effect->icon.flags &= ~1;
     }
-    nextFrame = p->timer + 1;
-    scaleTimer = nextFrame;
-    if ((p->timer = nextFrame) > 15) {
-        p->spriteFlags &= ~2;
-        HealthRestoreEffect_StartParticleBurst((u8 *)p);
-        p->callback = HealthRestoreEffect_UpdateShake;
-        p->timer = 0;
+    if (++effect->timer > 15) {
+        effect->icon.flags &= ~2;
+        HealthRestoreEffect_StartParticleBurst(effect);
+        effect->state = HealthRestoreEffect_UpdateShake;
+        effect->timer = 0;
         Sound_PlaySong(0x284);
         return;
     }
-    {
-        s32 v = scaleTimer + 0x22;
-        p->scale[1] = v;
-        p->scale[0] = v;
-    }
-    p->screenX = Div((p->targetX * p->timer) + (p->startX * (16 - p->timer)), 16);
-    y = Div((p->targetY * p->timer) + (p->startY * (16 - p->timer)), 16);
-    p->screenY = y - scale12(gUnk_086149C4[Div(p->timer << 7, 20) & 0xFF] << 4);
+    effect->icon.scaleX = effect->icon.scaleY = effect->timer + 34;
+    effect->icon.position.x = Div(effect->targetPosition.x * effect->timer +
+                                      effect->startPosition.x * (16 - effect->timer),
+                                  16);
+    effect->icon.position.y =
+        Div(effect->targetPosition.y * effect->timer +
+                effect->startPosition.y * (16 - effect->timer),
+            16) -
+        Math_ShiftTowardZero(gUnk_086149C4[Div(effect->timer << 7, 20) & 255] << 4, 12);
 }
