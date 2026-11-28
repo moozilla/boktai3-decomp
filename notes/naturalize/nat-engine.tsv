@@ -373,3 +373,4 @@ src/engine/video/palette/Effect_SetOrigin.c	Effect_SetOrigin	natural	natural
 src/engine/video/palette/Effect_SetPalette.c	Effect_SetPalette	natural	natural		
 src/engine/video/palette/Effect_Initialize.c	Effect_Initialize	contrived	natural	1	
 src/engine/video/palette/Effect_Remove.c	Effect_Remove	contrived	natural	1	
+src/engine/video/palette/ParticleSprite_Initialize.c	ParticleSprite_Initialize	contrived	natural	1	
