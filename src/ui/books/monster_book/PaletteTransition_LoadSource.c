@@ -8,18 +8,24 @@ struct PaletteTransitionObject {
     u8 unk3C[0x48 - 0x3C];
     void *palette;
 };
+struct PaletteTransition {
+    u8 pad0[0x54];
+    struct PaletteTransitionObject object;
+    u8 pad_a0[0x3A0 - 0x54 - sizeof(struct PaletteTransitionObject)];
+    struct PaletteTransitionBanks banks;
+};
 extern u32 gUnk_0824FC1C[];
 extern u8 gUnk_0824FC50[];
 extern u8 gUnk_0824FC5D[];
-void PaletteTransition_CopyBanks(struct PaletteTransitionBanks *, u8 *, u32, u32);
+void PaletteTransition_CopyBanks(struct PaletteTransitionBanks *, u16 *, u32, u32);
 // confidence=low: picks the palette source for id (0x64-0x67 remap to 0x36-0x39), fills the banks
 // and points the object at the destination palette.
-void PaletteTransition_LoadSource(u8 *p, s32 id)
+void PaletteTransition_LoadSource(struct PaletteTransition *p, s32 id)
 {
-    struct PaletteTransitionObject *object = (void *)(p + 0x54);
-    struct PaletteTransitionBanks *banks = (void *)(p + 0x3A0);
+    struct PaletteTransitionObject *object = &p->object;
+    struct PaletteTransitionBanks *banks = &p->banks;
     u32 resource;
-    u8 *src;
+    u16 *src;
     u32 color;
     u32 index;
     u32 bank, extra;
@@ -40,10 +46,10 @@ void PaletteTransition_LoadSource(u8 *p, s32 id)
     index = id - 0x34;
     resource = gUnk_0824FC1C[index];
     if (resource) {
-        src = (u8 *)ScriptProc_Start(0x92B3, resource) + 0x14;
+        src = (u16 *)((u8 *)ScriptProc_Start(0x92B3, resource) + 0x14);
         color = resource | 0xF000;
     } else {
-        src = gPaletteBankData + 0x41E0;
+        src = (u16 *)(gPaletteBankData + 0x41E0);
         color = 0xF20F;
     }
     bank = gUnk_0824FC50[index];

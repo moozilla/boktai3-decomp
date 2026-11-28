@@ -10,3 +10,11 @@ src/ui/books/monster_book/sub_081D3C90.c	sub_081D3C90	contrived	natural	8
 src/ui/books/monster_book/PaletteTransition_CopyBanks.c	PaletteTransition_CopyBanks	contrived	natural	20	
 src/ui/books/monster_book/PaletteTransition_ResetBuffers.c	PaletteTransition_ResetBuffers	contrived	natural	3	
 src/ui/books/monster_book/BestiaryDisplay_UpdatePalettePulse.c	BestiaryDisplay_UpdatePalettePulse	minor	natural	1	
+src/ui/books/monster_book/SceneDisplay_InitCurrentAnimation.c	SceneDisplay_InitCurrentAnimation	minor	minor	0	placeholder struct S, types not renamed
+src/ui/books/monster_book/SceneDisplay_UpdateHopAnimation.c	SceneDisplay_UpdateHopAnimation	natural	natural	0	
+src/ui/books/monster_book/SceneDisplay_GetAlternateDescriptor.c	SceneDisplay_GetAlternateDescriptor	minor	minor	0	placeholder struct S/field names
+src/ui/books/monster_book/SceneDisplay_SwitchToAlternateDescriptor.c	SceneDisplay_SwitchToAlternateDescriptor	minor	minor	0	placeholder struct S/field names
+src/ui/books/monster_book/Palette_BlendColor.c	Palette_BlendColor	natural	natural	0	
+src/ui/books/monster_book/PaletteTransition_BlendSelectedBanks.c	PaletteTransition_BlendSelectedBanks	natural	natural	0	
+src/ui/books/monster_book/PaletteTransition_BlendBankColors.c	PaletteTransition_BlendBankColors	natural	natural	0	
+src/ui/books/monster_book/PaletteTransition_LoadSource.c	PaletteTransition_LoadSource	contrived	natural	1	
