@@ -1,10 +1,8 @@
-#include "global.h"
+#include "ui/dialogue/message_window.h"
 
-struct S {
-    u8 f[0x150];
-    u32 a;
-};
-void TextState_ClearSelectedChoices(struct S *p)
+void TextState_ClearSelectedChoices(void *playback)
 {
-    p->a = 0;
+    struct MessagePlaybackState *state = playback;
+
+    state->selectedCount = 0;
 }
