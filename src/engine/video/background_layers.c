@@ -122,15 +122,6 @@ u8 *Video_GetBackgroundMap(u32);
 
 void BgGfx_LoadTiles(u8 *source, u8 *destination, u32 bytes);
 
-#define CopyMap(layer, dest)                                                                       \
-    {                                                                                              \
-        struct VideoDmaRegisters *d = (struct VideoDmaRegisters *)0x040000D4;                      \
-        d->source = (u32)Video_GetBackgroundMap(layer);                                            \
-        d->destination = (dest);                                                                   \
-        d->control = 0x84000200;                                                                   \
-        d->control;                                                                                \
-    }
-
 void Bg_UploadMapsAndTiles(void)
 {
     s32 i;
