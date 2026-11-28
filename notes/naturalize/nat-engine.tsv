@@ -330,3 +330,15 @@ src/engine/video/anim/Anim_DrawDecimalDigits.c	Anim_DrawDecimalDigits	contrived	
 src/engine/video/anim/Anim_SetFrameDurationScale.c	Anim_SetFrameDurationScale	minor	natural	1	
 src/engine/video/anim/Anim_Step.c	Anim_Step	contrived	natural	1	
 src/engine/video/anim/Anim_SetKeyframes.c	Anim_SetKeyframes	contrived	natural	1	
+src/engine/video/anim/Box_Overlaps.c	Box_Overlaps	natural	natural		
+src/engine/video/anim/sub_08220E6C.c	sub_08220E6C	minor	minor	2	sequence entry address built by integer sum (operand order)
+src/engine/video/anim/Palette_InterpolateBanks.c	Palette_InterpolateBanks	natural	natural		
+src/engine/video/anim/Sprite_BlinkUntilExpired.c	Sprite_BlinkUntilExpired	minor	minor	0	table alias macro
+src/engine/video/anim/String_CopyPadded.c	String_CopyPadded	natural	natural		
+src/engine/video/anim/Crc_ComputeCcitt16.c	Crc_ComputeCcitt16	natural	natural		
+src/engine/video/anim/Crc_ComputeIbm16.c	Crc_ComputeIbm16	natural	natural		
+src/engine/video/anim/Math_InitHooks.c	Math_InitHooks	natural	natural		
+src/engine/video/anim/Math_ShutdownHooks.c	Math_ShutdownHooks	natural	natural		
+src/engine/video/anim/Math_AngleToEightWayDirection.c	Math_AngleToEightWayDirection	natural	natural		
+src/engine/video/anim/Math_AngleToFourWayDirection.c	Math_AngleToFourWayDirection	natural	natural		
+src/engine/video/anim/Vec16_Lerp.c	Vec16_Lerp	natural	natural		
