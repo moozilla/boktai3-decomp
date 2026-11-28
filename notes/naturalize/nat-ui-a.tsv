@@ -420,3 +420,4 @@ src/ui/hud/shake_icon_display.c	ShakeIconDisplay_Initialize	fudged	natural	1
 src/ui/hud/countdown_timer.c	CountdownTimer_Stop	fudged	natural	1	
 src/ui/hud/countdown_timer.c	CountdownTimer_Update	fudged	natural	1	
 src/ui/hud/countdown_timer.c	CountdownTimer_InitFromScript	fudged	natural	1	
+src/ui/hud/countdown_timer.c	CountdownTimer_CreateFromScript	fudged	natural	1	
