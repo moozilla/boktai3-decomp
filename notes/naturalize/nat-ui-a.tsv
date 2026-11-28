@@ -405,3 +405,11 @@ src/ui/hud/scene_indicator.c	SceneIndicators_Initialize	fudged	partial	8	has/fir
 src/ui/hud/scene_indicator.c	SceneIndicators_FindFreeSlot	fudged	natural	4	
 src/ui/hud/scene_indicator.c	SceneIndicators_FindById	fudged	natural	2	
 src/ui/hud/scene_indicator.c	SceneIndicator_CreateFromScript	fudged	natural	5	
+src/ui/hud/scene_indicator.c	SceneIndicators_GetInstance	natural	natural	0	
+src/ui/hud/scene_indicator.c	SceneIndicator_Initialize	natural	natural	0	
+src/ui/hud/scene_indicator.c	SceneIndicator_Update	natural	natural	1	
+src/ui/hud/scene_indicator.c	SceneIndicator_Destroy	natural	natural	0	
+src/ui/hud/scene_indicator.c	SceneIndicators_Create	natural	natural	0	
+src/ui/hud/scene_indicator.c	SceneIndicator_Pause	natural	natural	0	
+src/ui/hud/scene_indicator.c	SceneIndicator_Resume	natural	natural	0	
+src/ui/hud/countdown_controller.c	Countdown_Tick	fudged	partial	4	remaining pointer stays: the decrement reuses its address

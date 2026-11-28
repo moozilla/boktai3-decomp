@@ -2,11 +2,10 @@
 
 s32 Countdown_Tick(struct CountdownTask *task)
 {
-    s32 done;
-    s32 *remaining;
     if (gPlayers[0] && gPlayers[0]->kind == 1) {
-        done = 0;
-        remaining = &gGameState->unk618;
+        s32 done = 0;
+        s32 *remaining = &gGameState->unk618;
+
         if (*remaining > 0) {
             if (++task->frame >= task->interval) {
                 task->frame = 0;
@@ -18,14 +17,12 @@ s32 Countdown_Tick(struct CountdownTask *task)
         } else {
             done = 1;
         }
-        if (done) {
-            if (gPlayers[0]->tetherMode != 0x18) {
-                Player_EnterKindFour(gPlayers[0]);
-                gPlayers[0]->tetherMode = 0x24;
-                gPlayers[0]->tetherPhase = 0;
-                gPlayers[0]->tetherFrame = 0;
-                Task_Kill(task);
-            }
+        if (done && gPlayers[0]->tetherMode != 0x18) {
+            Player_EnterKindFour(gPlayers[0]);
+            gPlayers[0]->tetherMode = 0x24;
+            gPlayers[0]->tetherPhase = 0;
+            gPlayers[0]->tetherFrame = 0;
+            Task_Kill(task);
         }
     }
     return 0;
