@@ -245,11 +245,8 @@ void ChallengeMenu_Update(struct ChallengeMenu *menu)
 void ChallengeMenu_Destroy(struct ChallengeMenu *menu)
 {
     s32 i;
-    struct AnimSprite *e = menu->widgets;
-    for (i = 3; i >= 0; i--) {
-        Anim_Remove(e);
-        e++;
-    }
+    for (i = 0; i < 4; i++)
+        Anim_Remove(&menu->widgets[i]);
     Anim_Remove(&menu->widgets[4]);
     Anim_Remove(&menu->widgets[5]);
     Bg_ClearTilemap(0);
