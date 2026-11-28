@@ -107,14 +107,14 @@ static inline u8 SceneSlot_IsOccupied(struct LargeFragmentSlotPool *pool, u32 in
 struct LargeFragmentSlot *SceneSlot_Allocate(struct LargeFragmentSlotPool *pool)
 {
     s32 i;
+    struct LargeFragmentSlot *slot;
+
     for (i = 0; i < 8; i++) {
         if (!SceneSlot_IsOccupied(pool, i)) {
             pool->occupied |= 1 << i;
-            {
-                struct LargeFragmentSlot *slot = &pool->slots[i];
-                slot->index = i;
-                return slot;
-            }
+            slot = &pool->slots[i];
+            slot->index = i;
+            return slot;
         }
     }
     return 0;

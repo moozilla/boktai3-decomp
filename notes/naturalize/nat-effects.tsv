@@ -86,3 +86,4 @@ src/effects/bursts/large_fragment_effect.c	LargeFragmentEffect_IsActive	contrive
 src/effects/bursts/large_fragment_effect.c	LargeFragmentEffect_StopAll	contrived	natural	1	-
 src/effects/bursts/large_fragment_effect.c	LargeFragmentEffect_InitCollider	contrived	natural	1	-
 src/effects/bursts/large_fragment_effect.c	LargeFragmentEffect_UpdateCollider	contrived	natural	1	-
+src/effects/bursts/large_fragment_effect.c	SceneSlot_Allocate	minor	natural	4	-
