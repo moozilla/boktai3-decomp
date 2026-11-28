@@ -650,9 +650,7 @@ void Anim_Remove(void *);
 
 void NameEntry_Destroy(struct NameEntryTask *p)
 {
-    u16 *q = &gDispCntShadow;
-    u32 m = ~3;
-    *q = m & *q;
+    Bg_DisableDisplay(3);
     Anim_Remove(&p->widgets[5]);
     Anim_Remove(&p->widgets[4]);
     Anim_Remove(&p->widgets[3]);
