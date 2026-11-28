@@ -1,69 +1,60 @@
-#include "player/player.h"
 #include "global.h"
-#define B(o) (*(u8 *)(p + (o)))
-#define H(o) (*(u16 *)(p + (o)))
-#define W(o) (*(u32 *)(p + (o)))
-struct TransitionPosition {
-    s32 x : 16, y : 16, z : 16, pad : 16;
-};
-void Player_SetSecondaryActionFlags(void *, u32);
+#include "player/player.h"
+void Player_SetSecondaryActionFlags(struct Player *, u32);
 void Camera_SnapToWithoutCompletion(void *);
 void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 void Player_PlayLocalSong(u32, u32);
 u32 ActorVariant_GetTableValue(u32, u32);
-void Player_SetAnimationIndex(void *, u32, u32);
-void Player_SetTetherMode(void *, u32, u32);
+void Player_SetAnimationIndex(struct Player *, u32, u32);
+void Player_SetTetherMode(struct Player *, u32, u32);
 // confidence=low: linked action camera, screen fade and timed animation phases.
-void Player_UpdateLinkedScreenTransition(u8 *p)
+void Player_UpdateLinkedScreenTransition(struct Player *p)
 {
-    struct TransitionPosition position;
+    struct SceneVec position;
     Player_SetSecondaryActionFlags(p, 4);
-    switch (B(0x458)) {
+    switch (p->tetherPhase) {
         case 0:
-            position = *(struct TransitionPosition *)(p + 0x30);
+            position = p->position;
             position.y += 150;
             Camera_SnapToWithoutCompletion(&position);
-            if (B(0x4E0))
+            if (p->cueVariant)
                 ScreenTransition_SendCommand(3, 3, 4, 4, 4, 0x1FFF, 16);
             else
                 ScreenTransition_SendCommand(3, 3, 4, 4, 4, 0x1FFF, 1);
-            Player_PlayLocalSong(W(0x18), 0x1AD);
-            {
-                struct Player *player = (struct Player *)p;
-                if (player->facing > 4) {
-                    player->heading = (8 - player->facing) >> 1;
-                    player->side = 1;
-                } else {
-                    player->heading = player->facing >> 1;
-                    player->side = 0;
-                }
+            Player_PlayLocalSong(p->slot, 0x1AD);
+            if (p->facing > 4) {
+                p->heading = (8 - p->facing) >> 1;
+                p->side = 1;
+            } else {
+                p->heading = p->facing >> 1;
+                p->side = 0;
             }
-            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(B(0x418), 0x29), 64);
+            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 0x29), 64);
             Player_SetTetherMode(p, 0x1B, 1);
-            H(0x4E8) = 0;
+            p->terrainRecoveryCounter = 0;
             break;
         case 1:
-            if (++H(0x45A) > 5) {
+            if (++p->tetherFrame > 5) {
                 Player_SetTetherMode(p, 0x1B, 2);
-                H(0x4E8) = 0;
-                B(0x153) = 1;
-                Player_PlayLocalSong(W(0x18), 0x1AE);
+                p->terrainRecoveryCounter = 0;
+                p->secondaryPriority = 1;
+                Player_PlayLocalSong(p->slot, 0x1AE);
             }
             break;
         case 2:
-            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(B(0x418), 0x12), 64);
-            H(0x4E8) -= 60;
-            if (H(0x45A) == 4) {
-                if (B(0x418) == 6)
-                    Player_PlayLocalSong(W(0x18), 0x2ED);
+            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 0x12), 64);
+            p->terrainRecoveryCounter -= 60;
+            if (p->tetherFrame == 4) {
+                if (p->actionMode == 6)
+                    Player_PlayLocalSong(p->slot, 0x2ED);
                 else
-                    Player_PlayLocalSong(W(0x18), 0x305);
+                    Player_PlayLocalSong(p->slot, 0x305);
             }
-            if (++H(0x45A) > 29)
+            if (++p->tetherFrame > 29)
                 Player_SetTetherMode(p, 0x1B, 3);
             break;
         case 3:
-            H(0x4E8) = 0;
+            p->terrainRecoveryCounter = 0;
             Player_SetSecondaryActionFlags(p, 1);
             break;
     }

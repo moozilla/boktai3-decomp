@@ -260,3 +260,4 @@ src/link/player/Player_UpdateChargedDashAttack.c	Player_UpdateChargedDashAttack	
 src/link/player/Player_UpdateChargedSpinAttack.c	Player_UpdateChargedSpinAttack	contrived	natural	4	
 src/link/player/Player_RunConfiguredActionHandler.c	Player_RunConfiguredActionHandler	contrived	natural	1	
 src/link/player/Player_UpdateSolarBombCharge.c	Player_UpdateSolarBombCharge	minor	natural	3	
+src/link/player/Player_UpdateLinkedScreenTransition.c	Player_UpdateLinkedScreenTransition	contrived	natural	2	
