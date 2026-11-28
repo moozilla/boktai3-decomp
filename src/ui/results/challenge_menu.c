@@ -360,12 +360,10 @@ void ChallengeMenu_InitAnimations(struct ChallengeMenu *menu)
 
 s32 ChallengeMenu_ScriptOpen(struct ChallengeMenu *menu)
 {
+    s32 i;
     if (Script_SeekToKeyword('e')) {
-        u32 *out = menu->selectionScripts;
-        s32 i = 3;
-        do {
-            *out++ = Script_GetValue();
-        } while (--i >= 0);
+        for (i = 0; i < 4; i++)
+            menu->selectionScripts[i] = Script_GetValue();
     }
     menu->enabledChoices = Script_GetKeywordValue('o', 7);
     if (Script_SeekToKeyword('s')) {
@@ -383,11 +381,9 @@ s32 ChallengeMenu_ScriptOpen(struct ChallengeMenu *menu)
         menu->optionText = (const void *)Script_GetTextSourcePc();
     }
     if (Script_SeekToKeyword('A')) {
-        s32 i = 0;
-        s32 *base = &menu->group;
-        for (; i <= 2; i++) {
-            s32 value = Script_GetValue();
-            ChallengeMenu_SetStoredRank(*(s32 *)base, i, value);
+        for (i = 0; i < 3; i++) {
+            s32 rank = Script_GetValue();
+            ChallengeMenu_SetStoredRank(menu->group, i, rank);
         }
     }
     menu->stateCallback = 0;
@@ -395,7 +391,7 @@ s32 ChallengeMenu_ScriptOpen(struct ChallengeMenu *menu)
     ChallengeMenu_InitBackgrounds(menu);
     ChallengeMenu_LoadPalette(menu);
     ChallengeMenu_InitAnimations(menu);
-    ChallengeMenu_UpdateDescription((struct ChallengeMenu *)menu);
+    ChallengeMenu_UpdateDescription(menu);
     ChallengeMenu_DrawOptions(menu);
     ChallengeMenu_StartFadeIn(menu);
     menu->selection = 0;
