@@ -420,3 +420,4 @@ src/npc/kuro/sub_081D1C38.c	sub_081D1C38	contrived	minor	1	facing/position point
 src/npc/kuro/Kuro_UpdateState15Animation.c	Kuro_UpdateState15Animation	contrived	natural	1	
 src/npc/kuro/Kuro_UpdateState16Animation.c	Kuro_UpdateState16Animation	contrived	natural	1	
 src/npc/kuro/Kuro_UpdateState17Animation.c	Kuro_UpdateState17Animation	contrived	natural	1	
+src/npc/kuro/Kuro_UpdateState17AnimationA.c	Kuro_UpdateState17AnimationA	contrived	minor	2	tag overlay cast over the actor's unnamed 0x20 block
