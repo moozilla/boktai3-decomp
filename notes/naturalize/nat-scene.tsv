@@ -232,3 +232,7 @@ src/scene/actor/behavior/SceneActorBehavior_DispatchPendingFlags.c	SceneActorBeh
 src/scene/actor/behavior/SceneActorMotion_Update.c	SceneActorMotion_Update	contrived	contrived	16	actor alias, behavior/flags pointers, enabled block and flag-setter inlines hold the ROM allocation
 src/scene/actor/behavior/SceneActorRoute_TryRecoveryDetour.c	SceneActorRoute_TryRecoveryDetour	contrived	contrived	0	table-view struct, alias pointers and goto routed: every plain substitution differs
 src/scene/actor/behavior/SceneActorReaction_DispatchPendingCommands.c	SceneActorReaction_DispatchPendingCommands	contrived	contrived	8	hand-written do/while over pending commands (for loop differs), value/initial locals at the attachment creators, HasGroup predicate
+src/scene/actor/behavior/SceneActorReaction_BeginTargetRecovery.c	SceneActorReaction_BeginTargetRecovery	contrived	contrived	0	mask blocks, flag out-parameter predicate: plain &= loads the field first
+src/scene/actor/behavior/SceneActor_UpdateActiveCallbacks.c	SceneActor_UpdateActiveCallbacks	minor	minor	0	dispatch(&callback, context) wrapper fixes the argument load order
+src/scene/actor/behavior/SceneActor_UpdateBehaviorCallbacks.c	SceneActor_UpdateBehaviorCallbacks	minor	minor	0	dispatch(&callback, context) wrapper fixes the argument load order
+src/scene/actor/behavior/SceneActor_SetContactReactionDirection.c	SceneActor_SetContactReactionDirection	minor	minor	8	delta pointer for the y and z stores

@@ -10,14 +10,14 @@ void SceneActor_SetContactReactionDirection(struct RoomActor *actor,
         actor->reactionDirection = source->direction;
     } else {
         struct ContactPosition *delta = &difference;
-        struct ContactPosition *right = &source->position;
-        struct ContactPosition *left = &destination->position;
-        difference.x = (u16)destination->position.x - (u16)source->position.x;
-        delta->y = (u16)left->y - (u16)right->y;
-        delta->z = (u16)left->z - (u16)right->z;
+        struct ContactPosition *from = &source->position;
+        struct ContactPosition *to = &destination->position;
+        difference.x = to->x - from->x;
+        delta->y = to->y - from->y;
+        delta->z = to->z - from->z;
         if (!difference.x && !difference.z) {
             gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-            actor->reactionDirection = *(const u16 *)(gRandomIndex * 2 + (u32)gRandomTable);
+            actor->reactionDirection = ((u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
         } else {
             actor->reactionDirection = Math_Atan2(difference.x, difference.z);
         }
