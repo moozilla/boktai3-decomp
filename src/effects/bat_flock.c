@@ -41,11 +41,6 @@ u32 BatFlockBat_Destroy(struct GroupObjects *m, struct GroupPiece *p, int index)
     Sprite_Remove(&p->sprite);
 }
 
-static inline u32 frame_factor(u16 v)
-{
-    return DisplaySequence_MaskCommand(v, 15);
-}
-
 static inline void BatFlockBat_GetFacingFlips(u8 quadrant, u8 *flipX, u8 *flipY)
 {
     if (quadrant == 1 || quadrant == 2)
@@ -70,87 +65,52 @@ void BatFlockBat_SetFacingAnim(struct GroupObjects *m, struct GroupPiece *p, int
 
 void BatFlockBat_UpdateAnimation(struct GroupPiece *p)
 {
-    struct DisplaySequenceSprite *o = &p->sprite;
-    struct DisplaySequenceState *a;
-    const u16 *entry;
+    struct DisplaySequenceSprite *sprite = &p->sprite;
+    struct DisplaySequenceState *anim;
+    const u16 *command;
     int done;
+
     p->sprite.position = p->position;
-    a = &p->anim;
-    entry = a->commands + a->index;
-    o->frame = *entry >> 6;
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = a->flags;
-        bit = 1;
-        first = (u8)(control.raw & bit);
-        if (first != (((*entry & 0x30) >> 4) & bit))
-            p->sprite.flags |= 4;
-        else
-            p->sprite.flags &= ~4;
-    }
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = a->flags;
-        bit = 2;
-        first = (u8)(control.raw & bit);
-        if (first != (((*entry & 0x30) >> 4) & bit))
-            o->flags |= 8;
-        else
-            o->flags &= ~8;
-    }
-    if (++a->elapsed >= a->duration) {
-        a->elapsed = 0;
-        if (a->flags & 4) {
-            if (a->index == 0) {
-                if (a->flags & 8) {
-                    a->elapsed = a->duration;
-                } else {
-                    a->index = a->frameCount - 1;
-                }
-                done = 1;
+    anim = &p->anim;
+    command = &anim->commands[anim->index];
+    DisplaySequence_ApplyFrame((struct SceneActorControlMotionDrawable *)sprite, anim, command);
+    if (++anim->elapsed >= anim->duration) {
+        anim->elapsed = 0;
+        if (anim->flags & 4) {
+            if (anim->index == 0) {
+                if (anim->flags & 8)
+                    anim->elapsed = anim->duration;
+                else
+                    anim->index = anim->frameCount - 1;
+                done = TRUE;
             } else {
-                a->index--;
-                done = 0;
+                anim->index--;
+                done = FALSE;
             }
+        } else if (++anim->index >= anim->frameCount) {
+            if ((u8)(anim->flags & 8)) {
+                anim->elapsed = anim->duration;
+                anim->index = anim->frameCount - 1;
+            } else {
+                anim->index = 0;
+            }
+            done = TRUE;
         } else {
-            if (++a->index >= a->frameCount) {
-                if ((u8)(a->flags & 8)) {
-                    a->elapsed = a->duration;
-                    a->index = a->frameCount - 1;
-                } else {
-                    a->index = 0;
-                }
-                done = 1;
-            } else
-                done = 0;
+            done = FALSE;
         }
-        entry = a->commands + a->index;
-        a->frameWeight = frame_factor(*entry);
-        a->duration = (a->frameWeight * a->speed) >> 6;
-        if (!a->duration)
-            a->duration = 1;
-    } else
-        done = 0;
+        command = &anim->commands[anim->index];
+        DisplaySequence_UpdateWeight(anim, command);
+        if (anim->duration == 0)
+            anim->duration = 1;
+    } else {
+        done = FALSE;
+    }
     p->done = done;
     if (p->position.y > p->targetY)
         p->position.y--;
     else if (p->position.y < p->targetY)
         p->position.y++;
-    {
-        int value = gUnk_086149C4[p->angle] * 32;
-        {
-            int delta;
-            if (value >= 0)
-                delta = value >> 12;
-            else {
-                int magnitude = -value;
-                delta = -(magnitude >> 12);
-            }
-            o->position.y = o->position.y + delta;
-        }
-    }
+    sprite->position.y += scale(gUnk_086149C4[p->angle] * 32);
     p->angle += 4;
 }
 
