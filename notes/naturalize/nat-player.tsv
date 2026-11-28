@@ -127,3 +127,4 @@ src/player/appearance/player_visuals.c	Player_InitVisualResources	contrived	mino
 src/player/attack/Player_UpdateAttackFacing.c	Player_UpdateAttackFacing	contrived	natural	1	-
 src/player/attack/Player_CalculateBaseAttackPower.c	Player_CalculateBaseAttackPower	contrived	minor	3	EquipmentFlagState view cast over actionFlagState (Player lists overlapping fields separately)
 src/player/attack/Player_CalculatePreviewActionStat.c	Player_CalculatePreviewActionStat	contrived	minor	1	EquipmentFlagState view cast over actionFlagState
+src/player/attack/Player_GetSpecialAttackPower.c	Player_GetSpecialAttackPower	contrived	natural	2	-
