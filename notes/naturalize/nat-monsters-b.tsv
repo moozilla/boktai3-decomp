@@ -201,3 +201,4 @@ src/monsters/screamer/Screamer_HandleDefeat.c	Screamer_HandleDefeat	contrived	mi
 src/monsters/screamer/Screamer_OnColliderContact.c	Screamer_OnColliderContact	natural	natural	0	
 src/monsters/screamer/Screamer_ApplyHitReaction.c	Screamer_ApplyHitReaction	contrived	minor	2	spark loop frame struct and pointer temps: loop invariant allocation
 src/monsters/screamer/Screamer_InitColliders.c	Screamer_InitColliders	contrived	natural	2	(u16) casts on s16 reaction flags passed as u32
+src/monsters/screamer/Screamer_WaitForPlayerApproach.c	Screamer_WaitForPlayerApproach	minor	minor	1	kept temps the ROM spills
