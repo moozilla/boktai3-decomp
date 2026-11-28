@@ -3,7 +3,8 @@
 #include "engine/engine.h"
 
 static inline const struct ActorAttachmentPartResource *
-ActorAttachment_GetPartResource(struct ActorAttachmentSlotView *slot, struct ActorAttachmentManagerView *manager)
+ActorAttachment_GetPartResource(struct ActorAttachmentSlotView *slot,
+                                struct ActorAttachmentManagerView *manager)
 {
     switch (slot->kind) {
         case 2:
@@ -57,18 +58,18 @@ void ActorAttachment_TickDetachedParts(struct ActorAttachmentSlotView *slot)
                 circle.y = (table[phase] * 70 << 4) >> 16;
                 slot->phase[i] = phase + 5;
                 parts[i].position.x = slot->anchor->x + circle.x + slot->offset.x;
-                parts[i].position.y = slot->anchor->y + circle.y + slot->position.z + slot->offset.y;
+                parts[i].position.y =
+                    slot->anchor->y + circle.y + slot->position.z + slot->offset.y;
                 parts[i].position.z = slot->anchor->z - circle.x + slot->offset.z;
                 parts[i].flags &= ~1;
                 ActorAttachment_BeginPartJitter(slot, i);
             }
         }
         if (complete > 2) {
+            s32 id;
             slot->flags31 = 0;
-            {
-                s32 id = slot->slotId;
-                manager->occupiedMask &= ~(1 << id);
-            }
+            id = slot->slotId;
+            manager->occupiedMask &= ~(1 << id);
             slot->update = NULL;
             slot->value = NULL;
             for (i = 0; i <= 2; i++) {
