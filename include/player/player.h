@@ -92,7 +92,8 @@ struct PlayerStatModifierContext {
     u8 unknownCA;
     u8 chargeTier;      /* owner + 0xC0F: charge attacks select tiers zero through two */
     u16 chargeDuration; /* owner + 0xC10: initialized to 60 by attached attack setup */
-    u8 unknownCE[3];
+    u16 chargeElapsed;  /* owner + 0xC12: frames since the charge started (tentative) */
+    u8 unknownD0;
     u8 unknownD1; /* owner + 0xC15: cleared by action modifier kind 1 (tentative) */
     u8 unknownD2[2];
     u8 statBOverrideMode;            /* owner + 0xC18: seven selects GameState stat B */
