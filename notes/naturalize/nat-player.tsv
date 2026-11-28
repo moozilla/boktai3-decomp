@@ -379,3 +379,7 @@ src/player/cutscene/player_cue_commands.c	Player_EnableStatGaugeFromScript	natur
 src/player/cutscene/player_cue_commands.c	Player_EnableStatGaugeAndHistoryFromScript	natural	natural	0	-
 src/player/cutscene/player_cue_commands.c	Player_RestrictActionRequestsFromScript	natural	natural	0	-
 src/player/cutscene/player_cue_commands.c	Player_EnterKindTwo	minor	minor	4	identical flag branches (ROM keeps both calls)
+src/player/cutscene/player_cue_commands.c	PlayerCue_OverlaySet	natural	natural	0	-
+src/player/cutscene/player_cue_commands.c	PlayerCue_OverlayOn	natural	natural	0	-
+src/player/cutscene/player_cue_commands.c	PlayerCue_OverlayOff	natural	natural	0	-
+src/player/cutscene/player_cue_commands.c	PlayerCue_SetPosition	minor	natural	1	-

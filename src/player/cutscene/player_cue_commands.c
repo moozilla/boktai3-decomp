@@ -84,7 +84,7 @@ void PlayerCue_OverlayOff(struct Player *player)
 
 void PlayerCue_SetPosition(struct Player *player, const struct ContactPosition *position)
 {
-    (*(struct ContactPosition *)&player->position) = *position;
+    *(struct ContactPosition *)&player->position = *position;
 }
 
 void PlayerCue_Hide(struct Player *player)
