@@ -322,3 +322,4 @@ src/engine/video/anim/Anim_SetDurationScale.c	Anim_SetDurationScale	contrived	na
 src/engine/video/anim/Anim_ResetDurationScale.c	Anim_ResetDurationScale	contrived	natural	1	
 src/engine/video/anim/sub_0822108C.c	sub_0822108C	contrived	minor	1	sequence entry address built by integer sum (operand order)
 src/engine/video/anim/Random_InitValueTable.c	Random_InitValueTable	contrived	contrived	1	do/while(0) around the store raises the value's allocation priority
+src/engine/video/anim/Palette_BlendBank.c	Palette_BlendBank	minor	natural	1	
