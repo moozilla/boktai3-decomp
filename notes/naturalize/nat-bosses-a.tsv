@@ -260,3 +260,4 @@ src/bosses/hresvelgr/ActorAction_PlayDescentSequence.c	ActorAction_PlayDescentSe
 src/bosses/hresvelgr/ActorAction_PlayTetherSequence.c	ActorAction_PlayTetherSequence	minor	minor	3	second actor pointer stays
 src/bosses/hresvelgr/Hresvelgr_UpdateRepeatedCharge.c	Hresvelgr_UpdateRepeatedCharge	contrived	minor	6	second actor pointer stays
 src/bosses/hresvelgr/Hresvelgr_UpdateOpeningAttackCycle.c	Hresvelgr_UpdateOpeningAttackCycle	contrived	minor	8	second actor pointer and PlayerFlags helper stay
+src/bosses/hresvelgr/Hresvelgr_UpdateAttackCycle.c	Hresvelgr_UpdateAttackCycle	contrived	minor	6	second actor pointer stays
