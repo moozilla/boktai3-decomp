@@ -1237,16 +1237,10 @@ static inline void SetBonusFlag(struct Player *p, u32 mask)
         *flags |= m;
     }
 }
-struct ActionModifierDescriptor {
-    u8 unknown[12];
-    struct {
-        u8 kind, unknown[3];
-    } modifiers[2];
-};
 void Player_SubtractResistance(struct Player *, s32, s32);
 
 void Player_BuildActionModifiers(struct Player *p, struct PlayerStatModifierContext *context,
-                                 const void *descriptor)
+                                 const struct PlayerActionDescriptor *descriptor)
 {
     s32 i;
     for (i = 0; i < 3; i++) {
@@ -1263,9 +1257,9 @@ void Player_BuildActionModifiers(struct Player *p, struct PlayerStatModifierCont
     }
     context->savedActionIndex = 0;
     for (i = 0; i <= 1; i++) {
-        switch (((const struct ActionModifierDescriptor *)descriptor)->modifiers[i].kind) {
+        switch (descriptor->modifiers[i].kind) {
             case 1:
-                *((u8 *)context + 0xD1) = 0;
+                context->unknownD1 = 0;
                 context->savedActionIndex = 17;
                 break;
             case 2:
@@ -1425,8 +1419,6 @@ void Player_SetWeaponInstance(struct Player *, u32);
 void ItemDescriptor_Reset(void *);
 
 void ActionRecord_CopyFromEntry(void *, void *);
-
-void Player_BuildActionModifiers(struct Player *, struct PlayerStatModifierContext *, const void *);
 
 void Player_ConfigureActionCollider(struct Player *);
 

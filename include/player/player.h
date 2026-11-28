@@ -32,7 +32,11 @@ struct PlayerIndexedAction {
 
 struct PlayerActionDescriptor {
     u8 kind, displaySelection, unknown2, duration;
-    u32 unknown4[7];
+    u32 unknown4[2];
+    struct {
+        u8 kind, unknown1[3];
+    } modifiers[2]; /* 0x0C: applied by Player_BuildActionModifiers (tentative) */
+    u32 unknown14[3];
 };
 
 struct PlayerActionConfig {
@@ -78,7 +82,9 @@ struct PlayerStatModifierContext {
     u8 unknownCA;
     u8 chargeTier;      /* owner + 0xC0F: charge attacks select tiers zero through two */
     u16 chargeDuration; /* owner + 0xC10: initialized to 60 by attached attack setup */
-    u8 unknownCE[6];
+    u8 unknownCE[3];
+    u8 unknownD1; /* owner + 0xC15: cleared by action modifier kind 1 (tentative) */
+    u8 unknownD2[2];
     u8 statBOverrideMode;            /* owner + 0xC18: seven selects GameState stat B */
     u8 thresholdSatisfied;           /* owner + 0xC19, tentative */
     s16 previousAnimation;           /* owner + 0xC1A: -1 requests a fresh attack animation */
