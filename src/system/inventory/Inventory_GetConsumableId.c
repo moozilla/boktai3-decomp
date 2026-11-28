@@ -1,6 +1,6 @@
-#include "global.h"
-extern u8 *gGameState;
+#include "system/game_state/game_state.h"
+
 s32 Inventory_GetConsumableId(u32 i)
 {
-    return *(s16 *)(gGameState + i * 2 + 0x160);
+    return *(i + gGameState->table160);
 }
