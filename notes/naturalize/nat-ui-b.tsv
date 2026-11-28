@@ -607,3 +607,10 @@ src/ui/town/storage/Storage_SetGridFlags.c	Storage_SetGridFlags	contrived	natura
 src/ui/town/storage/Storage_InitSelectionGrid.c	Storage_InitSelectionGrid	contrived	minor	2	repeat zero local
 src/ui/town/storage/Storage_UpdateCursorPosition.c	Storage_UpdateCursorPosition	contrived	natural	2	
 src/ui/town/storage/MenuPanel_FindEmptyOppositeHalf.c	MenuPanel_FindEmptyOppositeHalf	contrived	natural	1	
+src/ui/town/storage/Storage_GetSlotPosition.c	Storage_GetSlotPosition	natural	natural	0	
+src/ui/town/storage/sub_081BDC14.c	sub_081BDC14	natural	natural	0	
+src/ui/town/storage/sub_081BE130.c	sub_081BE130	natural	natural	0	empty delay loops are what the ROM does
+src/ui/town/storage/sub_081BE140.c	sub_081BE140	natural	natural	0	empty delay loop
+src/ui/town/storage/sub_081BE150.c	sub_081BE150	natural	natural	0	
+src/ui/town/storage/sub_081BE154.c	sub_081BE154	natural	natural	0	empty delay loops
+src/ui/town/storage/Storage_ShowConsumableDescription.c	Storage_ShowConsumableDescription	contrived	minor	3	index-first pointer sum into table160; private panel view

@@ -18,10 +18,7 @@ void Storage_ShowConsumableDescription(struct StoragePanel *panel)
 {
     s32 item;
     if (panel->selection <= 7) {
-        u32 selection = panel->items[panel->savedSelection];
-        struct GameState *state = gGameState;
-        struct GameState *indexed = (void *)(selection * 2 + (u32)state);
-        item = indexed->table160[0];
+        item = *(panel->items[panel->savedSelection] + gGameState->table160);
     } else
         item = -1;
     if (item < 0) {
