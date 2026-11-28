@@ -65,3 +65,4 @@ src/ui/books/monster_book/monster_book.c	MonsterBook_UpdateHighlightPulse	contri
 src/ui/books/monster_book/monster_book.c	MonsterBook_SetPage	contrived	natural	1	
 src/ui/books/monster_book/monster_book.c	MonsterBook_SetupPageBackgrounds	contrived	minor	12	dispcnt and white locals kept: constant must be loaded before the register read / loop counter
 src/ui/books/monster_book/monster_book.c	MonsterBook_InitWidgets	minor	natural	1	
+src/ui/books/monster_book/monster_book.c	MonsterBook_Init	contrived	natural	4	

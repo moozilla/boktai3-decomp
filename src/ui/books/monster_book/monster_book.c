@@ -659,10 +659,7 @@ s32 MonsterBook_Init(struct MonsterBook *book, void *context)
 {
     s32 i;
     s32 j;
-    s32 y;
-    s32 *win;
     u8 *src;
-    u8 *d;
 
     book->frame = 0;
     book->mode = 0;
@@ -676,23 +673,16 @@ s32 MonsterBook_Init(struct MonsterBook *book, void *context)
         return -1;
     if ((book->script = Script_GetTextSourcePc()) == 0)
         return -1;
-    j = 0;
-    win = book->windows;
-    y = 5;
-    do {
-        *win = TextWindow_Create(3, y, 0x17, 2);
-        TextWindow_SetScript(*win, book->script);
-        TextWindow_Refresh(*win, j);
-        TextWindow_Clear(*win++);
-        y += 2;
-        j++;
-    } while (j <= 7);
+    for (j = 0; j < 8; j++) {
+        book->windows[j] = TextWindow_Create(3, j * 2 + 5, 0x17, 2);
+        TextWindow_SetScript(book->windows[j], book->script);
+        TextWindow_Refresh(book->windows[j], j);
+        TextWindow_Clear(book->windows[j]);
+    }
     if (Script_SeekToKeyword('d')) {
         Script_SetPc(sub_08227E9C());
-        i = 0;
-        d = book->counts;
-        for (; i <= 0x52; i++)
-            d[i] = Script_GetValue();
+        for (i = 0; i < 83; i++)
+            book->counts[i] = Script_GetValue();
     }
     if (Script_SeekToKeyword('t')) {
         src = sub_08227E9C();
@@ -720,17 +710,13 @@ s32 MonsterBook_Init(struct MonsterBook *book, void *context)
     if (Script_SeekToKeyword('T'))
         book->rankScript = Script_GetTextSourcePc();
     book->closeScript = Script_GetKeywordValue('e', 0);
-    {
-        u16 *q = &book->transitionFlags;
-        i = 0;
-        *q = 5;
-    }
+    book->transitionFlags = 5;
     ScrollingDialogue_ClearScript();
     book->display = BestiaryDisplay_Create(0, 0);
     BestiaryDisplay_Hide(book->display);
     MonsterBook_InitWidgets(book);
     MonsterBook_SetPage(book, 0);
-    ScreenTransition_SendCommand(0, 4, 4, 4, 4, 0xFFFF, i);
+    ScreenTransition_SendCommand(0, 4, 4, 4, 4, 0xFFFF, 0);
     Sound_PlaySong(0x118);
     return 0;
 }
