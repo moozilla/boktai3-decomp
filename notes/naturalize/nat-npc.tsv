@@ -673,3 +673,4 @@ src/minigames/result_game/ResultMenu_IsPhaseStart.c	ResultMenu_IsPhaseStart	cont
 src/minigames/result_game/TransformMarker_SetTypeFromTable.c	TransformMarker_SetTypeFromTable	minor	natural	1	
 src/minigames/result_game/TransformMarker_ClearVector.c	TransformMarker_ClearVector	minor	natural	1	
 src/minigames/result_game/TransformMarker_CopyVector.c	TransformMarker_CopyVector	contrived	natural	1	
+src/minigames/result_game/sub_0801B600.c	sub_0801B600	contrived	natural	8	

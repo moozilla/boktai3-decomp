@@ -1,78 +1,68 @@
 #include "global.h"
 #include "ui/town/shop_item_values.h"
-extern u8 gUnk_08E6092C[][0x20];
-extern u8 gUnk_08E60F80[][16];
+extern struct SceneValueEquipmentDefinition gUnk_08E6092C[];
+extern struct SceneValueConsumableDefinition gUnk_08E60F80[];
 extern u8 gUnk_0824DB28[];
-void TransformMarker_SetTypeFromTable(u8 *p, u8 *q, u32 i);
-void TransformMarker_ClearVector(u8 *p);
+void TransformMarker_SetTypeFromTable(struct SceneValueEquipment *entry,
+                                      const struct SceneValueEquipmentDefinition *definition,
+                                      u32 grade);
+void TransformMarker_ClearVector(struct SceneValueEquipment *entry);
 
-void sub_0801B600(u32 a, u32 b, struct SceneValueEquipment *c)
+void sub_0801B600(u32 equipmentSlot, u32 consumableSlot, struct SceneValueEquipment *result)
 {
-    struct SceneValueEquipment *e = Inventory_GetEquipmentEntry(a);
-    s32 idx = Inventory_GetConsumableId(b);
-    u8 *t1 = gUnk_08E6092C[e->kind];
-    u8 *t2 = gUnk_08E60F80[idx];
-    u8 *e2;
-    u32 x;
+    struct SceneValueEquipment *entry = Inventory_GetEquipmentEntry(equipmentSlot);
+    s32 id = Inventory_GetConsumableId(consumableSlot);
+    struct SceneValueEquipmentDefinition *definition = &gUnk_08E6092C[entry->kind];
+    struct SceneValueConsumableDefinition *item = &gUnk_08E60F80[id];
+    struct SceneValueEquipmentDefinition *candidate;
+    u32 next, i;
 
-    *c = *e;
-    if (c->condition == 0) {
-        u32 want = t2[0xb];
-        x = t1[0x1e];
-        if (x != 0xff) {
-            e2 = gUnk_08E6092C[x];
-            if (e2[1] == want && e2[2] <= t2[0xa])
-                goto use;
+    *result = *entry;
+    if (result->condition == 0) {
+        u32 element = item->unknownA[1];
+        next = definition->unknown18[6];
+        if (next != 0xff) {
+            candidate = &gUnk_08E6092C[next];
+            if (candidate->unknown1 == element &&
+                candidate->descriptionStyleA <= item->unknownA[0]) {
+                definition = candidate;
+                result->kind = definition->descriptionTitle;
+                TransformMarker_SetTypeFromTable(result, definition, 0);
+                return;
+            }
         }
-        if (t1[1] != want) {
-            TransformMarker_SetTypeFromTable((u8 *)c, t1, 0);
-            TransformMarker_ClearVector((u8 *)c);
+        if (definition->unknown1 != element) {
+            TransformMarker_SetTypeFromTable(result, definition, 0);
+            TransformMarker_ClearVector(result);
         }
-        return;
+    } else if (definition->descriptionStyleA > item->unknownA[0]) {
+        if (definition->unknown1 != item->unknownA[1]) {
+            next = definition->unknown18[4];
+            if (next != 0xff) {
+                definition = &gUnk_08E6092C[next];
+                result->kind = definition->descriptionTitle;
+                TransformMarker_SetTypeFromTable(result, definition, 0);
+            }
+        }
     } else {
-        u32 tmp;
-        u32 lim;
-        u32 want;
-        u32 i;
-        u8 *s;
-        u8 *tbl;
-        if (t1[2] > (tmp = t2[0xa])) {
-            if (t1[1] != t2[0xb]) {
-                x = t1[0x1c];
-                if (x != 0xff) {
-                    t1 = gUnk_08E6092C[x];
-                    c->kind = t1[0];
-                    TransformMarker_SetTypeFromTable((u8 *)c, t1, 0);
+        s32 grade;
+        u32 element = item->unknownA[1];
+        for (i = 0; i < 5; i++) {
+            next = definition->unknown18[gUnk_0824DB28[i]];
+            if (next != 0xff) {
+                candidate = &gUnk_08E6092C[next];
+                if (candidate->unknown1 == element &&
+                    candidate->descriptionStyleA <= item->unknownA[0]) {
+                    definition = candidate;
+                    result->kind = definition->descriptionTitle;
+                    TransformMarker_SetTypeFromTable(result, definition, 0);
+                    return;
                 }
             }
-            return;
         }
-        goto loop;
-    use:
-        t1 = e2;
-        c->kind = t1[0];
-        TransformMarker_SetTypeFromTable((u8 *)c, t1, 0);
-        return;
-    loop:
-        want = t2[0xb];
-        i = 0;
-        tbl = gUnk_0824DB28;
-        lim = tmp;
-        s = t1 + 0x18;
-        for (; i <= 4; i++) {
-            x = s[*(u8 *)(i + (u32)tbl)];
-            if (x != 0xff) {
-                e2 = gUnk_08E6092C[x];
-                if (e2[1] == want && e2[2] <= lim)
-                    goto use;
-            }
-        }
-        {
-            s32 n = c->grade;
-            if (n <= 1)
-                n++;
-            TransformMarker_SetTypeFromTable((u8 *)c, t1, n);
-        }
-        return;
+        grade = result->grade;
+        if (grade <= 1)
+            grade++;
+        TransformMarker_SetTypeFromTable(result, definition, grade);
     }
 }
