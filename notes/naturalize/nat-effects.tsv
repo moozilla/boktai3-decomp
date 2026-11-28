@@ -57,3 +57,4 @@ src/effects/link_effect.c	SceneEffect_UpdateMovingState	natural	natural	0
 src/effects/link_effect.c	SceneOrbitHazard_OnDestroy	natural	natural	0	
 src/effects/link_effect.c	SceneEffect_CreateMovingTask	natural	natural	0	
 src/effects/link_effect.c	SceneOrbitHazard_Activate	natural	natural	0	
+src/effects/contact_impact.c	PopInSprite_GetStateResult	minor	natural	2	-

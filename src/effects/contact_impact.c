@@ -3,12 +3,7 @@
 
 u32 PopInSprite_GetStateResult(struct ContactImpactEffect *p)
 {
-    u32 r;
-    if (p)
-        r = p->stateResult;
-    else
-        r = 0;
-    return r;
+    return p ? p->stateResult : 0;
 }
 
 s32 __divsi3(s32, s32);
