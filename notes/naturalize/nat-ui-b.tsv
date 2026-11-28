@@ -319,3 +319,6 @@ src/ui/title/tutorial_otenko.c	TutorialOtenko_UpdateRotatingShrink	contrived	min
 src/ui/title/tutorial_otenko.c	sub_081E99EC	contrived	natural	1	
 src/ui/title/tutorial_otenko.c	TutorialOtenko_DispatchAnimationPhase	contrived	natural	1	(u8 *) argument of the shared dispatcher
 src/ui/title/tutorial_otenko.c	TutorialOtenko_DestroyController	contrived	natural	1	
+src/ui/title/tutorial_otenko.c	TutorialOtenko_UpdateRegionChildren	contrived	minor	5	current-region local and predicate helper (loop invariant), second children base
+src/ui/title/tutorial_otenko.c	TutorialOtenko_UpdateInactiveAnimation	natural	natural	0	
+src/ui/title/tutorial_otenko.c	TutorialOtenko_UpdateMotionPhase	natural	natural	0	

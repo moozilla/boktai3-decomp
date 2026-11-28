@@ -2023,11 +2023,6 @@ struct ActorRegionController {
     struct ActorRegionChild children[16];
 };
 
-struct ActorRegionPlayer {
-    u8 unk_00[0x5a0];
-    u32 region;
-};
-
 static inline u8 ActorChild_IsCurrentRegion(u32 current, u32 region)
 {
     if (current == region)
@@ -2043,7 +2038,7 @@ void TutorialOtenko_UpdateRegionChildren(struct ActorRegionController *p)
         struct ActorRegionChild *children = p->children;
         s32 visible = 0;
         if (visible < p->children[i].regionCount) {
-            u32 current = ((struct ActorRegionPlayer *)gGameState)->region;
+            u32 current = gGameState->region;
             s32 j;
             for (j = 0; j < p->children[i].regionCount; j++) {
                 if (ActorChild_IsCurrentRegion(current, p->children[i].regions[j]))
