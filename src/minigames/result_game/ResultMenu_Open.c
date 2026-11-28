@@ -1,20 +1,17 @@
 #include "global.h"
-void *Task_Create(s32, s32);
-void Task_SetCallbacks(void *, void *, void *);
-s32 ResultMenu_Initialize(void *, void *, void *);
-void Task_Kill(void *);
+#include "minigames/result_game/result_tutorial.h"
+s32 ResultMenu_Initialize(struct ResultMenu *menu, void *owner, void *unused);
 void ResultMenu_Update(void);
 void ResultMenu_OnTaskExit(void);
 void *ResultMenu_Open(void *a, void *b)
 {
-    void *obj;
-    obj = Task_Create(11, 0x7F4);
-    if (obj != 0) {
-        Task_SetCallbacks(obj, ResultMenu_Update, ResultMenu_OnTaskExit);
-        if (ResultMenu_Initialize(obj, a, b) < 0) {
-            Task_Kill(obj);
+    struct ResultMenu *menu = Task_Create(11, sizeof(*menu));
+    if (menu != 0) {
+        Task_SetCallbacks(menu, ResultMenu_Update, ResultMenu_OnTaskExit);
+        if (ResultMenu_Initialize(menu, a, b) < 0) {
+            Task_Kill(menu);
             return 0;
         }
     }
-    return obj;
+    return menu;
 }
