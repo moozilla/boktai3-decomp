@@ -10,10 +10,7 @@ void Vanargand_UpdateTargetFlagTransition(struct VanargandPairAttack *p)
         u32 mask = 0x1000;
         u32 flags = player->statusFlags & mask;
         if (!flags) {
-            u32 phase = 13;
-            p->actionPhase = phase;
-            p->actionTimer = flags;
-            p->entered = 1;
+            Vanargand_EnterActionPhase(p, 13);
             return;
         } else {
             Vanargand_EnterActionPhase(p, 17);
