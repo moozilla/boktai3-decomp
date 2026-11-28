@@ -1,7 +1,8 @@
 #include "global.h"
+#include "bosses/vanargand/vanargand_pair_attack.h"
 
-void Vanargand_AdvanceEffectStageThree(u8 *p)
+void Vanargand_AdvanceEffectStageThree(struct VanargandActionSequence *sequence)
 {
-    if (p[0x15] == 3)
-        p[0x15] = 4;
+    if (sequence->step == 3)
+        sequence->step = 4;
 }

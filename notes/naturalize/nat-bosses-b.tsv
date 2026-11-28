@@ -298,3 +298,4 @@ src/bosses/vanargand/positioned_effect.c	PositionedEffect_UpdateOscillatingCoord
 src/bosses/vanargand/Vanargand_UpdatePaletteTransition.c	Vanargand_UpdatePaletteTransition	near-natural	natural	6	source/target locals and the variant temporary kept: removing them changes argument evaluation order
 src/bosses/vanargand/Vanargand_StartActionSequence.c	Vanargand_StartActionSequence	contrived	natural	1	
 src/bosses/vanargand/Vanargand_AdvanceEffectStageOne.c	Vanargand_AdvanceEffectStageOne	contrived	natural	1	
+src/bosses/vanargand/Vanargand_AdvanceEffectStageThree.c	Vanargand_AdvanceEffectStageThree	contrived	natural	1	
