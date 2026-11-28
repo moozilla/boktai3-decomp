@@ -201,3 +201,5 @@ src/effects/bursts/spiral_burst/SpiralBurst_InitParticles.c	SpiralBurst_InitPart
 src/effects/bursts/spiral_burst/SpiralBurst_UpdateParticles.c	SpiralBurst_UpdateParticles	contrived	contrived	0	unchanged: indexed rewrite keeps a different flag address and loop pointers than the byte offset form
 src/effects/directional_effect/DirectionalEffect_Update.c	DirectionalEffect_Update	contrived	natural	1	-
 src/effects/directional_effect/Player_OnDirectionalEffectAnimationEvent.c	Player_OnDirectionalEffectAnimationEvent	contrived	natural	1	-
+src/effects/directional_effect/DirectionalEffect_DecodeAnimationMode.c	DirectionalEffect_DecodeAnimationMode	natural	natural	0	-
+src/effects/directional_effect/Player_ShowDirectionalEffect.c	Player_ShowDirectionalEffect	contrived	natural	2	-
