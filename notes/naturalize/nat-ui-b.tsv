@@ -65,3 +65,4 @@ src/ui/results/challenge_menu.c	ChallengeMenu_Destroy	contrived	natural	1
 src/ui/results/challenge_menu.c	ChallengeMenu_InitBackgrounds	contrived	natural	1	
 src/ui/results/challenge_menu.c	ChallengeMenu_LoadPalette	minor	natural	1	
 src/ui/results/time_result.c	TimeResult_HandleInput	minor	natural	2	
+src/ui/results/time_result.c	TimeResult_UpdateDigitReveal	contrived	minor	22	graphics, table and digit pointers: invariant addresses must be allocated in this order

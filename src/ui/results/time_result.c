@@ -1,4 +1,5 @@
 #include "ui/results/challenge_result.h"
+#include "engine/math/monster_particle_random.h"
 
 void TimeResult_SetState(struct ChallengeTimeResult *result,
                          void (*v)(struct ChallengeTimeResult *))
@@ -63,26 +64,20 @@ void TimeResult_UpdateResultHold(struct ChallengeTimeResult *result)
 
 void TimeResult_UpdateDigitReveal(struct ChallengeTimeResult *result)
 {
-    s32 *counter = &result->timer;
-    if (++*counter > 0x3c || (gPadState[1] & 1) != 0) {
+    if (++result->timer > 0x3c || (gPadState[1] & 1) != 0) {
         Sound_PlaySong(0x167);
         TimeResult_SetElapsedDigits(result);
         TimeResult_SetState(result, TimeResult_UpdateResultHold);
     } else {
-        struct AnimSpriteResource *resource = &result->digitGraphics;
+        struct AnimSpriteResource *graphics = &result->digitGraphics;
         const u16 *table = gRandomTable;
         struct AnimSprite *digit = result->digits;
         s32 i;
         for (i = 0; i < 6; i++) {
-            s32 r;
-            gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-            do {
-                r = table[gRandomIndex];
-            } while (0);
-            TimeResult_LoadDigit(digit, resource, sub_08249350(r >> 4, 10));
+            s32 value = ParticleRandom_ReadSample(table);
+            TimeResult_LoadDigit(digit, graphics, sub_08249350(value >> 4, 10));
             digit++;
         }
-
         if (result->timer & 1) {
             Sound_PlaySong(0x273);
         }
