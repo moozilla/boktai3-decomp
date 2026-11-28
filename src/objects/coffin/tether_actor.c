@@ -971,48 +971,19 @@ void TetherActor_SelectInteractionState(struct TetherActor *actor)
         TetherActor_SetState(gTetherActor, 4);
 }
 
-void TetherActor_BeginAuxiliaryState(struct TetherActor *input)
+void TetherActor_BeginAuxiliaryState(struct TetherActor *actor)
 {
-    struct TetherActor *actor = input;
     struct ContactPosition *position;
-    s32 x, z;
     s32 cell;
-    u8 *properties;
-    u32 surface, height;
     actor->auxiliaryOrigin = actor->position;
     actor->auxiliaryOrigin.y += 384;
     TetherActor_CreateAuxiliarySprite(actor);
     actor->auxiliarySprite.position = actor->position;
     position = &actor->auxiliarySprite.position;
-    x = position->x >> 8;
-    z = position->z >> 8;
     do {
-        if ((((x < 0) || (z < 0)) || (((u32)x) >= gTerrainWidth)) || (((u32)z) >= gTerrainHeight)) {
-            cell = 0;
-        } else {
-            u32 row = gTerrainMap->rows[z];
-            cell = row + x;
-        }
+        cell = SceneActorTerrain_GetCellIndex(position);
     } while (0);
-    properties = TerrainModifiers_FindCellOverride(cell, 1);
-    if (properties) {
-        properties += 4;
-    } else {
-        struct EngineMap *map = gTerrainMap;
-        u32 offset = cell * 4 + 12;
-        properties = map->cells + offset;
-    }
-    surface = *properties >> 4;
-    height = (*properties & 15) << 8;
-    switch (surface) {
-        case 1:
-            height -= (u8)position->z;
-            break;
-        case 2:
-            height -= (u8)position->x;
-            break;
-    }
-    actor->auxiliarySprite.position.y = height;
+    actor->auxiliarySprite.position.y = SceneActorTerrain_GetHeight(cell, position);
     if (actor->auxiliaryRegistered) {
         SceneActorContacts_RemoveNode(actor->auxiliaryRegistration);
         actor->auxiliaryRegistered = 0;

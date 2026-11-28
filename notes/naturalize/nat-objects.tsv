@@ -68,3 +68,4 @@ src/objects/coffin/tether_actor.c	TetherActor_ApplyPendingEffect	natural	natural
 src/objects/coffin/tether_actor.c	TetherActor_UpdatePendingEffect	natural	natural	0	
 src/objects/coffin/tether_actor.c	TetherActor_SetCardinalEntry	contrived	contrived	8	saved/second flag pointers and bare block: ROM keeps &flags[1] in its own register
 src/objects/coffin/tether_actor.c	TetherActor_RemoveStatusFlags	contrived	natural	1	
+src/objects/coffin/tether_actor.c	TetherActor_BeginAuxiliaryState	contrived	minor	12	do-while(0) around cell index stays: without it the constant 0 cell pseudo outranks actor in global alloc (r4/r5 swap)
