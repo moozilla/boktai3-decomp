@@ -18,154 +18,148 @@ s32 Player_SpawnSelectedAttackProjectile(void *);
 void Projectile_SetEntryDirection(s32, s32);
 void ActorSequence_Begin(void *, s32, s32);
 s32 Player_GetAttackEffectType(u32);
-#define BYTE(o)    (*(u8 *)(p + (o)))
-#define HALF(o)    (*(u16 *)(p + (o)))
-#define HELD       (**(u16 **)(p + 0x348) & 2)
-#define PRESSED    ((*(u16 **)(p + 0x348))[1] & 2)
-#define ANIMATE(n) Player_SetAnimation(p, ActorVariant_GetTableValue(BYTE(0x418), n), 64, 1)
-
 void Player_OnChargedAttackExit(void *);
 void Player_SetPendingCallback(void *, void (*)(void *));
 s32 ProjectileTask_GetKind7Value(s32);
 void Player_UpdateAttachedEntryPosition(void *);
 // confidence=low: attached task charge values choose tiers before recoil and buffered restart.
-void Player_UpdateAttachedChargeTiers(u8 *p)
+void Player_UpdateAttachedChargeTiers(struct Player *p)
 {
     struct ContactPackedVector origin;
     struct ContactPackedVector spread;
-    u16 *t;
-    u16 *r;
     if (Player_ConsumeStateEntry(p)) {
-        ((struct Player *)p)->statModifierContext.contactTimer = 0;
-        ((struct Player *)p)->statModifierContext.attachedEntry = -1;
+        p->statModifierContext.contactTimer = 0;
+        p->statModifierContext.attachedEntry = -1;
         Player_SetPendingCallback(p, Player_OnChargedAttackExit);
     }
-    switch (BYTE(0x458)) {
+    switch (p->tetherPhase) {
         case 0:
-            if (ANIMATE(0x23)) {
-                BYTE(0x53A) = 0;
+            if (Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0x23), 64, 1)) {
+                p->contactCounted = 0;
                 Player_SetActionPhase(p, 1);
             }
             break;
         case 1:
-            t = (u16 *)(p + 0x45A);
-            if (!*t)
+            if (!p->tetherFrame)
                 Sound_PlaySong(0x1F7);
-            if (HELD) {
+            if (p->inputKeys[0] & 2) {
                 Player_UpdateAttackFacing(p);
-                ANIMATE(0x24);
+                Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0x24), 64, 1);
             }
-            if (++*t > 6) {
-                s32 cost = Player_GetSpecialAttackDescriptor(BYTE(0xBF4))[2];
-                BYTE(0xC0F) = 0;
-                HALF(0x4D2) = 0;
+            if (++p->tetherFrame > 6) {
+                s32 cost = Player_GetSpecialAttackDescriptor(p->statModifierContext.actionKind)[2];
+                p->statModifierContext.chargeTier = 0;
+                p->contactMagnitude = 0;
                 cost = ActorResponse_Apply(p, cost);
-                if (HALF(0x428) < cost) {
+                if (p->currentStatB < cost) {
                     Sound_PlaySong(0xD5);
-                    goto entryRelease;
-                }
-                HALF(0xC12) = 15;
-                if (!Player_SpawnSelectedAttackProjectile(p)) {
-                entryRelease:
                     Player_SetActionPhase(p, 5);
-                } else
+                    break;
+                }
+                p->statModifierContext.chargeElapsed = 15;
+                if (!Player_SpawnSelectedAttackProjectile(p))
+                    Player_SetActionPhase(p, 5);
+                else
                     Player_SetActionPhase(p, 2);
             }
             break;
         case 2:
-            HALF(0xC12)++;
-            if (++HALF(0x45A) == 6)
+            p->statModifierContext.chargeElapsed++;
+            if (++p->tetherFrame == 6)
                 Sound_PlaySong(0x1F8);
-            if (!HELD)
-                goto updateRelease;
+            if (!(p->inputKeys[0] & 2)) {
+                Player_SetActionPhase(p, 5);
+                Player_UpdateAttachedEntryPosition(p);
+                break;
+            }
             Player_UpdateAttackFacing(p);
-            ANIMATE(0x24);
-            if (ProjectileTask_GetKind7Value(*(s32 *)(p + 0xC74)) > 1) {
-                HALF(0x4D2) = 30;
-                ((struct Player *)p)->actionEighteenParameter = 0x16E;
-                HALF(0xAD8) = 36;
+            Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0x24), 64, 1);
+            if (ProjectileTask_GetKind7Value(p->statModifierContext.attachedEntry) > 1) {
+                p->contactMagnitude = 30;
+                p->actionEighteenParameter = 0x16E;
+                p->actionEighteenDuration = 36;
                 Player_SetActionPhase(p, 3);
             }
-            goto attached;
+            Player_UpdateAttachedEntryPosition(p);
+            break;
         case 3:
-            HALF(0xC12)++;
-            if (!HELD)
-                goto updateRelease;
+            p->statModifierContext.chargeElapsed++;
+            if (!(p->inputKeys[0] & 2)) {
+                Player_SetActionPhase(p, 5);
+                Player_UpdateAttachedEntryPosition(p);
+                break;
+            }
             Player_UpdateAttackFacing(p);
-            ANIMATE(0x24);
-            if (ProjectileTask_GetKind7Value(*(s32 *)(p + 0xC74)) > 2) {
-                HALF(0x4D2) = 60;
-                ((struct Player *)p)->actionEighteenParameter = 0x16E;
-                HALF(0xAD8) = 36;
+            Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0x24), 64, 1);
+            if (ProjectileTask_GetKind7Value(p->statModifierContext.attachedEntry) > 2) {
+                p->contactMagnitude = 60;
+                p->actionEighteenParameter = 0x16E;
+                p->actionEighteenDuration = 36;
                 Sound_PlaySong(0x1F9);
                 Player_SetActionPhase(p, 4);
             }
-            goto attached;
+            Player_UpdateAttachedEntryPosition(p);
+            break;
         case 4:
-            HALF(0xC12)++;
-            if (!HELD) {
-            updateRelease:
+            p->statModifierContext.chargeElapsed++;
+            if (!(p->inputKeys[0] & 2)) {
                 Player_SetActionPhase(p, 5);
             } else {
                 Player_UpdateAttackFacing(p);
-                ANIMATE(0x24);
+                Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0x24), 64, 1);
             }
-        attached:
             Player_UpdateAttachedEntryPosition(p);
             break;
         case 5:
-            if (!HALF(0x45A)) {
+            if (!p->tetherFrame) {
                 Player_UpdateAttachedEntryPosition(p);
-                if (*(s32 *)(p + 0xC74) >= 0 && !Player_SpawnSelectedAttackProjectile(p))
+                if (p->statModifierContext.attachedEntry >= 0 &&
+                    !Player_SpawnSelectedAttackProjectile(p))
                     Player_SetActionPhase(p, 6);
-                HALF(0xC0A)++;
+                p->statModifierContext.contactTimer++;
             }
-            ANIMATE(0x25);
-            if (PRESSED)
-                BYTE(0xBF6) = 1;
-            r = (u16 *)(p + 0x4D2);
-            if (*r) {
+            Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0x25), 64, 1);
+            if (p->inputKeys[1] & 2)
+                p->statModifierContext.bufferedAttack = 1;
+            if (p->contactMagnitude) {
                 s32 ang, n;
-                if (*r > 5) {
+                if (p->contactMagnitude > 5) {
                     origin.x = 0;
                     origin.y = 0;
                     origin.z = 0;
                     spread.x = 32;
                     spread.y = 32;
                     spread.z = 32;
-                    SceneParticleBurst_CreateWhilePaused(p + 0x30, &origin, &spread, 1, 3, 4);
+                    SceneParticleBurst_CreateWhilePaused(&p->position, &origin, &spread, 1, 3, 4);
                 }
-                ang = ((BYTE(0x3A4) + 5) & 7) << 5;
-                n = *r;
-                *(s16 *)(p + 0x38) = -scale(gUnk_086149C4[(ang + 64) & 255] * n);
-                *(s16 *)(p + 0x3C) = -scale(HALF(0x4D2) * gUnk_086149C4[ang]);
-                HALF(0x4D2) = HALF(0x4D2) * 3 >> 2;
+                ang = ((p->facing + 5) & 7) << 5;
+                n = p->contactMagnitude;
+                p->velocityX = -scale(gUnk_086149C4[(ang + 64) & 255] * n);
+                p->velocityZ = -scale(p->contactMagnitude * gUnk_086149C4[ang]);
+                p->contactMagnitude = p->contactMagnitude * 3 >> 2;
             } else {
-                if (++HALF(0x45A) > 4)
+                if (++p->tetherFrame > 4)
                     Player_SetActionPhase(p, 6);
             }
             break;
-        case 6: {
-            u32 pending;
-            ANIMATE(0x24);
-            if (PRESSED)
-                BYTE(0xBF6) = 1;
-            pending = BYTE(0xBF6);
-            if (pending) {
-                *(s32 *)(p + 0xC74) = -1;
-                BYTE(0xBF6) = 0;
-                BYTE(0x458) = 1;
-            } else if (++((struct Player *)p)->tetherFrame > 14) {
-                BYTE(0xBF6) = 0;
+        case 6:
+            Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0x24), 64, 1);
+            if (p->inputKeys[1] & 2)
+                p->statModifierContext.bufferedAttack = 1;
+            if (p->statModifierContext.bufferedAttack) {
+                p->statModifierContext.attachedEntry = -1;
+                p->statModifierContext.bufferedAttack = 0;
+                p->tetherPhase = 1;
+            } else if (++p->tetherFrame > 14) {
+                p->statModifierContext.bufferedAttack = 0;
                 Player_SetActionPhase(p, 7);
             }
             break;
-        }
         case 7:
-            ANIMATE(0x23);
-            if (++HALF(0x45A) > 4)
+            Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0x23), 64, 1);
+            if (++p->tetherFrame > 4)
                 ActorSequence_Begin(p, 0, 0);
             break;
     }
-    BYTE(0xAC9) = Player_GetAttackEffectType(BYTE(0xC18));
+    p->actionVariant = Player_GetAttackEffectType(p->statModifierContext.statBOverrideMode);
 }
