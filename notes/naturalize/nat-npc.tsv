@@ -709,3 +709,5 @@ src/minigames/result_game/ResultMenu_Update.c	ResultMenu_Update	contrived	natura
 src/minigames/result_game/ResultMenu_ReadScript.c	ResultMenu_ReadScript	contrived	natural	8	camera pointer taken before the initial-position copy
 src/minigames/result_game/ResultMenu_Initialize.c	ResultMenu_Initialize	contrived	natural	3	
 src/minigames/result_game/ResultMenu_Open.c	ResultMenu_Open	minor	natural	2	
+src/minigames/result_game/ResultMenu_OnTaskExit.c	ResultMenu_OnTaskExit	natural	natural	0	
+src/minigames/result_game/result_tutorial.c	ResultTutorial_BlinkPlayer	contrived	natural	8	

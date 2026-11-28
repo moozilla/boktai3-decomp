@@ -116,8 +116,7 @@ int ResultTutorial_SlideMarkerIn(struct ResultMenu *tutorial)
 
 int ResultTutorial_BlinkPlayer(struct ResultMenu *tutorial)
 {
-    int state = tutorial->phase;
-    switch (state) {
+    switch (tutorial->phase) {
         case 0:
             tutorial->phase = 1;
             tutorial->timer = 0;
@@ -127,21 +126,16 @@ int ResultTutorial_BlinkPlayer(struct ResultMenu *tutorial)
             int visible;
             if (frame == 0)
                 Sound_PlaySong(0x2b0);
-            visible = 1;
             if (frame <= 19)
-                goto show;
-            if (frame <= 29)
+                visible = 1;
+            else if (frame <= 29)
                 visible = 0;
+            else
+                visible = 1;
             if (visible)
-            show: {
-                struct AnimSprite *playerWidget = &tutorial->widgets[4];
-                playerWidget->flags &= ~1;
-            }
-                else
-                {
-                    struct AnimSprite *playerWidget = &tutorial->widgets[4];
-                    playerWidget->flags |= state;
-                }
+                AnimSprite_Show(&tutorial->widgets[4]);
+            else
+                AnimSprite_Hide(&tutorial->widgets[4]);
             if ((tutorial->timer >> 5) > 2)
                 return 1;
             ++tutorial->timer;
