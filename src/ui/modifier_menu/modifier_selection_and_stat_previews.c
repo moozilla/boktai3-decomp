@@ -393,16 +393,14 @@ s32 ModifierMenu_CommitFourthSource(struct ModifierMenu *menu)
     return 0;
 }
 
-struct ModifierMenu *ModifierMenu_CommitSelection(struct ModifierMenu *menu)
+s32 ModifierMenu_CommitSelection(struct ModifierMenu *menu)
 {
-    struct ModifierMenu *base = menu;
-    struct ModifierSelection *pending;
-    struct ModifierSelection *current;
-    pending = &base->pending;
-    current = &base->current;
+    struct ModifierSelection *pending = &menu->pending;
+    struct ModifierSelection *current = &menu->current;
     current->selectedId = pending->selectedId;
     current->count = pending->count;
     current->mask = pending->mask;
+    /* No return statement; the caller ignores the result. */
 }
 
 s32 ModifierMenu_ToggleSelection(struct ModifierMenu *menu)
