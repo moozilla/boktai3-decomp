@@ -1,32 +1,24 @@
 #include "global.h"
 #include "engine/ram.h"
+#include "objects/hazards/fading_particle_group.h"
 void *AnimData_FindEntry(int);
-void *ScriptProc_Start(int, int);
-void Effect_Initialize(void *, void *, int);
-void Anim_SetSequence(void *, void *, int, int, int);
-int FadingParticleManager_Initialize(u8 *m)
+void Effect_Initialize(void *, const void *, int);
+s32 FadingParticleManager_Initialize(struct FadingParticleManager *manager)
 {
-    int i;
-    int clear;
-    gFadingParticleManager = m;
-    *(void **)(m + 28) = AnimData_FindEntry(0x1c1a);
-    *(void **)(m + 32) = ScriptProc_Start(0x922e, 0xd1b8);
-    i = 0;
-    clear = 0;
-    do {
-        u8 *g = m + 36 + i * 548;
-        u8 *a, *s;
-        int j, next;
-        g[0] = clear;
-        next = i + 1;
-        a = g + 56;
-        s = g + 16;
-        for (j = 7; j >= 0; a += 68, s += 68, j--) {
-            Effect_Initialize(s, *(void **)(m + 28), 0);
-            Anim_SetSequence(a, *(void **)(m + 32), 3, 0, clear);
+    s32 i, j;
+
+    gFadingParticleManager = manager;
+    manager->graphics = AnimData_FindEntry(0x1c1a);
+    manager->animations = ScriptProc_Start(0x922e, 0xd1b8);
+    for (i = 0; i < 6; i++) {
+        struct FadingParticleGroup *group = &manager->groups[i];
+        group->active = 0;
+        for (j = 0; j < 8; j++) {
+            struct FadingParticle *particle = &group->particles[j];
+            Effect_Initialize(&particle->motion.sprite, (void *)manager->graphics, 0);
+            Anim_SetSequence(&particle->motion.anim, manager->animations, 3, 0, 0);
         }
-        i = next;
-    } while (i <= 5);
-    *(u32 *)(m + 24) = 0;
+    }
+    manager->frame = 0;
     return 0;
 }
