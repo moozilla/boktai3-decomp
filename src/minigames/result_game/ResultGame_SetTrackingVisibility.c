@@ -1,9 +1,10 @@
-#include "global.h"
-void ResultGame_SetTrackingVisibility(u8 *p)
+#include "minigames/result_game/result_tutorial.h"
+
+void ResultGame_SetTrackingVisibility(struct ResultMenu *menu)
 {
-    u32 *field;
-    field = (u32 *)(p + 0x324);
-    field[2] &= ~1;
-    field = (u32 *)(p + 0x5C4);
-    field[2] |= 1;
+    struct AnimSprite *sprite;
+    sprite = &menu->widgets[5];
+    sprite->flags &= ~1;
+    sprite = &menu->widgets[12];
+    sprite->flags |= 1;
 }
