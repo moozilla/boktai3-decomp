@@ -99,3 +99,4 @@ src/link/panel/LinkPanelSlots_InitBackgroundResources.c	LinkPanelSlots_InitBackg
 src/link/panel/SlotMenu_CreateTextWindows.c	SlotMenu_CreateTextWindows	minor	natural	1	
 src/link/panel/sub_0810BF60.c	sub_0810BF60	contrived	natural	1	
 src/link/panel/SlotMenu_InitializeEntryValues.c	SlotMenu_InitializeEntryValues	minor	natural	1	
+src/link/panel/SceneMenu_InitializeDisplay.c	SceneMenu_InitializeDisplay	minor	natural	1	
