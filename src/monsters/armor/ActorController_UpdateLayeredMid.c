@@ -9,7 +9,7 @@ void ActorController_UpdateLayeredMid(struct SceneCombatActor *actor)
     u8 *s = &actor->actionPhase;
     u8 st = *s;
     switch (st) {
-        case 0: {
+        case 0:
             Armor_SetAnimationFromStart(
                 actor, &gActorLayeredMidAnimations[((actor->heading + 0x60) >> 6) & 3]);
             (*s)++;
@@ -29,7 +29,6 @@ void ActorController_UpdateLayeredMid(struct SceneCombatActor *actor)
             *(u16 *)(s - 14) &= ~0x20;
             Sound_PlaySongChecked(0xc2);
             break;
-        }
         case 1:
             if (actor->animationComplete) {
                 *s = 0xff;
