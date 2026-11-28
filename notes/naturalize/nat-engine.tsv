@@ -249,3 +249,4 @@ src/engine/video/background_layers.c	Bg_CopyTilemapRectangle	minor	natural	3
 src/engine/video/background_layers.c	BgGfx_FindEntryById	natural	natural		
 src/engine/video/background_layers.c	Bg_SetTilemapEntry	natural	natural		
 src/engine/video/background_layers.c	Bg_UploadTileEntries	contrived	natural	9	
+src/engine/video/background_layers.c	Bg_CopyTiles	minor	natural	9	

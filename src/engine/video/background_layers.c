@@ -276,11 +276,8 @@ s32 Bg_CopyTiles(struct BgTileResource *res, u32 id, u8 *dst, s32 start, u32 cou
     off = 0;
     p = (u16 *)(ent->offset + hdr.tileIndices);
     p += start;
-    for (i = 0; i < count; i++) {
+    for (i = 0; i < count; p++, off += 0x20, i++)
         CpuSet((u8 *)hdr.tiles + (*p << 5), dst + off, 0x04000008);
-        p++;
-        off += 0x20;
-    }
     return 0;
 }
 
