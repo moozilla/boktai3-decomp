@@ -496,3 +496,4 @@ src/system/game_state/SolarFruit_GetInventorySlot.c	SolarFruit_GetInventorySlot	
 src/system/game_state/GameState_MoveSlotEntry.c	GameState_MoveSlotEntry	contrived	natural	1	
 src/system/game_state/SolarFruit_ClearEquippedSlot.c	SolarFruit_ClearEquippedSlot	contrived	natural	1	
 src/system/game_state/sub_0822EB14.c	sub_0822EB14	contrived	natural	1	
+src/system/game_state/SolarFruit_Command.c	SolarFruit_Command	contrived	natural	1	
