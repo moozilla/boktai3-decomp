@@ -364,3 +364,4 @@ src/player/cutscene/player_script_stats.c	Player_SetSlotValueFromScript	natural	
 src/player/cutscene/player_script_stats.c	ScriptActor_ClearSlotFromScript	natural	natural	0	-
 src/player/cutscene/player_script_stats.c	ScriptActor_ClearSlotsFromScript	minor	natural	1	-
 src/player/cutscene/player_script_stats.c	ScriptActor_TestTimedEventCounter	contrived	natural	8	-
+src/player/cutscene/player_script_stats.c	ScriptActor_ClearTimedEventCounter	contrived	natural	2	-

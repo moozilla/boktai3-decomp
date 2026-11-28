@@ -302,8 +302,6 @@ void ScriptActor_ClearTimedEventCounter(void)
     s32 actorIndex = Script_GetActorIndex();
     player = gPlayers[actorIndex];
     if (player) {
-        u32 slot = player->timedEventSlot;
-        struct GameState *state = gGameState;
-        slot[state->counters628] = 0;
+        *(gGameState->counters628 + player->timedEventSlot) = 0;
     }
 }
