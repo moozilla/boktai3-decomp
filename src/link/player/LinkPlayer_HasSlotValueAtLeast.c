@@ -1,16 +1,19 @@
 #include "global.h"
+#include "player/player.h"
 #include "scene/areas/area_effect_link.h"
-u32 LinkPlayer_HasSlotValueAtLeast(u8 *s, s32 m)
+
+static inline u8 LinkPlayer_GetSlotValue(struct Player *p)
 {
-    s32 i = *(s32 *)(s + 0x18);
-    s32 r;
-    if (((u8 *)gLinkSession) == 0 || i < 0)
-        r = 0;
-    else {
-        u8 *q = ((u8 *)gLinkSession) + 0x5c;
-        r = q[i];
-    }
-    if (r < m)
+    s32 slot = p->slot;
+
+    if (gLinkSession == NULL || slot < 0)
+        return 0;
+    return gLinkSession->playerValues[slot];
+}
+
+u32 LinkPlayer_HasSlotValueAtLeast(struct Player *p, s32 minimum)
+{
+    if (LinkPlayer_GetSlotValue(p) < minimum)
         return 0;
     return 1;
 }
