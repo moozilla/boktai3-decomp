@@ -1,4 +1,3 @@
-#define LinkSelection_SwapPages LinkSession_ToggleConnectionRole
 #include "global.h"
 #include "scene/areas/area_effect_link.h"
 #include "system/game_state/game_state.h"
@@ -21,13 +20,8 @@ void LinkSelection_AdvanceBitExchange(struct AreaEffectLinkState *p, u32 flags, 
         LinkSession_UpdatePlayerValueAverage(p);
         p->sendBit = 0;
         p->receiveBits = (u16)gGameState->unk874 >> 2;
-        i = 0;
-        if (i < p->participantCount) {
-            do {
-                p->selectionBits[i + p->selectionPage * 4] = 0;
-                i++;
-            } while (i < p->participantCount);
-        }
+        for (i = 0; i < p->participantCount; i++)
+            p->selectionBits[i + p->selectionPage * 4] = 0;
     }
     if (gLinkSession && gLinkSession->localPlayer == 0 && p->receiveBit == 5)
         *value |= 8;

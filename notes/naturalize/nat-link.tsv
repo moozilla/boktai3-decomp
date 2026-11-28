@@ -360,3 +360,5 @@ src/link/selection/LinkSelection_WaitForEmptySlots.c	LinkSelection_WaitForEmptyS
 src/link/selection/SceneSelection_WaitForSlotTransition.c	SceneSelection_WaitForSlotTransition	contrived	minor	7	mask local and guarded do-while stay: a for loop reorders the mask load
 src/link/selection/LinkSession_OnStageIconComplete.c	LinkSession_OnStageIconComplete	natural	natural	0	
 src/link/selection/SessionMenu_CreateStageIconDisplay.c	SessionMenu_CreateStageIconDisplay	contrived	natural	1	
+src/link/selection/LinkSelection_RecordSlotState.c	LinkSelection_RecordSlotState	natural	natural	0	
+src/link/selection/LinkSelection_AdvanceBitExchange.c	LinkSelection_AdvanceBitExchange	minor	natural	1	
