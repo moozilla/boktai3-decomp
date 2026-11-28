@@ -151,3 +151,5 @@ src/effects/bursts/fragment_effect/FragmentEffect_InitManager.c	FragmentEffect_I
 src/effects/bursts/fragment_effect/FragmentEffect_GetOrCreateManager.c	FragmentEffect_GetOrCreateManager	minor	natural	1	-
 src/effects/bursts/fragment_effect/FragmentEffect_GrowToFullSize.c	FragmentEffect_GrowToFullSize	minor	natural	1	-
 src/effects/bursts/fragment_effect/FragmentEffect_UpdateOrbit.c	FragmentEffect_UpdateOrbit	contrived	minor	25	random byte read through the table's constant address (reload picks another register otherwise)
+src/effects/bursts/fragment_effect/FragmentEffect_ShrinkAndRemove.c	FragmentEffect_Create	contrived	natural	6	sprite pointer alias kept: ROM copies the fragment pointer for sprite accesses
+src/effects/bursts/fragment_effect/FragmentEffect_ShrinkAndRemove.c	FragmentEffect_ShrinkAndRemove	minor	natural	1	-

@@ -1,127 +1,83 @@
-#include "scene/collision/contact_swarm.h"
-#include "engine/ram.h"
+#include "effects/bursts/fragment_effect.h"
 #include "player/cutscene/player_cue_sequence.h"
-#include "effects/bursts/fragment_effect_sprite_layout.h"
-#include "effects/bursts/spiral_burst.h"
-struct Fragment {
-    u32 flags;
-    u8 active, unk_05[2], priority;
-    s8 scaleX, scaleY;
-    u8 unk_0A[2];
-    void *graphics;
-    u16 frame;
-    u8 unk_12[10];
-    struct ContactPosition position;
-    u8 unk_24[8];
-    struct DisplaySequenceState sequence;
-    u8 collider[0x54];
-    struct ContactPosition center, offset;
-    u32 angle, angularSpeed;
-    s16 direction;
-    u16 unk_AA;
-    s16 radius, scaleTimer;
-    void *resource;
-    s32 lifetime;
-    u16 unk_B8;
-    u8 state;
-    s8 slot;
-    u16 timer;
-    u8 entered;
-};
-struct Pool {
-    u8 unk_00[0x18];
-    u8 graphics[0x20];
-    u32 used;
-};
+
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
 void FragmentEffect_SpawnRandomParticle(struct ContactPosition *);
-void Sprite_Remove(void *);
-static inline void FragmentEffect_StepAnimation(struct Fragment *sprite, u32 initializing)
-{
-    PlayerCue_StepSequence(sprite, &sprite->sequence);
-}
+
 // Tentative: shrink the fragment, then release its sprite and pool slot.
-void FragmentEffect_ShrinkAndRemove(struct Pool *pool, struct Fragment *p)
+void FragmentEffect_ShrinkAndRemove(struct FragmentEffectPool *pool, struct Fragment *fragment)
 {
-    if (p->entered) {
-        p->flags = (p->flags & ~1) | 2;
-        p->scaleTimer = 20;
-        p->timer = 0;
-        p->entered = 0;
-        p->scaleX = 64;
-        p->scaleY = 64;
-        p->timer = 0;
+    if (fragment->entered) {
+        fragment->sprite.flags = (fragment->sprite.flags & ~1) | 2;
+        fragment->scaleTimer = 20;
+        fragment->timer = 0;
+        fragment->entered = 0;
+        fragment->sprite.scaleX = 64;
+        fragment->sprite.scaleY = 64;
+        fragment->timer = 0;
     }
-    if (!Mod(p->timer, 6))
-        FragmentEffect_SpawnRandomParticle(&p->position);
-    if (p->scaleTimer > 0) {
-        p->scaleX += Div(1 - p->scaleX, p->scaleTimer);
-        p->scaleY += Div(1 - p->scaleY, p->scaleTimer);
-        p->scaleTimer--;
+    if (!Mod(fragment->timer, 6))
+        FragmentEffect_SpawnRandomParticle(&fragment->sprite.position);
+    if (fragment->scaleTimer > 0) {
+        fragment->sprite.scaleX += Div(1 - fragment->sprite.scaleX, fragment->scaleTimer);
+        fragment->sprite.scaleY += Div(1 - fragment->sprite.scaleY, fragment->scaleTimer);
+        fragment->scaleTimer--;
     }
-    FragmentEffect_StepAnimation(p, 0);
-    if (p->scaleTimer <= 0) {
-        Sprite_Remove(p);
-        pool->used &= ~(1 << p->slot);
-        p->slot = -1;
-        p->state = 0;
-        p->entered = 0;
+    PlayerCue_StepSequence((struct ContactSwarmSprite *)&fragment->sprite, &fragment->sequence);
+    if (fragment->scaleTimer <= 0) {
+        Sprite_Remove(&fragment->sprite);
+        pool->occupied &= ~(1 << fragment->slot);
+        fragment->slot = -1;
+        fragment->state = 0;
+        fragment->entered = 0;
     } else {
-        p->timer++;
+        fragment->timer++;
     }
 }
-struct Pool *FragmentEffect_GetOrCreateManager(void);
-struct Fragment *sub_0812C3D0(struct Pool *);
+
+struct FragmentEffectPool *FragmentEffect_GetOrCreateManager(void);
+struct Fragment *sub_0812C3D0(struct FragmentEffectPool *);
 void FragmentEffect_InitCollider(struct Fragment *, u32, u32, u32, u32, u32, u32, u32);
-extern const s16 gUnk_086149C4[];
-static inline void FragmentEffect_ComputeOffset(struct ContactPosition *out, u32 heading,
-                                                s32 radius)
-{
-    u32 angle = heading >> 12;
-    s32 scale = radius * 128;
-    out->x = SpiralBurst_ScaleOffset(scale * gUnk_086149C4[(angle + 64) & 255]);
-    out->y = 0;
-    out->z = SpiralBurst_ScaleOffset(scale * gUnk_086149C4[angle & 255]);
-}
+
 void FragmentEffect_Create(const struct ContactPosition *position, u32 angle, u32 angularSpeed,
                            s32 radius, s32 direction, s32 lifetime, u32 a, u32 b, u32 c, u32 d)
 {
-    struct Pool *pool = (struct Pool *)gFragmentEffectManager;
-    struct Fragment *p;
+    struct FragmentEffectPool *pool = (struct FragmentEffectPool *)gFragmentEffectManager;
+    struct Fragment *fragment;
     struct FragmentEffectSprite *sprite;
     struct ContactPosition offset;
+    u32 heading;
+
     if (!pool) {
         pool = FragmentEffect_GetOrCreateManager();
         if (!pool)
             return;
     }
-    p = sub_0812C3D0(pool);
-    if (!p)
+    fragment = sub_0812C3D0(pool);
+    if (!fragment)
         return;
-    p->state = 1;
-    p->lifetime = lifetime;
-    p->unk_B8 = 0;
-    p->angle = angle << 12;
-    p->angularSpeed = angularSpeed;
-    p->radius = radius;
-    p->direction = direction;
-    p->entered = 1;
-    p->center = *position;
-    sprite = (struct FragmentEffectSprite *)p;
-    sprite->position = p->center;
-    {
-        u32 heading = p->angle;
-        FragmentEffect_ComputeOffset(&offset, heading, p->radius);
-    }
+    fragment->state = 1;
+    fragment->lifetime = lifetime;
+    fragment->unk_B8 = 0;
+    fragment->angle = angle << 12;
+    fragment->angularSpeed = angularSpeed;
+    fragment->radius = radius;
+    fragment->direction = direction;
+    fragment->entered = 1;
+    fragment->center = *position;
+    sprite = &fragment->sprite;
+    sprite->position = fragment->center;
+    heading = fragment->angle;
+    FragmentEffect_ComputeOffset(&offset, heading, fragment->radius);
     sprite->position.x += offset.x;
     sprite->position.z += offset.z;
-    p->resource = ScriptProc_Start(0x922e, 0x121b);
+    fragment->sequenceResource = ScriptProc_Start(0x922e, 0x121b);
     Sprite_Init(sprite, pool->graphics, 0);
-    Anim_SetSequence(&p->sequence, p->resource, 7, 0, 0);
+    Anim_SetSequence(&fragment->sequence, fragment->sequenceResource, 7, 0, 0);
     AnimData_SelectPaletteBank(sprite->graphics, 0x127);
-    FragmentEffect_StepAnimation(p, 1);
+    PlayerCue_StepSequence((struct ContactSwarmSprite *)&fragment->sprite, &fragment->sequence);
     sprite->priority = 2;
     sprite->flags &= ~1;
-    FragmentEffect_InitCollider(p, a, b, c, d, 0, 0, 0);
+    FragmentEffect_InitCollider(fragment, a, b, c, d, 0, 0, 0);
 }
