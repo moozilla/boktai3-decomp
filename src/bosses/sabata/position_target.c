@@ -11,21 +11,12 @@ s32 ActorMovement_CanReachTarget(struct SabataActorState *actor)
 {
     s32 targetCell, actorCell;
     struct ContactPosition *position;
-    u32 raw;
-    s32 x, z;
-    raw = (u16)actor->selectedPoint->x;
-    x = (s16)raw >> 8;
-    raw = (u16)actor->selectedPoint->z;
-    z = (s16)raw >> 8;
-    targetCell = SabataPosition_CellIndex(x, z);
+    targetCell =
+        SabataPosition_CellIndex(actor->selectedPoint->x >> 8, actor->selectedPoint->z >> 8);
     {
         struct ContactPosition *view = &actor->body.position;
-        u32 raw;
-        s32 x, z;
-        raw = (u16)view->x;
-        x = (s16)raw >> 8;
-        raw = (u16)view->z;
-        z = (s16)raw >> 8;
+        s32 x = view->x >> 8;
+        s32 z = view->z >> 8;
         position = view;
         actorCell = SabataPosition_CellIndex(x, z);
     }

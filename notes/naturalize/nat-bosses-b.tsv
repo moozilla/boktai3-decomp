@@ -186,3 +186,4 @@ src/bosses/sabata/impact.c	SceneActors_GetEffectiveTimeStep	natural	natural	0
 src/bosses/sabata/impact.c	ActorResource_ClampDecrease	natural	natural	0	minor: result assigned in two steps (one-expression form differs)
 src/bosses/sabata/position_search.c	ActorVariation_SelectRandomPair	machine-shaped	machine-shaped	3	raw table address and index temporaries stay: RANDOM_NEXT forms do not match
 src/bosses/sabata/position_search.c	ActorMovement_FindQuarterTurnPoint	machine-shaped	partial	8	kept coordinates/center pointers, mask and speed locals
+src/bosses/sabata/position_target.c	ActorMovement_CanReachTarget	machine-shaped	partial	5	kept view/position pointer pair
