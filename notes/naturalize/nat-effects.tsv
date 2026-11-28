@@ -120,3 +120,4 @@ src/effects/bursts/charged_burst/ChargedBurst_EmitTerminalDebris.c	ChargedBurst_
 src/effects/bursts/charged_burst/ChargedBurst_OnTaskUpdate.c	ChargedBurst_OnTaskUpdate	contrived	natural	1	-
 src/effects/bursts/charged_burst/ChargedBurst_OnTaskDestroy.c	ChargedBurst_OnTaskDestroy	contrived	natural	1	-
 src/effects/bursts/charged_burst/ChargedBurst_InitCollider.c	ChargedBurst_InitCollider	contrived	natural	3	-
+src/effects/bursts/charged_burst/ChargedBurst_InitCoreEffect.c	ChargedBurst_InitCoreEffect	contrived	natural	3	-
