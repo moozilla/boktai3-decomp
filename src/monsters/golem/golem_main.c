@@ -1887,47 +1887,44 @@ static inline u8 Golem_Drift(struct ChaseActor *actor)
 void Golem_ResumeBehaviorAfterDisplacement(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
-    if (!Golem_Drift(actor))
-        goto moving;
-    if (!actor->base.restart)
-        goto moving;
-    actor->base.stepDone = 1;
-    SceneActorChase_ClearMotionFlagComponent(actor, 0x20);
-    if (actor->base.hitReactionFlags & 0x80000) {
-        SceneActorChase_SetControl(actor, group->contactControl, 7);
-        SceneActorChase_SetState(actor, 3, 0, 0);
-        return;
-    }
-    if (SceneActorChase_MotionFlags(actor, 0x80)) {
-        actor->base.behaviorFlags |= 0x80;
-        SceneActorChase_SetFlagComponent((struct SceneActorChaseFlags16 *)&group->common.gate.flags,
-                                         4);
-        SceneActorChase_TrackPlayer(actor);
-        if (!Golem_Arrive(actor)) {
-            if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,
-                                          &actor->base.tracking.target->position)) {
-                Callback_InvokeActor(actor, group->fallback);
-                return;
-            }
+    if (Golem_Drift(actor) && actor->base.restart) {
+        actor->base.stepDone = 1;
+        SceneActorChase_ClearMotionFlagComponent(actor, 0x20);
+        if (actor->base.hitReactionFlags & 0x80000) {
+            SceneActorChase_SetControl(actor, group->contactControl, 7);
+            SceneActorChase_SetState(actor, 3, 0, 0);
+            return;
         }
-        SceneActorChase_SetControl(actor, group->common.gate.control, 0x1A);
-        SceneActorChase_SetState(actor, 0, 0, 12);
+        if (SceneActorChase_MotionFlags(actor, 0x80)) {
+            actor->base.behaviorFlags |= 0x80;
+            SceneActorChase_SetFlagComponent(
+                (struct SceneActorChaseFlags16 *)&group->common.gate.flags, 4);
+            SceneActorChase_TrackPlayer(actor);
+            if (!Golem_Arrive(actor)) {
+                if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,
+                                              &actor->base.tracking.target->position)) {
+                    Callback_InvokeActor(actor, group->fallback);
+                    return;
+                }
+            }
+            SceneActorChase_SetControl(actor, group->common.gate.control, 0x1A);
+            SceneActorChase_SetState(actor, 0, 0, 12);
+        } else {
+            SceneActorChase_TrackPlayer(actor);
+            SceneActorChase_SetActorFlags(actor, 0x90);
+            group->destination->pad = 0;
+            if (!Golem_Arrive(actor)) {
+                if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,
+                                              &actor->base.tracking.target->position)) {
+                    Callback_InvokeActor(actor, group->fallback);
+                    return;
+                }
+            }
+            SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
+            SceneActorChase_SetState(actor, 0, 0, 7);
+            actor->base.field2C2 = 0x20;
+        }
     } else {
-        SceneActorChase_TrackPlayer(actor);
-        SceneActorChase_SetActorFlags(actor, 0x90);
-        group->destination->pad = 0;
-        if (!Golem_Arrive(actor)) {
-            if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,
-                                          &actor->base.tracking.target->position)) {
-                Callback_InvokeActor(actor, group->fallback);
-                return;
-            }
-        }
-        SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
-        SceneActorChase_SetState(actor, 0, 0, 7);
-        actor->base.field2C2 = 0x20;
+        SceneActorChase_SetActorFlags(actor, 0x2000);
     }
-    return;
-moving:
-    SceneActorChase_SetActorFlags(actor, 0x2000);
 }
