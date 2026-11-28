@@ -301,3 +301,16 @@ src/engine/video/scanline_effect.c	ScanlineEffect_GetHorizontalScrollRegister	na
 src/engine/video/scanline_effect.c	ScanlineEffect_GetVerticalScrollRegister	natural	natural		
 src/engine/video/anim_sprite.c	AnimSprite_InitCleared	contrived	natural	2	
 src/engine/video/anim_sprite.c	AnimSprite_InitLinked	contrived	minor	4	negate-and-shift list flag
+src/engine/video/anim_sprite.c	Blend_SetAlpha	natural	natural		
+src/engine/video/anim_sprite.c	Blend_Disable	natural	natural		
+src/engine/video/anim_sprite.c	Anim_ResetDefaultFlags	natural	natural		
+src/engine/video/anim_sprite.c	Anim_Remove	natural	natural		
+src/engine/video/anim_sprite.c	Anim_RemoveAllInCurrentList	natural	natural		
+src/engine/video/anim_sprite.c	ResourceHeader_Relocate	natural	natural		
+src/engine/video/anim_sprite.c	Anim_FindGlyphEntryById	natural	natural		
+src/engine/video/anim_sprite.c	AnimSprite_SelectGlyph	natural	natural		
+src/engine/video/anim_sprite.c	AnimSprite_InitAtPosition	natural	natural		
+src/engine/video/anim_sprite.c	Anim_LoadKeyframe	natural	natural		
+src/engine/video/anim_sprite.c	Sprite_OnRenderPhase	natural	natural		
+src/engine/video/anim_sprite.c	Widget_CopyMasked	natural	natural		
+src/engine/video/anim_sprite.c	Anim_SelectPaletteBank	minor	minor	2	selected temp: reading the stored bank directly changes one load
