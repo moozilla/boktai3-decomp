@@ -569,3 +569,4 @@ src/ui/town/storage/Storage_RefreshConsumableSlots.c	Storage_RefreshConsumableSl
 src/ui/town/storage/Storage_RefreshEquipmentSlots.c	Storage_RefreshEquipmentSlots	contrived	contrived	2	byte-offset cell pointers and gotos (not reworked)
 src/ui/town/storage/Storage_BeginSwapTransition.c	Storage_BeginSwapTransition	contrived	minor	40	array base pointers set in the loop header; flags pointer for the consumable markers; slots pointer local
 src/ui/town/storage/Storage_BeginItemSpecialMove.c	Storage_BeginItemSpecialMove	contrived	minor	12	widget-run view for the flag write
+src/ui/town/storage/Storage_BeginEquipmentSpecialMove.c	Storage_BeginEquipmentSpecialMove	contrived	natural	12	

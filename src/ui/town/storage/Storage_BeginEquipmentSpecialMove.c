@@ -1,60 +1,31 @@
 #include "global.h"
 #include "ui/widgets/scene_input_grid.h"
+#include "ui/town/storage_screen.h"
 s32 Inventory_GetEquipmentId(u32);
 void Storage_GetSlotPosition(struct SceneInputPosition *, u32);
-struct StoragePanel {
-    u8 unknown0[0x1558];
-    struct SceneInputPair pair;
-    u8 unknown164C[0x1766 - 0x164C];
-    u8 selection;
-    u8 unknown1767[0x29];
-    u8 items[1];
-};
-struct StorageWidgetFlags {
-    u32 flags;
-    u8 unknown4[0x5c];
-};
-struct StorageFlagsView {
-    struct AnimSprite widgets[1];
-};
-void Storage_BeginEquipmentSpecialMove(struct StoragePanel *panel)
+void Storage_BeginEquipmentSpecialMove(struct StorageScreen *screen)
 {
-    struct SceneInputPosition starts[2], targets[2];
-    u32 enabled[2], frames[2], attributes[2];
-    struct StorageFlagsView *display = (void *)panel;
-    u32 savedAttribute;
-    struct SceneInputPosition *target;
+    struct SceneInputPosition starts[2];
+    struct SceneInputPosition targets[2];
+    u32 enabled[2];
+    u32 frames[2];
+    u32 attributes[2];
     enabled[0] = 1;
-    ((struct AnimSprite *)((u8 *)&display->widgets[panel->selection] + 0x318))->flags |= 1;
-    frames[0] = Inventory_GetEquipmentId(panel->items[panel->selection]) + 0xF0;
-    {
-        savedAttribute = 0x373;
-        attributes[0] = 0x373;
-    }
-    Storage_GetSlotPosition(starts, panel->selection);
-    target = targets;
-    Storage_GetSlotPosition(target, 32);
-    {
-        u32 *frameOut;
-        u32 placeholder;
-        u32 *attributeOut;
-        enabled[1] = 0;
-        placeholder = 0xF0;
-        frameOut = frames;
-        frameOut[1] = placeholder;
-        attributeOut = attributes;
-        attributeOut[1] = savedAttribute;
-        {
-            struct SceneInputPosition *start = starts;
-            start[1].x = 0;
-            start[1].y = 0;
-            start[1].z = 0;
-        }
-        target[1].x = 0;
-        target[1].y = 0;
-        target[1].z = 0;
-        SceneInput_BeginPairTransition(&panel->pair, enabled, starts, target, frameOut,
-                                       attributeOut, 12);
-    }
+    AnimSprite_Hide(&screen->firstSlots[screen->savedSelection]);
+    frames[0] = Inventory_GetEquipmentId(screen->slots[screen->savedSelection]) + 0xF0;
+    attributes[0] = 0x373;
+    Storage_GetSlotPosition(&starts[0], screen->savedSelection);
+    Storage_GetSlotPosition(&targets[0], 32);
+    enabled[1] = 0;
+    frames[1] = 0xF0;
+    attributes[1] = 0x373;
+    starts[1].x = 0;
+    starts[1].y = 0;
+    starts[1].z = 0;
+    targets[1].x = 0;
+    targets[1].y = 0;
+    targets[1].z = 0;
+    SceneInput_BeginPairTransition(&screen->markers, enabled, starts, targets, frames, attributes,
+                                   12);
     Sound_PlaySong(0x38A);
 }
