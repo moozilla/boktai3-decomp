@@ -1,7 +1,8 @@
-#include "global.h"
-void ResultMenu_SetPhase(u8 *p, u32 v)
+#include "minigames/result_game/result_tutorial.h"
+
+void ResultMenu_SetPhase(struct ResultMenu *menu, void (*update)(void))
 {
-    *(u32 *)(p + 0x3c) = 0;
-    p[0x38] = 1;
-    *(u32 *)(p + 0x7a4) = v;
+    menu->phaseFrame = 0;
+    menu->phaseStart = 1;
+    menu->update = update;
 }
