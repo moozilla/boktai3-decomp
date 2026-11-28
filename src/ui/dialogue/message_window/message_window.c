@@ -1,6 +1,7 @@
 #include "ui/dialogue/message_window.h"
 #include "engine/input.h"
 #include "engine/video/display_sequence_inline.h"
+#include "engine/video/display_sprite_playback.h"
 
 static inline s32 MessageWindow_GetCharacterDelay(void)
 {
@@ -14,10 +15,7 @@ static inline void MessageWindow_SetPlayback(struct MessageWindow *window, void 
 
 u32 MessageWindow_IsCreated(void)
 {
-    u32 x = (u32)gMessageWindow;
-    if (x != 0)
-        x = 1;
-    return x;
+    return gMessageWindow != 0;
 }
 
 int MessageWindow_LoadPalette(struct MessageWindow *window, int palette)
