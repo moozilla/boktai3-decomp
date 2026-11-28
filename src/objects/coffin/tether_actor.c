@@ -1,5 +1,6 @@
 #include "system/game_state/game_state_flags.h"
 #include "objects/coffin/tether_actor.h"
+#include "scene/motion/scene_actor_terrain.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
 #include "engine/math/monster_particle_random.h"
@@ -835,11 +836,7 @@ void TetherActor_UpdateMovingEffects(struct TetherActor *actor)
 {
     if (actor->soundCooldown)
         --actor->soundCooldown;
-    if (!actor->moving)
-        goto stopped;
-    if (actor->statusFlags)
-        goto stopped;
-    {
+    if (actor->moving && !actor->statusFlags) {
         if (actor->kind == 5) {
             if (!actor->effectFrame && !actor->soundCooldown) {
                 Sound_PlaySong(0x26A);
@@ -847,25 +844,8 @@ void TetherActor_UpdateMovingEffects(struct TetherActor *actor)
             }
         } else {
             if (!actor->effectFrame) {
-                struct ContactPosition *position = &actor->position;
-                s32 x = position->x >> 8;
-                s32 z = position->z >> 8;
-                s32 cell;
-                u8 *properties;
-                u32 surface;
-                if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-                    cell = 0;
-                else
-                    cell = gTerrainMap->rows[z] + x;
-                properties = TerrainModifiers_FindCellOverride(cell, 1);
-                if (properties)
-                    properties += 4;
-                else {
-                    struct EngineMap *map = gTerrainMap;
-                    u32 offset = cell * 4 + 12;
-                    properties = map->cells + offset;
-                }
-                surface = *properties >> 4;
+                s32 cell = SceneActorTerrain_GetCellIndex(&actor->position);
+                u32 surface = *SceneActorTerrain_GetCell(cell) >> 4;
                 if (surface - 1 <= 1)
                     Sound_PlaySong(0xD3);
                 else if (actor->kind == 9)
@@ -877,10 +857,9 @@ void TetherActor_UpdateMovingEffects(struct TetherActor *actor)
                 TetherActor_EmitDirectionalEffect(actor);
         }
         ++actor->effectFrame;
+    } else {
+        actor->effectFrame = 0;
     }
-    return;
-stopped:
-    actor->effectFrame = 0;
 }
 
 void TetherActor_UpdateEffects(struct TetherActor *actor)
