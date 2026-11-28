@@ -830,56 +830,24 @@ void PlayerClone_SetColliderExtents(struct PlayerCloneConfiguration *p, u32 a, u
 void PlayerClone_BeginActiveReactions(void)
 {
     struct PlayerCloneManager *manager = gDirectionalSpritePool;
-    u32 slotStride = sizeof(struct PlayerCloneSlot);
+    struct PlayerCloneSlot *slot;
+    s32 i;
+
     if (manager) {
-        struct PlayerCloneSlot *s = manager->slots;
-        s32 i = 0;
-        u32 resetValue = 0;
-        u32 *flags = &s->flags;
-        s32 *speed = &s->configuration.speed;
-        u32 timer = 660;
-        do {
-            if ((manager->activeSlots & (1 << i)) != 0) {
-                s->previousPosition =
-                    ((struct PlayerCloneSlot *)((u8 *)speed - (u32) &
-                                                ((struct PlayerCloneSlot *)0)->configuration.speed))
-                        ->animation.position;
-                s->position.x =
-                    ((struct PlayerCloneSlot *)((u8 *)speed - (u32) &
-                                                ((struct PlayerCloneSlot *)0)->configuration.speed))
-                        ->animation.position.x;
-                s->position.y =
-                    ((struct PlayerCloneSlot *)((u8 *)speed - (u32) &
-                                                ((struct PlayerCloneSlot *)0)->configuration.speed))
-                        ->animation.position.y +
-                    128;
-                s->position.z =
-                    ((struct PlayerCloneSlot *)((u8 *)speed - (u32) &
-                                                ((struct PlayerCloneSlot *)0)->configuration.speed))
-                        ->animation.position.z;
-                ((struct PlayerCloneSlot *)((u8 *)flags - (u32) &
-                                            ((struct PlayerCloneSlot *)0)->flags))
-                    ->behaviorPhase = 5;
-                *speed = resetValue;
-                {
-                    *flags |= 1;
-                }
-                {
-                    struct ContactCollider *collider = &s->collider;
-                    collider->flags |= 4;
-                }
-                PLAYER_CLONE_START_IDLE(
-                    ((struct PlayerCloneSlot *)((u8 *)flags - (u32) &
-                                                ((struct PlayerCloneSlot *)0)->flags))
-                        ->animationIndex,
-                    resetValue, &s->animation, &s->resource);
-                s->timer = timer;
+        slot = manager->slots;
+        for (i = 0; i < 3; i++, slot++) {
+            if (manager->activeSlots & (1 << i)) {
+                slot->previousPosition = slot->animation.position;
+                slot->position.x = slot->animation.position.x;
+                slot->position.y = slot->animation.position.y + 128;
+                slot->position.z = slot->animation.position.z;
+                slot->behaviorPhase = 5;
+                slot->configuration.speed = 0;
+                slot->flags |= 1;
+                ContactCollider_SetFlags(&slot->collider, 4);
+                PLAYER_CLONE_START_IDLE(slot->animationIndex, 0, &slot->animation, &slot->resource);
+                slot->timer = i * 30 + 660;
             }
-            timer += 30;
-            i++;
-            flags = (void *)(((u8 *)flags) + slotStride);
-            speed = (void *)(((u8 *)speed) + slotStride);
-            s++;
-        } while (i <= 2);
+        }
     }
 }

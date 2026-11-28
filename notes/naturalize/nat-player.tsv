@@ -169,3 +169,9 @@ src/player/clone.c	PlayerClone_DestroyPool	minor	natural	1	-
 src/player/clone.c	PlayerClone_InitializePool	contrived	natural	4	-
 src/player/clone.c	PlayerClone_FindFreeSlot	contrived	natural	2	-
 src/player/clone.c	PlayerClone_Spawn	contrived	minor	9	scratch struct and velocity-clear helper stay: direct CpuSet reorders the fill store
+src/player/clone.c	PlayerClone_SetBehaviorCallback	natural	natural	0	-
+src/player/clone.c	PlayerClone_InitConfig	natural	natural	0	-
+src/player/clone.c	PlayerClone_SetLifetimeAndBehavior	natural	natural	0	-
+src/player/clone.c	PlayerClone_SetColliderExtents	natural	natural	0	-
+src/player/clone.c	PlayerClone_CreatePool	natural	natural	0	-
+src/player/clone.c	PlayerClone_BeginActiveReactions	contrived	natural	3	-
