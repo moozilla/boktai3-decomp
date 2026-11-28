@@ -1,11 +1,12 @@
 #include "global.h"
 #include "engine/ram.h"
+#include "player/effects/player_attack_particles.h"
 
-void PlayerAttackEffect_SetEmissionState(u32 v)
+void PlayerAttackEffect_SetEmissionState(u32 state)
 {
-    if (gPlayerAttackEffect != 0) {
-        if (*(u32 *)(gPlayerAttackEffect + 0x598) != v)
-            *(u32 *)(gPlayerAttackEffect + 0x584) = 0;
-        *(u32 *)(gPlayerAttackEffect + 0x59C) = v;
+    if (gPlayerAttackEffect != NULL) {
+        if (((struct AttackParticleEffect *)gPlayerAttackEffect)->previous != state)
+            ((struct AttackParticleEffect *)gPlayerAttackEffect)->frame = 0;
+        ((struct AttackParticleEffect *)gPlayerAttackEffect)->current = state;
     }
 }
