@@ -101,3 +101,4 @@ src/objects/coffin/tether_actor.c	TetherActor_AddStatusFlags	natural	natural	0
 src/objects/coffin/tether_actor.c	TetherActor_BeginKindFourStateNine	natural	natural	0	
 src/objects/coffin/tether_actor.c	TetherActor_BeginKindFourStateTen	natural	natural	0	
 src/objects/coffin/tether_actor.c	TetherActor_GetRequestStatus	minor	natural	1	
+src/objects/coffin/tether_actor.c	TetherActor_GetRequestMode	minor	natural	1	

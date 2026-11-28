@@ -1460,12 +1460,9 @@ u8 TetherActor_GetRequestStatus(void)
 u8 TetherActor_GetRequestMode(void)
 {
     struct TetherActor *p = gTetherActor;
-    u8 r;
-    if (p)
-        r = p->requestMode;
-    else
-        r = 0;
-    return r;
+    if (!p)
+        return 0;
+    return p->requestMode;
 }
 
 /* Keep the existing pinned offset calculations: direct member addresses change allocation. */
