@@ -1,28 +1,28 @@
 #include "global.h"
-/* Anim_ApplyDurationScales: Scales the second animation's duration by both scale bytes */
+#include "scene/collision/contact_collider.h"
+#include "system/game_state/game_state.h"
+/* Anim_ApplyDurationScales: Scales a contact's damage by both colliders' damage multipliers */
 
 s32 Div(s32, s32);
-extern u8 *gGameState;
 
 #define SCALE64(v) ((v) >= 0 ? (v) >> 6 : -(-(v) >> 6))
 
-void Anim_ApplyDurationScales(u8 *a, u8 *b)
+void Anim_ApplyDurationScales(struct ContactCollider *source, struct ContactCollider *target)
 {
-    s8 *pa = (s8 *)(a + 0x48);
-    s8 *pb;
-    if (*pa != 0x40) {
-        if (*(s32 *)(a + 0x34) == 0x10) {
-            s32 n = *(s16 *)(gGameState + 0x876);
-            u16 *len = (u16 *)(b + 0x3e);
-            *len += Div((*len << 1) * n, 100);
+    s32 damage;
+    if (source->damageScale != 0x40) {
+        if (source->statRewardFlags == 0x10) {
+            s32 level = gGameState->unk876;
+            target->cost += Div((target->cost << 1) * level, 100);
         } else {
-            s32 v = *(u16 *)(b + 0x3e) * *pa;
-            *(u16 *)(b + 0x3e) = SCALE64(v);
+            damage = target->cost * source->damageScale;
+            damage = SCALE64(damage);
+            target->cost = damage;
         }
     }
-    pb = (s8 *)(b + 0x48);
-    if (*pb != 0x40) {
-        s32 v = *(u16 *)(b + 0x3e) * *pb;
-        *(u16 *)(b + 0x3e) = SCALE64(v);
+    if (target->damageScale != 0x40) {
+        damage = target->cost * target->damageScale;
+        damage = SCALE64(damage);
+        target->cost = damage;
     }
 }
