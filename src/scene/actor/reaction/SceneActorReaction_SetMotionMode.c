@@ -1,3 +1,4 @@
+#include "engine/math/math_shift.h"
 #include "scene/actor/scene_actor_status.h"
 #include "scene/actor/scene_actor_damage_flash.h"
 #include "global.h"
@@ -18,12 +19,6 @@ static inline u8 Reaction_IsBlockedFlags(struct ChaseActor *actor, u32 flags)
     if (actor->base.health <= 0)
         return 1;
     return 0;
-}
-static inline s32 Reaction_ScaleMotion(s32 value)
-{
-    if (value >= 0)
-        return value >> 12;
-    return -((-value) >> 12);
 }
 
 u32 SceneActorReaction_SetMotionMode(struct SceneActorBody *body, s32 mode, s32 amplitude)
@@ -58,7 +53,8 @@ u32 SceneActorReaction_SetMotionMode(struct SceneActorBody *body, s32 mode, s32 
                                 SceneActorDamage_ClearHitStart(motion, flags);
                                 SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags, 0x4000);
                                 {
-                                    struct SceneActorChaseTracking *tracking = &actor->base.tracking;
+                                    struct SceneActorChaseTracking *tracking =
+                                        &actor->base.tracking;
                                     s32 mask = ~0x10;
                                     tracking->flags &= mask;
                                 }
@@ -111,9 +107,10 @@ u32 SceneActorReaction_SetMotionMode(struct SceneActorBody *body, s32 mode, s32 
                 u8 *dir = &actor->base.body.direction;
                 struct ContactPosition *motion = &actor->base.secondaryMotion;
                 u8 direction = *dir;
-                motion->x = Reaction_ScaleMotion(gUnk_086149C4[(direction + 64) & 255] * amplitude);
+                motion->x =
+                    Math_ShiftTowardZero(gUnk_086149C4[(direction + 64) & 255] * amplitude, 12);
                 motion->y = 0;
-                motion->z = Reaction_ScaleMotion(gUnk_086149C4[direction] * amplitude);
+                motion->z = Math_ShiftTowardZero(gUnk_086149C4[direction] * amplitude, 12);
             }
             actor->base.secondaryMotion.y = 4;
             Chase_SetState(actor, 3, 0, 0);
