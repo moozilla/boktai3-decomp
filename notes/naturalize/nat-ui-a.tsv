@@ -644,3 +644,10 @@ src/ui/modifier_menu/modifier_selection_and_stat_previews.c	ModifierMenu_DrawCap
 src/ui/modifier_menu/modifier_selection_and_stat_previews.c	ModifierMenu_DrawBackground	fudged	natural	17	
 src/ui/modifier_menu/modifier_selection_and_stat_previews.c	ModifierMenu_LoadBackground	fudged	natural	1	
 src/ui/modifier_menu/modifier_selection_and_stat_previews.c	ModifierMenu_StartBackgroundScript	natural	natural	1	
+src/ui/modifier_menu/modifier_selection_and_stat_previews.c	ModifierMenu_DrawUnavailableStat	natural	natural	0	
+src/ui/modifier_menu/modifier_selection_and_stat_previews.c	ModifierMenu_DrawFirstSourceStats	natural	natural	0	
+src/ui/modifier_menu/modifier_selection_and_stat_previews.c	ModifierMenu_DrawThirdSourceStats	natural	natural	0	
+src/ui/modifier_menu/modifier_selection_and_stat_previews.c	ModifierMenu_DrawFourthSourceStats	natural	natural	0	
+src/ui/modifier_menu/modifier_selection_and_stat_previews.c	ModifierMenu_ClearBackground	natural	natural	0	
+src/ui/modifier_menu/modifier_selection_and_stat_previews.c	ModifierMenu_ResetBackground	natural	natural	0	
+src/ui/modifier_menu/modifier_selection_and_stat_previews.c	ModifierMenu_DrawSecondSourceStats	fudged	natural	3	

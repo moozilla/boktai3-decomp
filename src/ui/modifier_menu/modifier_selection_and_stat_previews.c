@@ -625,9 +625,7 @@ void ModifierMenu_DrawSecondSourceStats(struct ModifierMenu *menu)
     switch (menu->state) {
         case 0:
         case 2:
-            do {
-                ModifierMenu_DrawStatComparison(first, first, 21, 6, 2);
-            } while (0);
+            ModifierMenu_DrawStatComparison(first, first, 21, 6, 2);
             ModifierMenu_DrawStatComparison(second, second, 21, 7, 3);
             ModifierMenu_DrawStatComparison(third, third, 21, 8, 4);
             ModifierMenu_DrawCapacity(count, capacity, capacity, 21, 9);
@@ -636,32 +634,34 @@ void ModifierMenu_DrawSecondSourceStats(struct ModifierMenu *menu)
             if (menu->mode == 0) {
                 if (StateFlags_GetCategoryBit(menu->choice.cursor.category,
                                               menu->choice.cursor.index)) {
-                    goto validPreview;
+ModifierMenu_DrawStatComparison(first, nextFirst, 8, 13, 2);
+ModifierMenu_DrawStatComparison(second, nextSecond, 8, 14, 3);
+ModifierMenu_DrawStatComparison(third, nextThird, 8, 15, 4);
+ModifierMenu_DrawCapacity(count, capacity, nextCapacity, 8, 16);
+                } else {
+ModifierMenu_DrawUnavailableStat(8, 13, 3);
+ModifierMenu_DrawUnavailableStat(8, 14, 3);
+ModifierMenu_DrawUnavailableStat(8, 15, 3);
+ModifierMenu_DrawUnavailableStat(8, 16, 3);
                 }
-                goto invalidPreview;
             } else if (menu->mode == 1) {
-                if (!StateFlags_GetCategoryBit(4, menu->choice.cursor.index +
-                                                      ((menu->choice.cursor.category * 3) * 2))) {
-                    goto invalidPreview;
+                if (StateFlags_GetCategoryBit(4, menu->choice.cursor.index +
+                                                     menu->choice.cursor.category * 6)) {
+ModifierMenu_DrawStatComparison(first, nextFirst, 8, 13, 2);
+ModifierMenu_DrawStatComparison(second, nextSecond, 8, 14, 3);
+ModifierMenu_DrawStatComparison(third, nextThird, 8, 15, 4);
+ModifierMenu_DrawCapacity(count, capacity, nextCapacity, 8, 16);
+                } else {
+ModifierMenu_DrawUnavailableStat(8, 13, 3);
+ModifierMenu_DrawUnavailableStat(8, 14, 3);
+ModifierMenu_DrawUnavailableStat(8, 15, 3);
+ModifierMenu_DrawUnavailableStat(8, 16, 3);
                 }
-                do {
-                validPreview:
-                    ModifierMenu_DrawStatComparison(first, nextFirst, 8, 13, 2);
-                    ModifierMenu_DrawStatComparison(second, nextSecond, 8, 14, 3);
-                    ModifierMenu_DrawStatComparison(third, nextThird, 8, 15, 4);
-                } while (0);
-                ModifierMenu_DrawCapacity(count, capacity, nextCapacity, 8, 16);
-                break;
-            invalidPreview:
-                ModifierMenu_DrawUnavailableStat(8, 13, 3);
-                ModifierMenu_DrawUnavailableStat(8, 14, 3);
-                ModifierMenu_DrawUnavailableStat(8, 15, 3);
-                ModifierMenu_DrawUnavailableStat(8, 16, 3);
             } else {
-                ModifierMenu_DrawStatComparison(first, first, 8, 13, 2);
-                ModifierMenu_DrawStatComparison(second, second, 8, 14, 3);
-                ModifierMenu_DrawStatComparison(third, third, 8, 15, 4);
-                ModifierMenu_DrawCapacity(count, capacity, capacity, 8, 16);
+ModifierMenu_DrawStatComparison(first, first, 8, 13, 2);
+ModifierMenu_DrawStatComparison(second, second, 8, 14, 3);
+ModifierMenu_DrawStatComparison(third, third, 8, 15, 4);
+ModifierMenu_DrawCapacity(count, capacity, capacity, 8, 16);
             }
             break;
     }
