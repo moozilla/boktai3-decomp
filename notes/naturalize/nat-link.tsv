@@ -179,3 +179,8 @@ src/link/player/Player_GetActionIndex.c	Player_GetActionIndex	contrived	natural	
 src/link/player/LinkPlayer_InitAbilityState.c	LinkPlayer_InitAbilityState	contrived	minor	6	ability view overlays a signed id on the player fields
 src/link/player/LinkPlayer_ReadSlotFromScript.c	LinkPlayer_ReadSlotFromScript	contrived	natural	1	
 src/link/player/Player_InitializeActionState.c	Player_InitializeActionState	minor	natural	1	
+src/link/player/LinkPlayer_GetInitialActionCount.c	LinkPlayer_GetInitialActionCount	natural	natural	0	
+src/link/player/LinkPlayer_GetAbilityCostById.c	LinkPlayer_GetAbilityCostById	natural	natural	0	
+src/link/player/LinkPlayer_IsAbilityIdValid.c	LinkPlayer_IsAbilityIdValid	minor	minor	2	predicate helper stays: a plain return differs
+src/link/player/Player_GetTetherMode.c	Player_GetTetherMode	minor	minor	1	redundant returns and signed pointer cast stay: plain struct reads differ
+src/link/player/LinkPlayer_LoadBaseStats.c	LinkPlayer_LoadBaseStats	contrived	natural	1	

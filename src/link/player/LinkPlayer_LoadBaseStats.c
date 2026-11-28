@@ -1,20 +1,15 @@
 #include "global.h"
+#include "player/player.h"
+
 void LinkSession_GetSlotValues(u32, s32 *, s32 *, s32 *, s32 *);
-void LinkPlayer_LoadBaseStats(u8 *p)
+
+void LinkPlayer_LoadBaseStats(struct Player *p)
 {
     s32 values[4];
-    LinkSession_GetSlotValues((*(u8 **)(p + 0x344))[0x3d], &values[0], &values[1], &values[2],
-                              &values[3]);
-    {
-        s32 v = values[1];
-        *(u16 *)(p + 0x41c) = v;
-    }
-    {
-        s32 v = values[2];
-        *(u16 *)(p + 0x41e) = v;
-    }
-    {
-        s32 v = values[0];
-        *(u16 *)(p + 0x420) = v;
-    }
+
+    LinkSession_GetSlotValues(((const u8 *)p->actionConfig)[0x3D], &values[0], &values[1],
+                              &values[2], &values[3]);
+    p->derivedStats[0] = values[1];
+    p->derivedStats[1] = values[2];
+    p->derivedStats[2] = values[0];
 }
