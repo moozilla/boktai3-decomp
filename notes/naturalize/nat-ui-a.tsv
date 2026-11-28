@@ -35,3 +35,4 @@ src/ui/books/monster_book/BestiaryDisplay_CreateEntryAnimations.c	BestiaryDispla
 src/ui/books/monster_book/BestiaryDisplay_SetPresentationMode.c	BestiaryDisplay_SetPresentationMode	minor	natural	1	
 src/ui/books/monster_book/BestiaryDisplay_SetEntry.c	BestiaryDisplay_SetEntry	minor	natural	1	
 src/ui/books/monster_book/BestiaryDisplay_Hide.c	BestiaryDisplay_Hide	minor	natural	1	
+src/ui/books/monster_book/BestiaryDisplay_Show.c	BestiaryDisplay_Show	minor	natural	1	
