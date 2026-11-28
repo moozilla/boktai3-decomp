@@ -130,26 +130,6 @@ static inline u16 Clone_NextRandomAngle(void)
     return gUnk_086141BC[gEffectRandomTableIndex];
 }
 
-static inline void Clone_EnableRiseFlag(struct AnimSprite *animation)
-{
-    animation->flags |= 0x400;
-}
-
-static inline void Clone_DisableRiseFlag(struct AnimSprite *animation)
-{
-    animation->flags &= ~0x400;
-}
-
-static inline struct AnimSprite *Clone_GetAnimation(struct PlayerCloneSlot *clone)
-{
-    return &clone->animation;
-}
-
-static inline void Clone_SetRiseHeight(struct PlayerCloneSlot *clone, s16 height)
-{
-    clone->animation.position.y = height;
-}
-
 static inline void Clone_ClearVector(const void *value, void *destination, u32 control)
 {
     CpuSet(value, destination, control);
@@ -164,16 +144,6 @@ static inline u32 Clone_UpdateBlink(void *animation, struct PlayerCloneSlot *s)
     return 0;
 }
 
-#define CLONE_DISABLE_COLLIDER(collider)                                                           \
-    do {                                                                                           \
-        (collider)->flags |= 4;                                                                    \
-    } while (0)
-
-static inline void Clone_MaskColliderFlags(u32 mask, struct ContactCollider *collider)
-{
-    collider->flags &= mask;
-}
-
 s32 PlayerClone_UpdateBehavior(struct PlayerCloneSlot *clone, s32 index)
 {
     struct PlayerCloneConfiguration *params = &clone->configuration;
@@ -185,33 +155,24 @@ s32 PlayerClone_UpdateBehavior(struct PlayerCloneSlot *clone, s32 index)
     struct ContactPosition delta;
     struct ContactPosition particlePosition;
     switch (clone->behaviorPhase) {
-        case 0: {
-            struct ContactCollider *body = &clone->collider;
-            s32 direction;
-            struct ContactPosition *initialPosition;
-            CLONE_DISABLE_COLLIDER(body);
+        case 0:
+            ContactCollider_SetFlags(&clone->collider, 4);
             ScaledShadow_Enable(clone->shadow);
             AnimSprite_Hide(&clone->animation);
-            direction = params->angle;
-            Clone_CreateAngleVector(&offset, direction + 0x80, Div(clone->timer << 9, 30));
-            {
-                struct ContactPosition *destination = &clone->animation.position;
-                initialPosition = &clone->targetPosition;
-                Clone_AddVectors(destination, &offset, initialPosition);
-            }
+            Clone_CreateAngleVector(&offset, params->angle + 0x80, Div(clone->timer << 9, 30));
+            Clone_AddVectors(&clone->animation.position, &offset, &clone->targetPosition);
             if (clone->timer > 30) {
                 AnimSprite_Show(&clone->animation);
-                Clone_MaskColliderFlags(~4, body);
+                ContactCollider_ClearFlags(&clone->collider, 4);
                 clone->behaviorPhase = 1;
                 clone->flags &= ~1;
                 {
                     void *destination = &clone->velocity;
                     work.fillWord = 0;
-                    Clone_ClearVector((void *)(&work.fillWord), destination, 0x05000002);
+                    Clone_ClearVector(&work.fillWord, destination, 0x05000002);
                 }
             }
             break;
-        }
 
         case 1: {
             struct AnimSprite *display;
@@ -219,15 +180,12 @@ s32 PlayerClone_UpdateBehavior(struct PlayerCloneSlot *clone, s32 index)
                 TrapSpellParticles_CreateDefaultBurst(&clone->position, 0x28, 0x20, 0xc, 4, 0x18,
                                                       Clone_NextRandomByte(), 0x20, 0x20, 3, 2,
                                                       0x200);
-            display = Clone_GetAnimation(clone);
-            Clone_EnableRiseFlag(display);
-            {
-                s16 height = clone->previousPosition.y - ((60 - clone->timer) * 2);
-                Clone_SetRiseHeight(clone, height);
-            }
+            display = &clone->animation;
+            display->flags |= 0x400;
+            clone->animation.position.y = clone->previousPosition.y - ((60 - clone->timer) * 2);
             if (clone->timer > 60) {
                 clone->behaviorPhase = 2;
-                Clone_DisableRiseFlag(display);
+                display->flags &= ~0x400;
                 ScaledShadow_Disable(clone->shadow);
             }
             break;
@@ -245,56 +203,42 @@ s32 PlayerClone_UpdateBehavior(struct PlayerCloneSlot *clone, s32 index)
                 Anim_LoadKeyframe(&clone->animation, &clone->resource, 5, 1);
             }
             if (clone->timer > ((index * 30) + 0x294)) {
-                u32 z;
                 clone->previousPosition = clone->animation.position;
-                {
-                    u16 x = (u16)clone->animation.position.x;
-                    z = 0;
-                    clone->position.x = x;
-                }
-                clone->position.y = ((u16)clone->animation.position.y) + 0x80;
-                clone->position.z = (u16)clone->animation.position.z;
+                clone->position.x = clone->animation.position.x;
+                clone->position.y = clone->animation.position.y + 0x80;
+                clone->position.z = clone->animation.position.z;
                 clone->behaviorPhase = 5;
-                params->speed = z;
+                params->speed = 0;
                 WordFlags_Set(1, &clone->flags);
-                {
-                    struct ContactCollider *body = &clone->collider;
-                    CLONE_DISABLE_COLLIDER(body);
-                }
-                clone->blinkTimer = z;
-                PLAYER_CLONE_START_IDLE(clone->animationIndex, z, &clone->animation,
-                                        &clone->resource);
+                ContactCollider_SetFlags(&clone->collider, 4);
+                clone->blinkTimer = 0;
+                clone->animationIndex = 0;
+                Anim_LoadKeyframe(&clone->animation, &clone->resource, 0, 1);
             } else {
                 struct ContactPosition *playerPosition = Player_GetEffectivePosition(0);
                 struct ContactPosition *pos = &clone->animation.position;
                 s32 dx = playerPosition->x - pos->x;
                 s32 dz = playerPosition->z - pos->z;
                 if (((dx * dx) + (dz * dz)) <= 0xffff) {
-                    struct AnimSprite *animation;
-                    struct AnimSpriteResource *resource;
                     struct PlayerCloneManager *pool;
-                    s16 *timer = &clone->attackTimer;
-                    s32 z = 0;
-                    *timer = z;
-                    params->speed = z;
+                    clone->attackTimer = 0;
+                    params->speed = 0;
                     WordFlags_Set(1, &clone->flags);
                     {
                         struct ContactPosition *target = Player_GetEffectivePosition(0);
                         params->angle = Math_Atan2(target->x - pos->x, target->z - pos->z);
                     }
                     clone->animationIndex = 0x54;
-                    animation = &clone->animation;
-                    resource = &clone->resource;
-                    Anim_LoadKeyframe(animation, resource, 0x54, 2);
-                    Anim_SetKeyframes(animation, resource,
+                    Anim_LoadKeyframe(&clone->animation, &clone->resource, 0x54, 2);
+                    Anim_SetKeyframes(&clone->animation, &clone->resource,
                                       (u16)(clone->animationIndex + clone->foldedFacing), 2, 4);
-                    clone->animation.duration = z;
-                    pool = (void *)gDirectionalSpritePool;
+                    clone->animation.duration = 0;
+                    pool = (struct PlayerCloneManager *)gDirectionalSpritePool;
                     if (!pool) {
                         /* Animation setup cannot finish without the drawable pool. */
                         return;
                     }
-                    Anim_SelectPaletteBank(animation, 0x1f4);
+                    Anim_SelectPaletteBank(&clone->animation, 0x1f4);
                     clone->animation.paletteBank = 0xe000;
                     clone->animation.palette = pool->palette2;
                     ActorDebris_Show(clone->debris);
@@ -313,7 +257,7 @@ s32 PlayerClone_UpdateBehavior(struct PlayerCloneSlot *clone, s32 index)
                                          &clone->animation.position);
                     if (r == 0) {
                         work.fillWord = r;
-                        Clone_ClearVector((void *)(&work.fillWord), &delta, 0x05000002);
+                        Clone_ClearVector(&work.fillWord, &delta, 0x05000002);
                     } else {
                         delta.x = Div(delta.x * r, 0x20);
                         delta.y = 0;
@@ -329,13 +273,10 @@ s32 PlayerClone_UpdateBehavior(struct PlayerCloneSlot *clone, s32 index)
             }
             break;
 
-        case 4: {
-            s16 *attackTimer = &clone->attackTimer;
-            if ((*attackTimer) > 5) {
-                struct ContactCollider *area = &clone->area;
-                Clone_MaskColliderFlags(~4, area);
-            }
-            if ((*attackTimer) > 30) {
+        case 4:
+            if (clone->attackTimer > 5)
+                ContactCollider_ClearFlags(&clone->area, 4);
+            if (clone->attackTimer > 30) {
                 clone->behaviorPhase = 3;
                 params->angle = Clone_NextRandomAngle();
                 params->speed = clone->speed;
@@ -343,12 +284,10 @@ s32 PlayerClone_UpdateBehavior(struct PlayerCloneSlot *clone, s32 index)
                 clone->animationIndex = 5;
                 Anim_LoadKeyframe(&clone->animation, &clone->resource, 5, 1);
             }
-            (*attackTimer)++;
+            clone->attackTimer++;
             break;
-        }
 
-        case 5: {
-            s16 *height;
+        case 5:
             if (clone->timer & 1)
                 TrapSpellParticles_CreateDefaultBurst(&clone->position, 0x28, 0x20, 0xc, 4, 0x18,
                                                       Clone_NextRandomByte(), 0x20, 0x20, 3, 2,
@@ -357,12 +296,9 @@ s32 PlayerClone_UpdateBehavior(struct PlayerCloneSlot *clone, s32 index)
                 s32 delay = index * 30;
                 s32 elapsed = clone->timer - 0x2b2;
                 s32 remaining = delay - elapsed;
-                s16 y = clone->previousPosition.y - ((30 - remaining) * 2);
-                height = &clone->animation.position.y;
-                *height = y;
+                clone->animation.position.y = clone->previousPosition.y - ((30 - remaining) * 2);
             }
             return Clone_UpdateBlink(&clone->animation.flags, clone);
-        }
     }
 
     return 0;
