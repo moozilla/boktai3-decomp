@@ -423,6 +423,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/named-object-create-round9.md](../notes/named-object-create-round9.md) | MovingPlatform_CreateFromScript | #matching #round9b #named-object | 1 |
 | [notes/naming-debt_2026-11-26.md](../notes/naming-debt_2026-11-26.md) | Source naming debt before the filename pass | *#scripts #inventory* | 10 |
 | [notes/native-effect-profile-round9.md](../notes/native-effect-profile-round9.md) | ProjectileEffect_CreateFromProfile |  | 1 |
+| [notes/naturalize-pilot_2026-11-27.md](../notes/naturalize-pilot_2026-11-27.md) | Review baseline and the naturalize pilot (2026-11-27) | #process #phase3 #tooling #matching | 6 |
 | [notes/nav-mesh-route-round9.md](../notes/nav-mesh-route-round9.md) | NavMesh_FindRoute |  | 1 |
 | [notes/nidhoggr-init-parts-match.md](../notes/nidhoggr-init-parts-match.md) | Nidhoggr_InitParts (081940F8) | #matching #nidhoggr #cse #reload | 1 |
 | [notes/nidhoggr-restored-collider-ranges.md](../notes/nidhoggr-restored-collider-ranges.md) | Nidhoggr restored collider ranges | #matching #nidhoggr #register-allocation | 1 |
