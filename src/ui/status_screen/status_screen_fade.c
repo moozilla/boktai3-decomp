@@ -21,12 +21,10 @@ void StatusScreen_FadeAndExit(struct StatusScreen *p)
             int entry = bank * 16 + i;
             int color = buffer[entry];
             int r, g, b;
-            int red, green, blue;
+            int blue;
 
-            PALETTE_EXTRACT_CHANNEL(red, color, 0x001F);
-            r = (red * factor) & 0x7C0;
-            PALETTE_EXTRACT_CHANNEL(green, color, 0x03E0);
-            g = (green * factor) & 0xF800;
+            r = ((color & 0x001F) * factor) & 0x7C0;
+            g = ((color & 0x03E0) * factor) & 0xF800;
             PALETTE_EXTRACT_CHANNEL(blue, color, blueMask);
             b = (blue * factor) & 0x1F0000;
             buffer[entry] = (r | g | b) >> 6;

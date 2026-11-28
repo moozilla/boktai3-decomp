@@ -134,3 +134,4 @@ src/ui/status_screen/status_screen_fade.c	StatusScreen_WaitForStart	natural	natu
 src/ui/status_screen/status_screen_fade.c	StatusScreen_FadeAndExit	contrived	contrived	35	PALETTE_EXTRACT_CHANNEL macro and parked blueMask stay: plain channel masks are 13-20 insns off (the blue mask hoist and register rotation)
 src/ui/status_screen/status_screen_fade.c	StatusScreen_FadeOutPalette	minor	minor	12	b = 31744; b &= color stays: any single expression copies color before masking (1-3 insns)
 src/ui/status_screen/status_screen_fade.c	StatusScreen_FadeInPalette	contrived	contrived	45	nextBase/nextBank, the end pointer and b = 31744; b &= color stay: plain loop headers are 4-7 insns off (spill slot order of the two increments)
+src/ui/status_screen/status_screen_fade.c	StatusScreen_FadeAndExit	contrived	contrived	45	PALETTE_EXTRACT_CHANNEL on blue and the parked blueMask stay: masking blue directly loses the mask hoist (3-20 insns)
