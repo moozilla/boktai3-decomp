@@ -1081,20 +1081,20 @@ void Golem_UpdateChargeRecovery(struct ChaseActor *actor)
     Golem_GetDirectionVariant(actor, &directionVariant, &mirror);
     Golem_SelectAnimation(actor, 8, directionVariant, Golem_MirrorFlags(mirror));
     if (context->charge.phase == 0) {
-        s16 *speed = &context->charge.speed;
-        *speed -= 0x28;
-        if (*speed < 0) {
+        context->charge.speed -= 0x28;
+        if (context->charge.speed < 0) {
             context->charge.phase = 1;
-            *speed = 0;
+            context->charge.speed = 0;
             return;
         }
         {
             struct ContactPackedVector step;
             union SceneActorRegistryPackedPosition candidate;
             s32 cell;
-            step.x =
-                (*speed * gUnk_086149C4[(context->charge.motionDirection + 0x40) & 0xFF]) >> 16;
-            step.z = (*speed * gUnk_086149C4[context->charge.motionDirection]) >> 16;
+            step.x = (context->charge.speed *
+                      gUnk_086149C4[(context->charge.motionDirection + 0x40) & 0xFF]) >>
+                     16;
+            step.z = (context->charge.speed * gUnk_086149C4[context->charge.motionDirection]) >> 16;
             candidate.position = actor->base.body.position;
             candidate.packed.x += step.x;
             candidate.packed.z += step.z;
