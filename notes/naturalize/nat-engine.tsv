@@ -320,3 +320,4 @@ src/engine/video/anim/Anim_SetSequence.c	Anim_SetSequence	contrived	minor	1	addr
 src/engine/video/anim/Anim_RestartSequence.c	Anim_RestartSequence	contrived	natural	1	
 src/engine/video/anim/Anim_SetDurationScale.c	Anim_SetDurationScale	contrived	natural	1	
 src/engine/video/anim/Anim_ResetDurationScale.c	Anim_ResetDurationScale	contrived	natural	1	
+src/engine/video/anim/sub_0822108C.c	sub_0822108C	contrived	minor	1	sequence entry address built by integer sum (operand order)
