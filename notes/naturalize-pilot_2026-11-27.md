@@ -30,8 +30,10 @@ game programmer in 2005 plausibly have written this function this way?
 Of 5,137 constant sites tested one at a time, plain C (`p->flags |= 4`) matches at 312
 (6.1%); 2,665 fail with a single-use constant, 2,160 with a shared one. Applying the 312 by
 tool was tried and discarded: it replaces readable accessor calls with forms like
-`(((struct CameraTracking *)(&p->camera))->requests &= ~1);` and the linter rewards it. A
-typed accessor named for its object is ordinary C; the linter should not charge it.
+`(((struct CameraTracking *)(&p->camera))->requests &= ~1);` and the linter rewards it. Correction
+(2026-11-28, the project owner): the accessor call is not natural either. The plain operator on
+the field (`p->camera.requests &= ~1;`) is the target, a mask-as-argument accessor is an
+interim fudge that stays counted, and the linter keeps charging it.
 
 ## 3. A codemod to typed accessors (`claude/bindfix`, not merged)
 
@@ -74,7 +76,7 @@ function does (the ROM listing), keep the exact bytes, at most about 40 scope co
 1. **The objective is the reviewer's verdict per function**, not the warning count. Judge the
    whole tree once (about 11M Sonnet tokens at the sample's rate), keep verdict, tags and
    evidence per function in a table, re-judge a function when it changes. The linter stays as
-   the gate for errors and stops charging typed accessors.
+   the gate for errors.
 2. **The unit of work is the function, rewritten from the ROM**, not a flagged site edited in
    place. Queue: contrived first, in ROM order within an object so siblings fall together.
 3. **Cheap model first.** Sonnet takes each function with a compile cap; what it leaves
