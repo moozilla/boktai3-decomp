@@ -269,13 +269,11 @@ int MessageWindow_SetBoundsFromScript(void)
 int MessageWindow_SetNumberArgument(int a, int b)
 {
     struct MessageWindow *window = (void *)gMessageWindow;
-    int result;
-    if (window) {
-        TextState_SetNumber(&window->state, a, b);
-        result = 0;
-    } else
-        result = -1;
-    return result;
+
+    if (!window)
+        return -1;
+    TextState_SetNumber(&window->state, a, b);
+    return 0;
 }
 
 u32 MessageWindow_SetNumberArgumentFromScript(void)
