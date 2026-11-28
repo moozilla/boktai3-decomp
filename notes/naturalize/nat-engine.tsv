@@ -143,3 +143,4 @@ src/engine/sound/sub_0822B584.c	sub_0822B584	natural	natural	0
 src/engine/video/tile_animation.c	TileAnimation_Destroy	minor	natural	1	
 src/engine/video/tile_animation.c	TileAnimation_FindFreeChannel	minor	natural	1	
 src/engine/video/tile_animation.c	TileAnimation_FindChannel	minor	natural	1	
+src/engine/video/tile_animation.c	TileAnimation_Upload	contrived	natural	6	

@@ -90,25 +90,16 @@ void TileAnimation_Upload(void)
     struct TileAnimation *animation = TileAnimation_GetTask();
     struct TileAnimationChannel *channel;
     int index;
+
     if (animation) {
         channel = animation->channels;
-        {
-            void **tiles = &animation->tiles;
-            struct VideoDmaRegisters *dma = (struct VideoDmaRegisters *)REG_ADDR_DMA3;
-            index = 7;
-            do {
-                if (channel->active && channel->dirty) {
-                    u32 src = (u32)*tiles + channel->source[channel->frame] * 32;
-                    u32 dst = VRAM + channel->destination[channel->frame] * 32;
-                    dma->source = src;
-                    dma->destination = dst;
-                    dma->control = (channel->tileCount * 8) | ((u32)(DMA_ENABLE | DMA_32BIT) << 16);
-                    dma->control;
-                    channel->dirty = 0;
-                }
-                index--;
-                channel++;
-            } while (index >= 0);
+        for (index = 0; index < 8; index++, channel++) {
+            if (channel->active && channel->dirty) {
+                u32 src = (u32)animation->tiles + channel->source[channel->frame] * 32;
+                u32 dst = VRAM + channel->destination[channel->frame] * 32;
+                DmaCopy32(3, src, dst, channel->tileCount * 32);
+                channel->dirty = 0;
+            }
         }
     }
 }
