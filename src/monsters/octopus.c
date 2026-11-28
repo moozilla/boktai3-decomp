@@ -1599,34 +1599,24 @@ void Collider_Remove(void *);
 
 void SceneActorRegistry_UnlinkActor(void *);
 
-u32 Octopus_Destroy(struct ChaseActor *s)
+u32 Octopus_Destroy(struct ChaseActor *actor)
 {
-    u8 *p = s->base.drawable;
-    u8 *q;
-    u32 m;
-    u32 v;
-    if (s->base.drawableKind == 0)
-        Sprite_Remove(p);
-    else
-        Anim_Remove(p + 0x20);
-    Heap_Free(p);
-    m = 0x100;
-    if (SceneActorPlacement_TestFlags(&s->base.placementFlags, m))
-        SceneMessages_UnregisterReceiver(s->base.receiver);
-    {
-        u8 *r = s->base.shadow;
-        if (*r == 1)
-            Shadow_Destroy(r);
-    }
-    m = 0x2000000;
-    v = s->base.statusFlags & m;
-    q = (u8 *)&s->base.body;
-    if (v == 0)
-        TerrainOverlay_QueueRemoveActor(q);
+    u8 *drawable = actor->base.drawable;
 
-    SceneBody_Unregister(q);
-    Collider_Remove(&s->base.colliderA);
-    SceneActorRegistry_UnlinkActor(s);
+    if (actor->base.drawableKind == 0)
+        Sprite_Remove(drawable);
+    else
+        Anim_Remove(drawable + 0x20);
+    Heap_Free(drawable);
+    if (MonsterInit_TestMotionFlags(actor, 0x100))
+        SceneMessages_UnregisterReceiver(actor->base.receiver);
+    if (*actor->base.shadow == 1)
+        Shadow_Destroy(actor->base.shadow);
+    if (!SceneActorPlacement_ReadFlags32(&actor->base, 0x2000000))
+        TerrainOverlay_QueueRemoveActor(&actor->base.body);
+    SceneBody_Unregister((u8 *)&actor->base.body);
+    Collider_Remove(&actor->base.colliderA);
+    SceneActorRegistry_UnlinkActor(actor);
     return 0;
 }
 
