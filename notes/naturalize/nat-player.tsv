@@ -571,3 +571,4 @@ src/player/effects/spiral_trail/sub_08236F48.c	sub_08236F48	contrived	natural	6	
 src/player/effects/spiral_trail/RadialBurstEffect_BlendPaletteTowardWhite.c	RadialBurstEffect_BlendPaletteTowardWhite	contrived	minor	20	mask local: a literal 31 lets combine fold the green and blue extractions into a single shift
 src/player/effects/spiral_trail/SpiralTrail_UpdateSlots.c	SpiralTrail_UpdateSlots	contrived	natural	8	-
 src/player/effects/spiral_trail/AttachmentSprite_Setup.c	AttachmentSprite_Setup	contrived	minor	10	u16 kind compared through (u8) casts fixes the load-then-copy; fill local keeps the 0x3DEF load ahead of the hoisted addresses
+src/player/effects/spiral_trail/SpiralTrail_EmitOrbitParticle.c	SpiralTrail_EmitOrbitParticle	contrived	contrived	24	table and index pointer locals, split index increment and sprite alias fix the register allocation

@@ -18,26 +18,23 @@ void SpiralTrail_EmitOrbitParticle(struct SpiralTrailTask *owner,
         struct SpiralTrailParticle *p = &emitter->particles[emitter->next];
         const u16 *table;
         u32 *seed;
-        unsigned short i;
+        u16 index;
+        u32 random;
         struct SpiralTrailParticle *sprite;
 
         p->active = 1;
         table = gRandomTable;
         seed = &gRandomIndex;
-        i = *seed + 1;
-        i &= 1023;
-        {
-            u32 r = table[i];
-            p->speed = (r & 15) + 0x10;
-        }
-        i = (i + 1) & 1023;
-        {
-            u32 r = table[i];
-            p->radius = (r & 15) + 0x40;
-        }
-        i = (i + 1) & 1023;
-        *seed = i;
-        p->angle = table[i];
+        index = *seed + 1;
+        index &= 1023;
+        random = table[index];
+        p->speed = (random & 15) + 0x10;
+        index = (index + 1) & 1023;
+        random = table[index];
+        p->radius = (random & 15) + 0x40;
+        index = (index + 1) & 1023;
+        *seed = index;
+        p->angle = table[index];
         p->life = 8;
         p->timer = 0;
         p->origin = *origin;
