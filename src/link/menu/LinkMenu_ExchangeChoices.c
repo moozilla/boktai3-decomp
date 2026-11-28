@@ -1,8 +1,3 @@
-#define LinkMenu_ConsumeStateEntry     LinkSession_ConsumeStateEntry
-#define LinkMenu_SetState              LinkSession_SetState
-#define LinkMenu_CheckSession          LinkSession_CheckSessionReady
-#define LinkMenu_ResetSelection        LinkSession_BeginShutdown
-#define LinkMenu_ClearExchangeCounters LinkSession_ClearParticipantCounters
 #include "global.h"
 #include "scene/areas/area_effect_link.h"
 #include "engine/engine.h"
@@ -17,10 +12,18 @@ u8 LinkSession_ReceiveSelectionByte(void *, void *, s32, s32);
 void SlotState_ResetInactiveMode(void *);
 void ScriptPanel_OpenTextWindow(void);
 void LinkMenu_ShowChoiceMessage(void);
+/* The choice exchange's view of the session data. */
+struct LinkChoiceData {
+    u8 unknown0[0x60];
+    u16 randomSeed; /* confidence=low */
+    u8 unknown62[0x12C - 0x62];
+    u8 outgoing[4]; /* the first player's value and its CRC */
+    u8 incoming[4];
+};
 s32 LinkMenu_ExchangeChoices(struct AreaEffectLinkState *p)
 {
-    u8 *session = p->sessionData;
-    u8 *incoming;
+    struct LinkChoiceData *data = (struct LinkChoiceData *)p->sessionData;
+
     if (LinkSession_ConsumeStateEntry(p)) {
         LinkSession_ClearParticipantCounters(p);
         if (gLinkSession && gLinkSession->localPlayer == 0)
@@ -31,12 +34,11 @@ s32 LinkMenu_ExchangeChoices(struct AreaEffectLinkState *p)
         return -1;
     }
     if (gLinkSession && gLinkSession->localPlayer == 0)
-        ByteSequence_AdvanceEncodedValue(p, session + 0x12c, 4);
-    incoming = session + 0x130;
-    if (LinkSession_ReceiveSelectionByte(p, incoming, 0, 4) == 1) {
-        Crc_ComputeCcitt16(incoming, 0, 2);
-        SlotState_ResetInactiveMode(session);
-        gRandomIndex = *(u16 *)(session + 0x60) & 0x3ff;
+        ByteSequence_AdvanceEncodedValue(p, data->outgoing, 4);
+    if (LinkSession_ReceiveSelectionByte(p, data->incoming, 0, 4) == 1) {
+        Crc_ComputeCcitt16(data->incoming, 0, 2);
+        SlotState_ResetInactiveMode(data);
+        gRandomIndex = data->randomSeed & 0x3ff;
         LinkSession_SetState(p, 10, LinkMenu_ShowChoiceMessage);
     }
     return 0;
