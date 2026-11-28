@@ -367,7 +367,7 @@ int MessageWindow_SetAutoAdvanceFromScript(void)
 {
     int mode = Script_GetValue();
     int step = Script_GetValue();
-    int flags = Script_GetKeywordValue(0x6d, mode != 0);
+    int flags = Script_GetKeywordValue('m', mode != 0);
     return MessageWindow_SetAutoAdvance(mode, step, flags);
 }
 

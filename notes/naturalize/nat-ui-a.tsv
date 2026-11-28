@@ -241,3 +241,4 @@ src/ui/dialogue/message_window/message_window.c	MessageWindow_SetStringArgument	
 src/ui/dialogue/message_window/message_window.c	MessageWindow_SetStringArgumentFromScript	minor	natural	5	
 src/ui/dialogue/message_window/message_window.c	MessageWindow_SetStringFromPc	minor	natural	5	
 src/ui/dialogue/message_window/message_window.c	MessageWindow_SetChoicesFromScript	minor	natural	1	
+src/ui/dialogue/message_window/message_window.c	MessageWindow_SetAutoAdvanceFromScript	natural	natural	1	
