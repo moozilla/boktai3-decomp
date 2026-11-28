@@ -1,54 +1,22 @@
-#include "global.h"
-void AnimSprite_SelectGlyph(void *, void *, int);
-struct Flags {
-    u8 pad[0x71dc];
-    u8 flags[52];
-    u8 done[52];
-};
-struct Entry {
-    u32 flags;
-    u8 pad[0x5c];
-};
-struct Entries {
-    u8 pad[0x5444];
-    struct Entry items[52];
-};
-struct Visual {
-    u8 pad[6];
-    u16 flags;
-};
-struct Sprite {
-    u32 pad;
-    u32 flags;
-};
-void Anim_SetKeyframes(void *, void *, s32, s32, s32);
-s32 Anim_Step(void *, void *);
-void Sound_PlaySongChecked(s32);
-struct Pair {
-    u32 a, b;
-};
+#include "bosses/nidhoggr/nidhoggr_animation.h"
+#include "objects/scene_object_slot.h"
 extern const struct Pair gUnk_0824F35C;
 void Nidhoggr_CreateFallingAttackEffect(void *, void *, void *, void *);
-void SceneAnimation_UpdateSlotSequenceNineEffect(u8 *p, int i)
+
+void SceneAnimation_UpdateSlotSequenceNineEffect(struct Nidhoggr *boss, int i)
 {
-    u8 *base = p + 0x71dc;
-    u8 **base_pointer = &base;
-    u8 *q = *base_pointer + i;
-    u32 old = *q;
-    if (!old) {
-        struct Pair v;
-        u32 off = i * 0x60;
-        u8 *a;
-        ((struct Entries *)p)->items[i].flags &= ~1;
-        a = p + (off + 0x543c);
-        Anim_SetKeyframes(a, p + 0x541c, 9, 2, 4);
-        (*q)++;
-        ((struct Flags *)p)->done[i] = old;
+    struct Pair v;
+
+    if (!boss->rowInitFlag[i]) {
+        boss->rows[i].flags &= ~1;
+        Anim_SetKeyframes(&boss->rows[i], &boss->animHdr, 9, 2, 4);
+        boss->rowInitFlag[i]++;
+        boss->rowDoneFlag[i] = 0;
         v = gUnk_0824F35C;
-        Nidhoggr_CreateFallingAttackEffect(p + 0x54, a + 0x20, &v, p);
+        Nidhoggr_CreateFallingAttackEffect(&boss->effectPool, &boss->rows[i].position, &v, boss);
     }
-    if (Anim_Step(p + (i * 0x60 + 0x543c), p + 0x541c)) {
-        *q = 0xff;
-        ((struct Flags *)p)->done[i] = 1;
+    if (Anim_Step(&boss->rows[i], &boss->animHdr)) {
+        boss->rowInitFlag[i] = 0xff;
+        boss->rowDoneFlag[i] = 1;
     }
 }
