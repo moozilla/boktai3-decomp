@@ -581,3 +581,4 @@ src/ui/town/storage/Storage_FindEquippedItemSlot.c	Storage_FindEquippedItemSlot	
 src/ui/town/storage/Storage_TickCategorySelection.c	Storage_TickCategorySelection	contrived	natural	1	
 src/ui/town/storage/Storage_SetCategoryPalette.c	Storage_SetCategoryPalette	minor	natural	1	
 src/ui/town/storage/Storage_ResetCategoryPalette.c	Storage_ResetCategoryPalette	minor	natural	1	
+src/ui/town/storage/Storage_RefreshSelectedItemDetails.c	Storage_RefreshSelectedItemDetails	contrived	natural	1	

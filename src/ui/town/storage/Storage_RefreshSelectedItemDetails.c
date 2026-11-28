@@ -1,19 +1,19 @@
 #include "global.h"
-void Storage_ShowItemDescription(void *);
-void Storage_ShowEquipmentDescription(void *);
-void Storage_ShowConsumableDescription(void *);
-void Storage_RefreshSelectedItemDetails(u8 *p)
+#include "ui/town/storage_screen.h"
+void Storage_ShowItemDescription(struct StorageScreen *);
+void Storage_ShowEquipmentDescription(struct StorageScreen *);
+void Storage_ShowConsumableDescription(struct StorageScreen *);
+void Storage_RefreshSelectedItemDetails(struct StorageScreen *screen)
 {
-    u8 *a = p + 0x1754, *b = p + 0x1758;
-    switch (b[*a] >> 1) {
+    switch (screen->categoryKinds[screen->category] >> 1) {
         case 0:
-            Storage_ShowItemDescription(p);
+            Storage_ShowItemDescription(screen);
             break;
         case 1:
-            Storage_ShowEquipmentDescription(p);
+            Storage_ShowEquipmentDescription(screen);
             break;
         case 2:
-            Storage_ShowConsumableDescription(p);
+            Storage_ShowConsumableDescription(screen);
             break;
     }
 }
