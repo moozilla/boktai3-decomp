@@ -1,32 +1,21 @@
-#define SceneDistance_SelectRandomPosition Ratatosk_GetRandomMovementPoint
-#define SceneDistance_ApplyRequestedState  Ratatosk_InitRequestedState
-#define SceneDistance_RunStateCallback     Ratatosk_RunStateCallback
-#define SceneDistance_DispatchState        Ratatosk_UpdateBehavior
 #include "global.h"
-#include "engine/math/scene_vec.h"
-struct SceneDistanceActor {
-    u8 pad0[0xA0];
-    u8 nearTarget;
-    u8 padA1[0xE5C - 0xA1];
-    struct SceneVec selectedPosition;
-    u8 padE64[0xEF0 - 0xE64];
-    u32 phase;
-};
+#include "bosses/ratatosk/ratatosk.h"
+
 void SceneActors_UpdateTargetMetrics(void *);
 void SceneActors_UpdateEffects(void *);
-struct SceneVec *Ratatosk_GetRandomMovementPoint(void *);
+struct ContactPosition *Ratatosk_GetRandomMovementPoint(void *);
 void Ratatosk_UpdateAnimatedPosition(void *);
 void Ratatosk_UpdateBehavior(void *);
 u32 Ratatosk_InitRequestedState(void *);
 void Ratatosk_RunStateCallback(void *);
 void Ratatosk_UpdateCollidersAndPalette(void *);
-s32 SceneDistance_UpdateActor(struct SceneDistanceActor *p)
+s32 SceneDistance_UpdateActor(struct Ratatosk *p)
 {
     u8 previous = p->nearTarget;
     SceneActors_UpdateTargetMetrics(p);
     if (previous != p->nearTarget) {
-        p->selectedPosition = *Ratatosk_GetRandomMovementPoint(p);
-        p->phase = 2;
+        p->destination = *Ratatosk_GetRandomMovementPoint(p);
+        p->savedState = 2;
     }
     Ratatosk_UpdateAnimatedPosition(p);
     Ratatosk_UpdateBehavior(p);

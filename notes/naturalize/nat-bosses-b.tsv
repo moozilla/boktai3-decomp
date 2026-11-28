@@ -163,3 +163,7 @@ src/bosses/ratatosk/Ratatosk_InitAnimatedParticlePool.c	Ratatosk_InitAnimatedPar
 src/bosses/ratatosk/Ratatosk_CreateAnimatedParticlePool.c	Ratatosk_CreateAnimatedParticlePool	contrived	natural	2	falls off the end when the task is not created
 src/bosses/ratatosk/Ratatosk_FindFreeAnimatedParticle.c	Ratatosk_FindFreeAnimatedParticle	contrived	natural	2	
 src/bosses/ratatosk/Ratatosk_SpawnAnimatedParticle.c	Ratatosk_SpawnAnimatedParticle	minor	minor	7	TODO allocation-only guard, draw/frame locals, velocity pointer: each removal differs
+src/bosses/ratatosk/Ratatosk_SetAnimatedParticleUpdateCallback.c	Ratatosk_SetAnimatedParticleUpdateCallback	natural	natural	0	
+src/bosses/ratatosk/Ratatosk_InitAnimatedParticleParams.c	Ratatosk_InitAnimatedParticleParams	natural	natural	0	
+src/bosses/ratatosk/Ratatosk_ConfigureAnimatedParticle.c	Ratatosk_ConfigureAnimatedParticle	natural	natural	0	
+src/bosses/ratatosk/SceneDistance_UpdateActor.c	SceneDistance_UpdateActor	contrived	natural	1	

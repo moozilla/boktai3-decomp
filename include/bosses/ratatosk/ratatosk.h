@@ -40,7 +40,7 @@ struct Ratatosk {
     u8 vulnerable; /* 0x9A */
     u8 unknown9B;
     u32 flags; /* 0x9C: StateActor actionFlags. */
-    u8 unknownA0;
+    u8 nearTarget; /* 0xA0: a change picks a new destination in SceneDistance_UpdateActor. */
     u8 behaviorFlag; /* 0xA1: cleared before each Ratatosk_UpdateBehavior dispatch. */
     u8 reactionPhase; /* 0xA2 */
     u8 animationCompletions;
