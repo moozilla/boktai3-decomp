@@ -179,16 +179,6 @@ void Ivy_SetSegmentFlags(u8 *p, u32 v)
         object->segments[i].property = v;
 }
 
-struct IvySegmentHalfwordView {
-    u16 property;
-    u8 unknown2[0x1A];
-};
-
-struct IvySegmentWordView {
-    u32 property;
-    u8 unknown4[0x18];
-};
-
 void Ivy_SetSegmentProperties(u8 *p, u32 b, s32 a)
 {
     struct PhaseObject *object = (struct PhaseObject *)p;
