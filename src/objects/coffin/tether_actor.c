@@ -1673,40 +1673,12 @@ void TetherActor_SetTransformFromScript(void)
     if (actor) {
         if (Script_SeekToKeyword('p')) {
             struct ContactPosition *position;
-            s32 x, z, cell;
-            u8 *properties;
-            u32 surface, height;
             actor->savedPosition.x = Script_GetValue();
             actor->savedPosition.y = Script_GetValue();
             actor->savedPosition.z = Script_GetValue();
             position = &actor->savedPosition;
-            x = position->x >> 8;
-            z = position->z >> 8;
-            if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-                cell = 0;
-            else {
-                u32 row = gTerrainMap->rows[z];
-                cell = row + x;
-            }
-            properties = TerrainModifiers_FindCellOverride(cell, 1);
-            if (properties)
-                properties += 4;
-            else {
-                struct EngineMap *map = gTerrainMap;
-                u32 offset = cell * 4 + 12;
-                properties = map->cells + offset;
-            }
-            surface = *properties >> 4;
-            height = (*properties & 15) << 8;
-            switch (surface) {
-                case 1:
-                    height -= (u8)position->z;
-                    break;
-                case 2:
-                    height -= (u8)position->x;
-                    break;
-            }
-            actor->savedPosition.y = height;
+            actor->savedPosition.y =
+                SceneActorTerrain_GetHeight(SceneActorTerrain_GetCellIndex(position), position);
 
             actor->position = actor->savedPosition;
             *(struct ContactPosition *)actor->display.animation.position = actor->savedPosition;
