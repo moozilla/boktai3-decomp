@@ -4,11 +4,17 @@
 #include "global.h"
 
 struct LinkPalTarget {
-    u8 pad0[0xc];
+    u8 pad0[6];
+    u16 paletteBank;
+    u8 pad8[4];
     u16 *palette;
 };
 struct LinkPlayerFade {
-    u8 pad0[0xd4];
+    u8 pad0[0x20];
+    u32 statusFlags;
+    u8 pad24[0xc6 - 0x24];
+    u16 paletteBank;
+    u8 padC8[0xd4 - 0xc8];
     u16 *palette;
     u8 padD8[0x178 - 0xd8];
     struct LinkPalTarget *target;
@@ -17,7 +23,8 @@ struct LinkPlayerFade {
     u16 workPalette[16];
     u8 pad3A0[0x419 - 0x3a0];
     u8 alternate;
-    u8 pad41A[0xac4 - 0x41a];
+    u8 pad41A[0xab0 - 0x41a];
+    u16 paletteBanks[10];
     s16 modeArg;
     u8 brightness;
     u8 pad_ac7;

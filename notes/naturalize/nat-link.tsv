@@ -145,3 +145,4 @@ src/link/player/Player_InitConvergingParticles.c	Player_InitConvergingParticles	
 src/link/player/Player_UpdateConvergingParticles.c	Player_UpdateConvergingParticles	minor	natural	1	draw alias stays: the ROM keeps both registers
 src/link/player/Player_EmitConvergingParticle.c	Player_EmitConvergingParticle	minor	minor	1	draw alias and u16 radius sample stay
 src/link/player/sub_082392E8.c	sub_082392E8	contrived	minor	40	do/while(0) around the radius draw and draw alias stay: without the loop the random table and cursor swap reload registers
+src/link/player/ActorEffect_SelectModeFlag.c	ActorEffect_SelectModeFlag	minor	minor	9	mask local in the feature flag helper stays: the ROM loads the mask before gGameState

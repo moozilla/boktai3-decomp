@@ -1,24 +1,24 @@
 #include "global.h"
+#include "link/player/link_player_palette.h"
 #include "system/game_state/game_state.h"
-struct ActorEffectState {
-    u8 unknown0[0x20];
-    u32 flags;
-};
-static inline u8 global_mode(void)
+
+static inline u8 IsFeatureEnabled(void)
 {
     u32 mask = 2;
     if (gGameState->flags868 & mask)
-        return 1;
-    return 0;
+        return TRUE;
+    return FALSE;
 }
-s32 ActorEffect_SelectModeFlag(struct ActorEffectState *s)
+
+s32 ActorEffect_SelectModeFlag(struct LinkPlayerFade *p)
 {
     s32 result = 0;
-    if (!global_mode()) {
-        if (s->flags & 16)
+
+    if (!IsFeatureEnabled()) {
+        if (p->statusFlags & 16)
             result = 4;
     } else {
-        if (s->flags & 16)
+        if (p->statusFlags & 16)
             result = 8;
     }
     return result;
