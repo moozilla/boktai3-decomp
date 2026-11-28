@@ -550,3 +550,5 @@ src/ui/hud/display/hud.c	Hud_DrawSelectedClock	fudged	natural	1
 src/ui/hud/display/SceneHud_FinishPageExit.c	SceneHud_FinishPageExit	fudged	natural	3	
 src/ui/hud/display/SceneHud_FadeOutPage.c	SceneHud_FadeOutPage	natural	natural	0	
 src/ui/hud/display/Hud_BeginSavedBlend.c	Hud_BeginSavedBlend	fudged	natural	2	
+src/ui/hud/display/SceneHud_CanOpenFromStart.c	SceneHud_CanOpenFromStart	natural	natural	0	
+src/ui/hud/display/Hud_RemoveMenuGraphics.c	Hud_RemoveMenuGraphics	fudged	natural	3	

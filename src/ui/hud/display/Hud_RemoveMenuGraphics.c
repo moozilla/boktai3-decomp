@@ -14,12 +14,9 @@ void Anim_Remove(void *);
 void Sprite_Remove(void *);
 void Hud_RemoveMenuGraphics(struct HudManager *p)
 {
-    struct HudAnimation *anim = p->animations;
-    s32 i = 123;
-    do {
-        Anim_Remove(anim);
-        anim++;
-    } while (--i >= 0);
+    s32 i;
+    for (i = 0; i < 124; i++)
+        Anim_Remove(&p->animations[i]);
     Sprite_Remove(p->largeSprite);
     Anim_Remove(&p->extraAnimations[0]);
     Anim_Remove(&p->extraAnimations[1]);
