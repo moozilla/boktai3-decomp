@@ -569,3 +569,4 @@ src/player/effects/recoil_puffs/RecoilPuffPool_GetOrCreate.c	RecoilPuffPool_GetO
 src/player/effects/recoil_puffs/RecoilPuff_Spawn.c	RecoilPuff_Spawn	natural	natural	0	-
 src/player/effects/spiral_trail/sub_08236F48.c	sub_08236F48	contrived	natural	6	-
 src/player/effects/spiral_trail/RadialBurstEffect_BlendPaletteTowardWhite.c	RadialBurstEffect_BlendPaletteTowardWhite	contrived	minor	20	mask local: a literal 31 lets combine fold the green and blue extractions into a single shift
+src/player/effects/spiral_trail/SpiralTrail_UpdateSlots.c	SpiralTrail_UpdateSlots	contrived	natural	8	-

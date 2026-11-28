@@ -1,22 +1,20 @@
 #include "player/effects/spiral_trail.h"
-s32 sub_08249240(void *, void *, void *);
-void SpiralTrail_UpdateSlots(struct SpiralTrailTask *p)
+
+void SpiralTrail_UpdateSlots(struct SpiralTrailTask *task)
 {
-    if (p->emitter.active) {
+    if (task->emitter.active) {
         s32 count = 0;
-        u8 *slot = (u8 *)&p->emitter.particles[0].active;
-        struct SpiralTrailParticle *effect = p->emitter.particles;
-        s32 i = 7;
-        do {
-            if (*slot) {
-                sub_08249240(effect, p->emitter.graphics, *(void **)(slot + 0x10));
+        s32 i;
+
+        for (i = 0; i < 8; i++) {
+            struct SpiralTrailParticle *particle = &task->emitter.particles[i];
+
+            if (particle->active) {
+                particle->update(particle, task->emitter.graphics);
                 count++;
             }
-            slot += 0x3C;
-            effect++;
-            i--;
-        } while (i >= 0);
+        }
         if (!count)
-            p->emitter.active = count;
+            task->emitter.active = 0;
     }
 }
