@@ -9,14 +9,12 @@ struct AnimationHeader {
 void sub_0813FE30(struct Player *p)
 {
     struct AnimationHeader *source = ScriptProc_Start(0xCB05, 0xDE23);
-    struct AnimSprite *c1;
     if (source) {
         *((struct AnimationHeader *)p->animationData) = *source;
         ResourceHeader_Relocate(p->animationData, source);
-        c1 = &p->animation;
-        AnimSprite_InitLinked(c1, p->animationData, 0, 0x9000, 2, 0, 60, &p->position);
+        AnimSprite_InitLinked(&p->animation, p->animationData, 0, 0x9000, 2, 0, 60, &p->position);
         AnimSprite_InitLinked(&p->secondaryAnimation, p->animationData, 0, 0x1001, 2, 0, 60,
-                          &p->position);
+                              &p->position);
         if (Script_SeekToKeyword('d'))
             p->facing = Script_GetValue();
         else
@@ -31,13 +29,11 @@ void sub_0813FE30(struct Player *p)
                 p->side = 0;
             }
         } else {
-            u32 direction = p->facing;
-            if (direction > 4) {
-                u32 side = 8 - direction;
-                p->heading = side;
+            if (p->facing > 4) {
+                p->heading = 8 - p->facing;
                 p->side = 1;
             } else {
-                p->heading = direction;
+                p->heading = p->facing;
                 p->side = 0;
             }
         }
