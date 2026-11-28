@@ -623,28 +623,27 @@ void Golem_ResumeDelayedRoute(struct ChaseActor *actor)
         return;
     if ((u8)SceneActorReaction_BeginContactResponse(actor))
         return;
-    if ((s32)actor->base.counter2AC <= 60)
-        goto waiting;
-    SceneActorAttachment_ReplaceResponseSlot((u8 *)actor, 0, 2, actor->base.category);
-    Golem_SetState(actor, 3, 1, 0);
-    SceneActorChase_SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
-    if (SceneActorChase_MotionFlags(actor, 0x80)) {
-        SceneActorDelay_Prepare((void *)&group->saved, group->common.gate.control, 12, 30);
-        Golem_Arrive_ResumeDelayedRoute(actor);
+    if ((s32)actor->base.counter2AC > 60) {
+        SceneActorAttachment_ReplaceResponseSlot((u8 *)actor, 0, 2, actor->base.category);
+        Golem_SetState(actor, 3, 1, 0);
+        SceneActorChase_SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
+        if (SceneActorChase_MotionFlags(actor, 0x80)) {
+            SceneActorDelay_Prepare((void *)&group->saved, group->common.gate.control, 12, 30);
+            Golem_Arrive_ResumeDelayedRoute(actor);
+        } else {
+            SceneActorChase_SetActorFlags(actor, 0x10);
+            SceneActorDelay_Prepare((void *)&group->saved, actor->base.onAlternateEntry, 7, 30);
+            Golem_SnapToRoute_ResumeDelayedRoute(group->destination, &group->homeRoute);
+            if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,
+                                          group->destination)) {
+                SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 0);
+                Golem_SetState(actor, 3, 0, 0);
+            } else
+                group->destination->pad = 1;
+        }
     } else {
-        SceneActorChase_SetActorFlags(actor, 0x10);
-        SceneActorDelay_Prepare((void *)&group->saved, actor->base.onAlternateEntry, 7, 30);
-        Golem_SnapToRoute_ResumeDelayedRoute(group->destination, &group->homeRoute);
-        if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,
-                                      group->destination)) {
-            SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 0);
-            Golem_SetState(actor, 3, 0, 0);
-        } else
-            group->destination->pad = 1;
+        actor->base.counter2AC++;
     }
-    return;
-waiting:
-    actor->base.counter2AC++;
 }
 
 extern const u8 gUnk_08606134[];
