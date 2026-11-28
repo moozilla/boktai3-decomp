@@ -389,3 +389,4 @@ src/engine/video/sprite_component/SpriteComponent_Update.c	SpriteComponent_Updat
 src/engine/video/sprite_component/ArmorIndicator_DestroySprite.c	ArmorIndicator_DestroySprite	minor	natural	1	
 src/engine/video/sprite_component/SpriteComponent_ConfigureCollider.c	SpriteComponent_ConfigureCollider	minor	natural	1	
 src/engine/video/sprite_component/SpriteComponent_GetCollisionStatus.c	SpriteComponent_GetCollisionStatus	natural	natural	1	
+src/engine/video/sprite_component/SpriteComponent_Init.c	SpriteComponent_Init	minor	minor	1	callback addresses held in locals so both load before the stores
