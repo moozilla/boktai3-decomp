@@ -414,3 +414,8 @@ src/system/clock/region_menu.c	Time_OnLoadSave	natural	natural	1
 src/system/clock/region_menu.c	Time_ShowRegionMenu	minor	natural	1	
 src/system/clock/region_menu.c	Time_HandleRegionKeypad	contrived	minor	1	value assigned twice around the script argument; pointer and mask temporaries clear the display bits
 src/system/clock/region_menu.c	Time_LoadRegionList	contrived	natural	1	
+src/system/clock/region_menu.c	Time_OnRegionListSelect	minor	minor	3	session state cast and bare block keep the store order
+src/system/clock/region_menu.c	Time_DestroyRegionMenu	natural	natural		
+src/system/clock/region_menu.c	RegionMenuParams_SetFromScript	natural	natural		
+src/system/clock/region_menu.c	Time_CreateRegionMenu	natural	natural		
+src/system/clock/Clock_ClearState.c	Clock_ClearState	minor	natural	1	

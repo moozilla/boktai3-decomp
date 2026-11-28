@@ -1,8 +1,9 @@
 #include "global.h"
+#include "system/clock/sun_clock.h"
 
-void Memory_Clear(u32, u32);
+void Memory_Clear(void *, u32);
 
 void Clock_ClearState(void)
 {
-    Memory_Clear(0x03005430, 0x24);
+    Memory_Clear(&gSunClock, sizeof(gSunClock));
 }
