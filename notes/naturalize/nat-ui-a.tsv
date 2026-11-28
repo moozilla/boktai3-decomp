@@ -574,3 +574,4 @@ src/ui/hud/display/Hud_SaveModeFromScript.c	Hud_SaveModeFromScript	natural	natur
 src/ui/hud/display/Hud_RestoreModeFromScript.c	Hud_RestoreModeFromScript	natural	natural	0	
 src/ui/hud/display/Hud_SetModeFromScript.c	Hud_SetModeFromScript	natural	natural	0	
 src/ui/hud/display/Hud_BeginModeSixCue.c	Hud_BeginModeSixCue	fudged	natural	1	
+src/ui/hud/display/Hud_UpdateCountdownDisplay.c	Hud_UpdateCountdownDisplay	fudged	natural	1	
