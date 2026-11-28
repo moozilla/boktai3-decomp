@@ -604,3 +604,4 @@ src/player/gun/Player_ReleaseActionEffectOnExit.c	Player_ReleaseActionEffectOnEx
 src/player/gun/Player_StopActionSongOnExit.c	Player_StopActionSongOnExit	natural	natural	0	-
 src/player/gun/Player_UpdateAttachedChargeTiers.c	Player_UpdateAttachedChargeTiers	contrived	natural	3	-
 src/player/gun/Player_UpdateSustainedSpinAttack.c	Player_UpdateSustainedSpinAttack	contrived	natural	1	-
+src/player/gun/Player_UpdateAttachedAttackCharge.c	Player_UpdateAttachedAttackCharge	contrived	natural	4	-

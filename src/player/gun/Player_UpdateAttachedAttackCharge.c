@@ -2,6 +2,7 @@
 #include "global.h"
 #include "scene/collision/contact_actor.h"
 #include "effects/bat_flock.h"
+#include "player/player_slot_status.h"
 extern const s16 gUnk_086149C4[];
 void SceneParticleBurst_CreateWhilePaused(void *, void *, void *, u32, u32, u32);
 u32 Player_ConsumeStateEntry(void *);
@@ -16,9 +17,6 @@ s32 Player_SpawnSelectedAttackProjectile(void *);
 void Projectile_SetEntryDirection(s32, s32);
 void ActorSequence_Begin(void *, s32, s32);
 s32 Player_GetAttackEffectType(u32);
-#define HELD       (p->inputKeys[0] & 2)
-#define PRESSED    (p->inputKeys[1] & 2)
-#define ANIMATE(n) Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, n), 64, 1)
 
 static inline void FireCharge(struct Player *p)
 {
@@ -29,28 +27,17 @@ static inline void FireCharge(struct Player *p)
 static inline void FaceCharge(struct Player *p)
 {
     Player_UpdateAttackFacing(p);
-    ANIMATE(0x27);
+    Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0x27), 64, 1);
 }
 void Player_ReleaseActionEffectOnExit(void *);
 void Player_SetPendingCallback(void *, void (*)(void *));
 void Player_UpdateAttachedEntryPosition(void *);
 s32 ProjectileTask_GetKind7Value(s32);
-static inline u32 bonus(struct Player *p, u32 mask)
-{
-    u32 *field;
-    u32 bits;
-    if (!p)
-        return 0;
-    field = &p->statBonusFlags;
-    bits = mask;
-    return *field & bits;
-} // confidence=low: attached task tiers and buffered restart define this charge handler.
+// confidence=low: attached task tiers and buffered restart define this charge handler.
 void Player_UpdateAttachedAttackCharge(struct Player *p)
 {
     struct ContactPackedVector origin;
     struct ContactPackedVector spread;
-    u16 *t;
-    u16 *r;
     if (Player_ConsumeStateEntry(p)) {
         p->statModifierContext.contactTimer = 0;
         p->statModifierContext.attachedEntry = -1;
@@ -58,54 +45,51 @@ void Player_UpdateAttachedAttackCharge(struct Player *p)
     }
     switch (p->tetherPhase) {
         case 0:
-            if (ANIMATE(0x26)) {
+            if (Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0x26), 64, 1)) {
                 p->statModifierContext.chargeDuration = 60;
                 p->contactCounted = 0;
                 Player_SetActionPhase(p, 1);
             }
             break;
         case 1:
-            t = &p->tetherFrame;
-            if (!*t)
+            if (!p->tetherFrame)
                 Sound_PlaySong(0x1F7);
-            if (HELD) {
+            if (p->inputKeys[0] & 2) {
                 Player_UpdateAttackFacing(p);
-                ANIMATE(0x27);
+                Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0x27), 64, 1);
             }
-            if (++*t > 6) {
-                {
-                    u8 *chargeTier = &p->statModifierContext.chargeTier;
-                    *chargeTier = 0;
-                }
+            if (++p->tetherFrame > 6) {
+                p->statModifierContext.chargeTier = 0;
                 p->contactMagnitude = 0;
                 if (p->currentStatB <= 2) {
                     Sound_PlaySong(0xD5);
-                    goto release;
+                    Player_SetActionPhase(p, 5);
+                    Player_UpdateAttachedEntryPosition(p);
+                    break;
                 }
-                if (bonus(p, 0x10000000))
+                if (p && Player_ReadStatusBits(&p->statBonusFlags, 0x10000000))
                     Player_SetActionPhase(p, 4);
                 else
                     Player_SetActionPhase(p, 2);
-                if (!(bonus(p, 0x10000000)))
+                if (!(p && Player_ReadStatusBits(&p->statBonusFlags, 0x10000000)))
                     Player_SetActionPhase(p, 4);
                 else {
                     if (!Player_SpawnSelectedAttackProjectile(p))
-                        goto release;
-                    Player_SetActionPhase(p, 2);
+                        Player_SetActionPhase(p, 5);
+                    else
+                        Player_SetActionPhase(p, 2);
                 }
             }
-            goto attached;
+            Player_UpdateAttachedEntryPosition(p);
+            break;
         case 2:
             if (++p->tetherFrame == 6)
                 Sound_PlaySong(0x1F4);
-            if (!HELD)
+            if (!(p->inputKeys[0] & 2))
                 FireCharge(p);
             else {
                 if (ProjectileTask_GetKind7Value(p->statModifierContext.attachedEntry) > 1) {
-                    {
-                        u8 *chargeTier = &p->statModifierContext.chargeTier;
-                        *chargeTier = 1;
-                    }
+                    p->statModifierContext.chargeTier = 1;
                     p->contactMagnitude = 30;
                     p->actionEighteenParameter = 0x16E;
                     p->actionEighteenDuration = 36;
@@ -116,14 +100,11 @@ void Player_UpdateAttachedAttackCharge(struct Player *p)
             Player_UpdateAttachedEntryPosition(p);
             break;
         case 3:
-            if (!HELD)
+            if (!(p->inputKeys[0] & 2))
                 FireCharge(p);
             else {
                 if (ProjectileTask_GetKind7Value(p->statModifierContext.attachedEntry) > 2) {
-                    {
-                        u8 *chargeTier = &p->statModifierContext.chargeTier;
-                        *chargeTier = 1;
-                    }
+                    p->statModifierContext.chargeTier = 1;
                     p->contactMagnitude = 30;
                     p->actionEighteenParameter = 0x16E;
                     p->actionEighteenDuration = 36;
@@ -135,25 +116,22 @@ void Player_UpdateAttachedAttackCharge(struct Player *p)
             Player_UpdateAttachedEntryPosition(p);
             break;
         case 4:
-            if (!HELD) {
+            if (!(p->inputKeys[0] & 2)) {
                 if (Player_SpawnSelectedAttackProjectile(p))
                     Sound_PlaySong(0x1F6);
-            release:
                 Player_SetActionPhase(p, 5);
             } else {
                 FaceCharge(p);
             }
-        attached:
             Player_UpdateAttachedEntryPosition(p);
             break;
         case 5:
-            ANIMATE(0x28);
-            if (PRESSED)
+            Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0x28), 64, 1);
+            if (p->inputKeys[1] & 2)
                 p->statModifierContext.bufferedAttack = 1;
-            r = &p->contactMagnitude;
-            if (*r) {
+            if (p->contactMagnitude) {
                 s32 ang, n;
-                if (*r > 5) {
+                if (p->contactMagnitude > 5) {
                     origin.x = 0;
                     origin.y = 0;
                     origin.z = 0;
@@ -163,20 +141,18 @@ void Player_UpdateAttachedAttackCharge(struct Player *p)
                     SceneParticleBurst_CreateWhilePaused(&p->position, &origin, &spread, 1, 3, 4);
                 }
                 ang = ((p->facing + 5) & 7) << 5;
-                n = *r;
+                n = p->contactMagnitude;
                 p->velocityX = -scale(gUnk_086149C4[(ang + 64) & 255] * n);
                 p->velocityZ = -scale(p->contactMagnitude * gUnk_086149C4[ang]);
                 p->contactMagnitude = p->contactMagnitude * 3 >> 2;
             } else if (++p->tetherFrame > 4)
                 Player_SetActionPhase(p, 6);
             break;
-        case 6: {
-            u32 pending;
-            ANIMATE(0x27);
-            if (PRESSED)
+        case 6:
+            Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0x27), 64, 1);
+            if (p->inputKeys[1] & 2)
                 p->statModifierContext.bufferedAttack = 1;
-            pending = p->statModifierContext.bufferedAttack;
-            if (pending) {
+            if (p->statModifierContext.bufferedAttack) {
                 p->statModifierContext.attachedEntry = -1;
                 p->statModifierContext.bufferedAttack = 0;
                 p->tetherPhase = 1;
@@ -185,9 +161,8 @@ void Player_UpdateAttachedAttackCharge(struct Player *p)
                 Player_SetActionPhase(p, 7);
             }
             break;
-        }
         case 7:
-            ANIMATE(0x26);
+            Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0x26), 64, 1);
             if (++p->tetherFrame > 4)
                 ActorSequence_Begin(p, 0, 0);
             break;
