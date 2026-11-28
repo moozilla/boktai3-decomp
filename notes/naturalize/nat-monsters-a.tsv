@@ -446,3 +446,14 @@ src/monsters/axe/axe_contact.c	Axe_UpdateOrbitAttack	contrived	contrived	3	do-wh
 src/monsters/axe/axe.c	Axe_UpdateTargetLunge	contrived	contrived	4	flags pointer, mask blocks and entered temp: direct member updates change constant load order
 src/monsters/axe/axe.c	Axe_UpdateTrailFadeIn	minor	minor	0	block-scoped sprite view casts
 src/monsters/axe/axe.c	Axe_UpdateTargetWindup	minor	minor	0	block-scoped sprite view casts
+src/monsters/axe/axe.c	Axe_UpdateTurnAnimation	contrived	contrived	6	byte view of the body, constant and mask locals and a scale pointer: plain forms move constant loads and the heading address
+src/monsters/axe/axe.c	Axe_ConvergeRecoveryMotion	contrived	contrived	2	signed bitfield view and mask locals for the two flag clears: plain &= loads the mask in the other order
+src/monsters/axe/axe.c	Axe_UpdateDefeat	contrived	minor	3	placement mask block, x2 and a fill word shared with the stack arguments
+src/monsters/axe/axe.c	Axe_UpdatePursuit	contrived	minor	2	nested result block for the minimum step
+src/monsters/axe/axe.c	Axe_UpdateCollapsePhase	contrived	contrived	2	halfword flag view and mask locals: direct updates change constant load order
+src/monsters/axe/axe.c	SceneActorControl_UpdatePausePhase	contrived	natural	1	
+src/monsters/axe/axe.c	Axe_SelectRandomRoutePoint	contrived	minor	3	local view struct for the route fields
+src/monsters/axe/axe.c	SceneActorControl_InitializeHoverState	minor	minor	0	shared CpuSet fill word (already excused)
+src/monsters/axe/axe.c	Axe_BeginMoveToPosition	contrived	contrived	1	one stack array holds both the fill word and the delta: two locals swap their stack slots
+src/monsters/axe/axe.c	Axe_ClearForcedMovement	contrived	contrived	4	every mask and address parked in a local: direct updates load each mask after the value
+src/monsters/axe/axe.c	Axe_InitAttackCooldowns	contrived	contrived	1	open loop with exit inside and a health pointer: a counted for changes the strength reduction
