@@ -1,0 +1,2 @@
+path	function	verdict_before	verdict_after	compiles	stays_and_why
+src/monsters/ivy/ivy.c	Ivy_OnPrimaryContact	contrived	minor	6	Ivy_TestCaptureFlags(context, flag) kept: inline mask argument loads the mask before the field address

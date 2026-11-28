@@ -3,6 +3,12 @@
 
 #include "monsters/chase_actor.h"
 
+/* Bits of Ivy.captureFlags. */
+enum IvyCaptureFlag {
+    IVY_CAPTURE_RELEASED = 1,     /* the capture is over: contacts are ignored */
+    IVY_CAPTURE_HOLDS_PLAYER = 2, /* a grabbed player still has to be put down */
+};
+
 /* Ivy's class fields past the chase actor (Ivy_Create allocates 0x640 bytes; provisional). */
 struct Ivy {
     struct ChaseActor chase;

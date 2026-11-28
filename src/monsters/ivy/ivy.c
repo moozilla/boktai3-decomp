@@ -41,31 +41,18 @@
 
 void SceneActorBehavior_ApplyContactReaction(void *, void *, void *);
 
-static inline u32 ActorFlag(struct ChaseActor *actor, u32 input, u32 offset)
+static inline u8 Ivy_TestCaptureFlags(struct Ivy *context, u32 flags)
 {
-    u32 mask = input;
-    return offset == 0x2D4 ? *(u16 *)((u8 *)actor + offset) & mask
-                           : *(u32 *)((u8 *)actor + offset) & mask;
-}
-
-static inline u8 IsUnavailable(struct ChaseActor *actor)
-{
-    if (actor && (ActorFlag(actor, 0x40, 0x2D4) || ActorFlag(actor, 0x20000, 0x2D0) ||
-                  actor->base.health <= 0))
+    if (context->captureFlags & flags)
         return 1;
     return 0;
 }
 
-static inline u32 ContextFlag(struct Ivy *context, u32 input)
-{
-    return context->captureFlags & input;
-}
-
 void Ivy_OnPrimaryContact(void *source, void *target, struct ChaseActor *actor)
 {
-    if (IsUnavailable(actor))
+    if (SceneActorPlacement_IsUnavailable(&actor->base))
         return;
-    if (SceneActorChase_Test(ContextFlag(actor->base.context, 1), ~0))
+    if (Ivy_TestCaptureFlags(actor->base.context, IVY_CAPTURE_RELEASED))
         return;
     SceneActorBehavior_ApplyContactReaction(source, target, actor);
 }
@@ -1296,23 +1283,15 @@ s32 SceneActorControl_BeginSoundTransition(struct ChaseActor *actor)
     return result;
 }
 
-static inline u8 TestFlags_ReleaseCapturedPlayer(struct Ivy *context, u32 maskInput)
-{
-    u32 mask = maskInput;
-    if (context->captureFlags & mask)
-        return 1;
-    return 0;
-}
-
 /* Ivy release (tentative): once per capture (context flag 1), and when context flag 2 says the
  * player is held, puts the player back on the centre of the actor's terrain cell facing the
  * actor's quadrant (cue 0xE6); then returns the actor to idle with both colliders disabled. */
 
 void Ivy_ReleaseCapturedPlayer(struct ChaseActor *actor)
 {
-    if (TestFlags_ReleaseCapturedPlayer(actor->base.context, 1))
+    if (Ivy_TestCaptureFlags(actor->base.context, IVY_CAPTURE_RELEASED))
         return;
-    if (TestFlags_ReleaseCapturedPlayer(actor->base.context, 2)) {
+    if (Ivy_TestCaptureFlags(actor->base.context, IVY_CAPTURE_HOLDS_PLAYER)) {
         struct SceneVec position;
         s32 angle;
         CellCenter(&position, actor->base.terrainCell);
