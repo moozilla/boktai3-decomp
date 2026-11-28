@@ -49,46 +49,13 @@ void SceneActorBehavior_RecordDefeat(struct RoomActor *inputActor)
             return;
     }
     slot = actor->tracking.target->playerIndex;
-    {
-        u16 *counter;
-        u32 value;
-        u32 result;
-        if (slot == 0) {
-            IncrementFirst(&gGameState->actorDefeatsByPlayer[0]);
-            counter = CounterAddress(0x530);
-            value = *counter;
-            if (*(s16 *)counter > 9998)
-                goto capped;
-            result = value + 1;
-            *counter = result;
-            return;
-        } else if (slot == 1) {
-            counter = &gGameState->actorDefeatsByPlayer[1];
-            value = *counter;
-            if (*(s16 *)counter > 9998)
-                goto capped;
-            result = value + 1;
-            *counter = result;
-            return;
-        } else if (slot == 2) {
-            counter = &gGameState->actorDefeatsByPlayer[2];
-            value = *counter;
-            if (*(s16 *)counter > 9998)
-                goto capped;
-            result = value + 1;
-            *counter = result;
-            return;
-        } else if (slot == 3) {
-            counter = &gGameState->actorDefeatsByPlayer[3];
-            value = *counter;
-            if (*(s16 *)counter > 9998)
-                goto capped;
-            result = value + 1;
-            *counter = result;
-            return;
-        }
-        return;
-    capped:
-        *counter = 9999;
-    }
+    if (slot == 0) {
+        IncrementFirst(&gGameState->actorDefeatsByPlayer[0]);
+        IncrementFirst(CounterAddress(0x530));
+    } else if (slot == 1)
+        IncrementFirst(&gGameState->actorDefeatsByPlayer[1]);
+    else if (slot == 2)
+        IncrementFirst(&gGameState->actorDefeatsByPlayer[2]);
+    else if (slot == 3)
+        IncrementFirst(&gGameState->actorDefeatsByPlayer[3]);
 }
