@@ -12,11 +12,7 @@ void Text_FlushTileUploads(void)
     u32 src = 0x02034C00;
     for (i = 0; i < gTextTileUploadCount; i++) {
         u32 dst = (gTextTileUploadIndices[i] << 5) + 0x0600A000;
-        struct VideoDmaRegisters *d = (struct VideoDmaRegisters *)0x040000D4;
-        d->source = src;
-        d->destination = dst;
-        d->control = 0x84000008;
-        d->control;
+        DmaCopy32(3, src, dst, 32);
         src += 0x20;
     }
     gTextTileUploadCount = 0;

@@ -266,3 +266,4 @@ src/engine/video/sprite_oam.c	SpriteOam_QueueOverlayProjectedSprites	contrived	c
 src/engine/video/sprite_oam.c	SpriteOam_QueueProjectedSprites	contrived	contrived	8	goto next and manual advance
 src/engine/video/sprite_oam.c	SpriteOam_QueueFlaggedProjectedSprites	contrived	contrived	8	goto next and manual advance
 src/engine/video/sprite_oam.c	SpriteOam_QueueOverlayProjectedSprites	contrived	contrived	8	goto next and manual advance
+src/engine/video/text_graphics.c	Text_FlushTileUploads	contrived	natural	4	
