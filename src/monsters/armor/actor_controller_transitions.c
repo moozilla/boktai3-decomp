@@ -281,13 +281,11 @@ static inline s32 ActorController_ScaleHeavyAttack(s32 attack)
 
 void ActorController_UpdateHeavyAttackCollider(struct SceneCombatActor *actor)
 {
-    u8 *phase = &actor->actionPhase;
-    s32 initialPhase = *phase;
-    switch (initialPhase) {
-        case 0: {
+    switch (actor->actionPhase) {
+        case 0:
             Armor_SetAnimationFromStart(actor, gUnk_0824ECC4);
-            (*phase)++;
-            actor->actionReady = initialPhase;
+            actor->actionPhase++;
+            actor->actionReady = 0;
             ActorController_SelectPairedColliders(actor);
             {
                 struct ActorControllerMotion *motion = &actor->colliderGroup.motion;
@@ -296,13 +294,12 @@ void ActorController_UpdateHeavyAttackCollider(struct SceneCombatActor *actor)
             }
             actor->flags &= ~0x20;
             break;
-        }
         case 1:
             if (actor->animationComplete) {
                 struct ContactCollider *collider;
                 Armor_SetAnimationFromStart(actor, gUnk_0824ECC8);
-                (*phase)++;
-                actor->actionReady = initialPhase;
+                actor->actionPhase++;
+                actor->actionReady = 1;
                 ActorController_SetColliderFlags(&actor->colliderGroup.colliders[2], 4);
                 ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[1], 4);
                 ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[3], 4);
@@ -340,10 +337,7 @@ void ActorController_UpdateHeavyAttackCollider(struct SceneCombatActor *actor)
             *(const struct ContactPosition *)(tableOffset + (const u8 *)gUnk_0824ED0C);
         collider->offset =
             *(const struct ContactPosition *)(tableOffset + (const u8 *)gUnk_0824ECCC);
-        {
-            u8 heading = gUnk_0824ED4C[frame];
-            actor->colliderGroup.colliders[0].direction = heading;
-        }
+        actor->colliderGroup.colliders[0].direction = gUnk_0824ED4C[frame];
         if (frame == 3 && actor->animationFrame == 0)
             Sound_PlaySongChecked(0xbe);
     }
