@@ -277,3 +277,4 @@ src/monsters/armor/Armor_UpdatePart.c	Armor_UpdatePart	contrived	contrived	5	rem
 src/monsters/axe_armor/AxeArmor_ApplyHitReaction.c	AxeArmor_ApplyHitReaction	contrived	contrived	8	remaining: goto,block
 src/monsters/axe_armor/AxeArmor_UpdateAttackTiming.c	AxeArmor_UpdateAttackTiming	minor	natural	1	
 src/monsters/axe_armor/AxeArmor_InitializeFromScript.c	AxeArmor_InitializeFromScript	contrived	contrived	17	remaining: block,ptrtemp,structcast
+src/monsters/cannons/vulcan/VulcanCannon_UpdateTargeting.c	VulcanCannon_UpdateTargeting	contrived	minor	8	remaining: constlocal

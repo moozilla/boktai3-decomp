@@ -20,8 +20,7 @@ static inline s32 TargetDistance(struct SceneVec *player, struct ContactPosition
 s32 VulcanCannon_UpdateTargeting(struct VulcanCannon *p)
 {
     s32 facingRight = 0;
-    struct SceneVec *player = Player_GetEffectivePosition(0);
-    s32 distance = TargetDistance(player, &p->display.position);
+    s32 distance = TargetDistance((Player_GetEffectivePosition(0)), &p->display.position);
     struct SceneVec target;
 
     SceneVec_Copy(&target, Player_GetEffectivePosition(0));
@@ -80,14 +79,12 @@ s32 VulcanCannon_UpdateTargeting(struct VulcanCannon *p)
     if (p->aimTimer == 119) {
         u8 angle;
         s32 facing;
-        {
-            struct SceneVec *targetPosition;
-            struct ContactPosition *emitterPosition;
-            targetPosition = Player_GetEffectivePosition(0);
-            emitterPosition = &p->display.position;
-            angle = Math_Atan2(targetPosition->x - emitterPosition->x,
-                               targetPosition->z - emitterPosition->z);
-        }
+        struct SceneVec *targetPosition;
+        struct ContactPosition *emitterPosition;
+        targetPosition = Player_GetEffectivePosition(0);
+        emitterPosition = &p->display.position;
+        angle = Math_Atan2(targetPosition->x - emitterPosition->x,
+                           targetPosition->z - emitterPosition->z);
         p->timer = 0;
         p->shotCount = 0;
         facing = p->facing;
