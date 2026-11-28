@@ -29,32 +29,21 @@ struct AnimatedTile *AnimatedTile_Allocate(struct AnimatedTileManager *manager)
 
 /* Provisional names and field interpretations; confidence low. */
 
-static inline u8 AnimatedTile_IsUsed(u32 mask, s32 index, s32 one)
-{
-    if (mask & (one << index))
-        return 1;
-    return 0;
-}
-
 struct AnimatedTile *AnimatedTilePool_FindByName(u32 name)
 {
-    struct AnimatedTileManager *pool = (void *)gNamedEntryPool;
-    struct AnimatedTile *entry;
+    struct AnimatedTileManager *manager = (void *)gNamedEntryPool;
     s32 i;
-    u32 used;
-    s32 one;
-    if (!pool)
+    struct AnimatedTile *tile;
+
+    if (!manager)
         return 0;
-    i = 0;
-    used = pool->used;
-    one = 1;
-    entry = pool->tiles;
-    do {
-        if (AnimatedTile_IsUsed(used, i, one) && entry->name == name)
-            return entry;
-        entry++;
-        i++;
-    } while (i < 3);
+    for (i = 0; i < 3; i++) {
+        if (AnimatedTile_TestSlot(manager, i)) {
+            tile = &manager->tiles[i];
+            if (tile->name == name)
+                return tile;
+        }
+    }
     return 0;
 }
 
