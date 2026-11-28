@@ -189,3 +189,4 @@ src/ui/dialogue/message_menu.c	MessageMenu_Initialize	natural	natural	0
 src/ui/dialogue/message_menu.c	Password_Create	natural	natural	0	
 src/ui/dialogue/dialogue_transition.c	DialogueTransition_ConsumeStateEntry	minor	natural	5	
 src/ui/dialogue/dialogue_transition.c	DialogueTransition_UpdateFadeIn	contrived	natural	1	
+src/ui/dialogue/dialogue_transition.c	DialogueTransition_UpdateSkipFadeOut	contrived	natural	1	

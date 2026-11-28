@@ -73,8 +73,7 @@ void DialogueTransition_UpdateSkipFadeOut(struct DialogueTransition *transition)
     DialogueTransition_ConsumeStateEntry(transition);
     if (transition->skipProcedure) {
         if (transition->ticks > 15) {
-            u32 *brightness = &gBgFadeLevel;
-            *brightness = 0;
+            gBgFadeLevel = 0;
             Script_Call(transition->skipProcedure, 0);
             transition->skipProcedure = 0;
             Task_Kill(transition);
