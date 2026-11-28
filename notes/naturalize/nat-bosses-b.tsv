@@ -132,3 +132,4 @@ src/bosses/ratatosk/Ratatosk_OnFrontCollision.c	Ratatosk_OnFrontCollision	contri
 src/bosses/ratatosk/Ratatosk_OnBodyCollision.c	Ratatosk_OnBodyCollision	natural	natural	0	
 src/bosses/ratatosk/Ratatosk_OnOuterCollision.c	Ratatosk_OnOuterCollision	natural	natural	0	
 src/bosses/ratatosk/PreviewActor_ReplaceProjectileTowardPlayer.c	PreviewActor_ReplaceProjectileTowardPlayer	contrived	minor	3	originPtr/targetPtr stay; (s16) casts on the u16 range[] used as damage parameters
+src/bosses/ratatosk/Ratatosk_ApplyDamageReaction.c	Ratatosk_ApplyDamageReaction	contrived	minor	6	body pointer local and one mask-parameter flag accessor stay (register allocation / mask load order)
