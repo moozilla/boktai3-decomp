@@ -2420,7 +2420,7 @@ void ActorPhase_SelectDistantWaypoint(struct ChaseActor *actor, struct ContactPo
         }
         distance = ((*((s16 *)(&delta))) * (*((s16 *)(&delta)))) +
                    ((*(((s16 *)(&delta)) + 2)) * (*(((s16 *)(&delta)) + 2)));
-        if (((distance <= limit) && (bestDistance < distance)) &&
+        if ((distance <= limit && (bestDistance < distance)) &&
             (!Axe_IsRoutePointRecent(actor, i))) {
             bestIndex = i;
             bestDistance = distance;
@@ -2430,11 +2430,8 @@ void ActorPhase_SelectDistantWaypoint(struct ChaseActor *actor, struct ContactPo
     if (!bestDistance)
         bestIndex = Mod(Random_SelectDistantWaypoint(), *route.data);
     Axe_RecordRoutePoint(actor, bestIndex);
-    {
-        struct RoutePointSelection *dst = &route;
-        dst->index = bestIndex;
-        dst->mode = 0;
-    }
+    route.index = bestIndex;
+    route.mode = 0;
     route.entry = (u16 *)Path_GetPointData(route.data);
     route.entry = (u16 *)(((u8 *)route.entry) + (route.index * 8));
     wide = route.entry[0];

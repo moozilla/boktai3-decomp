@@ -260,3 +260,4 @@ src/monsters/axe/axe.c	Axe_UpdatePaletteFade	contrived	contrived	8	remaining: u8
 src/monsters/axe/axe.c	Axe_BeginPaletteTransition	contrived	contrived	14	remaining: u8cast,block,constlocal,mask,ptrtemp
 src/monsters/axe/axe.c	Axe_EmitMotionTrail	contrived	contrived	15	remaining: u8cast,bytep,zeroone,block,structcast
 src/monsters/axe/axe.c	Axe_TickAuxiliarySpriteTimers	contrived	contrived	9	remaining: u8cast,bytep,do,zeroone,block,constlocal,ptrtemp
+src/monsters/axe/axe.c	ActorPhase_SelectDistantWaypoint	contrived	contrived	2	remaining: u8cast,block
