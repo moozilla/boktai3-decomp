@@ -93,3 +93,4 @@ src/monsters/armor/Armor_SelectTimedAttack.c	Armor_SelectTimedAttack	contrived	m
 src/monsters/armor/Armor_UpdateAlignedAttackDecision.c	Armor_UpdateAlignedAttackDecision	contrived	minor	5	
 src/monsters/armor/Armor_UpdateAlignedStrikeDecision.c	Armor_UpdateAlignedStrikeDecision	contrived	minor	6	
 src/monsters/armor/Armor_Create.c	Armor_Create	contrived	natural	1	
+src/monsters/armor/Armor_OnPartDamageCollision.c	Armor_OnPartDamageCollision	contrived	minor	2	

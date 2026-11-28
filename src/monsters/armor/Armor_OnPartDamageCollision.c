@@ -150,9 +150,8 @@ void Armor_OnPartDamageCollision(struct ArmorContact *source, struct ArmorContac
         } else {
             Armor_ContactDisplacement(&displacement, (void *)target->pos, (void *)source->pos);
             if (displacement.x == 0 && displacement.z == 0) {
-                u32 *counter = &gRandomIndex;
-                *counter = (*counter + 1) & 0x3FF;
-                part->direction = ((const u16 *)RANDOM_TABLE_ADDR)[*counter];
+                gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+                part->direction = ((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
             } else {
                 part->direction = Math_Atan2(displacement.x, displacement.z);
             }
