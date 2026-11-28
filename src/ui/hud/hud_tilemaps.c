@@ -156,8 +156,8 @@ void SceneHud_ShowFourDigits(struct SceneInputPanel *parent, const struct Contac
     void *resource = &parent->widgetResource;
     struct AnimSprite *animSprite = &parent->numericLabel;
     s32 digits[4];
-    s32 offset, remaining;
-    s32 *digit;
+    s32 i;
+
     animSprite->flags &= ~1;
     animSprite->position = *position;
     Anim_LoadKeyframe(animSprite, resource, (u16)(label + 0xA8), 1);
@@ -169,18 +169,13 @@ void SceneHud_ShowFourDigits(struct SceneInputPanel *parent, const struct Contac
     digits[2] = Div(value, 10);
     value -= digits[2] * 10;
     digits[3] = value;
-    offset = 0;
-    digit = digits;
-    remaining = 3;
-    do {
+    for (i = 0; i < 4; i++) {
         animSprite->flags &= ~1;
-        Anim_LoadKeyframe(animSprite, resource, (u16)(*digit++ + 0xAA), 1);
+        Anim_LoadKeyframe(animSprite, resource, (u16)(digits[i] + 0xAA), 1);
         animSprite->position = *position;
-        animSprite->position.x += offset;
+        animSprite->position.x += i * 6;
         animSprite++;
-        offset += 6;
-        remaining--;
-    } while (remaining >= 0);
+    }
 }
 
 void SceneHud_HideFourDigits(struct SceneInputPanel *parent)
