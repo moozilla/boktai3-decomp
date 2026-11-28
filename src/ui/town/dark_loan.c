@@ -290,13 +290,10 @@ void DarkLoan_UpdateHidden(struct DarkLoanScreen *panel)
 
 void DarkLoan_UpdateOpeningAnimation(struct DarkLoanScreen *panel)
 {
-    u16 *c;
     Anim_Step(&panel->widgets[DARK_LOAN_BACKGROUND], &panel->resource);
-    c = &panel->timer;
-    if (*c == 0x20)
+    if (panel->timer == 0x20)
         Sound_PlaySong(0x2c0);
-    (*c)++;
-    if (*c > 0x68)
+    if (++panel->timer > 0x68)
         DarkLoan_FinishOpening(panel);
 }
 

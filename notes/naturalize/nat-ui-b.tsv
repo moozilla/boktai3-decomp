@@ -362,3 +362,15 @@ src/ui/town/dark_loan.c	DarkLoan_ShowPrompt	natural	natural	0
 src/ui/town/dark_loan.c	DarkLoan_ResetBackground	minor	natural	1	
 src/ui/town/dark_loan.c	DarkLoan_UpdateBalanceDigits	contrived	natural	1	
 src/ui/town/dark_loan.c	DarkLoan_UpdateAdjustmentDigits	contrived	natural	1	
+src/ui/town/dark_loan.c	DarkLoan_DrawPreview	natural	natural	0	
+src/ui/town/dark_loan.c	DarkLoan_HideSprites	natural	natural	0	
+src/ui/town/dark_loan.c	DarkLoan_SetState	natural	natural	0	
+src/ui/town/dark_loan.c	DarkLoan_BeginOpening	natural	natural	0	
+src/ui/town/dark_loan.c	DarkLoan_FinishOpening	natural	natural	0	
+src/ui/town/dark_loan.c	DarkLoan_BeginAdjustment	natural	natural	0	
+src/ui/town/dark_loan.c	DarkLoan_BeginClosing	natural	natural	0	
+src/ui/town/dark_loan.c	DarkLoan_ShowCompletionMessage	minor	minor	0	casts into an unnamed GameState field at 0x534 (shared header not owned)
+src/ui/town/dark_loan.c	DarkLoan_BeginAlternateOpening	natural	natural	0	
+src/ui/town/dark_loan.c	DarkLoan_HideDisplay	natural	natural	0	
+src/ui/town/dark_loan.c	DarkLoan_UpdateHidden	natural	natural	0	
+src/ui/town/dark_loan.c	DarkLoan_UpdateOpeningAnimation	minor	natural	1	
