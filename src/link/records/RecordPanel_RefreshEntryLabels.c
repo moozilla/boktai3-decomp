@@ -1,15 +1,14 @@
 #include "global.h"
-#include "link/records/record_name_panel.h"
+#include "ui/widgets/selection_panel.h"
 extern const u8 gUnk_0860654C[];
-void TextWindow_Clear(u32);
 void TextWindow_StartPlayback(s32);
 s32 TextWindow_SetScript(s32, const u8 *);
 s32 TextWindow_Refresh(s32, s32);
 u8 StateFlags_TestIndexedFlag(s32);
-void RecordPanel_RefreshEntryLabels(struct RecordNamePanel *p)
+void RecordPanel_RefreshEntryLabels(struct SelectionPanel *panel)
 {
     s32 skip, base, i;
-    switch ((s8)p->page) {
+    switch (panel->page) {
         case 0:
             skip = gUnk_0860654C[0] + 1;
             base = 0;
@@ -23,15 +22,15 @@ void RecordPanel_RefreshEntryLabels(struct RecordNamePanel *p)
     }
     for (i = 0; i < 6; i++) {
         if (skip == i) {
-            TextWindow_Clear(p->win[i + 1]);
+            TextWindow_Clear(panel->windows[i + 1]);
         } else {
-            TextWindow_Clear(p->win[i + 1]);
-            TextWindow_SetScript(p->win[i + 1], p->labelScript);
+            TextWindow_Clear(panel->windows[i + 1]);
+            TextWindow_SetScript(panel->windows[i + 1], panel->contextScript);
             if (StateFlags_TestIndexedFlag(i + base))
-                TextWindow_Refresh(p->win[i + 1], i + base);
+                TextWindow_Refresh(panel->windows[i + 1], i + base);
             else
-                TextWindow_Refresh(p->win[i + 1], 12);
-            TextWindow_StartPlayback(p->win[i + 1]);
+                TextWindow_Refresh(panel->windows[i + 1], 12);
+            TextWindow_StartPlayback(panel->windows[i + 1]);
         }
     }
 }
