@@ -974,10 +974,8 @@ s32 Player_GetStateModifierBonus(struct Player *p)
 s32 Player_IsActionBlocked(struct Player *);
 s32 Player_GetBlockedActionBonus(struct Player *p)
 {
-    if (Player_IsActionBlocked(p) == 0)
-        goto zero;
-    return 10;
-zero:
+    if (Player_IsActionBlocked(p))
+        return 10;
     return 0;
 }
 s32 Player_GetStatAModifierBonus(struct Player *p)

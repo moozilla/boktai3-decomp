@@ -64,3 +64,6 @@ src/player/appearance/player_visuals.c	Player_ClearStateTimer	natural	natural	0	
 src/player/appearance/player_visuals.c	Player_SelectTimedVisualMode	contrived	contrived	8	resource address via casts: counters628[slot] computes the base first; VisualBonusFlag accessor: plain test differs
 src/player/appearance/player_visuals.c	Player_SelectFlashingVisualMode	natural	natural	0	-
 src/player/appearance/player_visuals.c	Player_UpdateStatusVisuals	contrived	contrived	13	status-bit accessor: plain |= loads the field before the mask
+src/player/appearance/player_visuals.c	Player_AdvanceEffectTick	natural	natural	0	-
+src/player/appearance/player_visuals.c	SceneActor_UpdateVisualEffects	minor	minor	1	bare block orders the callback address before the context load
+src/player/appearance/player_visuals.c	Player_GetBlockedActionBonus	contrived	natural	1	-
