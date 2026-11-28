@@ -17,7 +17,7 @@ void SceneActorControl_UpdateCallbackTrigger(struct ChaseActor *actor)
         SceneActorTerrain_InstallControl(actor, actor->base.onDefeat, 0x11);
     } else if (actor->base.stepDone) {
         Trigger_ConsumePending(((u8 *)actor) + 0xC, 1);
-        SceneActorControl_Begin(actor, SceneActorControl_OnIdle, 0x10, taken);
+        SceneActorControl_Begin(actor, SceneActorControl_OnIdle, 0x10, 0);
         SceneActorTerrain_EnterState(actor, 3, 0, 0);
         SetFlags(actor, 0x1000);
     } else {

@@ -244,3 +244,4 @@ src/scene/actor/behavior/SceneActorReaction_UpdateRouteRecovery.c	SceneActorReac
 src/scene/actor/behavior/SceneActorControl_EnterTimedState.c	SceneActorControl_EnterTimedState	natural	natural	0	-
 src/scene/actor/behavior/SceneActorControl_BeginIdleControl.c	SceneActorControl_BeginIdleControl	minor	natural	1	-
 src/scene/actor/behavior/SceneActorControl_UpdateTriggerPhase.c	SceneActorControl_UpdateTriggerPhase	minor	natural	1	-
+src/scene/actor/behavior/SceneActorControl_UpdateCallbackTrigger.c	SceneActorControl_UpdateCallbackTrigger	minor	minor	2	flag setter inline (plain |= differs)
