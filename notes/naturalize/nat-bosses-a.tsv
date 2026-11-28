@@ -12,3 +12,4 @@ src/bosses/count/actor_graphics_and_basic_states.c	SceneActorGraphics_GetEffectS
 src/bosses/count/actor_graphics_and_basic_states.c	SceneActorState_SetValueClampedWhenInactive	natural	natural	0	
 src/bosses/count/actor_graphics_and_basic_states.c	SceneActorState_SetValueClampedWhenActive	natural	natural	0	
 src/bosses/count/actor_graphics_and_basic_states.c	SceneActors_StartDisappearEffect	minor	natural	1	
+src/bosses/count/actor_graphics_and_basic_states.c	SceneActors_RequestContactPoolClear	minor	natural	1	

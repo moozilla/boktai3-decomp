@@ -319,11 +319,10 @@ void ContactActorPool_RequestClear(struct ContactActorPool *);
 
 void SceneActors_RequestContactPoolClear(void)
 {
-    struct StateActor *p = SceneActors_GetBySlot(0);
-    if (p && ((struct SceneActorGraphics *)p->groundEffect)->contactPool != 0)
-        ContactActorPool_RequestClear(((struct SceneActorGraphics *)p->groundEffect)->contactPool);
+    struct SceneGraphicsActor *actor = (struct SceneGraphicsActor *)SceneActors_GetBySlot(0);
+    if (actor && actor->graphics.contactPool)
+        ContactActorPool_RequestClear(actor->graphics.contactPool);
 }
-
 void SceneActors_RequestContactPoolClear(void);
 
 void SceneActors_AddHealthCost(int amount)
