@@ -252,3 +252,8 @@ src/player/core/player_core.c	DirectionalEffect_GetAnimationParams	natural	natur
 src/player/core/player_core.c	ProjectEffectPosition	natural	natural	0	
 src/player/core/player_core.c	SetEffectOffset	natural	natural	0	
 src/player/core/player_core.c	Player_UpdateDirectionalEffectPair	minor	minor	1	unsigned halfword casts in the projection helpers
+src/player/core/player_core.c	Player_SetDirectionalVelocity	natural	natural	0	
+src/player/core/player_core.c	ActorSequence_Begin	natural	natural	0	
+src/player/core/player_core.c	Player_ConsumeStateEntry	natural	natural	0	
+src/player/core/player_core.c	Player_SetActionPhase	natural	natural	0	
+src/player/core/sub_08140244.c	sub_08140244	minor	natural	1	
