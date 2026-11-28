@@ -1,47 +1,33 @@
-#include "global.h"
+#include "npc/otenko/otenko_actor.h"
 #include "engine/engine.h"
-struct Npc {
-    u8 pad0[6];
-    u8 state, field7, pad8, field9;
-    u8 padA[2];
-    u16 flagsC, flagsE;
-    u32 field10;
-    u8 pad14[4];
-    u8 field18;
-    u8 pad19[0xBB];
-    u8 blockD4[0x1F8];
-    void *update;
-    u8 pad2D0[0x14];
-    void *callback;
-};
-s32 DisplayAnimation_TestFinished(void *);
+s32 DisplayAnimation_TestFinished(struct DisplayAnimation *);
 void Actor_OnHiddenIdleUpdate(void);
-void Otenko_UpdateStopped(void *unused, struct Npc *p)
+void Otenko_UpdateStopped(void *unused, struct OtenkoActor *npc)
 {
-    if (p->field9) {
-        p->field9 = 0;
-        p->field7 = 0;
-        Actor_PlayAnimationEntry(p, 5, 2, 0, 4);
+    if (npc->animationEntered) {
+        npc->animationEntered = 0;
+        npc->done = 0;
+        Actor_PlayAnimationEntry(npc, 5, 2, 0, 4);
         {
             s32 two = 2;
-            if ((p->flagsC & two) == 0)
+            if ((npc->commandFlags & two) == 0)
                 Sound_PlaySong(0x11F);
         }
         {
             s32 m = -3;
-            p->flagsC = m & p->flagsC;
+            npc->commandFlags = m & npc->commandFlags;
         }
     }
-    p->flagsE |= 1;
-    if ((u8)Callback_InvokeActor(p, p->callback) != 1 &&
-        DisplayAnimation_TestFinished(p->blockD4)) {
+    npc->displayFlags |= 1;
+    if ((u8)Callback_InvokeActor(npc, npc->animationCallback) != 1 &&
+        DisplayAnimation_TestFinished(&npc->display)) {
         void (*next)(void);
-        p->field7 = 1;
+        npc->done = 1;
         next = Actor_OnHiddenIdleUpdate;
-        p->state = 1;
-        p->update = next;
-        p->field10 = 0;
-        p->field9 = 1;
-        p->field18 = 0;
+        npc->prevState = 1;
+        npc->stateCallback = next;
+        npc->stateFrame = 0;
+        npc->animationEntered = 1;
+        npc->animationPhase = 0;
     }
 }
