@@ -3,6 +3,7 @@
 #include "engine/ram.h"
 #include "engine/task_manager.h"
 #include "scene/collision/packed_contact_vector.h"
+#include "scene/motion/scene_facing.h"
 struct OtenkoActor *Actor_Allocate(s32 name, s32 variant);
 s32 Actor_InitMotion(struct OtenkoActor *, s32 name, struct PackedContactVector *, s32 angle);
 s32 Actor_InitDrawable(struct OtenkoActor *, s32 kind, s32 a, s32 b, s32 c);
@@ -93,25 +94,8 @@ void Otenko_CreateFromScript(void)
     Actor_InitShadow(npc, (u32)npc->display.position, 1, 0, 0x40);
     SceneMessages_RegisterReceiver(&npc->receiver, name, 5);
     npc->body.direction = angle;
-    {
-        u16 a = angle;
-        {
-            s32 t;
-            u32 m;
-            t = a + 0x70;
-            t >>= 5;
-            m = 7;
-            m &= t;
-            npc->facing8 = m;
-        }
-        {
-            s32 t = (a + 0x60) >> 6;
-            u32 m;
-            m = 3;
-            m &= t;
-            npc->facing4 = m;
-        }
-    }
+    npc->facing8 = SceneFacing_EightWay(angle);
+    npc->facing4 = SceneFacing_FourWay(angle);
     Task_SetManager(Otenko_OnStateChange, (void **)&npc->animationCallback);
     Task_SetManager(sub_081D0864, &npc->callbacks[0]);
     Task_SetManager(Otenko_OnModeUpdate, &npc->callbacks[1]);

@@ -375,3 +375,7 @@ src/npc/otenko/Otenko_OnModeUpdate.c	Otenko_OnModeUpdate	natural	natural	0
 src/npc/otenko/Otenko_OnStateUpdate.c	Otenko_OnStateUpdate	natural	natural	0	
 src/npc/otenko/Otenko_OnDestroy.c	Otenko_OnDestroy	contrived	natural	2	falls off the end without a return value, as before
 src/npc/otenko/sub_081D010C.c	sub_081D010C	contrived	contrived	3	parked k/zero, callback local and the do-while around stageEntered order the state stores
+src/npc/otenko/Otenko_EnterProjectedIdle.c	Otenko_EnterProjectedIdle	contrived	contrived	1	do-while around the state change and parked state value order the stores
+src/npc/otenko/sub_081D0864.c	sub_081D0864	contrived	contrived	0	union reuse of one register for flags and counter plus parked masks; not attempted beyond reading
+src/npc/otenko/Otenko_OnStateEffectUpdate.c	Otenko_OnStateEffectUpdate	contrived	contrived	0	sample-origin wrapper struct, reused context register and pointer temps; not attempted beyond reading
+src/npc/otenko/Otenko_CreateFromScript.c	Otenko_CreateFromScript	contrived	contrived	1	parked one/mode/update locals per state change, body pointer block and box helper
