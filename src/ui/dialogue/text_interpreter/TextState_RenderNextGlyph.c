@@ -7,61 +7,62 @@ int TextState_DrawWideGlyph(struct MessagePlaybackState *, u32);
 int TextState_AdvanceCursor(struct MessagePlaybackState *, int);
 void TextState_AdvanceLine(struct MessagePlaybackState *);
 u32 Text_GetWideGlyphCount(void);
-const u8 *TextState_RenderNextGlyph(struct MessagePlaybackState *p, const u8 *s)
+const u8 *TextState_RenderNextGlyph(struct MessagePlaybackState *state, const u8 *text)
 {
     u16 glyph;
-    while (1) {
-        u32 c = *s;
+    u32 c;
+
+    for (;;) {
+        c = *text;
         c <<= 24;
         if ((s32)c >= 0) {
             c >>= 24;
             if (!c)
                 break;
             if (c == '<') {
-                s++;
-                if (!*s)
+                text++;
+                if (!*text)
                     break;
-                s = TextState_ProcessTag(p, s);
-                if (p->hold)
-                    return s;
-                if (!*s)
-                    return s;
-            } else if (*s == '\n') {
-                TextState_AdvanceLine(p);
-            } else if (*s == 0x1F) {
-                u32 code = (u16)Text_DecodeGlyphEscape(s);
+                text = TextState_ProcessTag(state, text);
+                if (state->hold || !*text)
+                    return text;
+            } else if (*text == '\n') {
+                TextState_AdvanceLine(state);
+            } else if (*text == 0x1F) {
+                u32 code = (u16)Text_DecodeGlyphEscape(text);
+
                 if (code == 0xFFFF) {
-                    glyph = *s - 32;
-                    TextState_DrawNarrowGlyph(p, glyph);
+                    glyph = *text - ' ';
+                    TextState_DrawNarrowGlyph(state, glyph);
                 } else if (code & 0xFF00) {
                     code &= 0x7FFF;
-                    TextState_DrawWideGlyph(p, code);
-                } else
-                    TextState_DrawNarrowGlyph(p, code);
-                s += 2;
-                return s;
+                    TextState_DrawWideGlyph(state, code);
+                } else {
+                    TextState_DrawNarrowGlyph(state, code);
+                }
+                text += 2;
+                return text;
             } else {
-                glyph = *s - 32;
-                TextState_DrawNarrowGlyph(p, glyph);
-                s++;
-                return s;
+                glyph = *text - ' ';
+                TextState_DrawNarrowGlyph(state, glyph);
+                text++;
+                return text;
             }
         } else {
-            u32 first = *s;
-            u32 mask = 0x7F;
-            u32 second;
-            mask &= first;
-            s++;
-            second = *s;
-            glyph = (mask << 8) | second;
+            u32 high = *text & 0x7F;
+            u32 low;
+
+            text++;
+            low = *text;
+            glyph = (high << 8) | low;
             if (glyph >= Text_GetWideGlyphCount())
-                TextState_AdvanceCursor(p, 1);
+                TextState_AdvanceCursor(state, 1);
             else
-                TextState_DrawWideGlyph(p, glyph);
-            s++;
-            return s;
+                TextState_DrawWideGlyph(state, glyph);
+            text++;
+            return text;
         }
-        s++;
+        text++;
     }
-    return s;
+    return text;
 }

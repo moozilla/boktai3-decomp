@@ -306,3 +306,4 @@ src/ui/dialogue/text_interpreter/TextState_SetChoiceProcedures.c	TextState_SetCh
 src/ui/dialogue/text_interpreter/TextState_GetNumberWidth.c	TextState_GetNumberWidth	minor	minor	12	absolute value through a temporary (abs() assigns in place)
 src/ui/dialogue/text_interpreter/TextState_ClearSelectedChoices.c	TextState_ClearSelectedChoices	minor	natural	1	
 src/ui/dialogue/text_interpreter/TextState_RunSelectedProcedures.c	TextState_RunSelectedProcedures	minor	natural	2	
+src/ui/dialogue/text_interpreter/TextState_RenderNextGlyph.c	TextState_RenderNextGlyph	contrived	minor	5	shift pair around the high-bit test; high and low byte locals
