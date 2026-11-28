@@ -220,3 +220,4 @@ src/engine/video/sprite.c	Sprite_RenderScaledList	contrived	minor	14	do/while(0)
 src/engine/video/sprite.c	Sprite_RenderCameraRelativeList	contrived	contrived	6	nested do/while(0) around the list head fetch: one level or none swaps cursor and resource registers (22 insns)
 src/engine/video/sprite.c	Sprite_RenderFlipAwareList	contrived	minor	7	short temp for offsetY in the unflipped vertical arm: the plain subtraction changes 80 insns
 src/engine/video/sprite.c	Sprite_RenderUnflippedList	minor	minor	1	edge temporaries in the culling box
+src/engine/video/sprite.c	SpriteTiles_LoadResource	contrived	natural	2	

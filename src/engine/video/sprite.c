@@ -729,13 +729,7 @@ void SpriteTiles_LoadResource(struct SpriteTileResource *resource)
 {
     gSpriteTileResource = resource;
     gStaticTileCount = resource->tileCount;
-    {
-        struct VideoDmaRegisters *dma = (struct VideoDmaRegisters *)REG_ADDR_DMA3SAD;
-        dma->source = (u32)resource + resource->dataOffset;
-        dma->destination = OBJ_VRAM0;
-        dma->control = ((resource->tileCount << 5) / 4) | 0x84000000;
-        dma->control;
-    }
+    DmaCopy32(3, (u32)resource + resource->dataOffset, OBJ_VRAM0, resource->tileCount << 5);
 }
 
 struct SpriteTileEntry *AnimData_FindEntry(u16 id)
