@@ -1,18 +1,19 @@
 #include "global.h"
-void Player_SetTetherMode(u8 *, s32, s32);
-s32 Player_SelectHistoryDirectionB(u8 *);
-void Player_UpdateActionFacingSide(u8 *);
+#include "player/player.h"
+
+void Player_SetTetherMode(struct Player *, s32, s32);
+s32 Player_SelectHistoryDirectionB(struct Player *);
+void Player_UpdateActionFacingSide(struct Player *);
 s32 ActorVariant_GetTableValue(u32, s32);
-void Player_SetAnimationIndex(u8 *, s32, s32);
-void Player_EnterIdleAnimation(u8 *p)
+void Player_SetAnimationIndex(struct Player *, s32, s32);
+
+void Player_EnterIdleAnimation(struct Player *p)
 {
-    s32 value;
-    if (p[0x457]) {
+    if (p->tetherMode) {
         Player_SetTetherMode(p, 0, 0);
-        p[0x3a4] = Player_SelectHistoryDirectionB(p);
+        p->facing = Player_SelectHistoryDirectionB(p);
         Player_UpdateActionFacingSide(p);
     }
-    *(u32 *)(p + 0x20) &= ~1;
-    value = ActorVariant_GetTableValue(p[0x418], 0);
-    Player_SetAnimationIndex(p, value, 0x40);
+    p->statusFlags &= ~1;
+    Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 0), 0x40);
 }
