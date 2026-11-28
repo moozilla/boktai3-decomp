@@ -32,3 +32,4 @@ src/scene/actor/actor_particles.c	ActorParticles_SpawnImpactBurst	natural	natura
 src/scene/actor/actor_particles.c	ActorParticles_UpdateEmitter	natural	natural	0	
 src/scene/actor/actor_particles.c	Actor_SetSpriteDepthOffsets	natural	natural	0	
 src/scene/actor/actor_particles.c	Character_SetLowResourceColorEffect	minor	minor	0	names (six/four/two) and u8* field bytes
+src/scene/actor/actor_particles.c	Actor_UpdateShadowSpriteParts	minor	minor	8	coordinates pointer: without taking the address of pos it stays in a register; an s16 array orders the x store differently

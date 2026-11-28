@@ -45,12 +45,12 @@ static inline int Rand(void)
 void Actor_UpdateShadowSpriteParts(struct ActorStats *actor, struct CharacterPreviewModel *model)
 {
     struct ContactPosition pos;
-    struct ContactPackedVector tmp;
+    struct ContactPackedVector world;
     s32 i;
     s32 shadowHeight;
     s32 groundHeight;
     s32 delta;
-    s32 v;
+    s32 speed;
     s16 *coordinates = &pos.x;
     pos.x = (actor->position.x >> 12) - gSceneCamera->x;
     coordinates[1] = ((actor->position.z + (actor->position.y + actor->height)) >> 12) + 0x5A;
@@ -60,23 +60,23 @@ void Actor_UpdateShadowSpriteParts(struct ActorStats *actor, struct CharacterPre
         model->view.parts[i].y = pos.y;
     }
     for (i = 3; i <= 4; i++) {
-        s32 ax = actor->position.x >> 12;
-        pos.x = ax - gSceneCamera->x;
-        tmp.y = actor->position.y >> 12;
-        tmp.z = actor->position.z >> 12;
+        s32 x = actor->position.x >> 12;
+        pos.x = x - gSceneCamera->x;
+        world.y = actor->position.y >> 12;
+        world.z = actor->position.z >> 12;
         switch (i) {
             case 3:
                 pos.x += 15;
                 pos.y -= 2;
-                tmp.x = ax + 15;
+                world.x = x + 15;
                 break;
             case 4:
                 pos.x -= 19;
                 pos.y -= 2;
-                tmp.x = ax - 19;
+                world.x = x - 19;
                 break;
         }
-        groundHeight = Terrain_GetCellClearance((s16 *)&tmp) - 6;
+        groundHeight = Terrain_GetCellClearance((s16 *)&world) - 6;
         delta = pos.y - groundHeight;
         if (delta > 8)
             shadowHeight = pos.y - 8;
@@ -96,12 +96,12 @@ void Actor_UpdateShadowSpriteParts(struct ActorStats *actor, struct CharacterPre
             model->view.parts[i].y += (Rand() & 3) - 1;
         }
     }
-    v = (actor->motion.forward >> 12) + 1;
-    if (v != 1) {
-        s32 sc = 0x40 - v * 2;
-        sc = sc < 0x20 ? 0x20 : sc;
-        Anim_SetFrameDurationScale(&model->view.parts[3], (u16)sc);
-        Anim_SetFrameDurationScale(&model->view.parts[4], (u16)sc);
+    speed = (actor->motion.forward >> 12) + 1;
+    if (speed != 1) {
+        s32 scale = 0x40 - speed * 2;
+        scale = scale < 0x20 ? 0x20 : scale;
+        Anim_SetFrameDurationScale(&model->view.parts[3], (u16)scale);
+        Anim_SetFrameDurationScale(&model->view.parts[4], (u16)scale);
     }
     Actor_SetSpriteDepthOffsets(model, actor->position.z >> 12);
 }
