@@ -54,14 +54,14 @@ s32 DisplayAnimation_UpdatePlayback(struct DisplayAnimation *display)
 
 s32 DisplayAnimation_TestFinished(struct DisplayAnimation *display)
 {
+    struct AnimSprite *sprite;
+
     if (display->kind == 1)
         return display->finished;
-    {
-        struct AnimSprite *state = &display->resource.keyframes.sprite;
-        if (state->status & 2)
-            return 1;
-        return 0;
-    }
+    sprite = &display->resource.keyframes.sprite;
+    if (sprite->status & 2)
+        return 1;
+    return 0;
 }
 
 s32 DisplayAnimation_GetFrameBoundary(struct DisplayAnimation *display, u32 *out)
