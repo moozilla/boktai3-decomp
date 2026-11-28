@@ -2,9 +2,6 @@
 #include "player/player.h"
 #include "engine/engine.h"
 // confidence=low: reverse velocity, shake, and target-directed recoil after impact.
-struct RecoveryVec {
-    s32 x : 16, y : 16, z : 16, pad : 16;
-};
 u32 ActorVariant_GetTableValue(u32, u32);
 u32 Player_SetAnimationIndex(void *, u32, u32);
 void Player_PlayLocalSong(u32, u32);
