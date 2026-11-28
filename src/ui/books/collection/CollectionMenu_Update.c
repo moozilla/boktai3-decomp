@@ -1,95 +1,75 @@
 #include "global.h"
 #include "engine/input.h"
-
-struct Keys {
-    u16 held;
-    u16 pressed;
-};
+#include "gba/io_reg.h"
+#include "ui/books/collection.h"
 
 void Sound_PlaySong(u32);
 u32 CollectionMenu_IsValidGridPosition(s32, s32, s32);
-void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
-void Collection_RefreshPage(void *);
-void Collection_RefreshSelection(void *);
-void Collection_UpdateHighlightPulse(void *);
-void Script_Call(void *, u32);
-void Task_Kill(void *);
-
-#define PAGE        (*(s16 *)(m + 0xb80))
-#define COL         (*(s16 *)(m + 0xb84))
-#define ROW         (*(s16 *)(m + 0xb86))
-#define INDEX       (*(u16 *)(m + 0xb88))
-#define EXITING     (*(s16 *)(m + 0xb8c))
-#define FADE        (*(s16 *)(m + 0xb8e))
-#define TIMER       (*(s16 *)(m + 0xb90))
-#define EXIT_SCRIPT (*(void **)(m + 0xba4))
 
 /* Tentative: L/R change page, d-pad moves the cursor, B closes the menu.
  * Declared s32 with no return statement: the original leaves r0 live. */
-s32 CollectionMenu_Update(u8 *m)
+s32 CollectionMenu_Update(struct CollectionMenu *menu)
 {
     u32 pageChanged = 0;
     u32 moved = 0;
 
-    if (EXITING == 0) {
-        if ((*(struct Keys *)gPadState).pressed & 0x200) {
-            if (--PAGE < 0)
-                PAGE = 2;
-            COL = moved;
-            ROW = moved;
+    if (menu->exiting == 0) {
+        if (gPadState[1] & L_BUTTON) {
+            if (--menu->page < 0)
+                menu->page = 2;
+            menu->column = 0;
+            menu->row = 0;
             Sound_PlaySong(0x10a);
             pageChanged = 1;
-        } else if ((*(struct Keys *)gPadState).pressed & 0x100) {
-            if (++PAGE > 2)
-                PAGE = moved;
-            COL = moved;
-            ROW = moved;
+        } else if (gPadState[1] & R_BUTTON) {
+            if (++menu->page > 2)
+                menu->page = 0;
+            menu->column = 0;
+            menu->row = 0;
             Sound_PlaySong(0x10a);
             pageChanged = 1;
         }
-        if (((*(struct Keys *)gPadState).pressed & 0x40) &&
-            (CollectionMenu_IsValidGridPosition(COL, ROW - 1, PAGE))) {
-            ROW--;
+        if ((gPadState[1] & DPAD_UP) &&
+            CollectionMenu_IsValidGridPosition(menu->column, menu->row - 1, menu->page)) {
+            menu->row--;
             moved = 1;
             Sound_PlaySong(0xdc);
-        } else if (((*(struct Keys *)gPadState).pressed & 0x80) &&
-                   (CollectionMenu_IsValidGridPosition(COL, ROW + 1, PAGE))) {
-            ROW++;
+        } else if ((gPadState[1] & DPAD_DOWN) &&
+                   CollectionMenu_IsValidGridPosition(menu->column, menu->row + 1, menu->page)) {
+            menu->row++;
             moved = 1;
             Sound_PlaySong(0xdc);
-        } else if (((*(struct Keys *)gPadState).pressed & 0x20) &&
-                   (CollectionMenu_IsValidGridPosition(COL - 1, ROW, PAGE))) {
-            COL--;
+        } else if ((gPadState[1] & DPAD_LEFT) &&
+                   CollectionMenu_IsValidGridPosition(menu->column - 1, menu->row, menu->page)) {
+            menu->column--;
             moved = 1;
             Sound_PlaySong(0xdc);
-        } else if (((*(struct Keys *)gPadState).pressed & 0x10) &&
-                   (CollectionMenu_IsValidGridPosition(COL + 1, ROW, PAGE))) {
-            COL++;
+        } else if ((gPadState[1] & DPAD_RIGHT) &&
+                   CollectionMenu_IsValidGridPosition(menu->column + 1, menu->row, menu->page)) {
+            menu->column++;
             moved = 1;
             Sound_PlaySong(0xdc);
         }
-        if ((*(struct Keys *)gPadState).pressed & 2) {
-            ScreenTransition_SendCommand(1, FADE, 4, 4, 4, 0xffff, 0);
-            EXITING = 1;
+        if (gPadState[1] & B_BUTTON) {
+            ScreenTransition_SendCommand(1, menu->fadeShift, 4, 4, 4, 0xffff, 0);
+            menu->exiting = 1;
             Sound_PlaySong(0x119);
         }
     }
-    if (pageChanged || moved) {
-        u16 idx = PAGE * 10 + ROW * 5 + COL;
-        INDEX = idx;
-    }
+    if (pageChanged || moved)
+        menu->selectedEntry = menu->page * 10 + menu->row * 5 + menu->column;
     if (pageChanged)
-        Collection_RefreshPage(m);
+        Collection_RefreshPage(menu);
     if (moved)
-        Collection_RefreshSelection(m);
-    if (EXITING) {
-        if (TIMER > 1 << FADE) {
-            if (EXIT_SCRIPT)
-                Script_Call(EXIT_SCRIPT, 0);
-            Task_Kill(m);
+        Collection_RefreshSelection(menu);
+    if (menu->exiting) {
+        if (menu->fadeTimer > 1 << menu->fadeShift) {
+            if (menu->exitScript)
+                Script_Call(menu->exitScript, 0);
+            Task_Kill(menu);
         }
-        TIMER++;
+        menu->fadeTimer++;
     } else {
-        Collection_UpdateHighlightPulse(m);
+        Collection_UpdateHighlightPulse(menu);
     }
 }
