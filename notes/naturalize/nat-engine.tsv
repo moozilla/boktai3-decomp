@@ -424,3 +424,8 @@ src/system/clock/Clock_CalculateDateDifference.c	Clock_CalculateDateDifference	c
 src/system/clock/Clock_CalculateWeekday.c	Clock_CalculateWeekday	minor	natural	1	
 src/system/clock/Clock_UnpackDate.c	Clock_UnpackDate	contrived	natural	1	
 src/system/clock/Clock_EncodeBcd.c	Clock_EncodeBcd	minor	natural	1	
+src/system/clock/Clock_DaysInMonth.c	Clock_DaysInMonth	natural	natural		
+src/system/clock/sun_clock.c	SunClock_Refresh	natural	natural		
+src/system/clock/sun_clock.c	SunClock_SetSunrise	natural	natural		
+src/system/clock/sun_clock.c	SunClock_SetSunset	natural	natural		
+src/system/clock/Clock_PackDate.c	Clock_PackDate	contrived	natural	1	

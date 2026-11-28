@@ -1,30 +1,19 @@
 #include "global.h"
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
-u32 Clock_PackDate(s32 a, s32 b, s32 c)
+u32 Clock_PackDate(s32 year, s32 month, s32 day)
 {
-    s32 d0, d1, d2, d3, e0, e1, f0, f1, sum, tmp;
-    u32 result;
-    d0 = Mod(a, 10);
-    d1 = Div(Mod(a, 100) - d0, 10);
-    tmp = Mod(a, 1000);
-    sum = d0 + d1;
-    d2 = Div(tmp - sum, 100);
-    tmp = Mod(a, 10000);
-    sum += d2;
-    tmp -= sum;
-    d3 = Div(tmp, 1000);
-    e0 = Mod(b, 10);
-    e1 = Div(Mod(b, 100) - e0, 10);
-    f0 = Mod(c, 10);
-    f1 = Div(Mod(c, 100) - f0, 10);
-    result = (u32)d3 << 28;
-    result |= (u32)d2 << 24;
-    result |= (u32)d1 << 20;
-    result |= (u32)d0 << 16;
-    result |= (u32)e1 << 12;
-    result |= (u32)e0 << 8;
-    result |= (u32)f1 << 4;
-    result |= f0;
-    return result;
+    s32 yearOnes, yearTens, yearHundreds, yearThousands;
+    s32 monthOnes, monthTens, dayOnes, dayTens;
+
+    yearOnes = Mod(year, 10);
+    yearTens = Div(Mod(year, 100) - yearOnes, 10);
+    yearHundreds = Div(Mod(year, 1000) - (yearOnes + yearTens), 100);
+    yearThousands = Div(Mod(year, 10000) - (yearOnes + yearTens + yearHundreds), 1000);
+    monthOnes = Mod(month, 10);
+    monthTens = Div(Mod(month, 100) - monthOnes, 10);
+    dayOnes = Mod(day, 10);
+    dayTens = Div(Mod(day, 100) - dayOnes, 10);
+    return (yearThousands << 28) | (yearHundreds << 24) | (yearTens << 20) | (yearOnes << 16) |
+           (monthTens << 12) | (monthOnes << 8) | (dayTens << 4) | dayOnes;
 }
