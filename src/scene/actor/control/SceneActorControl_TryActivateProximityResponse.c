@@ -1,49 +1,34 @@
 #include "global.h"
 #include "player/player.h"
-static inline u8 Test(u8 *s)
+#include "scene/motion/scene_actor_chase_shared.h"
+
+u32 SceneActorControl_TryActivateProximityResponse(struct ChaseActor *actor)
 {
-    u8 *p = s + 0xDC;
-    u32 mask = 2;
-    if (p[15] & mask)
-        return 1;
-    return 0;
-}
-u32 SceneActorControl_TryActivateProximityResponse(u8 *s)
-{
-    u8 *p;
-    s32 distance;
-    if (!Test(s))
+    struct SceneActorChaseTracking *tracking;
+    if (!SceneActorChase_TrackingFlags(&actor->base.tracking, 2))
         goto zero;
-    p = s + 0xDC;
+    tracking = &actor->base.tracking;
     {
-        s32 mask = -3;
-        mask &= p[15];
-        p[15] = mask;
+        s32 mask = ~2;
+        mask &= tracking->flags;
+        tracking->flags = mask;
     }
-    distance = *(s16 *)(s + 0x5E) - *(s16 *)((*(u8 **)gPlayers) + 0x32);
-    if (distance < 0)
-        distance = -distance;
-    if (distance > 0x200)
+    if (abs(actor->base.body.position.y - gPlayers[0]->position.y) > 0x200)
         goto zero;
-    {
-        u32 *a = (u32 *)(s + 0xF0);
-        u32 *b = (u32 *)(s + 0xF8);
-        if (*a >= *b)
-            goto zero;
-    }
-    goto one;
+    if (actor->base.tracking.distance < actor->base.tracking.limit)
+        goto one;
 zero:
     return 0;
 one: {
     u32 mask = 0x80;
-    u16 *flags = (u16 *)(s + 0x2D6);
+    u16 *flags = &actor->base.reactionFlags;
     mask |= *flags;
     *flags = mask;
 }
     {
         u32 mask = 0x10;
-        mask |= p[15];
-        p[15] = mask;
+        mask |= tracking->flags;
+        tracking->flags = mask;
     }
     return 1;
 }

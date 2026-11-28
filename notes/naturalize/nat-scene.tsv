@@ -326,3 +326,8 @@ src/scene/actor/control/SceneActorControl_GetTravelProfile.c	SceneActorControl_G
 src/scene/actor/control/SceneActorControl_AdvancePositionCurve.c	SceneActorControl_AdvancePositionCurve	contrived	natural	2	-
 src/scene/actor/control/SceneActorControl_ResetCollisionPhase.c	SceneActorControl_ResetCollisionPhase	contrived	contrived	7	flag pointer and mask blocks: plain |= and &= load the field before the mask
 src/scene/actor/control/SceneActorControl_GetDirectionalVariant.c	SceneActorControl_GetDirectionalVariant	minor	natural	1	-
+src/scene/actor/control/SceneActorControl_StartPositionCurve.c	SceneActorControl_StartPositionCurve	contrived	contrived	0	parked zero/one locals, temporary stack struct and CpuSet wrapper: plain state stores and ZeroFill8 change register choice and the stack layout
+src/scene/actor/control/SceneActorControl_ClearCollisionLatch.c	SceneActorControl_ClearCollisionLatch	contrived	contrived	0	mask blocks: plain &= loads the field before the mask
+src/scene/actor/control/SceneActorControl_ReflectTerrainProbe.c	SceneActorControl_ReflectTerrainProbe	contrived	contrived	0	pointer temporaries for the probe sum and negations: plain member forms change the address register choice
+src/scene/actor/control/SceneActorControl_RestartPositionCurve.c	SceneActorControl_RestartPositionCurve	minor	minor	0	flag accessor calls: plain |= and &= load the field before the mask
+src/scene/actor/control/SceneActorControl_TryActivateProximityResponse.c	SceneActorControl_TryActivateProximityResponse	contrived	minor	14	goto tail for the shared return and parked masks: nested ifs move the failure block, plain &=/|= load the field first
