@@ -580,10 +580,8 @@ static inline void Player_StoreStatusTimer(u16 *timers, s32 offset, u32 duration
 {
     *(u16 *)((u8 *)timers + offset) = duration;
 }
-void sub_0813D834(struct Player *p, s32 inputKind, u32 inputDuration)
+void sub_0813D834(struct Player *p, u32 kind, u32 duration)
 {
-    u32 kind = inputKind;
-    u32 duration = inputDuration;
     s32 offset;
     switch (kind) {
         case 0:
