@@ -1,28 +1,20 @@
 #include "global.h"
+#include "bosses/ratatosk/ratatosk.h"
 #include "engine/math/scene_vec.h"
-#include "bosses/ratatosk/proximity_entry_layout.h"
 
-struct SceneDistanceSet {
-    u8 pad0[0xD1C];
-    struct ProximityEntry entries[9];
-};
 struct SceneVec *Player_GetEffectivePosition(s32);
-void Ratatosk_UpdatePointDistancesToPlayer(struct SceneDistanceSet *set)
+
+void Ratatosk_UpdatePointDistancesToPlayer(struct Ratatosk *self)
 {
-    struct ProximityEntry *entry = set->entries;
-    u32 offset = 0;
-    s32 count = 8;
-    do {
-        struct SceneVec *target = Player_GetEffectivePosition(0);
-        s32 x = entry->position.x - target->x;
-        s32 z = entry->position.z - target->z;
-        x *= x;
-        x += z * z;
-        {
-            u8 *base = (u8 *)&set->entries[0].distanceSquared;
-            *(s32 *)(base + offset) = x;
-        }
-        entry++;
-        offset += 24;
-    } while (--count >= 0);
+    s32 i;
+
+    for (i = 0; i < 9; i++) {
+        struct SceneVec *player = Player_GetEffectivePosition(0);
+        s32 x = self->orbPoints[i].position.x - player->x;
+        s32 z = self->orbPoints[i].position.z - player->z;
+
+        s32 distance = x * x + z * z;
+
+        self->orbPoints[i].distance = distance;
+    }
 }
