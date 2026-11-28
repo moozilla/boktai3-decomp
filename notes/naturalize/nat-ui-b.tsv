@@ -473,3 +473,5 @@ src/ui/town/shop/Shop_BeginItemSpecialMove.c	Shop_BeginItemSpecialMove	contrived
 src/ui/town/shop/Shop_ClassifyItemMove.c	Shop_ClassifyItemMove	natural	natural	0	
 src/ui/town/shop/Shop_ClassifyConsumableMove.c	Shop_ClassifyConsumableMove	contrived	minor	1	index-first pointer sum into table160
 src/ui/town/shop/Shop_ClassifyEquipmentAction.c	Shop_ClassifyEquipmentAction	contrived	minor	8	catalog byte read as u8 then sign-extended (keeps the 255 test alive); catalog view cast
+src/ui/town/shop/Shop_ClassifyItemAction.c	Shop_ClassifyItemAction	minor	minor	0	catalog view cast
+src/ui/town/shop/Shop_ClassifyConsumableAction.c	Shop_ClassifyConsumableAction	contrived	minor	1	index-first pointer sum into table160; catalog view cast

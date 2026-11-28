@@ -5,8 +5,7 @@ s32 Shop_ClassifyConsumableAction(struct ShopControlView *panel)
     s32 item;
     if (panel->grid.selection > 15) {
         s32 pageIndex = (panel->page << 3) - 16;
-        item =
-            ((struct ShopCatalogView *)panel)->entries[pageIndex + panel->grid.selection];
+        item = ((struct ShopCatalogView *)panel)->entries[pageIndex + panel->grid.selection];
         result = 1;
         if (item < 0)
             result = 0;
@@ -15,7 +14,7 @@ s32 Shop_ClassifyConsumableAction(struct ShopControlView *panel)
         else if (panel->destination < 0)
             result = 0;
     } else {
-        item = ((struct GameState *)((u8 *)gGameState + panel->grid.selection * 2))->table160[0];
+        item = *(panel->grid.selection + gGameState->table160);
         if (GameState_IsConsumableSlotEquipped(panel->grid.selection))
             result = 0;
         else if (item < 0)
