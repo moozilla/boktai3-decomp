@@ -12,7 +12,7 @@ static inline s32 motionSquared(struct ContactPosition *motion)
 }
 s32 SceneActorMovement_UpdateAirborne(struct ChaseActor *actor)
 {
-    u8 category;
+    u32 category;
     u32 *flags;
     u32 value;
     u32 index;
@@ -40,10 +40,8 @@ s32 SceneActorMovement_UpdateAirborne(struct ChaseActor *actor)
         flags = &actor->base.statusFlags;
     }
     if (!value) {
-        u16 *y = (u16 *)&actor->base.secondaryMotion.y;
-        s32 dy;
-        *y = dy = *y - 2;
-        actor->base.heightOffset += dy;
+        actor->base.secondaryMotion.y -= 2;
+        actor->base.heightOffset += actor->base.secondaryMotion.y;
         actor->base.body.motion.x += actor->base.secondaryMotion.x;
         actor->base.body.motion.z += actor->base.secondaryMotion.z;
         index = actor->base.terrainCell;
@@ -67,17 +65,14 @@ s32 SceneActorMovement_UpdateAirborne(struct ChaseActor *actor)
 haveCell:
     kind = *cell >> 4;
     height = (*cell & 15) << 8;
-    if (kind == 1)
-        goto slopeZ;
-    if (kind == 2)
-        goto slopeX;
-    goto done;
-slopeZ:
-    height -= *((u8 *)local + 4);
-    goto done;
-slopeX:
-    height -= *(u8 *)local;
-done:;
+    switch (kind) {
+        case 1:
+            height -= (u8)local->z;
+            break;
+        case 2:
+            height -= (u8)local->x;
+            break;
+    }
     {
         s16 *elevation = (s16 *)&actor->base.heightOffset;
         if (*elevation + height <= height) {
@@ -95,9 +90,7 @@ done:;
             } else {
                 s32 y;
                 actor->base.secondaryMotion.x = Div(actor->base.secondaryMotion.x * 5, 10);
-                y = actor->base.secondaryMotion.y;
-                if (y < 0)
-                    y = -y;
+                y = abs(actor->base.secondaryMotion.y);
                 actor->base.secondaryMotion.y = Div(*bouncePtr * y, 10);
                 actor->base.secondaryMotion.z = Div(actor->base.secondaryMotion.z * 5, 10);
             }

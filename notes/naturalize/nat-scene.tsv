@@ -391,3 +391,7 @@ src/scene/actor/placement/SceneActorMovement_UpdateHeight.c	SceneActorMovement_U
 src/scene/actor/placement/SceneActorCollision_InitBody.c	SceneActorCollision_InitBody	contrived	natural	2	-
 src/scene/actor/placement/SceneActorCollision_InitBodyWithFlags.c	SceneActorCollision_InitBodyWithFlags	contrived	natural	2	-
 src/scene/actor/placement/SceneActorCollision_InitAttack.c	SceneActorCollision_InitAttack	contrived	minor	3	flags local before Collider_Init: the literal argument reorders the constant load
+src/scene/actor/placement/SceneActorCollision_InitExternalBody.c	SceneActorCollision_InitExternalBody	natural	natural	0	-
+src/scene/actor/placement/SceneActorCollision_InitExternalAttack.c	SceneActorCollision_InitExternalAttack	minor	minor	0	flags local before Collider_Init: the literal argument reorders the constant load
+src/scene/actor/placement/SceneActorCollision_InitExternalAttackWithField34.c	SceneActorCollision_InitExternalAttackWithField34	minor	minor	0	flags local before Collider_Init: the literal argument reorders the constant load
+src/scene/actor/placement/SceneActorMovement_UpdateAirborne.c	SceneActorMovement_UpdateAirborne	contrived	contrived	20	goto into the shared cell setup and flag pointer blocks: structured if/else moves the airborne branch layout
