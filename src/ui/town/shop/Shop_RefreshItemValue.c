@@ -10,9 +10,7 @@ void Shop_RefreshItemValue(struct ShopActionView *panel)
         value = SceneItemValue_CalculateItem(panel->selection);
         label = 1;
     } else if (panel->selection <= 23) {
-        s32 index = (panel->page << 3) - 16;
-        index += panel->selection;
-        kind = panel->catalog[index];
+        kind = panel->catalog[panel->selection - 16 + (panel->page << 3)];
         if (kind < 0)
             goto hidden;
         value = SceneItemValue_GetItemBaseValue(kind);

@@ -447,3 +447,4 @@ src/ui/town/shop/Shop_ShowItemDescription.c	Shop_ShowItemDescription	contrived	n
 src/ui/town/shop/Shop_ShowConsumableDescription.c	Shop_ShowConsumableDescription	contrived	minor	7	index-first pointer sum into table160 (address operand order)
 src/ui/town/shop/Shop_PopulateEquipmentGrid.c	Shop_PopulateEquipmentGrid	contrived	contrived	20	flag array view offset from the sprite pointers, row byte offsets and a nextRow copy: indexed loops give a different giv set (two walking bases in the ROM)
 src/ui/town/shop/Shop_RefreshEquipmentValue.c	Shop_RefreshEquipmentValue	contrived	natural	12	
+src/ui/town/shop/Shop_RefreshItemValue.c	Shop_RefreshItemValue	minor	minor	14	goto into the shared hide branch: separate early returns are not cross-jumped
