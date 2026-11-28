@@ -239,3 +239,4 @@ src/effects/healing/HealthRestoreEffect_OnUpdate.c	HealthRestoreEffect_OnUpdate	
 src/effects/healing/HealthRestoreEffect_OnDestroy.c	HealthRestoreEffect_OnDestroy	minor	natural	2	
 src/effects/healing/HealthRestoreEffect_InitAnimation.c	HealthRestoreEffect_InitAnimation	contrived	natural	4	
 src/effects/healing/HealthRestoreEffect_InitParticlePool.c	HealthRestoreEffect_InitParticlePool	minor	natural	6	particle pointer alias beside indexed fields: pointer copy order
+src/effects/healing/HealthRestoreEffect_Init.c	HealthRestoreEffect_Init	contrived	minor	40	projection written out with a zero local: cse takes the first zero between the screen row and depth

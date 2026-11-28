@@ -1,47 +1,40 @@
-#include "global.h"
-#include "engine/engine.h"
+#include "effects/healing/healing_effect.h"
+#include "engine/engine_globals.h"
 #include "engine/video/render.h"
-struct Vec50 {
-    s32 x : 16, y : 16, z : 16;
-};
-void HealthRestoreEffect_InitAnimation(u8 *);
-void HealthRestoreEffect_InitParticlePool(u8 *);
-void sub_08234DC8(u8 *);
-static inline s32 scale50(s32 v)
+#include "ui/hud/damage_number_display.h"
+
+s32 HealthRestoreEffect_Init(struct HealthRestoreEffect *effect, struct Player *owner)
 {
-    if (v >= 0)
-        v = v >> 5;
-    else
-        v = -((-v) >> 5);
-    return v;
-}
-s32 HealthRestoreEffect_Init(u8 *p, u8 *owner)
-{
-    struct Vec50 v;
-    u16 *dest;
-    s16 *coords;
+    struct ContactPosition position;
+    const struct ContactPosition *world;
+    struct ContactPosition *screen;
+    s32 scaledSum;
     s32 x, z, sum, vertical, y, depth;
     u32 zero;
-    *(u8 **)(p + 0x18) = owner;
-    v = *(struct Vec50 *)(owner + 0x30);
-    v.y += 150;
-    dest = (u16 *)(p + 0x84);
-    coords = (s16 *)&v;
-    x = coords[0];
-    z = coords[2];
-    dest[0] = scale50((x - z) * 3);
-    sum = scale50((x + z) * 3);
-    vertical = scale50(coords[1] * 3);
+
+    effect->owner = owner;
+    position = *(struct ContactPosition *)&owner->position;
+    position.y += 150;
+    /* DamageNumber_ProjectPosition, written out: the ROM clears the timer value between the
+     * screen row and the depth. */
+    screen = &effect->startPosition;
+    world = &position;
+    x = world->x;
+    z = world->z;
+    screen->x = DamageNumber_ProjectScale(3 * (x - z));
+    scaledSum = DamageNumber_ProjectScale(3 * (x + z));
+    sum = scaledSum;
+    vertical = DamageNumber_ProjectScale(3 * world->y);
     y = sum - vertical;
     zero = 0;
     depth = sum + vertical;
-    dest[0] = dest[0] - gCameraOrigin[0] + 120;
-    dest[1] = y - gCameraOrigin[1] + 80;
-    dest[2] = depth - gCameraOrigin[2];
-    HealthRestoreEffect_InitAnimation(p);
-    HealthRestoreEffect_InitParticlePool(p);
-    *(void (**)(u8 *))(p + 0x274) = sub_08234DC8;
-    *(u16 *)(p + 0x270) = zero;
+    screen->x = (u16)screen->x - gCameraOrigin[0] + 120;
+    screen->y = y - gCameraOrigin[1] + 80;
+    screen->z = depth - gCameraOrigin[2];
+    HealthRestoreEffect_InitAnimation(effect);
+    HealthRestoreEffect_InitParticlePool(effect);
+    effect->state = sub_08234DC8;
+    effect->timer = zero;
     gEngineFlags |= 1;
     return 0;
 }
