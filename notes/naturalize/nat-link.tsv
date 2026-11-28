@@ -210,3 +210,4 @@ src/link/player/Player_IsFlaggedWithGlobalModifier10.c	Player_IsFlaggedWithGloba
 src/link/player/sub_0823B8C4.c	sub_0823B8C4	natural	natural	0	
 src/link/player/Player_IsFlaggedWithGlobalModifier08.c	Player_IsFlaggedWithGlobalModifier08	natural	natural	0	
 src/link/player/Player_IsTerrainStepBlocked.c	Player_IsTerrainStepBlocked	contrived	natural	8	
+src/link/player/Actor_ProbeDiagonalTurnDir.c	Actor_ProbeDiagonalTurnDir	minor	natural	2	

@@ -1,90 +1,77 @@
 #include "global.h"
+#include "player/player.h"
 
 /* tentative: probes tiles beside the facing and picks a diagonal direction */
 
-struct Vec16 {
-    s16 x;
-    s16 y;
-    s16 z;
-    s16 w;
-};
+s32 Player_IsTerrainStepBlocked(struct Player *, struct SceneVec *);
 
-struct Obj {
-    u8 pad0[0x30];
-    struct Vec16 pos;
-    u8 pad38[0x48F - 0x38];
-    u8 dir;
-};
-
-s32 Player_IsTerrainStepBlocked(struct Obj *obj, struct Vec16 *v);
-
-s32 Actor_ProbeDiagonalTurnDir(struct Obj *obj)
+s32 Actor_ProbeDiagonalTurnDir(struct Player *p)
 {
-    struct Vec16 v;
+    struct SceneVec v;
 
-    switch (obj->dir) {
+    switch (p->unk48D[2]) {
         case 0:
-            v = obj->pos;
+            v = p->position;
             v.x -= 30;
             v.z -= 30;
             v.x -= 100;
-            if (Player_IsTerrainStepBlocked(obj, &v))
+            if (Player_IsTerrainStepBlocked(p, &v))
                 return 1;
             v.x += 100;
             v.z -= 100;
-            if (Player_IsTerrainStepBlocked(obj, &v))
+            if (Player_IsTerrainStepBlocked(p, &v))
                 return 7;
-            v = obj->pos;
+            v = p->position;
             v.x -= 100;
-            if (Player_IsTerrainStepBlocked(obj, &v))
+            if (Player_IsTerrainStepBlocked(p, &v))
                 return 1;
             return 7;
         case 2:
-            v = obj->pos;
+            v = p->position;
             v.x += 30;
             v.z -= 30;
             v.x += 100;
-            if (Player_IsTerrainStepBlocked(obj, &v))
+            if (Player_IsTerrainStepBlocked(p, &v))
                 return 1;
             v.x -= 100;
             v.z -= 100;
-            if (Player_IsTerrainStepBlocked(obj, &v))
+            if (Player_IsTerrainStepBlocked(p, &v))
                 return 3;
-            v = obj->pos;
+            v = p->position;
             v.x += 100;
-            if (Player_IsTerrainStepBlocked(obj, &v))
+            if (Player_IsTerrainStepBlocked(p, &v))
                 return 1;
             return 3;
         case 4:
-            v = obj->pos;
+            v = p->position;
             v.x += 30;
             v.z += 30;
             v.x += 100;
-            if (Player_IsTerrainStepBlocked(obj, &v))
+            if (Player_IsTerrainStepBlocked(p, &v))
                 return 5;
             v.x -= 100;
             v.z += 100;
-            if (Player_IsTerrainStepBlocked(obj, &v))
+            if (Player_IsTerrainStepBlocked(p, &v))
                 return 3;
-            v = obj->pos;
+            v = p->position;
             v.x += 100;
-            if (Player_IsTerrainStepBlocked(obj, &v))
+            if (Player_IsTerrainStepBlocked(p, &v))
                 return 5;
             return 3;
         case 6:
-            v = obj->pos;
+            v = p->position;
             v.x -= 30;
             v.z += 30;
             v.x -= 100;
-            if (Player_IsTerrainStepBlocked(obj, &v))
+            if (Player_IsTerrainStepBlocked(p, &v))
                 return 5;
             v.x += 100;
             v.z += 100;
-            if (Player_IsTerrainStepBlocked(obj, &v))
+            if (Player_IsTerrainStepBlocked(p, &v))
                 return 7;
-            v = obj->pos;
+            v = p->position;
             v.x -= 100;
-            if (Player_IsTerrainStepBlocked(obj, &v))
+            if (Player_IsTerrainStepBlocked(p, &v))
                 return 5;
             return 7;
     }
