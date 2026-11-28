@@ -450,3 +450,4 @@ src/ui/town/shop/Shop_RefreshEquipmentValue.c	Shop_RefreshEquipmentValue	contriv
 src/ui/town/shop/Shop_RefreshItemValue.c	Shop_RefreshItemValue	minor	minor	14	goto into the shared hide branch: separate early returns are not cross-jumped
 src/ui/town/shop/Shop_FindEquippedSlot.c	Shop_FindEquippedSlot	minor	natural	1	
 src/ui/town/shop/Shop_RefreshConsumableValue.c	Shop_RefreshConsumableValue	minor	minor	3	goto into the shared hide branch, as in the item version
+src/ui/town/shop/Shop_BeginEquipmentSwapPair.c	Shop_BeginEquipmentSwapPair	contrived	minor	5	widget-run view over the panel for the flag writes (one base for both sprite groups)
