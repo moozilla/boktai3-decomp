@@ -42,7 +42,7 @@ void SceneActorBehavior_UpdateColliders(struct ChaseActor *base)
     }
     {
         u32 category = actor->category;
-        if ((u32)(category - 12) <= 1 || category == 23) {
+        if (category == 12 || category == 13 || category == 23) {
             u16 *address = &actor->reactionFlags;
             u32 mask = ~0x4000;
             mask &= *address;
@@ -50,7 +50,7 @@ void SceneActorBehavior_UpdateColliders(struct ChaseActor *base)
             return;
         }
     }
-    if ((u8)(actor->controlKind - 21) <= 1)
+    if (actor->controlKind == 21 || actor->controlKind == 22)
         goto disable;
     {
         u32 mask = 0x8000;

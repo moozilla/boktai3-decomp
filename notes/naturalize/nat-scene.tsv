@@ -272,3 +272,12 @@ src/scene/actor/behavior/SceneActorBehavior_DispatchPrimaryOrEnterState2.c	Scene
 src/scene/actor/behavior/SceneActorBehavior_DispatchOrEnterState2.c	SceneActorBehavior_DispatchOrEnterState2	natural	natural	0	-
 src/scene/actor/behavior/SceneActorBehavior_DispatchAlternateOrEnterState2.c	SceneActorBehavior_DispatchAlternateOrEnterState2	natural	natural	0	-
 src/scene/actor/behavior/SceneActorBehavior_InstallCallbackTables.c	SceneActorBehavior_InstallCallbackTables	natural	natural	0	-
+src/scene/actor/behavior/SceneActorBehavior_CallActionScript.c	SceneActorBehavior_CallActionScript	natural	natural	0	-
+src/scene/actor/behavior/SceneActorBehavior_InitializeShadow.c	SceneActorBehavior_InitializeShadow	natural	natural	0	-
+src/scene/actor/behavior/SceneActorReaction_OnEnemyDefault.c	SceneActorReaction_OnEnemyDefault	natural	natural	0	-
+src/scene/actor/behavior/SceneActorReaction_RunUnusedHook.c	SceneActorReaction_RunUnusedHook	natural	natural	0	-
+src/scene/actor/behavior/SceneActorTarget_OnBindingChanged.c	SceneActorTarget_OnBindingChanged	natural	natural	0	-
+src/scene/actor/behavior/SceneActorTarget_RunUnusedDestroyHook.c	SceneActorTarget_RunUnusedDestroyHook	natural	natural	0	-
+src/scene/actor/behavior/SceneActorTarget_RunUnusedInitHook.c	SceneActorTarget_RunUnusedInitHook	natural	natural	0	-
+src/scene/actor/behavior/SceneActorTarget_RunUnusedUpdateHook.c	SceneActorTarget_RunUnusedUpdateHook	natural	natural	0	-
+src/scene/actor/behavior/SceneActorBehavior_UpdateColliders.c	SceneActorBehavior_UpdateColliders	contrived	contrived	30	goto chain, mask blocks and materialized flag predicates: plain forms share the disable tails differently; accessor forms only move the masks into arguments
