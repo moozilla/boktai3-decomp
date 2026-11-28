@@ -60,7 +60,7 @@ void PlasmaCannon_FireProjectile(struct OrangeSpine *p)
     t1 = &position;
     pos = t1;
     position = p->position;
-    (&position)->y += 128;
+    position.y += 128;
     vector(&delta, angle, 160);
     add(&position, &position, &delta);
     ProjectileConfig_Init(config);
