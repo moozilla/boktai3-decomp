@@ -8,7 +8,7 @@ s32 AnimData_Load(void *, u32);
 void Sprite_ApplyAnimation(void *, void *);
 void VariantSprite_SelectAnimation(struct VariantSprite *arg, u32 variant)
 {
-    register struct VariantSprite *p = arg;
+    struct VariantSprite *p = arg;
     switch (variant) {
         case 0:
             AnimData_Load(p->animation, 0xB250);
