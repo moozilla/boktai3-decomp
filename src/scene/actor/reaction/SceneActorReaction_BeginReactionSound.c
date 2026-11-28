@@ -1,7 +1,7 @@
+#include "scene/motion/scene_actor_terrain_reaction.h"
 #include "scene/actor/scene_actor_reaction.h"
 void SceneActorReaction_BeginReactionSound(struct ChaseActor *actor)
 {
-    u32 state;
     u32 timerZero;
     struct SceneActorReactionGroup *group = (void *)&actor->group.common;
     if (SceneActorReaction_TakePrepared(actor)) {
@@ -30,7 +30,7 @@ void SceneActorReaction_BeginReactionSound(struct ChaseActor *actor)
                     break;
             }
             {
-                u16 *timer = (u16 *)(((u8 *)actor) + 0x178);
+                u16 *timer = &actor->base.colliderA.responseValue;
                 timerZero = 0;
                 *timer = timerZero;
             }
@@ -46,18 +46,7 @@ void SceneActorReaction_BeginReactionSound(struct ChaseActor *actor)
             u32 mask = ~1;
             *(u32 *)(tile + 8) &= mask;
         }
-        {
-            u32 zero;
-            u8 *first;
-            state = 3;
-            first = &actor->base.state2A8;
-            zero = 0;
-            *first = state;
-            actor->base.phase2A9 = zero;
-            actor->base.behavior2AA = zero;
-            actor->base.counter2AC = zero;
-            actor->base.field2B1 = 1;
-        }
+        SceneActorTerrain_EnterState(actor, 3, 0, 0);
         actor->base.attachmentTimer = 0;
     }
 }

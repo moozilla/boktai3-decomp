@@ -465,3 +465,4 @@ src/scene/actor/reaction/SceneActorReaction_UpdateAnimationGate.c	SceneActorReac
 src/scene/actor/reaction/SceneActorReaction_PlayAnimationBUntilComplete.c	SceneActorReaction_PlayAnimationBUntilComplete	contrived	natural	2	-
 src/scene/actor/reaction/SceneActorReaction_TurnBackToRoute.c	SceneActorReaction_TurnBackToRoute	contrived	minor	9	the 0x10 mask local and the delayed-response callback/one locals stay (store order)
 src/scene/actor/reaction/SceneActorReaction_BeginFadedState.c	SceneActorReaction_BeginFadedState	contrived	contrived	7	partial: mask locals, drawable casts and the state-entry block stay; plain forms move the 3 and 0 registers
+src/scene/actor/reaction/SceneActorReaction_BeginReactionSound.c	SceneActorReaction_BeginReactionSound	contrived	contrived	22	partial: the empty while and zero-derived mask stay; without them the zero is loaded before the field address
