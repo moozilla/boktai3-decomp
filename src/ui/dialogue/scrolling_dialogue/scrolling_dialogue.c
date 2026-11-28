@@ -254,12 +254,10 @@ s32 ScrollingDialogue_SetNumberArgumentFromScript(void)
 s32 ScrollingDialogue_SetStringArgument(u32 a, u32 b)
 {
     struct ScrollingDialogue *dialogue = (void *)gScrollingDialogue;
-    s32 r;
-    if (dialogue == 0)
-        r = -1;
-    else
-        r = TextState_SetString(&dialogue->text, a, b);
-    return r;
+
+    if (dialogue)
+        return TextState_SetString(&dialogue->text, a, b);
+    return -1;
 }
 
 s32 ScrollingDialogue_SetStringFromScript(void)
