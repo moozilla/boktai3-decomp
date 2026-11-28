@@ -1,7 +1,6 @@
 #include "player/cues/player_cue.h"
 #include "player/player_status_flags.h"
 #include "player/cutscene/player_cue_sequence.h"
-// Tail address temporaries and register choices still differ.
 // confidence=low: spiral particles accompany a timed release and palette cue.
 u32 Player_ConsumeStateEntry(struct Player *);
 void Player_EmitQueuedEffects(struct Player *);
