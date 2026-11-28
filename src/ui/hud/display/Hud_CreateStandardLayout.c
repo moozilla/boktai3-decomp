@@ -1,26 +1,25 @@
 #include "global.h"
 #include "engine/ram.h"
+#include "engine/task.h"
+#include "ui/pause/scene_hud_display.h"
 
-u8 *Task_Create(u32, u32);
-void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
-s32 SceneHud_InitFromScript(u8 *, u32);
-void Task_Kill(u8 *);
+s32 SceneHud_InitFromScript(struct SceneHudState *, u32);
 void Hud_UpdateWithCallback(void);
 void SceneHud_DestroyOwner(void);
 
-u8 *Hud_CreateStandardLayout(u32 a)
+struct SceneHudState *Hud_CreateStandardLayout(u32 parameter)
 {
-    u8 *p;
-    if (gFieldHud != 0)
-        return gFieldHud;
-    p = Task_Create(0xc, 0x4DA0);
-    if (p != 0) {
-        Task_SetCallbacks(p, Hud_UpdateWithCallback, SceneHud_DestroyOwner);
-        *(u16 *)(p + 0xA5A) = a;
-        if (SceneHud_InitFromScript(p, a) < 0) {
-            Task_Kill(p);
+    struct SceneHudState *hud;
+    if (gFieldHud)
+        return (struct SceneHudState *)gFieldHud;
+    hud = (struct SceneHudState *)Task_Create(0xc, 0x4DA0);
+    if (hud) {
+        Task_SetCallbacks(&hud->task, Hud_UpdateWithCallback, SceneHud_DestroyOwner);
+        hud->creationParameter = parameter;
+        if (SceneHud_InitFromScript(hud, parameter) < 0) {
+            Task_Kill(&hud->task);
             return 0;
         }
     }
-    return p;
+    return hud;
 }
