@@ -123,3 +123,4 @@ src/monsters/mummy/mummy.c	Mummy_UpdateIdle	natural	natural	0
 src/monsters/mummy/mummy.c	Mummy_TurnTowardRoute	contrived	contrived	13	unchanged: motionFlags pointer, prepared local and SceneActorTurn flag accessors all fix load order
 src/monsters/mummy/mummy.c	Mummy_OnAttackCollision	contrived	contrived	19	two views of the actor argument (casts), contact latch and address helpers fix register allocation
 src/monsters/mummy/mummy_entry.c	Mummy_ResumeSavedTarget	contrived	contrived	11	goto rewind and flag accessors remain
+src/monsters/mummy/mummy_entry.c	Mummy_UpdateRevival	minor	minor	5	flag peek helper stays

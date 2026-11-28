@@ -224,7 +224,7 @@ void Mummy_UpdateRevival(void *object)
     actor->base.state2A8 = actor->base.saved.state;
     actor->base.phase2A9 = actor->base.saved.phase;
     actor->base.behavior2AA = actor->base.saved.behavior;
-    actor->base.target = (void *)actor->base.saved.control;
+    actor->base.target = actor->base.saved.control;
     actor->base.controlKind = actor->base.saved.kind;
     actor->base.placementFlags = actor->base.saved.motionFlags;
     actor->base.heightOffset = actor->base.saved.heightOffset;
