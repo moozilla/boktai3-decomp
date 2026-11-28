@@ -1,24 +1,28 @@
 #include "global.h"
 #include "engine/runtime.h"
-extern u8 gSunClock[];
+#include "system/clock/sun_clock.h"
 void Clock_UnpackDate(s32 *, s32 *, s32 *, u32);
 u32 Clock_PackDate(s32, s32, s32);
 s32 Clock_DaysInMonth(s32, s32);
 s32 Clock_CalculateWeekday(s32, s32, s32);
 void SunClock_TickFrame(void)
 {
-    if (++gSunClock[7] > 59) {
-        u8 *p;
-        gSunClock[7] = 0;
-        p = gSunClock;
-        if (++p[6] > 59) {
-            p[6] = 0;
-            if (++p[5] > 59) {
-                p[5] = 0;
-                if (++p[4] > 23) {
+    gSunClock.extra7++;
+        if (gSunClock.extra7 > 59) {
+        struct SunClock *clock;
+        gSunClock.extra7 = 0;
+        clock = &gSunClock;
+        clock->extra6++;
+        if (clock->extra6 > 59) {
+            clock->extra6 = 0;
+            clock->baseMinute++;
+        if (clock->baseMinute > 59) {
+                clock->baseMinute = 0;
+                clock->baseHour++;
+        if (clock->baseHour > 23) {
                     s32 year, month, day;
-                    p[4] = 0;
-                    Clock_UnpackDate(&year, &month, &day, *(u32 *)p);
+                    clock->baseHour = 0;
+                    Clock_UnpackDate(&year, &month, &day, clock->stamp);
                     day++;
                     if (day >= Clock_DaysInMonth(year, month)) {
                         day = 1;
@@ -30,18 +34,15 @@ void SunClock_TickFrame(void)
                                 year = 2099;
                         }
                     }
-                    *(u32 *)p = Clock_PackDate(year, month, day);
-                    p[8] = Clock_CalculateWeekday(year, month, day);
+                    clock->stamp = Clock_PackDate(year, month, day);
+                    clock->field8 = Clock_CalculateWeekday(year, month, day);
                 }
             }
             gSleepResumePending = 1;
-            {
-                u8 *other = gSunClock;
-                if (*(u16 *)(other + 12) == *(u16 *)(p + 4)) {
-                    u16 *counter = (u16 *)(other + 20);
-                    if (++*counter > 280)
-                        *counter = 0;
-                }
+            if (gSunClock.hourB == clock->baseHour && gSunClock.minuteB == clock->baseMinute) {
+                gSunClock.moonAgeTenths++;
+                if (gSunClock.moonAgeTenths > 280)
+                    gSunClock.moonAgeTenths = 0;
             }
         }
     }
