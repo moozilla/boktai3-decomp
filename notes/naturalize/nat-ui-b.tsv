@@ -1,0 +1,2 @@
+path	function	verdict_before	verdict_after	compiles	stays
+src/ui/results/stage_results/StageResults_ShowSummaryText.c	StageResults_ShowSummaryText	contrived	natural	1	
