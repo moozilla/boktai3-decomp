@@ -1,8 +1,11 @@
 #include "global.h"
-void ActorSequence_Begin(u8 *, u32, u32);
-void Player_ResetIdleMotion(u8 *p)
+#include "player/player.h"
+
+void ActorSequence_Begin(struct Player *, u32, u32);
+
+void Player_ResetIdleMotion(struct Player *p)
 {
-    *(u32 *)(p + 0x20) &= ~1;
-    if (p[0x5bb] == 0)
+    p->statusFlags &= ~1;
+    if (!p->movementModifierActive)
         ActorSequence_Begin(p, 0, 0);
 }
