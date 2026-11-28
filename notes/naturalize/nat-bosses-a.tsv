@@ -144,3 +144,4 @@ src/bosses/count/contact_actor_display.c	ContactActor_ApplyResourceContact	natur
 src/bosses/count/contact_actor_display.c	ContactActor_DestroySlot	natural	natural	0	
 src/bosses/count/contact_actor_display.c	ContactActor_SetDirectionalSequence	contrived	contrived	40	unchanged: ROM keeps two registers for &flip[1] (store and later load), as from an inlined out-parameter helper; every plain flag spelling drops them
 src/bosses/count/Count_ApplyPendingDamage.c	Count_ApplyPendingDamage	contrived	contrived	40	partial: keeps base alias, damagePtr/specialPtr, health pointer and forced temporaries; whole-function plain rewrite is 2 insns off (state alias placement and health base register)
+src/bosses/count/ContactActor_UpdateTracking.c	ContactActor_UpdateTracking	contrived	minor	22	keeps a block-local position pointer in the two target reads
