@@ -74,21 +74,21 @@ struct ScriptedColliderActor {
     u8 unknown9a[5], entered;
 };
 
-void LargeFragmentEffect_InitCollider(u8 *p, u32 a, u32 b, u32 c, u32 d)
+void LargeFragmentEffect_InitCollider(struct ScriptedColliderActor *actor, u32 a, u32 b, u32 c,
+                                      u32 d)
 {
-    struct PackedContactVector s1, s2;
-    u8 *q;
-    s1.x = 0x40;
-    s1.y = 0x80;
-    s1.z = 0x40;
-    s2.x = 0;
-    s2.y = 0;
-    s2.z = 0;
-    q = p + 0x3C;
-    Collider_Init(q, 0, 0x2401, 0, 0x10, &s1, &s2);
-    Collider_SetAttackProperties(q, a, b, 0, c, d);
-    Collider_SetCallback(q, LargeFragmentEffect_OnCollision, p);
-    Collider_SetPosition(q, p + 0x1c, 0);
+    struct PackedContactVector size, offset;
+
+    size.x = 0x40;
+    size.y = 0x80;
+    size.z = 0x40;
+    offset.x = 0;
+    offset.y = 0;
+    offset.z = 0;
+    Collider_Init(actor->collider, 0, 0x2401, 0, 0x10, &size, &offset);
+    Collider_SetAttackProperties(actor->collider, a, b, 0, c, d);
+    Collider_SetCallback(actor->collider, LargeFragmentEffect_OnCollision, actor);
+    Collider_SetPosition(actor->collider, &actor->position, 0);
 }
 
 void LargeFragmentEffect_UpdateCollider(u8 *p)
