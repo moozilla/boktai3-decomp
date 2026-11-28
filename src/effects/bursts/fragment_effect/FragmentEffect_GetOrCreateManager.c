@@ -1,25 +1,22 @@
-#include "global.h"
-#include "engine/ram.h"
+#include "effects/bursts/fragment_effect.h"
 
-u8 *Task_Create(u32, u32);
-void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
-s32 FragmentEffect_InitManager(u8 *);
-void Task_Kill(u8 *);
-void FragmentEffect_UpdateManager(void);
-void FragmentEffect_DestroyManager(void);
+s32 FragmentEffect_InitManager(struct FragmentEffectPool *);
+u32 FragmentEffect_UpdateManager(struct FragmentEffectPool *);
+u32 FragmentEffect_DestroyManager(struct FragmentEffectPool *);
 
-u8 *FragmentEffect_GetOrCreateManager(void)
+struct FragmentEffectPool *FragmentEffect_GetOrCreateManager(void)
 {
-    u8 *p;
-    if (gFragmentEffectManager != 0)
-        return gFragmentEffectManager;
-    p = Task_Create(0xa, 0x63c);
-    if (p != 0) {
-        Task_SetCallbacks(p, FragmentEffect_UpdateManager, FragmentEffect_DestroyManager);
-        if (FragmentEffect_InitManager(p) < 0) {
-            Task_Kill(p);
+    struct FragmentEffectPool *pool;
+
+    if (gFragmentEffectManager)
+        return (struct FragmentEffectPool *)gFragmentEffectManager;
+    pool = Task_Create(0xa, sizeof(*pool));
+    if (pool) {
+        Task_SetCallbacks(pool, FragmentEffect_UpdateManager, FragmentEffect_DestroyManager);
+        if (FragmentEffect_InitManager(pool) < 0) {
+            Task_Kill(pool);
             return 0;
         }
     }
-    return p;
+    return pool;
 }

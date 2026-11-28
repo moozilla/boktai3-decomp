@@ -148,3 +148,4 @@ src/effects/bursts/fragment_effect/sub_0812C3D0.c	sub_0812C3D0	minor	natural	1	-
 src/effects/bursts/fragment_effect/FragmentEffect_UpdateManager.c	FragmentEffect_UpdateManager	contrived	natural	1	-
 src/effects/bursts/fragment_effect/FragmentEffect_DestroyManager.c	FragmentEffect_DestroyManager	contrived	natural	1	-
 src/effects/bursts/fragment_effect/FragmentEffect_InitManager.c	FragmentEffect_InitManager	minor	natural	1	-
+src/effects/bursts/fragment_effect/FragmentEffect_GetOrCreateManager.c	FragmentEffect_GetOrCreateManager	minor	natural	1	-
