@@ -43,9 +43,8 @@ void Armor_UpdateAlignedAttackDecision(struct ArmorDecisionActor *p)
     s32 ax;
     s32 ay;
     s32 az;
-    s16 *cooldown = &p->attackCooldown;
-    if ((*cooldown) > 0)
-        --(*cooldown);
+    if (p->attackCooldown > 0)
+        --p->attackCooldown;
     if ((p->phase != 255) && (p->behavior != 20))
         return;
     ARMOR_ALIGNED_GRID(dx, dy, dz, ax, ay, az, gGameState, p);
@@ -182,7 +181,7 @@ void Armor_UpdateAlignedAttackDecision(struct ArmorDecisionActor *p)
                 break;
 
             case 1:
-                if ((*cooldown) <= 0) {
+                if (p->attackCooldown <= 0) {
                     ActorController_SetBehavior(p, 6);
                     *decision = 0;
                     p->secondaryCooldown = 0;
