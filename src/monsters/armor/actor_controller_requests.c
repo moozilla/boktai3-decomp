@@ -37,7 +37,7 @@ s32 ActorController_ForceAction(struct SceneCombatActor *actor, u8 action)
     actor->actionPhase = 0;
     actor->actionCounter = 0;
     actor->colliderGroup.colliders[0].flags |= 4;
-    actor->flags &= 0xFFFD;
+    actor->flags &= ~2;
     return 1;
 }
 
