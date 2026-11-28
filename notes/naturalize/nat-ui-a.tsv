@@ -84,3 +84,4 @@ src/ui/books/monster_book/monster_book.c	MonsterBook_DrawCategoryWidgets	natural
 src/ui/books/collection/collection.c	Collection_UnlockEntryFromScript	contrived	natural	1	
 src/ui/books/collection/collection.c	Collection_IsComplete	contrived	natural	1	
 src/ui/books/collection/collection.c	Collection_UpdatePageIndicator	contrived	natural	1	
+src/ui/books/collection/collection.c	Collection_UpdateHighlightPulse	contrived	natural	1	

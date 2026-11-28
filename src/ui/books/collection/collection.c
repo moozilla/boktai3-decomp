@@ -88,33 +88,27 @@ s32 Collection_UpdateCursor(struct CollectionMenu *p)
     return 0;
 }
 
-void Collection_UpdateHighlightPulse(struct CollectionMenu *arg)
+void Collection_UpdateHighlightPulse(struct CollectionMenu *p)
 {
-    struct CollectionMenu *p = arg;
-    s32 v = p->pulseFrame;
-    u32 out = 0x1f;
-    do {
-        if (v > 9) {
-            out = 0x1b;
-            if (v > 0x11) {
-                out = 0x12;
-                if (v > 0x19) {
-                    out = 10;
-                    if (v > 0x21) {
-                        out = 0x1b;
-                        if (v <= 0x29) {
-                            out = 0x12;
-                        }
-                    }
-                }
-            }
-        }
-        (*(u16 *)&p->pulseFrame)++;
-        if ((p->pulseFrame) > 0x31) {
-            *(u16 *)&p->pulseFrame = 0;
-        }
-    } while (0);
-    p->cursorColors[12] = out;
+    s16 frame = p->pulseFrame;
+    u32 color;
+
+    if (frame <= 9)
+        color = 0x1f;
+    else if (frame <= 0x11)
+        color = 0x1b;
+    else if (frame <= 0x19)
+        color = 0x12;
+    else if (frame <= 0x21)
+        color = 10;
+    else if (frame <= 0x29)
+        color = 0x12;
+    else
+        color = 0x1b;
+    p->pulseFrame++;
+    if (p->pulseFrame > 0x31)
+        p->pulseFrame = 0;
+    p->cursorColors[12] = color;
 }
 
 u32 Collection_UpdateSelectedEntryText(struct CollectionMenu *p)
