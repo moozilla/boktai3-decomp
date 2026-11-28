@@ -3,22 +3,14 @@ void *SceneActorContacts_FindObjectById(u16 id)
 {
     struct SceneActorContactManager *manager = gSceneActorContactManager;
     struct SceneActorContactNode *node;
-    void *object;
-    if (!manager)
-        goto failure;
-    if (id)
-        goto search;
-    goto failure;
-found:
-    return object;
-search:
+    if (!manager || !id)
+        return NULL;
     for (node = manager->head; node; node = node->next) {
         if (node->flags & 1) {
-            object = node->object;
+            void *object = node->object;
             if (*(u32 *)object == id)
-                goto found;
+                return object;
         }
     }
-failure:
     return NULL;
 }

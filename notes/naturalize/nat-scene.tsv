@@ -432,3 +432,4 @@ src/scene/actor/placement/SceneActorControl_RestoreInactiveDefaults.c	SceneActor
 src/scene/actor/reaction/SceneActorContacts_CanSelectNode.c	SceneActorContacts_CanSelectNode	contrived	natural	3	-
 src/scene/actor/reaction/SceneActorContacts_FindNodeByKind.c	SceneActorContacts_FindNodeByKind	contrived	natural	6	-
 src/scene/actor/reaction/SceneActorContacts_ContainsActiveNode.c	SceneActorContacts_ContainsActiveNode	contrived	natural	2	-
+src/scene/actor/reaction/SceneActorContacts_FindObjectById.c	SceneActorContacts_FindObjectById	contrived	natural	2	-
