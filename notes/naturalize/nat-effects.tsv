@@ -158,3 +158,4 @@ src/effects/bursts/fragment_effect/FragmentEffect_NoOp.c	FragmentEffect_NoOp	nat
 src/effects/bursts/fragment_effect/FragmentEffect_OnColliderContact.c	FragmentEffect_OnColliderContact	natural	natural	0	
 src/effects/bursts/fragment_effect/FragmentEffect_ResetManagerReference.c	FragmentEffect_ResetManagerReference	natural	natural	0	
 src/effects/bursts/linked_effect/LinkedEffect_ApplyVariant.c	LinkedEffect_ApplyVariant	contrived	natural	6	-
+src/effects/bursts/linked_effect/LinkedEffect_UpdateColliders.c	LinkedEffect_UpdateColliders	contrived	minor	8	u32-mask clear helper: a literal mask on the halfword loads a constant instead
