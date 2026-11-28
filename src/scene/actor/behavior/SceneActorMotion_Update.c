@@ -79,7 +79,7 @@ static inline u16 SceneActorMotion_Elapsed(struct ChaseActor *actor)
 }
 s32 SceneActorMotion_Update(struct ChaseActor *object)
 {
-    struct ChaseActor *actor = (void *)object;
+    struct ChaseActor *actor = object;
     struct SceneActorChaseGroup *group = &actor->group;
     struct ContactCollider *collider;
     struct ContactPosition *position;
@@ -104,8 +104,7 @@ s32 SceneActorMotion_Update(struct ChaseActor *object)
             void *drawable = actor->base.drawable;
             struct DisplayKeyframeState *state = (void *)((u8 *)drawable + 0x20);
             s32 ended = Anim_Step(state, drawable);
-            u8 bits = (enabledBit & state->status);
-            if (bits || ended)
+            if ((u8)(enabledBit & state->status) || ended)
                 actor->base.restart = enabledBit;
         }
     }
