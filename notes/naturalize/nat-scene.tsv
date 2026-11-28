@@ -39,3 +39,11 @@ src/scene/actor/actor_particles.c	Actor_SetSpriteDepthOffsets	natural	natural	0
 src/scene/actor/actor_particles.c	Character_SetLowResourceColorEffect	minor	minor	0	names (six/four/two) and u8* field bytes
 src/scene/actor/actor_pool/actor_pool.c	ActorPool_UpdateCallback	contrived	minor	4	PooledActor_TestFlags: plain &1 loses the loop-invariant hoist of the mask into r7
 src/scene/actor/actor_pool/actor_pool.c	ActorPool_InitManager	contrived	natural	1	
+src/scene/actor/actor_pool/actor_pool.c	ActorPool_GetManager	natural	natural	0	
+src/scene/actor/actor_pool/actor_pool.c	ActorPool_LinkObject	natural	natural	0	
+src/scene/actor/actor_pool/actor_pool.c	ActorPool_UnlinkObject	natural	natural	0	
+src/scene/actor/actor_pool/actor_pool.c	ActorPool_RefreshTargets	natural	natural	0	
+src/scene/actor/actor_pool/actor_pool.c	ActorPool_DestroyCallback	natural	natural	0	
+src/scene/actor/actor_pool/actor_pool.c	ActorPool_CreateManager	natural	natural	0	
+src/scene/actor/actor_pool/actor_pool.c	ActorPool_AllocObject	natural	natural	0	
+src/scene/actor/actor_pool/pooled_actor_helpers.c	Actor_CapturePendingHit	minor	natural	1	

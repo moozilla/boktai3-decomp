@@ -54,10 +54,7 @@ void Actor_CapturePendingHit(struct PooledActor *actor, struct ContactCollider *
         actor->pendingDamage = other->cost;
         actor->damageSource = self->statRewardFlags;
         actor->attackFlags = self->reactionFlags;
-        {
-            u32 value = self->responseValue;
-            actor->reaction = value;
-        }
+        actor->reaction = self->responseValue;
     }
 }
 
