@@ -119,13 +119,9 @@ void SceneActorSequence_UpdateSecondWaypointMotion(struct SceneActorSequence *);
 
 void SceneActorSequence_BeginSecondWaypointMotion(struct SceneActorSequence *p)
 {
-    struct SceneActorSequencePoint v;
-    s16 *q = (s16 *)&v;
-    int a = 0x70, b = 0x48, z = 0;
-    v.x = a;
-    q[1] = b;
-    q[2] = z;
-    SceneTarget_BeginMove(p->actor, 0, (s16 *)&v, -1, 0x10, p->firstWaypointSpeed, 0x32);
+    struct SceneActorSequencePoint end;
+    SceneActorSequence_SetPoint(&end, 112, 72, 0);
+    SceneTarget_BeginMove(p->actor, 0, &end, -1, 16, p->firstWaypointSpeed, 50);
     p->updateState = SceneActorSequence_UpdateSecondWaypointMotion;
     p->timer = 0;
 }
