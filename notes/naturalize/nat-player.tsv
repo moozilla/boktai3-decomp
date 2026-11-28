@@ -439,3 +439,4 @@ src/player/cutscene/player_cue_commands.c	PlayerCue_ShakeEffect	minor	natural	1	
 src/player/cutscene/player_cue_commands.c	PlayerCue_Refresh	natural	natural	0	-
 src/player/cutscene/player_cue_commands.c	Player_ConfigureAttachmentEffect	contrived	natural	1	-
 src/player/cutscene/player_cue_commands.c	PlayerCue_ReleaseControl	natural	natural	0	-
+src/player/cutscene/player_script_cues.c	ScriptActor_GetDirectionFromScript	minor	natural	2	-

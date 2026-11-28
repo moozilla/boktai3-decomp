@@ -2,12 +2,9 @@
 
 s32 ScriptActor_GetDirectionFromScript(void)
 {
-    s32 result;
-    if (Script_SeekToKeyword(0x64) == 0)
-        result = -1;
-    else
-        result = Script_GetValue();
-    return result;
+    if (Script_SeekToKeyword('d'))
+        return Script_GetValue();
+    return -1;
 }
 
 s32 ScriptActor_GetCueOptionFromScript(void)
@@ -332,7 +329,8 @@ void ScriptActor_PlayMotion30FromScript(void)
         else
             lengthOption = 0;
         direction = ScriptActor_GetDirectionFromScript();
-        PlayerCue_Motion30(player, direction, motionOption, lengthOption, ScriptActor_GetCueOptionFromScript());
+        PlayerCue_Motion30(player, direction, motionOption, lengthOption,
+                           ScriptActor_GetCueOptionFromScript());
         ScriptActor_EnableCompletionScript(player);
     }
 }
