@@ -530,3 +530,13 @@ src/ui/town/shop/Shop_ReadScriptCatalog.c	Shop_ReadScriptCatalog	minor	minor	3	p
 src/ui/town/shop/Shop_TickController.c	Shop_TickController	minor	natural	1	
 src/ui/town/shop/Shop_DestroyController.c	Shop_DestroyController	contrived	minor	1	cleanup view over the panel
 src/ui/town/shop/Shop_BuildConsumableCatalog.c	Shop_BuildConsumableCatalog	contrived	natural	10	
+src/ui/town/shop/Shop_ReadCompletionScript.c	Shop_ReadCompletionScript	natural	natural	0	
+src/ui/town/shop/Shop_WaitForController.c	Shop_WaitForController	minor	minor	0	lifecycle view cast
+src/ui/town/shop/Shop_RunController.c	Shop_RunController	minor	minor	0	lifecycle view cast
+src/ui/town/shop/Shop_FinishAndCallScript.c	Shop_FinishAndCallScript	natural	natural	0	
+src/ui/town/shop/Shop_InitializeController.c	Shop_InitializeController	natural	natural	0	
+src/ui/town/shop/Shop_CreateWeaponShop.c	Shop_CreateWeaponShop	minor	minor	0	task callback casts
+src/ui/town/shop/Shop_CreateItemShop.c	Shop_CreateItemShop	minor	minor	0	task callback casts
+src/ui/town/shop/Shop_CreateAccessoryShop.c	Shop_CreateAccessoryShop	minor	minor	0	task callback casts
+src/ui/town/shop/Shop_CreateTravelingMerchant.c	Shop_CreateTravelingMerchant	minor	minor	0	task callback casts
+src/ui/town/shop/Shop_CreateGariGariKunStall.c	Shop_CreateGariGariKunStall	minor	minor	0	task callback casts
