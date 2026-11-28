@@ -11,10 +11,12 @@ void ActorAttachment_TickAscendingSprite(struct ActorAttachmentSlotView *slot)
         u32 ended = ActorAttachment_StepSprite(sprite, sequence);
         if (slot->frame <= 1) {
             slot->unknown34 -= 4;
-            slot->position.pad = slot->unknown34 + (slot->anchor->y + slot->position.z) + slot->position.y;
+            slot->position.pad =
+                slot->unknown34 + (slot->anchor->y + slot->position.z) + slot->position.y;
         } else {
             slot->unknown34 -= 3;
-            slot->position.pad = slot->unknown34 + (slot->anchor->y + slot->position.z) + slot->position.y;
+            slot->position.pad =
+                slot->unknown34 + (slot->anchor->y + slot->position.z) + slot->position.y;
         }
         if (slot->position.pad < slot->position.y + slot->anchor->y - 16)
             slot->position.pad = slot->anchor->y + slot->position.y - 16;
@@ -27,11 +29,10 @@ void ActorAttachment_TickAscendingSprite(struct ActorAttachmentSlotView *slot)
             sequence->elapsed = 0;
         }
         if (ended) {
+            s32 id;
             slot->flags31 = 0;
-            {
-                s32 id = slot->slotId;
-                manager->occupiedMask &= ~(1 << id);
-            }
+            id = slot->slotId;
+            manager->occupiedMask &= ~(1 << id);
             sprite->flags |= 1;
             slot->status[0] = 0;
             slot->update = NULL;
