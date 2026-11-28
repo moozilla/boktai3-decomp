@@ -2,8 +2,8 @@
 #include "player/player.h"
 #include "engine/engine_globals.h"
 #include "player/player_slot_status.h"
+#include "system/game_state/game_state.h"
 // confidence=low: descriptor meanings remain tentative; creates the selected attack display projectile.
-extern u8 *gGameState;
 s32 Player_GetSelectedSlotActionScale(void);
 s32 ActorResponse_Apply(struct Player *, s32);
 u8 *Player_GetSpecialAttackDescriptor(s32);
@@ -33,6 +33,7 @@ s32 Player_SpawnSelectedAttackProjectile(struct Player *p)
     s32 special;
     s32 power;
     s32 size;
+    s32 stat;
     u8 *descriptor;
     struct SceneVec position;
     if (p->actionMode == 6) {
@@ -42,9 +43,9 @@ s32 Player_SpawnSelectedAttackProjectile(struct Player *p)
     if (p->statModifierContext.statBOverrideMode == 6 &&
         p->statModifierContext.statBOverrideEnabled)
         return 0;
-    if (gEngineFlags & 0x1000)
+    if (gEngineFlags & 0x1000) {
         cost = Player_GetSelectedSlotActionScale();
-    else {
+    } else {
         if (!p->statModifierContext.statBOverrideEnabled)
             cost = 3;
         else if (p->statModifierContext.statBOverrideMode == 1)
@@ -60,38 +61,30 @@ s32 Player_SpawnSelectedAttackProjectile(struct Player *p)
     }
     Player_ConfigureActionSelectionDisplay(p);
     PlayerContact_GetOffsetPosition(0, &position);
-    {
-        s32 stat = p->currentStatB;
-        special = 0;
-        if (gEngineFlags & 0x1000) {
-            if ((u8)(p->thresholdMode - 6) <= 5 && stat >= cost)
-                special = 1;
-        } else {
-            if ((!p->statModifierContext.statBOverrideEnabled && p &&
-                 Player_ReadStatusBits(&p->statBonusFlags, 0x10000000)) ||
-                Player_GetSpecialAttackDescriptor(p->statModifierContext.actionKind)[0] == 8) {
-                if (p->statModifierContext.attachedEntry < 0)
-                    cost = 0;
-                else {
-                    s32 count = ProjectileTask_GetKind7Value(p->statModifierContext.attachedEntry);
-                    if (count > 0) {
-                        s32 prior = cost - 1;
-                        cost = prior + count;
-                    }
-                }
+    stat = p->currentStatB;
+    special = 0;
+    if (gEngineFlags & 0x1000) {
+        if ((u8)(p->thresholdMode - 6) <= 5 && stat >= cost)
+            special = 1;
+    } else {
+        if ((!p->statModifierContext.statBOverrideEnabled && p &&
+             Player_ReadStatusBits(&p->statBonusFlags, 0x10000000)) ||
+            Player_GetSpecialAttackDescriptor(p->statModifierContext.actionKind)[0] == 8) {
+            if (p->statModifierContext.attachedEntry < 0)
+                cost = 0;
+            else {
+                s32 count = ProjectileTask_GetKind7Value(p->statModifierContext.attachedEntry);
+                if (count > 0)
+                    cost += count - 1;
             }
         }
     }
-    {
-        s32 kind;
-        if (!p->statModifierContext.statBOverrideEnabled)
-            kind = 8;
-        else
-            kind = p->statModifierContext.actionKind;
-        descriptor = Player_GetSpecialAttackDescriptor(kind);
-    }
+    if (!p->statModifierContext.statBOverrideEnabled)
+        descriptor = Player_GetSpecialAttackDescriptor(8);
+    else
+        descriptor = Player_GetSpecialAttackDescriptor(p->statModifierContext.actionKind);
     size = 16;
-    switch ((s32)descriptor[3]) {
+    switch (descriptor[3]) {
         case 0:
         default:
             break;
@@ -109,15 +102,18 @@ s32 Player_SpawnSelectedAttackProjectile(struct Player *p)
         switch (p->statModifierContext.actionKind) {
             case 1:
                 power = 30;
-                goto powerReady;
+                break;
             case 5:
             case 7:
                 power = 25;
-                goto powerReady;
+                break;
+            default:
+                power = gGameState->level + descriptor[1];
+                break;
         }
+    } else {
+        power = gGameState->level + descriptor[1];
     }
-    power = *(s16 *)(gGameState + 0x40) + descriptor[1];
-powerReady:
     if (special && (gEngineFlags & 0x1000)) {
         u32 flags =
             Player_GetAttackAttributeFlags(p->statModifierContext.statBOverrideMode) | 0x800000;
@@ -126,10 +122,8 @@ powerReady:
     } else if (!p->statModifierContext.statBOverrideEnabled) {
         s32 base = power + Div(power, 10);
         s32 half = Div(power, 2);
-        s32 ratio;
-        s32 maximum = p->maximumStatA;
-        ratio = Div((maximum - p->currentStatA) << 4, maximum);
-        base -= truncate4(ratio * half);
+
+        base -= truncate4(Div((p->maximumStatA - p->currentStatA) << 4, p->maximumStatA) * half);
         Projectile_SetDamageParams(p->statModifierContext.actionSelectionDisplay, size, 1, base, 50,
                                    20);
     } else if (p->statModifierContext.actionKind == 2) {

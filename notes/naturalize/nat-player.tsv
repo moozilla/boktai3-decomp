@@ -597,3 +597,4 @@ src/player/gun/Player_ConfigureActionSelectionDisplay.c	Player_ConfigureActionSe
 src/player/gun/Player_IsStatBBelow.c	Player_IsStatBBelow	natural	natural	0	-
 src/player/gun/Player_SubtractStatB.c	Player_SubtractStatB	natural	natural	0	-
 src/player/gun/Player_UpdateAttachedEntryPosition.c	Player_UpdateAttachedEntryPosition	minor	natural	1	-
+src/player/gun/Player_SpawnSelectedAttackProjectile.c	Player_SpawnSelectedAttackProjectile	contrived	natural	20	-
