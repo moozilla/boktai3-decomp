@@ -348,3 +348,4 @@ src/engine/video/palette/Video_SetWindowLayerMasks.c	Video_SetWindowLayerMasks	m
 src/engine/video/palette/Video_SaveWindowLayerMasks.c	Video_SaveWindowLayerMasks	minor	natural	1	
 src/engine/video/palette/Video_RestoreWindowLayerMasks.c	Video_RestoreWindowLayerMasks	minor	natural	1	
 src/engine/video/palette/Video_SaveDisplayControl.c	Video_SaveDisplayControl	minor	natural	1	
+src/engine/video/palette/Video_RestoreDisplayControl.c	Video_RestoreDisplayControl	minor	natural	1	
