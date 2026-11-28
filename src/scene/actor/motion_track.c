@@ -55,11 +55,7 @@ void OrbitMotion_BeginDistanceWave(struct OrbitMotion *motion, struct OrbitVecto
         *target = *end;
         motion->angle = angle;
         difference(&delta, target, motion->position);
-        {
-            s32 length = OrbitMotion_DistanceXZ(&delta);
-            s32 factor = 314 * speed;
-            motion->radius = __divsi3(length * factor, 25600);
-        }
+        motion->radius = OrbitMotion_DistanceXZ(&delta) * 314 * speed / 25600;
         if (motion->radius <= 1)
             motion->radius = 2;
         motion->speed = speed;
@@ -69,8 +65,8 @@ void OrbitMotion_BeginDistanceWave(struct OrbitMotion *motion, struct OrbitVecto
     }
 }
 
-s32 SceneryMotion_CalculateArcCenter(struct OrbitVector *, struct OrbitVector *, struct OrbitVector *,
-                                   s32);
+s32 SceneryMotion_CalculateArcCenter(struct OrbitVector *, struct OrbitVector *,
+                                     struct OrbitVector *, s32);
 
 s32 Math_Atan2(s32, s32);
 
@@ -106,8 +102,8 @@ static inline s32 OrbitMotion_DistanceXY(struct OrbitVector *v)
     return Sqrt(square(v->x) + square(v->y));
 }
 
-void OrbitMotion_BeginVerticalDistanceWave(struct OrbitMotion *motion, struct OrbitVector *position, struct OrbitVector *end,
-                  s32 angle, s32 speed)
+void OrbitMotion_BeginVerticalDistanceWave(struct OrbitMotion *motion, struct OrbitVector *position,
+                                           struct OrbitVector *end, s32 angle, s32 speed)
 {
     struct OrbitVector delta;
     if (motion && position && end) {
@@ -131,8 +127,8 @@ void OrbitMotion_BeginVerticalDistanceWave(struct OrbitMotion *motion, struct Or
     }
 }
 
-void OrbitMotion_BeginCrossedSines(struct OrbitMotion *motion, struct OrbitVector *position, s32 radius, s32 radius2,
-                  s32 duration)
+void OrbitMotion_BeginCrossedSines(struct OrbitMotion *motion, struct OrbitVector *position,
+                                   s32 radius, s32 radius2, s32 duration)
 {
     if (motion && position && duration) {
         motion->position = position;
@@ -146,8 +142,10 @@ void OrbitMotion_BeginCrossedSines(struct OrbitMotion *motion, struct OrbitVecto
     }
 }
 
-void PositionMotion_InitParameterizedApproach(struct OrbitMotion *motion, struct OrbitVector *position, struct OrbitVector *target, u32 xAmplitude, u32 yAmplitude,
-                                              u32 zAmplitude, u32 angle, u32 speed)
+void PositionMotion_InitParameterizedApproach(struct OrbitMotion *motion,
+                                              struct OrbitVector *position,
+                                              struct OrbitVector *target, u32 xAmplitude,
+                                              u32 yAmplitude, u32 zAmplitude, u32 angle, u32 speed)
 {
     if (motion != 0 && position != 0 && target != 0) {
         motion->position = position;
@@ -184,8 +182,6 @@ s32 SceneryMotion_UpdateCrossedSines(struct OrbitMotion *);
 void SceneryMotion_UpdateAbsoluteSines(struct OrbitMotion *);
 
 s32 SceneryMotion_InterpolatePosition(struct OrbitMotion *);
-
-
 
 s32 MotionTrack_Update(struct OrbitMotion *motion)
 {

@@ -342,3 +342,12 @@ src/scene/actor/control/scene_actor_stored_motion.c	SceneActorControl_UpdateStor
 src/scene/actor/control/scene_actor_stored_motion.c	SceneActorControl_TickVisibility	contrived	minor	4	materialized flag predicate and clear helper: plain tests lose the 0/1 value
 src/scene/actor/control/scene_actor_stored_motion.c	SceneActorControl_RequestVisibility	contrived	contrived	12	masked flag blocks with saved pointers: plain tests and stores load the field before the mask
 src/scene/actor/control/scene_actor_stored_motion.c	Bat_Destroy	contrived	contrived	6	parked flag mask and body pointer: plain tests load the field before the mask and drop the saved pointer
+src/scene/actor/control/scene_actor_stored_motion.c	SceneActorControl_ReturnSuccess	natural	natural	0	-
+src/scene/actor/control/scene_actor_stored_motion.c	SceneActorControl_SetApproachCallbacks	natural	natural	0	-
+src/scene/actor/control/scene_actor_stored_motion.c	SceneActorControl_StartStoredCurve	minor	minor	0	parked-seed-increment
+src/scene/actor/control/scene_actor_stored_motion.c	SceneActorControl_UpdateWanderTarget	minor	minor	0	speed-local-for-argument-order
+src/scene/actor/control/scene_actor_stored_motion.c	SceneActorControl_ConsumePendingEntry	natural	natural	0	-
+src/scene/actor/control/scene_actor_stored_motion.c	SceneActorControl_SetStoredMotionCallbacks	natural	natural	0	-
+src/scene/actor/control/scene_actor_stored_motion.c	Bat_OnUpdate	minor	minor	0	void-casts-to-callee-prototypes
+src/scene/actor/control/scene_actor_stored_motion.c	SceneActorControl_BindPrimaryPlayer	minor	minor	0	player-view-cast-to-reach-target
+src/scene/actor/motion_track.c	OrbitMotion_BeginDistanceWave	contrived	minor	6	target pointer to the base vector: direct member access reloads the address
