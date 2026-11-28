@@ -1,80 +1,59 @@
 #include "global.h"
+#include "bosses/vanargand/vanargand_pair_attack.h"
 
-struct Transition {
-    u8 pad0[0xAE];
-    u8 mode;
-    u8 active;
-    u8 pending;
-    u8 padB1[0xC4 - 0xB1];
-    u32 counter;
-    u8 padC8[0x56C - 0xC8];
-    void *pair;
-    u8 pad570[0x5C2 - 0x570];
-    s16 condition;
-    u8 pad5C4[2];
-    u8 action;
-    u8 variant;
-};
-s32 ScenePair_CountPositiveCounters(void *);
-static inline void Request(struct Transition *p, u32 mode)
+void VanargandPair_ApplyPairTransition(struct VanargandPairAttack *p)
 {
-    p->mode = mode;
-    p->counter = 0;
-    p->pending = 1;
-}
-void VanargandPair_ApplyPairTransition(struct Transition *p)
-{
-    struct Transition *q = p;
-    switch (q->action - 1) {
+    struct VanargandPairAttack *q = p;
+    switch (q->pairTransition - 1) {
         case 0:
             if (ScenePair_CountPositiveCounters(q->pair) == 2) {
-                if (q->variant == 3) {
-                    Request(p, 6);
+                if (q->pairLevel == 3) {
+                    Vanargand_EnterActionPhase(p, 6);
                     break;
                 }
-                if (q->variant > 1) {
-                    Request(p, 5);
+                if (q->pairLevel > 1) {
+                    Vanargand_EnterActionPhase(p, 5);
                     break;
                 }
             }
-            Request(p, 4);
+            Vanargand_EnterActionPhase(p, 4);
             break;
         case 1:
-            if (q->condition == 0) {
-                Request(p, 12);
+            if (q->mode == 0) {
+                Vanargand_EnterActionPhase(p, 12);
                 return;
             }
-            Request(p, 3);
+            Vanargand_EnterActionPhase(p, 3);
             break;
         case 2:
-            if (q->variant > 1)
-                Request(p, 8);
+            if (q->pairLevel > 1)
+                Vanargand_EnterActionPhase(p, 8);
             else
-                Request(p, 7);
+                Vanargand_EnterActionPhase(p, 7);
             break;
         case 3:
-            Request(p, 9);
+            Vanargand_EnterActionPhase(p, 9);
             break;
         case 4:
             if (ScenePair_CountPositiveCounters(q->pair) > 0)
-                Request(p, 10);
+                Vanargand_EnterActionPhase(p, 10);
             else
-                Request(p, 18);
+                Vanargand_EnterActionPhase(p, 18);
             break;
         case 6:
-            Request(p, 2);
+            Vanargand_EnterActionPhase(p, 2);
             break;
         case 7:
-            Request(p, 15);
+            Vanargand_EnterActionPhase(p, 15);
             break;
         case 5:
-            Request(p, 13);
+            Vanargand_EnterActionPhase(p, 13);
             break;
         case 9:
-            Request(p, 14);
+            Vanargand_EnterActionPhase(p, 14);
             break;
         case 8:
-            Request(p, 1);
+            Vanargand_EnterActionPhase(p, 1);
             return;
         default:
             return;

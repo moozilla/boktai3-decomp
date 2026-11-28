@@ -91,7 +91,10 @@ struct VanargandPairAttack {
     u8 pad5BC[0x5C0 - 0x5BC];
     u16 attackPhase; /* 0x5C0: cleared by the mode 25 transition (tentative). */
     s16 mode;
-    u8 unknown5C4[4];
+    u8 pairState;      /* 0x5C4: row of the pair transition table (tentative). */
+    u8 pairCursor;     /* 0x5C5: column of that row. */
+    u8 pairTransition; /* 0x5C6: the chosen transition. */
+    u8 pairLevel;      /* 0x5C7 */
     struct ContactCollider attackCollider, radialColliders[2];
     struct ContactCollider damageSource; /* Contact collider also identifies damage numbers. */
     u16 palettes[16][16];
