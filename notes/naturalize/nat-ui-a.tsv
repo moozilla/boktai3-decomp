@@ -413,3 +413,4 @@ src/ui/hud/scene_indicator.c	SceneIndicators_Create	natural	natural	0
 src/ui/hud/scene_indicator.c	SceneIndicator_Pause	natural	natural	0	
 src/ui/hud/scene_indicator.c	SceneIndicator_Resume	natural	natural	0	
 src/ui/hud/countdown_controller.c	Countdown_Tick	fudged	partial	4	remaining pointer stays: the decrement reuses its address
+src/ui/hud/countdown_controller.c	Countdown_InitializeFromScript	fudged	natural	1	

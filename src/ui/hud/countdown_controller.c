@@ -35,9 +35,8 @@ u32 Countdown_Destroy(void)
 
 s32 Countdown_InitializeFromScript(struct CountdownTask *task, u32 script, u32 context)
 {
-    s32 *q = &gGameState->unk618;
-    if (*q <= 0)
-        *q = 1;
+    if (gGameState->unk618 <= 0)
+        gGameState->unk618 = 1;
     if (Script_SeekToKeyword('s'))
         task->interval = Script_GetValue();
     else
