@@ -573,3 +573,4 @@ src/system/inventory/Inventory_CanReceiveItemFromScript.c	Inventory_CanReceiveIt
 src/system/inventory/sub_0822D490.c	sub_0822D490	contrived	natural	1	
 src/system/inventory/sub_0822D650.c	sub_0822D650	contrived	natural	1	
 src/system/inventory/Inventory_MarkEquipmentObtained.c	Inventory_MarkEquipmentObtained	contrived	natural	1	
+src/system/inventory/Inventory_GetEquipmentCondition.c	Inventory_GetEquipmentCondition	contrived	natural	1	

@@ -1,9 +1,7 @@
-#include "global.h"
-/* Inventory_GetEquipmentCondition: Returns the equipment entry halfword at offset 2 used as condition */
+#include "ui/town/shop_item_values.h"
 
-u8 *Inventory_GetEquipmentEntry(u32);
-
+/* Inventory_GetEquipmentCondition: Returns the condition of an equipment entry */
 u16 Inventory_GetEquipmentCondition(u32 slot)
 {
-    return *(u16 *)(Inventory_GetEquipmentEntry(slot) + 2);
+    return Inventory_GetEquipmentEntry(slot)->condition;
 }
