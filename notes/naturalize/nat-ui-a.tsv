@@ -20,3 +20,4 @@ src/ui/books/monster_book/PaletteTransition_BlendBankColors.c	PaletteTransition_
 src/ui/books/monster_book/PaletteTransition_LoadSource.c	PaletteTransition_LoadSource	contrived	natural	1	
 src/ui/books/monster_book/PaletteTransition_InitDisplays.c	PaletteTransition_InitDisplays	contrived	natural	5	origin pointer kept (address computed once)
 src/ui/books/monster_book/PaletteTransition_StartDisplay.c	PaletteTransition_StartDisplay	contrived	natural	5	origin pointer kept
+src/ui/books/monster_book/BestiaryDisplay_UpdateAnimations.c	BestiaryDisplay_UpdateAnimations	contrived	natural	2	
