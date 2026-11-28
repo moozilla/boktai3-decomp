@@ -3,6 +3,7 @@
 #include "engine/ram.h"
 #include "engine/task_manager.h"
 #include "scene/collision/packed_contact_vector.h"
+#include "scene/motion/scene_facing.h"
 struct Rig {
     u8 pad0[4];
     u32 handle;
@@ -164,25 +165,8 @@ void Kuro_Create(u32 tag)
     Actor_InitShadow(npc, npc->field160, 1, 0, 0x40);
     SceneMessages_RegisterReceiver(npc->block168, name, 5);
     npc->motion.angle = angle;
-    {
-        u16 a = angle;
-        {
-            s32 t;
-            u32 m;
-            t = a + 0x70;
-            t >>= 5;
-            m = 7;
-            m &= t;
-            npc->facing8 = m;
-        }
-        {
-            s32 t = (a + 0x60) >> 6;
-            u32 m;
-            m = 3;
-            m &= t;
-            npc->facing4 = m;
-        }
-    }
+    npc->facing8 = SceneFacing_EightWay(angle);
+    npc->facing4 = SceneFacing_FourWay(angle);
     Task_SetManager(Kuro_EnterRequestedState, &npc->callbacks[5]);
     Task_SetManager(Kuro_OnFrameUpdate, &npc->callbacks[0]);
     Task_SetManager(Kuro_OnBehaviorUpdate, &npc->callbacks[1]);
