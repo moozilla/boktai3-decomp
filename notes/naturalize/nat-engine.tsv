@@ -9,3 +9,22 @@ src/engine/task_scheduler.c	TaskSystem_InitLists	minor	natural	1
 src/engine/task_scheduler.c	TaskSystem_KillBelowPersistenceLevel	contrived	natural	1	
 src/engine/task_scheduler.c	Task_FindById	minor	natural	1	
 src/engine/task_scheduler.c	Task_KillById	minor	natural	3	
+src/engine/Background_ClearSlots.c	Background_ClearSlots	natural	natural	0	
+src/engine/runtime_input.c	TaskSystem_UpdateRoot	natural	natural	0	
+src/engine/runtime_input.c	Input_UpdatePadStates	minor	minor	0	PAD_UPDATE macro left as is: no helper to add and the loops are plain
+src/engine/runtime_input.c	Random_Next15	natural	natural	0	
+src/engine/heap_memory.c	Heap_Initialize	natural	natural	0	
+src/engine/heap_memory.c	Heap_Free	natural	natural	0	
+src/engine/heap_memory.c	Memory_FillWords	natural	natural	0	
+src/engine/heap_memory.c	Memory_Clear	natural	natural	0	
+src/engine/heap_memory.c	Memory_FillBytes	natural	natural	0	
+src/engine/heap_memory.c	Memory_Copy	natural	natural	0	
+src/engine/task_scheduler.c	Task_LinkToPriorityList	natural	natural	0	
+src/engine/task_scheduler.c	Task_UnlinkFromPriorityList	natural	natural	0	
+src/engine/task_scheduler.c	Task_Create	natural	natural	0	
+src/engine/task_scheduler.c	Task_CreateFromHeapEnd	natural	natural	0	
+src/engine/task_scheduler.c	Task_SetCallbacks	natural	natural	0	
+src/engine/task_scheduler.c	TaskSystem_RunFrame	natural	natural	0	
+src/engine/task_scheduler.c	Task_Kill	natural	natural	0	
+src/engine/task_scheduler.c	Task_TryDestroy	natural	natural	0	
+src/engine/resource_registry.c	ResourceRegistry_ClearEntries	minor	natural	2	
