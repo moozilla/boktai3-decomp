@@ -1,9 +1,10 @@
-#include "global.h"
+#include "engine/video/display_sequence.h"
 
-u32 Anim_SetSequence(u8 *, u32, u16, u8, u8);
+u32 Anim_SetSequence(struct DisplaySequenceState *, u8 *, u16, u8, u8);
 
-u32 Anim_RestartSequence(u8 *p, u32 a, u16 b, u8 c, u8 d)
+u32 Anim_RestartSequence(struct DisplaySequenceState *state, u8 *data, u16 sequence, u8 row,
+                         u8 flags)
 {
-    p[5] = 0;
-    return Anim_SetSequence(p, a, b, c, d);
+    state->frameCount = 0;
+    return Anim_SetSequence(state, data, sequence, row, flags);
 }
