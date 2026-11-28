@@ -20,8 +20,6 @@ void Player_InitVisualResources(struct Player *);
 void Player_UpdateFacingSide(struct Player *);
 void ActorSequence_Begin(struct Player *, s32, s32);
 void PlayerCue_EnterStandUpdate(struct Player *);
-#define H(off) (*(u16 *)((u8 *)p + (off)))
-#define B(off) (*((u8 *)p + (off)))
 static inline u32 TestModeFlags(u32 mask)
 {
     return gUnk_02000560 & mask;
@@ -38,18 +36,18 @@ void Player_UpdateFormChangeCue(struct Player *p)
         Sound_PlaySong(0x306);
         if (p->actionMode != 1) {
             if (p->statHundredths > 999 || (gEngineFlags & 0x1000) || p->kind == 2) {
-                B(0x432) = 1;
-                B(0x433) = 1;
+                p->unk432[0] = 1;
+                p->unk432[1] = 1;
             }
         } else {
-            B(0x432) = 0;
-            B(0x433) = 1;
+            p->unk432[0] = 0;
+            p->unk432[1] = 1;
         }
         Player_SetPendingCallback(p, Player_OnMotion10Exit);
         p->actionCountdown = 0;
-        H(0x4E6) = 0;
+        p->formCueParameterA = 0;
         p->terrainRecoveryCounter = 0;
-        H(0x4EA) = 0;
+        p->formCueParameterB = 0;
     }
     p->statusValue = 4000;
     if (gEngineFlags & 0x1000)
@@ -121,7 +119,7 @@ void Player_UpdateFormChangeCue(struct Player *p)
                 p->savedSpriteResource = 0xFFFF;
                 if (p->unk536 != 0x15 && p->unk536 != 0x31)
                     p->active = 0;
-                goto phaseFour;
+                Player_SetActionPhase(p, 4);
             }
             break;
         case 3:
@@ -129,10 +127,8 @@ void Player_UpdateFormChangeCue(struct Player *p)
                 Sound_PlaySong(0x192);
             Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 10), 64, 1);
             p->resetValue6FC = 30;
-            if (++p->tetherFrame > 15) {
-            phaseFour:
+            if (++p->tetherFrame > 15)
                 Player_SetActionPhase(p, 4);
-            }
             break;
         case 4:
             p->resetValue6FC = 15;

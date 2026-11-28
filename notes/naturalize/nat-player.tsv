@@ -649,3 +649,4 @@ src/player/motions/Player_UpdateAttachmentCue.c	Player_UpdateAttachmentCue	contr
 src/player/motions/Player_OnMotion11Exit.c	Player_OnMotion11Exit	contrived	natural	1	-
 src/player/motions/Player_UpdateAlternateFormCue.c	Player_UpdateAlternateFormCue	contrived	natural	4	-
 src/player/motions/Player_OnMotion10Exit.c	Player_OnMotion10Exit	contrived	natural	1	-
+src/player/motions/Player_UpdateFormChangeCue.c	Player_UpdateFormChangeCue	contrived	minor	4	TestModeFlags inline: the mask is loaded before the flag word
