@@ -1,3 +1,4 @@
+#include "engine/math/math_shift.h"
 #include "scene/actor/scene_actor_behavior.h"
 #include "scene/actor/scene_event_dispatch.h"
 #include "scene/motion/scene_actor_terrain_reaction.h"
@@ -52,7 +53,7 @@ union CommandWorkspace {
 s32 SceneActorReaction_DispatchPendingCommands(struct ChaseActor *input)
 {
     struct ChaseActor *actor = input;
-    struct SceneEventReceiver *receiver = NULL;
+    struct SceneEventReceiver *receiver;
     struct SceneActorChaseGroup *group;
     void *attachment;
     union CommandWorkspace workspace;
@@ -100,26 +101,21 @@ s32 SceneActorReaction_DispatchPendingCommands(struct ChaseActor *input)
                 case 1: {
                     s32 direction = actor->base.body.direction;
                     s32 delta;
-                    if (direction >= 0)
-                        direction >>= 5;
-                    else
-                        direction = -((-direction) >> 5);
-                    direction = (direction + 3) & 7;
-                    delta = command->data.args[0] - direction;
-                    if (delta < 0)
-                        delta = -delta;
+                    direction = (Math_ShiftTowardZero(direction, 5) + 3) & 7;
+                    delta = abs(command->data.args[0] - direction);
                     if (category == 23) {
                         if (delta) {
-                            actor->base.nextDirection =
-                                ((u8)command->data.args[0] + 5 & 7) << 5;
+                            actor->base.nextDirection = ((u8)command->data.args[0] + 5 & 7) << 5;
                             SetBehaviorAndIdle(actor, 2, 4);
                         } else
-                            Trigger_ConsumePending(((struct SceneEventReceiver *)actor->base.receiver), 1);
+                            Trigger_ConsumePending(
+                                ((struct SceneEventReceiver *)actor->base.receiver), 1);
                     } else if (delta > 1) {
                         actor->base.nextDirection = command->data.args[0];
                         SetBehaviorAndIdle(actor, 2, 4);
                     } else
-                        Trigger_ConsumePending(((struct SceneEventReceiver *)actor->base.receiver), 1);
+                        Trigger_ConsumePending(((struct SceneEventReceiver *)actor->base.receiver),
+                                               1);
                     break;
                 }
                 case 2:
@@ -184,11 +180,9 @@ s32 SceneActorReaction_DispatchPendingCommands(struct ChaseActor *input)
                             s16 *value;
                             s16 *initial;
                             s32 initialValue;
-                            actor->base.attachmentTimer =
-                                command->data.attachment.value;
+                            actor->base.attachmentTimer = command->data.attachment.value;
                             value = (s16 *)&actor->base.attachmentTimer;
-                            actor->base.attachmentRestart =
-                                command->data.attachment.initial;
+                            actor->base.attachmentRestart = command->data.attachment.initial;
                             initial = &actor->base.attachmentRestart;
                             SceneActorAttachment_SelectOffsets(category, 1, &workspace.offset.y,
                                                                &workspace.offset.z);
@@ -204,11 +198,9 @@ s32 SceneActorReaction_DispatchPendingCommands(struct ChaseActor *input)
                             s16 *initial;
                             s32 initialValue;
                             s32 count;
-                            actor->base.attachmentTimer =
-                                command->data.attachment.value;
+                            actor->base.attachmentTimer = command->data.attachment.value;
                             value = (s16 *)&actor->base.attachmentTimer;
-                            actor->base.attachmentRestart =
-                                command->data.attachment.initial;
+                            actor->base.attachmentRestart = command->data.attachment.initial;
                             initial = &actor->base.attachmentRestart;
                             count = command->data.attachment.count;
                             SceneActorAttachment_SelectOffsets(category, 3, &workspace.offset.y,
