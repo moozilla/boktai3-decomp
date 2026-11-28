@@ -136,13 +136,13 @@ void Bg_UploadMapsAndTiles(void)
     s32 i;
 
     if (gDispCntShadow & 0x100)
-        CopyMap(0, 0x0600F800);
+        DmaCopy32(3, Video_GetBackgroundMap(0), 0x0600F800, 0x800);
     if (gDispCntShadow & 0x200)
-        CopyMap(1, 0x0600F000);
+        DmaCopy32(3, Video_GetBackgroundMap(1), 0x0600F000, 0x800);
     if (gDispCntShadow & 0x400)
-        CopyMap(2, 0x0600E800);
+        DmaCopy32(3, Video_GetBackgroundMap(2), 0x0600E800, 0x800);
     if (gDispCntShadow & 0x800)
-        CopyMap(3, 0x0600E000);
+        DmaCopy32(3, Video_GetBackgroundMap(3), 0x0600E000, 0x800);
     for (i = 0; i <= 3; i++) {
         if (gBgTileUploadSrc[i]) {
             BgGfx_LoadTiles(gBgTileUploadSrc[i], (u8 *)0x06000000 + gBgTileUploadParamB[i],

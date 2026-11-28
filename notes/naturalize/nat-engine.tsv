@@ -236,3 +236,4 @@ src/engine/video/sprite.c	SpriteOam_FinalizeQueue	contrived	minor	24	base reused
 src/engine/video/background_layers.c	Bg_ClearAllTilemaps	minor	natural	1	
 src/engine/video/background_layers.c	Bg_ResetDisplay	contrived	natural	3	
 src/engine/video/background_layers.c	Bg_UpdateScrollShadow	contrived	natural	12	
+src/engine/video/background_layers.c	Bg_UploadMapsAndTiles	minor	natural	1	
