@@ -196,3 +196,4 @@ src/effects/bursts/spiral_burst/SpiralBurst_OnTaskUpdate.c	SpiralBurst_OnTaskUpd
 src/effects/bursts/spiral_burst/SpiralBurst_OnTaskDestroy.c	SpiralBurst_OnTaskDestroy	contrived	natural	1	-
 src/effects/bursts/spiral_burst/SpiralBurst_InitCollider.c	SpiralBurst_InitCollider	minor	natural	3	-
 src/effects/bursts/spiral_burst/SpiralBurst_Init.c	SpiralBurst_Init	contrived	natural	1	-
+src/effects/bursts/spiral_burst/SpiralBurst_Create.c	SpiralBurst_Create	minor	natural	1	-
