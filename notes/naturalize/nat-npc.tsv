@@ -484,3 +484,11 @@ src/script/script_utility.c	ScriptUtility_ReadIndexed	contrived	natural	8
 src/script/script_utility.c	ScriptUtility_SetPauseLatch	contrived	natural	5	non-void with no return in the matching build (r0 is left untouched)
 src/script/script_utility.c	ScriptUtility_CallRepeatedFromScript	contrived	natural	18	
 src/script/script_utility.c	ScriptUtility_GetRandom	contrived	natural	6	
+src/script/script_utility.c	ScriptUtility_WriteValuesToReference	natural	natural	0	
+src/script/script_utility.c	ScriptUtility_SetControlFlag	natural	natural	0	
+src/script/script_utility.c	ScriptUtility_SetControlFlagFromScript	natural	natural	0	
+src/script/script_utility.c	ScriptUtility_ClearControlFlagFromScript	natural	natural	0	
+src/script/script_utility.c	ScriptUtility_IsControlFlagSet	natural	natural	0	
+src/script/script_utility.c	ScriptUtility_WritePauseLatchToReference	natural	natural	0	
+src/script/script_utility.c	ScriptUtility_ClearControlFlag	contrived	contrived	8	parked u32 mask = ~8: the ROM loads the mask before the pause flags; &=, reversed operands and casts load the flags first
+src/script/script_utility.c	ScriptUtility_GetKeys	contrived	natural	11	
