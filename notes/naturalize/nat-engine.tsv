@@ -625,3 +625,18 @@ src/system/save/sub_08227E2C.c	sub_08227E2C	contrived	natural	1
 src/system/save/SaveData_GetSaveRequest.c	SaveData_GetSaveRequest	minor	natural	1	
 src/system/save/SaveData_WritePlayFramesToScript.c	SaveData_WritePlayFramesToScript	contrived	natural	1	
 src/system/save/SaveData_WritePlayTimeToScript.c	SaveData_WritePlayTimeToScript	minor	natural	1	
+src/system/save/ResourceLookup_FindValue.c	ResourceLookup_FindValue	natural	natural	0	
+src/system/save/ScreenTransition_SendCommand.c	ScreenTransition_SendCommand	natural	natural	0	
+src/system/save/Engine_SoftResetFromScript.c	Engine_SoftResetFromScript	natural	natural	0	
+src/system/save/sub_08227E8C.c	sub_08227E8C	natural	natural	0	
+src/system/save/Script_GetTextSourcePc.c	Script_GetTextSourcePc	natural	natural	0	
+src/system/save/sub_08227E9C.c	sub_08227E9C	natural	natural	0	
+src/system/save/SaveData_GetUnusedStatus.c	SaveData_GetUnusedStatus	natural	natural	0	
+src/system/save/Bg_LoadMapFromScript.c	Bg_LoadMapFromScript	natural	natural	0	
+src/system/save/sub_08227FEC.c	sub_08227FEC	natural	natural	0	
+src/system/save/Heap_IsEndGuardValid.c	Heap_IsEndGuardValid	natural	natural	0	
+src/system/save/PaletteSet_GetSlotForId.c	PaletteSet_GetSlotForId	minor	minor	0	table address passed as an integer to the lookup
+src/system/save/Equipment_GetDefinition.c	Equipment_GetDefinition	minor	minor	0	byte offset into the 32-byte records
+src/system/save/sub_08227E5C.c	sub_08227E5C	contrived	contrived	16	address built as an integer sum: field indexing associates the offset before the index
+src/system/save/SaveData_RequestSave.c	SaveData_RequestSave	minor	minor	2	set_flag inline: a direct store loads the pointer and the constant in the other order
+src/system/save/Settings_LoadOrInitializeDefaults.c	Settings_LoadOrInitializeDefaults	contrived	contrived	8	parked constants: direct field stores load the constants after the addresses
