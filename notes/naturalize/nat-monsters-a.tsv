@@ -8,3 +8,8 @@ src/monsters/armor/scene_combat_actor.c	SceneCombatActor_InitBouncingParticle	na
 src/monsters/armor/scene_combat_actor.c	ActorMarker_InitFacingSprite	natural	natural	0	
 src/monsters/armor/scene_combat_actor.c	ActorOverlay_InitSprite	natural	natural	0	
 src/monsters/armor/scene_combat_actor.c	ActorMarker_InitBouncingParticles	contrived	minor	4	SetParticleFrame stays: the store goes through the sprite pointer (strh [r,#0x10])
+src/monsters/armor/scene_combat_actor.c	SceneCombatActor_SpawnBouncingEffect	natural	natural	0	
+src/monsters/armor/scene_combat_actor.c	SceneCombatActor_SpawnBouncingParticle	natural	natural	0	
+src/monsters/armor/actor_marker.c	ActorMarker_InitOffsetPosition	natural	natural	0	
+src/monsters/armor/actor_marker.c	ActorMarker_InitMovingSprite	natural	natural	0	
+src/monsters/armor/actor_marker.c	ActorMarker_EmitRingEffects	contrived	minor	20	offset address stays sizeof-scaled integer arithmetic (index*8 + table operand order); index set before the position pointer

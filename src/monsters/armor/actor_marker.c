@@ -8,30 +8,42 @@ void ActorMarker_InitOffsetPosition(struct SceneCombatActor *actor)
     actor->looseParticles[1].velocity.components[0] = 0;
     switch (((actor->heading + 0x60) >> 6) & 3) {
         case 1:
-            actor->looseParticles[1].sprite.position.components[0] = actor->position.components[0] - 50;
-            actor->looseParticles[1].sprite.position.components[1] = actor->position.components[1] + 100;
-            actor->looseParticles[1].sprite.position.components[2] = actor->position.components[2] - 200;
+            actor->looseParticles[1].sprite.position.components[0] =
+                actor->position.components[0] - 50;
+            actor->looseParticles[1].sprite.position.components[1] =
+                actor->position.components[1] + 100;
+            actor->looseParticles[1].sprite.position.components[2] =
+                actor->position.components[2] - 200;
             actor->looseParticles[1].sprite.phase = 0;
             break;
 
         case 2:
-            actor->looseParticles[1].sprite.position.components[0] = actor->position.components[0] - 200;
-            actor->looseParticles[1].sprite.position.components[1] = actor->position.components[1] + 100;
-            actor->looseParticles[1].sprite.position.components[2] = actor->position.components[2] - 50;
+            actor->looseParticles[1].sprite.position.components[0] =
+                actor->position.components[0] - 200;
+            actor->looseParticles[1].sprite.position.components[1] =
+                actor->position.components[1] + 100;
+            actor->looseParticles[1].sprite.position.components[2] =
+                actor->position.components[2] - 50;
             actor->looseParticles[1].sprite.phase = 0;
             break;
 
         case 3:
-            actor->looseParticles[1].sprite.position.components[0] = actor->position.components[0] - 200;
-            actor->looseParticles[1].sprite.position.components[1] = actor->position.components[1] + 100;
-            actor->looseParticles[1].sprite.position.components[2] = actor->position.components[2] - 200;
+            actor->looseParticles[1].sprite.position.components[0] =
+                actor->position.components[0] - 200;
+            actor->looseParticles[1].sprite.position.components[1] =
+                actor->position.components[1] + 100;
+            actor->looseParticles[1].sprite.position.components[2] =
+                actor->position.components[2] - 200;
             actor->looseParticles[1].sprite.phase = 0;
             break;
 
         case 0:
-            actor->looseParticles[1].sprite.position.components[0] = actor->position.components[0] - 200;
-            actor->looseParticles[1].sprite.position.components[1] = actor->position.components[1] + 100;
-            actor->looseParticles[1].sprite.position.components[2] = actor->position.components[2] - 200;
+            actor->looseParticles[1].sprite.position.components[0] =
+                actor->position.components[0] - 200;
+            actor->looseParticles[1].sprite.position.components[1] =
+                actor->position.components[1] + 100;
+            actor->looseParticles[1].sprite.position.components[2] =
+                actor->position.components[2] - 200;
             actor->looseParticles[1].sprite.phase = 0;
             break;
     }
@@ -79,7 +91,7 @@ void ActorMarker_EmitRingEffects(struct SceneCombatActor *actor)
 {
     s32 row = 0;
     struct ActorMarkerEffectPosition position;
-    s32 index;
+    s32 i;
     const u16 *actorPosition;
     const u16(*offsetTable)[4];
     switch (((actor->heading + 0x60) >> 6) & 3) {
@@ -92,18 +104,15 @@ void ActorMarker_EmitRingEffects(struct SceneCombatActor *actor)
             row = 1;
             break;
     }
-    index = 0;
+    i = 0;
     offsetTable = gUnk_0824E6F8;
     actorPosition = actor->position.components;
-    if (index <= 6) {
-        do {
-            const u16 *offset = (const u16 *)(((row * 8 - row + index) * 8) + (u32)offsetTable);
-            position.x = actorPosition[0] + offset[0];
-            position.y = actor->position.components[1] + offset[1];
-            position.z = actor->position.components[2] + offset[2];
-            SparkParticle_Spawn(&position, 1, gUnk_0824E768, actor->heading + 0x80, 3, 8, 2, 2);
-            index++;
-        } while (index <= 6);
+    for (; i < 7; i++) {
+        const u16 *offset = (const u16 *)((row * 7 + i) * sizeof(*offsetTable) + (u32)offsetTable);
+        position.x = actorPosition[0] + offset[0];
+        position.y = actor->position.components[1] + offset[1];
+        position.z = actor->position.components[2] + offset[2];
+        SparkParticle_Spawn(&position, 1, gUnk_0824E768, actor->heading + 0x80, 3, 8, 2, 2);
     }
 }
 
@@ -204,17 +213,24 @@ void ActorMarker_LaunchFragments(struct SceneCombatActor *actor, u32 fast)
     for (; index < 9; index++) {
         struct BouncingSceneParticle *fragment = &actor->fragments[index];
         fragment->bounced = 0;
-        fragment->sprite.position.components[0] = *posX + gUnk_0824E818[(rowStart + index) - table].x;
-        fragment->sprite.position.components[1] = *posY + gUnk_0824E818[(rowStart + index) - table].y;
-        fragment->sprite.position.components[2] = *posZ + gUnk_0824E818[(rowStart + index) - table].z;
+        fragment->sprite.position.components[0] =
+            *posX + gUnk_0824E818[(rowStart + index) - table].x;
+        fragment->sprite.position.components[1] =
+            *posY + gUnk_0824E818[(rowStart + index) - table].y;
+        fragment->sprite.position.components[2] =
+            *posZ + gUnk_0824E818[(rowStart + index) - table].z;
         if (fast) {
-            fragment->velocity.signedComponents[0] = gUnk_0824E818[(rowStart + index) - table].x >> 3;
+            fragment->velocity.signedComponents[0] =
+                gUnk_0824E818[(rowStart + index) - table].x >> 3;
             fragment->velocity.signedComponents[1] = NextFragmentLift(randomTable, randomIndex);
-            fragment->velocity.signedComponents[2] = gUnk_0824E818[(rowStart + index) - table].z >> 3;
+            fragment->velocity.signedComponents[2] =
+                gUnk_0824E818[(rowStart + index) - table].z >> 3;
         } else {
-            fragment->velocity.signedComponents[0] = gUnk_0824E818[(rowStart + index) - table].x >> 5;
+            fragment->velocity.signedComponents[0] =
+                gUnk_0824E818[(rowStart + index) - table].x >> 5;
             fragment->velocity.signedComponents[1] = NextFragmentLift(randomTable, randomIndex);
-            fragment->velocity.signedComponents[2] = gUnk_0824E818[(rowStart + index) - table].z >> 5;
+            fragment->velocity.signedComponents[2] =
+                gUnk_0824E818[(rowStart + index) - table].z >> 5;
         }
     }
     Sound_PlaySongChecked(0xc4);
