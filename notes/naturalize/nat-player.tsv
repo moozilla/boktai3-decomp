@@ -180,3 +180,4 @@ src/player/clone.c	PlayerClone_UpdatePool	contrived	contrived	28	do/goto loop, a
 src/player/clone.c	PlayerClone_UpdateBehavior	contrived	minor	55	bare return when the drawable pool is missing (returning pool changes layout); CpuSet wrapper and fill word: direct call changes the stack address order; animation pointer in the rise case
 src/player/clone.c	PlayerClone_BeginActiveReactions	minor	natural	1	
 src/player/control/Player_GetInputDirection.c	Player_GetInputDirection	contrived	minor	20	u16 mask helper and constant-first AND for the last key: plain & drops the 16-bit truncation or swaps the AND operands
+src/player/control/Player_UpdateDirectionHistory.c	Player_UpdateDirectionHistory	contrived	natural	8	

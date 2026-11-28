@@ -1,24 +1,18 @@
 #include "global.h"
+#include "player/player.h"
 
-struct P08156C1C {
-    u8 f0[0x34C];
-    s16 a[10];
-    u8 f360[0x54A - 0x360];
-    s8 f54A;
-};
-s32 Player_GetInputDirection(void *);
+s32 Player_GetInputDirection(struct Player *);
 
-void Player_UpdateDirectionHistory(struct P08156C1C *p)
+void Player_UpdateDirectionHistory(struct Player *p)
 {
     s32 i;
-    s32 r;
+    s32 direction;
     for (i = 9; i > 0; i--)
-        p->a[i] = p->a[i - 1];
-    r = Player_GetInputDirection(p);
-    p->a[0] = r;
-    if ((s16)r >= 0) {
-        s32 t = r;
-        t += p->f54A;
-        p->a[0] = (t + 7) & 7;
+        p->directionHistory[i] = p->directionHistory[i - 1];
+    direction = Player_GetInputDirection(p);
+    p->directionHistory[0] = direction;
+    if ((s16)direction >= 0) {
+        s32 offset = (s8)p->catalogSavedOption;
+        p->directionHistory[0] = (direction + offset + 7) & 7;
     }
 }
