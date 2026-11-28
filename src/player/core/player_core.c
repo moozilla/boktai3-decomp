@@ -230,10 +230,9 @@ void Player_ApplyContactResponse(struct Player *player, struct ContactCollider *
 s32 Player_IsActionBlocked(struct Player *player)
 {
     s32 phase;
-    if (((struct GameState *)(player->timedEventSlot * sizeof(s32) + (u32)gGameState))
-                ->counters628[0] > 0 ||
+    if (*(gGameState->counters628 + player->timedEventSlot) > 0 ||
         (player != 0 && Player_ReadStatusBits(&player->statBonusFlags, 0x4000) != 0) ||
-        ((phase = SunClock_GetPhase()), (u32)(phase - 4) <= 1 || phase == 0))
+        (phase = SunClock_GetPhase(), phase == 4 || phase == 5 || phase == 0))
         return 1;
     return 0;
 }
