@@ -88,3 +88,11 @@ src/ui/books/collection/collection.c	Collection_UpdateHighlightPulse	contrived	n
 src/ui/books/collection/collection.c	Collection_CountUnlockedEntries	contrived	natural	5	
 src/ui/books/collection/collection.c	Collection_UpdateSelectedEntryText	contrived	natural	5	
 src/ui/books/collection/collection.c	Collection_LoadPageBackground	contrived	natural	8	
+src/ui/books/collection/collection.c	Collection_GetPageEntryCount	natural	natural	0	
+src/ui/books/collection/collection.c	Collection_SetEntryUnlocked	natural	natural	0	
+src/ui/books/collection/collection.c	Collection_IsEntryUnlocked	natural	natural	0	
+src/ui/books/collection/collection.c	Collection_UpdateEntryVisibility	natural	natural	0	
+src/ui/books/collection/collection.c	Collection_UpdateCountDigits	natural	natural	0	
+src/ui/books/collection/collection.c	Collection_UpdateCursor	natural	natural	0	
+src/ui/books/collection/collection.c	Collection_RefreshPage	natural	natural	0	
+src/ui/books/collection/collection.c	Collection_RefreshSelection	natural	natural	0	
