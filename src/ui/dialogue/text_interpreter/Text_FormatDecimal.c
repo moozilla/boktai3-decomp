@@ -42,20 +42,11 @@ void Text_FormatDecimal(u8 *buffer, int value)
         *out = digit + '0';
         out++;
     }
-    {
-        int v;
-        int next;
-        digit = 0;
-        v = value;
-        if (v > 0) {
-            do {
-                digit++;
-                next = v - 1;
-                v = next;
-            } while (next > 0);
-            value = next;
-        }
-        *out++ = digit + '0';
-        *out = 0;
+    digit = 0;
+    while (value > 0) {
+        digit++;
+        value--;
     }
+    *out++ = digit + '0';
+    *out = 0;
 }
