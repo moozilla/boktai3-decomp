@@ -76,10 +76,7 @@ void Armor_InitPartStretch(struct StretchPart *p)
         one = 1;
         p->byte9 = one;
         gRandomIndex = (gRandomIndex + 1) & 1023;
-        {
-            u32 offset = gRandomIndex * 2;
-            choice = *(const u16 *)(offset + (u32)gRandomTable);
-        }
+        choice = *(const u16 *)((gRandomIndex * 2) + (u32)gRandomTable);
         choice &= one;
         p->spin = choice ? 1 : -1;
         p->flagsA2 &= ~4;

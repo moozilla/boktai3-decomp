@@ -271,3 +271,4 @@ src/monsters/armor/armor_tracking.c	Armor_UpdateFacingAction	contrived	minor	2	r
 src/monsters/armor/Armor_ApplySceneCommands.c	Armor_ApplySceneCommands	contrived	contrived	44	remaining: rawoff,bytep,do,block,constlocal
 src/monsters/armor/Armor_BeginPartTravelToPlayer.c	Armor_BeginPartTravelToPlayer	contrived	natural	1	
 src/monsters/armor/Armor_InitPartLunge.c	Armor_InitPartLunge	contrived	contrived	2	remaining: rawoff,u8cast,bytep
+src/monsters/armor/Armor_InitPartStretch.c	Armor_InitPartStretch	contrived	contrived	2	remaining: u8cast,zeroone
