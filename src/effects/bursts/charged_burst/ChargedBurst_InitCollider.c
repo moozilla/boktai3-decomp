@@ -1,24 +1,23 @@
-#include "global.h"
+#include "effects/bursts/charged_burst.h"
 #include "scene/collision/packed_contact_vector.h"
-void Collider_Init(u8 *, s32, s32, s32, s32, struct PackedContactVector *,
-                   struct PackedContactVector *);
-void Collider_SetAttackProperties(u8 *, s32, s32, s32, s32, s32);
-void Collider_SetCallback(u8 *, void *, u8 *);
-void Collider_SetPosition(u8 *, u8 *, s32);
-void ChargedBurst_InitCollider(u8 *p, u32 id, s32 a, s32 b)
+
+void Collider_SetAttackProperties(struct ContactCollider *, s32, s32, s32, s32, s32);
+
+void ChargedBurst_InitCollider(struct ChargedBurst *burst, u32 contactFlags, s32 power, s32 b)
 {
-    struct PackedContactVector scale;
-    struct PackedContactVector position;
-    u8 *q = p + 0x20;
-    scale.x = 100;
-    scale.y = 100;
-    scale.z = 100;
-    position.x = 0;
-    position.y = 0;
-    position.z = 0;
-    Collider_Init(q, 0, 0x2100, 0, (u16)id, &scale, &position);
-    Collider_SetAttackProperties(q, a, 0, 0x20000, 0, 0);
-    p[0x62] = b;
-    Collider_SetCallback(q, 0, p);
-    Collider_SetPosition(q, p + 0x8c, 0);
+    struct ContactCollider *collider = &burst->collider;
+    struct PackedContactVector size;
+    struct PackedContactVector offset;
+
+    size.x = 100;
+    size.y = 100;
+    size.z = 100;
+    offset.x = 0;
+    offset.y = 0;
+    offset.z = 0;
+    Collider_Init(collider, 0, 0x2100, 0, (u16)contactFlags, &size, &offset);
+    Collider_SetAttackProperties(collider, power, 0, 0x20000, 0, 0);
+    collider->direction = b;
+    Collider_SetCallback(collider, 0, burst);
+    Collider_SetPosition(collider, &burst->core.position, 0);
 }
