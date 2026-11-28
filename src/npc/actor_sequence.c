@@ -1,4 +1,5 @@
 #include "global.h"
+#include "gba/io_reg.h"
 #include "npc/actor_sequence.h"
 #include "engine/math/fixed8_interpolation.h"
 #include "engine/video/render.h"
@@ -236,16 +237,13 @@ void SceneActorSequence_InitDisplayResources(struct SceneActorSequence *p)
     u8 *resource;
     u8 *palette;
     s32 layers[2];
-    {
-        u16 *control = &gDispCntShadow;
-        u32 mask = 0xfffff0ff;
-        u16 value = *control;
-        mask &= value;
-        {
-            u16 enabled = 0xa00;
-            *control = mask | enabled;
-        }
-    }
+    u16 *dispcnt = &gDispCntShadow;
+    u32 control;
+    u16 enabled;
+    control = ~DISPCNT_BG_ALL_ON;
+    control &= *dispcnt;
+    enabled = DISPCNT_BG1_ON | DISPCNT_BG3_ON;
+    *dispcnt = control | enabled;
     resource = sub_08216E54(0x98e2);
     p->background = resource;
     layers[0] = 1;

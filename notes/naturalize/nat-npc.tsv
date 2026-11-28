@@ -117,3 +117,10 @@ src/npc/actor_sequence.c	SceneActorSequence_UpdateFirstWaypointMotion	natural	na
 src/npc/actor_sequence.c	SceneActorSequence_BeginSecondWaypointMotion	contrived	natural	5	
 src/npc/actor_sequence.c	SceneActorSequence_UpdateSecondWaypointMotion	natural	natural	0	
 src/npc/actor_sequence.c	SceneActorSequence_BeginFinalWaypointMotion	contrived	natural	5	
+src/npc/actor_sequence.c	SceneActorSequence_UpdateFinalWaypointMotion	natural	natural	0	
+src/npc/actor_sequence.c	SceneActorSequence_BeginFadeOut	natural	natural	0	
+src/npc/actor_sequence.c	SceneActorSequence_UpdateCompletionDelay	natural	natural	0	
+src/npc/actor_sequence.c	SceneActorSequence_UpdateActorAnimation	contrived	contrived	1	one-line read helper stays: a direct field read folds to the known case constant
+src/npc/actor_sequence.c	SceneActorSequence_Update	natural	natural	0	
+src/npc/actor_sequence.c	SceneActorSequence_OnDestroy	natural	natural	0	
+src/npc/actor_sequence.c	SceneActorSequence_InitDisplayResources	contrived	contrived	22	display pointer, mask-first local and enabled-bits local: ROM loads address, mask, then the register, and builds the bits after the and
