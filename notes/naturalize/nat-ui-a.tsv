@@ -347,3 +347,4 @@ src/ui/dialogue/text_window/TextWindow_Refresh.c	TextWindow_Refresh	fudged	natur
 src/ui/dialogue/text_window/TextWindow_SetText.c	TextWindow_SetText	fudged	natural	1	
 src/ui/dialogue/text_window/TextWindow_SetBounds.c	TextWindow_SetBounds	fudged	natural	3	returns the value of TextState_SetBounds, declared void in its unit: local int prototype kept
 src/ui/dialogue/text_window/TextWindow_SetNumber.c	TextWindow_SetNumber	fudged	natural	1	
+src/ui/dialogue/text_window/TextWindow_SetString.c	TextWindow_SetString	fudged	natural	4	
