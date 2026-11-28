@@ -1,99 +1,81 @@
-/* Provisional names and object interpretation; offsets follow static accesses. */
 #include "global.h"
-struct Digit {
-    u32 flags;
-    u8 rest[0x5c];
-};
+#include "ui/results/stage_results.h"
+
 s32 Div(s32, s32);
 s32 AnimSprite_SelectGlyph(void *, void *, u32);
-static inline u32 *FLP(struct Digit *p, s32 n)
+
+void StageResults_ShowTimeDigits(struct StageResults *results, s32 field, s32 value)
 {
-    u32 o = n * 0x60;
-    return (u32 *)((u32)p + o);
-}
-#define FL(p, n) (*FLP(p, n))
-void StageResults_ShowTimeDigits(u8 *s, s32 mode, s32 time)
-{
-    struct Digit *fb;
+    s32 row;
+    s32 column;
     s32 base;
-    s32 outer;
-    s32 j;
+    s32 index;
     s32 divisor;
     u32 glyph;
-    s32 seen;
-    s32 idx;
-    if (mode == 8) {
+    s32 shown;
+    if (field == 8) {
         s32 minutes;
         s32 hundredths;
-        s32 clamped = time;
-        if (time > 60000)
-            clamped = 60000;
-        else if (time < 0)
-            clamped = 0;
-        time = clamped;
-        if (time > 59999) {
+        value = StageResults_Clamp(value, 60000);
+        if (value > 59999) {
             minutes = 999;
             hundredths = 999;
         } else {
-            minutes = Div(time, 60);
-            hundredths = Div((time - minutes * 60) * 169, 10);
+            minutes = Div(value, 60);
+            hundredths = Div((value - minutes * 60) * 169, 10);
         }
-        outer = 0;
-        fb = (struct Digit *)(s + 0x2c);
-        do {
+        for (row = 0; row < 2; row++) {
             divisor = 100;
-            base = outer * 3 + 8;
-            time = hundredths;
-            if (outer == 0)
-                time = minutes;
-            seen = 0;
-            j = 0;
-            do {
+            base = row * 3 + 8;
+            value = hundredths;
+            if (row == 0)
+                value = minutes;
+            shown = 0;
+            for (column = 0; column < 3; column++) {
                 glyph = 0x3e;
-                idx = base + j;
-                while (time >= divisor) {
+                index = base + column;
+                while (value >= divisor) {
                     glyph++;
-                    time -= divisor;
+                    value -= divisor;
                 }
-                if (outer == 0) {
-                    if (glyph == 0x3e && j != 2) {
-                        if (seen)
-                            FL(fb, mode + j) &= ~1;
+                if (row == 0) {
+                    if (glyph == 0x3e && column != 2) {
+                        if (shown)
+                            results->sprites[field + column].flags &= ~1;
                         else
-                            FL(fb, mode + j) |= 1;
+                            results->sprites[field + column].flags |= 1;
                     } else {
-                        FL(fb, idx) &= ~1;
-                        seen = 1;
+                        results->sprites[index].flags &= ~1;
+                        shown = 1;
                     }
                 } else {
-                    FL(fb, idx) &= ~1;
+                    results->sprites[index].flags &= ~1;
                 }
-                AnimSprite_SelectGlyph(s + 0x24 + *(&idx) * 0x60, s + 0x8c4, (u16)glyph);
+                /* *&index keeps the digit index in memory */
+                AnimSprite_SelectGlyph(&results->sprites[*&index], results->animation, (u16)glyph);
                 divisor = Div(divisor, 10);
-            } while (++j < 3);
-        } while (++outer < 2);
-    } else if (mode == 14 || mode == 17 || mode == 20) {
+            }
+        }
+    } else if (field == 14 || field == 17 || field == 20) {
         divisor = 100;
-        seen = 0;
-        j = 0;
-        fb = (struct Digit *)(s + 0x2c);
-        for (; j < 3; j++) {
+        shown = 0;
+        for (column = 0; column < 3; column++) {
             glyph = 0x3e;
-            idx = mode + j;
-            while (time >= divisor) {
+            index = field + column;
+            while (value >= divisor) {
                 glyph++;
-                time -= divisor;
+                value -= divisor;
             }
-            if (glyph == 0x3e && j != 2) {
-                if (seen)
-                    FL(fb, idx) &= ~1;
+            if (glyph == 0x3e && column != 2) {
+                if (shown)
+                    results->sprites[index].flags &= ~1;
                 else
-                    FL(fb, idx) |= 1;
+                    results->sprites[index].flags |= 1;
             } else {
-                FL(fb, idx) &= ~1;
-                seen = 1;
+                results->sprites[index].flags &= ~1;
+                shown = 1;
             }
-            AnimSprite_SelectGlyph(s + 0x24 + idx * 0x60, s + 0x8c4, (u16)glyph);
+            AnimSprite_SelectGlyph(&results->sprites[index], results->animation, (u16)glyph);
             divisor = Div(divisor, 10);
         }
     }
