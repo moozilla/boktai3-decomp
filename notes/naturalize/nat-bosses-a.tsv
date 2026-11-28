@@ -197,3 +197,4 @@ src/bosses/hresvelgr/Math_ApproachAngleByHalf.c	Math_ApproachAngleByHalf	minor	n
 src/bosses/hresvelgr/Math_ApproachAngleByQuarter.c	Math_ApproachAngleByQuarter	minor	natural	1	
 src/bosses/hresvelgr/Math_ApproachAngleByEighth.c	Math_ApproachAngleByEighth	minor	natural	1	
 src/bosses/hresvelgr/Math_ApproachAngleBySixteenth.c	Math_ApproachAngleBySixteenth	minor	natural	1	
+src/bosses/hresvelgr/Math_ApproachAngleByFrameCount.c	Math_ApproachAngleByFrameCount	minor	natural	1	
