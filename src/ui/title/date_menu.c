@@ -74,7 +74,8 @@ void DateMenu_UpdateCursor(struct DateMenu *p)
     p->widgets[2].flags &= ~1;
     switch (p->selection) {
         case 0:
-            *(u32 *)&r = 0;
+            r.x = 0;
+            r.y = 0;
             p->widgets[1].flags &= ~1;
             p->widgets[2].flags |= 1;
             Menu_SetTextRect(&p->widgets[1], &r);
