@@ -433,3 +433,4 @@ src/system/clock/SunClock_TickFrame.c	SunClock_TickFrame	contrived	natural	1
 src/system/clock/SunClock_GetSunriseHour.c	SunClock_GetSunriseHour	minor	natural	1	
 src/system/clock/SunClock_GetSunriseMinute.c	SunClock_GetSunriseMinute	minor	natural	1	
 src/system/clock/SunClock_GetSunsetHour.c	SunClock_GetSunsetHour	minor	natural	1	
+src/system/clock/SunClock_GetSunsetMinute.c	SunClock_GetSunsetMinute	minor	natural	1	
