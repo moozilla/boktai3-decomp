@@ -455,3 +455,4 @@ src/scene/actor/reaction/SceneActorTarget_ResetContactResponse.c	SceneActorTarge
 src/scene/actor/reaction/SceneActorTarget_ResolvePendingObject.c	SceneActorTarget_ResolvePendingObject	contrived	contrived	12	partial: parked masks for the gate/reaction/tracking flags and the owner copy stay; plain operators load the field before the mask
 src/scene/actor/reaction/SceneActorTarget_UpdateTrackedContact.c	SceneActorTarget_UpdateTrackedContact	contrived	contrived	11	partial: work-pointer round trips, flag accessor calls and zero-as-NULL stay; each plain form moves registers
 src/scene/actor/reaction/SceneActorTarget_ApplyResetCommand.c	SceneActorTarget_ApplyResetCommand	contrived	contrived	6	partial: parked masks and bit locals stay; plain operators reorder the load and mask
+src/scene/actor/reaction/SceneActorControl_DispatchControl.c	SceneActorControl_DispatchControl	contrived	natural	3	-

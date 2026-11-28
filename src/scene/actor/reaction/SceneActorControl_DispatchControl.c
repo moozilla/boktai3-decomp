@@ -1,15 +1,10 @@
-#include "global.h"
+#include "link/session/room_actor.h"
 
-void sub_08249240(u8 *, u32, u32);
-
-void SceneActorControl_DispatchControl(u8 *p)
+void SceneActorControl_DispatchControl(struct RoomActor *actor)
 {
-    u16 *q;
-    u32 v, f;
-    p[0x2b0] = 0;
-    q = (u16 *)(p + 0x2c8);
-    v = (*q)++;
-    f = *(u32 *)(p + 0x21c);
-    if (f != 0)
-        sub_08249240(p, v, f);
+    s32 frame;
+    actor->stepDone = 0;
+    frame = actor->field2C8++;
+    if (actor->target)
+        ((void (*)(struct RoomActor *, s32))actor->target)(actor, frame);
 }
