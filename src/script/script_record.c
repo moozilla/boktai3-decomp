@@ -255,15 +255,12 @@ static inline int ClampAmount(int x)
 
 void Actor_RecomputeScriptedValue(struct ScenePoolActor *actor)
 {
-    s32 i;
     struct StatModifier *modifiers = actor->modifiers;
-    struct StatModifier *entry;
+    s32 i;
     actor->amountLimit = actor->baseAmount;
-    for (i = 0; i < actor->modifierCount; i++) {
-        entry = &modifiers[i];
-        if (entry->state.record.kind == 6)
-            actor->amountLimit = entry->callback(entry, actor->amountLimit);
-    }
+    for (i = 0; i < actor->modifierCount; i++)
+        if (modifiers[i].state.record.kind == 6)
+            actor->amountLimit = modifiers[i].callback(&modifiers[i], actor->amountLimit);
     actor->amountLimit = ClampAmount(actor->amountLimit);
     actor->currentAmount = actor->amountLimit;
     actor->halfAmount = actor->amountLimit >> 1;
