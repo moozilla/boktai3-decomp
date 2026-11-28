@@ -45,7 +45,6 @@ static inline s32 GetGroundHeight(const struct ContactPosition *pos)
 void StoryCharacter_UpdateAnimation16State(void *context, struct Npc *p)
 {
     u32 r;
-    struct ContactPosition *pos;
 
     if (p->entered != 0) {
         p->entered = 0;
@@ -96,15 +95,13 @@ void StoryCharacter_UpdateAnimation16State(void *context, struct Npc *p)
         p->flags |= mask;
     }
 
-    pos = &p->pos;
     {
-        s32 height = GetGroundHeight(pos);
+        s32 height = GetGroundHeight(&p->pos);
         if (p->pos.y <= height) {
             p->pos.y = height;
             p->done = 1;
         } else {
-            s32 v = -p->speed;
-            p->vel.y = v;
+            p->vel.y = -p->speed;
         }
     }
 }

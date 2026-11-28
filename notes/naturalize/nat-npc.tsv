@@ -170,3 +170,5 @@ src/npc/story_character/Actor_BeginKindFourEntrySix.c	Actor_BeginKindFourEntrySi
 src/npc/story_character/StoryCharacter_StartKind9Or10Animation2.c	StoryCharacter_StartKind9Or10Animation2	minor	natural	1	
 src/npc/story_character/StoryCharacter_StartKind5Animation6Then7.c	StoryCharacter_StartKind5Animation6Then7	minor	natural	1	
 src/npc/story_character/StoryCharacter_StartKind9Animation6Then5.c	StoryCharacter_StartKind9Animation6Then5	minor	natural	1	
+src/npc/story_character/StoryCharacter_UpdateAnimation13State.c	StoryCharacter_UpdateAnimation13State	minor	minor	3	speed copy (spd) stays: ROM keeps a second copy of the speed for both velocity components
+src/npc/story_character/StoryCharacter_UpdateAnimation16State.c	StoryCharacter_UpdateAnimation16State	contrived	contrived	6	parked flag masks stay: ROM materializes the mask before loading displayFlags; local Npc struct view
