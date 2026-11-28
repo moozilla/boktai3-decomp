@@ -369,3 +369,4 @@ src/bosses/vanargand/Vanargand_RunInterruptibleModeCallback.c	Vanargand_RunInter
 src/bosses/vanargand/Vanargand_RunSecondaryModeCallback.c	Vanargand_RunSecondaryModeCallback	contrived	natural	1	
 src/bosses/vanargand/Vanargand_RunSharedModeCallback.c	Vanargand_RunSharedModeCallback	contrived	natural	1	
 src/bosses/vanargand/Vanargand_RunModeCallback.c	Vanargand_RunModeCallback	contrived	natural	1	
+src/bosses/vanargand/ActorSoundPhase_StartFlaggedAnimation.c	ActorSoundPhase_StartFlaggedAnimation	contrived	near-natural	3	flag mask local kept: constant loaded before the flags word
