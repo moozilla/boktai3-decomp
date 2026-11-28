@@ -48,3 +48,5 @@ src/player/appearance/actor_stat_config.c	ActorStats_ConfigureScaledParameters	n
 src/player/appearance/PaletteFade_ApplyBrightenedPalette.c	PaletteFade_ApplyBrightenedPalette	contrived	minor	40	(u16)color shifts and a second *src read: other color types change the extraction shifts or register choice
 src/player/appearance/player_visuals.c	Player_GetVisualEffectFlags	natural	natural	0	-
 src/player/appearance/player_visuals.c	Player_LoadVisualParameters	contrived	natural	6	index loaded then reduced in two statements (one expression adds a register copy)
+src/player/appearance/player_visuals.c	sub_0813C9B4	contrived	contrived	35	unchanged: gcse puts &p->animation.palette after the base/brightness pointers unless it is a named pointer; counted-up second loop needs while(1)/break (loop.c reverses a for loop)
+src/player/appearance/player_visuals.c	Player_UpdateVisualPalette	contrived	minor	6	inner 'source' shadows the outer one (a single variable swaps the p and requestedMode registers)
