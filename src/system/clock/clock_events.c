@@ -11,17 +11,10 @@ void ClockEvents_RunScript(struct ClockEvents *clock, s32 event)
 
 static inline int ClockEvents_Distance(int seconds, int eventTime)
 {
-    int difference = seconds - eventTime;
-    if (seconds < eventTime)
-        difference = eventTime - seconds;
+    int difference = seconds < eventTime ? eventTime - seconds : seconds - eventTime;
     if (difference > 43199)
         difference -= 86400;
-    {
-        int distance = difference;
-        if (distance < 0)
-            distance = -distance;
-        return distance;
-    }
+    return abs(difference);
 }
 
 int ClockEvents_Update(struct ClockEvents *clock)
@@ -35,6 +28,8 @@ int ClockEvents_Update(struct ClockEvents *clock)
     if (clock->frame > 59) {
         clock->frame = zero;
     } else {
+        int eventTime, limit;
+
         clock->hour = SunClock_GetBaseHour();
         clock->minute = SunClock_GetBaseMinute();
         clock->second = SunClock_GetSecond();
@@ -47,27 +42,25 @@ int ClockEvents_Update(struct ClockEvents *clock)
         } else {
             clock->armed[0] = 1;
         }
-        {
-            int eventTime = gSunClock.hourA * 3600 + gSunClock.minuteA * 60, limit = clock->window;
-            if (ClockEvents_Distance(clock->seconds, eventTime) <= limit) {
-                if (clock->armed[1]) {
-                    clock->armed[1] = 0;
-                    ClockEvents_RunScript(clock, 1);
-                }
-            } else {
-                clock->armed[1] = 1;
+        eventTime = gSunClock.hourA * 3600 + gSunClock.minuteA * 60;
+        limit = clock->window;
+        if (ClockEvents_Distance(clock->seconds, eventTime) <= limit) {
+            if (clock->armed[1]) {
+                clock->armed[1] = 0;
+                ClockEvents_RunScript(clock, 1);
             }
+        } else {
+            clock->armed[1] = 1;
         }
-        {
-            int eventTime = gSunClock.hourB * 3600 + gSunClock.minuteB * 60, limit = clock->window;
-            if (ClockEvents_Distance(clock->seconds, eventTime) <= limit) {
-                if (clock->armed[2]) {
-                    clock->armed[2] = 0;
-                    ClockEvents_RunScript(clock, 2);
-                }
-            } else {
-                clock->armed[2] = 1;
+        eventTime = gSunClock.hourB * 3600 + gSunClock.minuteB * 60;
+        limit = clock->window;
+        if (ClockEvents_Distance(clock->seconds, eventTime) <= limit) {
+            if (clock->armed[2]) {
+                clock->armed[2] = 0;
+                ClockEvents_RunScript(clock, 2);
             }
+        } else {
+            clock->armed[2] = 1;
         }
     }
     return 0;

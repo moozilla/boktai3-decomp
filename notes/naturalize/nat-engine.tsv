@@ -402,3 +402,4 @@ src/engine/video/sprite_component/sub_08180850.c	sub_08180850	minor	natural	1
 src/engine/video/sprite_component/SceneMotion_InitState.c	SceneMotion_InitState	natural	natural		
 src/engine/video/sprite_component/ProximityVolume_Update.c	ProximityVolume_Update	natural	natural		
 src/engine/video/sprite_component/ProximityVolume_IdleCallback.c	ProximityVolume_IdleCallback	natural	natural		
+src/system/clock/clock_events.c	ClockEvents_Update	contrived	minor	1	zero set through do/while(0) so it stays in a register for the frame and noon-latch stores
