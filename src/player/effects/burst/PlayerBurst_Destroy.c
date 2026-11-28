@@ -1,19 +1,10 @@
-#include "global.h"
+#include "player/effects/orbit_effect.h"
 
-void Anim_Remove(u8 *);
-void Effect_Remove(u8 *);
-
-s32 PlayerBurst_Destroy(u8 *p)
+s32 PlayerBurst_Destroy(struct PlayerOrbitEffect *effect)
 {
-    u8 *q;
     s32 i;
-    Anim_Remove(p + 0x3c);
-    q = p + 0xfc;
-    i = 15;
-    do {
-        Effect_Remove(q);
-        q += 0x3c;
-        i--;
-    } while (i >= 0);
+    Anim_Remove(&effect->drawable);
+    for (i = 0; i < 16; i++)
+        Effect_Remove(&effect->particles[i]);
     return 0;
 }

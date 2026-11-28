@@ -525,3 +525,4 @@ src/player/effects/attack/PlayerAttackEffect_UpdateParticles.c	PlayerAttackEffec
 src/player/effects/burst/PlayerTransition_StepReveal.c	PlayerTransition_StepReveal	minor	natural	1	-
 src/player/effects/burst/PlayerBurst_UpdateShutdown.c	PlayerBurst_UpdateShutdown	contrived	minor	2	andm helper (mask loaded before the pause flags)
 src/player/effects/burst/PlayerBurst_Update.c	PlayerBurst_Update	contrived	natural	1	-
+src/player/effects/burst/PlayerBurst_Destroy.c	PlayerBurst_Destroy	contrived	natural	2	-
