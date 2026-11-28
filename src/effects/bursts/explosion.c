@@ -7,24 +7,19 @@ static inline void UpdateFrame(struct Explosion *explosion)
 
 s32 Explosion_Update(struct Explosion *explosion)
 {
-    u16 *delay = &explosion->delay;
-    if (*delay)
-        (*delay)--;
-    else {
-        u16 *age;
-        u32 value;
-        UpdateFrame(explosion);
-        value = explosion->age;
-        age = &explosion->age;
-        if (value == 0) {
+    if (explosion->delay) {
+        explosion->delay--;
+    } else {
+        explosion->sprite.frame = explosion->age >> 2;
+        if (explosion->age == 0) {
             explosion->sprite.flags &= ~1;
-            if (explosion->silent == 0)
+            if (!explosion->silent)
                 Sound_PlaySong(0x195);
         }
-        if (*age <= 7 && explosion->collisionDisabled == 0)
+        if (explosion->age <= 7 && !explosion->collisionDisabled)
             Collider_Refresh(&explosion->collider);
-        (*age)++;
-        if (*age > 23)
+        explosion->age++;
+        if (explosion->age > 23)
             Task_Kill(explosion);
     }
     return 0;

@@ -100,3 +100,4 @@ src/effects/bursts/large_fragment_effect.c	FragmentSpritePool_Init	natural	natur
 src/effects/bursts/large_fragment_effect.c	FragmentSpritePool_GetOrCreate	natural	natural	0	
 src/effects/bursts/large_fragment_effect.c	FragmentSpritePool_ResetSingleton	natural	natural	0	
 src/effects/bursts/large_fragment_effect.c	LargeFragmentEffect_UpdateAnimation	minor	minor	0	left: views the slot through a second struct (Feather) and casts to the other effect types
+src/effects/bursts/explosion.c	Explosion_Update	contrived	natural	1	-
