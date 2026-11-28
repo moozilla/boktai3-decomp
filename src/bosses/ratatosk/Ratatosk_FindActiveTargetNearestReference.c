@@ -1,21 +1,17 @@
 #include "global.h"
+#include "bosses/ratatosk/ratatosk.h"
 
-s32 Ratatosk_FindActiveTargetNearestReference(u8 *p)
+s32 Ratatosk_FindActiveTargetNearestReference(struct Ratatosk *self)
 {
-    s32 idx = -1;
-    u32 best = 0xFFFFFFFF;
-    s32 i = 0;
-    u8 *q = p + 0xDF0;
-    do {
-        if (*(u32 *)q == 1) {
-            u32 v = *(u32 *)(q + 0xC);
-            if (v <= best) {
-                best = v;
-                idx = i;
-            }
+    s32 selected = -1;
+    u32 minimum = -1;
+    s32 i;
+
+    for (i = 0; i < 4; i++) {
+        if (self->targets[i].active == 1 && self->targets[i].anchorDistance <= minimum) {
+            minimum = self->targets[i].anchorDistance;
+            selected = i;
         }
-        q += 0x18;
-        i++;
-    } while (i <= 3);
-    return idx;
+    }
+    return selected;
 }
