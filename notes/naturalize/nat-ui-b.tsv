@@ -472,3 +472,4 @@ src/ui/town/shop/Shop_BeginItemCatalogMove.c	Shop_BeginItemCatalogMove	contrived
 src/ui/town/shop/Shop_BeginItemSpecialMove.c	Shop_BeginItemSpecialMove	contrived	minor	1	widget-run view over the panel for the flag writes
 src/ui/town/shop/Shop_ClassifyItemMove.c	Shop_ClassifyItemMove	natural	natural	0	
 src/ui/town/shop/Shop_ClassifyConsumableMove.c	Shop_ClassifyConsumableMove	contrived	minor	1	index-first pointer sum into table160
+src/ui/town/shop/Shop_ClassifyEquipmentAction.c	Shop_ClassifyEquipmentAction	contrived	minor	8	catalog byte read as u8 then sign-extended (keeps the 255 test alive); catalog view cast

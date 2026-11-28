@@ -6,35 +6,22 @@ s32 Shop_ClassifyEquipmentAction(struct ShopControlView *panel)
         s32 entry;
         result = 1;
         {
-            s32 pageIndex = (panel->page << 3) - 16;
-            u8 raw;
-            raw = ((struct ShopCatalogView *)panel)
-                      ->entries[pageIndex + panel->grid.selection];
+            u8 raw = ((struct ShopCatalogView *)panel)
+                         ->entries[panel->grid.selection - 16 + (panel->page << 3)];
             entry = (s8)raw;
         }
-        if (entry == 255 || entry < 0)
-            goto invalid;
-        {
-            s32 funds = gGameState->unk7B0;
-            if (funds < Equipment_GetDefinition(entry)->baseValue)
-                goto invalid;
-        }
-        if (panel->destination >= 0)
-            goto done;
-        goto invalid;
+        if (entry == 255 || entry < 0 ||
+            gGameState->unk7B0 < Equipment_GetDefinition(entry)->baseValue ||
+            panel->destination < 0)
+            result = 0;
     } else {
         s32 selected = panel->grid.selection;
+        s32 assignable;
         Inventory_GetEquipmentId(selected);
-        {
-            s32 equipped = Inventory_CanAssignEquipment(selected);
-            result = -1;
-            if (!equipped)
-                goto invalid;
-        }
+        assignable = Inventory_CanAssignEquipment(selected);
+        result = -1;
+        if (!assignable)
+            result = 0;
     }
-    goto done;
-invalid:
-    result = 0;
-done:
     return result;
 }
