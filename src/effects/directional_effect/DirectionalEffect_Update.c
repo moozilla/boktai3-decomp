@@ -1,42 +1,17 @@
-#include "global.h"
-#include "engine/video/display_animation.h"
+#include "player/player.h"
 #include "player/cutscene/player_cue_sequence.h"
+#include "engine/video/display_sprite_playback.h"
 
-struct DirectionalEffect {
-    u32 flags;
-    u8 unknown4[0xC];
-    u16 frame;
-    u8 unknown12[10];
-    u16 x;
-    u8 unknown1E[2];
-    u16 y;
-    u8 unknown22[0x26];
-    struct DisplaySequenceState sequence;
-    u8 unknown58[4];
-    u16 dx;
-    u8 unknown5E[2];
-    u16 dy;
-    u8 unknown62[2];
-    u8 active;
-};
-
-static inline u32 StepPlayback(struct DirectionalEffect *owner, struct DisplaySequenceState *state,
-                               struct DirectionalEffect *base, u32 one)
+void DirectionalEffect_Update(struct DirectionalSpriteEffect *effect)
 {
-    return PlayerCue_StepSequenceEnded(owner, &base->sequence);
-}
-void DirectionalEffect_Update(struct DirectionalEffect *p)
-{
-    if (p->active) {
-        if (StepPlayback(p, &p->sequence, p, 1)) {
-            p->active = 0;
-            {
-                struct DirectionalEffect *q = p;
-                q->flags |= 1;
-            }
+    if (effect->active) {
+        if (PlayerCue_StepSequenceEnded((struct ContactSwarmSprite *)&effect->sprite,
+                                        &effect->animation)) {
+            effect->active = 0;
+            effect->sprite.flags |= 1;
         } else {
-            p->x += p->dx;
-            p->y += p->dy;
+            effect->sprite.position.axis.x += effect->velocityX;
+            effect->sprite.position.axis.depth += effect->velocityY;
         }
     }
 }
