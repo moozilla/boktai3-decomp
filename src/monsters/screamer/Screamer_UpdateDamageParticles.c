@@ -5,6 +5,7 @@
 #include "engine/ram.h"
 #include "engine/math/monster_particle_random.h"
 #include "engine/engine_pause.h"
+#include "engine/word_flags.h"
 #include "player/player.h"
 extern u8 gUnk_0203B000[];
 void SceneDrawablePair_SetFlags(void);
@@ -19,38 +20,37 @@ void EnemyAttackParticle_SetVerticalMotion(void *, s32, s32);
 void EnemyAttackParticle_EnableShadow(void *);
 void EnemyAttackParticle_AddFlags(void *, u32);
 void EnemyAttackParticle_Emit(void *, void *);
-static inline u32 TestFlags(s16 mask, u32 *flags)
-{
-    return *flags & mask;
-}
-static inline void Screamer_CopyPosition(struct ContactPosition *out, const struct ContactPosition *in)
+static inline void Screamer_CopyPosition(struct ContactPosition *out,
+                                         const struct ContactPosition *in)
 {
     *out = *in;
 }
-s32 Screamer_UpdateDamageParticles(struct ScreamerState *p)
+s32 Screamer_UpdateDamageParticles(struct ScreamerState *screamer)
 {
     struct EnemyParticleParams parameters;
     struct ContactPosition position;
     s32 emitted;
     void *dataOwner;
-    u16 *blink;
-    if (Engine_PauseBits(0x400) || TestFlags(4, &gPlayerSlotStatus[0]))
+    u16 amount;
+    if (Engine_PauseBits(0x400) || Flags_MaskedWord(4, &gPlayerSlotStatus[0]))
         return 0;
-    Callback_InvokeActor(p, p->update);
-    if ((p->f1DC > 0) && (!p->f1E0)) {
-        p->f1E4 -= p->f1DC;
-        p->f200 = p->f204;
+    Callback_InvokeActor(screamer, screamer->update);
+    amount = screamer->f1DC;
+    if (screamer->f1DC > 0 && !screamer->f1E0) {
+        screamer->f1E4 -= amount;
+        screamer->f200 = screamer->f204;
         Sound_PlaySong(0x13e);
-        if (p->f1DC > 0) {
-            struct ContactCollider *body = (void *)(void *)&p->bodyCollider;
-            DamageNumberDisplay_Show(body, p->f1DC, 0, &body->position, &body->offset, 1);
-            SceneHud_SetTimedState(p->f1F8, p->f1E4, p->f1E6, p->f1EC, body->costFlags == 4,
-                                   p->f1F4);
+        if (screamer->f1DC > 0) {
+            DamageNumberDisplay_Show(&screamer->bodyCollider, screamer->f1DC, 0,
+                                     &screamer->bodyCollider.position,
+                                     &screamer->bodyCollider.offset, 1);
+            SceneHud_SetTimedState(screamer->f1F8, screamer->f1E4, screamer->f1E6, screamer->f1EC,
+                                   screamer->bodyCollider.costFlags == 4, screamer->f1F4);
         }
-        if (p->f1E4 <= 0) {
+        if (screamer->f1E4 <= 0) {
             const u16 *randomTable;
-            p->f1E0 = 1;
-            p->bodyCollider.responseValue = 0;
+            screamer->f1E0 = 1;
+            screamer->bodyCollider.responseValue = 0;
 
             for (emitted = 0; emitted < 8; emitted++) {
                 dataOwner = gUnk_0203B000;
@@ -61,8 +61,8 @@ s32 Screamer_UpdateDamageParticles(struct ScreamerState *p)
                     EnemyAttackParticle_InitParameters(&parameters);
                     direction = ParticleRandom_ReadDirectSample(randomTable);
                     EnemyAttackParticle_SetGraphicsParameters(&parameters, 0x7E7C, frame, 0x1C4);
-                    EnemyAttackParticle_SetMotionParameters(&parameters, 0, 60, direction,
-                                                      ParticleRandom_ReadSample(randomTable) & 15);
+                    EnemyAttackParticle_SetMotionParameters(
+                        &parameters, 0, 60, direction, ParticleRandom_ReadSample(randomTable) & 15);
                     EnemyAttackParticle_SetVerticalMotion(&parameters, 0x2000, 0x18000);
                     EnemyAttackParticle_EnableShadow(&parameters);
                     if (emitted & 1)
@@ -73,39 +73,38 @@ s32 Screamer_UpdateDamageParticles(struct ScreamerState *p)
                         EnemyAttackParticle_AddFlags(&parameters, 4);
                     if (ParticleRandom_ReadBankSample((const u16 *)dataOwner) & 1)
                         EnemyAttackParticle_AddFlags(&parameters, 8);
-                    Screamer_CopyPosition(&position, &p->sprite.position);
-                    if (!p->f1D8)
+                    Screamer_CopyPosition(&position, &screamer->sprite.position);
+                    if (!screamer->f1D8)
                         position.x += 16;
                     else
                         position.z += 16;
                     EnemyAttackParticle_Emit(&parameters, &position);
                 }
             }
-            p->f1DE = 0;
-            p->update = SceneDrawablePair_SetFlags;
-            p->age = 0;
-            Screamer_HandleDefeat(p);
+            screamer->f1DE = 0;
+            screamer->update = SceneDrawablePair_SetFlags;
+            screamer->age = 0;
+            Screamer_HandleDefeat(screamer);
             Sound_PlaySong(0x52E);
         } else
-            p->f1DE = 8;
-        p->f1E2 = 1;
-        p->f1DC = 0;
+            screamer->f1DE = 8;
+        screamer->f1E2 = 1;
+        screamer->f1DC = 0;
     }
-    if (p->f1DE > 0) {
-        AnimData_SelectPaletteBank((void *)&p->graphics, 0x192);
+    if (screamer->f1DE > 0) {
+        AnimData_SelectPaletteBank(&screamer->graphics, 0x192);
 
-        p->f1DE--;
+        screamer->f1DE--;
     } else {
-        AnimData_SelectPaletteBank((void *)&p->graphics, 0x1C4);
+        AnimData_SelectPaletteBank(&screamer->graphics, 0x1C4);
     }
-    blink = &p->bodyCollider.responseValue;
-    if ((*blink) && (!p->f1E0)) {
-        (*blink)--;
-        if (((*blink) >> 2) & 1)
-            p->sprite.flags |= 1;
+    if (screamer->bodyCollider.responseValue && !screamer->f1E0) {
+        screamer->bodyCollider.responseValue--;
+        if ((screamer->bodyCollider.responseValue >> 2) & 1)
+            screamer->sprite.flags |= 1;
         else
-            p->sprite.flags &= ~1;
+            screamer->sprite.flags &= ~1;
     }
-    dataOwner = p;
+    dataOwner = screamer;
     ((struct ScreamerState *)dataOwner)->age++;
 }
