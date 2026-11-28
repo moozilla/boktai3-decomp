@@ -263,3 +263,4 @@ src/monsters/axe/axe.c	Axe_TickAuxiliarySpriteTimers	contrived	contrived	9	remai
 src/monsters/axe/axe.c	ActorPhase_SelectDistantWaypoint	contrived	contrived	2	remaining: u8cast,block
 src/monsters/axe/axe.c	Axe_UpdateScreenShake	contrived	minor	5	remaining: constlocal
 src/monsters/axe/axe.c	Axe_InitAttackTrail	minor	minor	16	remaining: block
+src/monsters/axe/axe.c	Axe_UpdateAttackColliderPositions	minor	minor	1	remaining: constlocal

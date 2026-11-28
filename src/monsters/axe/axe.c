@@ -2695,12 +2695,11 @@ void Axe_UpdateAttackColliderPositions(struct ChaseActor *actor)
 {
     struct Axe *q = actor->base.context;
     s32 i = 0;
-    struct ContactPosition *k = &q->auxiliarySprite.position;
     for (; i < 3; i++) {
         struct ContactCollider *e;
-        Collider_SetPosition(&q->body[i], k, 0);
+        Collider_SetPosition(&q->body[i], &q->auxiliarySprite.position, 0);
         e = &q->attack[i];
-        Collider_SetPosition(e, k, 0);
+        Collider_SetPosition(e, &q->auxiliarySprite.position, 0);
         Collider_Refresh(e);
     }
 }
