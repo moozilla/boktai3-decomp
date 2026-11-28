@@ -22,8 +22,8 @@ void SceneHud_FillDigitBacking(u32 x, u32 y, s32 count)
 void SceneHud_FillEmptyDigitRow(u32 x, u32 y, s32 count)
 {
     u16 *cell = SceneHud_GetMapCell(0, x, y);
-    s32 remaining;
-    for (remaining = count; remaining > 0; remaining--)
+
+    for (; count > 0; count--)
         *cell++ = 0xF020;
 }
 
