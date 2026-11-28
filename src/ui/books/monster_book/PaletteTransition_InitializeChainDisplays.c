@@ -43,13 +43,11 @@ void PaletteTransition_InitializeChainDisplays(struct PaletteTransition *p)
     struct DisplayAnimation *animation;
     s32 i;
     struct Position positionValue;
-    struct Position *position;
     p->timer = 0;
     entry = p->entry;
     animation = p->animations;
-    i = 0;
-    position = &positionValue;
-    for (; i < 5; i++) {
+    for (i = 0; i < 5; i++) {
+        struct Position *position = &positionValue;
         s32 x = p->x;
         s32 offsetX = gUnk_086126CC[i * 2];
         s32 y = p->y;
