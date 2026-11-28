@@ -397,40 +397,31 @@ u32 MonsterBook_InitWidgets(struct MonsterBook *book)
 
 u32 MonsterBook_SetupPageBackgrounds(struct MonsterBook *book, u32 value)
 {
-    u32 mask = 0xF00;
-    u16 *reg = &gDispCntShadow;
-    void *backgroundResource, *palette;
-    u32 color;
-    u16 *dst;
+    u16 *palette;
+    struct BackgroundLayer *layer;
     s32 i;
-    u32 zero;
-    struct BackgroundLayer *fields;
-    mask |= *reg;
-    *reg = mask;
-    backgroundResource = ScriptProc_Start(0xC091, 0x3536);
-    book->backgroundResource = backgroundResource;
-    Bg_SetupLayers(1, 0, backgroundResource, 0, 0, 1, &value);
+    u32 dispcnt = DISPCNT_BG0_ON | DISPCNT_BG1_ON | DISPCNT_BG2_ON | DISPCNT_BG3_ON;
+    u32 white;
+
+    dispcnt |= gDispCntShadow;
+    gDispCntShadow = dispcnt;
+    book->backgroundResource = ScriptProc_Start(0xC091, 0x3536);
+    Bg_SetupLayers(1, 0, book->backgroundResource, 0, 0, 1, &value);
     Bg_SetPriority(2, 0);
     BgGfx_LoadTilemapAtPosition(2, 0, 0);
-    palette = ((struct MonsterBookPalette *)ScriptProc_Start(0x92B3, 0x204))->colors;
-    book->paletteSource = palette;
-    dst = (u16 *)gBgPaletteBuffer;
-    CpuSet(palette, dst, 0x30);
-    color = 0x73FF;
-    i = 15;
-    dst += 0x4F;
-    for (; i >= 0; i--) {
-        *dst = color;
-        dst--;
-    }
-    zero = 0;
-    Bg_SetupLayers(2, 0, book->backgroundResource, 0, zero, 1, &value);
-    fields = &gBgRecords[3];
-    fields->width = 0x10;
-    fields->x = zero;
-    fields->y = zero;
+    book->paletteSource = ((struct MonsterBookPalette *)ScriptProc_Start(0x92B3, 0x204))->colors;
+    palette = (u16 *)gBgPaletteBuffer;
+    CpuSet(book->paletteSource, palette, 0x30);
+    white = 0x73FF;
+    for (i = 0; i < 16; i++)
+        palette[0x40 + i] = white;
+    Bg_SetupLayers(2, 0, book->backgroundResource, 0, 0, 1, &value);
+    layer = &gBgRecords[3];
+    layer->width = 0x10;
+    layer->x = 0;
+    layer->y = 0;
     Bg_SetPriority(3, 3);
-    Bg_FillTilemapRectangle(3, 4, 6, 8, 9, 1, zero, 4);
+    Bg_FillTilemapRectangle(3, 4, 6, 8, 9, 1, 0, 4);
     return 0;
 }
 
