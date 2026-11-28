@@ -19,11 +19,8 @@ struct ChallengeMenu {
     void (*stateCallback)(struct ChallengeMenu *);
     s32 stateTimer;
 };
-struct ChallengeMenuPoint {
-    u16 x, y;
-};
 struct ChallengeMenuPositions {
-    struct ChallengeMenuPoint entries[5];
+    u16 entries[5][2]; /* x, y per group */
 };
 struct ChallengeMenuFrames {
     u32 frames[4];

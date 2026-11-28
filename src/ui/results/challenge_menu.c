@@ -316,13 +316,9 @@ void ChallengeMenu_SetGroupIcon(struct ChallengeMenu *menu)
     struct ChallengeMenuPositions keyframes;
     memcpy(&positions, &gUnk_0824F9C8, sizeof(positions));
     keyframes = gUnk_0824F9DC;
-    menu->widgets[4].position.x = positions.entries[menu->group].x;
-    {
-        u32 entryOffset = menu->group << 2;
-        u16 *firstY = &positions.entries[0].y;
-        menu->widgets[4].position.y = *(u16 *)((u8 *)firstY + entryOffset);
-    }
-    Anim_LoadKeyframe(&menu->widgets[4], &menu->resources[2], keyframes.entries[menu->group].x, 0);
+    menu->widgets[4].position.x = positions.entries[menu->group][0];
+    menu->widgets[4].position.y = positions.entries[menu->group][1];
+    Anim_LoadKeyframe(&menu->widgets[4], &menu->resources[2], keyframes.entries[menu->group][0], 0);
     menu->widgets[4].attribute1A = 3;
 }
 
