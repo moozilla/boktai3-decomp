@@ -80,10 +80,7 @@ void CentipedeBody_ReturnToCellCenter(struct ChaseActor *actor)
     s32 index;
     struct ContactPosition target;
     if (Tentacle_TakeEntry(&actor->base.field2B1)) {
-        {
-            u32 cell = actor->base.terrainCell;
-            body->returnCell = cell;
-        }
+        body->returnCell = actor->base.terrainCell;
         SceneActorTerrain_GetCenter(body->returnCell, &body->returnCenter);
     }
     Callback_InvokeActor(actor, actor->base.contactQuery.opaque);
@@ -102,14 +99,14 @@ void CentipedeBody_ReturnToCellCenter(struct ChaseActor *actor)
     }
     Tentacle_AddPositions(&target, &actor->base.body.motion, &actor->base.body.position);
     index = SceneActorTerrain_GetCellIndex(&target);
-    if ((body->returnCell) != index) {
+    if (body->returnCell != index) {
         Chase_Delta(&target, &target, &body->returnCenter);
         actor->base.body.motion.x += Div(target.x, 10);
         actor->base.body.motion.z += Div(target.z, 10);
     }
     Centipede_UpdateSegmentPositions(actor, 12, 0xA410);
-    if (((difference < 0) ? (-difference) : (difference)) <= 7) {
-        if ((body->returnCell) == index)
+    if ((difference < 0 ? (-difference) : (difference)) <= 7) {
+        if (body->returnCell == index)
             Tentacle_BeginForwardState(actor);
     } else if (difference > 0) {
         actor->base.body.direction += (((64 - actor->base.field2C2) >> 4) << 1) + 1;

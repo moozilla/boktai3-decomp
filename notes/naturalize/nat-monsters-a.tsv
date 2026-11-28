@@ -222,3 +222,4 @@ src/monsters/centipede/CentipedeBody_UpdateDefeat.c	CentipedeBody_UpdateDefeat	c
 src/monsters/centipede/CentipedeBody_ApproachWaypoint.c	CentipedeBody_ApproachWaypoint	contrived	minor	1	remaining: u8cast
 src/monsters/centipede/CentipedeBody_UpdateRetreat.c	CentipedeBody_UpdateRetreat	contrived	contrived	2	remaining: u8cast,block
 src/monsters/centipede/CentipedeBody_UpdatePursuit.c	CentipedeBody_UpdatePursuit	contrived	contrived	2	remaining: u8cast,block
+src/monsters/centipede/CentipedeBody_ReturnToCellCenter.c	CentipedeBody_ReturnToCellCenter	minor	minor	4	remaining: block
