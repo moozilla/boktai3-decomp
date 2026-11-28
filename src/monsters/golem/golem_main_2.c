@@ -464,12 +464,10 @@ void Golem_ResumeRouteAfterControl(struct ChaseActor *actor)
     if (Golem_InvokeEnabledBehavior(actor))
         return;
     if (actor->base.stepDone) {
-        u16 blocked;
         SceneActorChase_SetState(actor, 3, 1, 0);
         SceneActorChase_SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
         ProximityVolume_TranslateBounds(group->route, &actor->base.body.position);
-        blocked = SceneActorChase_MotionFlags(actor, 0x80);
-        if (blocked) {
+        if (SceneActorChase_MotionFlags(actor, 0x80)) {
             SceneActorDelay_Prepare((void *)&group->saved, group->common.gate.control, 12, 30);
             if (SceneActorChase_Test(gEngineFlags, 0x4800)) {
                 if (!SceneActorTarget_TrySelectNearestParticipant(actor))
