@@ -686,14 +686,13 @@ int Actor_EndScriptControl(void)
 
 u32 Actor_IsInReactionStateFromScript(void)
 {
-    struct SceneActorManager *g = gSceneActorListManager;
-    if (g) {
-        struct SceneActor *e = Actor_FindById(g, Script_GetKeywordValue(0x6e, 0));
-        if (e && (u8)(e->savedState - 13) <= 2)
-            goto yes;
-    }
-    return 0;
-yes:
+    struct SceneActorManager *manager = gSceneActorListManager;
+    struct SceneActor *actor;
+    if (!manager)
+        return 0;
+    actor = Actor_FindById(manager, Script_GetKeywordValue('n', 0));
+    if (!actor || (u8)(actor->savedState - 13) > 2)
+        return 0;
     return 1;
 }
 

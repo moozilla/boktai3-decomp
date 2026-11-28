@@ -30,3 +30,7 @@ src/npc/manager/scene_actor_animation.c	Actor_SetMirroredEightWayAnimation	natur
 src/npc/manager/scene_actor_animation.c	Actor_SetUndirectedAnimation	natural	natural	0	
 src/npc/manager/scene_actor_animation.c	Actor_PlayAnimationEntry	natural	natural	0	
 src/npc/manager/scene_actor_animation.c	Actor_PlayFootstepSound	contrived	natural	4	table/frames pointer pair: ROM adds the foot index to the array base
+src/npc/manager/scene_actor_animation.c	Actor_IsWithinHorizontalRange	natural	natural	0	
+src/npc/manager/scene_actor_animation.c	Actor_SetAttachmentEffect	natural	natural	0	
+src/npc/manager/scene_actor_animation.c	Packet_QueueFromScript	natural	natural	0	
+src/npc/manager/scene_actor_animation.c	Actor_IsInReactionStateFromScript	contrived	natural	8	(u8)(state-13) > 2 range test: two comparisons are not folded
