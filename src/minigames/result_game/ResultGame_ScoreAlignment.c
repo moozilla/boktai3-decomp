@@ -1,55 +1,49 @@
 #include "global.h"
+#include "minigames/result_game/result_tutorial.h"
 extern u8 gUnk_0824DB2D[];
-void Sound_StopSong(int);
-void Sound_PlaySong(int);
-void ResultMenu_EnqueueMarker(void *);
-void ResultGame_ScoreAlignment(u8 *p)
+void ResultMenu_EnqueueMarker(struct ResultMenu *menu);
+void ResultGame_ScoreAlignment(struct ResultMenu *menu)
 {
-    int delta = *(int *)(p + 0x8c) - *(int *)(p + 0x9c);
+    int delta = menu->playerPosition - menu->targetPosition;
     int limit, value, width;
     if (delta < 0)
         delta = -delta;
-    {
-        int enabled = p[0xbc];
-        limit = 96;
-        if (enabled)
-            limit = 160;
-    }
-    width = gUnk_0824DB2D[p[0xae]] << 5;
-    value = *(u16 *)(p + 0xa0);
+    limit = menu->wideTimingWindow ? 160 : 96;
+    width = gUnk_0824DB2D[menu->difficulty] << 5;
+    value = menu->trackingScore;
     if (delta <= limit) {
         value += 5;
         if (value > 65535)
             value = 65535;
-        *(u16 *)(p + 0xa0) = value;
-        ++*(int *)(p + 0xd8);
-        if (p[0xbf]) {
+        menu->trackingScore = value;
+        menu->preciseCount++;
+        if (menu->lastTimingGrade) {
             Sound_StopSong(0x3ee);
             Sound_PlaySong(0x3ed);
         }
-        p[0xbf] = 0;
+        menu->lastTimingGrade = 0;
     } else if (delta <= width) {
         value += 3;
         if (value > 65535)
             value = 65535;
-        *(u16 *)(p + 0xa0) = value;
-        ++*(int *)(p + 0xdc);
+        menu->trackingScore = value;
+        menu->closeCount++;
         if (delta > 320)
             Sound_StopSong(0x3ed);
-        if (p[0xbf] != 1)
+        if (menu->lastTimingGrade != 1)
             Sound_StopSong(0x3ee);
-        p[0xbf] = 1;
+        menu->lastTimingGrade = 1;
     } else {
         if (value > 65535)
             value = 65535;
-        *(u16 *)(p + 0xa0) = value;
-        ++*(int *)(p + 0xe0);
-        if (p[0xbf] != 2) {
+        menu->trackingScore = value;
+        menu->missedCount++;
+        if (menu->lastTimingGrade != 2) {
             Sound_StopSong(0x3ed);
             Sound_PlaySong(0x3ee);
         }
-        p[0xbf] = 2;
+        menu->lastTimingGrade = 2;
     }
-    ResultMenu_EnqueueMarker(p);
-    ++*(u16 *)(p + 0xa2);
+    ResultMenu_EnqueueMarker(menu);
+    menu->trackingSamples++;
 }
