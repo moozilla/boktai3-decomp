@@ -323,6 +323,7 @@ void Sprite_QueueFramePieces(struct DisplaySequenceSprite *p, s32 x, s32 y, s32 
     struct SpriteRenderAnimationState *anim;
     struct SpriteRenderFrame *frame;
     struct SpriteRenderPiece *piece;
+    u8 *pieces;
 
     z = z >= 0 ? z >> 1 : -((-z) >> 1);
     if (z < -128)
@@ -366,23 +367,21 @@ void Sprite_QueueFramePieces(struct DisplaySequenceSprite *p, s32 x, s32 y, s32 
     anim = (struct SpriteRenderAnimationState *)&p->frame;
     frame = res->frames;
     frame += anim->frame;
-    {
-        u8 *pieces = gAnimResourceSection14 + frame->pieceOffset;
-        if (p->flags & 4)
-            x -= anim->x;
-        else
-            x += anim->x;
-        baseX = x;
-        if (p->flags & 8)
-            baseY = y - anim->y;
-        else
-            baseY = y + anim->y;
-        priority = p->priority;
-        count = 0;
-        tile = 0;
-        prev = 0;
-        piece = (struct SpriteRenderPiece *)pieces;
-    }
+    pieces = gAnimResourceSection14 + frame->pieceOffset;
+    if (p->flags & 4)
+        x -= anim->x;
+    else
+        x += anim->x;
+    baseX = x;
+    if (p->flags & 8)
+        baseY = y - anim->y;
+    else
+        baseY = y + anim->y;
+    priority = p->priority;
+    count = 0;
+    tile = 0;
+    prev = 0;
+    piece = (struct SpriteRenderPiece *)pieces;
     for (k = 0; k < frame->count; k++, piece++) {
         u32 shape = piece->shape;
         s32 w, h, left, top;

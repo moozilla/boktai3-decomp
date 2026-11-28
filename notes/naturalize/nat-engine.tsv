@@ -197,3 +197,22 @@ src/engine/video/interrupts_video.c	InterruptsAndVideo_RunIdleHook	natural	natur
 src/engine/video/interrupts_video.c	InterruptsAndVideo_RunFrameHook	natural	natural	0	
 src/engine/video/interrupts_video.c	InterruptsAndVideo_OnUnusedInterrupt	natural	natural	0	
 src/engine/video/sprite.c	Sprite_Init	contrived	minor	10	negate-and-shift list flag: (flags & 0x80) != 0 evaluates in another order (22 insns); stores of previous/next between the choice and the link stay
+src/engine/video/sprite.c	Sprite_CopyRenderState	minor	minor	3	visible temp: the ROM loads the visibility byte before the other byte copies and stores it after them; 8-byte frame state copied through a struct view because the shared sprite struct keeps the fields flat
+src/engine/video/sprite.c	Sprite_InitSystem	natural	natural		
+src/engine/video/sprite.c	Sprite_SetCurrentListHead	natural	natural		
+src/engine/video/sprite.c	Effect_SetCurrentListHead	natural	natural		
+src/engine/video/sprite.c	Anim_SetCurrentListHead	natural	natural		
+src/engine/video/sprite.c	Sprite_LinkToList	natural	natural		
+src/engine/video/sprite.c	Sprite_UnlinkFromList	natural	natural		
+src/engine/video/sprite.c	Effect_LinkToList	natural	natural		
+src/engine/video/sprite.c	Effect_UnlinkFromList	natural	natural		
+src/engine/video/sprite.c	Anim_LinkToList	natural	natural		
+src/engine/video/sprite.c	Anim_UnlinkFromList	natural	natural		
+src/engine/video/sprite.c	Video_SetRenderCallbacks	natural	natural		
+src/engine/video/sprite.c	Sprite_InitUnlinked	natural	natural		
+src/engine/video/sprite.c	Sprite_Remove	natural	natural		
+src/engine/video/sprite.c	Sprite_ResetRenderDefaults	natural	natural		
+src/engine/video/sprite.c	Sprite_SetOriginStub	natural	natural		
+src/engine/video/sprite.c	Sprite_ApplyAnimation	natural	natural		
+src/engine/video/sprite.c	Sprite_SetAnimDataIfPresent	natural	natural		
+src/engine/video/sprite.c	Sprite_QueueFramePieces	minor	minor	4	pieces byte pointer then cast into piece: casting into piece directly moves the cursor setup (14 hunks); frame advanced in two statements
