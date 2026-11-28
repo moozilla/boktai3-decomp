@@ -1,22 +1,14 @@
-#include "global.h"
-struct S {
-    u8 pad[7];
-    u8 b;
-    u8 gap[6];
-    u16 h;
-    u32 n;
-    u8 gap2[0x2cc - 0x14];
-    void (*fn)(void *, void *, u32);
-};
-u32 StoryCharacter_OnUpdateState(void *a, struct S *p)
+#include "npc/story_character/scene_character.h"
+
+u32 StoryCharacter_OnUpdateState(void *context, struct SceneNpc *npc)
 {
-    u32 n;
-    void (*fn)(void *, void *, u32);
-    p->h = 0;
-    p->b = 0;
-    n = p->n++;
-    fn = p->fn;
-    if (fn)
-        fn(a, p, n);
+    u32 frame;
+    void (*callback)(void *, struct SceneNpc *, u32);
+    npc->displayFlags = 0;
+    npc->done = 0;
+    frame = npc->stateFrame++;
+    callback = (void *)npc->stateCallback;
+    if (callback)
+        callback(context, npc, frame);
     return 0;
 }

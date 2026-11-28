@@ -130,3 +130,4 @@ src/npc/actor_sequence.c	SceneActorSequence_InitDisplayResources	contrived	natur
 src/npc/story_character/StoryCharacter_DispatchCommand.c	StoryCharacter_DispatchCommand	natural	natural	0	
 src/npc/story_character/StoryCharacter_OnCommand.c	StoryCharacter_OnCommand	natural	natural	0	
 src/npc/story_character/StoryCharacter_EnterPendingState.c	StoryCharacter_EnterPendingState	contrived	natural	7	
+src/npc/story_character/StoryCharacter_OnUpdateState.c	StoryCharacter_OnUpdateState	minor	natural	1	
