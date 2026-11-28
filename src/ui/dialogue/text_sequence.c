@@ -36,9 +36,7 @@ void TextSequence_UpdateFadeIn(struct TextSequence *p, struct TextSequenceStep *
 
 void TextSequence_UpdateHold(struct TextSequence *p, struct TextSequenceStep *step)
 {
-    s16 *c = &p->timer;
-    (*c)++;
-    if (*c >= step->holdFrames)
+    if (++p->timer >= step->holdFrames)
         TextSequence_SetState(p, 2);
 }
 

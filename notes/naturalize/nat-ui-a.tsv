@@ -200,3 +200,4 @@ src/ui/dialogue/dialogue_transition.c	DialogueTransition_OnTaskDestroy	natural	n
 src/ui/dialogue/dialogue_transition.c	DialogueTransition_Initialize	minor	minor	7	display control built in a local from the saved value
 src/ui/dialogue/dialogue_transition.c	DialogueTransition_CreateFromScript	natural	natural	0	
 src/ui/dialogue/text_sequence.c	TextSequence_SetState	contrived	natural	1	
+src/ui/dialogue/text_sequence.c	TextSequence_UpdateHold	contrived	natural	1	
