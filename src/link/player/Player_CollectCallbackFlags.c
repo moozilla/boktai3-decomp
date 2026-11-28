@@ -2,9 +2,8 @@
 #include "player/player.h"
 #include "engine/engine.h"
 
-u32 Player_CollectCallbackFlags(struct Player *arg)
+u32 Player_CollectCallbackFlags(struct Player *p)
 {
-    struct Player *p = arg;
     u32 flags = 0;
     s32 i = 0;
     void **callback = p->flagCallbacks;
