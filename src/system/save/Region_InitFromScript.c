@@ -1,15 +1,17 @@
 #include "global.h"
 #include "engine/ram.h"
+#include "system/save/region_list.h"
 s32 Script_SeekToKeyword(u32);
 s32 Script_GetValue(void);
 u8 *Script_GetPc(void);
-u32 Region_InitFromScript(u32 *p)
+u32 Region_InitFromScript(struct RegionList *list)
 {
-    if (Script_SeekToKeyword(0x6d)) {
-        u32 *q = p + 6;
+    if (Script_SeekToKeyword('m')) {
+        s32 *region = list->regions;
+
         while (Script_GetPc())
-            *q++ = Script_GetValue();
+            *region++ = Script_GetValue();
     }
-    gRegionList = (u8 *)p;
+    gRegionList = list;
     return 0;
 }
