@@ -104,3 +104,4 @@ src/link/panel/sub_0810C0BC.c	sub_0810C0BC	minor	natural	1
 src/link/panel/LinkPanelSlots_RemoveAnimations.c	LinkPanelSlots_RemoveAnimations	contrived	natural	1	
 src/link/panel/LinkPanel_SelectActiveAnimation.c	LinkPanel_SelectActiveAnimation	minor	natural	1	
 src/link/panel/LinkPanelSlots_ShowSlotReadyFrame.c	LinkPanelSlots_ShowSlotReadyFrame	minor	natural	1	
+src/link/panel/LinkPanelSlots_ShowSlotDefaultFrame.c	LinkPanelSlots_ShowSlotDefaultFrame	minor	natural	1	
