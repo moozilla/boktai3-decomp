@@ -34,13 +34,7 @@ void SceneActorReaction_SinkAndRemove(struct ChaseActor *actor, s32 frame)
         if (category != 2 && category != 22) {
             SceneActorAttachment_ReplaceResponseSlot(actor, 0, 1, (u8)category);
         }
-        {
-            u16 *destination = &collider->flags;
-            u32 flags = *destination;
-            u32 mask = 4;
-            mask |= flags;
-            *destination = mask;
-        }
+        collider->flags |= 4;
         Show(actor);
         SceneActorTerrain_EnterState(actor, 3, 0, 0);
         actor->base.attachmentTimer = 0;
