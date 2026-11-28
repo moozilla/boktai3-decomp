@@ -2,8 +2,6 @@
 #include "bosses/ratatosk/ratatosk_particle.h"
 #include "engine/ram.h"
 
-#define gRandomTableIndex gEffectRandomTableIndex
-
 extern const u16 gUnk_086141BC[];
 s32 Mod(s32, s32);
 
@@ -23,13 +21,13 @@ s32 Ratatosk_UpdateParticleFallAndWander(struct RatatoskParticle *particle, s32 
         if (--params->speed <= 0)
             params->speed = 0;
         if (params->speed <= 1) {
-            gRandomTableIndex = (gRandomTableIndex + 1) & 0x3FF;
+            gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 0x3FF;
             {
-                u32 sample = gUnk_086141BC[gRandomTableIndex];
+                u32 sample = gUnk_086141BC[gEffectRandomTableIndex];
                 params->speed = sample & 3;
             }
-            gRandomTableIndex = (gRandomTableIndex + 1) & 0x3FF;
-            params->angle = gUnk_086141BC[gRandomTableIndex];
+            params->angle =
+                gUnk_086141BC[gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 0x3FF];
         }
     }
     return 0;
