@@ -293,13 +293,6 @@ static inline void CellCenter(struct SceneVec *out, u32 cell)
     out->z = (z << 8) + 0x80;
 }
 
-static inline void FacingAngle(struct ChaseActor *actor, u8 *angle)
-{
-    s32 turn = (actor->base.body.direction + 0x20) & 0xFF;
-    s32 quadrant = turn >= 0 ? turn >> 6 : -(-turn >> 6);
-    *angle = quadrant << 6;
-}
-
 static inline void ClearHeld(struct Ivy *context)
 {
     u32 *flags = &context->captureFlags;
@@ -445,7 +438,7 @@ void Ivy_UpdateHold(struct ChaseActor *actor, s32 frame)
             u32 status, power, flags;
 
             if (IsIdle(player) || Ivy_TicksHeld(context) > context->holdTicks) {
-                FacingAngle(actor, &quadrant);
+                quadrant = Math_ShiftTowardZero((actor->base.body.direction + 0x20) & 0xFF, 6) << 6;
                 CellCenter((struct SceneVec *)&position, actor->base.terrainCell);
                 Player_ApplyPositionRequest(player, (struct SceneVec *)&position, 0x40, quadrant,
                                             0x3C, 0, 0, 0);
