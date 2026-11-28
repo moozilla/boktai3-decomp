@@ -342,3 +342,5 @@ src/link/score_panel/LinkScorePanel_RefreshPlayerName.c	LinkScorePanel_RefreshPl
 src/link/score_panel/sub_0810FA0C.c	sub_0810FA0C	contrived	minor	1	pointer spans nameWindow and windows[7]
 src/link/score_panel/LinkScorePanel_InitGlyphFrames.c	LinkScorePanel_InitGlyphFrames	contrived	minor	1	loop writes glyphs[1..18], one past the array into cachedGlyphs[0] (game behavior)
 src/link/score_panel/sub_0810FADC.c	RecordList_InitializeSprites	contrived	natural	1	also RecordList_InitializeSprites in the same unit
+src/link/score_panel/RecordList_InitializeSprites.c	RecordList_InitializeSprites	minor	natural	1	committed with sub_0810FADC
+src/link/score_panel/LinkMenu_LoadSelectionSprite.c	LinkMenu_LoadSelectionSprite	contrived	minor	1	validSelection goto inline stays
