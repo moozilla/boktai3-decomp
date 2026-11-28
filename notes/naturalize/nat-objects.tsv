@@ -400,3 +400,4 @@ src/objects/interaction_prompts.c	InteractionPrompt_ScriptRelease	natural	natura
 src/objects/items/item_container.c	TriggerManager_Update	contrived	minor	40	projection keeps the i*8+p+60 form (the array index strength-reduces into an induction register); shown/object pointer pair (one pointer moves the flag clears, 47 insns)
 src/objects/items/item_container.c	TriggerManager_InsertTrigger	minor	natural	1	
 src/objects/items/item_container.c	TriggerManager_RemoveTrigger	minor	natural	1	
+src/objects/items/item_container.c	Trigger_UpdateShake	contrived	natural	12	

@@ -4,6 +4,7 @@
 #include "engine/video/display_sequence_inline.h"
 #include "player/cutscene/player_cue_sequence.h"
 #include "player/player_slot_status.h"
+#include "engine/math/monster_particle_random.h"
 
 void ScaledShadow_Destroy(void *);
 s32 sub_0822D490(s32, s32);
@@ -188,22 +189,8 @@ void Trigger_UpdateShake(struct Trigger *p)
             p->position->x = p->baseX;
             p->position->z = p->baseZ;
         } else {
-            const u16 *table = gRandomTable;
-            unsigned short random;
-            gRandomIndex = (gRandomIndex + 1) & 1023;
-            random = table[gRandomIndex];
-            {
-                struct SceneVec *position = p->position;
-                random &= 15;
-                position->x = random + p->baseX - 4;
-            }
-            gRandomIndex = (gRandomIndex + 1) & 1023;
-            random = table[gRandomIndex];
-            {
-                struct SceneVec *position = p->position;
-                random &= 7;
-                position->z = random + (u16)p->baseZ - 4;
-            }
+            p->position->x = (ParticleRandom_ReadDirectSample(gRandomTable) & 15) + p->baseX - 4;
+            p->position->z = (ParticleRandom_ReadDirectSample(gRandomTable) & 7) + p->baseZ - 4;
         }
     }
 }
