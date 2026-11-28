@@ -1,5 +1,6 @@
 #include "global.h"
 #include "ui/hud/scene_indicator.h"
+#include "scene/motion/scene_facing.h"
 typedef struct {
     u16 id;
     u8 unk_02[4];
@@ -67,23 +68,12 @@ static inline void setState(struct TaggedSceneNpc *npc, u32 sub)
     npc->timer = 0;
 }
 
-static inline void setFacing(struct TaggedSceneNpc *npc, s16 a)
+static inline void setFacing(struct TaggedSceneNpc *npc, s16 angle)
 {
-    npc->motion.angle = a;
-    {
-        s32 t = (s32)(a + 0x70) >> 5;
-        u32 m = 7;
-        m &= t;
-        npc->facing8 = m;
-    }
-    {
-        s32 t = (s32)(a + 0x60) >> 6;
-        u32 m = 3;
-        m &= t;
-        npc->facing4 = m;
-    }
+    npc->motion.angle = angle;
+    npc->facing8 = SceneFacing_EightWay(angle);
+    npc->facing4 = SceneFacing_FourWay(angle);
 }
-
 static inline void aim(struct TaggedSceneNpc *npc, s16 *m)
 {
     struct Vec *t, *p;
