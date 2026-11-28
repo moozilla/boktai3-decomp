@@ -74,7 +74,11 @@ struct SceneGraphicsActor {
     u32 hitReactionFlags;   /* 0xC0 */
     u8 unkC4[0xE2 - 0xC4];
     u8 contactHundredths; /* 0xE2 */
-    u8 unkE3[0x220 - 0xE3];
+    u8 unkE3[0x110 - 0xE3];
+    struct ContactPosition *playerPositions[4]; /* 0x110 */
+    u8 unk120[0x174 - 0x120];
+    u8 playerCount; /* 0x174 */
+    u8 unk175[0x220 - 0x175];
     struct AnimSpriteResource animationResource; /* 0x220: keyframe resource. */
     struct AnimSprite animation; /* 0x240: body animation playback. */
     u8 unk2A0[0x33C - 0x2A0];

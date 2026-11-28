@@ -364,38 +364,37 @@ struct BoxSearchPosition {
     s16 x, y, z;
 };
 
-static inline s32 ReadPositionReference(u32 *entry, struct BoxSearchPosition **out)
+// Finds the first tracked position inside the inclusive x/z bounds.
+static inline s32 BoxSearchPosition_IsInside(const struct BoxSearchPosition *pos,
+                                             const struct BoxSearchPosition *min,
+                                             const struct BoxSearchPosition *max)
 {
-    *out = (struct BoxSearchPosition *)*entry;
+    if (pos->x >= min->x && pos->x <= max->x && pos->z >= min->z && pos->z <= max->z)
+        return 1;
+    return 0;
+}
+
+static inline s32 SceneGraphicsActor_GetPlayerPosition(struct SceneGraphicsActor *actor,
+                                                       s32 index,
+                                                       struct BoxSearchPosition **out)
+{
+    *out = (struct BoxSearchPosition *)actor->playerPositions[index];
     return *out != NULL;
 }
 
-// Finds the first tracked position inside the inclusive x/z bounds.
-s32 sub_08022624(void *actor, s32 count, struct BoxSearchPosition *min,
+s32 sub_08022624(void *owner, s32 count, struct BoxSearchPosition *min,
                  struct BoxSearchPosition *max)
 {
-    u8 *bytes = actor;
+    struct SceneGraphicsActor *actor = owner;
     s32 i;
     for (i = 0; i < count; i++) {
-        s32 offset = i * 4;
         struct BoxSearchPosition *pos;
-        u32 address = (u32)(bytes + 0x110);
-
-        address += offset;
-        ReadPositionReference((u32 *)address, &pos);
-        if (pos) {
-            s32 x = pos->x;
-            s32 minX = min->x;
-            s32 inside = 0;
-            if (x >= minX && x <= max->x && pos->z >= min->z && pos->z <= max->z)
-                inside = 1;
-            if (inside)
-                return i;
-        }
+        SceneGraphicsActor_GetPlayerPosition(actor, i, &pos);
+        if (pos && BoxSearchPosition_IsInside(pos, min, max))
+            return i;
     }
     return -1;
 }
-
 typedef struct ParticleOffset {
     s16 x, y, z, pad;
 } ParticleOffset;
