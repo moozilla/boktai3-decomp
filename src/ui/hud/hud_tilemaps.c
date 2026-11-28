@@ -14,12 +14,9 @@ u16 *SceneHud_GetMapCell(u32 layerIndex, u32 x, u32 y)
 void SceneHud_FillDigitBacking(u32 x, u32 y, s32 count)
 {
     u16 *cell = SceneHud_GetMapCell(0, x, y);
-    if (count > 0) {
-        do {
-            *cell++ = 0xF001;
-            count--;
-        } while (count > 0);
-    }
+
+    for (; count > 0; count--)
+        *cell++ = 0xF001;
 }
 
 void SceneHud_FillEmptyDigitRow(u32 x, u32 y, s32 count)

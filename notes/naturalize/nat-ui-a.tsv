@@ -421,3 +421,12 @@ src/ui/hud/countdown_timer.c	CountdownTimer_Stop	fudged	natural	1
 src/ui/hud/countdown_timer.c	CountdownTimer_Update	fudged	natural	1	
 src/ui/hud/countdown_timer.c	CountdownTimer_InitFromScript	fudged	natural	1	
 src/ui/hud/countdown_timer.c	CountdownTimer_CreateFromScript	fudged	natural	1	
+src/ui/hud/countdown_controller.c	Countdown_Destroy	natural	natural	0	
+src/ui/hud/countdown_controller.c	Countdown_CreateFromScript	natural	natural	0	
+src/ui/hud/shake_icon_display.c	ShakeIconDisplay_Destroy	natural	natural	0	
+src/ui/hud/shake_icon_display.c	ShakeIconDisplay_CreateFromScript	natural	natural	0	
+src/ui/hud/countdown_timer.c	CountdownTimer_GetRemaining	natural	natural	0	
+src/ui/hud/countdown_timer.c	CountdownTimer_StopFromScript	natural	natural	0	
+src/ui/hud/countdown_timer.c	CountdownTimer_Destroy	natural	natural	0	
+src/ui/hud/countdown_timer.c	CountdownTimer_AddFromScript	natural	natural	0	
+src/ui/hud/hud_tilemaps.c	SceneHud_FillDigitBacking	fudged	natural	1	
