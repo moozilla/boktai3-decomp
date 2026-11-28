@@ -75,7 +75,7 @@ struct ScriptedColliderActor {
 };
 
 void LargeFragmentEffect_InitCollider(struct ScriptedColliderActor *actor, u32 a, u32 b, u32 c,
-                                      u32 d)
+                                      u32 d, u32 unused1, u32 unused2, u32 unused3)
 {
     struct PackedContactVector size, offset;
 
@@ -288,10 +288,6 @@ void SceneSlot_Remove(struct LargeFragmentSlotPool *pool, struct LargeFragmentSl
     }
 }
 
-#define ScriptedColliderActors_EnsureManager FragmentSpritePool_GetOrCreate
-
-#define ScriptedColliderActor_InitCollider LargeFragmentEffect_InitCollider
-
 struct ScriptedColliderManager {
     u8 task[0x18];
     u8 resource[0x1c];
@@ -304,6 +300,7 @@ void ScriptedColliderActor_Create(struct SceneVec *position, u32 variant, u32 a,
 {
     struct ScriptedColliderManager *manager = gScriptedColliderManager;
     struct ScriptedColliderActor *actor;
+
     if (!manager) {
         manager = (struct ScriptedColliderManager *)FragmentSpritePool_GetOrCreate();
         if (!manager)
@@ -327,7 +324,7 @@ void ScriptedColliderActor_Create(struct SceneVec *position, u32 variant, u32 a,
     AnimData_SelectPaletteBank(actor->graphics, 0x127);
     actor->priority = 2;
     actor->flags |= 1;
-    ((void (*)())LargeFragmentEffect_InitCollider)(actor, a, b, c, d, 0, 0, 0);
+    LargeFragmentEffect_InitCollider(actor, a, b, c, d, 0, 0, 0);
 }
 
 extern void (*const gUnk_086107F8[])(void);
