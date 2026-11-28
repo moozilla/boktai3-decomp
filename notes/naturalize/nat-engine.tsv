@@ -690,3 +690,4 @@ src/system/save/Save_ToggleSelectedSlot.c	Save_ToggleSelectedSlot	minor	natural	
 src/system/save/Save_CopySelectedStateToAlternateSlot.c	Save_CopySelectedStateToAlternateSlot	minor	natural	1	
 src/system/save/sub_0822BE60.c	sub_0822BE60	minor	natural	1	
 src/system/save/Save_WriteAlternateSlotAndSelect.c	Save_WriteAlternateSlotAndSelect	minor	natural	1	
+src/system/save/Region_SetCurrentFromScript.c	Region_SetCurrentFromScript	contrived	natural	1	

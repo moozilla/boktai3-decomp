@@ -1,9 +1,12 @@
-#include "global.h"
+#include "system/game_state/game_state.h"
 #include "engine/ram.h"
-extern u8 *gGameState;
 s32 Script_GetValue(void);
 void Region_SetCurrentFromScript(void)
 {
-    *(s32 *)(gGameState + 0x5a0) = Script_GetValue();
+    {
+        s32 region = Script_GetValue();
+
+        gGameState->region = region;
+    }
     gRegionOverride = 1;
 }
