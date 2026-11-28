@@ -101,3 +101,4 @@ src/bosses/count/SceneActorAnimation_UpdateFlashPulse.c	SceneActorAnimation_Upda
 src/bosses/count/SceneActorAnimation_UpdateFlashAlternating.c	SceneActorAnimation_UpdateFlashAlternating	contrived	natural	1	shared effect setter, plain branches
 src/bosses/count/SceneActorAnimation_UpdateFlashAlternatingRepeat.c	SceneActorAnimation_UpdateFlashAlternatingRepeat	contrived	minor	2	shared effect setter; kept cleared-flag local (register reuse)
 src/bosses/count/SceneActors_UpdateRouteProjectileAttack.c	SceneActors_UpdateRouteProjectileAttack	contrived	minor	2	typed fields; body read through the state actor view, graphics through the graphics view (register choice)
+src/bosses/count/SceneActors_UpdateTravelProjectileAttack.c	SceneActors_UpdateTravelProjectileAttack	contrived	minor	1	typed fields; player slot read through a second actor view
