@@ -12,3 +12,4 @@ src/ui/results/stage_results/ActorMarkerPool_EnsureSingleton.c	ActorMarkerPool_E
 src/ui/results/stage_results/SceneSlot_RegisterObject.c	SceneSlot_RegisterObject	contrived	natural	4	
 src/ui/results/stage_results/ActorMarkerPool_RemoveMarker.c	ActorMarkerPool_RemoveMarker	contrived	natural	1	
 src/ui/results/stage_results/ActorMarkerPool_HideMarker.c	ActorMarkerPool_HideMarker	contrived	natural	1	
+src/ui/results/stage_results/ActorMarkerPool_ShowMarker.c	ActorMarkerPool_ShowMarker	contrived	natural	1	
