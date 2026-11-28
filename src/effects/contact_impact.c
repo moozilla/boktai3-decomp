@@ -37,16 +37,15 @@ static inline void ToScreen(struct ContactPosition *screen, struct ContactPositi
     s32 z = world->z;
     s32 sum;
     s32 y;
+
     screen->x = Scale(x - z);
     sum = Scale(x + z);
     y = Scale(world->y);
     screen->y = sum - y;
-    sum += y;
-    screen->z = sum;
+    screen->z = sum + y;
     screen->x = screen->x - gCameraOrigin[0] + 120;
     screen->y = screen->y - gCameraOrigin[1] + 80;
-    sum -= gCameraOrigin[2];
-    screen->z = sum;
+    screen->z -= gCameraOrigin[2];
 }
 
 // confidence=low: configures a contact effect's movement and independent scale ramp.
@@ -96,26 +95,6 @@ void ContactImpactEffect_BeginMotion(void *object, struct ContactPosition *from,
 
 void OrbitMotion_BeginArc(void *, void *, void *, u32, u32);
 
-static inline void ToScreenArc(struct ContactPosition *screen, struct ContactPosition *world)
-{
-    s32 x = world->x;
-    s32 z = world->z;
-    s32 sum;
-    s32 y;
-    s32 sy, depth;
-    screen->x = Scale(x - z);
-    sum = Scale(x + z);
-    y = Scale(world->y);
-    sy = sum - y;
-
-    screen->y = sy;
-    depth = sum + y;
-    screen->z = depth;
-    screen->x = screen->x - gCameraOrigin[0] + 120;
-    screen->y = screen->y - gCameraOrigin[1] + 80;
-    screen->z -= gCameraOrigin[2];
-}
-
 void SceneTarget_BeginMove(void *object, struct ContactPosition *from, struct ContactPosition *to,
                            s32 rampFrom, u32 rampTo, u32 arcParameter, u32 trackMode)
 {
@@ -142,7 +121,7 @@ void SceneTarget_BeginMove(void *object, struct ContactPosition *from, struct Co
     else
         effect->rampFrom = rampFrom;
     effect->rampTo = rampTo;
-    ToScreenArc(&effect->sprite.position, &effect->world);
+    ToScreen(&effect->sprite.position, &effect->world);
     effect->sprite.scaleX = effect->rampFrom;
     effect->sprite.scaleY = effect->rampFrom;
     OrbitMotion_BeginArc(&effect->motion, &effect->world, &effect->target, arcParameter, trackMode);
@@ -179,23 +158,6 @@ void PopInSprite_ClearState(struct ContactImpactEffect *p)
     if (p) {
         ContactImpactEffect_EnterUpdate(p, NULL);
     }
-}
-
-static inline void Project(u16 *screen, struct ContactPosition *world)
-{
-    s32 x = world->x;
-    s32 z = world->z;
-    s32 sum;
-    s32 y;
-    s32 sy, depth;
-    screen[0] = Scale(x - z);
-    sum = Scale(x + z);
-    y = Scale(world->y);
-    sy = sum - y;
-    depth = sum + y;
-    screen[0] = screen[0] - gCameraOrigin[0] + 120;
-    screen[1] = sy - gCameraOrigin[1] + 80;
-    screen[2] = depth - gCameraOrigin[2];
 }
 
 // confidence=low: initializes linear world movement and a scale ramp without a motion track.
@@ -325,7 +287,7 @@ void PopInSprite_UpdateVisibleIdle(struct ContactImpactEffect *p)
 
 s32 sub_08249350(s32, s32);
 
-static inline void ApplyOffset(u16 *field, s32 random, s32 range)
+static inline void ApplyOffset(s16 *field, s32 random, s32 range)
 {
     s32 offset = sub_08249350(random >> 4, range);
     *field += offset;
@@ -335,29 +297,23 @@ static inline void ApplyOffset(u16 *field, s32 random, s32 range)
 
 void ContactImpactEffect_UpdateShakingPosition(struct ContactImpactEffect *effect)
 {
-    s32 *timer;
-    s32 range;
     const u16 *table;
-    u32 *seed;
+    s32 range;
     u16 index;
-    s32 random;
-    Project((u16 *)&effect->sprite.position.x, (struct ContactPosition *)&effect->world.x);
-    timer = &effect->timer;
-    if (*timer >= effect->shakeThreshold)
+
+    ToScreen(&effect->sprite.position, &effect->world);
+    if (effect->timer >= effect->shakeThreshold)
         effect->stateResult = 1;
-    range = *timer >> 2;
+    range = effect->timer >> 2;
     table = gRandomTable;
-    seed = &gRandomIndex;
-    index = *seed + 1;
+    index = gRandomIndex + 1;
     index &= 0x3FF;
-    *seed = index;
-    random = table[index];
-    ApplyOffset((u16 *)&effect->sprite.position.x, random, range);
+    gRandomIndex = index;
+    ApplyOffset(&effect->sprite.position.x, table[index], range);
     index = (index + 1) & 0x3FF;
-    *seed = index;
-    random = table[index];
-    ApplyOffset((u16 *)&effect->sprite.position.y, random, range);
-    ++*timer;
+    gRandomIndex = index;
+    ApplyOffset(&effect->sprite.position.y, table[index], range);
+    effect->timer++;
 }
 
 void MotionTrack_Update(u8 *);
