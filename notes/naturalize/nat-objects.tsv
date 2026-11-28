@@ -92,3 +92,4 @@ src/objects/coffin/tether_actor.c	TetherActor_StartInteractionEffect	contrived	n
 src/objects/coffin/tether_actor.c	TetherActor_GetParameter	minor	natural	2	
 src/objects/coffin/tether_actor.c	TetherActor_BeginDetachedState	minor	natural	1	
 src/objects/coffin/tether_actor.c	TetherActor_BeginDisplayPositionState	minor	natural	1	
+src/objects/coffin/tether_actor.c	TetherActor_GetStatusFlags	minor	natural	2	

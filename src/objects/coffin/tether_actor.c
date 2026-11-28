@@ -1343,12 +1343,9 @@ void TetherActor_BeginDisplayPositionState(void)
 u32 TetherActor_GetStatusFlags(void)
 {
     struct TetherActor *p = gTetherActor;
-    u32 r;
-    if (p)
-        r = p->statusFlags;
-    else
-        r = 0;
-    return r;
+    if (!p)
+        return 0;
+    return p->statusFlags;
 }
 
 u32 TetherActor_TestStatusFlags(u32 m)
