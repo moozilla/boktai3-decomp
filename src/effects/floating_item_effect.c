@@ -271,11 +271,9 @@ s32 FloatingEffectManager_Update(struct LinkedWidgetSet *manager)
 u32 FloatingEffectManager_Destroy(struct LinkedWidgetSet *manager)
 {
     s32 i;
-    struct AnimSprite *sprite = &manager->effects[0].sprite;
-    for (i = 7; i >= 0; i--) {
-        Anim_Remove(sprite);
-        sprite = (void *)((u8 *)sprite + sizeof(struct FloatingEffect));
-    }
+
+    for (i = 0; i < 8; i++)
+        Anim_Remove(&manager->effects[i].sprite);
     FloatingEffect_SetManager(NULL);
 }
 
