@@ -59,23 +59,22 @@ struct AnimatedTile *AnimatedTile_Allocate(struct AnimatedTileManager *);
 void AnimatedTile_CreateFromScript(void)
 {
     struct AnimatedTileManager *manager = (void *)gNamedEntryPool;
+    struct AnimatedTile *allocated;
     struct AnimatedTile *tile;
-    struct AnimatedTile *slot;
     s32 palette;
-    struct DisplaySequenceState *playback;
-    u32 one;
+
     if (!manager) {
         manager = AnimatedTile_CreateManager();
         if (!manager)
             return;
     }
-    slot = AnimatedTile_Allocate(manager);
-    if (!slot)
+    allocated = AnimatedTile_Allocate(manager);
+    if (!allocated)
         return;
-    tile = slot;
+    tile = allocated;
     AnimData_Load(&tile->graphics, 0x3876);
     Sprite_Init(tile, &tile->graphics, 0);
-    one = tile->state = 1;
+    tile->state = 1;
     tile->entered = 1;
     if (Script_SeekToKeyword('p')) {
         tile->sprite.position.x = Script_GetValue();
@@ -88,9 +87,8 @@ void AnimatedTile_CreateFromScript(void)
     tile->script = Script_GetKeywordValue('C', 0);
     palette = Script_GetKeywordValue('c', 0);
     AnimData_SelectPaletteBank((void *)tile->sprite.resource, palette + 0x304);
-    playback = &tile->animation;
-    Anim_SetSequence(playback, manager->sequences, 0, 0, tile->sequence);
-    PlayerCue_StepSequenceEndedWithFirstFlipMask((void *)tile, &tile->animation, one);
+    Anim_SetSequence(&tile->animation, manager->sequences, 0, 0, tile->sequence);
+    PlayerCue_StepSequenceEndedWithFirstFlipMask((void *)tile, &tile->animation, 1);
 }
 
 /* AnimatedTile_UpdateIdleState: Empty entry preceding an animation state handler; provisionally an idle state hook */

@@ -3,3 +3,4 @@ src/objects/animated_tile.c	AnimatedTile_Allocate	contrived	natural	2	u8 slot pr
 src/objects/animated_tile.c	AnimatedTile_OnManagerDestroy	contrived	natural	1	typed slot predicate
 src/objects/animated_tile.c	AnimatedTilePool_FindByName	contrived	natural	8	
 src/objects/animated_tile.c	CallbackSlots_DispatchActive	contrived	minor	8	one small inline kept to dispatch a slot: direct form flips the operand order of the slot address add
+src/objects/animated_tile.c	AnimatedTile_CreateFromScript	contrived	minor	5	allocated->tile second variable: ROM copies the result after the null test
