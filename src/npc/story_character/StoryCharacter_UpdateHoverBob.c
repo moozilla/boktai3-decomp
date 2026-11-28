@@ -1,26 +1,18 @@
 #include "global.h"
 #include "engine/video/render.h"
+#include "engine/math/math_shift.h"
+#include "npc/manager/scene_actor_lifecycle.h"
 
-#define B(o) (*(u8 *)((u8 *)p + (o)))
-#define H(o) (*(u16 *)((u8 *)p + (o)))
-
-void Actor_PlayAnimationEntry(void *, u32, u32, u32, u32);
 extern const s16 gUnk_086149C4[];
 
-static inline s32 shift12(s32 x)
+void StoryCharacter_UpdateHoverBob(u32 context, struct SceneActor *p, u32 ticks)
 {
-    if (x >= 0)
-        return x >> 12;
-    return -((-x) >> 12);
-}
-
-void StoryCharacter_UpdateHoverBob(u32 a, void *p, u32 flags)
-{
-    u32 r;
-    if (B(9) != 0) {
-        B(9) = 0;
-        B(7) = 0;
-        switch (B(1)) {
+    u32 animation;
+    s32 bob;
+    if (p->animationEntered != 0) {
+        p->animationEntered = 0;
+        p->finished = 0;
+        switch (p->variant) {
             case 4:
             case 5:
             case 6:
@@ -34,7 +26,7 @@ void StoryCharacter_UpdateHoverBob(u32 a, void *p, u32 flags)
             case 14:
             case 15:
             case 16:
-                r = 0;
+                animation = 0;
                 break;
             case 17:
             case 18:
@@ -48,33 +40,21 @@ void StoryCharacter_UpdateHoverBob(u32 a, void *p, u32 flags)
             case 26:
             case 27:
             case 28:
-                r = 0;
+                animation = 0;
                 break;
             case 29:
-                r = 0xb;
+                animation = 0xb;
                 break;
             default:
-                r = 0;
+                animation = 0;
                 break;
         }
-        Actor_PlayAnimationEntry(p, r, 1, 0, 4);
+        Actor_PlayAnimationEntry(p, animation, 1, 0, 4);
         CpuSet(gPaletteBankData + 0x5C0, (u8 *)p + 0x1CC, 0x04000008);
     }
-    {
-        u16 m = 0x400;
-        H(0xE) = m | H(0xE);
-    }
-    {
-        s32 val = (s32)gUnk_086149C4[(flags << 2) & 0xFF] << 4;
-        s32 dx = shift12(val);
-        u16 *q = (u16 *)*(void **)((u8 *)p + 0x160) + 1;
-        u32 t = *q;
-        t = t + 0x80;
-        t = t + dx;
-        *q = t;
-    }
-    if (flags & 0x10) {
-        u16 m = 0x100;
-        H(0xE) = m | H(0xE);
-    }
+    SceneActor_SetFlags(p, 0x400);
+    bob = Math_ShiftTowardZero(gUnk_086149C4[(ticks << 2) & 0xFF] << 4, 12);
+    ((struct ContactPosition *)p->drawable.sequence.position)->y += 0x80 + bob;
+    if (ticks & 0x10)
+        SceneActor_SetFlags(p, 0x100);
 }
