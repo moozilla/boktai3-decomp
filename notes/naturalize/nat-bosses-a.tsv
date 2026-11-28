@@ -94,3 +94,5 @@ src/bosses/count/SceneActorAnimation_UpdatePlayerGrab.c	SceneActorAnimation_Upda
 src/bosses/count/SceneActorAnimation_UpdateChargeShotRelease.c	SceneActorAnimation_UpdateChargeShotRelease	contrived	minor	7	typed body and bat pool; plain sequence branch; kept add/clamp helpers and random-table address arithmetic (load order)
 src/bosses/count/SceneActorAnimation_UpdateImpactHazard.c	SceneActorAnimation_UpdateImpactHazard	contrived	minor	4	typed actor fields replace fake target view and position union; kept second actor view cast for player slots, delta pointer, u8 heading read
 src/bosses/count/SceneActorAnimation_UpdateImpactFinish.c	SceneActorAnimation_UpdateImpactFinish	contrived	natural	1	shared effect setter, plain sequence branch
+src/bosses/count/SceneActorAnimation_ResetActionState.c	SceneActorAnimation_ResetActionState	natural	natural	0	
+src/bosses/count/SceneActorAnimation_UpdateImpactRelease.c	SceneActorAnimation_UpdateImpactRelease	contrived	natural	1	shared effect setter, plain sequence branch
