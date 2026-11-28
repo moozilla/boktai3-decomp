@@ -50,3 +50,4 @@ src/objects/coffin/tether_actor.c	TetherActor_CreateAuxiliarySprite	minor	minor	
 src/objects/coffin/tether_actor.c	TetherActor_RemoveAuxiliarySprite	minor	natural	1	
 src/objects/coffin/tether_actor.c	TetherActor_UpdateShake	minor	natural	1	
 src/objects/coffin/tether_actor.c	TetherActor_EmitDirectionalEffect	contrived	natural	1	
+src/objects/coffin/tether_actor.c	TetherActor_EmitRandomEffect	contrived	natural	6	

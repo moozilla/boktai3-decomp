@@ -662,14 +662,10 @@ void TetherActor_EmitDirectionalEffect(struct TetherActor *actor)
 void TetherActor_EmitRandomEffect(struct TetherActor *actor)
 {
     u32 angle;
-    const u8 *sample;
-    u32 mask;
     struct ContactPackedVector velocity, position, size;
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    sample = (const u8 *)RANDOM_TABLE_ADDR + gRandomIndex * 2;
-    mask = 255;
-    angle = *sample;
-    velocity.x = scaleEmission(gUnk_086149C4[(angle + 64) & mask] * 32);
+
+    angle = ParticleRandom_ReadDirectSample((const u16 *)RANDOM_TABLE_ADDR) & 255;
+    velocity.x = scaleEmission(gUnk_086149C4[(angle + 64) & 255] * 32);
     velocity.y = 0;
     velocity.z = scaleEmission(gUnk_086149C4[angle] * 32);
     position.x = actor->position.x + (u16)velocity.x * 4;
