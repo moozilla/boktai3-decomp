@@ -140,12 +140,12 @@ void CharacterModel_InitPalettes(struct CharacterPreviewModel *model, s32 appear
 void CharacterPreview_InitializePalette(struct CharacterPreviewPalette *paletteState,
                                         struct CharacterPreviewModel *model, s32 index)
 {
-    u16 *palette;
     s32 resource;
-    s32 offset, partIndex;
-    struct CharacterPreviewPalette *flash = paletteState;
+    const u8 *primary;
+    s32 i;
+    struct TilemapPanel *panel;
     paletteState->target = model;
-    flash->flashPalette = gPaletteBankData + 0x3240;
+    paletteState->flashPalette = gPaletteBankData + 0x3240;
     switch (model->view.metadata.kind) {
         case 0:
             resource = CharacterModel_GetPrimaryPaletteIndex(model);
@@ -168,33 +168,21 @@ void CharacterPreview_InitializePalette(struct CharacterPreviewPalette *paletteS
             break;
     }
     paletteState->paletteId = index + 0x379;
-    {
-        const u8 *source = gPaletteBankData + (resource << 5);
-        paletteState->normalPalette = gPaletteBankData + (paletteState->paletteId << 5);
-        palette = model->activePalette;
-        CpuSet(source, palette, 16);
-    }
+    primary = gPaletteBankData + (resource << 5);
+    paletteState->normalPalette = gPaletteBankData + (paletteState->paletteId << 5);
+    CpuSet(primary, model->activePalette, 16);
     CpuSet(paletteState->normalPalette, model->normalPalette, 16);
-    {
-        struct TilemapPanel **allocator = &gSceneCamera;
-        struct TilemapPanel **tileAllocator;
-        tileAllocator = allocator;
-        offset = 0;
-        partIndex = 4;
-        do {
-            struct ModifierDisplayObject *part =
-                (void *)((u8 *)paletteState->target->view.parts + offset);
-            part->palette = model->activePalette;
-            part->tile = (*tileAllocator)->value38;
-            offset += sizeof(*part);
-        } while (--partIndex >= 0);
-        (*allocator)->value38 = (*allocator)->value38 + (offset = 2);
-        if ((*allocator)->value38 > 0xafff) {
-            (*allocator)->value38 = 0xa000;
-        } else if ((*allocator)->value38 <= 0x9fff) {
-            (*allocator)->value38 = 0xa000;
-        }
+    for (i = 0; i < 5; i++) {
+        struct ModifierDisplayObject *part = &paletteState->target->view.parts[i];
+        part->palette = model->activePalette;
+        part->tile = ((struct TilemapPanel *)gSceneCamera)->value38;
     }
+    panel = (struct TilemapPanel *)gSceneCamera;
+    panel->value38 += 2;
+    if (panel->value38 > 0xafff)
+        panel->value38 = 0xa000;
+    else if (panel->value38 <= 0x9fff)
+        panel->value38 = 0xa000;
 }
 
 void PaletteFlash_SelectPalette(struct CharacterPreviewPalette *flash, s32 mode)

@@ -4,3 +4,5 @@ src/player/appearance/character_model.c	ActorResource_SelectElementResource	cont
 src/player/appearance/character_model.c	CharacterModel_GetPrimaryPaletteIndex	natural	natural	0	-
 src/player/appearance/character_model.c	CharacterModel_LoadPrimaryPalette	natural	natural	0	-
 src/player/appearance/character_model.c	CharacterModel_LoadSecondaryPalette	minor	natural	5	-
+src/player/appearance/character_model.c	CharacterModel_InitPalettes	natural	natural	0	-
+src/player/appearance/character_model.c	CharacterPreview_InitializePalette	contrived	minor	3	TilemapPanel casts of gSceneCamera: shared headers type it as another camera view
