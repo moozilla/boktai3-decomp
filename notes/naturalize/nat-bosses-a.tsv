@@ -1,2 +1,3 @@
 path	function	verdict_before	verdict_after	compiles	what_stays_and_why
 src/bosses/count/actor_graphics_and_basic_states.c	SceneActorGraphics_SelectResource	contrived	natural	2	struct T view replaced by SceneGraphicsActor fields
+src/bosses/count/actor_graphics_and_basic_states.c	SceneActorGraphics_OnDamageContact	contrived	minor	12	second actor view 'victim' (ROM keeps a copy of the actor in r8); flags local copied twice (plain store computes the address before the load); mask accessors kept (plain & loads flags before the mask)

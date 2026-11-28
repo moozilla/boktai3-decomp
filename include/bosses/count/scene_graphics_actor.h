@@ -3,6 +3,7 @@
 
 #include "global.h"
 #include "engine/video/anim_sprite.h"
+#include "scene/actor/scene_actor_components.h"
 
 struct ContactActorPool;
 struct BackgroundFlashController;
@@ -15,7 +16,9 @@ struct BackgroundFlashController;
  * (confidence=low). */
 struct SceneActorGraphics {
     s16 scale, scaleMin, scaleMax, scaleStep; /* 0x344: SceneActorGraphics_OscillateScale. */
-    u8 unk34C[0x352 - 0x34C];
+    u16 paletteFlashFrames; /* 0x34C: set when a hit is blocked. */
+    u16 hitImmunityFrames;  /* 0x34E: copied from the attacker; damage is ignored while set. */
+    u8 unk350[2];
     s16 recoveryGroundHeight; /* 0x352: compared with the forward terrain probe. */
     u16 approachFrames; /* 0x354: duration passed to the polar interpolator. */
     u16 recoveryTimer;  /* 0x356: frames of recovery set by the *ThenRecover handlers. */
@@ -27,7 +30,8 @@ struct SceneActorGraphics {
     u8 unk36E[0x378 - 0x36E];
     s16 routeProjectileAmount, routeProjectileKind;
     s16 travelColliderA, travelColliderB;
-    u8 unk380[3];
+    s16 contactStatHundredths; /* 0x380 */
+    u8 unk382;
     u8 trackedPlayerEscaped; /* 0x383: set after enough facing changes in the grab. */
     u8 unk384[4];
     u32 reactionScript; /* 0x388: called after the special hit reaction. */
@@ -63,7 +67,14 @@ struct SceneActorGraphics {
 
 /* Actor-relative view used by contact, animation and palette handlers. */
 struct SceneGraphicsActor {
-    u8 unk0[0x220];
+    u8 unk0[0x48];
+    struct SceneActorBody body; /* 0x48 */
+    u8 unk90[0xBC - 0x90];
+    u32 hitStatRewardFlags; /* 0xBC: copied from the collider that last hit the actor. */
+    u32 hitReactionFlags;   /* 0xC0 */
+    u8 unkC4[0xE2 - 0xC4];
+    u8 contactHundredths; /* 0xE2 */
+    u8 unkE3[0x220 - 0xE3];
     struct AnimSpriteResource animationResource; /* 0x220: keyframe resource. */
     struct AnimSprite animation; /* 0x240: body animation playback. */
     u8 unk2A0[0x33C - 0x2A0];

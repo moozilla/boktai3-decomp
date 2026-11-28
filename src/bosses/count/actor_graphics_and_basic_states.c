@@ -102,107 +102,82 @@ s32 Math_Atan2(s32, s32);
 s32 WirelessGame_TryAddCyclingItem(void *);
 void WirelessGame_AddItem(void *, s32);
 
-void SceneActorGraphics_OnDamageContact(u8 *source, u8 *contact, u8 *p)
+void SceneActorGraphics_OnDamageContact(struct ContactCollider *source,
+                                        struct ContactCollider *contact,
+                                        void *owner)
 {
-    u8 *actor = p;
-    u8 *sprite = p + 0x48;
+    struct SceneGraphicsActor *actor = owner;
+    struct SceneGraphicsActor *victim = owner;
+    struct SceneActorBody *body = &actor->body;
     u32 mode;
+    u32 flags;
     struct ContactReactionVector size;
-    u8 *position;
-    s32 item;
-    u16 responseValue;
-    if (*((u16 *)(p + 0x34e)))
+    if (actor->graphics.hitImmunityFrames)
         return;
-    mode = (*(u8 **)gPlayers)[0x418];
+    mode = gPlayers[0]->actionMode;
     Collision_CalculateDamageResponse(source, contact);
-    if ((((struct SceneGraphicsActor *)p)->graphics.stepTableKind == 1) && (mode != 2))
-        ((struct ContactCollider *)contact)->cost = 0;
+    if (actor->graphics.stepTableKind == 1 && mode != 2)
+        contact->cost = 0;
     if (!(gEngineFlags & 0x1000))
-        PlayerStats_AddContactHundredths(source, contact, *((s16 *)(p + 0x380)));
-    ((struct SceneGraphicsActor *)p)->pendingDamage = ((struct ContactCollider *)contact)->cost;
-    if ((((struct ContactCollider *)contact)->cost) == 0) {
+        PlayerStats_AddContactHundredths(source, contact, actor->graphics.contactStatHundredths);
+    actor->pendingDamage = contact->cost;
+    if (contact->cost == 0) {
         Sound_PlaySongChecked(0x211);
-        *((u16 *)(p + 0x34c)) = 10;
-        *((void **)(p + 0x288)) = p + 0x5c4;
+        actor->graphics.paletteFlashFrames = 10;
+        actor->animation.palette = (u16 *)actor->graphics.paletteBank1;
         size.x = 16;
         size.y = 0;
         size.z = 16;
-        DamageNumberDisplay_Show(contact, ((struct ContactCollider *)contact)->cost, 0, sprite + 12,
-                                 &size, 1);
+        DamageNumberDisplay_Show(contact, contact->cost, 0, &body->position, &size, 1);
     }
-    {
-        if (ContactCollider_TestFlags((struct ContactCollider *)source, 0x100)) {
-            u8 angle = ((struct ContactCollider *)source)->direction;
-            ((struct SceneGraphicsActor *)p)->hitAngle = angle;
-        } else
-            ((struct SceneGraphicsActor *)p)->hitAngle = Math_Atan2(
-                ((struct ContactCollider *)contact)->x - ((struct ContactCollider *)source)->x,
-                ((struct ContactCollider *)contact)->z - ((struct ContactCollider *)source)->z);
-    }
-    {
-        u32 value = ((struct ContactCollider *)source)->statRewardFlags;
-        *((u32 *)(actor + 0xbc)) = value;
-        value = ((struct ContactCollider *)source)->reactionFlags;
-        *((u32 *)(actor + 0xc0)) = value;
-    }
-    responseValue = ((struct ContactCollider *)source)->responseValue;
-    *((u16 *)(p + 0x34e)) = responseValue;
-    PlayerStats_AddContactHundredths(source, contact, actor[0xe2]);
-    if ((((struct SceneGraphicsActor *)p)->pendingDamage > 0) &&
-        ContactCollider_TestReactionFlags((struct ContactCollider *)source, 1))
-        ((struct SceneGraphicsActor *)p)->damagePending = 1;
+    if (ContactCollider_TestFlags(source, 0x100))
+        actor->hitAngle = source->direction;
+    else
+        actor->hitAngle = Math_Atan2(contact->x - source->x, contact->z - source->z);
+    flags = source->statRewardFlags;
+    victim->hitStatRewardFlags = flags;
+    flags = source->reactionFlags;
+    victim->hitReactionFlags = flags;
+    actor->graphics.hitImmunityFrames = source->responseValue;
+    PlayerStats_AddContactHundredths(source, contact, victim->contactHundredths);
+    if (actor->pendingDamage > 0 && ContactCollider_TestReactionFlags(source, 1))
+        actor->damagePending = 1;
     if (!(gEngineFlags & 0x1000))
         return;
-    if ((mode - 1) <= 1) {
-        position = contact + 0xc;
-        if (WirelessGame_TryAddCyclingItem(position) &&
-            (((struct ContactCollider *)contact)->costFlags & 8))
-            WirelessGame_AddItem(position, 0);
+    if (mode == 1 || mode == 2) {
+        if (WirelessGame_TryAddCyclingItem(&contact->position) && (contact->costFlags & 8))
+            WirelessGame_AddItem(&contact->position, 0);
         return;
     }
-    if (((struct ContactCollider *)contact)->costFlags & 8)
-        WirelessGame_AddItem(contact + 0xc, 0);
-    if (!ContactCollider_TestReactionFlags((struct ContactCollider *)source, 0x800000))
+    if (contact->costFlags & 8)
+        WirelessGame_AddItem(&contact->position, 0);
+    if (!ContactCollider_TestReactionFlags(source, 0x800000))
         return;
-    {
-        u8 *stats = (u8 *)gGameState;
-        u32 offset = *((s16 *)(stats + 0x52)) << 1;
-        item = (s16)(*((u16 *)(offset + (u32)stats + 0x88)) - 6);
-    }
-    switch ((u32)item) {
+    switch ((s16)(*(gGameState->slots88 + gGameState->selected) - 6)) {
         case 0:
-            WirelessGame_AddItem(contact + 0xc, 2);
+            WirelessGame_AddItem(&contact->position, 2);
             break;
-
         case 1:
-            WirelessGame_AddItem(contact + 0xc, 1);
+            WirelessGame_AddItem(&contact->position, 1);
             break;
-
         case 2:
-            WirelessGame_AddItem(contact + 0xc, 3);
+            WirelessGame_AddItem(&contact->position, 3);
             break;
-
         case 3:
-            contact += 0xc;
-            WirelessGame_AddItem(contact, 2);
-            WirelessGame_AddItem(contact, 1);
+            WirelessGame_AddItem(&contact->position, 2);
+            WirelessGame_AddItem(&contact->position, 1);
             break;
-
         case 4:
-            contact += 0xc;
-            WirelessGame_AddItem(contact, 2);
-            WirelessGame_AddItem(contact, 3);
+            WirelessGame_AddItem(&contact->position, 2);
+            WirelessGame_AddItem(&contact->position, 3);
             break;
-
         case 5:
-            contact += 0xc;
-            WirelessGame_AddItem(contact, 2);
-            WirelessGame_AddItem(contact, 1);
-            WirelessGame_AddItem(contact, 3);
+            WirelessGame_AddItem(&contact->position, 2);
+            WirelessGame_AddItem(&contact->position, 1);
+            WirelessGame_AddItem(&contact->position, 3);
             break;
     }
 }
-
 void SceneActorGraphics_InitBodyNoOp(void)
 {
 }
@@ -237,7 +212,8 @@ void SceneActorGraphics_InitializeBody(struct StateActor *p)
     }
 }
 
-void SceneActorGraphics_OnDamageContact(u8 *, u8 *, u8 *);
+void SceneActorGraphics_OnDamageContact(struct ContactCollider *, struct ContactCollider *,
+                                        void *);
 
 void SceneActorGraphics_InitializeOverlay(struct StateActor *p, int resource)
 {
