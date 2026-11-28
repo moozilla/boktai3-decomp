@@ -640,3 +640,4 @@ src/system/save/Equipment_GetDefinition.c	Equipment_GetDefinition	minor	minor	0	
 src/system/save/sub_08227E5C.c	sub_08227E5C	contrived	contrived	16	address built as an integer sum: field indexing associates the offset before the index
 src/system/save/SaveData_RequestSave.c	SaveData_RequestSave	minor	minor	2	set_flag inline: a direct store loads the pointer and the constant in the other order
 src/system/save/Settings_LoadOrInitializeDefaults.c	Settings_LoadOrInitializeDefaults	contrived	contrived	8	parked constants: direct field stores load the constants after the addresses
+src/system/save/GameState_UpdateCounterBalanceRank.c	GameState_UpdateCounterBalanceRank	contrived	natural	1	
