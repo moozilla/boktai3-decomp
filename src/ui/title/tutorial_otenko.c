@@ -904,18 +904,9 @@ void TutorialOtenko_BeginPositionedEffect(void)
         g->obj.position.y = Script_GetValue();
         g->obj.position.z = Script_GetValue();
     } else {
-        {
-            u32 value = (u16)g->owner->position.x;
-            g->obj.position.x = value;
-        }
-        {
-            u32 value = (u16)g->owner->position.y + 160;
-            g->obj.position.y = value;
-        }
-        {
-            u32 value = (u16)g->owner->position.z;
-            g->obj.position.z = value;
-        }
+        g->obj.position.x = g->owner->position.x;
+        g->obj.position.y = g->owner->position.y + 160;
+        g->obj.position.z = g->owner->position.z;
     }
     TutorialOtenko_SetState(g, 2, 14);
 }

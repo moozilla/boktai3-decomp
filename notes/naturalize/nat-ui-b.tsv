@@ -275,3 +275,7 @@ src/ui/title/tutorial_otenko.c	TutorialOtenko_BeginCurveToPosition	contrived	nat
 src/ui/title/tutorial_otenko.c	TutorialOtenko_BeginCurveToRest	natural	natural	0	
 src/ui/title/tutorial_otenko.c	TutorialOtenko_BeginScriptedCurve	natural	natural	0	
 src/ui/title/tutorial_otenko.c	TutorialOtenko_SetFacingAndIdle	minor	natural	2	
+src/ui/title/tutorial_otenko.c	TutorialOtenko_BeginFadeAnimation	natural	natural	0	
+src/ui/title/tutorial_otenko.c	TutorialOtenko_BeginReverseFadeAnimation	natural	natural	0	
+src/ui/title/tutorial_otenko.c	TutorialOtenko_BeginHide	natural	natural	0	
+src/ui/title/tutorial_otenko.c	TutorialOtenko_BeginPositionedEffect	contrived	natural	1	
