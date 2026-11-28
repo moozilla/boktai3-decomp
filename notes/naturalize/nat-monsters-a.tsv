@@ -681,3 +681,9 @@ src/bosses/nidhoggr/Nidhoggr_StepPoolAnimation.c	Nidhoggr_StepPoolAnimation	natu
 src/bosses/nidhoggr/NidhoggrEffect_InitPool.c	NidhoggrEffect_InitPool	contrived	natural	0	for loops over pool position words and both slot arrays
 src/bosses/nidhoggr/Nidhoggr_ClearEffectPools.c	Nidhoggr_ClearEffectPools	contrived	natural	0	pool struct argument instead of raw 0xA24 offset; for loops
 src/bosses/nidhoggr/NidhoggrEffect_UpdatePool.c	NidhoggrEffect_UpdatePool	minor	minor	0	for loop over small effects; the stride-stepped motion/position pointers stay: indexing large[i] changes the loop strength reduction
+src/bosses/nidhoggr/duel_orbs.c	NidhoggrDuelOrb_Update	contrived	contrived	1	sprite/position/center pointers stay: address materialization before the adds
+src/bosses/nidhoggr/duel_orbs.c	NidhoggrDuelOrb_BeginExpansion	minor	minor	1	one local stays: constant shared by two stores
+src/bosses/nidhoggr/duel_bursts.c	NidhoggrDuelBurst_OnContact	contrived	contrived	2	do-while(0), mask local and pointer casts stay: store scheduling and constant load order
+src/bosses/nidhoggr/duel_bursts.c	NidhoggrDuelBurst_UpdateContactAnimation	contrived	contrived	2	per-branch sprite pointer blocks stay: address formed before the frame load
+src/bosses/nidhoggr/duel_bursts.c	NidhoggrDuelBurst_Update	contrived	contrived	4	screen height and one flag set are direct now; collider pointer branches, mask local and countdown do-while stay: induction and address order
+src/bosses/nidhoggr/duel_bursts.c	NidhoggrDuelBurst_Initialize	natural	natural	0	returns the refresh result through a shared status; documented in source
