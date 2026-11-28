@@ -245,3 +245,4 @@ src/effects/healing/FlickerParticle_UpdateSecondaryMotion.c	FlickerParticle_Upda
 src/effects/healing/FlickerParticle_StartSecondaryBurst.c	FlickerParticle_StartSecondaryBurst	contrived	contrived	0	unchanged: closest plain draft differs only in the table register (local alloc r4, ROM hoists it in the second loop pass to r8); walking cursor, offsets and capture macro stay
 src/effects/healing/FlickerParticle_UpdatePool.c	FlickerParticle_UpdatePool	minor	natural	2	
 src/effects/healing/HealthBurstEffect_UpdateFadeOut.c	HealthBurstEffect_UpdateFadeOut	contrived	natural	3	
+src/effects/healing/HealthBurstEffect_StartBurst.c	HealthBurstEffect_StartBurst	minor	minor	40	ringX temporary before x (copy after the shift), flags local for the cell test (and operand order)
