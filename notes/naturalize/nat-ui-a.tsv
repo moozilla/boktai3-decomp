@@ -141,3 +141,4 @@ src/ui/books/forging_book/ForgingBook_RefreshCategoryPreview.c	ForgingBook_Refre
 src/ui/books/forging_book/sub_0821290C.c	sub_0821290C	contrived	natural	1	falls off the end of an s32 function (kept)
 src/ui/books/forging_book/CollectionBook_GetPageEntryCount.c	CollectionBook_GetPageEntryCount	natural	natural	1	
 src/ui/books/forging_book/CollectionBook_SetEntryCollected.c	CollectionBook_SetEntryCollected	contrived	natural	1	
+src/ui/books/forging_book/CollectionBook_IsEntryCollected.c	CollectionBook_IsEntryCollected	minor	natural	1	
