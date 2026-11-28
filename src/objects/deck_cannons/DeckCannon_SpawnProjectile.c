@@ -1,18 +1,22 @@
 #include "global.h"
-void DeckCannon_InitProjectile(void *, void *, s32, s32);
-void DeckCannon_SpawnProjectile(u8 *p, s32 a, s32 b)
+#include "objects/deck_cannons/deck_cannon_battery.h"
+
+void DeckCannon_InitProjectile(struct DeckCannonBattery *, struct DeckCannonShot *,
+                               struct ContactPosition *, s32);
+
+void DeckCannon_SpawnProjectile(struct DeckCannonBattery *battery, struct ContactPosition *origin,
+                                s32 horizontal)
 {
-    u8 *q = 0;
-    s32 i = 0;
-    while (i <= 7) {
-        s32 flags = *(u16 *)(p + 0x1e);
-        if (!((flags >> i) & 1)) {
-            q = p + 0xd68 + i * 0xb8;
-            *(u16 *)(p + 0x1e) = flags | (1 << i);
+    struct DeckCannonShot *shot = NULL;
+    s32 i;
+
+    for (i = 0; i < 8; i++) {
+        if (!((battery->usedShots >> i) & 1)) {
+            shot = &battery->shots[i];
+            battery->usedShots |= 1 << i;
             break;
         }
-        i++;
     }
-    if (q)
-        DeckCannon_InitProjectile(p, q, a, b);
+    if (shot)
+        DeckCannon_InitProjectile(battery, shot, origin, horizontal);
 }
