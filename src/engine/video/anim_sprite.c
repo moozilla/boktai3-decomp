@@ -146,7 +146,6 @@ s32 AnimSprite_InitLinked(struct AnimSprite *animSprite, void *resource, u16 gly
                       const struct ContactPosition *position)
 {
     struct ContactPosition initialPosition;
-    u32 zero;
 
     if (position == 0) {
         initialPosition.x = 0;
@@ -154,38 +153,37 @@ s32 AnimSprite_InitLinked(struct AnimSprite *animSprite, void *resource, u16 gly
         initialPosition.z = 0;
     } else
         initialPosition = *position;
-    zero = animSprite->active;
-    if (zero == 0) {
-        animSprite->glyphKind = zero;
-        animSprite->value6 = zero;
-        animSprite->sequenceId = zero;
-        animSprite->frameIndex = zero;
-        animSprite->frameCount = zero;
-        animSprite->playbackFlags = zero;
+    if (animSprite->active == 0) {
+        animSprite->glyphKind = 0;
+        animSprite->value6 = 0;
+        animSprite->sequenceId = 0;
+        animSprite->frameIndex = 0;
+        animSprite->frameCount = 0;
+        animSprite->playbackFlags = 0;
         animSprite->status = 0;
-        animSprite->width = zero;
-        animSprite->height = zero;
-        animSprite->originX = zero;
-        animSprite->originY = zero;
-        animSprite->centerX = zero;
-        animSprite->centerY = zero;
+        animSprite->width = 0;
+        animSprite->height = 0;
+        animSprite->originX = 0;
+        animSprite->originY = 0;
+        animSprite->centerX = 0;
+        animSprite->centerY = 0;
         animSprite->scaleX = 0;
         animSprite->scaleY = 0;
-        animSprite->rotation = zero;
-        animSprite->value3C = zero;
+        animSprite->rotation = 0;
+        animSprite->value3C = 0;
         animSprite->frames = NULL;
-        animSprite->palette = zero;
-        animSprite->tileData = zero;
-        animSprite->extraData = zero;
+        animSprite->palette = 0;
+        animSprite->tileData = 0;
+        animSprite->extraData = 0;
         AnimSprite_InitAtPosition(animSprite, resource, glyph, flags, attributeA, mode,
                                   duration, &initialPosition);
         gDefaultAnimFlags++;
         if (gDefaultAnimFlags == 0xFFFF)
-            gDefaultAnimFlags = zero;
+            gDefaultAnimFlags = 0;
         animSprite->cachedFrame = -1;
         animSprite->cachedPalette = -1;
-        animSprite->previous = zero;
-        animSprite->next = zero;
+        animSprite->previous = 0;
+        animSprite->next = 0;
         Anim_LinkToList(animSprite, (u32) - (flags & 0x80) >> 31);
         return 0;
     }

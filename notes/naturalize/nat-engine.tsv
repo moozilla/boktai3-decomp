@@ -300,3 +300,4 @@ src/engine/video/scanline_effect.c	ScanlineEffect_GetBuffer	natural	natural
 src/engine/video/scanline_effect.c	ScanlineEffect_GetHorizontalScrollRegister	natural	natural		
 src/engine/video/scanline_effect.c	ScanlineEffect_GetVerticalScrollRegister	natural	natural		
 src/engine/video/anim_sprite.c	AnimSprite_InitCleared	contrived	natural	2	
+src/engine/video/anim_sprite.c	AnimSprite_InitLinked	contrived	minor	4	negate-and-shift list flag
