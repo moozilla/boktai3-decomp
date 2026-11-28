@@ -44,3 +44,18 @@ src/ui/books/monster_book/SceneDisplay_SwitchToAlternateDescriptor.c	SceneDispla
 src/ui/books/monster_book/bestiary.c	Bestiary_GetEntryForActor	contrived	natural	1	
 src/ui/books/monster_book/bestiary.c	Bestiary_UpdateCompletionBadges	contrived	natural	3	
 src/ui/books/monster_book/bestiary.c	Bestiary_UnlockEntry	contrived	natural	1	
+src/ui/books/monster_book/bestiary.c	Bestiary_GetCategoryFirstEntry	natural	natural	0	
+src/ui/books/monster_book/bestiary.c	Bestiary_GetCategoryEntryCount	natural	natural	0	
+src/ui/books/monster_book/bestiary.c	Bestiary_GetGroupEntryCount	natural	natural	0	
+src/ui/books/monster_book/bestiary.c	Bestiary_GetGroupFirstEntry	natural	natural	0	
+src/ui/books/monster_book/bestiary.c	Bestiary_SelectCategoryForEntry	natural	natural	0	
+src/ui/books/monster_book/bestiary.c	Bestiary_GetEntryGroup	natural	natural	0	
+src/ui/books/monster_book/bestiary.c	Bestiary_UnlockReward	natural	natural	0	
+src/ui/books/monster_book/bestiary.c	Bestiary_UnlockRewardFromScript	natural	natural	0	
+src/ui/books/monster_book/bestiary.c	Bestiary_UnlockEntryFromScript	natural	natural	0	
+src/ui/books/monster_book/bestiary.c	Bestiary_IsEntryUnlocked	minor	minor	0	signed shift toward zero spelled out
+src/ui/books/monster_book/bestiary.c	Bestiary_IsRewardUnlocked	natural	natural	0	
+src/ui/books/monster_book/bestiary.c	Bestiary_IsGroupComplete	natural	natural	0	
+src/ui/books/monster_book/bestiary.c	Bestiary_CountUnlockedGroupEntries	natural	natural	0	
+src/ui/books/monster_book/bestiary.c	Bestiary_AreAllEntriesUnlocked	natural	natural	0	
+src/ui/books/monster_book/bestiary.c	Script_ConsumeOptionalKeywordValue	natural	natural	0	
