@@ -117,3 +117,4 @@ src/ui/books/forging_book/ForgingBook_IsItemDiscoveryRecorded.c	ForgingBook_IsIt
 src/ui/books/forging_book/ForgingBook_IsItemDiscovered.c	ForgingBook_IsItemDiscovered	minor	natural	1	
 src/ui/books/forging_book/ForgingBook_RecordWeaponDiscoveryFromScript.c	ForgingBook_RecordWeaponDiscoveryFromScript	contrived	natural	1	
 src/ui/books/forging_book/ForgingBook_RecordItemDiscoveryFromScript.c	ForgingBook_RecordItemDiscoveryFromScript	contrived	natural	1	
+src/ui/books/forging_book/ForgingBook_SetItemNameText.c	ForgingBook_SetItemNameText	minor	natural	1	

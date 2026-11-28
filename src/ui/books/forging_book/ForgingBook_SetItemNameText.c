@@ -1,9 +1,10 @@
 #include "global.h"
-u32 Script_ParseStringRef(u32);
-u8 *Text_LookupString(u32);
-void ScrollingDialogue_SetScript(u8 *);
-void ForgingBook_SetItemNameText(u8 *p, u32 q)
+#include "ui/books/forging_book.h"
+s32 ScrollingDialogue_SetScript(const u8 *);
+
+void ForgingBook_SetItemNameText(const u8 *entry, const void *script)
 {
-    u32 r = Script_ParseStringRef(q) + 0x30;
-    ScrollingDialogue_SetScript(Text_LookupString(r + *p));
+    s32 id = Script_ParseStringRef(script) + 0x30;
+
+    ScrollingDialogue_SetScript(Text_LookupString(id + *entry));
 }
