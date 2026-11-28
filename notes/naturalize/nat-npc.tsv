@@ -108,15 +108,15 @@ src/npc/sabata_rider/script.c	SabataRider_ResetFromScript	contrived	minor	5	entr
 src/npc/actor_sequence.c	SceneActorSequence_UpdateBackgroundScroll	natural	natural	0	
 src/npc/actor_sequence.c	SceneActorSequence_BeginFadeIn	natural	natural	0	
 src/npc/actor_sequence.c	SceneActorSequence_UpdateFadeIn	minor	natural	1	
-src/npc/actor_sequence.c	SceneActorSequence_BeginDownwardMotion	contrived	natural	6	
+src/npc/actor_sequence.c	SceneActorSequence_BeginDownwardMotion	contrived	contrived	8	s16 view and value locals stay: ROM builds the point as a setter inline would, and the brief allows no new helper (a shared point setter matched Corner/Second/Final/Downward)
 src/npc/actor_sequence.c	SceneActorSequence_UpdateFadeInHold	minor	natural	1	
-src/npc/actor_sequence.c	SceneActorSequence_BeginCornerMotion	contrived	natural	5	
+src/npc/actor_sequence.c	SceneActorSequence_BeginCornerMotion	contrived	contrived	8	s16 view and value locals stay: ROM builds the point as a setter inline would, and the brief allows no new helper (a shared point setter matched Corner/Second/Final/Downward)
 src/npc/actor_sequence.c	SceneActorSequence_BeginCenterMotion	natural	natural	0	
 src/npc/actor_sequence.c	SceneActorSequence_UpdateCenterMotion	natural	natural	0	
 src/npc/actor_sequence.c	SceneActorSequence_UpdateFirstWaypointMotion	natural	natural	0	
-src/npc/actor_sequence.c	SceneActorSequence_BeginSecondWaypointMotion	contrived	natural	5	
+src/npc/actor_sequence.c	SceneActorSequence_BeginSecondWaypointMotion	contrived	contrived	8	s16 view and value locals stay: ROM builds the point as a setter inline would, and the brief allows no new helper (a shared point setter matched Corner/Second/Final/Downward)
 src/npc/actor_sequence.c	SceneActorSequence_UpdateSecondWaypointMotion	natural	natural	0	
-src/npc/actor_sequence.c	SceneActorSequence_BeginFinalWaypointMotion	contrived	natural	5	
+src/npc/actor_sequence.c	SceneActorSequence_BeginFinalWaypointMotion	contrived	contrived	8	s16 view and value locals stay: ROM builds the point as a setter inline would, and the brief allows no new helper (a shared point setter matched Corner/Second/Final/Downward)
 src/npc/actor_sequence.c	SceneActorSequence_UpdateFinalWaypointMotion	natural	natural	0	
 src/npc/actor_sequence.c	SceneActorSequence_BeginFadeOut	natural	natural	0	
 src/npc/actor_sequence.c	SceneActorSequence_UpdateCompletionDelay	natural	natural	0	
@@ -124,3 +124,5 @@ src/npc/actor_sequence.c	SceneActorSequence_UpdateActorAnimation	contrived	contr
 src/npc/actor_sequence.c	SceneActorSequence_Update	natural	natural	0	
 src/npc/actor_sequence.c	SceneActorSequence_OnDestroy	natural	natural	0	
 src/npc/actor_sequence.c	SceneActorSequence_InitDisplayResources	contrived	contrived	22	display pointer, mask-first local and enabled-bits local: ROM loads address, mask, then the register, and builds the bits after the and
+src/npc/actor_sequence.c	SceneActorSequence_InitFromScript	natural	natural	0	
+src/npc/actor_sequence.c	SceneActorSequence_CreateFromScript	natural	natural	0	

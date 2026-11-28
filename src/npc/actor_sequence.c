@@ -38,22 +38,24 @@ void SceneTarget_BeginMove(void *, void *, void *, int, int, int, int);
 
 void SceneActorSequence_UpdateFadeInHold(struct SceneActorSequence *);
 
-static inline void SceneActorSequence_SetPoint(struct SceneActorSequencePoint *point, int x, int y,
-                                               int z)
-{
-    point->x = x;
-    point->y = y;
-    point->z = z;
-}
-
 void SceneActorSequence_BeginDownwardMotion(struct SceneActorSequence *p)
 {
     struct SceneActorSequencePoint start, end;
-    SceneActorSequence_SetPoint(&start, 120, 80, 0);
-    SceneActorSequence_SetPoint(&end, 120, 144, 0);
+    s16 *q = (s16 *)&start;
+    int x = 120, y = 80, zero = 0;
+    start.x = x;
+    q[1] = y;
+    q[2] = zero;
+    {
+        s16 *r = (s16 *)&end;
+        int y2 = 144;
+        r[0] = x;
+        r[1] = y2;
+        r[2] = zero;
+    }
     SceneTarget_BeginMove(p->actor, &start, &end, 1, 64, 128, 60);
     p->updateState = SceneActorSequence_UpdateFadeInHold;
-    p->timer = 0;
+    p->timer = zero;
 }
 
 s32 PopInSprite_GetStateResult(void *);
@@ -102,10 +104,14 @@ void SceneActorSequence_UpdateFirstWaypointMotion(struct SceneActorSequence *);
 void SceneActorSequence_BeginCornerMotion(struct SceneActorSequence *p)
 {
     struct SceneActorSequencePoint end;
-    SceneActorSequence_SetPoint(&end, 48, 48, 0);
-    SceneTarget_BeginMove(p->actor, 0, &end, -1, 48, p->secondWaypointSpeed, 45);
+    s16 *q = (s16 *)&end;
+    int xy = 48, zero = 0;
+    end.x = xy;
+    q[1] = xy;
+    q[2] = zero;
+    SceneTarget_BeginMove(p->actor, 0, (s16 *)&end, -1, xy, p->secondWaypointSpeed, 45);
     p->updateState = SceneActorSequence_UpdateFirstWaypointMotion;
-    p->timer = 0;
+    p->timer = zero;
 }
 
 void SceneActorSequence_BeginSecondWaypointMotion(struct SceneActorSequence *);
@@ -120,9 +126,13 @@ void SceneActorSequence_UpdateSecondWaypointMotion(struct SceneActorSequence *);
 
 void SceneActorSequence_BeginSecondWaypointMotion(struct SceneActorSequence *p)
 {
-    struct SceneActorSequencePoint end;
-    SceneActorSequence_SetPoint(&end, 112, 72, 0);
-    SceneTarget_BeginMove(p->actor, 0, &end, -1, 16, p->firstWaypointSpeed, 50);
+    struct SceneActorSequencePoint v;
+    s16 *q = (s16 *)&v;
+    int a = 0x70, b = 0x48, z = 0;
+    v.x = a;
+    q[1] = b;
+    q[2] = z;
+    SceneTarget_BeginMove(p->actor, 0, (s16 *)&v, -1, 0x10, p->firstWaypointSpeed, 0x32);
     p->updateState = SceneActorSequence_UpdateSecondWaypointMotion;
     p->timer = 0;
 }
@@ -139,9 +149,13 @@ void SceneActorSequence_UpdateFinalWaypointMotion(struct SceneActorSequence *);
 
 void SceneActorSequence_BeginFinalWaypointMotion(struct SceneActorSequence *p)
 {
-    struct SceneActorSequencePoint end;
-    SceneActorSequence_SetPoint(&end, 54, 82, 0);
-    SceneTarget_BeginMove(p->actor, 0, &end, -1, 1, p->finalWaypointSpeed, 60);
+    struct SceneActorSequencePoint v;
+    s16 *q = (s16 *)&v;
+    int a = 0x36, b = 0x52, z = 0;
+    v.x = a;
+    q[1] = b;
+    q[2] = z;
+    SceneTarget_BeginMove(p->actor, 0, (s16 *)&v, -1, 0x1, p->finalWaypointSpeed, 0x3C);
     p->updateState = SceneActorSequence_UpdateFinalWaypointMotion;
     p->timer = 0;
 }
