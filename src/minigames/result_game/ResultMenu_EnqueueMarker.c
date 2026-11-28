@@ -1,18 +1,13 @@
-#include "global.h"
-#include "minigames/result_game/result_menu_marker.h"
-typedef struct ResultMenuMarkerGraphic Graphic;
-typedef struct {
-    u16 state, time;
-} State;
-void Anim_LoadKeyframe(void *, void *, int, int);
-void ResultMenu_EnqueueMarker(u8 *p)
+#include "minigames/result_game/result_tutorial.h"
+
+void ResultMenu_EnqueueMarker(struct ResultMenu *menu)
 {
-    State *s = (State *)(p + 0x78c + p[0x4a] * 4);
-    Graphic *g = (Graphic *)(p + 0x384 + p[0x4a] * 0x60);
-    Anim_LoadKeyframe(g, p + 0x104, p[0xbf] + 0xc2, 0);
-    g->flags &= ~0x201;
-    s->state = 1;
-    s->time = 0;
-    if (++p[0x4a] > 4)
-        p[0x4a] = 0;
+    struct ResultMarkerFeedback *feedback = &menu->markerFeedback[menu->nextFeedbackSlot];
+    struct AnimSprite *sprite = &menu->widgets[6 + menu->nextFeedbackSlot];
+    Anim_LoadKeyframe(sprite, &menu->primaryResource, menu->lastTimingGrade + 0xc2, 0);
+    sprite->flags &= ~0x201;
+    feedback->phase = 1;
+    feedback->elapsed = 0;
+    if (++menu->nextFeedbackSlot > 4)
+        menu->nextFeedbackSlot = 0;
 }

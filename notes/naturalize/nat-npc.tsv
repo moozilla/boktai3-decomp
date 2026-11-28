@@ -683,3 +683,4 @@ src/minigames/result_game/Transformation_Charge.c	Transformation_Charge	contrive
 src/minigames/result_game/Transformation_Reveal.c	Transformation_Reveal	contrived	minor	6	out and origin pointers for the dropped item position
 src/minigames/result_game/ResultMenu_CreateGraphics.c	ResultMenu_CreateGraphics	natural	natural	0	
 src/minigames/result_game/ResultMenu_SendCommand.c	ResultMenu_SendCommand	contrived	minor	16	counted do/while copy with src and count locals: a for loop adds a second count test
+src/minigames/result_game/ResultMenu_EnqueueMarker.c	ResultMenu_EnqueueMarker	contrived	natural	2	
