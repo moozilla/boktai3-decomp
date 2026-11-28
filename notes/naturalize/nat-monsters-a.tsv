@@ -656,3 +656,12 @@ src/bosses/nidhoggr/duel_minions.c	NidhoggrDuelMinion_UpdateAppearing	natural	na
 src/bosses/nidhoggr/duel_minions.c	NidhoggrDuelMinion_UpdateActive	natural	natural	0	
 src/bosses/nidhoggr/duel_minions.c	NidhoggrDuelMinion_Destroy	natural	natural	0	
 src/bosses/nidhoggr/duel_minions.c	NidhoggrDuelMinionPool_Create	natural	natural	0	
+src/bosses/nidhoggr/duel_minions.c	NidhoggrDuelMinion_ApplyHealthContact	contrived	contrived	1	saved actor alias stays: saved-register choice for the actor
+src/bosses/nidhoggr/duel_minions.c	NidhoggrDuelMinion_Deactivate	minor	minor	1	collider pointer block stays: field address formed before the load
+src/bosses/nidhoggr/duel_minions.c	NidhoggrDuelMinion_UpdateDying	contrived	contrived	5	health test reads the member now; scatter pointers, u32 sample chain and (u16) adds stay: store/load order of the position halfwords
+src/bosses/nidhoggr/duel_minions.c	NidhoggrDuelMinion_Update	contrived	contrived	4	per-branch collider pointers, mask local and jitter copy pointers stay: address materialization order
+src/bosses/nidhoggr/duel_minions.c	NidhoggrDuelMinionPool_Update	minor	minor	2	for loop now; first/second palette bank pointers stay: base loaded before both offsets
+src/bosses/nidhoggr/duel_minions.c	NidhoggrDuelMinionPool_Destroy	minor	natural	1	for loop over the actors
+src/bosses/nidhoggr/duel_minions.c	NidhoggrDuelMinionPool_Initialize	minor	natural	1	for loop over the actors
+src/bosses/nidhoggr/duel_minions.c	NidhoggrDuelMinionPool_SpawnActor	contrived	contrived	6	resource and frame passed directly now; owner/position aliases and collider pointers stay: saved-register choice
+src/bosses/nidhoggr/duel_minions.c	NidhoggrDuelMinionPool_BeginAllDeaths	minor	natural	1	for loop over the actors
