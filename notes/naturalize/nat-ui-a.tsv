@@ -125,3 +125,4 @@ src/ui/books/forging_book/ForgingBook_RefreshEntrySprites.c	ForgingBook_RefreshE
 src/ui/books/forging_book/ForgingBook_UpdateCategoryCountDigits.c	ForgingBook_UpdateCategoryCountDigits	contrived	natural	1	
 src/ui/books/forging_book/SceneKeyframe_UpdateSelectionVisibility.c	SceneKeyframe_UpdateSelectionVisibility	minor	natural	1	
 src/ui/books/forging_book/ForgingBook_UpdateSelectionCursor.c	ForgingBook_UpdateSelectionCursor	contrived	natural	1	
+src/ui/books/forging_book/ForgingBook_UpdateHighlightPulse.c	ForgingBook_UpdateHighlightPulse	contrived	natural	1	
