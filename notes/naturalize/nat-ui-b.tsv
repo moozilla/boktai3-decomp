@@ -437,3 +437,9 @@ src/ui/town/shop/SceneInputPanel_AdjustSlidingY.c	SceneInputPanel_AdjustSlidingY
 src/ui/town/shop/SceneInputPanel_RequestAction.c	SceneInputPanel_RequestAction	minor	minor	0	private two-field view of the controller: no shared struct carries the action word
 src/ui/town/shop/SceneInputPanel_ShowDescription.c	SceneInputPanel_ShowDescription	minor	minor	1	void * owner and unused parameters follow the callers
 src/ui/town/shop/SceneItemValue_CalculateEquipment.c	SceneItemValue_CalculateEquipment	minor	natural	4	
+src/ui/town/shop/SceneItemValue_GetItemBaseValue.c	SceneItemValue_GetItemBaseValue	natural	natural	0	
+src/ui/town/shop/SceneItemValue_CalculateItem.c	SceneItemValue_CalculateItem	natural	natural	0	
+src/ui/town/shop/SceneItemValue_GetConsumableBaseValue.c	SceneItemValue_GetConsumableBaseValue	natural	natural	0	
+src/ui/town/shop/SceneItemValue_CalculateConsumable.c	SceneItemValue_CalculateConsumable	natural	natural	0	
+src/ui/town/shop/Shop_PrepareEquipmentDescriptor.c	Shop_PrepareEquipmentDescriptor	natural	natural	0	
+src/ui/town/shop/sub_0805F904.c	sub_0805F904	contrived	natural	12	

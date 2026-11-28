@@ -2,8 +2,7 @@
 #include "ui/town/shop_panel.h"
 #include "ui/town/equipment_descriptor.h"
 void Inventory_GetEquipmentDescriptor(s32, void *);
-void Shop_PrepareEquipmentDescriptor(struct ShopPanel *,
-                                               struct EquipmentDescriptor *);
+void Shop_PrepareEquipmentDescriptor(struct ShopPanel *, struct EquipmentDescriptor *);
 void Presentation_ApplyGraphicData(void *, void *);
 void Presentation_ApplyGraphicSettings(void *, const void *);
 void Presentation_ApplyPackedGraphicData(const void *, const void *);
@@ -17,33 +16,29 @@ void sub_0805F904(struct ShopPanel *panel)
     if (panel->selection <= 15) {
         entry = Inventory_GetEquipmentEntry(panel->selection);
         if (entry->kind == 0xFF) {
-        nodata:
             data = 0;
-            goto hide;
+        } else {
+            Inventory_GetEquipmentDescriptor(panel->selection, &descriptor);
+            data = &descriptor;
         }
-        Inventory_GetEquipmentDescriptor(panel->selection, &descriptor);
-        data = &descriptor;
     } else if (panel->selection <= 23) {
-        s32 offset = panel->page * 8;
-        s32 kind;
-        offset -= 16;
-        offset += panel->selection;
-        kind = panel->catalog[offset];
+        s32 kind = panel->catalog[panel->selection - 16 + panel->page * 8];
         entry = 0;
-        if (kind < 0)
-            goto nodata;
-        descriptor = *(struct EquipmentDescriptor *)Equipment_GetDefinition(kind);
-        data = &descriptor;
-        descriptor.modifierA = (u32)entry;
-        descriptor.modifierB = (u32)entry;
-        descriptor.modifierC = (u32)entry;
-        Shop_PrepareEquipmentDescriptor(panel, data);
+        if (kind >= 0) {
+            descriptor = *(struct EquipmentDescriptor *)Equipment_GetDefinition(kind);
+            data = &descriptor;
+            descriptor.modifierA = 0;
+            descriptor.modifierB = 0;
+            descriptor.modifierC = 0;
+            Shop_PrepareEquipmentDescriptor(panel, data);
+        } else {
+            data = 0;
+        }
     } else {
         data = 0;
         entry = 0;
     }
     if (!data) {
-    hide:
         panel->display.banner.flags |= 1;
         MessageWindow_Clear();
         ScrollingDialogue_ClearScript();
