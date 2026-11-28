@@ -347,17 +347,13 @@ void ModifierMenu_ReconcileSelection(struct ModifierMenu *menu)
     if (current->count > current->capacity) {
         count = 0;
         mask = 0;
-        index = 0;
-        for (;;) {
-            if (index > 31)
-                break;
+        for (index = 0; index <= 31; index++) {
             if (Modifier_TestSelection(current, index)) {
                 mask |= 1 << index;
                 count++;
                 if (count >= current->capacity)
                     break;
             }
-            index++;
         }
         current->count = count;
         current->mask = mask;

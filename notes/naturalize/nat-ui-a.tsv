@@ -630,3 +630,4 @@ src/ui/modifier_menu/modifier_selection_and_stat_previews.c	Modifier_LoadFourthS
 src/ui/modifier_menu/modifier_selection_and_stat_previews.c	ModifierMenu_SelectPendingSource	fudged	partial	13	shared id local across the three cases is required (dropping it changes register allocation)
 src/ui/modifier_menu/modifier_selection_and_stat_previews.c	ModifierMenu_CommitFirstSource	fudged	natural	3	
 src/ui/modifier_menu/modifier_selection_and_stat_previews.c	ModifierMenu_CommitSecondSource	fudged	natural	3	
+src/ui/modifier_menu/modifier_selection_and_stat_previews.c	ModifierMenu_ReconcileSelection	fudged	natural	1	
