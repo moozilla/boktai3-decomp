@@ -8,7 +8,7 @@
 #include "engine/video/render.h"
 
 void NidhoggrDuelBurst_OnContact(struct ContactCollider *self, struct ContactCollider *otherInput,
-                            struct ContactBurst *effectInput)
+                                 struct ContactBurst *effectInput)
 {
     struct ContactCollider *other = otherInput;
     struct ContactBurst *effect = effectInput;
@@ -110,12 +110,7 @@ s32 NidhoggrDuelBurst_Update(struct ContactBurst *effect)
         effect->sprite.flags &= ~1;
         screen = &effect->sprite.position.vector;
         projectPosition(screen, effect->world);
-        {
-            struct ContactBurst *addressBase = effect;
-            s16 *height;
-            height = &addressBase->sprite.position.vector.z;
-            *height += 50;
-        }
+        effect->sprite.position.vector.z += 50;
         if (effect->contactTimer) {
             struct ContactCollider *collider = &effect->collider;
             collider->flags |= 4;
@@ -150,22 +145,13 @@ s32 NidhoggrDuelBurst_Update(struct ContactBurst *effect)
                 sample &= 15;
                 direction += sample;
                 frame = NidhoggrDuelBurst_RandomParticleFrame();
-                ImpactFragment_Spawn((struct DirectionalParticleSource *)effect, direction,
-                                          frame);
+                ImpactFragment_Spawn((struct DirectionalParticleSource *)effect, direction, frame);
                 ++index;
             } while (index <= 7);
             Sound_PlaySong(0x3B7);
         }
         effect->sprite.flags |= 1;
-        {
-            struct ContactCollider *reader = collider;
-            u32 flags = reader->flags;
-            u32 mask = 4;
-            struct ContactCollider *writer;
-            mask |= flags;
-            writer = collider;
-            writer->flags = mask;
-        }
+        collider->flags |= 4;
     }
     effect->previousEnabled = effect->enabled;
     return 0;
@@ -179,7 +165,7 @@ s32 NidhoggrDuelBurst_Destroy(struct ContactBurst *effect)
 }
 
 void NidhoggrDuelBurst_OnContact(struct ContactCollider *, struct ContactCollider *,
-                            struct ContactBurst *);
+                                 struct ContactBurst *);
 
 void Collider_SetBodyProperties(void *, u32, u32, u32);
 
