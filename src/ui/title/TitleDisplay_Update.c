@@ -1,4 +1,6 @@
 #include "ui/title/title_display.h"
+#include "gba/io_reg.h"
+#include "system/game_state/game_state.h"
 #include "engine/video/render.h"
 #include "ui/menu_parameters.h"
 #include "engine/input.h"
@@ -9,7 +11,6 @@ struct Message {
     u32 unused : 16;
     void *values;
 };
-extern u8 *gGameState;
 extern const s32 gUnk_08613D80[];
 s32 TimeDisplay_GetCurrentMonth(void);
 s32 TimeDisplay_GetLightPhaseGroup(void);
@@ -91,7 +92,7 @@ void TitleDisplay_Update(struct Display *p)
             }
             break;
         case 1:
-            if ((gPadState[1] & 1) || (gPadState[1] & 10)) {
+            if ((gPadState[1] & A_BUTTON) || (gPadState[1] & (B_BUTTON | START_BUTTON))) {
                 if (p->stateTimer > 10) {
                     p->skipped = 1;
                     p->unused760 = 1;
@@ -134,7 +135,7 @@ void TitleDisplay_Update(struct Display *p)
             }
             break;
         case 5:
-            if ((gPadState[1] & 1) || (gPadState[1] & 10)) {
+            if ((gPadState[1] & A_BUTTON) || (gPadState[1] & (B_BUTTON | START_BUTTON))) {
                 if (!p->skipped) {
                     p->skipped = 1;
                     p->paletteStep = 1 << p->unused760;
@@ -162,7 +163,7 @@ void TitleDisplay_Update(struct Display *p)
             }
             break;
         case 6:
-            if ((gPadState[1] & 1) || (gPadState[1] & 8)) {
+            if ((gPadState[1] & A_BUTTON) || (gPadState[1] & START_BUTTON)) {
                 if (p->timer > (1 << p->fadeShift)) {
                     p->widgets[2].flags &= ~1;
                     p->state = 7;
@@ -213,10 +214,11 @@ void TitleDisplay_Update(struct Display *p)
             if (p->timer < (1 << p->fadeShift)) {
                 break;
             }
-            if ((gPadState[1] & 1) || (gPadState[1] & 0x38)) {
+            if ((gPadState[1] & A_BUTTON) ||
+                (gPadState[1] & (START_BUTTON | DPAD_RIGHT | DPAD_LEFT))) {
                 p->idleTimer = 0;
-                if ((gPadState[1] & 1) || (gPadState[1] & 8)) {
-                    *(u16 *)(gGameState + 0x870) = p->selection;
+                if ((gPadState[1] & A_BUTTON) || (gPadState[1] & START_BUTTON)) {
+                    *(u16 *)&gGameState->timeDisplaySelection = p->selection;
                     if (p->selection == 0) {
                         Sound_PlaySong(0xE0);
                         p->fadeShift = gTimeDisplayParameters.confirmFade;
@@ -238,14 +240,14 @@ void TitleDisplay_Update(struct Display *p)
                         }
                     }
                     break;
-                } else if (gPadState[1] & 0x20) {
+                } else if (gPadState[1] & DPAD_LEFT) {
                     Sound_PlaySong(0x12B);
                     if ((--p->selection) < 0) {
                         p->selection = p->count - 1;
                     }
                     p->state = 11;
                     break;
-                } else if (gPadState[1] & 0x10) {
+                } else if (gPadState[1] & DPAD_RIGHT) {
                     Sound_PlaySong(0x12B);
                     if ((++p->selection) >= p->count) {
                         p->selection = 0;
@@ -260,12 +262,8 @@ void TitleDisplay_Update(struct Display *p)
         case 9:
             Anim_LoadKeyframe(&p->widgets[3], p->keyframes, (u16)(p->selection + 12), 0);
             p->widgets[3].flags &= ~1;
-            {
-                s16 *destination = &p->widgets[3].x;
-                s32 zero = 0;
-                *destination = 144;
-                p->velocity = zero;
-            }
+            p->widgets[3].x = 144;
+            p->velocity = 0;
             p->state = 10;
             break;
         case 10:
@@ -276,11 +274,8 @@ void TitleDisplay_Update(struct Display *p)
             p->velocity -= 2;
             position = p->widgets[3].x + p->velocity;
             p->widgets[3].x = position;
-            {
-                s32 y = (s16)position - 144;
-                p->widgets[2].x = y;
-            }
-            if ((s16)position <= 0) {
+            p->widgets[2].x = position - 144;
+            if (position <= 0) {
                 Anim_LoadKeyframe(&p->widgets[2], p->keyframes, (u16)(p->selection + 12), 0);
                 p->widgets[2].x = 0;
                 p->widgets[3].flags |= 1;
@@ -290,15 +285,8 @@ void TitleDisplay_Update(struct Display *p)
         case 11:
             Anim_LoadKeyframe(&p->widgets[3], p->keyframes, (u16)(p->selection + 12), 0);
             p->widgets[3].flags &= ~1;
-            {
-                u16 *destination = (u16 *)&p->widgets[3].x;
-                s32 zero = 0;
-                {
-                    s32 initialY = 0xFF70;
-                    *destination = initialY;
-                }
-                p->velocity = zero;
-            }
+            p->widgets[3].x = -144;
+            p->velocity = 0;
             p->state = 12;
             break;
         case 12:
@@ -309,11 +297,8 @@ void TitleDisplay_Update(struct Display *p)
             p->velocity += 2;
             position = p->widgets[3].x + p->velocity;
             p->widgets[3].x = position;
-            {
-                s32 y = (s16)position + 144;
-                p->widgets[2].x = y;
-            }
-            if ((s16)position >= 0) {
+            p->widgets[2].x = position + 144;
+            if (position >= 0) {
                 Anim_LoadKeyframe(&p->widgets[2], p->keyframes, (u16)(p->selection + 12), 0);
                 p->widgets[2].x = 0;
                 p->widgets[3].flags |= 1;

@@ -343,3 +343,4 @@ src/ui/title/TitleDisplay_Initialize.c	TitleDisplay_Initialize	contrived	natural
 src/ui/title/TitleDisplay_Destroy.c	TitleDisplay_Destroy	natural	natural	0	
 src/ui/title/TitleDisplay_SetFromScript.c	TitleDisplay_SetFromScript	natural	natural	0	
 src/ui/title/TitleDisplay_Create.c	TitleDisplay_Create	natural	natural	0	
+src/ui/title/TitleDisplay_Update.c	TitleDisplay_Update	contrived	minor	8	per-season table/offset locals for the month music; source/input/output locals in the palette blend; (u16 *) store of the saved selection
