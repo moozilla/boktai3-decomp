@@ -1,2 +1,3 @@
 path	function	verdict_before	verdict_after	compiles	what_stays_and_why
 src/bosses/ratatosk/Ratatosk_FindPointNearestPlayer.c	Ratatosk_FindPointNearestPlayer	contrived	natural	1	
+src/bosses/ratatosk/Ratatosk_FindPointNearestReference.c	Ratatosk_FindPointNearestReference	contrived	natural	1	
