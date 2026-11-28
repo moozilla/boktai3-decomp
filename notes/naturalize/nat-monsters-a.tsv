@@ -375,3 +375,34 @@ src/monsters/centipede/tentacle_body.c	CentipedeBody_UpdateAttackWindup	minor	mi
 src/monsters/centipede/tentacle_body.c	CentipedeBody_ResetDirectionalPose	minor	minor	0	struct casts between actor views and an out-flag profile entry remain
 src/monsters/centipede/tentacle_body.c	CentipedeBody_UpdateAttackRecovery	minor	minor	0	struct casts between actor views and an out-flag profile entry remain
 src/monsters/cannons/plasma/PlasmaCannon_InitCollider.c	PlasmaCannon_InitCollider	contrived	natural	1	
+src/monsters/cannons/plasma/PlasmaCannon_TryFireAtPlayer.c	PlasmaCannon_TryFireAtPlayer	minor	minor	2	pos pointer for the z comparisons: direct member reads load from the stack differently
+src/monsters/cannons/wind/WindCannon_UpdateActive.c	WindCannon_UpdateActive	contrived	contrived	8	pos/out aliases of stack vectors, source reused for three tables, split origin temps: removing each moves stack-address registers
+src/monsters/centipede/ActorTrail_ApplyAngularOffsets.c	ActorTrail_ApplyAngularOffsets	natural	natural	0	
+src/monsters/centipede/Centipede_ResetSegmentPositions.c	Centipede_ResetSegmentPositions	natural	natural	0	
+src/monsters/centipede/ActorTrail_RemoveAllSegments.c	ActorTrail_RemoveAllSegments	natural	natural	0	
+src/monsters/centipede/Centipede_RemoveSegmentColliders.c	Centipede_RemoveSegmentColliders	natural	natural	0	
+src/monsters/centipede/Centipede_UpdateSegmentImpulses.c	Centipede_UpdateSegmentImpulses	natural	natural	0	
+src/monsters/centipede/Centipede_OnSegmentAttackCollision.c	Centipede_OnSegmentAttackCollision	natural	natural	0	
+src/monsters/centipede/Centipede_ResetRouteHistory.c	Centipede_ResetRouteHistory	natural	natural	0	
+src/monsters/centipede/Centipede_RecordVisitedRoute.c	Centipede_RecordVisitedRoute	natural	natural	0	
+src/monsters/centipede/Centipede_UpdatePendingVelocity.c	Centipede_UpdatePendingVelocity	natural	natural	0	
+src/monsters/centipede/Centipede_Create.c	Centipede_Create	natural	natural	0	
+src/monsters/dragon_puppy/DragonPuppy_UpdateAttackRecovery.c	DragonPuppy_UpdateAttackRecovery	natural	natural	0	
+src/monsters/dragon_puppy/DragonPuppy_UpdateAttackWindup.c	DragonPuppy_UpdateAttackWindup	natural	natural	0	
+src/monsters/dragon_puppy/DragonPuppy_Create.c	DragonPuppy_Create	natural	natural	0	
+src/monsters/garmr_statue/GarmrStatue_Create.c	GarmrStatue_Create	natural	natural	0	
+src/monsters/golem/golem_main.c	Golem_ResetIdleControl	natural	natural	0	
+src/monsters/golem/golem_main.c	Golem_InitAnimationProfile	natural	natural	0	
+src/monsters/golem/golem_main.c	Golem_ClearControlFlag	natural	natural	0	
+src/monsters/golem/golem_main.c	Golem_InvokeEnabledBehavior	natural	natural	0	
+src/monsters/golem/golem_main.c	Golem_OnBodyCollision	natural	natural	0	
+src/monsters/golem/golem_main.c	Golem_UpdateDeath	natural	natural	0	
+src/monsters/golem/golem_main.c	Skeleton_ClearDirectionalEntryFlag	natural	natural	0	
+src/monsters/golem/golem_main.c	Golem_BeginChargeBuildup	natural	natural	0	
+src/monsters/golem/golem_main.c	Golem_UpdateReactionRecovery	natural	natural	0	
+src/monsters/centipede/ActorTrail_UpdateTimedScale.c	ActorTrail_UpdateTimedScale	minor	minor	0	halfword view casts and small flag/getter wrappers remain
+src/monsters/golem/golem_main.c	Golem_CenterPositionInCell	minor	minor	0	halfword view casts and small flag/getter wrappers remain
+src/monsters/golem/golem_main.c	SceneActorControl_RefreshMotionRoute	minor	minor	0	halfword view casts and small flag/getter wrappers remain
+src/monsters/golem/golem_main.c	Golem_TurnTowardRouteFacing	minor	minor	0	halfword view casts and small flag/getter wrappers remain
+src/monsters/golem/golem_main.c	Golem_UpdateSlideImpact	minor	minor	0	halfword view casts and small flag/getter wrappers remain
+src/monsters/golem/golem_main.c	Skeleton_LookupAnimationEntry	minor	minor	1	second pointer to the sequence for the second table read: one pointer drops the reload
