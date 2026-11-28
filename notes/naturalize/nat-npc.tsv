@@ -16,3 +16,7 @@ src/npc/manager/scene_actor_lifecycle.c	Actor_SetDefaultPaletteBank	natural	natu
 src/npc/manager/scene_actor_lifecycle.c	Actor_ResetPaletteBank	natural	natural	0	
 src/npc/manager/scene_actor_lifecycle.c	Actor_Destroy	natural	natural	0	
 src/npc/manager/scene_actor_lifecycle.c	Actor_InitShadow	contrived	natural	1	
+src/npc/manager/scene_actor_lifecycle.c	Actor_InitMotion	minor	minor	2	SceneActorBody_SetFlags(body,4) stays: the plain |= loads the mask after the field (inline u32 parameter materializes it first)
+src/npc/manager/scene_actor_lifecycle.c	Actor_InitDrawable	minor	minor	2	keyframes/part pointer locals stay: ROM addresses paletteIndex through a sub-struct base (+0xe0/+0x100); field access folds the offset
+src/npc/manager/scene_actor_lifecycle.c	Actor_SetPaletteBank	minor	minor	1	drawable pointer local stays: ROM computes the address before storing paletteBank
+src/npc/manager/scene_actor_animation.c	Actor_UpdateMovementAnimationAndEffects	contrived	minor	4	SceneActor_TestFlags(actor,0x400) stays: ROM materializes the mask before loading the flags

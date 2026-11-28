@@ -46,37 +46,34 @@ int Actor_UpdateMovementAnimationAndEffects(void *unused, struct SceneActor *act
     struct SceneActorBody *body = &actor->body;
     void *drawable = &actor->drawable.common.kind;
     Obj_StepPosition(body);
-    {
-        if (!SceneActor_TestFlags(actor, 0x400)) {
-            struct ContactPosition *pos = &body->position;
-            int x = pos->x >> 8, z = pos->z >> 8, index, SceneActor_TerrainHeight, slope;
-            u8 *c;
-            if ((((x < 0) || (z < 0)) || (((u32)x) >= gTerrainWidth)) ||
-                (((u32)z) >= gTerrainHeight)) {
-                index = 0;
-            } else {
-                index = gTerrainMap->rows[z] + x;
-            }
-            c = SceneActor_GetTerrainCell(index);
-            slope = *c >> 4;
-            SceneActor_TerrainHeight = (*c & 15) << 8;
-            switch (slope) {
-                case 1:
-                    SceneActor_TerrainHeight -= (u8)pos->z;
-                    break;
-                case 2:
-                    SceneActor_TerrainHeight -= (u8)pos->x;
-                    break;
-            }
-            body->position.y = SceneActor_TerrainHeight;
+    if (!SceneActor_TestFlags(actor, 0x400)) {
+        struct ContactPosition *pos = &body->position;
+        int x = pos->x >> 8, z = pos->z >> 8;
+        int index, slope, height;
+        u8 *cell;
+        if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
+            index = 0;
+        else
+            index = gTerrainMap->rows[z] + x;
+        cell = SceneActor_GetTerrainCell(index);
+        slope = *cell >> 4;
+        height = (*cell & 15) << 8;
+        switch (slope) {
+            case 1:
+                height -= (u8)pos->z;
+                break;
+            case 2:
+                height -= (u8)pos->x;
+                break;
         }
+        body->position.y = height;
     }
     DisplayAnimation_SetPosition(drawable, (struct DisplayPosition *)&body->position);
     DisplayAnimation_UpdatePlayback(drawable);
     if (actor->timer > 0) {
         actor->timer--;
         if (actor->timer <= 3) {
-            if (actor->flashing && (!(gEngineFlags & 0x200))) {
+            if (actor->flashing && !(gEngineFlags & 0x200)) {
                 actor->timer = actor->duration;
             } else {
                 actor->timer = 0;
