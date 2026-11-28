@@ -286,3 +286,4 @@ src/monsters/cannons/wind/WindCannon_CreateFromScript.c	WindCannon_CreateFromScr
 src/monsters/dragon_puppy/DragonPuppy_UpdateAttackTiming.c	DragonPuppy_UpdateAttackTiming	contrived	contrived	5	remaining: rawoff,u8cast,bytep
 src/monsters/dragon_puppy/DragonPuppy_InitializeFromScript.c	DragonPuppy_InitializeFromScript	contrived	contrived	1	remaining: mask,structcast
 src/monsters/cannons/plasma/PlasmaCannon_InitializeFromScript.c	PlasmaCannon_InitializeFromScript	contrived	contrived	6	remaining: mask,structcast
+src/monsters/golem/golem_main_2.c	Golem_UpdateChargePursuit	contrived	contrived	55	remaining: bytep,goto,block,constlocal,mask,ptrtemp,maskhelper

@@ -230,14 +230,14 @@ void Golem_UpdateChargePursuit(struct ChaseActor *actor)
         index = SceneActorChase_PlayerSlot(partner);
         if (index < 0)
             goto route;
-        if (IsDazzled(gPlayers[index])) {
+        if ((SceneActorChase_Bits32(&gPlayers[index]->statusFlags, 0x20000))) {
             u8 held = Golem_HasRouteFlag(body, 0x80000);
             if (!held) {
                 Golem_Recover(body);
                 return;
             }
         }
-    } else if (IsDazzled(gPlayers[0])) {
+    } else if ((SceneActorChase_Bits32(&gPlayers[0]->statusFlags, 0x20000))) {
         u8 held = Golem_HasRouteFlag(body, 0x80000);
         if (!held) {
             Golem_Recover(body);
@@ -246,84 +246,81 @@ void Golem_UpdateChargePursuit(struct ChaseActor *actor)
     }
 route:
     route = group->route;
-    {
-        u16 flag = *(u16 *)route & 4;
-        if (flag) {
-            if (Actor_StepTowardTargetAxis(actor, route, 24, 24, body->pushSpeed, 0)) {
-                s32 distance;
-                s32 d;
-                body->target69C = body->home694;
-                SceneActorTerrain_Subtract(&diff, &body->target69C, &actor->base.body.position);
-                distance = diff.x * diff.x + diff.z * diff.z;
-                {
-                    u8 *facing = &body->direction68E;
-                    body->flag625 = 1;
-                    d = Wrap(actor->base.tracking.heading - *facing);
-                }
-                if (d < 0)
-                    d = -d;
-                if (d <= 15 && distance <= 0xFFFE && body->pushSpeed > 199) {
-                    Golem_Recover(body);
-                    return;
-                }
-                {
-                    u32 facing = body->direction68E;
-                    s32 a = Wrap(Golem_DifferenceHeading(&diff) - facing);
-                    a = a < 0 ? -a : a;
-                    if (a <= 15) {
-                        u32 cell = SceneActorChase_CellAt(&body->target69C);
-                        u32 height = *SceneActorTerrain_GetCell(cell) & 15;
-                        u32 direction = ((body->direction68E + 0x20) & 0xFF) >> 6;
-                        if (!SceneActorTerrain_CompareNeighborHeight(cell, height, direction))
-                            Skeleton_StepPosition(&body->target69C, direction);
-                        Golem_AlignChargeTarget(body);
-                    } else if ((u32)(a - 0x34) <= 0x18)
-                        Golem_AlignChargeTarget(body);
-                }
-                if (Golem_TurnGap(body->savedDirection690, &body->direction68E) > 31) {
-                    Golem_TurnAway(body);
-                    return;
-                }
-                SceneActorTerrain_Subtract(&diff, &actor->base.tracking.target->position,
-                                           &actor->base.body.position);
-                distance = diff.x * diff.x + diff.z * diff.z;
-                if (distance <= 0xFFFE && body->pushSpeed > 199) {
-                    if (SceneActorChase_Test(gEngineFlags, 0x4800)) {
-                        struct SceneActorChaseTarget *partner = actor->base.tracking.target;
-                        s32 index;
-                        if (!partner)
-                            goto recover;
-                        index = SceneActorChase_PlayerSlot(partner);
-                        if (index < 0)
-                            goto recover;
-                        if (IsDazzled(gPlayers[index]))
-                            goto recover;
-                        body->charge688 = 400;
-                    } else {
-                        if (IsDazzled(gPlayers[0]))
-                            goto recover;
-                        body->charge688 = 400;
-                    }
-                }
-            recover:
+    if ((*(u16 *)route & 4)) {
+        if (Actor_StepTowardTargetAxis(actor, route, 24, 24, body->pushSpeed, 0)) {
+            s32 distance;
+            s32 d;
+            body->target69C = body->home694;
+            SceneActorTerrain_Subtract(&diff, &body->target69C, &actor->base.body.position);
+            distance = diff.x * diff.x + diff.z * diff.z;
+            {
+                u8 *facing = &body->direction68E;
+                body->flag625 = 1;
+                d = Wrap(actor->base.tracking.heading - *facing);
+            }
+            if (d < 0)
+                d = -d;
+            if (d <= 15 && distance <= 0xFFFE && body->pushSpeed > 199) {
                 Golem_Recover(body);
                 return;
             }
+            {
+                u32 facing = body->direction68E;
+                s32 a = Wrap(Golem_DifferenceHeading(&diff) - facing);
+                a = a < 0 ? -a : a;
+                if (a <= 15) {
+                    u32 cell = SceneActorChase_CellAt(&body->target69C);
+                    u32 height = *SceneActorTerrain_GetCell(cell) & 15;
+                    u32 direction = ((body->direction68E + 0x20) & 0xFF) >> 6;
+                    if (!SceneActorTerrain_CompareNeighborHeight(cell, height, direction))
+                        Skeleton_StepPosition(&body->target69C, direction);
+                    Golem_AlignChargeTarget(body);
+                } else if ((u32)(a - 0x34) <= 0x18)
+                    Golem_AlignChargeTarget(body);
+            }
+            if (Golem_TurnGap(body->savedDirection690, &body->direction68E) > 31) {
+                Golem_TurnAway(body);
+                return;
+            }
+            SceneActorTerrain_Subtract(&diff, &actor->base.tracking.target->position,
+                                       &actor->base.body.position);
+            distance = diff.x * diff.x + diff.z * diff.z;
+            if (distance <= 0xFFFE && body->pushSpeed > 199) {
+                if (SceneActorChase_Test(gEngineFlags, 0x4800)) {
+                    struct SceneActorChaseTarget *partner = actor->base.tracking.target;
+                    s32 index;
+                    if (!partner)
+                        goto recover;
+                    index = SceneActorChase_PlayerSlot(partner);
+                    if (index < 0)
+                        goto recover;
+                    if ((SceneActorChase_Bits32(&gPlayers[index]->statusFlags, 0x20000)))
+                        goto recover;
+                    body->charge688 = 400;
+                } else {
+                    if ((SceneActorChase_Bits32(&gPlayers[0]->statusFlags, 0x20000)))
+                        goto recover;
+                    body->charge688 = 400;
+                }
+            }
+        recover:
+            Golem_Recover(body);
+            return;
+        }
+        Golem_Retarget(actor, body);
+        if (Golem_TurnGap(body->savedDirection690, &body->direction68E) > 31) {
+            Golem_TurnAway(body);
+            return;
+        }
+    } else {
+        if (Actor_StepTowardTargetAxis(actor, route, 24, 24, body->pushSpeed, 0)) {
+            body->target69C = body->home694;
+            Golem_AlignChargeTarget(body);
+        } else
             Golem_Retarget(actor, body);
-            if (Golem_TurnGap(body->savedDirection690, &body->direction68E) > 31) {
-                Golem_TurnAway(body);
-                return;
-            }
-        } else {
-            if (Actor_StepTowardTargetAxis(actor, route, 24, 24, body->pushSpeed, 0)) {
-                body->target69C = body->home694;
-                Golem_AlignChargeTarget(body);
-            } else
-                Golem_Retarget(actor, body);
-            if (Golem_TurnGap(body->savedDirection690, &body->direction68E) > 31) {
-                Golem_TurnAway(body);
-                return;
-            }
+        if (Golem_TurnGap(body->savedDirection690, &body->direction68E) > 31) {
+            Golem_TurnAway(body);
+            return;
         }
     }
     if (body->routeDelay > 0)
@@ -331,10 +328,7 @@ route:
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     SceneActorChase_SelectState(actor, 3, 1, 0);
     SceneActorChase_ResetStateEntry(actor);
-    {
-        void *target = SceneActorReaction_RestoreAfterDelay;
-        SceneActorChase_SetControl(actor, target, 0xE);
-    }
+    SceneActorChase_SetControl(actor, SceneActorReaction_RestoreAfterDelay, 0xE);
     {
         u16 *flags = SceneActorChase_MotionFlagsOf(actor);
         s32 mask = ~0x100;
@@ -351,7 +345,7 @@ route:
         actor->base.field2C2 = 0x40;
         SetCommand((void *)&group->saved, actor->base.onAlternateEntry, 7, 60);
         SceneActorChase_SnapToRoute(group->destination, &group->homeRoute);
-        (group->destination)->pad = 1;
+        group->destination->pad = 1;
         if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,
                                       group->destination)) {
             Callback_InvokeActor(actor, group->fallback);
