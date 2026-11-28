@@ -480,3 +480,6 @@ src/scene/actor/reaction/SceneActorReaction_ApplyAreaDamage.c	SceneActorReaction
 src/scene/actor/reaction/SceneActorReaction_ApplyStaggerDamage.c	SceneActorReaction_ApplyStaggerDamage	contrived	contrived	6	partial: mask-first locals and halfword flag wrappers stay; plain operators load the field first
 src/scene/actor/reaction/SceneActorReaction_ApplyCategoryDamage.c	SceneActorReaction_ApplyCategoryDamage	contrived	contrived	6	partial: mask-first locals and halfword flag wrappers stay; plain operators load the field first
 src/scene/actor/reaction/SceneActorReaction_EndHitCheckDefeat.c	SceneActorReaction_EndHitCheckDefeat	contrived	contrived	6	partial: mask-first locals and halfword flag wrappers stay; plain operators load the field first
+src/scene/actor/reaction/SceneActorBehavior_DispatchFlaggedCategory.c	SceneActorBehavior_DispatchFlaggedCategory	natural	natural	0	-
+src/scene/actor/reaction/SceneActorPlacement_BeginDestinationJump.c	SceneActorPlacement_BeginDestinationJump	natural	natural	0	-
+src/scene/actor/reaction/SceneActorReaction_ApplyLinkedAreaDamage.c	SceneActorReaction_ApplyLinkedAreaDamage	contrived	contrived	6	partial: link/plain gain branches keep duplicate stores and mask locals stay
