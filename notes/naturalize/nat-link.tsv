@@ -40,3 +40,4 @@ src/link/lobby/sub_0810F254.c	sub_0810F268	contrived	natural	1
 src/link/lobby/sub_0810F254.c	sub_0810F2B8	contrived	natural	1	
 src/link/lobby/SceneTask_UpdateTextDelay.c	SceneTask_UpdateTextDelay	contrived	natural	1	
 src/link/lobby/RecordMenu_UpdateSelection.c	RecordMenu_UpdateSelection	contrived	natural	2	
+src/link/lobby/RecordMenu_UpdateRecords.c	RecordMenu_UpdateRecords	contrived	natural	1	
