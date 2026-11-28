@@ -61,3 +61,4 @@ src/engine/math/ScalarApproach_SixteenthAngle.c	ScalarApproach_SixteenthAngle	na
 src/engine/math/ScalarApproach_ApplyAngleProfile.c	ScalarApproach_ApplyAngleProfile	minor	natural	1	
 src/engine/math/ScalarApproach_StepHalfArray.c	ScalarApproach_StepHalfArray	contrived	natural	1	
 src/engine/math/ScalarApproach_QuarterArray.c	ScalarApproach_QuarterArray	minor	natural	1	
+src/engine/math/ScalarApproach_EighthArray.c	ScalarApproach_EighthArray	minor	natural	1	
