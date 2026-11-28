@@ -449,3 +449,15 @@ src/system/clock/Clock_CheckRtcDate.c	Clock_CheckRtcDate	contrived	natural	1
 src/system/clock/Clock_IsEarlyMorning.c	Clock_IsEarlyMorning	minor	natural	1	
 src/system/clock/sub_08229180.c	sub_08229180	minor	natural	1	
 src/system/clock/Clock_ReadValidatedRtcDateTime.c	Clock_ReadValidatedRtcDateTime	contrived	natural	1	
+src/system/clock/SunClock_SetDateTime.c	SunClock_SetDateTime	natural	natural		
+src/system/clock/Clock_SyncFromRtc.c	Clock_SyncFromRtc	natural	natural		
+src/system/clock/Clock_CheckRtcStatus.c	Clock_CheckRtcStatus	minor	minor	3	probe keeps the byte shifted to the top so the unused power-failure branch survives
+src/system/clock/SunClock_GetBaseHour.c	SunClock_GetBaseHour	natural	natural		
+src/system/clock/SunClock_GetBaseMinute.c	SunClock_GetBaseMinute	natural	natural		
+src/system/clock/SunClock_GetSecond.c	SunClock_GetSecond	natural	natural		
+src/system/clock/SunClock_SetMoonAge.c	SunClock_SetMoonAge	natural	natural		
+src/system/clock/Clock_RunReservedHook.c	Clock_RunReservedHook	natural	natural		
+src/system/clock/SunClock_RunReservedHook.c	SunClock_RunReservedHook	natural	natural		
+src/system/clock/SunClock_RunReservedMoonHook.c	SunClock_RunReservedMoonHook	natural	natural		
+src/system/clock/SunClock_GetPhase.c	SunClock_GetPhase	contrived	contrived	0	window macros and do/while(0) presets raise the result variable priority; left as is
+src/system/clock/Time_CalculateSolarRiseTransitSet.c	Time_CalculateSolarRiseTransitSet	contrived	minor	1	one block around the transit values keeps the double stack slots in order
