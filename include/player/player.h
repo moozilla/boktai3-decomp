@@ -301,7 +301,8 @@ struct Player {
     u8 actionPhase488, actionActive489;
     u8 unk48A[2];
     u8 movementVelocityLocked; /* 0x48C: suppresses velocity recalculation */
-    u8 unk48D[3];
+    u8 unk48D[2];
+    u8 lockedFacing; /* 0x48F: facing used while movementVelocityLocked */
     struct SceneVec lockedVelocity; /* 0x490: velocity kept while movementVelocityLocked */
     struct SceneVec
         resourceStationPosition; /* 0x498: copied by Player_BeginResourceStationInteraction */

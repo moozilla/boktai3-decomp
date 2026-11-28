@@ -14,7 +14,7 @@ s32 Player_SelectLockedTurnDirection(struct Player *player)
 {
     union TerrainProbePosition probe;
 
-    switch (player->unk48D[2]) {
+    switch (player->lockedFacing) {
         case 0:
             probe.position = player->position;
             probe.position.x -= 30;

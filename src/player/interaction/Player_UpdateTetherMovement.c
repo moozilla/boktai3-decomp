@@ -6,14 +6,6 @@
 #include "objects/dungeon_prop/orbit_motion.h"
 
 // confidence=low: updates movement and step cues while constraining the tether target.
-struct PlayerMovementCueFields {
-    u8 unknown0[0x292];
-    u16 normalAction;
-};
-struct PlayerLockedFacingFields {
-    u8 unknown0[0x48F];
-    u8 lockedFacing;
-};
 extern const s16 gUnk_086149C4[];
 s32 Player_ConsumeStateEntry(void *);
 void ActorSequence_Begin(void *, s32, s32);
@@ -66,7 +58,7 @@ void Player_UpdateTetherMovement(struct Player *p)
     if ((s16)p->directionHistory[0] < 0 || p->cameraOffsetActive != 0) {
         animation = ActorVariant_GetTableValue(p->actionMode, 16);
         if (p->movementVelocityLocked)
-            angle = ((((struct PlayerLockedFacingFields *)p)->lockedFacing + 1) & 7) << 5;
+            angle = ((p->lockedFacing + 1) & 7) << 5;
         else
             angle = ((p->facing + 1) & 7) << 5;
         cosine = gUnk_086149C4[(angle + 64) & 255];
@@ -81,7 +73,7 @@ void Player_UpdateTetherMovement(struct Player *p)
         Player_UpdateFacingSide(p);
         if (p->movementVelocityLocked) {
             rate = 32;
-            angle = ((((struct PlayerLockedFacingFields *)p)->lockedFacing + 1) & 7) << 5;
+            angle = ((p->lockedFacing + 1) & 7) << 5;
             cosine = gUnk_086149C4[(angle + 64) & 255];
             sine = gUnk_086149C4[angle & 255];
         } else {
@@ -125,9 +117,7 @@ void Player_UpdateTetherMovement(struct Player *p)
                 Player_PlayPositionEffect(p, &p->position, 1, 1, &p->position, 0, 0x163);
             else
                 Player_PlayPositionEffect(p, &p->position, 1, 1, &p->position, 0, 0x162);
-        } else if (Player_IsNormalActionAllowed(
-                       ((struct PlayerMovementCueFields *)p)->normalAction) &&
-                   !(p && modeFive(p))) {
+        } else if (Player_IsNormalActionAllowed(p->movementStatus) && !(p && modeFive(p))) {
             if (!p->animation.frameIndex)
                 Player_PlayPositionEffect(p, &p->position, 1, 1, &p->position, 0, 0x194);
             else

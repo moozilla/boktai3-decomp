@@ -618,3 +618,4 @@ src/player/interaction/Player_CalculateMovementSpeed.c	Player_CalculateMovementS
 src/player/interaction/Player_ConstrainTetherTarget.c	Player_ConstrainTetherTarget	contrived	minor	5	u16 cast on the final angle
 src/player/interaction/Player_TestTetherTarget.c	Player_TestTetherTarget	minor	natural	1	-
 src/player/interaction/Player_InvokeStoredCallback.c	Player_InvokeStoredCallback	contrived	natural	1	-
+src/player/interaction/Player_UpdateTetherMovement.c	Player_UpdateTetherMovement	contrived	contrived	3	FlagMovement/PlayerRef and modeFive helpers plus goto to the animation tail fix the branch layout and tests
