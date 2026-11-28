@@ -1,30 +1,24 @@
 #include "global.h"
-#include "scene/collision/packed_contact_halfwords.h"
-#include "scene/collision/packed_collider_extents.h"
-void Collider_Init(u8 *, u16, u32, u32, u32, struct PackedColliderExtents *,
-                   struct PackedColliderExtents *);
-void Collider_SetCallback(u8 *, void (*)(void), u8 *);
-void Collider_SetPosition(u8 *, u8 *, u32);
-s32 Collider_Refresh(u8 *);
+#include "monsters/garmr_statue.h"
+#include "scene/collision/contact_actor.h"
+#include "engine/engine.h"
 void GarmrStatue_ApplyHitReaction(void);
-void Collider_SetBodyProperties(void *, u32, u32, u32);
-struct Q {
-    u8 pad[6];
-    u16 flags;
-};
-void GarmrStatue_InitCollider(u8 *p)
+
+void GarmrStatue_InitCollider(struct GarmrStatue *p)
 {
-    struct PackedColliderExtents a, b;
-    u8 *q = p + 0x6c;
-    a.xy.lo = 100;
-    a.xy.hi = 120;
-    a.zAndPad.lo = 100;
-    *(u32 *)&b.xy = 0x780000;
-    *(u32 *)&b.zAndPad &= 0xffff0000;
-    Collider_Init(q, 0, 0x5009, 0, 0x10, &a, &b);
-    Collider_SetPosition(q, p + 0x40, 0);
-    Collider_SetCallback(q, GarmrStatue_ApplyHitReaction, p);
-    Collider_SetBodyProperties(q, 0, *(u16 *)(p + 0x138), *(u16 *)(p + 0x13a));
-    Collider_Refresh(q);
-    ((struct Q *)q)->flags |= 4;
+    struct ContactPackedVector size, offset;
+    struct ContactCollider *collider = &p->collider;
+
+    size.x = 100;
+    size.y = 120;
+    size.z = 100;
+    offset.x = 0;
+    offset.y = 120;
+    offset.z = 0;
+    Collider_Init(collider, 0, 0x5009, 0, 0x10, &size, &offset);
+    Collider_SetPosition(collider, &p->sprite.display.position, 0);
+    Collider_SetCallback(collider, GarmrStatue_ApplyHitReaction, p);
+    Collider_SetBodyProperties(collider, 0, (u16)p->bodyReactionFlags, (u16)p->sparkMask);
+    Collider_Refresh(collider);
+    collider->flags |= 4;
 }
