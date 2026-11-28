@@ -23,24 +23,17 @@ struct Hresvelgr {
 void Collision_CalculateDamageResponse(void *, void *);
 void PlayerStats_AddContactHundredths(void *, void *, u32);
 s32 Math_Atan2(s32, s32);
-static inline u32 testReaction(u32 *flags, u32 mask)
-{
-    return *flags & mask;
-}
 void Hresvelgr_OnBodyContact(struct ContactCollider *a, struct ContactCollider *b,
                              struct Hresvelgr *actor)
 {
     struct Hresvelgr *saved = actor;
     if (actor->contactBlocked == 0) {
         s32 magnitude, shift;
+        u32 mask;
         Collision_CalculateDamageResponse(a, b);
         magnitude = b->cost;
         shift = actor->contactShift;
-        if (magnitude >= 0)
-            magnitude >>= shift;
-        else
-            magnitude = -(-magnitude >> shift);
-        actor->contactMagnitude = magnitude;
+        actor->contactMagnitude = magnitude >= 0 ? magnitude >> shift : -(-magnitude >> shift);
         actor->responseFlags = a->reactionFlags;
         if (SceneActorTurn_Flags(&a->flags, 0x100))
             actor->contactDirection = a->direction;
@@ -55,7 +48,8 @@ void Hresvelgr_OnBodyContact(struct ContactCollider *a, struct ContactCollider *
             saved->contactFlags = flags;
         }
         PlayerStats_AddContactHundredths(a, b, saved->contactCue);
-        if (testReaction(&a->reactionFlags, 0x20))
+        mask = 0x20;
+        if (a->reactionFlags & mask)
             actor->contactSpecial = 1;
         actor->contactPending = 1;
         actor->responseValue = a->responseValue;

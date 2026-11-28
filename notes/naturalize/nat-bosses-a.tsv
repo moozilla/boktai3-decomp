@@ -230,3 +230,4 @@ src/bosses/hresvelgr/Hresvelgr_SetPartApproachMotion.c	Hresvelgr_SetPartApproach
 src/bosses/hresvelgr/Hresvelgr_SelectPlayerAnimation.c	Hresvelgr_SelectPlayerAnimation	minor	natural	1	
 src/bosses/hresvelgr/Collider_IgnoreCallback.c	Collider_IgnoreCallback	natural	natural	0	
 src/bosses/hresvelgr/Hresvelgr_InitializeCollider.c	Hresvelgr_InitializeCollider	minor	natural	1	
+src/bosses/hresvelgr/Hresvelgr_OnBodyContact.c	Hresvelgr_OnBodyContact	contrived	minor	30	saved actor alias and a mask local stay (the ROM masks the 0x20 register)
