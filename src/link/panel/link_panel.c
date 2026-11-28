@@ -99,36 +99,25 @@ void LinkPanel_InitMessageDisplay(struct LinkPanel *unused)
 
 s32 LinkPanel_GetConnectionStatus(struct LinkPanel *panel)
 {
-    s32 state, result, status;
-    if (panel->role < 0) {
-    two:
+    s32 state;
+
+    if (panel->role < 0)
         return 2;
-    }
     state = LinkSession_GetSessionState();
     if ((u32)(state - 5) <= 1)
         return 4;
     if (connected() && state == 8)
         return 6;
-    status = peerStatus(panel->role);
-    if (status == 2)
-        goto two;
-    if (status <= 2)
-        goto lower;
-    if (status == 3)
-        goto three;
-    goto bad;
-lower:
-    if (status < 0)
-        goto bad;
-    result = 1;
-    goto end;
-three:
-    result = 3;
-    goto end;
-bad:
-    result = -1;
-end:
-    return result;
+    switch (peerStatus(panel->role)) {
+        case 0:
+        case 1:
+            return 1;
+        case 2:
+            return 2;
+        case 3:
+            return 3;
+    }
+    return -1;
 }
 
 void LinkPanel_UpdateStatusMessage(struct LinkPanel *panel)

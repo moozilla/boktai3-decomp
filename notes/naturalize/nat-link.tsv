@@ -107,3 +107,7 @@ src/link/panel/LinkPanelSlots_ShowSlotReadyFrame.c	LinkPanelSlots_ShowSlotReadyF
 src/link/panel/LinkPanelSlots_ShowSlotDefaultFrame.c	LinkPanelSlots_ShowSlotDefaultFrame	minor	natural	1	
 src/link/panel/LinkPanelSlots_HideAnimations.c	LinkPanelSlots_HideAnimations	natural	natural	0	
 src/link/panel/sub_0810C128.c	sub_0810C128	minor	natural	1	
+src/link/panel/link_panel.c	LinkPanel_UpdateAnimations	contrived	contrived	6	gotos stay: structured forms place the timer increment before the default-frame call or fail to share it
+src/link/panel/link_panel.c	LinkPanel_UpdateLastEntry	natural	natural	0	
+src/link/panel/link_panel.c	LinkPanel_InitMessageDisplay	natural	natural	0	
+src/link/panel/link_panel.c	LinkPanel_GetConnectionStatus	contrived	natural	3	
