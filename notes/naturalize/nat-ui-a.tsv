@@ -593,3 +593,4 @@ src/ui/hud/display/SceneHud_DrawSlotMarkers.c	SceneHud_DrawSlotMarkers	fudged	na
 src/ui/hud/display/SceneHud_DrawSlotMeter.c	SceneHud_DrawSlotMeter	fudged	natural	1	
 src/ui/hud/display/Hud_RefreshPlayerBinding.c	Hud_RefreshPlayerBinding	fudged	natural	3	slot local before indexing gPlayers (load order)
 src/ui/hud/display/Hud_Destroy.c	Hud_Destroy	fudged	natural	1	
+src/ui/hud/display/Hud_UpdateWithCallback.c	Hud_UpdateWithCallback	fudged	natural	3	player local before storing the action owner
