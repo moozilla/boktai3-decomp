@@ -351,8 +351,7 @@ void LinkRecordPanel_UpdateExit(struct LinkRecordPanel *owner)
 
 void LinkRecordPanel_UpdateDelay(struct LinkRecordPanel *owner)
 {
-    int i;
-    struct CharacterPreviewModel *panel;
+    s32 i;
     if (owner->entering) {
         Bg_SetLayerMap(3, owner->backgroundResource, 2);
         BgGfx_LoadTilemapSimple(3, 0, 0, 0, 0);
@@ -360,13 +359,8 @@ void LinkRecordPanel_UpdateDelay(struct LinkRecordPanel *owner)
         owner->timer = 0;
         owner->entering = 0;
     }
-    i = 0;
-    panel = &owner->previews[0].model;
-    do {
-        CharacterModel_UpdatePairedAnimations(panel, i);
-        panel = (struct CharacterPreviewModel *)((u8 *)panel + sizeof(owner->previews[0]));
-        i++;
-    } while (i < 2);
+    for (i = 0; i <= 1; i++)
+        CharacterModel_UpdatePairedAnimations(&owner->previews[i].model, i);
     PaletteFade_CycleMenuColors(&owner->paletteCycle);
     if (owner->timer < 240) {
         owner->timer++;
