@@ -142,3 +142,4 @@ src/player/attack/Player_SelectNearestMotionTarget.c	Player_SelectNearestMotionT
 src/player/attack/Player_OnTargetMotionExit.c	Player_OnTargetMotionExit	contrived	natural	3	-
 src/player/attack/Player_UpdateTargetMotion.c	Player_UpdateTargetMotion	contrived	contrived	34	animation macros (ternary/direct forms change codegen), count bitfield, relative-origin random sample, pointer-staged velocity: each plain form changes register allocation
 src/player/attack/Player_FindNearestVisibleTarget.c	Player_FindNearestVisibleTarget	contrived	minor	1	ProjectPosition keeps its sum copy; TargetPosition view casts
+src/player/attack/Player_OnGrabMotionExit.c	Player_OnGrabMotionExit	contrived	natural	1	-

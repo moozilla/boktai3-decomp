@@ -1,6 +1,7 @@
 #include "global.h"
-void Player_OnGrabMotionExit(u8 *p)
+#include "player/player.h"
+
+void Player_OnGrabMotionExit(struct Player *p)
 {
-    u32 *q = (u32 *)(p + 0xec);
-    q[2] |= 1;
+    AnimSprite_Hide(&p->secondaryAnimation);
 }
