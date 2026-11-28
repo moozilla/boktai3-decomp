@@ -524,3 +524,7 @@ src/ui/town/shop/Shop_UpdateDisplay.c	Shop_UpdateDisplay	minor	minor	2	panel vie
 src/ui/town/shop/Shop_BuildUnlockedEquipmentCatalog.c	Shop_BuildUnlockedEquipmentCatalog	minor	minor	5	u8 view keeps the byte store of -1
 src/ui/town/shop/Shop_BuildUnlockedItemCatalog.c	Shop_BuildUnlockedItemCatalog	minor	minor	2	u8 view keeps the byte store of -1
 src/ui/town/shop/Shop_InitPanel.c	Shop_InitPanel	contrived	minor	10	panel view casts
+src/ui/town/shop/Shop_InitCatalogBackground.c	Shop_InitCatalogBackground	minor	minor	0	catalog view cast
+src/ui/town/shop/Shop_InitMessageBox.c	Shop_InitMessageBox	natural	natural	0	
+src/ui/town/shop/Shop_ReadScriptCatalog.c	Shop_ReadScriptCatalog	minor	minor	3	pointer-sum subscripts: p->catalog[n] changes the address order and strength reduction
+src/ui/town/shop/Shop_TickController.c	Shop_TickController	minor	natural	1	
