@@ -402,19 +402,18 @@ s32 GameOver_Initialize(struct GameOver *panel)
 
 void *GameOver_Create(void)
 {
-    void *r = gGameOver;
-    void *q;
-    if (r == 0) {
-        q = Task_Create(0xb, 0x354);
-        if (q != 0) {
-            Task_SetCallbacks(q, (void (*)(void *))GameOver_OnUpdate,
-                              (void (*)(void *))GameOver_OnDestroy);
-            if (GameOver_Initialize(q) < 0) {
-                Task_Kill(q);
-                return 0;
-            }
+    struct GameOver *panel;
+
+    if (gGameOver)
+        return gGameOver;
+    panel = Task_Create(11, sizeof(struct GameOver));
+    if (panel) {
+        Task_SetCallbacks(panel, (void (*)(void *))GameOver_OnUpdate,
+                          (void (*)(void *))GameOver_OnDestroy);
+        if (GameOver_Initialize(panel) < 0) {
+            Task_Kill(panel);
+            return 0;
         }
-        r = q;
     }
-    return r;
+    return panel;
 }
