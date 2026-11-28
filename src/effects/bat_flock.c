@@ -572,6 +572,7 @@ void BatFlockBat_ChasePlayer(struct GroupObjects *m, struct GroupPiece *p, int i
     struct ContactPosition *target;
     int dx, dz;
     int active;
+
     if (m->actor)
         p->target = m->actor->position;
     active = p->active;
@@ -579,35 +580,33 @@ void BatFlockBat_ChasePlayer(struct GroupObjects *m, struct GroupPiece *p, int i
     target = &p->target;
     if (active) {
         const u16 *table;
+
         p->active = 0;
-        p->direction = Math_Atan2(target->x - position->x, target->z - position->z);
+        p->direction = BatFlock_AngleTo(position, target);
         table = gRandomTable;
         p->direction += (randomWith(table) & 31) - 16;
         p->speed = (randomWith(table) & 15) + 16;
     }
     if (p->speed == 0) {
         const u16 *table;
-        p->direction = Math_Atan2(target->x - position->x, target->z - position->z);
+
+        p->direction = BatFlock_AngleTo(position, target);
         table = gRandomTable;
         p->direction += (randomWith(table) & 15) - 8;
         p->speed = (randomWith(table) & 15) + 16;
-    } else
+    } else {
         p->speed--;
+    }
     dx = p->target.x - p->position.x;
     dz = target->z - position->z;
-    if (dx * dx + dz * dz <= 0xFFF) {
+    if (dx * dx + dz * dz < 64 * 64) {
         BatFlockBat_SetState(p, 4);
-    } else {
-        polar(&delta, p->direction, p->duration);
-        {
-            struct ContactPosition *src = &delta;
-            p->position.x += delta.x;
-            position->y += src->y;
-            position->z += src->z;
-        }
-        BatFlockBat_SetFacingAnim(m, p, 0);
-        p->timer++;
+        return;
     }
+    polar(&delta, p->direction, p->duration);
+    addPositionAt(&p->position, position, &delta);
+    BatFlockBat_SetFacingAnim(m, p, 0);
+    p->timer++;
 }
 
 void BatFlockBat_AdvanceWithOffset(struct GroupObjects *m, struct GroupPiece *p, int index)
