@@ -194,3 +194,4 @@ src/bosses/hresvelgr/Math_UnwrapAngleNearReference.c	Math_UnwrapAngleNearReferen
 src/bosses/hresvelgr/Math_ClampAroundCenter.c	Math_ClampAroundCenter	contrived	minor	3	keeps limit assigned in the condition
 src/bosses/hresvelgr/Math_ClampAngleAroundReference.c	Math_ClampAngleAroundReference	contrived	minor	2	per-file inline helpers stay (original code is shared between files)
 src/bosses/hresvelgr/Math_ApproachAngleByHalf.c	Math_ApproachAngleByHalf	minor	natural	1	
+src/bosses/hresvelgr/Math_ApproachAngleByQuarter.c	Math_ApproachAngleByQuarter	minor	natural	1	
