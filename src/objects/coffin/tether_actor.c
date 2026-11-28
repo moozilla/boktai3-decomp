@@ -2225,19 +2225,16 @@ void TetherActor_UpdateFollowingState(struct TetherActor *actor)
     else
         TetherActor_SetEntry(actor, 0);
     if (!(gEngineFlags & 512) && actor->kind != 9) {
-        u16 *lock = &actor->interactionLock;
-        if (*lock)
+        if (actor->interactionLock) {
             TetherActor_UpdateLockedShake(actor);
-        else {
-            u32 ready = actor->chargeReady;
-            if (ready)
-                TetherActor_UpdateShake(actor);
-            else if (actor->blendRequested) {
-                actor->secondaryValue = actor->secondaryMaximum;
-                actor->currentValue = actor->maximumValue;
-                *lock = ready;
-            } else
-                TetherActor_UpdateSecondaryLock(actor);
+        } else if (actor->chargeReady) {
+            TetherActor_UpdateShake(actor);
+        } else if (actor->blendRequested) {
+            actor->secondaryValue = actor->secondaryMaximum;
+            actor->currentValue = actor->maximumValue;
+            actor->interactionLock = 0;
+        } else {
+            TetherActor_UpdateSecondaryLock(actor);
         }
     }
 }
