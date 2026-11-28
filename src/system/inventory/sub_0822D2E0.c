@@ -24,7 +24,7 @@ void sub_0822D2E0(s32 amount)
         s32 value;
         if (id < 0 || gUnk_08E61280[id].agingLimit == 0)
             continue;
-        if ((*(u8 **)gPlayers) && WordFlags_Test((u32 *)((*(u8 **)gPlayers) + 0x444), 0x100000))
+        if (gPlayers[0] && WordFlags_Test(&gPlayers[0]->statBonusFlags, 0x100000))
             amount *= 2;
         value = Inventory_GetItemStateValue(i) + amount;
         if (value > 0x7FFF)
