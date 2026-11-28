@@ -40,3 +40,8 @@ src/engine/message_queue.c	MessageQueue_SwapBuffers	contrived	natural	3
 src/engine/message_queue.c	MessageQueue_GetMessagesById	contrived	minor	16	if + do/while for the count: a plain while lets jump2 cross-jump the return
 src/engine/message_queue.c	MessageQueue_PostMessage	natural	natural	0	
 src/engine/iwram_code.c	Palette_CacheObjectBankArm	contrived	natural	3	
+src/engine/iwram_code.c	sub_08000430	contrived	contrived	1	ARM giant: tile-cursor byte-offset aliases, reqs pointer through IwAllocTiles and `u8 *b = 0` steer ARM allocation; plain gObjTileCursor/gUnk_02039000 differs in 126 insns
+src/engine/iwram_code.c	sub_08000E90	natural	natural	1	IwProject helper keeps sum = scaledSum (50 insns differ without it)
+src/engine/iwram_code.c	sub_08001038	natural	natural	0	
+src/engine/iwram_code.c	sub_08001120	natural	natural	0	
+src/engine/iwram_code.c	sub_080012E0	natural	natural	0	
