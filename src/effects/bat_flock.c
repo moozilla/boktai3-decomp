@@ -751,15 +751,12 @@ int BatFlock_Initialize(struct GroupObjects *m, int id)
 {
     struct GroupPiece *p;
     int i;
+
     m->active = 0;
     m->actorId = 0;
     m->actor = 0;
     m->animation = ScriptProc_Start(0x922E, 0x5BB7);
-    {
-        void *first = gPaletteBankData + 0x5A60;
-        void *second = gPaletteBankData + 0x5AA0;
-        Palette_InterpolateBanks(m->palette, first, second, 64, 6);
-    }
+    BatFlock_BlendPalette(m, 64);
     p = m->pieces;
     for (i = 0; i < 16; i++, p++)
         BatFlockBat_Initialize(m, p, i);
