@@ -602,3 +602,4 @@ src/system/inventory/sub_0822DB2C.c	sub_0822DB2C	natural	natural	0
 src/system/inventory/RecordEntry_AddFromScript.c	RecordEntry_AddFromScript	minor	minor	1	list length kept in a local: the literal bound compiles differently
 src/system/inventory/Inventory_SetEntryFromScript.c	Inventory_SetEntryFromScript	natural	natural	0	
 src/system/inventory/Inventory_ContainsFromScript.c	Inventory_ContainsFromScript	natural	natural	0	
+src/system/inventory/Inventory_IsEquipmentAssigned.c	Inventory_IsEquipmentAssigned	contrived	natural	1	
