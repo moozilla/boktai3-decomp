@@ -244,7 +244,7 @@ void SceneTilemap_LoadLayoutFromScript(struct TilemapPanel *panel)
         for (panel->mapSize = 0; (value = Script_GetValue()) >= 0; panel->mapSize++)
             values[panel->mapSize] = value;
         length = panel->mapSize;
-        padding = 3 & length;
+        padding = length & 3;
         if (padding > 0) {
             padding = 4 - padding;
             allocationSize = length + padding;

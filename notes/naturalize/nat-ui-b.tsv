@@ -98,3 +98,4 @@ src/ui/save/save_menu.c	SaveMenu_Update	natural	natural	0
 src/ui/save/save_menu.c	SaveMenu_Destroy	natural	natural	0	
 src/ui/save/save_menu.c	SaveMenu_InitializeFromScript	natural	natural	0	
 src/ui/save/save_menu.c	SaveMenu_CreateFromScript	natural	natural	0	
+src/ui/save/scene_tilemap.c	SceneTilemap_LoadLayoutFromScript	minor	natural	2	-
