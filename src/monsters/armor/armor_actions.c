@@ -73,28 +73,26 @@ struct P {
     u32 x : 16, y : 16, z : 16, w : 16;
 };
 
-void Armor_UpdateFacingAction9(u8 *p)
+void Armor_UpdateFacingAction9(struct ArmorFacingAction6Actor *p)
 {
-    u8 *state = p + 0xb3d;
-    switch (*state) {
+    switch (p->b3d) {
         case 0: {
             struct P v;
-            u8 *actor = gGameState;
             s32 angle;
-            v.x = *(u16 *)(actor + 0x30);
-            v.y = *(u16 *)(actor + 0x32);
-            v.z = *(u16 *)(actor + 0x34);
-            angle = Math_Atan2((s16)v.x - *(s16 *)(p + 0x48), (s16)v.z - *(s16 *)(p + 0x4c));
+            v.x = *(u16 *)(gGameState + 0x30);
+            v.y = *(u16 *)(gGameState + 0x32);
+            v.z = *(u16 *)(gGameState + 0x34);
+            angle = Math_Atan2((s16)v.x - p->a48, (s16)v.z - p->a4c);
             angle = (angle + 0x20) & 0xc0;
-            if (p[0xb39] != angle)
+            if (p->b39 != angle)
                 ActorController_StartTurn(p, angle);
             else if (Armor_TryStartAction(p, 9))
-                *state = 1;
+                p->b3d = 1;
             break;
         }
         case 1:
-            if (p[0xb40] == 0xff)
-                *state = 0xff;
+            if (p->b40 == 0xff)
+                p->b3d = 0xff;
             break;
     }
 }
