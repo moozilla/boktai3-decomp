@@ -360,3 +360,8 @@ src/npc/otenko/Otenko_PlayAnimation12.c	Otenko_PlayAnimation12	contrived	minor	1
 src/npc/otenko/Otenko_UpdateRisingToTerrain.c	Otenko_UpdateRisingToTerrain	contrived	minor	1	u32 mask parked before the display flag OR
 src/npc/otenko/Otenko_UpdateDescendingDash.c	Otenko_UpdateDescendingDash	minor	minor	1	u32 mask parked before the display flag OR
 src/npc/otenko/Otenko_UpdateParticleDisappearance.c	Otenko_UpdateParticleDisappearance	contrived	contrived	5	u32 masks parked before the display flag ORs; callback local; graphics pointer for the palette override
+src/npc/otenko/sub_081CFB04.c	sub_081CFB04	natural	natural	0	
+src/npc/otenko/sub_081CFD3C.c	sub_081CFD3C	natural	natural	0	
+src/npc/otenko/sub_081CFD6C.c	sub_081CFD6C	natural	natural	0	
+src/npc/otenko/sub_081CFD84.c	sub_081CFD84	natural	natural	0	
+src/npc/otenko/Otenko_UpdateTurnInPlace.c	Otenko_UpdateTurnInPlace	contrived	natural	1	
