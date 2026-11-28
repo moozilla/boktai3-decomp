@@ -7,15 +7,7 @@ void Shop_ShowItemDescription(struct ShopPanel *panel)
         item = Inventory_GetItemId(panel->selection);
         frame = PauseDisplay_GetItemConditionFrame(panel->selection);
     } else if (panel->selection <= 23) {
-        {
-            s32 offset = panel->page * 8;
-            offset -= 16;
-            {
-                u32 selected = panel->selection;
-                offset += selected;
-            }
-            item = panel->catalog[offset];
-        }
+        item = panel->catalog[panel->selection - 16 + panel->page * 8];
         if (item >= 0) {
             u32 condition = gUnk_08E61280[item].conditionKey;
             frame = 395;
