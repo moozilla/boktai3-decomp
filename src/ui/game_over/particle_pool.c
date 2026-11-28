@@ -189,13 +189,10 @@ s32 ParticlePool_OnUpdate(struct ParticlePool *pool)
 
 s32 ParticlePool_OnDestroy(struct ParticlePool *pool)
 {
-    struct PoolParticle *particle = pool->particles;
-    s32 remaining = 15;
-    do {
-        Effect_Remove(particle);
-        particle++;
-        remaining--;
-    } while (remaining >= 0);
+    s32 i;
+
+    for (i = 0; i < 16; i++)
+        Effect_Remove(&pool->particles[i]);
     return 0;
 }
 

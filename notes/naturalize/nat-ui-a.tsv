@@ -391,3 +391,4 @@ src/ui/game_over/particle_pool.c	SpiralParticles_UpdateParticle	fudged	natural	6
 src/ui/game_over/particle_pool.c	ParticlePool_UpdateLinearParticle	fudged	natural	1	
 src/ui/game_over/particle_pool.c	ParticlePool_SpawnJitteredParticle	fudged	partial	36	random table block stays (halfword-built table pointer, mask local, cursor pointer, ReadCursor): plain RANDOM_NEXT draws allocate table/cursor/index to other registers
 src/ui/game_over/particle_pool.c	SpriteParticles_UpdateEntries	fudged	natural	17	
+src/ui/game_over/particle_pool.c	ParticlePool_OnDestroy	fudged	natural	1	
