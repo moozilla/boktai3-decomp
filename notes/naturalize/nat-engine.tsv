@@ -618,3 +618,4 @@ src/system/inventory/Inventory_CanAssignEquipment.c	Inventory_CanAssignEquipment
 src/system/save/Palette_GetStateBlendIndices.c	Palette_GetStateBlendIndices	contrived	natural	1	
 src/system/save/sub_0822797C.c	sub_0822797C	minor	natural	1	
 src/system/save/Background_ClearVisibilityFlagFromScript.c	Background_ClearVisibilityFlagFromScript	contrived	natural	1	
+src/system/save/Background_SetVisibilityFlagFromScript.c	Background_SetVisibilityFlagFromScript	contrived	natural	1	
