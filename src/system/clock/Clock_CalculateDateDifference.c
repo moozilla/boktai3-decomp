@@ -18,18 +18,12 @@ s32 Clock_CalculateDateDifference(s32 year, s32 month, s32 day, s32 otherYear, s
     s32 total = yearDays(year);
     s32 otherTotal;
     s32 i;
-    i = 1;
-    while (i < month) {
+    for (i = 1; i < month; i++)
         total += Clock_DaysInMonth(year, i);
-        i++;
-    }
     total += day;
     otherTotal = yearDays(otherYear);
-    i = 1;
-    while (i < otherMonth) {
+    for (i = 1; i < otherMonth; i++)
         otherTotal += Clock_DaysInMonth(otherYear, i);
-        i++;
-    }
     otherTotal += otherDay;
     return total - otherTotal;
 }
