@@ -204,3 +204,9 @@ src/link/player/Player_SmoothCameraAnchor.c	Player_SmoothCameraAnchor	contrived	
 src/link/player/Player_CanUseAction.c	Player_CanUseAction	contrived	natural	10	
 src/link/player/sub_0823B728.c	sub_0823B728	contrived	natural	1	
 src/link/player/LinkPlayer_ClampToRecoveryTerrainCell.c	LinkPlayer_ClampToRecoveryTerrainCell	minor	natural	1	
+src/link/player/LinkPlayer_BeginTerrainRecovery.c	LinkPlayer_BeginTerrainRecovery	contrived	contrived	3	mask local sequence stays: a single expression changes register allocation
+src/link/player/Player_IsFlaggedWithoutGlobalModifiers.c	Player_IsFlaggedWithoutGlobalModifiers	natural	natural	0	
+src/link/player/Player_IsFlaggedWithGlobalModifier10.c	Player_IsFlaggedWithGlobalModifier10	natural	natural	0	
+src/link/player/sub_0823B8C4.c	sub_0823B8C4	natural	natural	0	
+src/link/player/Player_IsFlaggedWithGlobalModifier08.c	Player_IsFlaggedWithGlobalModifier08	natural	natural	0	
+src/link/player/Player_IsTerrainStepBlocked.c	Player_IsTerrainStepBlocked	contrived	natural	8	
