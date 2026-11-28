@@ -38,7 +38,6 @@ ActorAttachment_CreateSpriteSlot(u32 frame, struct ContactPosition *anchor, void
     void *sequence;
     s32 xOffset, zOffset;
     u8 startFrame = frame;
-    u8 alternate;
     existing = gActorAttachmentManager;
     if (!existing) {
         manager = ActorAttachment_CreateManager();
@@ -62,11 +61,10 @@ ActorAttachment_CreateSpriteSlot(u32 frame, struct ContactPosition *anchor, void
     slot->position.z = z;
     slot->status[0] = 1;
     slot->timer = 10;
-    alternate = ActorAttachment_IsAlternateMode();
-    if (alternate)
+    if (ActorAttachment_IsAlternateMode())
         slot->resourceKind = 6;
     else
-        slot->resourceKind = alternate;
+        slot->resourceKind = 0;
     slot->active48 = 1;
     slot->anchor = anchor;
     slot->source = source;
