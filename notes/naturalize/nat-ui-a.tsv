@@ -357,3 +357,4 @@ src/ui/dialogue/text_window/TextWindowManager_OnUpdate.c	TextWindowManager_OnUpd
 src/ui/dialogue/text_window/TextWindowManager_OnDestroy.c	TextWindowManager_OnDestroy	fudged	natural	1	
 src/ui/dialogue/text_window/TextWindowManager_Init.c	TextWindowManager_Init	fudged	natural	2	
 src/ui/dialogue/text_window/TextWindowManager_Create.c	TextWindowManager_Create	fudged	natural	2	
+src/ui/dialogue/text_window/TextWindowManager_DestroyAllWindows.c	TextWindowManager_DestroyAllWindows	fudged	natural	1	
