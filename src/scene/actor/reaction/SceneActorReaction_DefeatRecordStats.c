@@ -99,10 +99,7 @@ u32 SceneActorReaction_DefeatRecordStats(struct ChaseActor *actor)
             u32 one = 1;
             link->flags |= one;
         }
-        {
-            void *control = actor->base.onDefeat;
-            SceneActorTerrain_InstallControl(actor, control, 17);
-        }
+        SceneActorTerrain_InstallControl(actor, actor->base.onDefeat, 17);
         SceneActorTerrain_EnterState(actor, 3, 0, 0);
         if (SceneActorChase_Test(gEngineFlags, 0x4800)) {
             Player_NotifyFirstSelectedSlot(actor->base.hitOwners, actor->base.hitAttributes);
@@ -125,7 +122,6 @@ u32 SceneActorReaction_DefeatRecordStats(struct ChaseActor *actor)
                 goto record;
         }
         {
-
             if (kind != 5 && kind != 7 && kind != 6) {
                 STAT_INC(0x87C);
                 STAT_INC(0x538);
@@ -200,7 +196,7 @@ u32 SceneActorReaction_DefeatRecordStats(struct ChaseActor *actor)
     record:
         if (!SceneActorChase_Test(Mask(flags2C0, 0x80), ~0))
             SceneActorRecord_RecordDefeat(actor);
-        ((struct ContactCollider *)collider)->flags |= 4;
+        collider->flags |= 4;
     done:
         return 1;
     }
