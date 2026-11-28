@@ -188,21 +188,11 @@ int Actor_SetFrontBackAnimation(struct SceneActor *actor, int a, int b, int stri
 {
     int direction, flip;
     if (actor->drawable.common.kind == 1) {
-        u32 facing = actor->facing8;
-        direction = 0;
-        if (facing == 4)
-            direction = stride;
-        flip = 0;
-        if (facing > 4)
-            flip = 1;
+        direction = actor->facing8 == 4 ? stride : 0;
+        flip = actor->facing8 > 4;
     } else {
-        u32 facing = actor->facing8;
-        direction = 0;
-        if (facing == 4)
-            direction = stride;
-        flip = 0;
-        if (facing > 4)
-            flip = 1;
+        direction = actor->facing8 == 4 ? stride : 0;
+        flip = actor->facing8 > 4;
     }
     return DisplayAnimation_SetEntry(&actor->drawable.common, a, direction, flip, b, c, d);
 }

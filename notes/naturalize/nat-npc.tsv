@@ -24,3 +24,4 @@ src/npc/manager/scene_actor_animation.c	Actor_NoopUpdate	natural	natural	0
 src/npc/manager/scene_actor_animation.c	Actor_NoopRender	natural	natural	0	
 src/npc/manager/scene_actor_animation.c	Actor_UpdateVisibilityAndShadow	minor	minor	1	SceneActor_TestFlags stays: ROM materializes the mask before the flags load
 src/npc/manager/scene_actor_animation.c	Actor_SetMirroredFourWayAnimation	contrived	natural	1	
+src/npc/manager/scene_actor_animation.c	Actor_SetFrontBackAnimation	contrived	natural	1	duplicated kind branches are in the ROM
