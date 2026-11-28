@@ -128,3 +128,4 @@ src/effects/bursts/fragment_burst/FragmentBurst_RunCompletionScript.c	FragmentBu
 src/effects/bursts/fragment_burst/sub_081281D0.c	sub_081281D0	minor	minor	4	collider pointer assigned after the size vectors
 src/effects/bursts/fragment_burst/FragmentBurst_UpdateRadialAnimation.c	FragmentBurst_UpdateRadialAnimation	contrived	minor	27	FragmentSequence_Prepare helper and owner alias order the two loop pointers; masked sine index
 src/effects/bursts/fragment_burst/SpriteGroup_Release.c	SpriteGroup_Release	minor	natural	1	-
+src/effects/bursts/fragment_burst/FragmentBurst_UpdateImpactAnimation.c	FragmentBurst_UpdateImpactAnimation	contrived	natural	3	-
