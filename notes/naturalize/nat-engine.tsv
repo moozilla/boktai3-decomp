@@ -596,3 +596,9 @@ src/system/inventory/ItemRecord_MeetsLevelRequirement.c	ItemRecord_MeetsLevelReq
 src/system/inventory/Inventory_AddAssignedSlot.c	Inventory_AddAssignedSlot	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
 src/system/inventory/Inventory_RemoveAssignedSlot.c	Inventory_RemoveAssignedSlot	contrived	minor	1	array indexed as *(i + field) for the index-first address sum; selected slot read as signed through a cast
 src/system/inventory/GameState_ResetEntriesFromScript.c	GameState_ResetEntriesFromScript	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
+src/system/inventory/Inventory_SetEquipmentEntry.c	Inventory_SetEquipmentEntry	natural	natural	0	
+src/system/inventory/Inventory_ClearEquipmentEntry.c	Inventory_ClearEquipmentEntry	natural	natural	0	
+src/system/inventory/sub_0822DB2C.c	sub_0822DB2C	natural	natural	0	
+src/system/inventory/RecordEntry_AddFromScript.c	RecordEntry_AddFromScript	minor	minor	1	list length kept in a local: the literal bound compiles differently
+src/system/inventory/Inventory_SetEntryFromScript.c	Inventory_SetEntryFromScript	natural	natural	0	
+src/system/inventory/Inventory_ContainsFromScript.c	Inventory_ContainsFromScript	natural	natural	0	
