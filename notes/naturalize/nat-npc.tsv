@@ -55,3 +55,9 @@ src/npc/manager/scene_actor_animation.c	SceneActorAnimation_UpdateRouteWalk	cont
 src/npc/manager/scene_actor_animation.c	Actor_UpdateNavigationWalk	contrived	minor	1	distance/limit locals and from copy
 src/npc/manager/scene_actor_animation.c	Actor_UpdateRunToPosition	contrived	minor	2	distance/limit locals and from/to copies
 src/npc/manager/scene_actor_animation.c	Actor_UpdateWalkToPosition	minor	minor	1	follow-up: facing block replaced by the shared setter
+src/npc/manager/scene_actor_animation.c	Actor_SelectPathNodeAction	minor	minor	4	shared mask local: the ROM keeps one 7 in r2 for both facing octants
+src/npc/manager/scene_actor_animation.c	SceneCharacter_GetPathNodeState	natural	natural	0	
+src/npc/manager/scene_actor_animation.c	SceneCharacter_UpdateIdleState	natural	natural	0	
+src/npc/manager/scene_actor_animation.c	SceneCharacter_UpdateStandState	natural	natural	0	
+src/npc/manager/scene_actor_animation.c	SceneCharacter_UpdateOneShotActionState	natural	natural	0	
+src/npc/manager/scene_actor_animation.c	SceneCharacter_UpdateProximityWaitState	contrived	natural	40	

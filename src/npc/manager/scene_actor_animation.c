@@ -1365,49 +1365,18 @@ void SceneCharacter_UpdateOneShotActionState(void *unused, struct SceneActor *ac
 static inline int SceneActor_IsNearTarget(struct SceneActor *actor, struct ContactPosition *b)
 {
     struct ContactPosition *a = &actor->body.position;
-    int limit;
-    int x;
-    int result;
-    limit = actor->rateA;
-    x = b->x - a->x;
-    if (x < 0)
-        x = -x;
-    if (x >= limit)
-        goto fail;
-    {
-        int y = b->y - a->y;
-        if (y < 0)
-            y = -y;
-        if (y > 255)
-            goto fail;
-    }
-    {
-        int z = b->z - a->z;
-        if (z < 0)
-            z = -z;
-        result = 1;
-        if (z < limit)
-            goto done;
-    }
-fail:
-    result = 0;
-done:
-    return result;
+    int range = actor->rateA;
+    if (Abs(b->x - a->x) < range && Abs(b->y - a->y) <= 255 && Abs(b->z - a->z) < range)
+        return 1;
+    return 0;
 }
 
 static inline int SceneActor_HasNearbyTarget(struct SceneActorManager *manager,
                                              struct SceneActor *actor)
 {
-    int result;
-    if (manager->target) {
-        int close = SceneActor_IsNearTarget(actor, manager->target);
-        result = 1;
-        if (close)
-            goto done;
-    }
-    result = 0;
-done:
-    return result;
+    if (manager->target && SceneActor_IsNearTarget(actor, manager->target))
+        return 1;
+    return 0;
 }
 
 void SceneCharacter_UpdateTurnState(void *unused, struct SceneActor *actor)
@@ -1460,15 +1429,13 @@ void SceneCharacter_UpdateStopState(void *unused, struct SceneActor *actor)
 void SceneCharacter_UpdateProximityWaitState(struct SceneActorManager *manager,
                                              struct SceneActor *actor)
 {
-    int close;
     if (actor->commandEntered) {
         actor->commandEntered = 0;
         actor->finished = 0;
         actor->action = 2;
         Trigger_ConsumePending(actor->messageReceiver, 1);
     }
-    close = SceneActor_HasNearbyTarget(manager, actor);
-    if (close) {
+    if (SceneActor_HasNearbyTarget(manager, actor)) {
         SceneCharacter_InterruptForTarget(actor);
     } else
         actor->ticks++;
