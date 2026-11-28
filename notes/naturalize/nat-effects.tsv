@@ -185,3 +185,4 @@ src/effects/bursts/radial_burst/PaletteTransition_UpdateFadeIn.c	PaletteTransiti
 src/effects/bursts/radial_burst/PaletteTransition_UpdateFadeOut.c	PaletteTransition_UpdateFadeOut	minor	natural	1	-
 src/effects/bursts/radial_burst/PaletteTransition_UpdateOwnerFade.c	PaletteTransition_UpdateOwnerFade	minor	natural	1	-
 src/effects/bursts/radial_burst/sub_082364A4.c	sub_082364A4	contrived	natural	2	-
+src/effects/bursts/radial_burst/CallbackGroup_UpdateActive.c	CallbackGroup_UpdateActive	contrived	natural	12	-

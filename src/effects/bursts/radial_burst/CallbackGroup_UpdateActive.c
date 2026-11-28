@@ -1,37 +1,20 @@
-#include "global.h"
-#include "engine/engine.h"
-struct CallbackGroupEntry {
-    u8 unknown0[0x28];
-    u8 active;
-    u8 unknown29[0x17];
-    void *callback;
-};
-struct CallbackGroup {
-    u8 unknown0[0x13a];
-    u8 active;
-    u8 unknown13B;
-    void *context;
-    struct CallbackGroupEntry entries[12];
-};
-void CallbackGroup_UpdateActive(struct CallbackGroup *group)
+#include "effects/bursts/radial_burst.h"
+
+void CallbackGroup_UpdateActive(struct RadialBurst *burst)
 {
-    s32 count;
-    u8 *active;
-    struct CallbackGroupEntry *entry;
-    s32 i;
-    if (group->active) {
+    struct RadialBurstParticle *particle;
+    s32 count, i;
+
+    if (burst->emitter.particlesActive) {
         count = 0;
-        active = &group->entries[0].active;
-        entry = group->entries;
-        for (i = 11; i >= 0; i--) {
-            if (*active) {
-                sub_08249240(entry, group->context, *(void **)(active + 0x18));
+        for (i = 0; i < 12; i++) {
+            particle = &burst->emitter.particles[i];
+            if (particle->active) {
+                sub_08249240(particle, (void *)burst->emitter.graphics, particle->update);
                 count++;
             }
-            active += 0x44;
-            entry++;
         }
         if (count == 0)
-            group->active = count;
+            burst->emitter.particlesActive = count;
     }
 }
