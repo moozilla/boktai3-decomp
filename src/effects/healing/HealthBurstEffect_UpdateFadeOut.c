@@ -1,17 +1,17 @@
-#include "global.h"
+#include "effects/healing/healing_effect.h"
+#include "engine/engine.h"
 #include "engine/engine_globals.h"
+
 void Camera_RequestShake(s32);
-s32 Collider_Refresh(u8 *);
-void Task_Kill(u8 *);
-#define H(o) (*(u16 *)(p + (o)))
-void HealthBurstEffect_UpdateFadeOut(u8 *p)
+
+void HealthBurstEffect_UpdateFadeOut(struct HealthBurstEffect *effect)
 {
-    Camera_RequestShake((16 - H(0x34e)) * 2);
-    if (H(0x34e) <= 5)
-        Collider_Refresh(p + 0x94);
-    else if (H(0x34e) == 6)
+    Camera_RequestShake((16 - effect->timer) * 2);
+    if (effect->timer <= 5)
+        Collider_Refresh(&effect->collider);
+    else if (effect->timer == 6)
         gEngineFlags &= ~1;
-    H(0x34e)++;
-    if (H(0x34e) > 15)
-        Task_Kill(p);
+    effect->timer++;
+    if (effect->timer > 15)
+        Task_Kill(effect);
 }
