@@ -17,3 +17,4 @@ src/player/appearance/character_model.c	CharacterModel_UpdatePairedAnimations	co
 src/player/appearance/character_model.c	CharacterModel_RemoveAnimations	minor	natural	1	-
 src/player/appearance/character_model.c	CharacterModel_SetAnimationFlags	contrived	natural	1	-
 src/player/appearance/character_model.c	CharacterModel_ClearAnimationFlags	contrived	natural	1	-
+src/player/appearance/character_model.c	CharacterModel_SetComponentRenderMode	contrived	natural	1	-

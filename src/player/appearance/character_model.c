@@ -380,11 +380,9 @@ void CharacterModel_ClearAnimationFlags(struct CharacterPreviewModel *model, u32
 
 void CharacterModel_SetComponentRenderMode(struct ModifierDisplayObject *parts, u32 mode)
 {
-    struct ModifierDisplayObject *part = &parts[4];
-    do {
-        part->attribute1A = mode;
-        part--;
-    } while ((s32)part >= (s32)parts);
+    s32 i;
+    for (i = 0; i < 5; i++)
+        parts[i].attribute1A = mode;
 }
 
 /* ScenePool_ApplyMotionInput: keep the address symbol for the external motion caller. */
