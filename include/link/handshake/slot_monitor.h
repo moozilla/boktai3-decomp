@@ -7,17 +7,17 @@ struct SlotMonitor {
     u8 pad0[0x18];
     s32 timeout;
     u32 param;
-    u32 f20;      /* confidence=low */
-    s32 result;   /* confidence=low */
-    u32 f28;      /* confidence=low */
-    u32 finished; /* confidence=low */
+    u32 f20;       /* confidence=low */
+    s32 result;    /* confidence=low */
+    u32 succeeded; /* confidence=low */
+    u32 finished;  /* confidence=low */
     u32 f30;
     s32 elapsed;        /* confidence=low; counts toward timeout */
-    u32 readyFrames;    /* confidence=low */
-    u32 errorFrames;    /* confidence=low */
+    s32 readyFrames;    /* confidence=low */
+    s32 errorFrames;    /* confidence=low */
     s32 roleRetryTimer; /* confidence=low; frames without a serial role */
-    s32 f44;            /* confidence=low */
-    s32 f48;            /* confidence=low */
+    s32 sendResult;     /* confidence=low */
+    s32 receiveResult;  /* confidence=low */
     s32 field4c;        /* confidence=low */
     s32 retryTimer;
     s32 ticks;
@@ -37,6 +37,7 @@ struct SlotMonitor {
     u32 f80;
 };
 
+u8 SlotMonitor_CheckTimeout(struct SlotMonitor *obj);
 u8 LinkHandshake_AdvanceTimeout(struct SlotMonitor *obj);
 void LinkHandshake_UpdateRestartState(struct SlotMonitor *obj);
 void SlotMonitor_PollResult(struct SlotMonitor *obj);

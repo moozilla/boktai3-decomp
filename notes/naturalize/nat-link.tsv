@@ -14,3 +14,4 @@ src/link/handshake/LinkHandshake_AdvanceTimeout.c	LinkHandshake_AdvanceTimeout	c
 src/link/handshake/CallbackTask_Finish.c	CallbackTask_Finish	minor	natural	1	
 src/link/handshake/LinkHandshake_UpdateRestartState.c	LinkHandshake_UpdateRestartState	contrived	natural	1	
 src/link/handshake/SlotMonitor_PollResult.c	SlotMonitor_PollResult	contrived	natural	1	
+src/link/handshake/sub_08108C94.c	sub_08108C94	contrived	natural	3	restart block written in both error branches (cross-jumped)

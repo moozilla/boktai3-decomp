@@ -1,7 +1,7 @@
 #include "global.h"
 #include "link/handshake/slot_monitor.h"
 
-s32 SlotMonitor_CheckTimeout(struct SlotMonitor *obj)
+u8 SlotMonitor_CheckTimeout(struct SlotMonitor *obj)
 {
     s32 count;
     s32 i;
@@ -24,7 +24,8 @@ s32 SlotMonitor_CheckTimeout(struct SlotMonitor *obj)
             return 0;
         } else {
             obj->activeTimer = 0;
-            if (obj->f48 < 0 || obj->f48 != obj->result || obj->f44 < 0) {
+            if (obj->receiveResult < 0 || obj->receiveResult != obj->result ||
+                obj->sendResult < 0) {
                 if (obj->idleTimer > 70)
                     return 1;
                 obj->idleTimer++;
