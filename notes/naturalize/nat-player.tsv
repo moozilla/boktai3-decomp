@@ -1,0 +1,3 @@
+path	function	verdict_before	verdict_after	compiles	stays_and_why
+src/player/appearance/character_model.c	ActorStats_ApplyPendingIncrement	natural	natural	0	-
+src/player/appearance/character_model.c	ActorResource_SelectElementResource	contrived	natural	1	-

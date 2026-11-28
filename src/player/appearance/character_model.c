@@ -17,15 +17,12 @@ void ActorStats_ApplyPendingIncrement(struct ActorStats *actor)
     }
 }
 
-static inline u8 ValidIndex(s32 index)
+static inline u8 IsValidLinkSlot(s32 index)
 {
     if (index < 0)
-        goto invalid;
-    if (index <= 1)
-        goto valid;
-invalid:
-    return 0;
-valid:
+        return 0;
+    if (index > 1)
+        return 0;
     return 1;
 }
 
@@ -36,9 +33,10 @@ s32 ActorResource_SelectElementResource(s32 index)
     if (Engine_PauseBits(0x800)) {
         struct AreaEffectLinkState *link = gLinkSession;
         struct AreaEffectLinkResourceSlot *slot;
-        if (!link || link->unavailable != 1 || !ValidIndex(index))
+        if (!link || link->unavailable != 1 || !IsValidLinkSlot(index))
             return 0x378;
-        slot = (void *)(link->sessionData + (index * sizeof(*slot) + 0x40));
+        slot =
+            (struct AreaEffectLinkResourceSlot *)&link->sessionData[0x40 + index * sizeof(*slot)];
         if (!slot)
             return 0x378;
         kind = slot->element;
