@@ -1970,23 +1970,9 @@ void TetherActor_UpdateWorldPosition(struct TetherActor *actor)
     u32 oldHeight;
     u32 oldAttributes;
     if (!actor->statusFlags && actor->state != 5) {
-        s32 cell;
-        u8 *properties;
-        u32 surface, height;
         position = &actor->position;
-        cell = cellIndex_0804AF80(position->x >> 8, position->z >> 8);
-        properties = cellProperties(cell);
-        surface = *properties >> 4;
-        height = (*properties & 15) << 8;
-        switch (surface) {
-            case 1:
-                height -= (u8)position->z;
-                break;
-            case 2:
-                height -= (u8)position->x;
-                break;
-        }
-        actor->position.y = height;
+        actor->position.y =
+            SceneActorTerrain_GetHeight(SceneActorTerrain_GetCellIndex(position), position);
     }
     {
         struct ContactPosition *display =
@@ -2011,19 +1997,8 @@ void TetherActor_UpdateWorldPosition(struct TetherActor *actor)
         Obj_StepPosition(&actor->bodyConfig);
     } else {
         u8 *properties;
-        u32 cell;
-        actor->movementProbeStorage.cell = cellIndex_0804AF80(position->x >> 8, position->z >> 8);
-        cell = actor->movementProbeStorage.cell;
-        {
-            u8 *raw = TerrainModifiers_FindCellOverride(cell, 1);
-            if (raw)
-                properties = raw + 4;
-            else {
-                struct EngineMap *map = gTerrainMap;
-                u32 offset = cell * 4 + 12;
-                properties = map->cells + offset;
-            }
-        }
+        actor->movementProbeStorage.cell = SceneActorTerrain_GetCellIndex(position);
+        properties = SceneActorTerrain_GetCell(actor->movementProbeStorage.cell);
         actor->movementProbeStorage.shape = *properties >> 4;
         actor->movementProbeStorage.height = *properties & 15;
         actor->movementProbeStorage.flags = *(u16 *)(properties + 2);
