@@ -724,20 +724,16 @@ void *PlayerClone_CreatePool(void)
 
 struct PlayerCloneSlot *PlayerClone_FindFreeSlot(struct PlayerCloneManager *a, s32 *out)
 {
-    struct PlayerCloneSlot *e = a->slots;
-    s32 i = 0;
-    u32 m = 1;
-    u32 w = a->activeSlots;
-    do {
-        if ((m << i & w) != 0) {
-            i++;
-            e++;
-            continue;
+    struct PlayerCloneSlot *slot = a->slots;
+    s32 i;
+
+    for (i = 0; i < 3; i++, slot++) {
+        if (!(a->activeSlots & (1 << i))) {
+            *out = i;
+            return slot;
         }
-        *out = i;
-        return e;
-    } while (i <= 2);
-    return 0;
+    }
+    return NULL;
 }
 
 static inline void PlayerClone_ClearVelocity(const u32 *zero, struct ContactPosition *velocity)
