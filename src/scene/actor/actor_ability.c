@@ -78,7 +78,6 @@ s32 ActorAbility_UpdateRecovery(struct ActorAbility *ability)
     struct ActorAbilityOwner *owner;
     struct ActorStats *stats;
     s32 cost, palette;
-    u32 started;
     ability->request = 255;
     if (!Modifier_IsFourthSourceReady(ability))
         return 0;
@@ -96,9 +95,8 @@ s32 ActorAbility_UpdateRecovery(struct ActorAbility *ability)
     if (stats->amount > stats->amountLimit)
         stats->amount = stats->amountLimit;
     palette = CharacterModel_GetPrimaryPaletteIndex(&owner->actors[0].model);
-    started = ability->started;
-    if (started == 0) {
-        PalFade_Start(stats, 0x386, 0x386, palette, stats->recoveryValue, 15, 4, started);
+    if (!ability->started) {
+        PalFade_Start(stats, 0x386, 0x386, palette, stats->recoveryValue, 15, 4, 0);
         ability->started = 1;
     } else if (!(owner->actors[0].control.effectFlags & 1)) {
         PalFade_Start(stats, 0x386, 0x386, palette, stats->recoveryValue, 15, 4, 1);
