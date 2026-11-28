@@ -223,3 +223,4 @@ src/effects/feathers/FeatherEffectPool_UpdateTask.c	FeatherEffectPool_UpdateTask
 src/effects/feathers/FeatherEffectPool_DestroyTask.c	FeatherEffectPool_DestroyTask	contrived	natural	1	-
 src/effects/feathers/FeatherEffectPool_Init.c	FeatherEffectPool_Init	minor	natural	2	-
 src/effects/feathers/FeatherEffectPool_GetOrCreate.c	FeatherEffectPool_GetOrCreate	minor	natural	1	-
+src/effects/feathers/FeatherEffectPool_ResetSingleton.c	FeatherEffectPool_ResetSingleton	natural	natural	0	-
