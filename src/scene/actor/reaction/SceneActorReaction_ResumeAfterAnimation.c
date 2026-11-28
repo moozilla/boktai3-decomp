@@ -22,9 +22,6 @@ void SceneActorReaction_ResumeAfterAnimation(struct ChaseActor *actor, s32 unuse
         }
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
         SceneActorTerrain_EnterState(actor, 3, 1, 0);
-        {
-            void *control = group->routeResumeControl;
-            SceneActorTerrain_InstallControl(actor, control, 15);
-        }
+        SceneActorTerrain_InstallControl(actor, group->routeResumeControl, 15);
     }
 }
