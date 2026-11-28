@@ -289,10 +289,10 @@ void GameOver_UpdateCostSelection(struct GameOver *panel)
 {
     s32 decision = -1;
     if (gPadState[1] & 1) {
-        u32 choice = panel->choice;
-        decision = 1;
-        if (choice != 0)
+        if (panel->choice)
             decision = 0;
+        else
+            decision = 1;
         Sound_PlaySong(221);
     } else if (gPadState[1] & 2) {
         decision = 0;
@@ -311,7 +311,7 @@ void GameOver_UpdateCostSelection(struct GameOver *panel)
     } else if (decision == 1) {
         s32 i;
         Sound_FadeOutChannel10(2);
-        panel->overlay.flags |= decision;
+        panel->overlay.flags |= 1;
         for (i = 0; i < 8; i++)
             panel->sprites[i].flags |= 1;
         MessageWindow_Clear();
