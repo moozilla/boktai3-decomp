@@ -30,13 +30,13 @@ s32 Ratatosk_ApplyQueuedDamage(struct Ratatosk *p)
     } scratch;
     struct Ratatosk *p2 = p;
     s32 react = 0;
-    s32 damage = (s16)p2->frameDamage;
-    u32 particles = p2->motionFlag;
+    s32 damage = p->frameDamage;
+    u32 particles = p->motionFlag;
     s32 oldPhase;
     u32 changed;
-    p2->frameDamage = react;
-    p2->unknownE71 = 0;
-    p2->motionFlag = 0;
+    p->frameDamage = react;
+    p->unknownE71 = 0;
+    p->motionFlag = 0;
     oldPhase = p2->healthPhase;
     if (!p2->healthPhase &&
         p->health < ((p->maxHealth >> 1) + (p->maxHealth >> 3) + (p->maxHealth >> 4)))
