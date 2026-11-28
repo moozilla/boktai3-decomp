@@ -221,19 +221,18 @@ void NidhoggrDuel_SpawnTargetedProjectile(struct GridAttackActor *actor,
     struct SceneVec position;
     struct ContactPosition target;
     struct ContactPosition original;
-    struct ContactPosition *vel = &velocity;
     s16 *pos;
-    ZeroFill8(vel);
+    ZeroFill8(&velocity);
     pos = (s16 *)&position;
     original = *point;
-    *(struct ContactPosition *)&position = original;
+    *(struct ContactPosition *)&position = *point;
     NidhoggrDuel_OffsetCoordinate(&pos[0], NidhoggrDuel_RandomValue());
     pos[1] += 1024;
     NidhoggrDuel_OffsetCoordinate(&pos[2], NidhoggrDuel_RandomValue());
     {
         struct ContactPosition *dest = &target;
         *dest = original;
-        BouncingBomb_Spawn(&position, vel, dest, actor->projectileDamage, 50, kind, 0);
+        BouncingBomb_Spawn(&position, &velocity, dest, actor->projectileDamage, 50, kind, 0);
     }
 }
 
