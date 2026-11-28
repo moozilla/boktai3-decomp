@@ -1,33 +1,30 @@
-#include "global.h"
+#include "npc/manager/scene_actor_lifecycle.h"
+#include "npc/story_character/state_actor.h"
 
-void Kuro_PlayTaggedAnimation(void *, int, int, int, int);
-int DisplayAnimation_TestFinished(void *);
-int Anim_Step(void *, void *);
+void Kuro_PlayTaggedAnimation(struct SceneActor *, int, int, int, int);
 s32 Mod(s32, s32);
+s32 DisplayAnimation_TestFinished(struct DisplayAnimation *);
 void *ActorAttachment_UpdateFromDescriptor(void *, void *, int, int, void *, int, int, int);
 
-void Kuro_UpdateState17AnimationB(void *unused, u8 *p, s32 tick)
+void Kuro_UpdateState17AnimationB(void *unused, struct SceneActor *actor, s32 tick)
 {
-    u8 *tag = p + 0x20;
-    if (p[9]) {
-        s32 zero = 0;
-        p[9] = zero;
-        p[7] = zero;
-        Kuro_PlayTaggedAnimation(p, 5, 2, 0, 4);
-        *(u16 *)(p + 0x114) = 3;
-        *(u16 *)(p + 0x10c) = zero;
-        Anim_Step(p + 0x10c - 0xc, p + 0xe0);
+    struct StateActorTag *tag = (struct StateActorTag *)actor->unknown20;
+    if (actor->animationEntered) {
+        actor->animationEntered = 0;
+        actor->finished = 0;
+        Kuro_PlayTaggedAnimation(actor, 5, 2, 0, 4);
+        actor->drawable.common.resource.keyframes.sprite.frameIndex = 3;
+        actor->drawable.common.resource.keyframes.sprite.elapsed = 0;
+        Anim_Step(&actor->drawable.common.resource.keyframes.sprite,
+                  &actor->drawable.common.resource.keyframes.resource);
     }
-    {
-        u32 mask = 0x800;
-        *(u16 *)(p + 0xe) |= mask;
-    }
-    if (DisplayAnimation_TestFinished(p + 0xd4))
-        p[7] = 1;
-    if (*(u16 *)(tag + 0x16) != 0 && tick > 0) {
-        s32 r = Mod(tick, 70);
-        if (r == 0)
-            *(void **)(tag + 0x18) = ActorAttachment_UpdateFromDescriptor(
-                *(void **)(tag + 0x18), p + 0x5c, 2, 0, (void *)r, r, 0x80, r);
+    SceneActor_SetFlags(actor, 0x800);
+    if (DisplayAnimation_TestFinished(&actor->drawable.common))
+        actor->finished = 1;
+    if (tag->field16 && tick > 0) {
+        s32 remainder = Mod(tick, 70);
+        if (remainder == 0)
+            tag->attachment = ActorAttachment_UpdateFromDescriptor(tag->attachment, &actor->body, 2,
+                                                                   0, 0, 0, 128, 0);
     }
 }
