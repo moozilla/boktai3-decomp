@@ -1,19 +1,10 @@
 #include "global.h"
-struct O {
-    u8 pad0[0x44];
-    u8 f44[0x80];
-    u8 fc4[0x20];
-    u16 fe4;
-    u16 fe6;
-    u8 pad[0xB64 - 0xE8];
-    s16 b64;
-    s16 b66;
-};
-void Anim_LoadKeyframe(void *, void *, u32, u32);
-s32 ForgingBook_UpdateSelectionCursor(struct O *o)
+#include "ui/books/forging_book.h"
+
+s32 ForgingBook_UpdateSelectionCursor(struct ForgingBook *book)
 {
-    o->fe4 = o->b64 * 24 + 0x58;
-    o->fe6 = o->b66 * 24 + 0x18;
-    Anim_LoadKeyframe(o->fc4, o->f44, 0x4d, 0);
+    book->cursor.position.x = book->column * 24 + 0x58;
+    book->cursor.position.y = book->row * 24 + 0x18;
+    Anim_LoadKeyframe(&book->cursor, &book->cursorResource, 0x4d, 0);
     return 0;
 }
