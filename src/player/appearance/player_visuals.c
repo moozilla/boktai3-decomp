@@ -1552,11 +1552,6 @@ void Player_ConsumeActionCharge(struct Player *p)
 void Player_RefreshEquipmentWithOptions(struct Player *p, s32 unused, s32 flag);
 
 // confidence=low: rebuilds equipment-derived stat and action flags.
-struct EquipmentFlagState {
-    u8 unknown0[6];
-    u16 bonus[3];
-    u32 special;
-};
 void *GameState_GetConsumableDescriptor(u32);
 s32 Inventory_GetConsumableId(u32);
 s32 GameState_HasEquippedConsumable(u32);

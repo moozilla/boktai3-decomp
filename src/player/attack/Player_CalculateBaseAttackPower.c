@@ -1,28 +1,21 @@
 #include "global.h"
+#include "player/player.h"
 
-struct P0814A76C {
-    u8 f0[0x336];
-    s16 f336;
-    u8 f338[0x420 - 0x338];
-    u16 f420;
-    u8 f422[0xBF4 - 0x422];
-    u8 fBF4;
-    u8 fBF5;
-};
-s32 Player_CalculateActionStat(void *, void *, s32);
-s32 Player_GetSpecialAttackPower(void *, s32, s32);
+s32 Player_CalculateActionStat(struct Player *, struct PlayerStatModifierContext *, s32);
+s32 Player_GetSpecialAttackPower(struct Player *, s32, s32);
 
-s32 Player_CalculateBaseAttackPower(struct P0814A76C *p, s32 d)
+s32 Player_CalculateBaseAttackPower(struct Player *p, s32 bonus)
 {
-    u8 *q = (u8 *)p + 0x32C;
-    s32 sum = *(s16 *)(q + 10) + p->f420 + d;
-    switch (p->fBF5) {
+    struct EquipmentFlagState *equipment = (struct EquipmentFlagState *)p->actionFlagState;
+    s32 sum = (s16)equipment->bonus[2] + p->derivedStats[2] + bonus;
+
+    switch (p->statModifierContext.statBOverrideEnabled) {
         case 0:
         case 1:
         case 2:
-            return Player_CalculateActionStat(p, (u8 *)p + 0xB44, sum);
+            return Player_CalculateActionStat(p, &p->statModifierContext, sum);
         case 4:
-            return Player_GetSpecialAttackPower(p, p->fBF4, sum);
+            return Player_GetSpecialAttackPower(p, p->statModifierContext.actionKind, sum);
         default:
             return 1;
     }

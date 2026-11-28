@@ -26,6 +26,14 @@ struct PlayerActionRequest {
     u8 enabled, latched, duration, blocked;
 };
 
+/* The block at Player::actionFlagState (0x32C), rebuilt from the equipped items by
+ * PlayerAction_RefreshFlagState (tentative). It spans fields the owner also lists separately. */
+struct EquipmentFlagState {
+    u8 unknown0[6];
+    u16 bonus[3];
+    u32 special;
+};
+
 struct PlayerIndexedAction {
     u8 unknown0, duration, unknown2, unknown3;
 };
