@@ -262,3 +262,4 @@ src/monsters/axe/axe.c	Axe_EmitMotionTrail	contrived	contrived	15	remaining: u8c
 src/monsters/axe/axe.c	Axe_TickAuxiliarySpriteTimers	contrived	contrived	9	remaining: u8cast,bytep,do,zeroone,block,constlocal,ptrtemp
 src/monsters/axe/axe.c	ActorPhase_SelectDistantWaypoint	contrived	contrived	2	remaining: u8cast,block
 src/monsters/axe/axe.c	Axe_UpdateScreenShake	contrived	minor	5	remaining: constlocal
+src/monsters/axe/axe.c	Axe_InitAttackTrail	minor	minor	16	remaining: block

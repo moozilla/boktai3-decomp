@@ -2629,14 +2629,13 @@ void Axe_InitAttackTrail(struct ChaseActor *s)
     struct ContactPackedVector attackSize;
     struct ContactPackedVector attackOffset;
     struct Axe *d = s->base.context;
-    void *resource = &d->auxiliaryGraphics;
     struct DisplaySequenceSprite *sprite;
     struct DisplaySequenceState *frames;
     void *sequence;
     s32 i;
-    AnimData_Load(resource, 0x5291);
+    AnimData_Load(&d->auxiliaryGraphics, 0x5291);
     sprite = &d->auxiliarySprite;
-    Sprite_Init(sprite, resource, 0);
+    Sprite_Init(sprite, &d->auxiliaryGraphics, 0);
     sequence = ScriptProc_Start(0x922e, 0x3f72);
     {
         struct DisplaySequenceState *drawable =
