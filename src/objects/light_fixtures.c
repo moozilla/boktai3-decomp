@@ -24,14 +24,11 @@ void LightFixture_EnterState(struct PooledInteractable *slot, u32 state)
 /* Returns 1 once after a state starts. */
 u32 LightFixture_ConsumeEnteredFlag(struct PooledInteractable *slot)
 {
-    u32 r;
-    if (slot->entered == 0) {
-        r = 0;
-    } else {
+    if (slot->entered) {
         slot->entered = 0;
-        r = 1;
+        return 1;
     }
-    return r;
+    return 0;
 }
 
 /* Collider callback: moves to state 3 or 4 when hit by the matching attack kind. */
@@ -47,7 +44,8 @@ void LightFixture_OnHit(struct SceneCollider *other, u32 unused, struct PooledIn
     }
 }
 
-s32 LightFixture_InitSlot(struct PooledInteractableManager *manager, struct PooledInteractable *slot)
+s32 LightFixture_InitSlot(struct PooledInteractableManager *manager,
+                          struct PooledInteractable *slot)
 {
     struct SceneExtent dimensions, scale, offset;
     void *resource;
@@ -97,7 +95,7 @@ void LightFixture_NullCallback(void)
 }
 
 void LightFixture_UpdateAnimation(struct PooledInteractableManager *manager,
-                               struct PooledInteractable *slot)
+                                  struct PooledInteractable *slot)
 {
     if (LightFixture_ConsumeEnteredFlag(slot)) {
         void *q = &slot->drawable;
@@ -137,7 +135,8 @@ void LightFixture_React(struct PooledInteractableManager *manager, struct Pooled
 /* Particle emission uses packed coordinate fields. */
 #define POSITION (*(struct SceneExtent *)&slot->drawable.position)
 
-void LightFixture_Activate(struct PooledInteractableManager *manager, struct PooledInteractable *slot)
+void LightFixture_Activate(struct PooledInteractableManager *manager,
+                           struct PooledInteractable *slot)
 {
     struct SceneExtent effect;
     if (LightFixture_ConsumeEnteredFlag(slot)) {
