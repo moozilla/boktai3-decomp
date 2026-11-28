@@ -331,12 +331,12 @@ s32 ScenePaletteFade_InitFromScript(struct ScenePaletteFade *fade, void *unused)
     return 0;
 }
 
-void *ScenePaletteFade_Create(void *a)
+void *ScenePaletteFade_Create(void *argument)
 {
-    void *fade = Task_Create(0xb, 0x38);
+    struct ScenePaletteFade *fade = Task_Create(0xb, sizeof(*fade));
     if (fade != 0) {
         Task_SetCallbacks(fade, ScenePaletteFade_Update, ScenePaletteFade_Destroy);
-        if (ScenePaletteFade_InitFromScript(fade, a) < 0) {
+        if (ScenePaletteFade_InitFromScript(fade, argument) < 0) {
             Task_Kill(fade);
             return 0;
         }
