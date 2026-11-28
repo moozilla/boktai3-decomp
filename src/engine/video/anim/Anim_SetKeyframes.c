@@ -20,20 +20,13 @@ void Anim_SetKeyframes(struct AnimSprite *anim, struct AnimSpriteResource *data,
         sequence = 0;
     seqs = data->sequences;
     frames = (struct AnimationKeyframe *)(data->frameData + seqs[sequence].offset);
-    {
-        s32 off;
-        if (!(flags & 1)) {
-            if (flags & 2)
-                off = seqs[sequence].frameCount * 4 - 4;
-            else {
-                frame = frames;
-                goto have_frame;
-            }
-        } else
-            off = anim->frameIndex * 4;
-        frame = (struct AnimationKeyframe *)((u8 *)frames + off);
-    }
-have_frame:
+    if (!(flags & 1)) {
+        if (flags & 2)
+            frame = &frames[seqs[sequence].frameCount - 1];
+        else
+            frame = frames;
+    } else
+        frame = &frames[anim->frameIndex];
     if (anim->sequenceId != sequence || (flags & 4))
         Anim_LoadKeyframe(anim, data, frame->key, (u8)mode);
     anim->sequenceId = sequence;
