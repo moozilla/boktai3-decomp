@@ -12,7 +12,7 @@ void ActorTrail_ResetAtSavedPosition(struct ChaseActor *actor)
 {
     struct TentacleBody *trail = actor->base.context;
     struct ContactPosition *saved;
-    trail->attackFlags &= 0xFFFD;
+    trail->attackFlags &= ~2;
     trail->blockedFrameCount = 0;
     trail->returnCell = 0;
     {
