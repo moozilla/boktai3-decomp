@@ -1,22 +1,26 @@
 #include "global.h"
-struct FlagAC {
-    s8 a;
-    u8 b, c, d;
+#include "player/player.h"
+
+struct LinkAbilityState {
+    s8 id;
+    u8 enabled, stamp, cost;
 };
+
 s32 LinkPlayer_GetAbilityCostById(s32);
-s32 LinkPlayer_IsAbilityIdValid(u8 *, s32);
-void LinkPlayer_InitAbilityState(u8 *p)
+s32 LinkPlayer_IsAbilityIdValid(struct Player *, s32);
+
+void LinkPlayer_InitAbilityState(struct Player *p)
 {
-    struct FlagAC *f = (struct FlagAC *)(p + 0x33c);
-    s8 value = (*(u8 **)(p + 0x344))[0x3e];
-    u32 zero = 0;
-    f->a = value;
-    if (f->a < 0) {
-        f->d = zero;
-        f->b = zero;
+    struct LinkAbilityState *ability = (struct LinkAbilityState *)&p->thresholdMode;
+
+    ability->id = ((const u8 *)p->actionConfig)[0x3E];
+    if (ability->id < 0) {
+        ability->cost = 0;
+        ability->enabled = 0;
+        ability->stamp = 0;
     } else {
-        f->d = LinkPlayer_GetAbilityCostById(f->a);
-        f->b = LinkPlayer_IsAbilityIdValid(p, f->a);
+        ability->cost = LinkPlayer_GetAbilityCostById(ability->id);
+        ability->enabled = LinkPlayer_IsAbilityIdValid(p, ability->id);
+        ability->stamp = 0;
     }
-    f->c = zero;
 }
