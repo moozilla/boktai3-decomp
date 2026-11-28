@@ -21,21 +21,15 @@ struct StateActor *SceneActors_GetBySlot(u32 slot)
 struct StateActor *SceneActors_FindAvailable(void)
 {
     struct StateActor *found = 0;
-    struct StateActor **cursor;
-    int i = 0;
-    cursor = (struct StateActor **)gSceneActorRegistry;
-    do {
-        struct StateActor *actor;
-        actor = *cursor;
+    int i;
+    for (i = 0; i < 8; i++) {
+        struct StateActor *actor = (struct StateActor *)gSceneActorRegistry[i];
         if (actor && !actor->locked) {
-            if (found) {
+            if (found)
                 return found;
-            }
             found = actor;
         }
-        cursor++;
-        i++;
-    } while (i < 8);
+    }
     return found;
 }
 
@@ -171,9 +165,9 @@ void SceneActors_StartAnimation(struct StateActor *actor, struct AnimSprite *ani
     }
 }
 
-void SceneActors_StartDirectionalAnimation(struct StateActor *actor,
-                                           struct AnimSprite *animation, int resource,
-                                           int sequence, int speed, int offset, int flags)
+void SceneActors_StartDirectionalAnimation(struct StateActor *actor, struct AnimSprite *animation,
+                                           int resource, int sequence, int speed, int offset,
+                                           int flags)
 {
     int savedFlags = flags;
     flags = savedFlags;
@@ -236,9 +230,8 @@ void SceneActors_StartEightDirectionAnimation(struct StateActor *actor,
     }
 }
 
-void SceneActors_StartUnmirroredAnimation(struct StateActor *actor,
-                                          struct AnimSprite *animation, int resource,
-                                          int sequence, int speed, int flags)
+void SceneActors_StartUnmirroredAnimation(struct StateActor *actor, struct AnimSprite *animation,
+                                          int resource, int sequence, int speed, int flags)
 {
     actor->animationOffset = 0;
     actor->animationMirrored = 0;

@@ -354,3 +354,7 @@ src/scene/actor/motion_track.c	OrbitMotion_BeginDistanceWave	contrived	minor	6	t
 src/scene/actor/motion_track.c	OrbitMotion_BeginVerticalDistanceWave	contrived	minor	6	target pointer to the base vector: direct member access reloads the address
 src/scene/actor/motion_track.c	OrbitMotion_BeginCrossedSines	minor	natural	1	-
 src/scene/actor/motion_track.c	MotionTrack_Update	contrived	minor	8	savedTarget/savedStep copies in the arrival test: direct member reads change register choice
+src/scene/actor/motion_track.c	MotionTrack_Initialize	natural	natural	0	-
+src/scene/actor/motion_track.c	OrbitMotion_BeginArc	minor	minor	0	target-pointer-and-center-coordinate-locals-fix-load-order
+src/scene/actor/motion_track.c	PositionMotion_InitParameterizedApproach	natural	natural	0	-
+src/scene/actor/scene_actors.c	SceneActors_FindAvailable	contrived	minor	1	cast from the byte-pointer registry to the actor type
