@@ -123,24 +123,23 @@ s32 ActorAbility_SpawnProjectile(struct ActorAbility *ability)
     struct ActorAbilityProjectileParameters args;
     ability->request = 255;
     if (!Modifier_IsFourthSourceReady(ability))
-        goto fail;
+        return 0;
     owner = ability->owner;
     stats = &owner->actors[0].stats;
     cost = CallbackList_RunMatchingState(stats, ability->cost, 10);
     if (stats->value < cost)
-        goto fail;
+        return 0;
     args.projectile = owner->actors[0].control.projectile;
     args.y = 0;
     args.z = 0;
     height = stats->height - 0x12000;
     if (SceneProcSprites_CreateEntry(&stats->position, height, owner->actors[0].control.projectile,
-                                     owner->actors[0].control.direction, &ability->id) < 0) {
-    fail:
-        return 0;
+                                     owner->actors[0].control.direction, &ability->id) >= 0) {
+        CallbackList_SubtractStateTenValue(stats, ability, cost);
+        ability->remaining = ability->duration;
+        return 1;
     }
-    CallbackList_SubtractStateTenValue(stats, ability, cost);
-    ability->remaining = ability->duration;
-    return 1;
+    return 0;
 }
 
 s32 ActorAbility_SpawnAlternateProjectile(struct ActorAbility *ability)
