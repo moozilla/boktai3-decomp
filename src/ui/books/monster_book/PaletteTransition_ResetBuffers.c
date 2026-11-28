@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ui/books/palette_transition_banks.h"
 // Family and descriptive names are tentative interpretations of static code.
 struct PaletteTransition {
     u8 pad0[0x1c];
@@ -6,28 +7,23 @@ struct PaletteTransition {
     u8 pad20[8];
     u32 mode;
     u8 pad2c[0x374];
-    u16 source[0x100];
-    u16 destination[0x100];
-    u16 white[16];
-    u16 black[16];
+    struct PaletteTransitionBanks banks;
 };
 void PaletteTransition_StartDisplay(struct PaletteTransition *, u32);
 void PaletteTransition_LoadSource(struct PaletteTransition *, u32);
 void PaletteTransition_ResetBuffers(struct PaletteTransition *p)
 {
-    u16 *source;
     s32 i;
-    u16 value;
+
     PaletteTransition_StartDisplay(p, p->parameter);
     if (p->mode == 2) {
-        source = p->source;
+        struct PaletteTransitionBanks *banks = &p->banks;
+
         PaletteTransition_LoadSource(p, p->parameter);
-        CpuSet(source, p->destination, 0x04000080);
-        value = 0x7fff;
-        for (i = 15; i >= 0; i--)
-            p->white[i] = value;
-        value = 0;
-        for (i = 15; i >= 0; i--)
-            ((u16 *)((u8 *)source + 0x420))[i] = value;
+        CpuSet(banks->source, banks->destination, 0x04000080);
+        for (i = 0; i < 16; i++)
+            banks->target[0][i] = 0x7fff;
+        for (i = 0; i < 16; i++)
+            banks->target[1][i] = 0;
     }
 }
