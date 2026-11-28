@@ -262,3 +262,9 @@ src/bosses/hresvelgr/Hresvelgr_UpdateRepeatedCharge.c	Hresvelgr_UpdateRepeatedCh
 src/bosses/hresvelgr/Hresvelgr_UpdateOpeningAttackCycle.c	Hresvelgr_UpdateOpeningAttackCycle	contrived	minor	8	second actor pointer and PlayerFlags helper stay
 src/bosses/hresvelgr/Hresvelgr_UpdateAttackCycle.c	Hresvelgr_UpdateAttackCycle	contrived	minor	6	second actor pointer stays
 src/bosses/hresvelgr/Hresvelgr_UpdateActionTwentySevenRequest.c	Hresvelgr_UpdateActionTwentySevenRequest	minor	minor	2	second actor pointer stays
+src/bosses/hresvelgr/Hresvelgr_UpdateActionTwentyEightRequest.c	Hresvelgr_UpdateActionTwentyEightRequest	natural	natural	0	
+src/bosses/hresvelgr/Hresvelgr_UpdateActionTwentyNineRequest.c	Hresvelgr_UpdateActionTwentyNineRequest	natural	natural	0	
+src/bosses/hresvelgr/Hresvelgr_UpdateActionThirtyRequest.c	Hresvelgr_UpdateActionThirtyRequest	natural	natural	0	
+src/bosses/hresvelgr/Hresvelgr_UpdateActionThirtyOneRequest.c	Hresvelgr_UpdateActionThirtyOneRequest	natural	natural	0	
+src/bosses/hresvelgr/ActorAction_WaitThenChangeBehavior.c	ActorAction_WaitThenChangeBehavior	natural	natural	0	
+src/bosses/hresvelgr/HresvelgrState_Hold37.c	HresvelgrState_Hold37	minor	minor	2	second actor pointer stays
