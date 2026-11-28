@@ -184,3 +184,4 @@ src/link/player/LinkPlayer_GetAbilityCostById.c	LinkPlayer_GetAbilityCostById	na
 src/link/player/LinkPlayer_IsAbilityIdValid.c	LinkPlayer_IsAbilityIdValid	minor	minor	2	predicate helper stays: a plain return differs
 src/link/player/Player_GetTetherMode.c	Player_GetTetherMode	minor	minor	1	redundant returns and signed pointer cast stay: plain struct reads differ
 src/link/player/LinkPlayer_LoadBaseStats.c	LinkPlayer_LoadBaseStats	contrived	natural	1	
+src/link/player/LinkPlayer_InitHealth.c	LinkPlayer_InitHealth	minor	natural	1	
