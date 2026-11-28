@@ -92,3 +92,4 @@ src/engine/sound/Sound_PlaySong.c	Sound_PlaySong	minor	natural	1
 src/engine/sound/Sound_PlaySongChecked.c	Sound_PlaySongChecked	contrived	natural	1	
 src/engine/sound/Sound_PlayTrackedSong.c	Sound_PlayTrackedSong	contrived	minor	1	players pointer: without it the table address is loaded after the index
 src/engine/sound/Sound_PlayChannel12Song.c	Sound_PlayChannel12Song	contrived	minor	1	assignment inside the index: it loads the table address before the player number
+src/engine/sound/Sound_FadeOutChannel12.c	Sound_FadeOutChannel12	minor	natural	1	
