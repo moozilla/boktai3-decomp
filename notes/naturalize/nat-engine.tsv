@@ -403,3 +403,11 @@ src/engine/video/sprite_component/SceneMotion_InitState.c	SceneMotion_InitState	
 src/engine/video/sprite_component/ProximityVolume_Update.c	ProximityVolume_Update	natural	natural		
 src/engine/video/sprite_component/ProximityVolume_IdleCallback.c	ProximityVolume_IdleCallback	natural	natural		
 src/system/clock/clock_events.c	ClockEvents_Update	contrived	minor	1	zero set through do/while(0) so it stays in a register for the frame and noon-latch stores
+src/system/clock/clock_events.c	ClockEvents_RunScript	natural	natural		
+src/system/clock/clock_events.c	ClockEvents_Destroy	natural	natural		
+src/system/clock/clock_events.c	ClockEvents_Initialize	natural	natural		
+src/system/clock/clock_events.c	ClockEvents_Create	natural	natural		
+src/system/clock/time_palette.c	TimePalette_GetSourceIndex	natural	natural		
+src/system/clock/time_palette.c	TimePalette_UpdateTransition	natural	natural		
+src/system/clock/time_palette.c	TimePalette_InitTransition	natural	natural		
+src/system/clock/region_menu.c	Time_OnLoadSave	natural	natural	1	

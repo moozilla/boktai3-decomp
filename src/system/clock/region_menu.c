@@ -5,6 +5,7 @@
 #include "engine/runtime.h"
 #include "engine/video/render.h"
 #include "engine/input.h"
+#include "system/clock/sun_clock.h"
 
 void Menu_EraseRect(s32, s32, s32, s32);
 
@@ -46,8 +47,6 @@ struct TimeState {
     u32 region;
 };
 
-extern u8 gSunClock[];
-
 void Time_CalculateSunriseSunset(s32 latitude, s32 longitude, s32 timezone);
 
 void Save_WriteHeader(void);
@@ -56,7 +55,7 @@ void Time_OnRegionListSelect(struct RegionMenu *menu)
 {
     Time_CalculateSunriseSunset(menu->entries[menu->selected].latitude,
                                 menu->entries[menu->selected].longitude, 0);
-    gSunClock[9] = 0;
+    gSunClock.pad9 = 0;
     {
         s32 sel = menu->selected;
         ((struct TimeState *)gSessionState)->region = sel;
@@ -346,5 +345,5 @@ void Time_OnLoadSave(void)
         region = 6;
     }
     Time_CalculateSunriseSunset(entries[region].latitude, entries[region].longitude, 0);
-    gSunClock[9] = 0;
+    gSunClock.pad9 = 0;
 }
