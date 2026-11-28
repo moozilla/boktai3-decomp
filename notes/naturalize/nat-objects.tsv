@@ -329,3 +329,4 @@ src/objects/hazards/falling_objects.c	FallingObjectManager_Update	natural	natura
 src/objects/hazards/falling_objects.c	FallingObjectManager_Destroy	natural	natural	0	
 src/objects/hazards/falling_objects.c	FallingObjectManager_Initialize	natural	natural	0	
 src/objects/hazards/falling_objects.c	FallingObject_Create	contrived	natural	10	
+src/objects/hazards/timed_hazard/TimedHazard_OnDamageContact.c	TimedHazard_OnDamageContact	contrived	minor	4	mask local keeps the constant loaded before the flag word
