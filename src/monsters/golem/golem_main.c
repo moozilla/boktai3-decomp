@@ -1537,10 +1537,7 @@ void Golem_ResumeSavedTarget(struct ChaseActor *actor, s32 frame)
                                      ((struct ChaseRouteProbe *)group->route)->destination.x,
                                      ((struct ChaseRouteProbe *)group->route)->destination.z);
             SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
-            {
-                void *target = SceneActorControl_OnIdle;
-                SceneActorChase_SetTypedControl(actor, target, 0x10);
-            }
+            SceneActorChase_SetTypedControl(actor, SceneActorControl_OnIdle, 0x10);
             SceneActorChase_SelectState(actor, 0, 2, 0);
             SceneActorChase_ResetStateEntry(actor);
 
