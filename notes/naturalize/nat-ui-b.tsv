@@ -508,3 +508,4 @@ src/ui/town/shop/Shop_BeginAlternateConsumableSelection.c	Shop_BeginAlternateCon
 src/ui/town/shop/Shop_HandleClockShortcut.c	Shop_HandleClockShortcut	natural	natural	0	
 src/ui/town/shop/Shop_HandlePageKeys.c	Shop_HandlePageKeys	natural	natural	0	
 src/ui/town/shop/Shop_TickMoveSelection.c	Shop_TickMoveSelection	natural	natural	0	
+src/ui/town/shop/Shop_TickPurchaseTransition.c	Shop_TickPurchaseTransition	contrived	minor	7	catalog and transition views over the tail layout
