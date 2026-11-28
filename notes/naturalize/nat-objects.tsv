@@ -303,3 +303,4 @@ src/objects/hazards/directional_force/DirectionalForce_SetThreshold.c	Directiona
 src/objects/hazards/directional_force/DirectionalForce_SetThresholdFromScript.c	DirectionalForce_SetThresholdFromScript	natural	natural	0	
 src/objects/hazards/directional_force/DirectionalForce_Destroy.c	DirectionalForce_Destroy	natural	natural	0	
 src/objects/hazards/falling_object_effects/FadingParticleManager_Update.c	FadingParticleManager_Update	contrived	natural	2	
+src/objects/hazards/falling_object_effects/FadingParticleManager_Destroy.c	FadingParticleManager_Destroy	contrived	natural	2	
