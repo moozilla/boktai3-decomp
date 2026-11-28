@@ -130,18 +130,14 @@ void SceneActor_UpdateDirectionalAnimation(struct ChaseActor *actor)
         Actor_InitLaunchVelocity(actor);
         body->direction = Math_Atan2(actor->base.secondaryMotion.x, actor->base.secondaryMotion.z);
         SceneActorAnimation_SelectDirectionalEntry(&actor->base, 5);
-        mask = 0x100;
-        actor->base.motionFlags |= mask;
+        SceneActorChase_SetMotionFlags(actor, 0x100);
     }
     if (sequence->index > 2) {
         if (sequence->index == 4 && sequence->elapsed == 0)
             Sound_PlaySong(0x101);
     }
     if (SceneActorChase_StatusFlags(actor, 0x10)) {
-        u16 *flags = &actor->base.motionFlags;
-        u32 mask = ~0x100;
-        mask &= *flags;
-        *flags = mask;
+        SceneActorChase_ClearMotionFlagComponent(actor, 0x100);
         actor->base.stepDone = 1;
         SceneActorAnimation_SelectDirectionalEntry(&actor->base, 0);
     } else {
