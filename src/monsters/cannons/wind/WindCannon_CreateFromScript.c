@@ -134,20 +134,18 @@ s32 WindCannon_CreateFromScript(void)
         p->dead = 1;
         Anim_SetSequence(&p->sequence, p->resource, 0x16, (u8)p->direction, (u8)p->variant);
     }
-    PlayerCue_StepSequence((struct ContactSwarmSprite *)&p->sprite.flags,
-                           &p->sequence);
+    PlayerCue_StepSequence((struct ContactSwarmSprite *)&p->sprite.flags, &p->sequence);
     if (!p->initialDead)
         sub_082093F8(p);
     if (p->terrain && !p->initialDead) {
-        s32 cell = Fan_Cell(&p->sprite.position);
-        TerrainModifiers_RegisterCell(p->terrainCell, cell, 0, p->sprite.position.y >> 8, 0, 0x803);
+        TerrainModifiers_RegisterCell(p->terrainCell, (Fan_Cell(&p->sprite.position)), 0,
+                                      p->sprite.position.y >> 8, 0, 0x803);
     }
     if (p->hasBody) {
         u32 heading = (u8)((p->direction << 6) + 0xc0);
-        void *body = p->body;
-        SceneBody_Init(body, p->name, &p->sprite.position, heading, 4, p);
-        SceneBody_SetSprite(body, &p->sprite.flags);
-        TerrainOverlay_QueueAddActor(body);
+        SceneBody_Init(p->body, p->name, &p->sprite.position, heading, 4, p);
+        SceneBody_SetSprite(p->body, &p->sprite.flags);
+        TerrainOverlay_QueueAddActor(p->body);
     }
     if (p->schedule)
         WindCannon_ReadToggleSchedule(p);
