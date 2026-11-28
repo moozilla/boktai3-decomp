@@ -6,3 +6,4 @@ src/ui/books/monster_book/sub_081D3750.c	sub_081D3750	contrived	contrived	75	sta
 src/ui/books/monster_book/Particle_UpdateHoming.c	Particle_UpdateHoming	contrived	natural	2	
 src/ui/books/monster_book/PaletteTransition_UpdateBlink.c	PaletteTransition_UpdateBlink	contrived	natural	2	
 src/ui/books/monster_book/PaletteTransition_InitializeChainDisplays.c	PaletteTransition_InitializeChainDisplays	minor	natural	14	position pointer kept: stores to the stack vector go through it
+src/ui/books/monster_book/sub_081D3C90.c	sub_081D3C90	contrived	natural	8	

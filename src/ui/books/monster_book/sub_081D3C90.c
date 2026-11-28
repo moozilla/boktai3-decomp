@@ -27,8 +27,6 @@ static inline s32 Shift13(s32 v)
 }
 // confidence=low: places six parts at fixed offsets from the anchor and sways each one in x by
 // a sine wave whose amplitude shrinks along the chain.
-// fix.py best (sweep after the inlined-insn fix)
-// The ROM reloads p->phase every iteration (not hoisted) and keeps the anchor coordinate addresses in registers.
 void sub_081D3C90(struct WaveChain *p)
 {
     s32 i;
@@ -36,25 +34,20 @@ void sub_081D3C90(struct WaveChain *p)
     p->phase += 0x20;
     part = p->parts;
     for (i = 0; i < 6; i++) {
-        s32 x;
-        s32 dx, y, dy, z;
-        struct WavePosition *position;
-        x = p->x;
-        dx = gUnk_086126CC[i * 2];
-        y = p->y;
-        dy = gUnk_086126CC[i * 2 + 1];
-        z = p->z;
-        position = part->position;
+        s32 x = p->x;
+        s32 dx = gUnk_086126CC[i * 2];
+        s32 y = p->y;
+        s32 dy = gUnk_086126CC[i * 2 + 1];
+        s32 z = p->z;
+        struct WavePosition *position = part->position;
+        s32 angle;
         x += dx;
         y += dy;
         position->x = x;
         position->y = y;
         position->z = z;
-        {
-            s32 angle = Shift5(p->phase) + i * 32;
-            s32 amplitude = 8 - i;
-            part->position->x += Shift13(amplitude * gUnk_086149C4[angle & 255]);
-        }
+        angle = Shift5(p->phase) + i * 32;
+        part->position->x += Shift13((8 - i) * gUnk_086149C4[angle & 255]);
         part++;
     }
 }
