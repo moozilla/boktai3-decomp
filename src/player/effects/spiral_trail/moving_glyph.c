@@ -9,19 +9,6 @@ void MovingGlyph_SetState(struct MovingSprite *p, void (*phase)(void))
     p->frame = 0;
 }
 
-struct FlashTask {
-    u8 pad0[0x18];
-    u32 flags;
-    u8 pad1C[0x28 - 0x1C];
-    u16 frame;
-    u8 pad2A[0x6A - 0x2A];
-    u16 baseFrame;
-    u16 kind;
-    u8 pad6E[0x76 - 0x6E];
-    u16 timer;
-};
-
-
 static inline u32 Flip(u16 kind)
 {
     u32 flip = 0;
@@ -40,47 +27,41 @@ static inline u32 Flip(u16 kind)
 
 // kills itself after six frames.
 
-void MovingGlyph_UpdateFlash(struct FlashTask *p)
+void MovingGlyph_UpdateFlash(struct MovingSprite *p)
 {
-    if (p->timer <= 2)
-        p->frame = (p->baseFrame >> 1) + 4;
+    if (p->frame <= 2)
+        p->sprite.frame = (p->id >> 1) + 4;
     else {
         s32 offset;
-        if (p->kind & 1)
+        if (p->angle & 1)
             offset = 1;
         else
-            offset = (p->kind >> 1) & 1 ? 2 : 0;
-        p->flags |= Flip(p->kind);
-        p->frame = offset + 6;
+            offset = (p->angle >> 1) & 1 ? 2 : 0;
+        p->sprite.flags |= Flip(p->angle);
+        p->sprite.frame = offset + 6;
     }
-    if (++p->timer > 5)
+    if (++p->frame > 5)
         Task_Kill(p);
 }
 
-#define MovingSprite_SetPhase MovingGlyph_SetState
-
-
-
 void MovingSprite_UpdateMotion(struct MovingSprite *p)
 {
-    p->position.coordinates.x += p->velocityX;
-    p->position.coordinates.y += p->velocityY;
-    p->displayedPosition = p->position.coordinates;
+    p->position.x += p->velocityX;
+    p->position.z += p->velocityY;
+    p->sprite.position = p->position;
     p->frame++;
     if (p->frame >= p->duration)
         MovingGlyph_SetState(p, MovingGlyph_UpdateFlash);
 }
 
-
 void MovingSprite_UpdateDelay(struct MovingSprite *p)
 {
     p->frame++;
     if (p->frame >= p->delay) {
-        p->flags &= ~1;
+        p->sprite.flags &= ~1;
         MovingGlyph_SetState(p, MovingSprite_UpdateMotion);
     }
 }
-
 
 u32 MovingGlyph_UpdateTask(struct MovingSprite *p)
 {
@@ -88,53 +69,41 @@ u32 MovingGlyph_UpdateTask(struct MovingSprite *p)
     return 0;
 }
 
-
-u32 MovingGlyph_DestroyTask(u8 *p)
+u32 MovingGlyph_DestroyTask(struct MovingSprite *p)
 {
-    Sprite_Remove(p + 0x18);
+    Sprite_Remove(&p->sprite);
     return 0;
 }
-
-
 
 static inline s32 scale(s32 value)
 {
     return value >= 0 ? value >> 12 : -((-value) >> 12);
 }
 
-s32 MovingSprite_Initialize(struct MovingSprite *p, u32 *position, u32 palette, u32 id, u32 angle,
-                            u32 speed, u32 delay, u32 duration)
+s32 MovingSprite_Initialize(struct MovingSprite *p, const struct ContactPosition *position,
+                            u32 palette, u32 id, u32 angle, u32 speed, u32 delay, u32 duration)
 {
-    u8 *sprite = (u8 *)&p->flags;
-    u8 *anim = p->animation;
-    u32 loaded;
+    struct DisplaySequenceSprite *sprite = &p->sprite;
+    u32 frame;
     s32 index;
-    u32 a;
-    u32 b;
-    AnimData_Load(anim, 0x210E);
-    Sprite_Init(sprite, anim, 0);
-    a = position[0];
-    b = position[1];
-    p->position.words.a = a;
-    p->position.words.b = b;
-    ((u32 *)sprite)[7] = a;
-    ((u32 *)sprite)[8] = b;
-    sprite[7] = 1;
-    AnimData_SelectPaletteBank(anim, palette);
-    {
-        u16 *q = &p->id;
-        *q = id;
-        loaded = *q;
-        *(u16 *)(sprite + 0x10) = loaded;
-    }
+
+    AnimData_Load(p->animation, 0x210E);
+    Sprite_Init(sprite, p->animation, 0);
+    p->position = *position;
+    sprite->position = *position;
+    sprite->priority = 1;
+    AnimData_SelectPaletteBank(p->animation, palette);
+    p->id = id;
+    frame = p->id;
+    sprite->frame = frame;
     p->angle = angle;
     index = ((p->angle + 1) & 7) << 5;
     p->velocityX = -scale(gUnk_086149C4[(index + 64) & 255] * speed);
-    p->velocityY = -scale(gUnk_086149C4[index << 0] * speed);
+    p->velocityY = -scale(gUnk_086149C4[index] * speed);
     p->delay = delay;
     p->duration = duration;
     if (p->delay) {
-        *(u32 *)sprite |= 1;
+        sprite->flags |= 1;
         MovingGlyph_SetState(p, MovingSprite_UpdateDelay);
     } else {
         MovingGlyph_SetState(p, MovingSprite_UpdateMotion);
@@ -142,17 +111,8 @@ s32 MovingSprite_Initialize(struct MovingSprite *p, u32 *position, u32 palette, 
     return 0;
 }
 
-#define MovingSprite_Update  MovingGlyph_UpdateTask
-
-#define MovingSprite_Destroy MovingGlyph_DestroyTask
-
-
-
-
-
-
-void *MovingGlyph_Create(void *position, u32 id, u32 a, u32 direction, u32 duration,
-                                   u32 delay, u32 b)
+void *MovingGlyph_Create(void *position, u32 id, u32 a, u32 direction, u32 duration, u32 delay,
+                         u32 b)
 {
     void *p = Task_Create(10, 0x7C);
     if (p) {
@@ -164,7 +124,6 @@ void *MovingGlyph_Create(void *position, u32 id, u32 a, u32 direction, u32 durat
     }
     return p;
 }
-
 
 s32 MovingGlyph_InitializeFromScript(void *p, u32 unusedA, u32 unusedB)
 {
@@ -206,11 +165,6 @@ s32 MovingGlyph_InitializeFromScript(void *p, u32 unusedA, u32 unusedB)
     MovingSprite_Initialize(p, &position, palette, id, angle, speed, delay, duration);
     return 0;
 }
-
-
-
-
-
 
 void *MovingGlyph_CreateFromScript(u32 a, u32 b)
 {

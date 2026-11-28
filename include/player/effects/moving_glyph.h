@@ -3,22 +3,13 @@
 
 #include "global.h"
 #include "engine/task.h"
+#include "engine/video/sprite.h"
 
-struct MovingSpritePosition {
-    u16 x, unknown2, y, unknown6;
-};
-union MovingSpritePositionValue {
-    struct MovingSpritePosition coordinates;
-    struct { u32 a, b; } words;
-};
 struct MovingSprite {
     struct Task task;
-    u32 flags;
-    u8 spritePrefix[0x18];
-    struct MovingSpritePosition displayedPosition;
-    u8 spriteSuffix[8];
+    struct DisplaySequenceSprite sprite;
     u8 animation[0x1C];
-    union MovingSpritePositionValue position;
+    struct ContactPosition position;
     u8 unknown68[2];
     u16 id;
     u16 angle;

@@ -583,3 +583,10 @@ src/player/effects/spiral_trail/SpiralTrail_Destroy.c	SpiralTrail_Destroy	natura
 src/player/effects/spiral_trail/ActorAttachment_Initialize.c	ActorAttachment_Initialize	natural	natural	0	-
 src/player/effects/spiral_trail/ActorAttachment_Create.c	ActorAttachment_Create	natural	natural	0	-
 src/player/effects/spiral_trail/SpiralTrail_CreateWithParticles.c	SpiralTrail_CreateWithParticles	natural	natural	0	-
+src/player/effects/spiral_trail/moving_glyph.c	MovingGlyph_SetState	natural	natural	0	-
+src/player/effects/spiral_trail/moving_glyph.c	MovingGlyph_UpdateFlash	contrived	natural	1	-
+src/player/effects/spiral_trail/moving_glyph.c	MovingSprite_UpdateMotion	minor	natural	1	-
+src/player/effects/spiral_trail/moving_glyph.c	MovingSprite_UpdateDelay	natural	natural	1	-
+src/player/effects/spiral_trail/moving_glyph.c	MovingGlyph_UpdateTask	natural	natural	0	-
+src/player/effects/spiral_trail/moving_glyph.c	MovingGlyph_DestroyTask	minor	natural	1	-
+src/player/effects/spiral_trail/moving_glyph.c	MovingSprite_Initialize	contrived	minor	12	sprite pointer and a u32 reload of id before the sprite frame store
