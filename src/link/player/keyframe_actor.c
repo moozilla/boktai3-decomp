@@ -1,56 +1,39 @@
 #include "global.h"
+#include "player/player.h"
 #include "player/cutscene/player_cue_sequence.h"
 #include "engine/ram.h"
 #include "engine/engine.h"
 
-// 19 differing instruction runs; first diff at +0x4 (adds r6, r0, #0 vs adds r5, r0, #0)
-
-struct BlobAE {
+struct KeyframeResource {
     u32 words[8];
 };
 
-
-
-void AnimSprite_InitLinked(u8 *, struct BlobAE *, u32, u32, u32, u32, u32, void *);
-
+void AnimSprite_InitLinked(void *, void *, u32, u32, u32, u32, u32, void *);
 
 s32 Script_GetValue(void);
 
-void Player_UpdateActionFacingSide(u8 *);
+void Player_UpdateActionFacingSide(struct Player *);
 
-
-void KeyframeActor_InitKeyframeDisplay(u8 *p)
+void KeyframeActor_InitKeyframeDisplay(struct Player *p)
 {
-    struct BlobAE *data = ScriptProc_Start(0xcb05, 0xde23);
-    typeof(p[0x548]) t1;
+    struct KeyframeResource *data = ScriptProc_Start(0xcb05, 0xde23);
+
     if (data) {
-        struct BlobAE *copy;
-        u8 *object;
-        s32 found;
-        u32 zero;
-        *((struct BlobAE *)(p + 0x6c)) = *data;
-        copy = (struct BlobAE *)(p + 0x6c);
-        ResourceHeader_Relocate((struct BlobAE *)(p + 0x6c), data);
-        object = p + 0x8c;
-        AnimSprite_InitLinked(p + 0x8c, (struct BlobAE *)(p + 0x6c), 0, 0x9000, 2, 0, 60, p + 0x30);
-        found = Script_SeekToKeyword(0x64);
-        if (found)
-            p[0x548] = Script_GetValue();
+        *(struct KeyframeResource *)p->animationData = *data;
+        ResourceHeader_Relocate(p->animationData, data);
+        AnimSprite_InitLinked(&p->animation, p->animationData, 0, 0x9000, 2, 0, 60, &p->position);
+        if (Script_SeekToKeyword(0x64))
+            p->savedLinkFacing = Script_GetValue();
         else
-            p[0x548] = found;
-        t1 = p[0x548];
-        {
-            u8 *q = &p[0x3a4];
-            zero = 0;
-            *q = t1;
-        }
+            p->savedLinkFacing = 0;
+        p->facing = p->savedLinkFacing;
         Player_UpdateActionFacingSide(p);
-        *((u16 *)(p + 0x3a0)) = zero;
-        Anim_SetKeyframes(p + 0x8c, (struct BlobAE *)(p + 0x6c), p[0x3a2], 1, zero);
-        if (p[0x3a3])
-            *((u32 *)(p + 0x94)) |= 4;
+        p->animationIndex = 0;
+        Anim_SetKeyframes(&p->animation, p->animationData, p->heading, 1, 0);
+        if (p->side)
+            p->animation.flags |= 4;
         else
-            *((u32 *)(p + 0x94)) &= ~4;
+            p->animation.flags &= ~4;
     }
 }
 
@@ -101,7 +84,7 @@ u8 *TerrainModifiers_FindCellOverride(s32, s32);
 
 u32 SceneBody_Init(void *, u32, void *, u32, u32, void *);
 
-void KeyframeActor_InitKeyframeDisplay(u8 *);
+void KeyframeActor_InitKeyframeDisplay(struct Player *);
 
 void KeyframeActor_InitAuxiliarySprite(u8 *);
 
@@ -170,7 +153,7 @@ u32 KeyframeActor_InitBodyFromScript(u8 *p, u32 entry)
     }
     body = p + 0x24;
     SceneBody_Init(body, entry, p + 0x540, 0, p[0x18], p);
-    KeyframeActor_InitKeyframeDisplay(p);
+    KeyframeActor_InitKeyframeDisplay((struct Player *)p);
     KeyframeActor_InitAuxiliarySprite(p);
     p[0x419] = zero;
     SceneBody_SetKeyframeDisplay(body, p + 0x8c);
