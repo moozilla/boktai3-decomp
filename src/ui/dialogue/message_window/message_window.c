@@ -473,26 +473,26 @@ void MessageWindow_UpdatePageAdvance(struct MessageWindow *window)
     if (window->autoAdvance) {
         if (window->autoAdvanceCounter++ >= window->autoAdvanceStep) {
             if (window->pageAdvanceTimer >= window->pageAdvanceDelay) {
-                window->pageAdvanceDelay = result;
-                window->pageAdvanceTimer = result;
-                window->autoAdvanceCounter = result;
+                window->pageAdvanceDelay = 0;
+                window->pageAdvanceTimer = 0;
+                window->autoAdvanceCounter = 0;
                 result = 2;
             } else {
                 window->pageAdvanceTimer++;
             }
         }
     } else if (window->pageAdvanceTimer >= window->pageAdvanceDelay) {
-        window->pageAdvanceDelay = result;
-        window->pageAdvanceTimer = result;
-        if (gPadState[0] & 2) {
+        window->pageAdvanceDelay = 0;
+        window->pageAdvanceTimer = 0;
+        if (gPadState[0] & B_BUTTON) {
             window->fastPlayback = 1;
             result = 1;
         }
-        if (gPadState[1] & 1)
+        if (gPadState[1] & A_BUTTON)
             result = 1;
         window->animSprite.flags &= ~1;
     } else {
-        window->fastPlayback = result;
+        window->fastPlayback = 0;
         window->animSprite.flags |= 1;
         window->pageAdvanceTimer++;
     }
