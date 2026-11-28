@@ -25,7 +25,8 @@ static inline void Reaction_Show(struct ChaseActor *actor)
 static inline void Reaction_SetDrawMode(struct ChaseActor *actor, u32 mode)
 {
     if (!actor->base.drawableKind)
-        ((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sprite.priority = mode;
+        ((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sprite.priority =
+            mode;
     else
         ((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile.attribute1A = mode;
 }
@@ -48,9 +49,7 @@ void SceneActorReaction_UpdateContactRouteRecovery(struct ChaseActor *actor)
     u32 *motion = &actor->base.statusFlags;
 
     if (prepared) {
-        {
-            SceneActorReaction_ResetRouteControl(actor, &group->common.control);
-        }
+        SceneActorReaction_ResetRouteControl(actor, &group->common.control);
         SceneActorAnimation_SelectDirectionFlagsVariant((void *)actor, 3, 1);
         collider->flags |= 4;
         collider->responseValue = 0;
