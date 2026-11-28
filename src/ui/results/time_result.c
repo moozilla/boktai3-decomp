@@ -151,10 +151,8 @@ void TimeResult_InitializeBackground(struct ChallengeTimeResult *result)
 void TimeResult_LoadPalette(struct ChallengeTimeResult *result)
 {
     struct TimeResultPalette *resource = ScriptProc_Start(0x92B3, 0x204);
-    u16 **destination = &result->paletteSource;
-    u16 *colors = resource->colors;
-    *destination = colors;
-    CpuSet(colors, gBgPaletteBuffer, 0x04000028);
+    result->paletteSource = resource->colors;
+    CpuSet(result->paletteSource, gBgPaletteBuffer, 0x04000028);
 }
 
 union DigitLayoutSource {
