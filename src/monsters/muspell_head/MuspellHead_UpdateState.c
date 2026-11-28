@@ -30,7 +30,9 @@ u32 MuspellHead_UpdateState(struct MuspellHead *head)
         collider->flags &= ~4;
         Collider_SetPosition(collider, &head->sprite.position, 0);
     } else {
-        ContactCollider_SetFlags(&head->bodyCollider, 4);
+        struct ContactCollider *collider = &head->bodyCollider;
+
+        collider->flags |= 4;
         head->graphics.paletteData = gPaletteBankData + 0x36e0;
     }
     if (head->damage > 0 && (s16)head->dead == 0) {
