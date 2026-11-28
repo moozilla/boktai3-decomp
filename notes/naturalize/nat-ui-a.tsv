@@ -181,3 +181,9 @@ src/ui/dialogue/choice_menu.c	ChoiceMenu_ParseTag	minor	minor	1	shared tag-argum
 src/ui/dialogue/choice_menu.c	ChoiceMenu_Create	natural	natural	0	
 src/ui/dialogue/message_menu.c	MessageMenu_LoadBackground	minor	natural	1	
 src/ui/dialogue/message_menu.c	MessageMenu_Destroy	minor	natural	1	
+src/ui/dialogue/TriggerManager_Reset.c	TriggerManager_Reset	natural	natural	0	
+src/ui/dialogue/message_menu.c	MessageMenu_CreateTextWindows	minor	minor	1	window handle pointer reused for all three windows
+src/ui/dialogue/message_menu.c	MessageMenu_InitializeTransition	minor	minor	0	local position struct
+src/ui/dialogue/message_menu.c	MessageMenu_Update	natural	natural	0	
+src/ui/dialogue/message_menu.c	MessageMenu_Initialize	natural	natural	0	
+src/ui/dialogue/message_menu.c	Password_Create	natural	natural	0	
