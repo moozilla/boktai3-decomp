@@ -1,9 +1,9 @@
 #include "global.h"
 #include "player/player.h"
 #include "engine/engine_globals.h"
+#include "system/game_state/game_state.h"
+#include "objects/coffin/tether_actor.h"
 // confidence=low: phases coordinate attachment creation, facing and a fading control cue.
-extern u8 *gTetherActor;
-extern u8 *gGameState;
 void Sound_PlaySong(u32);
 void *ActorAttachment_UpdateFromDescriptor(void *, void *, int, int, int, int, int, int);
 s32 Math_Atan2(s32, s32);
@@ -18,7 +18,7 @@ void Player_UpdateAttachmentCue(struct Player *p)
         case 0:
             if (!p->tetherFrame) {
                 s32 song = 0xE7;
-                if (gTetherActor && *(s16 *)(gGameState + 0x5AA) == 9)
+                if (gTetherActor && gGameState->unk5AA == 9)
                     song = 0x3F6;
                 Sound_PlaySong(song);
                 p->kindTwoAttachmentDescriptor = 0;
@@ -28,16 +28,13 @@ void Player_UpdateAttachmentCue(struct Player *p)
                     1, 0, 0, 0, 0x50);
                 Sound_PlaySong(0x1B1);
                 if (gTetherActor) {
-                    s32 direction =
-                        ((u16)Math_Atan2(*(s16 *)(gTetherActor + 0x50) - p->position.x,
-                                         *(s16 *)(gTetherActor + 0x54) - p->position.z) +
-                         0x70) >>
-                        5;
-                    {
-                        s32 facing = 7;
-                        facing &= direction;
-                        p->facing = facing;
-                    }
+                    s32 direction = ((u16)Math_Atan2(gTetherActor->position.x - p->position.x,
+                                                     gTetherActor->position.z - p->position.z) +
+                                     0x70) >>
+                                    5;
+                    s32 facing = 7;
+                    facing &= direction;
+                    p->facing = facing;
                     Player_UpdateFacingSide(p);
                 }
             }
