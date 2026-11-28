@@ -1,4 +1,5 @@
 #include "ui/results/challenge_result.h"
+#include "gba/io_reg.h"
 #include "engine/math/monster_particle_random.h"
 
 void TimeResult_SetState(struct ChallengeTimeResult *result,
@@ -137,18 +138,14 @@ void TimeResult_Destroy(struct ChallengeTimeResult *result)
 
 void TimeResult_InitializeBackground(struct ChallengeTimeResult *result)
 {
-    u32 layers[1];
     void *script;
-    u16 *control = &gDispCntShadow;
-    u32 mask = 0xfffff0ff;
-    u32 flags;
-    mask &= *control;
-    flags = mask | 0x400;
-    *control = flags;
+    u32 layers;
+    Bg_DisableDisplay(DISPCNT_BG0_ON | DISPCNT_BG1_ON | DISPCNT_BG2_ON | DISPCNT_BG3_ON);
+    Bg_EnableDisplay(DISPCNT_BG2_ON);
     script = ScriptProc_Start(0xc091, 0x3536);
     result->backgroundResource = script;
-    layers[0] = 12;
-    Bg_SetupLayers(1, 0, script, 0, 0, 1, layers);
+    layers = 12;
+    Bg_SetupLayers(1, 0, script, 0, 0, 1, &layers);
 }
 
 void TimeResult_LoadPalette(struct ChallengeTimeResult *result)
