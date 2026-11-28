@@ -147,6 +147,12 @@ static inline void BatFlock_BlendPalette(struct GroupObjects *m, int weight)
     Palette_InterpolateBanks(m->palette, from, to, weight, 6);
 }
 
+static inline int BatFlock_Random(void)
+{
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return ((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
+}
+
 int BatFlockBats_StartStraightAdvance(struct GroupObjects *m, struct GroupQueue *q, struct GroupCommand *cmd)
 {
     struct ContactPosition origin;
@@ -256,46 +262,47 @@ struct PackedVec {
     u32 x : 16, y : 16, z : 16;
 };
 
+static inline void BatFlock_Subtract(struct ContactPosition *d, const struct ContactPosition *a,
+                                     const struct ContactPosition *b)
+{
+    d->x = a->x - b->x;
+    d->y = a->y - b->y;
+    d->z = a->z - b->z;
+}
+
 // confidence=low: converges the board pieces on the command origin at a scaled speed.
 int BatFlockBats_StartConvergence(struct GroupObjects *m, struct GroupQueue *q,
                                  struct GroupCommand *cmd)
 {
     struct ContactPosition origin;
-    struct ContactPosition d;
+    struct ContactPosition delta;
     int i;
-    int radius;
+    int frames;
     void *palette;
     struct GroupPiece *p;
-    struct GroupPiece *r;
+    struct GroupPiece *piece;
+
     origin.x = cmd->originX;
     origin.y = cmd->originY;
     origin.z = cmd->originZ;
-    radius = cmd->radius0;
-    if (radius <= 0)
-        radius = 1;
+    frames = cmd->radius0;
+    if (frames <= 0)
+        frames = 1;
     m->origin = origin;
     m->timer = 0;
-    r = m->pieces;
+    piece = m->pieces;
     i = 0;
     palette = m->palette;
-    for (; i < 16; i++, r++) {
+    for (; i < 16; i++, piece++) {
         int angle;
-        struct ContactPosition *dp = &d;
-        struct ContactPosition *o = &origin;
-        p = r;
-        {
-            u32 state = 7;
-            p->state = state;
-            p->active = 1;
-            p->timer = 0;
-        }
-        dp->x = o->x - p->position.x;
-        dp->y = o->y - p->position.y;
-        dp->z = o->z - p->position.z;
-        angle = Math_Atan2(dp->x, dp->z);
-        p->duration = Div(
-            scale(dp->x * gUnk_086149C4[(angle + 64) & 255] + dp->z * gUnk_086149C4[angle & 255]),
-            radius);
+
+        p = piece;
+        BatFlockBat_SetState(p, 7);
+        BatFlock_Subtract(&delta, &origin, &p->position);
+        angle = Math_Atan2(delta.x, delta.z);
+        p->duration = Div(scale(delta.x * gUnk_086149C4[(angle + 64) & 255] +
+                                delta.z * gUnk_086149C4[angle & 255]),
+                          frames);
         p->target = origin;
         {
             union RandomTableView table = {gRandomTable};
@@ -305,10 +312,10 @@ int BatFlockBats_StartConvergence(struct GroupObjects *m, struct GroupQueue *q,
         }
         p->sprite.position = p->position;
         p->sprite.flags &= ~1;
-        BatFlockBat_SetFacingAnim(m, r, 0);
-        AnimData_SelectPaletteBank(&r->resource, 0x2D3);
+        BatFlockBat_SetFacingAnim(m, piece, 0);
+        AnimData_SelectPaletteBank(&piece->resource, 0x2D3);
         p->resource.palette = palette;
-        ActorShadow_Enable(r->transform);
+        ActorShadow_Enable(piece->transform);
     }
     m->active = 1;
     return 0;
@@ -607,12 +614,6 @@ void BatFlockBat_ChasePlayer(struct GroupObjects *m, struct GroupPiece *p, int i
         BatFlockBat_SetFacingAnim(m, p, 0);
         p->timer++;
     }
-}
-
-static inline int BatFlock_Random(void)
-{
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    return ((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
 }
 
 void BatFlockBat_AdvanceWithOffset(struct GroupObjects *m, struct GroupPiece *p, int index)
