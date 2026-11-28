@@ -200,3 +200,4 @@ src/bosses/hresvelgr/Math_ApproachAngleBySixteenth.c	Math_ApproachAngleBySixteen
 src/bosses/hresvelgr/Math_ApproachAngleByFrameCount.c	Math_ApproachAngleByFrameCount	minor	natural	1	
 src/bosses/hresvelgr/Math_StepAngleTowardTarget.c	Math_StepAngleTowardTarget	contrived	contrived	6	goto into the second branch stays: every structured step differs by the shared assignment
 src/bosses/hresvelgr/Math_BlendAngleWithTableFactor.c	Math_BlendAngleWithTableFactor	minor	natural	1	
+src/bosses/hresvelgr/Math_WrapAngleArrayNearTargets.c	Math_WrapAngleArrayNearTargets	minor	natural	1	
