@@ -166,7 +166,7 @@ struct SceneHudState {
     u8 unknownDB0[0x78];
     struct AnimSprite secondaryWidgets[3]; /* 0xE28 */
     s8 selection;                                /* 0xF48 */
-    u8 unknownF49;
+    u8 callbackBurstTimer; /* 0xF49: set to six with the panel burst (tentative) */
     s8 tertiarySelection;  /* 0xF4A */
     u8 tertiaryVisible;    /* 0xF4B */
     u8 tertiarySlideTimer; /* 0xF4C */

@@ -570,3 +570,7 @@ src/ui/hud/display/Hud_SetLayoutFromScript.c	Hud_SetLayoutFromScript	fudged	natu
 src/ui/hud/display/Hud_RefreshInventoryDisplay.c	Hud_RefreshInventoryDisplay	fudged	natural	2	gFieldHud is declared u8* in a shared header, so each typed use casts it
 src/ui/hud/display/Hud_RefreshEquipmentDisplay.c	Hud_RefreshEquipmentDisplay	fudged	natural	2	gFieldHud is declared u8* in a shared header, so each typed use casts it
 src/ui/hud/display/Hud_SetField13F1FromScript.c	Hud_SetField13F1FromScript	fudged	natural	2	gFieldHud is declared u8* in a shared header, so each typed use casts it
+src/ui/hud/display/Hud_SaveModeFromScript.c	Hud_SaveModeFromScript	natural	natural	0	
+src/ui/hud/display/Hud_RestoreModeFromScript.c	Hud_RestoreModeFromScript	natural	natural	0	
+src/ui/hud/display/Hud_SetModeFromScript.c	Hud_SetModeFromScript	natural	natural	0	
+src/ui/hud/display/Hud_BeginModeSixCue.c	Hud_BeginModeSixCue	fudged	natural	1	

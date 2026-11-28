@@ -54,9 +54,9 @@ void PauseMenu_UpdateSelectedEquipmentIcons(struct SceneHudState *p)
         } else
             PauseMenu_LoadAttributeIconFrame(p, p->primaryWidgets, *icon);
     }
-    if (p->unknownF49) {
+    if (p->callbackBurstTimer) {
         PauseMenu_LoadEmptySlotFrame(p, p->secondaryWidgets);
-        p->unknownF49--;
+        p->callbackBurstTimer--;
         return;
     }
     if ((u8)(p->actionOwner->actionMode - 1) <= 1) {
