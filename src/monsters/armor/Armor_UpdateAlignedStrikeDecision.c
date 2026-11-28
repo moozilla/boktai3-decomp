@@ -46,9 +46,8 @@ void Armor_UpdateAlignedStrikeDecision(struct ArmorDecisionActor *actor)
     s32 absZ;
     u32 flag;
     u8 *decisionPtr;
-    s16 *cooldown = &actor->attackCooldown;
-    if ((*cooldown) > 0)
-        --(*cooldown);
+    if (actor->attackCooldown > 0)
+        --actor->attackCooldown;
     if ((((actor->phase != 255) && (actor->behavior != 20)) && (actor->behavior != 2)) &&
         (actor->behavior != 19))
         return;
