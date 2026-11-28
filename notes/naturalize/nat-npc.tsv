@@ -374,3 +374,4 @@ src/npc/otenko/Otenko_PlayAttachmentEffect.c	Otenko_PlayAttachmentEffect	minor	m
 src/npc/otenko/Otenko_OnModeUpdate.c	Otenko_OnModeUpdate	natural	natural	0	
 src/npc/otenko/Otenko_OnStateUpdate.c	Otenko_OnStateUpdate	natural	natural	0	
 src/npc/otenko/Otenko_OnDestroy.c	Otenko_OnDestroy	contrived	natural	2	falls off the end without a return value, as before
+src/npc/otenko/sub_081D010C.c	sub_081D010C	contrived	contrived	3	parked k/zero, callback local and the do-while around stageEntered order the state stores

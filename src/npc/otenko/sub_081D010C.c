@@ -1,4 +1,5 @@
 #include "npc/otenko/otenko_actor.h"
+#include "engine/math/math_shift.h"
 
 struct Msg081D010C {
     u8 pad[8];
@@ -13,17 +14,11 @@ void sub_081D010C(struct OtenkoActor *npc, struct Msg081D010C *m)
 {
     struct ContactPosition *t;
     struct OtenkoEffectState *effect = &npc->effect;
-    s32 v, r;
     u32 ang;
     s32 zero, k;
     void (*cb)(void);
     npc->savedPosition = *(const struct ContactPosition *)npc->display.position;
-    v = npc->projection.height;
-    if (v >= 0)
-        r = v >> 12;
-    else
-        r = -(-v >> 12);
-    npc->savedPosition.y = r;
+    npc->savedPosition.y = Math_ShiftTowardZero(npc->projection.height, 12);
     {
         s32 x = m->x, y = m->y, z = m->z;
         t = &npc->target;
