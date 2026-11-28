@@ -339,3 +339,7 @@ src/ui/title/tutorial_otenko.c	TutorialOtenko_RequestControllerRemoval	natural	n
 src/ui/title/tutorial_otenko.c	TutorialOtenko_EnsureController	natural	natural	0	
 src/ui/title/tutorial_otenko.c	TutorialOtenko_InitializeController	contrived	minor	8	countdown palette copies with a mask local; view of the effect buffer for its palette pointer; sprite/shadow locals
 src/ui/title/tutorial_otenko.c	TutorialOtenko_ConfigureInteractionChildFromScript	contrived	contrived	1	strength-reduced pointer walk over the children, empty countdown loop and do-while store macro; a plain indexed rewrite is 150+ instructions off
+src/ui/title/TitleDisplay_Initialize.c	TitleDisplay_Initialize	contrived	natural	1	
+src/ui/title/TitleDisplay_Destroy.c	TitleDisplay_Destroy	natural	natural	0	
+src/ui/title/TitleDisplay_SetFromScript.c	TitleDisplay_SetFromScript	natural	natural	0	
+src/ui/title/TitleDisplay_Create.c	TitleDisplay_Create	natural	natural	0	
