@@ -13,7 +13,7 @@ s32 sub_08242D30(struct Player *p)
     else if (mode != 0x1D && mode != 0x17 && mode != 0x16 && mode != 0x1C && mode != 4 &&
              mode != 0xE) {
         if (p->inputKeys[1] & 1) {
-            if ((u8)Trigger_TryOpenNearby((struct TriggerOpener *)((u8 *)p + 0x24)))
+            if ((u8)Trigger_TryOpenNearby((struct TriggerOpener *)&p->positionalEffectGroup))
                 mode = 0;
             else
                 mode = 4;

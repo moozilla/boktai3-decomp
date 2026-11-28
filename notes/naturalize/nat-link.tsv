@@ -283,3 +283,4 @@ src/link/player/sub_082424D0.c	sub_082424D0	natural	natural	0
 src/link/player/LinkPlayer_SetFacingActionOrigin.c	LinkPlayer_SetFacingActionOrigin	natural	natural	0	
 src/link/player/Player_UpdateLinkKind.c	Player_UpdateLinkKind	contrived	minor	9	special local for contactSpecial; cellProps cast for terrain flags
 src/link/player/Player_UpdateHalfChargeLinkKind.c	Player_UpdateHalfChargeLinkKind	contrived	minor	7	special local for contactSpecial; ledge counter still unnamed (unk4A6)
+src/link/player/sub_08242D30.c	sub_08242D30	minor	natural	1	
