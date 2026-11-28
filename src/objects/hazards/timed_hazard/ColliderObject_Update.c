@@ -1,40 +1,25 @@
 #include "global.h"
-#include "engine/engine.h"
 #include "engine/ram.h"
-/* Tentative: per-frame update of a collider-carrying object (restart animation once, move colliders, advance timer). */
-struct ColliderObjectCtx {
-    u8 pad[0x18];
-    void *animation;
-};
-struct ColliderObject {
-    u8 pad0, restart, pad2, pad3, hold, done;
-    u16 timer;
-    u8 pad8[0xE];
-    s16 health;
-    void *collider, *attack;
-    u8 pad20[0x1C];
-    u32 flags;
-    u8 pad40[0x28];
-    u8 anim[1];
-};
+#include "objects/hazards/timed_hazard.h"
 
-void ColliderObject_Update(struct ColliderObject *p)
+/* Tentative: per-frame update of a collider-carrying object (restart animation once, move colliders, advance timer). */
+void ColliderObject_Update(struct TimedHazard *hazard)
 {
-    if (p->restart) {
-        p->restart = 0;
-        p->flags &= ~1;
-        Anim_SetSequence(p->anim, ((struct ColliderObjectCtx *)gColliderSpritePool)->animation, 1,
-                         0, 0);
+    if (hazard->entered) {
+        hazard->entered = 0;
+        hazard->sprite.flags &= ~1;
+        Anim_SetSequence(&hazard->anim, ((struct TimedHazardPool *)gColliderSpritePool)->animation,
+                         1, 0, 0);
     }
-    if (p->health <= 0 || p->hold) {
-        p->done = 1;
+    if (hazard->health <= 0 || hazard->animationDone) {
+        hazard->remove = 1;
     } else {
-        if (p->collider)
-            Collider_SetPosition(p->collider, (u8 *)p + 0xC, 0);
-        if (p->attack) {
-            Collider_SetPosition(p->attack, (u8 *)p + 0xC, 0);
-            Collider_Refresh(p->attack);
+        if (hazard->collider)
+            Collider_SetPosition(hazard->collider, &hazard->position, 0);
+        if (hazard->attack) {
+            Collider_SetPosition(hazard->attack, &hazard->position, 0);
+            Collider_Refresh(hazard->attack);
         }
-        p->timer++;
+        hazard->timer++;
     }
 }
