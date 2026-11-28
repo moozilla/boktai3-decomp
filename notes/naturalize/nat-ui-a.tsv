@@ -41,3 +41,4 @@ src/ui/books/monster_book/BestiaryDisplay_Create.c	BestiaryDisplay_Create	minor	
 src/ui/books/monster_book/SceneDisplay_InitCurrentAnimation.c	SceneDisplay_InitCurrentAnimation	minor	natural	1	
 src/ui/books/monster_book/SceneDisplay_GetAlternateDescriptor.c	SceneDisplay_GetAlternateDescriptor	minor	natural	1	
 src/ui/books/monster_book/SceneDisplay_SwitchToAlternateDescriptor.c	SceneDisplay_SwitchToAlternateDescriptor	minor	natural	1	
+src/ui/books/monster_book/bestiary.c	Bestiary_GetEntryForActor	contrived	natural	1	

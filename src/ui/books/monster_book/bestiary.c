@@ -53,268 +53,199 @@ s32 Bestiary_GetEntryGroup(s32 entry)
 
 s32 Bestiary_GetEntryForActor(u32 kind, s32 variant)
 {
-    s32 result;
     switch (kind) {
         case 1:
             switch (variant) {
                 case 0:
-                    result = 23;
-                    break;
+                    return 23;
                 case 1:
-                    result = 24;
-                    break;
+                    return 24;
                 case 2:
-                    result = 25;
-                    break;
+                    return 25;
                 default:
-                    goto missing;
+                    return -1;
             }
-            break;
         case 2:
             switch (variant) {
                 case 1:
-                    result = 5;
-                    break;
+                    return 5;
                 case 0:
                 case 2:
-                    result = 4;
-                    break;
+                    return 4;
                 default:
-                    goto missing;
+                    return -1;
             }
-            break;
         case 3:
             switch (variant) {
                 case 0:
-                    result = 44;
-                    break;
+                    return 44;
                 case 1:
-                    result = 45;
-                    break;
+                    return 45;
                 case 3:
-                    result = 46;
-                    break;
+                    return 46;
                 default:
-                    goto missing;
+                    return -1;
             }
-            break;
         case 4:
             switch (variant) {
                 case 1:
-                    result = 20;
-                    break;
+                    return 20;
                 case 2:
-                    result = 21;
-                    break;
+                    return 21;
                 case 3:
-                    result = 22;
-                    break;
+                    return 22;
                 default:
-                    goto missing;
+                    return -1;
             }
-            break;
         case 5:
             switch (variant) {
                 case 0:
-                    result = 37;
-                    break;
+                    return 37;
                 case 5:
-                    result = 43;
-                    break;
+                    return 43;
                 case 12:
-                    result = 40;
-                    break;
+                    return 40;
                 default:
-                    goto missing;
+                    return -1;
             }
-            break;
         case 6:
             switch (variant) {
                 case 0:
-                    result = 38;
-                    break;
+                    return 38;
                 case 12:
-                    result = 41;
-                    break;
+                    return 41;
                 default:
-                    goto missing;
+                    return -1;
             }
-            break;
         case 7:
             switch (variant) {
                 case 0:
-                    result = 39;
-                    break;
+                    return 39;
                 case 12:
-                    result = 42;
-                    break;
+                    return 42;
                 default:
-                    goto missing;
+                    return -1;
             }
-            break;
         case 9:
-            result = 13;
-            break;
+            return 13;
         case 10:
-            result = 47;
-            break;
+            return 47;
         case 11:
             switch (variant) {
                 case 0:
-                    result = 48;
-                    break;
+                    return 48;
                 case 1:
-                    result = 49;
-                    break;
+                    return 49;
                 default:
-                    goto missing;
+                    return -1;
             }
-            break;
         case 12:
         case 13:
             switch (variant) {
                 case 0:
-                    result = 50;
-                    break;
+                    return 50;
                 case 1:
-                    result = 51;
-                    break;
+                    return 51;
                 default:
-                    goto missing;
+                    return -1;
             }
-            break;
         case 14:
-            result = 19;
-            break;
+            return 19;
         case 17:
             switch (variant) {
                 case 0:
-                    result = 68;
-                    break;
+                    return 68;
                 case 1:
-                    result = 69;
-                    break;
+                    return 69;
                 case 2:
-                    result = 70;
-                    break;
+                    return 70;
                 default:
-                    goto missing;
+                    return -1;
             }
-            break;
         case 18:
             switch (variant) {
                 case 1:
-                    result = 10;
-                    break;
+                    return 10;
                 case 0:
                 case 2:
-                    result = 9;
-                    break;
+                    return 9;
                 default:
-                    goto missing;
+                    return -1;
             }
-            break;
         case 19:
             switch (variant) {
                 case 1:
-                    result = 12;
-                    break;
+                    return 12;
                 case 0:
                 case 2:
-                    result = 11;
-                    break;
+                    return 11;
                 default:
-                    goto missing;
+                    return -1;
             }
-            break;
         case 20:
             switch (variant) {
                 case 0:
-                    result = 6;
-                    break;
+                    return 6;
                 case 1:
-                    result = 8;
-                    break;
+                    return 8;
                 case 2:
-                    result = 7;
-                    break;
+                    return 7;
                 default:
-                    goto missing;
+                    return -1;
             }
-            break;
         case 21:
             switch (variant) {
                 case 0:
-                    result = 14;
-                    break;
+                    return 14;
                 case 1:
-                    result = 16;
-                    break;
+                    return 16;
                 case 3:
-                    result = 15;
-                    break;
+                    return 15;
                 case 2:
-                    result = 17;
-                    break;
+                    return 17;
                 default:
-                    goto missing;
+                    return -1;
             }
-            break;
         case 22:
             switch (variant) {
                 case 1:
-                    result = 74;
-                    break;
+                    return 74;
                 case 2:
-                    result = 73;
-                    break;
+                    return 73;
                 case 4:
-                    result = 71;
-                    break;
+                    return 71;
                 case 5:
-                    result = 72;
-                    break;
+                    return 72;
                 default:
-                    goto missing;
+                    return -1;
             }
-            break;
         case 23:
             switch (variant) {
                 case 0:
-                    result = 75;
-                    break;
+                    return 75;
                 case 1:
-                    result = 76;
-                    break;
+                    return 76;
                 default:
-                    goto missing;
+                    return -1;
             }
-            break;
         case 24:
-            result = 18;
-            break;
+            return 18;
         case 25:
             switch (variant) {
                 case 0:
-                    result = 26;
-                    break;
+                    return 26;
                 case 2:
-                    result = 27;
-                    break;
+                    return 27;
                 default:
-                    goto missing;
+                    return -1;
             }
-            break;
         case 0:
         case 8:
         case 15:
         case 16:
         default:
-        missing:
-            result = -1;
-            break;
+            return -1;
     }
-    return result;
 }
 
 void Bestiary_UnlockReward(s32 entry, s32 reward)
