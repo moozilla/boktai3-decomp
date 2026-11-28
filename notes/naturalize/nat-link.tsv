@@ -330,3 +330,4 @@ src/link/records/Registry30AC_ResetInstance.c	Registry30AC_ResetInstance	natural
 src/link/records/sub_0810D554.c	sub_0810D554	natural	natural	0	
 src/link/records/RecordPanel_LoadBackground.c	RecordPanel_LoadBackground	contrived	natural	2	
 src/link/records/Bg_GetWrappedTilemapEntry.c	Bg_GetWrappedTilemapEntry	contrived	minor	7	map pointer advanced in two steps: a single expression adds the offset before loading the map
+src/link/records/RecordPanel_SetSelectedDisplayResource.c	RecordPanel_SetSelectedDisplayResource	contrived	natural	2	
