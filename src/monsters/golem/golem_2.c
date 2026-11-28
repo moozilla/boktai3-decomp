@@ -67,13 +67,7 @@ void Golem_UpdateDefeat(struct ChaseActor *actor)
             control->timer = 0;
         }
         Sound_PlaySong(0x13E);
-        {
-            u16 *flags = &actor->base.colliderA.flags;
-            u32 value = *flags;
-            u32 m = 4;
-            m |= value;
-            *flags = m;
-        }
+        actor->base.colliderA.flags |= 4;
     }
     SceneActorTerrain_ClearCollisionTimers((void *)actor);
     if (!actor->base.restart)
@@ -670,7 +664,8 @@ void Golem_UpdateAttackProperties(void *);
 static inline u8 Unavailable(struct Golem *a)
 {
     if (a) {
-        if (SceneActorContact_MotionFlags(&a->chase, 0x40) || SceneActorChase_StatusFlags(&a->chase, 0x20000) || a->chase.base.health <= 0)
+        if (SceneActorContact_MotionFlags(&a->chase, 0x40) ||
+            SceneActorChase_StatusFlags(&a->chase, 0x20000) || a->chase.base.health <= 0)
             return 1;
     }
     return 0;
