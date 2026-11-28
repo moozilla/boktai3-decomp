@@ -8,7 +8,7 @@ void Player_RestoreCameraFollow(struct Player *);
 void Player_EnterKindFour(struct Player *p)
 {
     s32 i;
-    if ((u8)(p->actionMode - 3) <= 2) {
+    if (p->actionMode == 3 || p->actionMode == 4 || p->actionMode == 5) {
         p->actionLatch464 = 1;
         p->actionLatch465 = 1;
     }

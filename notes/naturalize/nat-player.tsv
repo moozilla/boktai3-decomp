@@ -268,3 +268,6 @@ src/player/core/Player_IsStatusBit13ActionActive.c	Player_IsStatusBit13ActionAct
 src/player/core/Player_IsStatusBit3ActionActive.c	Player_IsStatusBit3ActionActive	natural	natural	0	
 src/player/core/PlayerContact_ComputeCost.c	PlayerContact_ComputeCost	natural	natural	0	
 src/player/core/sub_08140250.c	sub_08140250	contrived	natural	2	
+src/player/core/PlayerContact_ApplyStatReward.c	PlayerContact_ApplyStatReward	natural	natural	0	
+src/player/core/PlayerContact_ApplySyntheticContact.c	PlayerContact_ApplySyntheticContact	natural	natural	0	
+src/player/core/Player_EnterKindFour.c	Player_EnterKindFour	minor	natural	1	
