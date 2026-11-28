@@ -189,10 +189,9 @@ void IceBoulder_UpdateDamageAnimation(struct RegionActor *p)
     p->collider.costFlags = 0;
 }
 
-void IceBoulder_UpdateBehaviorAnimation(struct RegionActor *input)
+void IceBoulder_UpdateBehaviorAnimation(struct RegionActor *p)
 {
-    struct RegionActor *p = input;
-    struct ContactSwarmSprite *sprite = &input->sprite;
+    struct ContactSwarmSprite *sprite = &p->sprite;
     struct RegionSpriteManager *manager = gRegionActorPool;
     if (manager) {
         p->sprite.flags &= ~1;

@@ -364,3 +364,5 @@ src/objects/ice_boulders.c	IceBoulder_UpdateDamageAnimation	minor	natural	1
 src/objects/ice_boulders.c	IceBoulder_AnimateSparkleTransition	contrived	natural	1	
 src/objects/ice_boulders.c	IceBoulder_CreateFromScript	contrived	minor	25	open-coded cell index, flag pointer and mask locals remain: shared terrain helper reorders gcse spill slots; plain flag sets reload the mask second
 src/objects/ice_boulders.c	IceBoulder_ApplyContactDamage	contrived	minor	8	Mask() word tests keep constant-first operand order; clamp ternary keeps the halfword store shape
+src/objects/ice_boulders.c	IceBoulder_UnregisterTerrain	contrived	contrived	12	mask, pointer and value locals through TestV: plain flag test/clear reloads the flag word in another order
+src/objects/ice_boulders.c	IceBoulder_UpdateBehaviorAnimation	minor	natural	2	
