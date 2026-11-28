@@ -47,3 +47,4 @@ src/scene/actor/actor_pool/actor_pool.c	ActorPool_DestroyCallback	natural	natura
 src/scene/actor/actor_pool/actor_pool.c	ActorPool_CreateManager	natural	natural	0	
 src/scene/actor/actor_pool/actor_pool.c	ActorPool_AllocObject	natural	natural	0	
 src/scene/actor/actor_pool/pooled_actor_helpers.c	Actor_CapturePendingHit	minor	natural	1	
+src/scene/actor/actor_pool/pooled_actor_helpers.c	Actor_SetActionParameters	minor	natural	1	

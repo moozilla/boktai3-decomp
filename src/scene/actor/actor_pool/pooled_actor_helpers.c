@@ -194,11 +194,8 @@ void Actor_StepFacingAngle(struct PooledActor *actor)
 
 void Actor_SetActionParameters(struct PooledActor *actor, u32 value, s32 count, u32 *src)
 {
+    s32 i;
     actor->action = value;
-    if (count > 0) {
-        u32 *dst = actor->actionParameters;
-        do {
-            *dst++ = *src++;
-        } while (--count != 0);
-    }
+    for (i = 0; i < count; i++)
+        actor->actionParameters[i] = src[i];
 }
