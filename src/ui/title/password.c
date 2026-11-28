@@ -158,9 +158,11 @@ initialize:
     PASSWORD_REQUIRE(Text_CopyWithoutTags(e->text, src, sizeof(e->text)) == sizeof(e->text),
                      goto invalidLength);
     result = Password_EncodeSymbols(e);
-    PASSWORD_REQUIRE(result >= 0, goto release);
+    if (result < 0)
+        goto release;
     result = NameEntry_DecodeAndValidate(e);
-    PASSWORD_REQUIRE(result >= 0, goto release);
+    if (result < 0)
+        goto release;
     Password_ApplyDecoded(e, output);
 release:
     Heap_Free(e);
