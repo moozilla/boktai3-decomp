@@ -30,13 +30,11 @@ extern u32 gUnk_0824EEE0[];
 
 void ActorController_UpdateTimedMotion(struct SceneCombatActor *actor)
 {
-    u8 *phase = &actor->actionPhase;
-    u8 initialPhase = *phase;
-    switch (initialPhase) {
+    switch (actor->actionPhase) {
         case 0: {
             Armor_SetAnimationFromStart(actor, &gUnk_0824EEE0[((actor->heading + 0x60) >> 6) & 3]);
-            (*phase)++;
-            actor->actionReady = initialPhase;
+            actor->actionPhase++;
+            actor->actionReady = 0;
             ActorController_SelectDefenseColliders(actor);
             {
                 struct ActorControllerMotion *motion = &actor->colliderGroup.motion;
@@ -47,8 +45,8 @@ void ActorController_UpdateTimedMotion(struct SceneCombatActor *actor)
         } break;
         case 1:
             if (actor->actionCounter > 9) {
-                *phase = 0xFF;
-                actor->actionReady = initialPhase;
+                actor->actionPhase = 0xFF;
+                actor->actionReady = 1;
             }
             break;
     }

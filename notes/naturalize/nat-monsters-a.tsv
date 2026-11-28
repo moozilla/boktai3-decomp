@@ -151,3 +151,4 @@ src/monsters/armor/Armor_Destroy.c	Armor_Destroy	natural	natural	0
 src/monsters/armor/Armor_InitExtendedCollider.c	Armor_InitExtendedCollider	natural	natural	0	
 src/monsters/armor/ActorController_UpdateBounceParticle.c	ActorController_UpdateBounceParticle	contrived	minor	8	remaining pointer temps and constants fix register choices
 src/monsters/armor/actor_controller_motion.c	ActorController_UpdateRetreatMotion	contrived	natural	10	
+src/monsters/armor/actor_controller_motion.c	ActorController_UpdateTimedMotion	contrived	natural	6	
