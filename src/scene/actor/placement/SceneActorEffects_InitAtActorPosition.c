@@ -1,8 +1,9 @@
-#include "global.h"
+#include "scene/actor/scene_actor_effects.h"
 
-void sub_08232264(u8 *, u8 *, u32, u32, u32);
+void sub_08232264(void *, struct ContactPosition *, u32, u32, u32);
 
-void SceneActorEffects_InitAtActorPosition(u8 *p)
+void SceneActorEffects_InitAtActorPosition(struct ChaseActor *actor)
 {
-    sub_08232264(p + 0x47c, p + 0x5c, 0, 0, 0);
+    sub_08232264(&((struct SceneActorEffectsView *)actor)->effect, &actor->base.body.position, 0, 0,
+                 0);
 }

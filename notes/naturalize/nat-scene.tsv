@@ -420,3 +420,4 @@ src/scene/actor/placement/SceneActorPlacement_EmitTimedParticles.c	SceneActorPla
 src/scene/actor/placement/SceneActorPlacement_PlayCategoryResponseSound.c	SceneActorPlacement_PlayCategoryResponseSound	minor	minor	0	unsigned long long flag test and parked mask: plain tests drop the widened compare
 src/scene/actor/placement/SceneActorEffects_ReleaseResources.c	SceneActorEffects_ReleaseResources	contrived	contrived	4	parked flag masks, predicate and identity pointer: plain tests load the field before the mask and drop the saved pointers
 src/scene/actor/placement/SceneActorPlacement_ResetStateThree.c	SceneActorPlacement_ResetStateThree	contrived	minor	6	flag helper calls: plain &= loads the field before the mask
+src/scene/actor/placement/SceneActorEffects_InitAtActorPosition.c	SceneActorEffects_InitAtActorPosition	contrived	minor	1	effects view cast: the effect member lives in the effects view of the actor
