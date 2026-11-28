@@ -1,9 +1,11 @@
 #include "global.h"
+#include "engine/engine.h"
 #include "engine/ram.h"
+#include "objects/floor_switch/floor_switch_layout.h"
 
-s32 FloorSwitch_InitManager(u8 *obj)
+s32 FloorSwitch_InitManager(struct FloorSwitchManager *manager)
 {
-    gFloorSwitchManager = obj;
-    *(u32 *)(obj + 0x498) = 0;
+    gFloorSwitchManager = (u32)manager;
+    manager->used = 0;
     return 0;
 }
