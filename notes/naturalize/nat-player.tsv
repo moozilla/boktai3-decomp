@@ -512,3 +512,6 @@ src/player/effects/attack/PlayerAttackEffect_SetEmissionState.c	PlayerAttackEffe
 src/player/effects/attack/PlayerAttackEffect_SetDefaultPaletteSource.c	PlayerAttackEffect_SetDefaultPaletteSource	contrived	natural	2	-
 src/player/effects/attack/PlayerAttackEffect_SetElementMode.c	PlayerAttackEffect_SetElementMode	contrived	natural	1	-
 src/player/effects/attack/PlayerAttackEffect_Destroy.c	PlayerAttackEffect_Destroy	contrived	natural	1	-
+src/player/effects/attack/PlayerAttackEffect_Create.c	PlayerAttackEffect_Create	natural	natural	0	-
+src/player/effects/attack/PlayerAttackEffect_AllocateParticle.c	PlayerAttackEffect_AllocateParticle	minor	minor	1	unchanged: pointer-plus-index sprite flag access and parallel state/slot cursors
+src/player/effects/attack/PlayerAttackEffect_EmitPaletteBaseTrail.c	PlayerAttackEffect_EmitPaletteBaseTrail	contrived	minor	16	split shift helpers, offset constant local, temporary angle block

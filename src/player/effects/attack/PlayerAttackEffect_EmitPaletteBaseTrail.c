@@ -40,25 +40,20 @@ s32 PlayerAttackEffect_EmitPaletteBaseTrail(struct AttackParticleEffect *p)
         if (p->owner->elapsed > 2)
             goto done;
         {
-            s32 a6, m;
+            s32 a6;
             if (*p->side) {
                 s32 t = p->frame * step;
                 s32 h = t + step / 2;
                 s32 k = -256;
-                a6 = angle - (h + k) + 32;
-                m = 255;
-                a6 &= m;
-                angle = angle - (t + k) + 32;
+                a6 = (angle - (h + k) + 32) & 255;
+                angle = (angle - (t + k) + 32) & 255;
             } else {
                 s32 t = p->frame * step;
                 s32 h = t + step / 2;
                 s32 k = 256;
-                a6 = angle + (h + k) - 32;
-                m = 255;
-                a6 &= m;
-                angle = angle + (t + k) - 32;
+                a6 = (angle + (h + k) - 32) & 255;
+                angle = (angle + (t + k) - 32) & 255;
             }
-            angle = angle & m;
             a.x = p->owner->position.x + shift12(p->radius * SIN(angle + 64));
             a.y = p->owner->position.y + 200;
             a.z = p->owner->position.z + shift12(p->radius * gUnk_086149C4[angle]);
