@@ -488,3 +488,4 @@ src/system/game_state/GameState_GetUnlockDescriptor.c	GameState_GetUnlockDescrip
 src/system/game_state/GameState_GetUnlockEntry.c	GameState_GetUnlockEntry	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
 src/system/game_state/GameState_SetUnlockSlot.c	GameState_SetUnlockSlot	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
 src/system/game_state/GameState_AddUnlock.c	GameState_AddUnlock	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
+src/system/game_state/sub_0822E6E4.c	sub_0822E6E4	contrived	natural	1	
