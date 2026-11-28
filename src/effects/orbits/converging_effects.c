@@ -8,13 +8,6 @@ s32 Math_Atan2(s32, s32);
 
 void SpriteDrawable_SelectTileFrame(struct ConvergingParticle *, void *, s32);
 
-static inline s32 scale(s32 v)
-{
-    if (v >= 0)
-        return v >> 12;
-    return -((-v) >> 12);
-}
-
 void ConvergingEffects_UpdateParticles(struct Player *player)
 {
     s32 count, i;
@@ -76,12 +69,6 @@ void ConvergingEffects_EmitNearParticle(struct Player *player, struct SceneVec *
         player->convergingEffects.ticks -= 40;
         player->convergingEffects.active = 1;
     }
-}
-
-static inline s32 random_value(void)
-{
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    return *(u16 *)((u8 *)gRandomTable + (gRandomIndex << 1));
 }
 
 void ConvergingEffects_EmitFarParticle(struct Player *player, struct SceneVec *position)
