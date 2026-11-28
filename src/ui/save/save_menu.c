@@ -94,7 +94,7 @@ void SaveMenu_UpdateSaveDelay(struct SaveMenu *menu)
         menu->entering = 0;
     }
     if (menu->timer == 0x3c) {
-        if (!(u8)Save_CopySelectedStateToAlternateSlot()) {
+        if (!Save_CopySelectedStateToAlternateSlot()) {
             SetUpdate(menu, SaveMenu_UpdateSaveFailure, 8);
         } else {
             LinkSession_RequestHandshakeContinue();

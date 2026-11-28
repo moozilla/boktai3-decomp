@@ -87,3 +87,4 @@ src/ui/results/time_result.c	TimeResult_InitAnimations	natural	natural	0
 src/ui/results/time_result.c	TimeResult_InitializeFromScript	natural	natural	0	
 src/ui/results/time_result.c	TimeResult_Create	natural	natural	0	
 src/ui/results/time_result.c	Actor_DispatchPrimaryState	natural	natural	0	
+src/ui/save/save_menu.c	SaveMenu_UpdateSaveDelay	minor	natural	1	
