@@ -103,3 +103,4 @@ src/effects/bursts/large_fragment_effect.c	LargeFragmentEffect_UpdateAnimation	m
 src/effects/bursts/explosion.c	Explosion_Update	contrived	natural	1	-
 src/effects/bursts/explosion.c	Explosion_InitSprite	contrived	natural	1	-
 src/effects/bursts/explosion.c	Explosion_InitCollider	contrived	natural	1	-
+src/effects/bursts/explosion.c	Explosion_InitColliderWithFlags	contrived	natural	1	-
