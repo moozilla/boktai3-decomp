@@ -1254,7 +1254,7 @@ u32 TetherActor_CanStartInteraction(void)
         return 0;
     if (actor->interactionCooldown)
         return 0;
-    if (actor->state <= 1 || ((u8)(actor->state - 3) <= 1 && actor->chargeReady))
+    if (actor->state <= 1 || ((actor->state == 3 || actor->state == 4) && actor->chargeReady))
         return 1;
     return 0;
 }
