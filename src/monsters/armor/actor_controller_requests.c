@@ -23,7 +23,7 @@ s32 Armor_TryStartAction(struct SceneCombatActor *actor, s32 action)
         actor->actionPhase = 0;
         actor->actionCounter = 0;
         actor->colliderGroup.colliders[0].flags |= 4;
-        actor->flags &= 0xFFFD;
+        actor->flags &= ~2;
         started = 1;
     } else {
         started = 0;
