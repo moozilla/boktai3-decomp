@@ -155,3 +155,4 @@ src/ui/books/forging_book/ForgingBook_RefreshEntryDescription.c	ForgingBook_Refr
 src/ui/books/forging_book/ForgingBook_SetupPageBackground.c	ForgingBook_SetupPageBackground	contrived	minor	1	initial size 16 stored twice
 src/ui/books/forging_book/ForgingBook_RefreshPage.c	ForgingBook_RefreshPage	minor	natural	1	
 src/ui/books/forging_book/sub_0821353C.c	sub_0821353C	minor	natural	1	
+src/ui/books/forging_book/ForgingBook_ReleaseGraphics.c	ForgingBook_ReleaseGraphics	contrived	natural	1	
