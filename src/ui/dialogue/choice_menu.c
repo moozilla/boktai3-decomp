@@ -480,10 +480,10 @@ struct ChoiceMenu *ChoiceMenu_CreateFromScript(void)
 void ChoiceMenu_ReloadFromScript(void)
 {
     struct ChoiceMenu *p = gChoiceMenu;
-    if (p != 0 && Script_SeekToKeyword(0x72)) {
+    if (p != 0 && Script_SeekToKeyword('r')) {
         p->window = Script_GetTextSourcePc();
-        p->stringBase = Script_GetKeywordValue(0x69, 0);
-        if (Script_SeekToKeyword(0x77))
+        p->stringBase = Script_GetKeywordValue('i', 0);
+        if (Script_SeekToKeyword('w'))
             p->selected = Script_GetValue();
         if (p->window != 0) {
             ChoiceMenu_LayoutText(p, p->window);
