@@ -183,3 +183,4 @@ src/ui/title/name_entry.c	NameEntry_Create	natural	natural	0	-
 src/ui/title/date_menu.c	DateMenu_LoadCurrentDate	contrived	natural	1	-
 src/ui/title/date_menu.c	DateMenu_UpdateCursor	minor	natural	1	-
 src/ui/title/date_menu.c	DateMenu_HandleClockInput	contrived	natural	1	-
+src/ui/title/date_menu.c	DateMenu_Update	minor	natural	1	-

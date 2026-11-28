@@ -306,13 +306,13 @@ void DateMenu_Update(struct DateMenu *p)
             p->oldDay = p->day;
             p->oldHour = p->hour;
             p->oldMinute = p->minute;
-            if (gPadState[1] & 0x20) {
+            if (gPadState[1] & DPAD_LEFT) {
                 if (p->selection <= 0)
                     p->selection = 4;
                 else
                     p->selection--;
                 Sound_PlaySong(0xDC);
-            } else if (gPadState[1] & 0x10) {
+            } else if (gPadState[1] & DPAD_RIGHT) {
                 if (p->selection > 3)
                     p->selection = 0;
                 else
@@ -320,7 +320,7 @@ void DateMenu_Update(struct DateMenu *p)
                 Sound_PlaySong(0xDC);
             }
             DateMenu_HandleClockInput(p);
-            if (gPadState[1] & 8) {
+            if (gPadState[1] & START_BUTTON) {
                 Sound_PlaySong(0xDD);
                 SunClock_SetDateTime(p->year, p->month, p->day, p->hour, p->minute, 0, 1);
                 Time_CalculateSunriseSunset(0x23A666, 0x8BC000, 0);
