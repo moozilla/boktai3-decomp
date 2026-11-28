@@ -39,39 +39,44 @@ void KeyframeActor_InitKeyframeDisplay(struct Player *p)
 
 // confidence=low: script body initialization installs this auxiliary sprite and animation.
 
-struct Vec {
-    s16 x, y, z;
+struct KeyframeAuxiliaryView {
+    u8 unknown0[0x30];
+    struct SceneVec position;
+    u8 unknown38[0x114];
+    struct ContactSwarmSprite sprite; /* 0x14C */
+    void *spriteData;                 /* 0x178 */
+    u8 unknown17C[0x1C];
+    u8 spriteBuffer[0x264];               /* 0x198 */
+    struct DisplaySequenceState sequence; /* 0x3FC */
+    u8 unknown40C[4];
+    void *sequenceData; /* 0x410 */
+    u8 unknown414[0xD4];
+    u16 formCueTimer; /* 0x4E8 */
 };
 
-void KeyframeActor_InitAuxiliarySprite(u8 *arg)
+void KeyframeActor_InitAuxiliarySprite(struct Player *p)
 {
-    u8 *p = arg;
-    void *data = p + 0x198;
+    struct KeyframeAuxiliaryView *view = (struct KeyframeAuxiliaryView *)p;
+    u8 *data = view->spriteBuffer;
     void *sequence;
-    struct ContactSwarmSprite *render;
+    struct ContactSwarmSprite *sprite;
     u32 zero;
     struct DisplaySequenceState *frames;
+
     AnimData_Load(data, 0xD495);
     sequence = ScriptProc_Start(0x922E, 0xAF44);
-    *(void **)(p + 0x410) = sequence;
-    render = (void *)(p + 0x14C);
-    *(void **)(p + 0x178) = data;
+    view->sequenceData = sequence;
+    sprite = &view->sprite;
+    view->spriteData = data;
     zero = 0;
-    Sprite_Init(render, data, 0x1001);
-    {
-        u32 value = *(u16 *)(p + 0x30);
-        *(s16 *)(p + 0x168) = value;
-        {
-            u32 y = *(u16 *)(p + 0x32);
-            *(s16 *)(p + 0x16A) = y;
-        }
-        value = *(u16 *)(p + 0x34);
-        *(s16 *)(p + 0x16C) = value;
-    }
-    *(u16 *)(p + 0x4E8) = zero;
-    frames = (void *)(p + 0x3FC);
-    Anim_SetSequence(frames, sequence, 0, p[0x3A2], p[0x3A3]);
-    PlayerCue_StepSequence(render, frames);
+    Sprite_Init(sprite, data, 0x1001);
+    view->sprite.position.x = view->position.x;
+    view->sprite.position.y = view->position.y;
+    view->sprite.position.z = view->position.z;
+    view->formCueTimer = zero;
+    frames = &view->sequence;
+    Anim_SetSequence(frames, sequence, 0, p->heading, p->side);
+    PlayerCue_StepSequence(sprite, frames);
 }
 
 /* tentative: reads the script position and sets up the body, probe and contact node */
@@ -86,7 +91,7 @@ u32 SceneBody_Init(void *, u32, void *, u32, u32, void *);
 
 void KeyframeActor_InitKeyframeDisplay(struct Player *);
 
-void KeyframeActor_InitAuxiliarySprite(u8 *);
+void KeyframeActor_InitAuxiliarySprite(struct Player *);
 
 u32 SceneBody_SetKeyframeDisplay(void *, void *);
 
@@ -154,7 +159,7 @@ u32 KeyframeActor_InitBodyFromScript(u8 *p, u32 entry)
     body = p + 0x24;
     SceneBody_Init(body, entry, p + 0x540, 0, p[0x18], p);
     KeyframeActor_InitKeyframeDisplay((struct Player *)p);
-    KeyframeActor_InitAuxiliarySprite(p);
+    KeyframeActor_InitAuxiliarySprite((struct Player *)p);
     p[0x419] = zero;
     SceneBody_SetKeyframeDisplay(body, p + 0x8c);
     CellObject_Init(p + 0x284, p + 0x540);
