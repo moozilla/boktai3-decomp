@@ -1249,7 +1249,7 @@ void Mummy_UpdateDelayedPursuit(struct ChaseActor *actor)
     SceneActorAttachment_ReplaceResponseSlot(actor, 0, 2, actor->base.category);
     SceneActorChase_SetState(actor, 3, 1, 0);
     SceneActorChase_SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
-    if (SceneActorChase_MotionFlags(actor, 0x80)) {
+    if ((SceneActorChase_ReadMotionFlags(actor)) & 0x80) {
         actor->base.behaviorFlags |= 0x80;
         if (!SceneActorChase_Arrive(actor)) {
             if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,
@@ -1259,10 +1259,10 @@ void Mummy_UpdateDelayedPursuit(struct ChaseActor *actor)
             }
         }
         SceneActorChase_SetFlagComponent(&group->common.gate.flags, 4);
-        SceneActorDelay_Prepare((void *)&group->saved, group->common.gate.control, 12, 30);
+        SceneActorDelay_Prepare(&group->saved, group->common.gate.control, 12, 30);
     } else {
         SceneActorChase_SetActorFlags(actor, 0x10);
-        SceneActorDelay_Prepare((void *)&group->saved, actor->base.onAlternateEntry, 7, 30);
+        SceneActorDelay_Prepare(&group->saved, actor->base.onAlternateEntry, 7, 30);
         SceneActorChase_SnapToRoute(group->destination, &group->homeRoute);
         if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,
                                       group->destination)) {

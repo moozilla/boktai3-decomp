@@ -128,3 +128,4 @@ src/monsters/mummy/mummy_entry.c	Mummy_ResumeRouteAfterRecovery	contrived	contri
 src/monsters/mummy/mummy_entry.c	Mummy_UpdateDefeat	contrived	contrived	46	flag accessors, parked temps and speed/half helpers fix load order
 src/monsters/mummy/mummy_entry.c	Mummy_UpdatePlayerRoute	contrived	contrived	19	mask-first accessors and block remain
 src/monsters/mummy/mummy_entry.c	Mummy_TryStimulusRoute	contrived	contrived	22	flag accessors and parked mask fix load order
+src/monsters/mummy/mummy_entry.c	Mummy_UpdateDelayedPursuit	contrived	minor	11	flag setters: mask loaded before the field
