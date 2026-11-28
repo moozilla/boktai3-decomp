@@ -243,3 +243,4 @@ src/link/player/Terrain_ClassifyOffsetHeight.c	Terrain_ClassifyOffsetHeight	mino
 src/link/player/sub_0823C6BC.c	sub_0823C6BC	contrived	natural	4	
 src/link/player/sub_0823C760.c	sub_0823C760	contrived	natural	1	dash speed/duration bytes still unnamed (unk4EF)
 src/link/player/Player_IsWithinSidestepCellMargin.c	Player_IsWithinSidestepCellMargin	minor	minor	8	mask-first &= keeps the and tied to the constant register
+src/link/player/sub_0823D750.c	sub_0823D750	natural	natural	1	follow-up: names powerBonus in the stat modifier context

@@ -12,8 +12,7 @@ s32 sub_0823D750(struct Player *p)
         case 1:
         case 2: {
             u32 base = (p->derivedStats[2] + 99) >> 1;
-            s32 bonus = p->statModifierContext.actionDuration +
-                        *(s16 *)&p->statModifierContext.unknownCE[4];
+            s32 bonus = p->statModifierContext.actionDuration + p->statModifierContext.powerBonus;
             if (bonus < 0)
                 bonus = 0;
             return base + bonus;

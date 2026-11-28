@@ -68,7 +68,7 @@ struct PlayerStatModifierContext {
     /* Attack motion (tentative): wait windupFrames, move for swingFrames at motionSpeed
        (angle step per frame), then hold the collider for holdFrames; contactTimer counts. */
     u16 motionSpeed; /* owner + 0xC00 */
-    u8 unknownBE[2];
+    u16 attackAnimation; /* owner + 0xC02: slash animation variant (tentative) */
     u16 swingFrames;    /* owner + 0xC04 */
     u16 holdFrames;     /* owner + 0xC06 */
     u16 windupFrames;   /* owner + 0xC08 */
@@ -78,7 +78,8 @@ struct PlayerStatModifierContext {
     u8 unknownCA;
     u8 chargeTier;      /* owner + 0xC0F: charge attacks select tiers zero through two */
     u16 chargeDuration; /* owner + 0xC10: initialized to 60 by attached attack setup */
-    u8 unknownCE[6];
+    u8 unknownCE[4];
+    s16 powerBonus; /* owner + 0xC16: added to duration-based action power (tentative) */
     u8 statBOverrideMode;            /* owner + 0xC18: seven selects GameState stat B */
     u8 thresholdSatisfied;           /* owner + 0xC19, tentative */
     s16 previousAnimation;           /* owner + 0xC1A: -1 requests a fresh attack animation */
