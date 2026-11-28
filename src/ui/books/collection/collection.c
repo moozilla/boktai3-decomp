@@ -43,11 +43,7 @@ s32 Collection_CountUnlockedEntries()
 
 u32 Collection_IsComplete(void)
 {
-    s32 v = Collection_CountUnlockedEntries();
-    u32 r = 0;
-    if (v > 26)
-        r = 1;
-    return r;
+    return Collection_CountUnlockedEntries() > 26;
 }
 
 /* Tentative: bit 0 hides an entry display outside the unlocked current page. */
