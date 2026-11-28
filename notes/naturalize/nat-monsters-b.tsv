@@ -28,3 +28,6 @@ src/monsters/ivy/ivy.c	Ivy_InitControlPresets	natural	natural	0
 src/monsters/ivy/ivy.c	Ivy_WaitThenResetPhase	minor	minor	0	empty DEBUG_PRINT arm (compiled-out debug print, accepted form)
 src/monsters/ivy/ivy.c	Ivy_WaitLimitThenResetPhase	minor	minor	0	empty DEBUG_PRINT arm (compiled-out debug print, accepted form)
 src/monsters/ivy/ivy.c	SceneActorControl_BeginSoundTransition	contrived	contrived	40	Chase_MotionFlags and SceneActorChase_ClearMotionFlagComponent accessors (plain test/clear changes mask width and address register); no parked locals left
+src/monsters/ivy/ivy.c	Ivy_NotifyGroup	natural	natural	0	
+src/monsters/ivy/ivy.c	Ivy_InitProfileId	natural	natural	0	
+src/monsters/ivy/ivy.c	Ivy_TickDrawable	minor	natural	3	drawable+0x40 position of the tile drawable stays a raw offset (no type for that drawable)

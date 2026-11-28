@@ -1249,11 +1249,11 @@ void Ivy_InitProfileId(struct ChaseActor *actor)
 
 void Ivy_TickDrawable(struct ChaseActor *actor)
 {
-    {
-        struct Ivy *context = actor->base.context;
-        context->captureFlags = 0;
-        context->targetMissFrames = 0;
-    }
+    struct Ivy *context = actor->base.context;
+    struct SceneActorControlMotionDrawable *drawable;
+
+    context->captureFlags = 0;
+    context->targetMissFrames = 0;
     actor->base.body.position.x += 0x20;
     actor->base.body.position.z += 0x20;
     if (!actor->base.drawableKind)
@@ -1262,10 +1262,8 @@ void Ivy_TickDrawable(struct ChaseActor *actor)
     else
         *(struct ContactPosition *)((u8 *)actor->base.drawable + 0x40) = actor->base.body.position;
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
-    {
-        struct SceneActorControlMotionDrawable *drawable = actor->base.drawable;
-        DisplaySequence_StepState(drawable, &drawable->sequence);
-    }
+    drawable = actor->base.drawable;
+    DisplaySequence_StepState(drawable, &drawable->sequence);
 }
 
 void Ivy_OnPrimaryContact(void *source, void *target, struct ChaseActor *actor);
