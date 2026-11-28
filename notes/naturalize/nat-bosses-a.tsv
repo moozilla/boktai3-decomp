@@ -270,3 +270,4 @@ src/bosses/hresvelgr/ActorAction_WaitThenChangeBehavior.c	ActorAction_WaitThenCh
 src/bosses/hresvelgr/HresvelgrState_Hold37.c	HresvelgrState_Hold37	minor	minor	2	second actor pointer stays
 src/bosses/hresvelgr/ActorAction_FinishRecoveryAnimation.c	ActorAction_FinishRecoveryAnimation	minor	minor	3	second actor pointer stays
 src/bosses/hresvelgr/HresvelgrState_Hold35.c	HresvelgrState_Hold35	minor	minor	3	second actor pointer stays
+src/bosses/hresvelgr/HresvelgrState_Restart.c	HresvelgrState_Restart	minor	minor	3	second actor pointer stays
