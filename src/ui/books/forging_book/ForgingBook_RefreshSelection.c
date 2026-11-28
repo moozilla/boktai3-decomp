@@ -1,11 +1,13 @@
 #include "global.h"
-void ForgingBook_UpdateSelectionCursor(u32);
-void ForgingBook_UpdateCategoryCountDigits(u32);
-void ForgingBook_RefreshSelectedEntryText(u32);
-u32 ForgingBook_RefreshSelection(u32 a)
+#include "ui/books/forging_book.h"
+void ForgingBook_UpdateSelectionCursor(struct ForgingBook *);
+void ForgingBook_UpdateCategoryCountDigits(struct ForgingBook *);
+void ForgingBook_RefreshSelectedEntryText(struct ForgingBook *);
+
+u32 ForgingBook_RefreshSelection(struct ForgingBook *book)
 {
-    ForgingBook_UpdateSelectionCursor(a);
-    ForgingBook_UpdateCategoryCountDigits(a);
-    ForgingBook_RefreshSelectedEntryText(a);
+    ForgingBook_UpdateSelectionCursor(book);
+    ForgingBook_UpdateCategoryCountDigits(book);
+    ForgingBook_RefreshSelectedEntryText(book);
     return 0;
 }
