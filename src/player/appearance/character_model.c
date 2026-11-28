@@ -353,9 +353,8 @@ void CharacterModel_UpdateAccessoryAnimations(struct CharacterPreviewModel *mode
 
 void CharacterModel_UpdatePairedAnimations(struct CharacterPreviewModel *model)
 {
-    struct ModifierGraphicsResource *resource;
-    Anim_Step(&model->view.parts[3], resource = &model->resource);
-    Anim_Step(&model->view.parts[4], resource);
+    Anim_Step(&model->view.parts[3], &model->resource);
+    Anim_Step(&model->view.parts[4], &model->resource);
 }
 
 void CharacterModel_RemoveAnimations(struct ModifierDisplayObject *part)

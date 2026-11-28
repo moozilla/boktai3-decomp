@@ -13,3 +13,4 @@ src/player/appearance/character_model.c	CharacterPreview_PositionParts	minor	nat
 src/player/appearance/character_model.c	ScenePalette_RefreshOnFlags	natural	natural	0	-
 src/player/appearance/character_model.c	CharacterModel_SetComponentKeyframes	minor	natural	1	-
 src/player/appearance/character_model.c	CharacterModel_UpdateAccessoryAnimations	contrived	natural	1	-
+src/player/appearance/character_model.c	CharacterModel_UpdatePairedAnimations	contrived	natural	1	-
