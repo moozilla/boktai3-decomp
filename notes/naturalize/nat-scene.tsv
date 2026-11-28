@@ -457,3 +457,4 @@ src/scene/actor/reaction/SceneActorTarget_UpdateTrackedContact.c	SceneActorTarge
 src/scene/actor/reaction/SceneActorTarget_ApplyResetCommand.c	SceneActorTarget_ApplyResetCommand	contrived	contrived	6	partial: parked masks and bit locals stay; plain operators reorder the load and mask
 src/scene/actor/reaction/SceneActorControl_DispatchControl.c	SceneActorControl_DispatchControl	contrived	natural	3	-
 src/scene/actor/reaction/SceneActorControl_OnIdle.c	SceneActorControl_OnIdle	contrived	natural	1	-
+src/scene/actor/reaction/SceneActorControl_UpdateContactRelease.c	SceneActorControl_UpdateContactRelease	contrived	minor	8	drawable offsets and the SetActorFlags helper stay (plain |= loads the field first)
