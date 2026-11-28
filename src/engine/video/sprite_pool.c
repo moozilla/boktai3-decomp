@@ -71,20 +71,13 @@ struct SpritePool *SpritePool_Create(void)
 struct SpritePoolSlot *SpritePool_FindFreeSlot(struct SpritePool *pool)
 {
     struct SpritePoolSlot *slot = pool->slots;
-    s32 index = 0;
-    struct SpritePoolSlot *result;
-    do {
-        if (slot->active != 0) {
-            index++;
-            slot++;
-            continue;
-        }
-        result = slot;
-        goto end;
-    } while (index <= 0xf);
-    result = 0;
-end:
-    return result;
+    s32 index;
+
+    for (index = 0; index < 16; index++, slot++) {
+        if (slot->active == 0)
+            return slot;
+    }
+    return 0;
 }
 
 struct SpritePoolSlot *SpritePool_Find(struct SpritePool *pool, u32 id)
