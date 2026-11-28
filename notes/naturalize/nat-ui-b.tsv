@@ -318,3 +318,4 @@ src/ui/title/tutorial_otenko.c	TutorialOtenko_UpdateRotatingGrowth	contrived	min
 src/ui/title/tutorial_otenko.c	TutorialOtenko_UpdateRotatingShrink	contrived	minor	1	scale kept in the palette fields of the shared sprite struct
 src/ui/title/tutorial_otenko.c	sub_081E99EC	contrived	natural	1	
 src/ui/title/tutorial_otenko.c	TutorialOtenko_DispatchAnimationPhase	contrived	natural	1	(u8 *) argument of the shared dispatcher
+src/ui/title/tutorial_otenko.c	TutorialOtenko_DestroyController	contrived	natural	1	

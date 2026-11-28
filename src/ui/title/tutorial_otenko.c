@@ -2148,14 +2148,10 @@ void SceneBody_Unregister(void *);
 s32 TutorialOtenko_DestroyController(struct ActorAnimController *p)
 {
     s32 i;
-    u8 *c;
     Sprite_Remove(&p->obj);
     Shadow_Destroy(p->p2);
-    c = (u8 *)p + 0x1c;
-    for (i = 15; i >= 0; i--) {
-        Sprite_Remove(c);
-        c += 0xdc;
-    }
+    for (i = 0; i < 16; i++)
+        Sprite_Remove(&p->children[i]);
     if (SceneBody_GetById(p->resource))
         SceneBody_Unregister(&p->body);
     gScriptedActorController = 0;
