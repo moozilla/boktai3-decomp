@@ -216,3 +216,4 @@ src/engine/video/sprite.c	Sprite_SetOriginStub	natural	natural
 src/engine/video/sprite.c	Sprite_ApplyAnimation	natural	natural		
 src/engine/video/sprite.c	Sprite_SetAnimDataIfPresent	natural	natural		
 src/engine/video/sprite.c	Sprite_QueueFramePieces	minor	minor	4	pieces byte pointer then cast into piece: casting into piece directly moves the cursor setup (14 hunks); frame advanced in two statements
+src/engine/video/sprite.c	Sprite_RenderScaledList	contrived	minor	14	do/while(0) around the list head fetch: without it flow gives resource a higher priority than the cursor and they swap r5/r6

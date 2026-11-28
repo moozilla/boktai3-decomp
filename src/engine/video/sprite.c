@@ -483,14 +483,10 @@ static inline void Sprite_ProjectPosition(struct ContactPosition *dst, struct Co
 void Sprite_RenderScaledList(void)
 {
 
-    s32 z = 0;
+    s32 z;
     struct ContactPosition pos;
     struct DisplaySequenceSprite *p;
-    u32 parity = gSceneEffectPalettePhase & 1;
-    u32 skip = 0x401;
-    if (parity) {
-        skip = 0x201;
-    }
+    u32 skip = (gSceneEffectPalettePhase & 1) ? 0x201 : 0x401;
     do {
         p = gSpriteListHeads[gRenderListIndex];
         if (!p) {
