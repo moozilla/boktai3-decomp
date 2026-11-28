@@ -157,3 +157,4 @@ src/effects/bursts/fragment_effect/FragmentEffect_SpawnRandomParticle.c	Fragment
 src/effects/bursts/fragment_effect/FragmentEffect_NoOp.c	FragmentEffect_NoOp	natural	natural	0	
 src/effects/bursts/fragment_effect/FragmentEffect_OnColliderContact.c	FragmentEffect_OnColliderContact	natural	natural	0	
 src/effects/bursts/fragment_effect/FragmentEffect_ResetManagerReference.c	FragmentEffect_ResetManagerReference	natural	natural	0	
+src/effects/bursts/linked_effect/LinkedEffect_ApplyVariant.c	LinkedEffect_ApplyVariant	contrived	natural	6	-
