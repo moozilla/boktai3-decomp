@@ -46,12 +46,6 @@ void ConvergingEffects_UpdateParticles(struct Player *player)
         player->convergingEffects.active = 0;
 }
 
-static inline s32 ReadParticleSpeedSample(void)
-{
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    return *(u16 *)((u8 *)RANDOM_TABLE_ADDR + (gRandomIndex << 1));
-}
-
 void ConvergingEffects_EmitNearParticle(struct Player *player, struct SceneVec *position)
 {
     s32 step = gGameState->unk876;
@@ -69,12 +63,12 @@ void ConvergingEffects_EmitNearParticle(struct Player *player, struct SceneVec *
         angle = ParticleRandom_ReadDirectSample(gRandomTable) & 255;
         radiusSample = ParticleRandom_ReadDirectSample(gRandomTable);
         radius = radiusSample % 64 + 128;
-        e->offsetX = scale(radius * gUnk_086149C4[(angle + 64) & 255]);
-        e->offsetZ = scale(radius * gUnk_086149C4[angle & 255]);
+        e->offsetX = Math_ShiftTowardZero(radius * gUnk_086149C4[(angle + 64) & 255], 12);
+        e->offsetZ = Math_ShiftTowardZero(radius * gUnk_086149C4[angle & 255], 12);
         draw->position = *position;
         draw->position.x += e->offsetX;
         draw->position.z += e->offsetZ;
-        e->speed = (ReadParticleSpeedSample() & 3) + 14;
+        e->speed = (ParticleRandom_ReadDirectSample((const u16 *)RANDOM_TABLE_ADDR) & 3) + 14;
         e->ticks = 0;
         e->active = 1;
         if (++player->convergingEffects.next > 3)
