@@ -409,3 +409,7 @@ src/npc/kuro/Kuro_UpdateMode24.c	Kuro_UpdateMode24	minor	natural	1
 src/npc/kuro/Kuro_UpdateMode25.c	Kuro_UpdateMode25	contrived	natural	1	
 src/npc/kuro/Kuro_SetTargetToCurrentPosition.c	Kuro_SetTargetToCurrentPosition	natural	natural	0	
 src/npc/kuro/Kuro_DispatchMode.c	Kuro_DispatchMode	contrived	natural	1	
+src/npc/kuro/Kuro_BlendPalette.c	Kuro_BlendPalette	contrived	contrived	6	parked 31/mask locals and shift spelling: plain u16 channel extraction changes constant sharing and shift widths
+src/npc/kuro/Kuro_UpdateBehavior.c	Kuro_UpdateBehavior	natural	natural	0	
+src/npc/kuro/Kuro_OnBehaviorUpdate.c	Kuro_OnBehaviorUpdate	natural	natural	0	
+src/npc/kuro/Kuro_UpdateAnimationSequence.c	Kuro_UpdateAnimationSequence	contrived	minor	2	per-case tag pointer locals; animation passed through the targetPosition field that overlaps it

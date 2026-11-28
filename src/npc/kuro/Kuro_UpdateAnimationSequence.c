@@ -1,20 +1,11 @@
 #include "global.h"
 #include "npc/story_character/state_actor.h"
+#include "scene/motion/scene_facing.h"
 static inline void facing(struct StateActor *npc, short angle)
 {
     npc->angle = angle;
-    {
-        s32 t = (s32)(angle + 0x70) >> 5;
-        u32 m = 7;
-        m &= t;
-        npc->facing8 = m;
-    }
-    {
-        s32 t = (s32)(angle + 0x60) >> 6;
-        u32 m = 3;
-        m &= t;
-        npc->facing4 = m;
-    }
+    npc->facing8 = SceneFacing_EightWay(angle);
+    npc->facing4 = SceneFacing_FourWay(angle);
 }
 void Kuro_PlayTaggedAnimation(void *, s32, s32, s32, s32);
 s32 DisplayAnimation_TestFinished(void *);
