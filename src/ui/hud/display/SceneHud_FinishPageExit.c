@@ -1,97 +1,84 @@
 #include "global.h"
 #include "engine/video/render.h"
 #include "engine/engine_pause_flags.h"
+#include "ui/pause/scene_hud_display.h"
+#include "player/player.h"
+#include "engine/engine.h"
+#include "gba/io_reg.h"
 void Hud_InitSelectionBounds(u32, u32);
-void Hud_UpdateEquipmentPrompt(void *);
-void Hud_SetUpdateCallback(void *, void (*)(void *));
+void Hud_UpdateEquipmentPrompt(struct SceneHudState *);
+void Hud_SetUpdateCallback(struct SceneHudState *, void (*)(struct SceneHudState *));
 void Sound_ResumePersistentSongs(void);
-void HealthBurstEffect_Create(void *, u32);
+void HealthBurstEffect_Create(struct Player *, u32);
 struct Args {
     u16 count;
     u16 pad;
     s32 *values;
 };
-void Script_Call(void *, struct Args *);
-struct PackedVec {
-    s32 x : 16;
-    s32 y : 16;
-    s32 z : 16;
-    s32 pad : 16;
-};
-void EffectManager_SpawnParticles(u32, u32, u32, struct PackedVec *, struct PackedVec *, u32, u32);
-void SceneHud_FinishPageExit(u8 *p)
+void EffectManager_SpawnParticles(u32, u32, u32, struct SceneVec *, struct SceneVec *, u32, u32);
+void SceneHud_FinishPageExit(struct SceneHudState *hud)
 {
-    u32 zero;
-    s32 value;
-    struct Args args;
-    struct PackedVec pos, size;
-    s32 value2;
-    struct Args args2;
-    u16 *timer = (u16 *)(p + 0xa4c);
-    Hud_InitSelectionBounds(*timer * 4, 0x1084);
-    if (!*timer) {
-        *(vu16 *)0x04000050 = *(u16 *)(p + 0xa10);
-        if (*(u16 *)(p + 0x43d8) & 0x200)
+    Hud_InitSelectionBounds(hud->pageFadeTimer * 4, 0x1084);
+    if (!hud->pageFadeTimer) {
+        REG_BLDCNT = hud->savedBlendControl;
+        if (hud->savedDisplayControl & 0x200)
             gDispCntShadow |= 0x200;
-        if (*(u16 *)(p + 0x43d8) & 0x400)
+        if (hud->savedDisplayControl & 0x400)
             gDispCntShadow |= 0x400;
-        if (*(u16 *)(p + 0x43d8) & 0x800)
+        if (hud->savedDisplayControl & 0x800)
             gDispCntShadow |= 0x800;
     }
-    {
-        u32 next = *(u16 *)(p + 0xa4c) + 1;
-        zero = 0;
-        *(u16 *)(p + 0xa4c) = next;
-        if ((u16)next > 16) {
-            Hud_SetUpdateCallback(p, Hud_UpdateEquipmentPrompt);
-            gBgFadeColor = *(u16 *)(p + 0x43e0);
-            gBgFadeBankMask = *(u16 *)(p + 0x43e2);
-            gObjFadeColor = *(u16 *)(p + 0x43e4);
-            gObjFadeFlags = *(u16 *)(p + 0x43e6);
-            Engine_ClearPauseFlags(4);
-            Sound_ResumePersistentSongs();
-            if (p[0x487c]) {
-                HealthBurstEffect_Create(*(void **)(p + 0xa40), p[0x487d]);
-                p[0x487c] = zero;
+    if (++hud->pageFadeTimer > 16) {
+        Hud_SetUpdateCallback(hud, Hud_UpdateEquipmentPrompt);
+        gBgFadeColor = hud->savedFade[0];
+        gBgFadeBankMask = hud->savedFade[1];
+        gObjFadeColor = hud->savedFade[2];
+        gObjFadeFlags = hud->savedFade[3];
+        Engine_ClearPauseFlags(4);
+        Sound_ResumePersistentSongs();
+        if (hud->secondaryEffectRequested) {
+            HealthBurstEffect_Create(hud->actionOwner, hud->secondaryEffectMode);
+            hud->secondaryEffectRequested = 0;
+        }
+        if (hud->primaryEffectRequested) {
+            if (hud->pageExitScript) {
+                struct Args args;
+                s32 value;
+                args.count = 1;
+                value = hud->primaryEffectMode;
+                args.values = &value;
+                Script_Call(hud->pageExitScript, &args);
             }
-            if (p[0x4874]) {
-                void *script = *(void **)(p + 0x4878);
-                if (script) {
-                    args.count = 1;
-                    value = p[0x4875];
-                    args.values = &value;
-                    Script_Call(script, &args);
-                }
-                p[0x4875] = zero;
-                p[0x4874] = zero;
+            hud->primaryEffectMode = 0;
+            hud->primaryEffectRequested = 0;
+        }
+        if (hud->particleEffectRequested) {
+            struct SceneVec position, size;
+            s32 i;
+            position = hud->actionOwner->position;
+            position.x -= 512;
+            position.z -= 512;
+            position.y -= 256;
+            size.x = 1024;
+            size.z = 1024;
+            size.y = 512;
+            for (i = 0; i < 3; i++)
+                EffectManager_SpawnParticles(4, hud->particleEffectMode, hud->particleEffectKind,
+                                             &position, &size, 300, 120);
+            hud->particleEffectMode = 0;
+            hud->particleEffectRequested = 0;
+        }
+        if (hud->effectActive) {
+            /* Tests one script and runs the other, as shipped. */
+            if (hud->pageExitScript) {
+                struct Args args;
+                s32 value;
+                args.count = 1;
+                value = hud->effectActive - 1;
+                args.values = &value;
+                Script_Call(hud->effectScript, &args);
             }
-            if (p[0x4870]) {
-                s32 i;
-                struct PackedVec *a, *b;
-                pos = *(struct PackedVec *)(*(u8 **)(p + 0xa40) + 0x30);
-                pos.x -= 512;
-                pos.z -= 512;
-                pos.y -= 256;
-                size.x = 1024;
-                size.z = 1024;
-                size.y = 512;
-                a = &pos;
-                b = &size;
-                for (i = 2; i >= 0; i--)
-                    EffectManager_SpawnParticles(4, p[0x4871], *(u16 *)(p + 0x4872), a, b, 300,
-                                                 120);
-                p[0x4871] = 0;
-                p[0x4870] = 0;
-            }
-            if (p[0x487f]) {
-                if (*(void **)(p + 0x4878)) {
-                    args2.count = 1;
-                    value2 = p[0x487f] - 1;
-                    args2.values = &value2;
-                    Script_Call(*(void **)(p + 0x4880), &args2);
-                }
-                p[0x487f] = 0;
-            }
+            hud->effectActive = 0;
         }
     }
 }

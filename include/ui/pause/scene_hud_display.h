@@ -235,7 +235,7 @@ struct SceneHudState {
     u16 savedDisplayControl;                        /* 0x43D8 */
     u16 savedMosaicHalfword, savedMosaicParameter;  /* 0x43DA */
     u8 savedSpriteMosaicAttribute, savedMosaicByte; /* 0x43DE */
-    u8 unknown43E0[8];
+    u16 savedFade[4];                               /* 0x43E0: BG color/banks, OBJ color/flags */
     u8 directionRepeatTimer; /* 0x43E8 */
     u8 binaryChoice;         /* 0x43E9: left/right toggles; A confirms, B cancels */
     u8 unknown43EA[2];
@@ -253,13 +253,15 @@ struct SceneHudState {
     u16 savedStatA; /* 0x486A: restored after a previewed item effect */
     u8 unknown486C[2];
     u16 savedStatB; /* 0x486E: restored after a previewed item effect */
-    u8 unknown4870[4];
+    u8 particleEffectRequested, particleEffectMode; /* 0x4870 */
+    u16 particleEffectKind;                         /* 0x4872 */
     u8 primaryEffectRequested, primaryEffectMode; /* 0x4874 */
-    u8 unknown4876[6];
+    u8 unknown4876[2];
+    u32 pageExitScript; /* 0x4878 */
     u8 secondaryEffectRequested, secondaryEffectMode; /* 0x487C */
     u8 unknown487E;
     u8 effectActive; /* 0x487F: cleared when previewed stats are restored */
-    u8 unknown4880[4];
+    u32 effectScript; /* 0x4880 */
     struct SceneValueEquipment alternateEquipment; /* 0x4884 */
     u8 unknown4894[4];
     s8 comparisonProfiles[0x10]; /* 0x4898: profile index per party member, extent tentative */
