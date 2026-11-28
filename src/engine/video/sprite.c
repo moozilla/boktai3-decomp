@@ -735,15 +735,14 @@ void SpriteTiles_LoadResource(struct SpriteTileResource *resource)
 struct SpriteTileEntry *AnimData_FindEntry(u16 id)
 {
     struct SpriteTileResource *h = gSpriteTileResource;
+    struct SpriteTileEntry *e;
+    s32 i;
     if (h == 0)
         return 0;
-    {
-        struct SpriteTileEntry *e = h->entries;
-        s32 i = 0;
-        for (; i < h->entryCount; i++, e++) {
-            if (e->id == id)
-                return e;
-        }
+    e = h->entries;
+    for (i = 0; i < h->entryCount; i++, e++) {
+        if (e->id == id)
+            return e;
     }
     return 0;
 }
