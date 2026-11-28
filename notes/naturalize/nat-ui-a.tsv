@@ -324,3 +324,12 @@ src/ui/dialogue/scrolling_dialogue/scrolling_dialogue.c	ScrollingDialogue_SetCho
 src/ui/dialogue/scrolling_dialogue/scrolling_dialogue.c	ScrollingDialogue_RequestShow	minor	natural	1	
 src/ui/dialogue/scrolling_dialogue/scrolling_dialogue.c	ScrollingDialogue_RequestHide	minor	natural	1	
 src/ui/dialogue/scrolling_dialogue/scrolling_dialogue.c	ScrollingDialogue_HideImmediately	minor	natural	1	
+src/ui/dialogue/scrolling_dialogue/scrolling_dialogue.c	ScrollingDialogue_ClearTextArea	natural	natural	0	
+src/ui/dialogue/scrolling_dialogue/scrolling_dialogue.c	ScrollingDialogue_OnTaskUpdate	natural	natural	0	
+src/ui/dialogue/scrolling_dialogue/scrolling_dialogue.c	ScrollingDialogue_Init	natural	natural	0	
+src/ui/dialogue/scrolling_dialogue/scrolling_dialogue.c	ScrollingDialogue_ClearScript	natural	natural	0	
+src/ui/dialogue/scrolling_dialogue/scrolling_dialogue.c	ScrollingDialogue_SetNumberArgumentFromScript	natural	natural	0	
+src/ui/dialogue/scrolling_dialogue/scrolling_dialogue.c	ScrollingDialogue_SetStringFromScript	natural	natural	0	
+src/ui/dialogue/scrolling_dialogue/scrolling_dialogue.c	ScrollingDialogue_SetStringReferenceFromScript	natural	natural	0	
+src/ui/dialogue/scrolling_dialogue/TextWindowManager_ResetInstance.c	TextWindowManager_ResetInstance	natural	natural	0	
+src/ui/dialogue/scrolling_dialogue/TextWindowManager_IsCreated.c	TextWindowManager_IsCreated	contrived	natural	1	

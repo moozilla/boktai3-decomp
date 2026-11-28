@@ -4,8 +4,5 @@
 
 u32 TextWindowManager_IsCreated(void)
 {
-    u32 r = (u32)gWindowManager;
-    if (r)
-        r = 1;
-    return r;
+    return gWindowManager != 0;
 }
