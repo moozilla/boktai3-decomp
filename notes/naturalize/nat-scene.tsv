@@ -127,3 +127,4 @@ src/scene/actor/actor_utilities.c	SceneActorTerrain_IsBelowForwardFloor	natural	
 src/scene/actor/actor_utilities.c	ActorParticles_SpawnDirectionalBurst	natural	natural	0	
 src/scene/actor/actor_utilities.c	ActorMode_SelectOddStateVariant	natural	natural	0	
 src/scene/actor/actor_utilities.c	ActorParticles_SpawnWideBurst	natural	natural	0	
+src/scene/actor/animation/SceneActorAnimation_SelectDirectionFlagsVariant.c	SceneActorAnimation_SelectDirectionFlagsVariant	contrived	natural	4	shared SceneActorAnimation_Apply inline in include/scene/actor/animation_apply.h replaces the pasted body
