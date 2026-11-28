@@ -493,3 +493,5 @@ src/player/cutscene/player_cue_dispatch.c	Player_SendSceneMessage	natural	natura
 src/player/cutscene/player_cue_dispatch.c	PlayerCue_InitCollider	natural	natural	0	-
 src/player/cutscene/player_cue_dispatch.c	Player_OnStateOneEvent	natural	natural	0	-
 src/player/cutscene/player_cue_dispatch.c	Player_ScaleLevelValue	minor	natural	11	-
+src/player/cutscene/player_cue_dispatch.c	PlayerCue_InitAttackCollider	minor	minor	1	unchanged: sum reused for the facing octant (register choice)
+src/player/cutscene/player_cue_dispatch.c	Player_UpdateColliderRefreshCountdown	minor	natural	1	-

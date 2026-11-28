@@ -404,10 +404,9 @@ void PlayerCue_InitAttackCollider(struct Player *player, void *position, u32 fla
 
 void Player_UpdateColliderRefreshCountdown(struct Player *player)
 {
-    u8 *remaining = &player->cueColliderPhase;
-    if (*remaining != 0) {
+    if (player->cueColliderPhase != 0) {
         Collider_Refresh(&player->cueCollider);
-        *remaining = *remaining - 1;
+        player->cueColliderPhase--;
     }
 }
 
