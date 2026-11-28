@@ -342,3 +342,4 @@ src/engine/video/anim/Math_ShutdownHooks.c	Math_ShutdownHooks	natural	natural
 src/engine/video/anim/Math_AngleToEightWayDirection.c	Math_AngleToEightWayDirection	natural	natural		
 src/engine/video/anim/Math_AngleToFourWayDirection.c	Math_AngleToFourWayDirection	natural	natural		
 src/engine/video/anim/Vec16_Lerp.c	Vec16_Lerp	natural	natural		
+src/engine/video/palette/sub_08216F18.c	sub_08216F18	minor	natural	1	
