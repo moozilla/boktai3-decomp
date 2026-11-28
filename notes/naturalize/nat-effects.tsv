@@ -154,3 +154,6 @@ src/effects/bursts/fragment_effect/FragmentEffect_UpdateOrbit.c	FragmentEffect_U
 src/effects/bursts/fragment_effect/FragmentEffect_ShrinkAndRemove.c	FragmentEffect_Create	contrived	natural	6	sprite pointer alias kept: ROM copies the fragment pointer for sprite accesses
 src/effects/bursts/fragment_effect/FragmentEffect_ShrinkAndRemove.c	FragmentEffect_ShrinkAndRemove	minor	natural	1	-
 src/effects/bursts/fragment_effect/FragmentEffect_SpawnRandomParticle.c	FragmentEffect_SpawnRandomParticle	contrived	minor	1	random-bank origin and velocity pointer kept for literal load order
+src/effects/bursts/fragment_effect/FragmentEffect_NoOp.c	FragmentEffect_NoOp	natural	natural	0	
+src/effects/bursts/fragment_effect/FragmentEffect_OnColliderContact.c	FragmentEffect_OnColliderContact	natural	natural	0	
+src/effects/bursts/fragment_effect/FragmentEffect_ResetManagerReference.c	FragmentEffect_ResetManagerReference	natural	natural	0	
