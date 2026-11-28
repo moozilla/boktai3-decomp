@@ -1,29 +1,18 @@
-#define PaletteTransition_BlendFromGray RadialBurstEffect_BlendSpritePalette
-#include "global.h"
-struct PaletteTransition {
-    u32 flags;
-    u8 unknown4[0x18];
-    u8 position[0x2c];
-    const u16 *source;
-    u16 colors[16];
-    u8 unknown6C;
-    u8 alpha;
-    u8 unknown6E[4];
-    u16 ticks;
-    void *owner;
-};
-void RadialBurstEffect_BlendSpritePalette(struct PaletteTransition *);
-void PaletteTransition_UpdateFadeOut(struct PaletteTransition *transition)
+#include "effects/bursts/radial_burst.h"
+
+void RadialBurstEffect_BlendSpritePalette(struct RadialBurstFade *);
+
+void PaletteTransition_UpdateFadeOut(struct RadialBurstFade *fade)
 {
-    if (transition->alpha <= 5)
-        transition->flags |= 0x400;
+    if (fade->alpha <= 5)
+        fade->flags |= 0x400;
     else
-        transition->flags &= ~0x400;
-    if (transition->alpha == 0) {
-        transition->flags |= 1;
-        transition->unknown6C = 0;
+        fade->flags &= ~0x400;
+    if (fade->alpha == 0) {
+        fade->flags |= 1;
+        fade->active = 0;
     } else {
-        transition->alpha--;
-        RadialBurstEffect_BlendSpritePalette(transition);
+        fade->alpha--;
+        RadialBurstEffect_BlendSpritePalette(fade);
     }
 }
