@@ -285,7 +285,7 @@ s32 Trigger_TryOpenNearby(struct TriggerOpener *actor)
     index = actor->index;
     for (p = manager->head; p;) {
         struct Player *state;
-        if ((p->flags & 1) || *(u16 *)&p->actor != 511)
+        if ((p->flags & 1) || p->actor != -1 || p->type != 1)
             goto next;
         {
             struct SceneVec *point = &actor->position;
@@ -315,7 +315,7 @@ s32 Trigger_TryOpenNearby(struct TriggerOpener *actor)
                     event = 1;
                 else
                     event = sub_0822D490(p->id, p->kind) == 1;
-                Trigger_RunScript(p, *(u16 *)&p->startScript, event);
+                Trigger_RunScript(p, p->startScript, event);
             }
             return 1;
         }
