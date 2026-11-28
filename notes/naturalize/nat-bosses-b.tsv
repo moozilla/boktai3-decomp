@@ -255,3 +255,6 @@ src/bosses/sabata/ActorAnimation_UpdateDirectional.c	ActorAnimation_UpdateDirect
 src/bosses/sabata/attacks.c	ActorEffect_UpdateTimedSequence	natural	natural	0	
 src/bosses/sabata/attacks.c	ActorEffect_InitializeOffset	machine-shaped	partial	3	kept origin setter with its zero local and x/z temporaries
 src/bosses/sabata/attacks.c	Sabata_UpdateKnockbackLanding	machine-shaped	partial	4	kept volume alias, terrain-height inline and velocity zero local
+src/bosses/sabata/attacks.c	Sabata_UpdateRepeatedShot	machine-shaped	machine-shaped	3	kept second actor alias (ROM keeps a copy) and facing helper
+src/bosses/sabata/attacks.c	Sabata_UpdatePursuitSpin	machine-shaped	machine-shaped	3	kept second actor alias (ROM keeps a copy) and facing helper
+src/bosses/sabata/attacks.c	Sabata_UpdateImpactSlide	machine-shaped	machine-shaped	3	kept second actor alias (ROM keeps a copy) and facing helper
