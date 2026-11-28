@@ -744,3 +744,4 @@ src/system/solar/Solar_InitControllerState.c	Solar_InitControllerState	contrived
 src/system/solar/sub_0822CAA0.c	sub_0822CAA0	contrived	minor	1	state pointer kept for the reads after the minute store
 src/system/solar/sub_0822CB08.c	sub_0822CB08	contrived	minor	1	fields in unnamed ranges of the shared header are read through casts
 src/system/solar/Solar_CreateController.c	Solar_CreateController	minor	natural	1	
+src/system/solar/Solar_InitTimer.c	Solar_InitTimer	minor	minor	1	mask inline and raw cartridge GPIO addresses stay

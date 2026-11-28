@@ -22,12 +22,12 @@ void Solar_InitTimer(void)
     REG_IME = 0;
     ie = REG_IE;
     REG_IE = 0;
-    *(vu16 *)0x0400010C = 0;
-    *(vu16 *)0x0400010E = 0xC0;
+    REG_TM3CNT_L = 0;
+    REG_TM3CNT_H = TIMER_ENABLE | TIMER_INTR_ENABLE;
     gSerialInterruptState[2] = Solar_OnTimerInterrupt;
     gSolarGpioSaved = *(vu16 *)0x080000C4;
     *(vu16 *)0x080000C6 = 7;
     *(vu16 *)0x080000C8 = 1;
-    REG_IE = maskIE(ie, 0x40);
+    REG_IE = maskIE(ie, INTR_FLAG_TIMER3);
     REG_IME = 1;
 }
