@@ -831,10 +831,9 @@ void Hud_DrawClockLabelB(u32 x, u32 y)
 void Hud_DrawClockLabelA(u32 x, u32 y)
 {
     u16 *cell = Hud_GetTilemapCell(0, x, y);
-    *cell = 0xF07C;
-    cell++;
-    *cell = 0xF07D;
-    cell[1] = 0xF07E;
+    *cell++ = 0xF07C;
+    *cell++ = 0xF07D;
+    *cell = 0xF07E;
 }
 
 void Hud_DrawSelectedClock(struct SceneHudState *hud)
