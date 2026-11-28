@@ -595,3 +595,4 @@ src/ui/town/storage/sub_081BECF0.c	sub_081BECF0	minor	natural	1
 src/ui/town/storage/Storage_LoadDisplayResources.c	Storage_LoadDisplayResources	contrived	minor	2	text view cast: the palette pointer overlaps the glyph pair
 src/ui/town/storage/Storage_InitEntries.c	Storage_InitEntries	contrived	natural	2	
 src/ui/town/storage/Storage_UpdateOpeningDelay.c	Storage_UpdateOpeningDelay	contrived	natural	1	
+src/ui/town/storage/Storage_UpdateCloseDelay.c	Storage_UpdateCloseDelay	contrived	natural	2	

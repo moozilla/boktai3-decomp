@@ -1,14 +1,12 @@
 #include "global.h"
-void Script_Call(u32, u32);
-void Task_Kill(u8 *);
-void Storage_UpdateCloseDelay(u8 *p)
+#include "ui/town/storage_screen.h"
+void Storage_UpdateCloseDelay(struct StorageScreen *screen)
 {
-    u16 *c = (u16 *)(p + 0x174e);
-    (*c)++;
-    if (*c > 0x27) {
-        u32 v = *(u32 *)(p + 0x17ec);
-        if (v)
-            Script_Call(v, 0);
-        Task_Kill(p);
+    screen->timer++;
+    if (screen->timer > 0x27) {
+        u32 script = screen->completionScript;
+        if (script)
+            Script_Call(script, 0);
+        Task_Kill(screen);
     }
 }
