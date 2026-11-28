@@ -99,12 +99,12 @@ void ConvergingEffects_EmitFarParticle(struct Player *player, struct SceneVec *p
         angle = ParticleRandom_ReadDirectSample(gRandomTable) & 255;
         radiusSample = ParticleRandom_ReadDirectSample(gRandomTable);
         radius = radiusSample % 128 + 256;
-        e->offsetX = scale(radius * gUnk_086149C4[(angle + 64) & 255]);
-        e->offsetZ = scale(radius * gUnk_086149C4[angle]);
+        e->offsetX = Math_ShiftTowardZero(radius * gUnk_086149C4[(angle + 64) & 255], 12);
+        e->offsetZ = Math_ShiftTowardZero(radius * gUnk_086149C4[angle], 12);
         draw->position = *position;
         draw->position.x += (u16)e->offsetX;
         draw->position.z += (u16)e->offsetZ;
-        e->speed = (random_value() & 7) + 28;
+        e->speed = (ParticleRandom_ReadDirectSample((const u16 *)RANDOM_TABLE_ADDR) & 7) + 28;
         e->ticks = 0;
         e->active = 1;
         player->convergingEffects.active = 1;
