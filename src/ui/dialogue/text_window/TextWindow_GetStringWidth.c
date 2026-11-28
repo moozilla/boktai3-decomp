@@ -1,13 +1,17 @@
 #include "global.h"
+#include "engine/ram.h"
+#include "ui/dialogue/text_window.h"
+#include "ui/dialogue/text_window_manager.h"
 /* TextWindow_GetStringWidth: Measures an indexed substitution string including expanded numbers and wide characters */
 
-u8 *TextWindow_Find(u32);
-s32 TextState_MeasureStringLine(void *, u32);
+struct TextWindow *TextWindow_Find(int);
+int TextState_MeasureStringLine(struct TextState *, int);
 
-s32 TextWindow_GetStringWidth(u32 id, u32 arg)
+int TextWindow_GetStringWidth(int id, int index)
 {
-    u8 *w = TextWindow_Find(id);
-    if (w == NULL)
+    struct TextWindow *window = TextWindow_Find(id);
+
+    if (!window)
         return -1;
-    return TextState_MeasureStringLine(w + 0x60, arg);
+    return TextState_MeasureStringLine(&window->text, index);
 }
