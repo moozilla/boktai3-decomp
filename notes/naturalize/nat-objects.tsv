@@ -192,3 +192,5 @@ src/objects/deck_cannons/DeckCannon_InitMuzzleFlash.c	DeckCannon_InitMuzzleFlash
 src/objects/deck_cannons/DeckCannon_SpawnMuzzleFlash.c	DeckCannon_SpawnMuzzleFlash	contrived	natural	1	
 src/objects/deck_cannons/DeckCannon_ReadOptions.c	DeckCannon_ReadOptions	contrived	natural	3	
 src/objects/deck_cannons/DeckCannon_Create.c	DeckCannon_Create	contrived	natural	2	
+src/objects/deck_cannons/sub_0819A414.c	sub_0819A414	contrived	contrived	6	offset arithmetic: the ROM adds the battery base before the 0x28/0xD68 member offset, which every typed array form folds the other way
+src/objects/deck_cannons/DeckCannon_Update.c	DeckCannon_Update	contrived	natural	6	RunCallback() helper stops jump threading past the reload of update
