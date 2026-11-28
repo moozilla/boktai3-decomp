@@ -604,14 +604,11 @@ u32 Actor_IsInReactionStateFromScript(void)
 
 int Actor_InitBehaviorFromScript(void *unused, struct SceneActor *actor)
 {
-    if (Script_GetKeywordValue(0x43, 1))
+    if (Script_GetKeywordValue('C', 1))
         Actor_RegisterMotion(actor);
-    {
-        u8 angle = actor->body.direction;
-        actor->savedAngle = angle;
-    }
-    actor->registered = Script_GetKeywordValue(0x43, 1);
-    if (Script_SeekToKeyword(0x72)) {
+    actor->savedAngle = actor->body.direction;
+    actor->registered = Script_GetKeywordValue('C', 1);
+    if (Script_SeekToKeyword('r')) {
         actor->routeId = Script_GetValue();
         actor->routeMode = Script_GetValue();
         actor->routePoint = Script_GetValue();
@@ -620,7 +617,7 @@ int Actor_InitBehaviorFromScript(void *unused, struct SceneActor *actor)
         Path_GetPointPosition(&actor->body.position, actor->route.point, actor->routePoint);
     } else
         actor->routeId = -1;
-    if (Script_SeekToKeyword(0x68)) {
+    if (Script_SeekToKeyword('h')) {
         actor->hasDestination = 1;
         actor->destination.x = Script_GetValue();
         actor->destination.y = Script_GetValue();
@@ -629,7 +626,7 @@ int Actor_InitBehaviorFromScript(void *unused, struct SceneActor *actor)
         actor->hasDestination = 0;
         actor->destination = actor->body.position;
     }
-    if (Script_SeekToKeyword(0x54)) {
+    if (Script_SeekToKeyword('T')) {
         actor->hasParameters = 1;
         actor->paramA = Script_GetValue();
         actor->paramB = Script_GetValue();
@@ -642,7 +639,7 @@ int Actor_InitBehaviorFromScript(void *unused, struct SceneActor *actor)
         actor->paramC = 21;
         actor->paramD = 0;
     }
-    if (Script_SeekToKeyword(0x62)) {
+    if (Script_SeekToKeyword('b')) {
         actor->modeA = Script_GetValue();
         actor->modeB = Script_GetValue();
         actor->modeValue = Script_GetValue();
@@ -651,17 +648,16 @@ int Actor_InitBehaviorFromScript(void *unused, struct SceneActor *actor)
         actor->modeB = 1;
         actor->modeValue = 0;
     }
-    if (Script_SeekToKeyword(0x77)) {
+    if (Script_SeekToKeyword('w')) {
         actor->rateC = Script_GetValue();
         actor->rateA = Script_GetValue();
         actor->rateB = Script_GetValue();
     } else {
-        int *dst = &actor->rateC;
-        *dst = 256;
+        actor->rateC = 256;
         actor->rateA = 256;
         actor->rateB = 512;
     }
-    if (Script_SeekToKeyword(0x48)) {
+    if (Script_SeekToKeyword('H')) {
         actor->interaction.turning.firstDirection = Script_GetValue();
         actor->interaction.turning.secondDirection = Script_GetValue();
         actor->interaction.turning.turnRate = 4;
@@ -672,10 +668,10 @@ int Actor_InitBehaviorFromScript(void *unused, struct SceneActor *actor)
         actor->interaction.turning.turnRate = 4;
         actor->interaction.turning.turnState = 255;
     }
-    actor->interaction.turning.turnRate = Script_GetKeywordValue(0x42, 4);
-    if (Script_SeekToKeyword(0x74))
+    actor->interaction.turning.turnRate = Script_GetKeywordValue('B', 4);
+    if (Script_SeekToKeyword('t'))
         actor->script = Script_GetValue();
-    if (Script_SeekToKeyword(0x73)) {
+    if (Script_SeekToKeyword('s')) {
         int a = Script_GetValue();
         int b = Script_GetValue();
         actor->radiusA = a;
@@ -693,10 +689,10 @@ int Actor_InitBehaviorFromScript(void *unused, struct SceneActor *actor)
         actor->radiusASquared = 6400;
         actor->radiusBSquared = 9216;
     }
-    actor->distance = Script_GetKeywordValue(0x4d, 10);
+    actor->distance = Script_GetKeywordValue('M', 10);
     actor->distanceSquared = actor->distance * actor->distance;
-    actor->enabled = Script_GetKeywordValue(0x75, 1);
-    actor->soundEnabled = Script_GetKeywordValue(0x46, 1);
+    actor->enabled = Script_GetKeywordValue('u', 1);
+    actor->soundEnabled = Script_GetKeywordValue('F', 1);
     return 0;
 }
 

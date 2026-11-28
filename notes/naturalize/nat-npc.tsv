@@ -37,3 +37,5 @@ src/npc/manager/scene_actor_animation.c	Actor_IsInReactionStateFromScript	contri
 src/npc/manager/scene_actor_animation.c	Actor_EndScriptControl	contrived	natural	2	
 src/npc/manager/scene_actor_animation.c	Actor_EmitTowardNearbyActors	contrived	minor	8	SceneActor_TestFlags stays (mask-first order); origin pointer: ROM keeps &emitter->position in a register
 src/npc/manager/scene_actor_animation.c	Actor_UpdateInteractionCue	contrived	minor	62	SceneActor_TestFlags twice (mask-first order in the loop)
+src/npc/manager/scene_actor_animation.c	Actor_BeginScriptControl	natural	natural	0	
+src/npc/manager/scene_actor_animation.c	Actor_InitBehaviorFromScript	minor	natural	1	
