@@ -168,3 +168,4 @@ src/link/player/ActorEffect_TestStatusFlags.c	ActorEffect_TestStatusFlags	contri
 src/link/player/sub_0823A53C.c	sub_0823A53C	natural	natural	0	
 src/link/player/Player_NotifyFirstSelectedSlot.c	Player_NotifyFirstSelectedSlot	natural	natural	0	
 src/link/player/sub_0823A5EC.c	sub_0823A5EC	contrived	minor	6	flag set and clear accessors stay: plain operators differ
+src/link/player/sub_0823A830.c	sub_0823A830	contrived	natural	1	field names come from the local player layout
