@@ -233,21 +233,7 @@ void ActorController_UpdateMovementVelocity(struct SceneCombatActor *actor)
 void ActorController_UpdateDecayingVelocity(struct SceneCombatActor *actor)
 {
     ActorController_UpdateMovingAttackCollider(actor);
-    {
-        u8 *heading = &actor->heading;
-        int shift = actor->actionCounter >> 1;
-        int speed = 20;
-        struct ActorControllerVelocity *velocity = &actor->velocity;
-        int angle = *heading;
-        speed >>= shift;
-        velocity->x = (ActorController_TruncateFixed(gUnk_086149C4[(angle + 64) & 255] * speed));
-        velocity->y = 0;
-        {
-            const s16 *table = gUnk_086149C4;
-            const s16 *entry = (const void *)((angle * sizeof(*table)) + (const u8 *)table);
-            velocity->z = ActorController_TruncateFixed(*entry * speed);
-        }
-    }
+    ActorController_SetMotion(&actor->velocity, actor->heading, 20 >> (actor->actionCounter >> 1));
     if (actor->velocity.x || actor->velocity.z) {
         actor->flags |= 0x20;
         return;
