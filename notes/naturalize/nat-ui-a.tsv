@@ -416,3 +416,4 @@ src/ui/hud/countdown_controller.c	Countdown_Tick	fudged	partial	4	remaining poin
 src/ui/hud/countdown_controller.c	Countdown_InitializeFromScript	fudged	natural	1	
 src/ui/hud/shake_icon_display.c	ShakeIconDisplay_TickShake	fudged	natural	4	
 src/ui/hud/shake_icon_display.c	ShakeIconDisplay_Tick	fudged	natural	1	
+src/ui/hud/shake_icon_display.c	ShakeIconDisplay_Initialize	fudged	natural	1	
