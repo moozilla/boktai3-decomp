@@ -250,3 +250,4 @@ src/ui/dialogue/message_window/message_window.c	MessageWindow_UpdateImmediatePla
 src/ui/dialogue/message_window/message_window.c	MessageWindow_ApplyPalette	minor	natural	1	
 src/ui/dialogue/message_window/message_window.c	MessageWindow_UpdatePageAdvance	contrived	natural	1	
 src/ui/dialogue/message_window/message_window.c	MessageWindow_UpdateFastPlayback	contrived	natural	1	
+src/ui/dialogue/message_window/message_window.c	MessageWindow_UpdateNormalPlayback	minor	natural	1	

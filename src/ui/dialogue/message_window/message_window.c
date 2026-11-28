@@ -553,7 +553,7 @@ void MessageWindow_UpdateNormalPlayback(struct MessageWindow *window)
     struct MessagePlaybackState *state = &window->state;
     state->skip = window->skipFlags;
     if (state->pc) {
-        if (!state->stream && !*((u8 *)state->pc)) {
+        if (!state->stream && !*state->pc) {
             window->pageAdvanceTimer = 0;
             MessageWindow_SetPlayback(window, MessageWindow_UpdatePageAdvance);
             if (!window->autoAdvance && !window->pageAdvanceDelay)
@@ -573,13 +573,13 @@ void MessageWindow_UpdateNormalPlayback(struct MessageWindow *window)
     }
     if (window->callback != MessageWindow_ClearTextCompletion && !window->autoAdvance) {
         if (window->inputDelay == 0) {
-            if (gPadState[1] & 1) {
+            if (gPadState[1] & A_BUTTON) {
                 MessageWindow_SetPlayback(window, MessageWindow_UpdateFastPlayback);
                 return;
             }
         } else
             window->inputDelay--;
-        if (gPadState[0] & 2) {
+        if (gPadState[0] & B_BUTTON) {
             MessageWindow_SetPlayback(window, MessageWindow_UpdateFastPlayback);
             window->fastPlayback = 1;
         }
