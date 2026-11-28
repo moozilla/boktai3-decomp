@@ -298,3 +298,5 @@ src/ui/title/tutorial_otenko.c	TutorialOtenko_UpdateLargeRestAnimation	contrived
 src/ui/title/tutorial_otenko.c	TutorialOtenko_HideAndResetChildren	contrived	minor	18	child callback view, callback local and u8 one (hoisted constant order)
 src/ui/title/tutorial_otenko.c	TutorialOtenko_MoveAlongCurveToRest	contrived	minor	1	set_direction helper, (u16) start height cast
 src/ui/title/tutorial_otenko.c	TutorialOtenko_MoveAlongScriptedCurve	contrived	minor	1	set_direction helper, (u16) start height cast
+src/ui/title/tutorial_otenko.c	TutorialOtenko_MoveTowardTarget	minor	minor	0	u8 casts on the facing row, parked sine table pointer
+src/ui/title/tutorial_otenko.c	TutorialOtenko_UpdateFadeAnimation	contrived	natural	1	
