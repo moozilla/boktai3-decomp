@@ -152,112 +152,91 @@ void PlayerOrbitEffect_UpdateIntro(struct PlayerOrbitEffect *effect)
 
 void PlayerOrbitEffect_UpdateStatTransfer(struct PlayerOrbitEffect *effect)
 {
-    u16 *frame = &effect->phaseFrame;
-    struct AnimSprite *animation;
-    struct AnimSpriteResource *data;
-    if (!*frame) {
+    if (!effect->phaseFrame) {
         Sound_PlaySong(0x303);
         Sound_PlaySong(0x1FB);
     }
     gPlayers[0]->animation.flags |= 1;
     ActorShadow_Disable(gPlayers[0]->shadow);
-    if (*frame <= 7) {
-        animation = &effect->drawable;
-        data = &effect->animationData;
-        if (*frame == 0) {
+    if (effect->phaseFrame <= 7) {
+        if (effect->phaseFrame == 0) {
             effect->drawable.flags |= 4;
-            Anim_SetKeyframes(animation, data, 0xE5, 1, 0);
+            Anim_SetKeyframes(&effect->drawable, &effect->animationData, 0xE5, 1, 0);
         }
-        effect->drawable.position.x = effect->owner->position.x - (*frame << 7);
+        effect->drawable.position.x = effect->owner->position.x - (effect->phaseFrame << 7);
         effect->drawable.position.z = effect->owner->position.z;
         PlayerOrbitEffect_SpawnParticle(effect, &effect->drawable.position, 0x80);
-    } else if (*frame <= 23) {
-        animation = &effect->drawable;
-        data = &effect->animationData;
-        if (*frame == 8) {
+    } else if (effect->phaseFrame <= 23) {
+        if (effect->phaseFrame == 8) {
             effect->drawable.flags &= ~4;
-            Anim_SetKeyframes(animation, data, 0xE5, 1, 1);
+            Anim_SetKeyframes(&effect->drawable, &effect->animationData, 0xE5, 1, 1);
         }
         {
             struct CameraPosition *origin = &gCamera.position;
-            s32 offset = *frame << 5;
+            s32 offset = effect->phaseFrame << 5;
             offset -= 768;
             effect->drawable.position.x = origin->x + offset;
         }
-        effect->drawable.position.z = gCamera.position.z - ((*frame - 16) << 7);
+        effect->drawable.position.z = gCamera.position.z - ((effect->phaseFrame - 16) << 7);
         PlayerOrbitEffect_SpawnParticle(effect, &effect->drawable.position, 0x48);
-    } else if (*frame <= 39) {
-        animation = &effect->drawable;
-        data = &effect->animationData;
-        if (*frame == 24) {
+    } else if (effect->phaseFrame <= 39) {
+        if (effect->phaseFrame == 24) {
             effect->drawable.flags |= 4;
-            Anim_SetKeyframes(animation, data, 0xE6, 1, 1);
+            Anim_SetKeyframes(&effect->drawable, &effect->animationData, 0xE6, 1, 1);
         }
         {
             struct CameraPosition *origin = &gCamera.position;
-            s32 offset = *frame << 5;
+            s32 offset = effect->phaseFrame << 5;
             offset -= 1280;
             effect->drawable.position.x = origin->x - offset;
         }
-        effect->drawable.position.z = gCamera.position.z + ((*frame - 32) << 7);
+        effect->drawable.position.z = gCamera.position.z + ((effect->phaseFrame - 32) << 7);
         PlayerOrbitEffect_SpawnParticle(effect, &effect->drawable.position, 0xC8);
-    } else if (*frame <= 55) {
-        animation = &effect->drawable;
-        data = &effect->animationData;
-        if (*frame == 40) {
+    } else if (effect->phaseFrame <= 55) {
+        if (effect->phaseFrame == 40) {
             effect->drawable.flags |= 4;
-            Anim_SetKeyframes(animation, data, 0xE5, 1, 1);
+            Anim_SetKeyframes(&effect->drawable, &effect->animationData, 0xE5, 1, 1);
         }
-        effect->drawable.position.x = gCamera.position.x - ((*frame - 48) << 7);
+        effect->drawable.position.x = gCamera.position.x - ((effect->phaseFrame - 48) << 7);
         {
             struct CameraPosition *origin = &gCamera.position;
-            s32 offset = *frame << 5;
+            s32 offset = effect->phaseFrame << 5;
             offset -= 1280;
             effect->drawable.position.z = origin->z + offset;
         }
         PlayerOrbitEffect_SpawnParticle(effect, &effect->drawable.position, 9);
-    } else if (*frame <= 71) {
-        animation = &effect->drawable;
-        data = &effect->animationData;
-        if (*frame == 56) {
+    } else if (effect->phaseFrame <= 71) {
+        if (effect->phaseFrame == 56) {
             effect->drawable.flags &= ~4;
-            Anim_SetKeyframes(animation, data, 0xE6, 1, 1);
+            Anim_SetKeyframes(&effect->drawable, &effect->animationData, 0xE6, 1, 1);
         }
-        effect->drawable.position.x = gCamera.position.x + ((*frame - 64) << 7);
+        effect->drawable.position.x = gCamera.position.x + ((effect->phaseFrame - 64) << 7);
         {
             struct CameraPosition *origin = &gCamera.position;
-            s32 offset = *frame << 5;
+            s32 offset = effect->phaseFrame << 5;
             offset -= 2304;
             effect->drawable.position.z = origin->z + offset;
         }
         PlayerOrbitEffect_SpawnParticle(effect, &effect->drawable.position, 0x89);
     } else {
-        struct ContactPosition *position;
-        u32 bits = *frame & 3;
-        position = &effect->drawable.position;
-        if (!bits)
+        if (!(effect->phaseFrame & 3))
             PlayerOrbitEffect_SpawnParticle(effect, &effect->drawable.position, 0xC0);
-        {
-            u32 current = *frame;
-            animation = &effect->drawable;
-            data = &effect->animationData;
-            if (current == 72) {
-                effect->drawable.flags |= 4;
-                Anim_SetKeyframes(animation, data, 0xE6, 1, 1);
-            }
-        }
-        if (*frame == 96) {
+        if (effect->phaseFrame == 72) {
             effect->drawable.flags |= 4;
-            Anim_SetKeyframes(animation, data, 0xE8, 1, 0);
+            Anim_SetKeyframes(&effect->drawable, &effect->animationData, 0xE6, 1, 1);
         }
-        position->x = effect->owner->position.x;
-        effect->drawable.position.z = effect->owner->position.z - ((104 - *frame) << 5);
+        if (effect->phaseFrame == 96) {
+            effect->drawable.flags |= 4;
+            Anim_SetKeyframes(&effect->drawable, &effect->animationData, 0xE8, 1, 0);
+        }
+        effect->drawable.position.x = effect->owner->position.x;
+        effect->drawable.position.z = effect->owner->position.z - ((104 - effect->phaseFrame) << 5);
         if (effect->drawable.position.y > gPlayers[0]->position.y)
             effect->drawable.position.y -= 10;
         else
             effect->drawable.position.y = gPlayers[0]->position.y;
     }
-    Anim_Step(animation, data);
+    Anim_Step(&effect->drawable, &effect->animationData);
     if (effect->owner->currentStatA > effect->targetStatA) {
         s32 next = effect->owner->currentStatA - effect->recoveryStep;
         if (next < effect->targetStatA)
