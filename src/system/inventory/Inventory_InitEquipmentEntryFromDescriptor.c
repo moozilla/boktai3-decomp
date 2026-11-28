@@ -1,19 +1,31 @@
 #include "global.h"
-void Inventory_InitEquipmentEntryFromDescriptor(u8 *src, u8 *dst)
+
+struct ItemDescriptorView {
+    u8 type;
+    u8 unk1[11];
+    u32 values[3];
+    u8 unk18[8];
+};
+struct ItemRecord {
+    u8 type;
+    u8 unk1;
+    u16 condition;
+    u32 values[3];
+};
+void Inventory_InitEquipmentEntryFromDescriptor(const struct ItemDescriptorView *descriptor,
+                                                struct ItemRecord *record)
 {
-    u32 *from;
-    u32 *to;
-    s32 n;
-    dst[0] = src[0];
-    {
-        u16 life = 1000;
-        *(u16 *)(dst + 2) = life;
-    }
-    from = (u32 *)src;
-    to = (u32 *)dst;
-    for (n = 2; n >= 0; n--) {
-        to[1] = from[3];
-        from++;
-        to++;
+    const u32 *src;
+    u32 *dst;
+    s32 i;
+
+    record->type = descriptor->type;
+    record->condition = 1000;
+    src = (const u32 *)descriptor;
+    dst = (u32 *)record;
+    for (i = 0; i < 3; i++) {
+        dst[1] = src[3];
+        src++;
+        dst++;
     }
 }
