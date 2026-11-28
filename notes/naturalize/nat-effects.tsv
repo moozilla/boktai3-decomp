@@ -139,3 +139,4 @@ src/effects/bursts/fragment_burst/FragmentBurst_OnContact.c	FragmentBurst_OnCont
 src/effects/bursts/fragment_burst/FragmentBurst_NoOpState.c	FragmentBurst_NoOpState	natural	natural	0	
 src/effects/bursts/fragment_burst/FragmentBurst_ResetPool.c	FragmentBurst_ResetPool	natural	natural	0	
 src/effects/bursts/fragment_burst/FragmentBurst_Create.c	FragmentBurst_Create	contrived	minor	12	table local and split mask for the random start frame
+src/effects/bursts/fragment_effect/PursuingActor_RetireAll.c	PursuingActor_RetireAll	contrived	natural	1	-

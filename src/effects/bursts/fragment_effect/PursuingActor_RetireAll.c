@@ -21,18 +21,13 @@ static inline s32 OptionalValue(void)
 void PursuingActor_RetireAll(void)
 {
     struct PursuingActorManager *manager = gPursuingActorManager;
-    u8 *active;
-    s32 i, state, stride;
-    if (manager) {
-        state = 3;
-        active = &manager->actors[0].active;
-        stride = sizeof(struct PursuingActor);
-        i = 7;
-        do {
-            if (*active == 1)
-                *active = state;
-            active += stride;
-        } while (--i >= 0);
+    s32 i;
+
+    if (!manager)
+        return;
+    for (i = 0; i < 8; i++) {
+        if (manager->actors[i].active == 1)
+            manager->actors[i].active = 3;
     }
 }
 
