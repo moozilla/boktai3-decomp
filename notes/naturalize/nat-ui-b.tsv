@@ -283,3 +283,5 @@ src/ui/title/tutorial_otenko.c	TutorialOtenko_BeginRadialBurst	contrived	contriv
 src/ui/title/tutorial_otenko.c	TutorialOtenko_GetFacingDirection	contrived	natural	1	
 src/ui/title/tutorial_otenko.c	TutorialOtenko_SetSpritePriorityFromScript	contrived	natural	1	
 src/ui/title/tutorial_otenko.c	TutorialOtenko_SetPreviousAnimationStateFromScript	contrived	natural	1	
+src/ui/title/tutorial_otenko.c	TutorialOtenko_OnControllerIdle	natural	natural	0	
+src/ui/title/tutorial_otenko.c	TutorialOtenko_OnInteractionChildUpdate	contrived	minor	3	controller parameter copied into a local (parameter copy order)

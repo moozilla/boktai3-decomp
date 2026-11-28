@@ -987,13 +987,12 @@ static inline u8 child_take(struct ActorChildSlot *c)
 }
 
 void TutorialOtenko_OnInteractionChildUpdate(struct ActorAnimController *input,
-                                             struct ActorChildSlot *child)
+                                             struct ActorChildSlot *c)
 {
-    struct ActorChildSlot *c = child;
     struct ActorAnimController *p = input;
     if (child_take(c))
         c->flags &= ~1;
-    TutorialOtenko_TryInteraction(p, c);
+    TutorialOtenko_TryInteraction(p, (struct InteractionPartner *)c);
 }
 
 /* Tentative role: Wait through a child-triggered delay, then enter mode 2 / phase 4. */
