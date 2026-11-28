@@ -218,3 +218,4 @@ src/scene/actor/behavior/SceneActorBehavior_IsNearParticipant.c	SceneActorBehavi
 src/scene/actor/behavior/SceneActorBehavior_CallTerrainScript.c	SceneActorBehavior_CallTerrainScript	contrived	minor	6	status flag read through Flags_MaskedWord (plain & loads the field first); terrain flags local (plain & swaps registers)
 src/scene/actor/behavior/SceneActorBehavior_PlayReactionSound.c	SceneActorBehavior_PlayReactionSound	minor	natural	3	-
 src/scene/actor/behavior/SceneActorBehavior_TickDrawableBlink.c	SceneActorBehavior_TickDrawableBlink	contrived	contrived	30	hidden test and toggle need materialized TestNonzero, a shared mask and the kind/drawable locals: accessor forms reload kind or move the mask load
+src/scene/actor/behavior/SceneActorBehavior_AccelerateTowardDescriptor.c	SceneActorBehavior_AccelerateTowardDescriptor	minor	minor	4	field-pointer blocks for position z and velocity, and in-place ScaleProduct (Math_ShiftTowardZero returns in another register)
