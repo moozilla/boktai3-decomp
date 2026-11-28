@@ -23,22 +23,14 @@ static inline s32 GroundHeight(u32 cell, struct ContactPosition *position)
         data = gTerrainMap->cells + 12 + cell * 4;
     type = data[0] >> 4;
     height = (data[0] & 15) << 8;
-    {
-        u32 slope;
-        if (type == 1)
-            goto alongZ;
-        if (type == 2)
-            goto alongX;
-        goto finished;
-    alongZ:
-        slope = (u8)position->z;
-        goto subtract;
-    alongX:
-        slope = (u8)position->x;
-    subtract:
-        height -= slope;
+    switch (type) {
+        case 1:
+            height -= (u8)position->z;
+            break;
+        case 2:
+            height -= (u8)position->x;
+            break;
     }
-finished:
     return height;
 }
 void SceneActorScript_SetPositionFromScript(void)
