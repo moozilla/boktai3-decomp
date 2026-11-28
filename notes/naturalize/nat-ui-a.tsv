@@ -588,3 +588,5 @@ src/ui/hud/display/Hud_SetGaugeDisplayFlagFromScript.c	Hud_SetGaugeDisplayFlagFr
 src/ui/hud/display/Hud_StartMessageDisplayTimer.c	Hud_StartMessageDisplayTimer	fudged	natural	1	
 src/ui/hud/display/Hud_CloseMessageFromScript.c	Hud_CloseMessageFromScript	fudged	natural	1	
 src/ui/hud/display/Hud_ShowPanelFromScript.c	Hud_ShowPanelFromScript	fudged	natural	1	
+src/ui/hud/display/SceneHud_RefreshActionKeyframes.c	SceneHud_RefreshActionKeyframes	natural	natural	0	
+src/ui/hud/display/SceneHud_DrawSlotMarkers.c	SceneHud_DrawSlotMarkers	fudged	natural	14	flag local read before the kind pointer is formed
