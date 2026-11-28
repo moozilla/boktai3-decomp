@@ -1853,11 +1853,9 @@ void TetherActor_UpdateChargeAndCooldown(struct TetherActor *actor)
 
 void TetherActor_UpdateSecondaryColliderValues(struct TetherActor *p)
 {
-    struct ContactCollider *q = &p->secondaryCollider;
-    struct GameState *g = gGameState;
-    s32 v = (s16)g->savedZ;
-    p->valueA = v * 10 + 5 - (u16)g->unk876;
-    Collider_SetAttackProperties(q, p->valueA, p->valueB, 0, 0x40000, 0x1E);
+    struct ContactCollider *collider = &p->secondaryCollider;
+    p->valueA = (s16)gGameState->savedZ * 10 + 5 - gGameState->unk876;
+    Collider_SetAttackProperties(collider, p->valueA, p->valueB, 0, 0x40000, 0x1E);
 }
 
 void TetherActor_OnChargeContact(struct ContactCollider *collider, void *other,

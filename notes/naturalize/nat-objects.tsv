@@ -116,3 +116,7 @@ src/objects/coffin/tether_actor.c	TetherActor_InitSecondaryCollider	contrived	na
 src/objects/coffin/tether_actor.c	TetherActor_AccumulateCharge	minor	natural	1	
 src/objects/coffin/tether_actor.c	TetherActor_UpdateChargeDecay	contrived	natural	3	
 src/objects/coffin/tether_actor.c	TetherActor_UpdateChargeAndCooldown	minor	natural	2	
+src/objects/coffin/tether_actor.c	TetherActor_InitChargeCollider	natural	natural	0	
+src/objects/coffin/tether_actor.c	TetherActor_InitStateParameters	natural	natural	0	
+src/objects/coffin/tether_actor.c	TetherActor_UpdateInteractionCooldown	natural	natural	0	
+src/objects/coffin/tether_actor.c	TetherActor_UpdateSecondaryColliderValues	minor	natural	3	
