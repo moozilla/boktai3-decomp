@@ -3,7 +3,7 @@
 void Vanargand_UpdateQueuedActionTransition(void *object)
 {
     struct VanargandPairAttack *p = object;
-    struct VanargandPairAttack *q = object;
+    struct VanargandPairAttack *q = p;
     if (Vanargand_ConsumeActionEntry(p) && p->state != 22)
         Vanargand_EnterAction(p, 22);
     if (p->finished) {
