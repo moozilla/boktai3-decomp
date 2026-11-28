@@ -1,16 +1,7 @@
 #include "global.h"
+#include "monsters/centipede/centipede_body.h"
 #include "scene/actor/scene_actor_reset.h"
 #include "scene/motion/scene_actor_chase.h"
-struct Group {
-    u8 pad0[0x8d0];
-    u16 flags;
-    u8 pad8d2[4];
-    u16 timer;
-    u8 pad8d8[0x12];
-    u8 activeCount, healthStep;
-    u8 pad8ec[8];
-    u16 flashTimer;
-};
 void Sound_PlaySong(u32);
 u8 ActorTrail_RemoveLastSegment(void *);
 // confidence=low: removes excess segments after damage and restores idle control.
@@ -35,7 +26,7 @@ static inline void ClearMotionFlags(struct ChaseActor *actor, u32 mask)
 // motion-flags address into a copy of the one the head computed through MotionFlags.
 u32 Centipede_RecoverFromSegmentLoss(struct ChaseActor *p)
 {
-    struct Group *g = p->base.context;
+    struct TentacleBody *body = p->base.context;
     s32 count;
     if (p->base.reactionSoundVariant == 0)
         Sound_PlaySong(0x211);
@@ -44,19 +35,19 @@ u32 Centipede_RecoverFromSegmentLoss(struct ChaseActor *p)
     ClearHalf(MotionFlags(p), ~0x100);
     {
         u16 bit = 4;
-        bit = bit | g->flags;
-        g->flags = bit;
+        bit = bit | body->attackFlags;
+        body->attackFlags = bit;
     }
-    g->timer = 240;
+    body->hitReactionTimer = 240;
     {
         u16 value = p->base.colliderA.responseValue + 30;
         p->base.colliderA.responseValue = value;
     }
-    g->flashTimer = 16;
+    body->unknown8F4 = 16;
     ClearWord(&p->base.statusFlags, ~0x100000);
     ClearHalf(MotionFlags(p), ~1);
-    count = Div(p->base.health, g->healthStep);
-    while (count < g->activeCount) {
+    count = Div(p->base.health, body->healthPerSegment);
+    while (count < body->spreadStage) {
         ActorTrail_RemoveLastSegment(p);
         count++;
     }

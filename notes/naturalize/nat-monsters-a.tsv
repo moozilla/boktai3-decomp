@@ -539,3 +539,4 @@ src/monsters/centipede/Centipede_ApplyPendingRadialVelocity.c	Centipede_ApplyPen
 src/monsters/centipede/Centipede_SpawnSparkBurst.c	Centipede_SpawnSparkBurst	contrived	contrived	0	table address assembled through a union: a plain table pointer changes constant materialization
 src/monsters/centipede/SceneActor_ResetQueuedState.c	SceneActor_ResetQueuedState	contrived	natural	6	
 src/monsters/centipede/Centipede_UpdateComponents.c	Centipede_UpdateComponents	contrived	natural	1	
+src/monsters/centipede/Centipede_RecoverFromSegmentLoss.c	Centipede_RecoverFromSegmentLoss	contrived	minor	3	mask helpers and halfword value blocks remain
