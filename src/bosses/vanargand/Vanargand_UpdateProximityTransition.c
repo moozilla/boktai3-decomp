@@ -6,12 +6,8 @@ void Vanargand_UpdateProximityTransition(void *object)
     s32 dx, dz;
     struct SceneVec *destination, *position;
     if (Vanargand_ConsumeActionEntry(p)) {
-        u32 alternate = ((struct VanargandPairAttack *)object)->variant;
-        if (!alternate) {
-            u32 phase = 4;
-            p->actionPhase = phase;
-            p->actionTimer = alternate;
-            p->entered = 1;
+        if (!((struct VanargandPairAttack *)object)->variant) {
+            Vanargand_EnterActionPhase(p, 4);
             return;
         } else {
             Vanargand_EnterAction(p, 19);

@@ -344,3 +344,4 @@ src/bosses/vanargand/Vanargand_UpdateTimedMode4.c	Vanargand_UpdateTimedMode4	nea
 src/bosses/vanargand/Vanargand_UpdateTimedMode5.c	Vanargand_UpdateTimedMode5	near-natural	near-natural	1	second boss alias keeps a register copy
 src/bosses/vanargand/Vanargand_UpdateTimedMode6.c	Vanargand_UpdateTimedMode6	near-natural	near-natural	1	second boss alias keeps a register copy
 src/bosses/vanargand/Vanargand_UpdateModeCycle.c	Vanargand_UpdateModeCycle	near-natural	near-natural	1	second boss alias keeps a register copy
+src/bosses/vanargand/Vanargand_UpdateProximityTransition.c	Vanargand_UpdateProximityTransition	near-natural	near-natural	2	object casts kept: reads from the incoming pointer
