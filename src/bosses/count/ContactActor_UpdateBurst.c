@@ -1,25 +1,14 @@
 #include "scene/collision/contact_actor.h"
+#include "scene/motion/scene_actor_charge_offset.h"
 void ContactActor_SetDirectionalSequence(struct ContactActorPool *, struct ContactActor *, u32);
-static inline s32 truncateShift12(s32 value)
-{
-    if (value >= 0)
-        return value >> 12;
-    return -((-value) >> 12);
-}
 void ContactActor_UpdateBurst(struct ContactActorPool *pool, struct ContactActor *slot, s32 index)
 {
     struct ContactPosition delta;
-    u32 frame;
     u32 speed;
     if (slot->enter) {
         struct ContactPosition *position;
         slot->enter = 0;
-        {
-            struct ContactCollider *collider = &slot->healthCollider;
-            s32 mask = -5;
-            mask &= collider->flags;
-            collider->flags = mask;
-        }
+        ContactCollider_ClearFlags(&slot->healthCollider, 4);
         position = &slot->position;
         slot->origin = slot->position;
         if (slot->targetIndex >= 0) {
@@ -38,40 +27,37 @@ void ContactActor_UpdateBurst(struct ContactActorPool *pool, struct ContactActor
     {
         struct ContactPosition *write = &delta;
         u32 direction = slot->direction;
-        write->x = truncateShift12(gUnk_086149C4[(direction + 64) & 255] * speed);
+        write->x = SceneActor_ChargeComponent(gUnk_086149C4[(direction + 64) & 255] * speed);
         write->y = 0;
-        write->z = truncateShift12(gUnk_086149C4[direction] * speed);
+        write->z = SceneActor_ChargeComponent(gUnk_086149C4[direction] * speed);
     }
     {
         struct ContactPosition *position = &slot->position;
         const struct ContactPosition *origin = &slot->origin;
         const struct ContactPosition *read = &delta;
-        const struct ContactPosition *first = &delta;
-        struct ContactCollider *resource;
-        slot->position.x = slot->origin.x + first->x;
+        position->x = origin->x + read->x;
         position->y = origin->y + read->y;
         position->z = origin->z + read->z;
-        resource = &slot->resourceCollider;
-        Collider_SetPosition(resource, position, 0);
+        Collider_SetPosition(&slot->resourceCollider, position, 0);
         Collider_SetPosition(&slot->healthCollider, position, 0);
-        Collider_Refresh(resource);
+        Collider_Refresh(&slot->resourceCollider);
     }
     ContactActor_SetDirectionalSequence(pool, slot, 0);
     if (slot->stateFrame > 31) {
         ContactActor_EnterState(slot, 2);
     } else {
-        if (slot->retargetTimer && !--slot->retargetTimer) {
-            u32 mode = pool->mode;
-            if (mode == 2) {
-                if (index <= 7)
-                    slot->targetIndex = 1;
-                else
+        if (slot->retargetTimer) {
+            slot->retargetTimer--;
+            if (!slot->retargetTimer) {
+                if (pool->mode == 2) {
+                    if (index <= 7)
+                        slot->targetIndex = 1;
+                    else
+                        slot->targetIndex = 0;
+                } else if (pool->mode == 1)
                     slot->targetIndex = 0;
-            } else if (mode == 1)
-                slot->targetIndex = 0;
-            else {
-                mode = 255;
-                slot->targetIndex = mode;
+                else
+                    slot->targetIndex = -1;
             }
         }
         slot->stateFrame++;
