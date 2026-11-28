@@ -162,14 +162,11 @@ void LinkEffect_UpdateSecondOrb(struct LinkEffect *effect)
     }
 }
 
-void SceneBurstEmitter_SetState(struct LinkEffect *effect, u32 v)
+void SceneBurstEmitter_SetState(struct LinkEffect *effect, u32 state)
 {
-    u32 z;
-    u8 *q = &effect->state;
-    z = 0;
-    *q = v;
-    effect->phase = z;
-    effect->timer = z;
+    effect->state = state;
+    effect->phase = 0;
+    effect->timer = 0;
 }
 
 void SceneBurstEmitter_TransitionIfComplete(struct LinkEffect *effect, u32 v)

@@ -38,3 +38,4 @@ src/effects/floating_item_effect.c	ScanlineWave_Reset	natural	natural	0
 src/effects/floating_item_effect.c	FloatingItemEffect_Spawn	minor	minor	2	do/while slot search and idx temp: a for loop reallocates the whole function
 src/effects/link_effect.c	SceneEffect_CreateLinkedEntry	minor	natural	1	
 src/effects/link_effect.c	LinkEffect_UpdateProjectileBurst	contrived	minor	5	spawn pointer and byte read of the random table
+src/effects/link_effect.c	SceneBurstEmitter_SetState	contrived	natural	1	
