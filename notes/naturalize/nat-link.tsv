@@ -186,3 +186,4 @@ src/link/player/Player_GetTetherMode.c	Player_GetTetherMode	minor	minor	1	redund
 src/link/player/LinkPlayer_LoadBaseStats.c	LinkPlayer_LoadBaseStats	contrived	natural	1	
 src/link/player/LinkPlayer_InitHealth.c	LinkPlayer_InitHealth	minor	natural	1	
 src/link/player/LinkPlayer_InitEnergy.c	LinkPlayer_InitEnergy	minor	natural	1	
+src/link/player/Player_InitializeInputHistory.c	Player_InitializeInputHistory	minor	natural	2	
