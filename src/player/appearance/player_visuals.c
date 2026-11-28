@@ -2003,7 +2003,7 @@ s32 Player_HasRequiredEnergy(struct Player *p, s32 v)
 
 s32 Player_CanSpendSharedResource(struct Player *p, s32 v)
 {
-    if (*(s32 *)(p->timedEventSlot * 4 + (u8 *)gGameState + 0x628) <= 0 && gGameState->unk876 >= v)
+    if (*(gGameState->counters628 + p->timedEventSlot) <= 0 && gGameState->unk876 >= v)
         return 1;
     return 0;
 }

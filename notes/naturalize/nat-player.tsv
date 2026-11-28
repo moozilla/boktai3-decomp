@@ -115,3 +115,4 @@ src/player/appearance/player_visuals.c	Player_SpendEnchantmentEnergy	minor	natur
 src/player/appearance/player_visuals.c	Player_IsEnchantmentAvailable	natural	natural	0	-
 src/player/appearance/player_visuals.c	Player_GetUsableEnchantment	natural	natural	0	-
 src/player/appearance/player_visuals.c	Player_HasRequiredEnergy	minor	natural	1	-
+src/player/appearance/player_visuals.c	Player_CanSpendSharedResource	contrived	natural	2	-
