@@ -1,65 +1,16 @@
-// scope: write LinkedEffect_FollowTarget here
-#include "global.h"
-#include "engine/engine_globals.h"
-#include "engine/ram.h"
+#include "effects/bursts/linked_effect.h"
+#include "engine/math/monster_particle_random.h"
 #include "player/cutscene/player_cue_sequence.h"
-#include "ui/hud/scene_indicator.h"
-#include "effects/bursts/spiral_burst.h"
-// confidence=low: steers and accelerates a linked effect toward a target until expiry.
-struct Sprite {
-    u32 flags;
-    u8 visible, unknown5, palette, unknown7;
-    s8 scaleX, scaleY;
-    u8 padA[6];
-    u16 frame;
-    u8 pad12[10];
-    struct Vec position;
-    u8 pad24[0x24];
-};
 
-struct Effect {
-    struct Sprite sprite;
-    struct DisplaySequenceState anim;
-    u8 pad58[0xA8];
-    struct Vec *target;
-    u8 pad104[0x68];
-    struct Vec velocity;
-    u16 unknown174;
-    u8 state;
-    s8 slot;
-    u16 frame;
-    u8 entered, speed, ended, heading;
-    u16 unknown17E, lifetime, riseTimer, delay, turnTimer, maxSpeed;
-};
-struct Pool {
-    u8 pad[0x18];
-    void *resource;
-    u32 allocated;
-};
-extern const s16 gUnk_086149C4[];
-s32 Math_Atan2(s32, s32);
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
-void LinkedEffect_UpdateColliders(struct Effect *);
+void LinkedEffect_UpdateColliders(struct LinkedEffect *);
+
 static inline s32 RandomValue(void)
 {
     u32 index = (gRandomIndex + 1) & 1023;
     gRandomIndex = index;
     return *(const u16 *)((index << 1) + RANDOM_TABLE_ADDR);
-}
-
-static inline void Vec_Subtract(struct Vec *out, const struct Vec *a, const struct Vec *b)
-{
-    out->x = b->x - a->x;
-    out->y = b->y - a->y;
-    out->z = b->z - a->z;
-}
-
-static inline void Polar(struct Vec *out, u32 heading, u32 speed)
-{
-    out->x = SpiralBurst_ScaleOffset(speed * gUnk_086149C4[(heading + 64) & 255]);
-    out->y = 0;
-    out->z = SpiralBurst_ScaleOffset(speed * gUnk_086149C4[heading]);
 }
 
 static inline u16 RandomByte(void)
@@ -68,77 +19,82 @@ static inline u16 RandomByte(void)
     return (u8)((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
 }
 
-static inline void LinkedEffect_TargetDelta(struct Vec *out, struct Sprite *sprite,
-                                            struct Effect *p)
+static inline void LinkedEffect_TargetDelta(struct ContactPosition *out,
+                                            struct FragmentEffectSprite *sprite,
+                                            struct LinkedEffect *effect)
 {
-    Vec_Subtract(out, &sprite->position, p->target);
+    LinkedEffect_Subtract(out, &sprite->position, effect->target);
 }
 
-void LinkedEffect_FollowTarget(struct Pool *poolArg, struct Effect *p)
+// confidence=low: steers and accelerates a linked effect toward a target until expiry.
+void LinkedEffect_FollowTarget(struct LinkedEffectPool *pool, struct LinkedEffect *effect)
 {
-    struct Pool *pool = poolArg;
-    struct Sprite *sprite = &p->sprite;
-    struct DisplaySequenceState *sequence = &p->anim;
-    if (p->entered) {
-        p->sprite.flags &= ~1;
-        p->riseTimer = 60;
-        p->frame = 0;
-        p->entered = 0;
+    struct FragmentEffectSprite *sprite = &effect->sprite;
+    struct DisplaySequenceState *sequence = &effect->animation;
+
+    if (effect->entered) {
+        effect->sprite.flags &= ~1;
+        effect->riseTimer = 60;
+        effect->frame = 0;
+        effect->entered = 0;
     }
-    if (p->ended) {
+    if (effect->animationEnded) {
         s16 value = RandomByte();
-        if (value <= 63) {
-            Anim_SetSequence(sequence, pool->resource, 21, 0, 0);
-        } else if (value <= 77)
-            Anim_SetSequence(sequence, pool->resource, 22, 0, 0);
+
+        if (value <= 63)
+            Anim_SetSequence(sequence, pool->sequences, 21, 0, 0);
+        else if (value <= 77)
+            Anim_SetSequence(sequence, pool->sequences, 22, 0, 0);
         else
-            Anim_SetSequence(sequence, pool->resource, 20, 0, 0);
-        p->ended = 0;
+            Anim_SetSequence(sequence, pool->sequences, 20, 0, 0);
+        effect->animationEnded = 0;
     }
-    if (!p->delay) {
-        struct Vec delta;
+    if (!effect->delay) {
+        struct ContactPosition delta;
         s32 turn;
-        LinkedEffect_TargetDelta(&delta, sprite, p);
-        turn = Math_Atan2(delta.x, delta.z) - p->heading;
+
+        LinkedEffect_TargetDelta(&delta, sprite, effect);
+        turn = Math_Atan2(delta.x, delta.z) - effect->heading;
         if (turn > 128)
             turn -= 256;
         else if (turn < -128)
             turn += 256;
-        if (p->turnTimer) {
+        if (effect->turnTimer) {
             s32 magnitude = turn;
+
             if (magnitude < 0)
                 magnitude = -magnitude;
             if (magnitude > 2) {
                 if (turn < 0)
-                    p->heading -= (RandomValue() & 1) + 1;
+                    effect->heading -= (RandomValue() & 1) + 1;
                 else
-                    p->heading += (RandomValue() & 1) + 1;
-                p->turnTimer--;
+                    effect->heading += (RandomValue() & 1) + 1;
+                effect->turnTimer--;
             } else
-                p->turnTimer = 0;
+                effect->turnTimer = 0;
         }
     } else
-        p->delay--;
-    Polar(&p->velocity, p->heading, p->speed);
-    if ((!Mod(p->frame, 10)) && (p->speed < p->maxSpeed))
-        p->speed++;
-    sprite->position.x += p->velocity.x;
-    if (p->riseTimer) {
-        s32 targetY = p->target->y;
-        s32 currentY = sprite->position.y;
-        currentY -= 200;
-        sprite->position.y += Div(targetY - currentY, p->riseTimer);
-        p->riseTimer--;
+        effect->delay--;
+    LinkedEffect_SetPlanarVector(&effect->velocity, effect->heading, effect->speed);
+    if (!Mod(effect->frame, 10) && effect->speed < effect->maxSpeed)
+        effect->speed++;
+    sprite->position.x += effect->velocity.x;
+    if (effect->riseTimer) {
+        s32 targetY = effect->target->y;
+        s32 height = sprite->position.y - 200;
+
+        sprite->position.y += Div(targetY - height, effect->riseTimer);
+        effect->riseTimer--;
     }
-    sprite->position.z += p->velocity.z;
-    p->ended = PlayerCue_StepSequenceEnded((struct ContactSwarmSprite *)sprite,
-                                           sequence);
-    LinkedEffect_UpdateColliders(p);
-    p->frame++;
-    if (p->lifetime)
-        p->lifetime--;
+    sprite->position.z += effect->velocity.z;
+    effect->animationEnded =
+        PlayerCue_StepSequenceEnded((struct ContactSwarmSprite *)sprite, sequence);
+    LinkedEffect_UpdateColliders(effect);
+    effect->frame++;
+    if (effect->lifetime)
+        effect->lifetime--;
     else {
-        p->state = 3;
-        p->entered = 1;
+        effect->state = 3;
+        effect->entered = 1;
     }
 }
