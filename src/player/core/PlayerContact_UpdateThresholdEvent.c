@@ -4,7 +4,6 @@
 #include "engine/engine.h"
 #include "engine/ram.h"
 
-#define gRandomTableIndex gRandomIndex
 s32 Mod(s32, s32);
 void Player_CallEventScript(struct Player *, u32);
 void *PlayerBurst_Create(void *);
@@ -17,22 +16,21 @@ static inline u16 nextRandom(void)
 }
 void PlayerContact_UpdateThresholdEvent(struct Player *p)
 {
-    u32 zero = gEngineFlags & 0x1000;
-    if (zero)
+    if (gEngineFlags & 0x1000)
         return;
     if (p->actionMode == 1) {
         if ((s32)gGameState->unk600 >= gGameState->contactThreshold) {
             if (p->contactThresholdReady) {
                 if (p->tetherMode <= 1) {
-                    gGameState->unk600 = zero;
+                    gGameState->unk600 = 0;
                     gGameState->contactThreshold = Mod(nextRandom(), 100) + 200;
-                    p->contactThresholdReady = zero;
+                    p->contactThresholdReady = 0;
                     Player_CallEventScript(p, 2);
                     PlayerBurst_Create(p);
                 }
             } else if (p->contactThresholdPending) {
                 p->contactThresholdReady = 1;
-                p->contactThresholdPending = zero;
+                p->contactThresholdPending = 0;
             }
         } else {
             p->contactThresholdPending = 0;

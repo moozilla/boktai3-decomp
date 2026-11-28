@@ -275,3 +275,5 @@ src/player/core/PlayerContact_ApplyTerrainDamage.c	PlayerContact_ApplyTerrainDam
 src/player/core/Player_UpdateResetBlink.c	Player_UpdateResetBlink	contrived	minor	11	player alias q before the countdown fixes register allocation
 src/player/core/Player_SaveStateSnapshot.c	Player_SaveStateSnapshot	contrived	contrived	2	unchanged: struct member stores let agbcc keep gGameState cached; the ROM reloads it between every store (byte-pointer view)
 src/player/core/Player_RecordInputTicks.c	Player_RecordInputTicks	contrived	natural	5	
+src/player/core/Player_ApplyLatchedActionMode.c	Player_ApplyLatchedActionMode	natural	natural	0	
+src/player/core/PlayerContact_UpdateThresholdEvent.c	PlayerContact_UpdateThresholdEvent	contrived	natural	3	
