@@ -697,19 +697,6 @@ struct SceneEventDispatchState {
 };
 extern struct SceneEventDispatchState *gSceneEventDispatchState;
 
-static inline void SceneActorGraphics_SetEffect(struct SceneGraphicsActor *actor, int mode,
-                                                int resource, int duration)
-{
-    actor->graphics.resourceId = resource;
-    actor->graphics.effectMode = mode;
-    actor->graphics.effectDuration = duration;
-    if (actor->graphics.effectMode == 2) {
-        u32 scale = duration == 5 ? 32 : 64;
-        actor->graphics.effectScale = scale;
-    } else if (actor->graphics.effectMode == 1)
-        actor->graphics.effectScale = 0;
-}
-
 void SceneActors_DispatchCommands(struct StateActor *p)
 {
     struct SceneGraphicsActor *actor = (struct SceneGraphicsActor *)p;

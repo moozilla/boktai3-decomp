@@ -118,4 +118,19 @@ static inline void SceneGraphicsActor_ClearPendingDamage(struct SceneGraphicsAct
     actor->damagePending = 0;
 }
 
+/* Choose the palette resource and its flash behavior: mode 2 scales the effect by its
+ * duration, mode 1 starts it from zero. */
+static inline void SceneActorGraphics_SetEffect(struct SceneGraphicsActor *actor, int mode,
+                                                int resource, int duration)
+{
+    actor->graphics.resourceId = resource;
+    actor->graphics.effectMode = mode;
+    actor->graphics.effectDuration = duration;
+    if (actor->graphics.effectMode == 2) {
+        u32 scale = duration == 5 ? 32 : 64;
+        actor->graphics.effectScale = scale;
+    } else if (actor->graphics.effectMode == 1)
+        actor->graphics.effectScale = 0;
+}
+
 #endif
