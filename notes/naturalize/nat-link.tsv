@@ -57,3 +57,4 @@ src/link/menu/LinkMenu_UpdateSelection.c	LinkMenu_UpdateSelection	contrived	natu
 src/link/menu/LinkMenu_WaitSelectionMode.c	LinkMenu_WaitSelectionMode	contrived	minor	20	mode test takes &p so gcse PRE does not reuse the selection load; double return 0 needed for the shared SetState call
 src/link/menu/LinkMenu_ExchangeChoices.c	LinkMenu_ExchangeChoices	minor	natural	2	
 src/link/menu/SessionMenu_RunEventScript.c	SessionMenu_RunEventScript	minor	natural	1	
+src/link/menu/LinkMenu_ShowReadyMessage.c	LinkMenu_ShowReadyMessage	contrived	natural	1	
