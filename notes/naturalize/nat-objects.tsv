@@ -188,3 +188,4 @@ src/objects/deck_cannons/DeckCannon_CreateCannon.c	DeckCannon_CreateCannon	minor
 src/objects/deck_cannons/DeckCannon_UpdateProjectile.c	DeckCannon_UpdateProjectile	minor	natural	1	
 src/objects/deck_cannons/DeckCannon_InitProjectile.c	DeckCannon_InitProjectile	contrived	minor	8	local update/destroy pair loads both addresses before either store; constant direction locals materialize the angle before the field address
 src/objects/deck_cannons/DeckCannon_SpawnProjectile.c	DeckCannon_SpawnProjectile	contrived	natural	1	
+src/objects/deck_cannons/DeckCannon_InitMuzzleFlash.c	DeckCannon_InitMuzzleFlash	minor	minor	3	local update/destroy pair loads both addresses before either store

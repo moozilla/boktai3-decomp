@@ -1,43 +1,38 @@
 #include "global.h"
-#include "engine/engine.h"
-#include "scene/collision/contact_position.h"
-struct CannonBatteryMuzzleFlash {
-    u32 update, destroy;
-    u8 animation[0x1C], sprite[0x1C];
-    struct ContactPosition position;
-    u8 unk48[8], sequence[0x10];
-    u8 unk60[0x57], unkB7;
-};
-u32 DeckCannon_LoadAnimation(void);
+#include "objects/deck_cannons/deck_cannon_battery.h"
+
+void *DeckCannon_LoadAnimation(void);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
-void DeckCannon_UpdateMuzzleFlash(void);
-void DeckCannon_DestroyMuzzleFlash(void);
-void DeckCannon_InitMuzzleFlash(void *pool, struct CannonBatteryMuzzleFlash *p,
-                                   struct ContactPosition *origin, s32 horizontal)
+void DeckCannon_UpdateMuzzleFlash(struct DeckCannonShot *);
+void DeckCannon_DestroyMuzzleFlash(struct DeckCannonShot *);
+
+void DeckCannon_InitMuzzleFlash(struct DeckCannonBattery *battery, struct DeckCannonShot *shot,
+                                struct ContactPosition *origin, s32 horizontal)
 {
-    void *resource = (void *)DeckCannon_LoadAnimation();
-    AnimData_Load(p->animation, 0x8D95);
-    AnimData_SelectPaletteBank(p->animation, 0x8F);
-    Sprite_Init(p->sprite, p->animation, 0);
+    void *resource = DeckCannon_LoadAnimation();
+
+    AnimData_Load(shot->animation, 0x8D95);
+    AnimData_SelectPaletteBank(shot->animation, 0x8F);
+    Sprite_Init(&shot->sprite, shot->animation, 0);
     if (horizontal) {
-        Anim_RestartSequence(p->sequence, resource, 0, 0, 9);
+        Anim_RestartSequence(&shot->sequence, resource, 0, 0, 9);
     } else {
-        Anim_RestartSequence(p->sequence, resource, 0, 0, 8);
+        Anim_RestartSequence(&shot->sequence, resource, 0, 0, 8);
     }
     if (horizontal) {
-        p->position.x = origin->x - 0xC0;
-        p->position.y = origin->y + 0x80;
-        p->position.z = origin->z;
+        shot->sprite.position.x = origin->x - 0xC0;
+        shot->sprite.position.y = origin->y + 0x80;
+        shot->sprite.position.z = origin->z;
     } else {
-        p->position.x = origin->x;
-        p->position.y = origin->y + 0x80;
-        p->position.z = origin->z - 0xC0;
+        shot->sprite.position.x = origin->x;
+        shot->sprite.position.y = origin->y + 0x80;
+        shot->sprite.position.z = origin->z - 0xC0;
     }
-    p->unkB7 = 0;
+    shot->finished = 0;
     {
-        u32 update = (u32)DeckCannon_UpdateMuzzleFlash;
-        u32 destroy = (u32)DeckCannon_DestroyMuzzleFlash;
-        p->update = update;
-        p->destroy = destroy;
+        void (*update)(struct DeckCannonShot *) = DeckCannon_UpdateMuzzleFlash;
+        void (*destroy)(struct DeckCannonShot *) = DeckCannon_DestroyMuzzleFlash;
+        shot->update = update;
+        shot->destroy = destroy;
     }
 }
