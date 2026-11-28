@@ -559,10 +559,8 @@ void TetherActor_UpdateSegments(struct TetherActor *actor)
     s32 depthOffset;
     s32 i;
     if ((*gPlayers)->tetherMode != 6) {
-        s32 n;
-        for (n = 0, segment = actor->segments; n < 7; n++, segment++)
+        for (i = 0, segment = actor->segments; i < 7; i++, segment++)
             segment->flags |= 1;
-
         return;
     }
     angle = (((*gPlayers)->heading + 1) & 7) * 32;
@@ -584,18 +582,13 @@ void TetherActor_UpdateSegments(struct TetherActor *actor)
     end.z = actor->position.z + scaleOffsetR(100 * gUnk_086149C4[angle & 255]);
     depthOffset = ((*gPlayers)->heading == 4) ? (-20) : (-2);
     segment = actor->segments;
-    i = 0;
-    do {
-        s32 count = i + 1;
-        s32 remaining = 7 - i;
-        segment->position.x = ((end.x * count) + (start.x * remaining)) >> 3;
-        segment->position.y = ((end.y * count) + (start.y * remaining)) >> 3;
-        segment->position.z = ((end.z * count) + (start.z * remaining)) >> 3;
+    for (i = 0; i < 7; i++, segment++) {
+        segment->position.x = ((end.x * (i + 1)) + (start.x * (7 - i))) >> 3;
+        segment->position.y = ((end.y * (i + 1)) + (start.y * (7 - i))) >> 3;
+        segment->position.z = ((end.z * (i + 1)) + (start.z * (7 - i))) >> 3;
         segment->depthOffset = depthOffset;
         segment->flags &= ~1;
-        i = count;
-        ++segment;
-    } while (i <= 6);
+    }
 }
 
 void TetherActor_RemoveSegments(struct TetherActor *actor)
