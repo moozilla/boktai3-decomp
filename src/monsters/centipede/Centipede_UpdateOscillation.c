@@ -1,15 +1,14 @@
-#include "global.h"
+#include "monsters/centipede/centipede_body.h"
 
-void Centipede_UpdateOscillation(u8 *p, s32 limit, s32 scale)
+void Centipede_UpdateOscillation(struct ChaseActor *actor, s32 limit, s32 scale)
 {
-    u8 *q = *(u8 **)(p + 0x3d0);
-    s16 *pos = (s16 *)(q + 0x8d8);
-    if (*pos >= limit) {
-        *pos = limit;
-        *(u8 *)(q + 0x8d4) = 0xff;
-    } else if (*pos <= -limit) {
-        *pos = -limit;
-        *(u8 *)(q + 0x8d4) = 1;
+    struct TentacleBody *body = actor->base.context;
+    if (body->oscillationPhase >= limit) {
+        body->oscillationPhase = limit;
+        body->oscillationDirection = -1;
+    } else if (body->oscillationPhase <= -limit) {
+        body->oscillationPhase = -limit;
+        body->oscillationDirection = 1;
     }
-    *(s16 *)(q + 0x8d8) += (s8) * (u8 *)(q + 0x8d4) * scale;
+    body->oscillationPhase += body->oscillationDirection * scale;
 }
