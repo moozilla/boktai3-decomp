@@ -45,3 +45,4 @@ src/engine/iwram_code.c	sub_08000E90	natural	natural	1	IwProject helper keeps su
 src/engine/iwram_code.c	sub_08001038	natural	natural	0	
 src/engine/iwram_code.c	sub_08001120	natural	natural	0	
 src/engine/iwram_code.c	sub_080012E0	natural	natural	0	
+src/engine/math/ScalarApproach_ClampCentered.c	ScalarApproach_ClampCentered	contrived	minor	1	assignment inside the condition
