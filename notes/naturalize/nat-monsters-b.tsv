@@ -68,3 +68,4 @@ src/monsters/ivy/ivy.c	Ivy_WaitForColorRelease	minor	minor	0	result local r: ear
 src/monsters/ivy/ivy.c	Ivy_UpdatePartColliders	minor	minor	0	file-local part structs and (s16)(p->y - 220) narrowing
 src/monsters/ivy/ivy.c	ColorPulse_ApplyContact	contrived	contrived	10	velocity pointer in a bare block and u32 damage/flags temps: address formed before the mode test, load order
 src/monsters/ivy/ivy.c	Ivy_UpdateDefeat	contrived	contrived	14	partial: Flag/SaveFlag/ClearPos helpers, parked mask locals, COUNT macros and spark-table union stay: mask-before-address load order and zero-word CpuSet; needs a shared defeat/tally rewrite across monsters
+src/monsters/ivy/sub_080F2D00.c	sub_080F2D00	minor	natural	1	(u8) cast on the callback result
