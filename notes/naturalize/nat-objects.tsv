@@ -295,3 +295,10 @@ src/objects/hazards/directional_force/DirectionalForce_InitializeFromScript.c	Di
 src/objects/hazards/directional_force/DirectionalForce_ConfigureFixedFromScript.c	DirectionalForce_ConfigureFixedFromScript	minor	natural	1	
 src/objects/hazards/directional_force/DirectionalForce_ConfigureRandomFromScript.c	DirectionalForce_ConfigureRandomFromScript	minor	natural	1	
 src/objects/hazards/directional_force/DirectionalForce_CreateFromScript.c	DirectionalForce_CreateFromScript	minor	natural	1	
+src/objects/hazards/directional_force/DirectionalForce_Stop.c	DirectionalForce_Stop	natural	natural	0	
+src/objects/hazards/directional_force/DirectionalForce_StopFromScript.c	DirectionalForce_StopFromScript	natural	natural	0	
+src/objects/hazards/directional_force/DirectionalForce_ConfigureRandom.c	DirectionalForce_ConfigureRandom	natural	natural	0	
+src/objects/hazards/directional_force/DirectionalForce_ConfigureFixed.c	DirectionalForce_ConfigureFixed	natural	natural	0	
+src/objects/hazards/directional_force/DirectionalForce_SetThreshold.c	DirectionalForce_SetThreshold	natural	natural	0	
+src/objects/hazards/directional_force/DirectionalForce_SetThresholdFromScript.c	DirectionalForce_SetThresholdFromScript	natural	natural	0	
+src/objects/hazards/directional_force/DirectionalForce_Destroy.c	DirectionalForce_Destroy	natural	natural	0	
