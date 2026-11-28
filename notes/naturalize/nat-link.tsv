@@ -218,3 +218,8 @@ src/link/player/Player_EmitPositionEffect.c	Player_EmitPositionEffect	natural	na
 src/link/player/Player_EnterIdleAnimation.c	Player_EnterIdleAnimation	contrived	natural	1	
 src/link/player/Player_ComputeLinkedActionDelay.c	Player_ComputeLinkedActionDelay	contrived	minor	2	fixed delay flag helper keeps a goto: structured forms differ
 src/link/player/Player_GetLinkedSmoothedDirection.c	Player_GetLinkedSmoothedDirection	contrived	natural	2	
+src/link/player/Player_RestoreLinkedActionState.c	Player_RestoreLinkedActionState	natural	natural	0	
+src/link/player/Player_SelectHistoryDirectionB.c	Player_SelectHistoryDirectionB	natural	natural	0	
+src/link/player/Player_GetMovementAnimationRate.c	Player_GetMovementAnimationRate	natural	natural	0	
+src/link/player/Player_PlayActionCueSound.c	Player_PlayActionCueSound	natural	natural	0	
+src/link/player/Player_UpdateTerrainSidestep.c	Player_UpdateTerrainSidestep	contrived	minor	20	SetFlags mask param keeps mask loaded before flags (plain |= differs; shared accessor adds literal-param warnings); separate flags local; frame/delta locals for load order; cellProps cast for cell flags
