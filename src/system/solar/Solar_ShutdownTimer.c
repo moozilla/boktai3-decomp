@@ -8,10 +8,10 @@ void Solar_ShutdownTimer(void)
     REG_IME = 0;
     ie = REG_IE;
     REG_IE = 0;
-    *(vu16 *)0x0400010E = 0;
-    *(vu16 *)0x0400010C = 0;
+    REG_TM3CNT_H = 0;
+    REG_TM3CNT_L = 0;
     gSerialInterruptState[2] = InterruptsAndVideo_OnUnusedInterrupt;
     *(vu16 *)0x080000C8 = 0;
-    REG_IE = ie & 0xFFBF;
+    REG_IE = ie & ~INTR_FLAG_TIMER3;
     REG_IME = 1;
 }
