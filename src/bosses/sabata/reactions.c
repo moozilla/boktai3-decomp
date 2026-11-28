@@ -588,7 +588,6 @@ void Sabata_UpdateChargePaletteSequence(struct SabataActorState *eventActor)
 
 void Sabata_UpdateSongStopTransition(struct SabataActorState *actor)
 {
-    s16 k2;
     if (actor->changed) {
         actor->changed = 0;
         Sabata_EnterSequenceStep(actor, 0);
@@ -615,30 +614,10 @@ void Sabata_UpdateSongStopTransition(struct SabataActorState *actor)
                 actor->pendingAction++;
             }
             if (actor->finished) {
-                u32 phase;
-                int shifted;
-                u32 facing;
-                facing = 0x20;
-                actor->body.direction = facing;
-                k2 = 2;
-                phase = k2;
-                shifted = actor->body.direction + 0x60;
-                shifted >>= 6;
-                facing = 3;
-                facing &= shifted;
-                actor->facing4 = facing;
-                {
-                    int sh;
-                    u32 m;
-                    sh = actor->body.direction + 0x70;
-                    sh >>= 5;
-                    m = 7;
-                    m &= sh;
-                    actor->facing8 = m;
-                }
+                Sabata_SetDirection(actor, 32);
                 SceneActors_StartEightDirectionAnimation(actor, &actor->graphics,
                                                          &actor->animationResource, 0xF4, 1, 1, 4);
-                Sabata_EnterSequenceStep(actor, phase);
+                Sabata_EnterSequenceStep(actor, 2);
                 actor->pending = 1;
             }
             break;
