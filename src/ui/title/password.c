@@ -5,9 +5,8 @@ int Text_CopyWithoutTags(u8 *dst, u8 *src, int limit)
     int tag = 0, count = 0;
     u32 c;
     while ((c = *src) != 0) {
-        s8 first = c;
-        if (first >= 0) {
-            u8 ascii = first;
+        if ((s8)c >= 0) {
+            u8 ascii = c;
             if (ascii == '<') {
                 tag = 1;
             } else if (tag == 1 && ascii == '>') {
