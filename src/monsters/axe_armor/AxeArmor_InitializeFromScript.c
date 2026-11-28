@@ -35,8 +35,8 @@ static inline void AxeArmor_GetFlags(u32 **out, struct DisplaySequenceSprite *sp
     *out = &sprite->flags;
 }
 static inline u32 AxeArmor_StepSequence(u32 *flipFlags, struct AxeArmor *actor,
-                                         struct DisplaySequenceSprite *owner,
-                                         struct DisplaySequenceState *state)
+                                        struct DisplaySequenceSprite *owner,
+                                        struct DisplaySequenceState *state)
 {
     const u16 *command;
     u32 ended;
@@ -149,7 +149,7 @@ s32 AxeArmor_InitializeFromScript(struct AxeArmor *p, void *parent)
         p->interval = 60;
     if (Script_SeekToKeyword('h')) {
         s32 v = Script_GetValue();
-        s8 *h = &(p->facing);
+        s8 *h = &p->facing;
         *h = v;
         *h = ((*h) - 1) / 2;
         if (((u8)(*h)) > 3)
@@ -181,27 +181,26 @@ s32 AxeArmor_InitializeFromScript(struct AxeArmor *p, void *parent)
     }
     if (Script_SeekToKeyword('V')) {
         p->hudTime = Script_GetValue();
-        if ((p->hudTime) > 99)
+        if (p->hudTime > 99)
             p->hudTime = 99;
-        if ((p->hudTime) <= 0)
+        if (p->hudTime <= 0)
             p->hudTime = 1;
     } else
         p->hudTime = 0;
     p->parent = parent;
     {
-        struct ContactSwarmGraphics *graphics = &p->graphics;
         struct DisplaySequenceSprite *earlySprite;
         s16 *x;
         s16 *z;
         s8 *h;
-        AnimData_Load(graphics, 0x7e82);
+        AnimData_Load(&p->graphics, 0x7e82);
         earlySprite = &p->sprite;
-        Sprite_Init(earlySprite, graphics, 1);
-        x = &(p->sprite.position.x);
+        Sprite_Init(earlySprite, &p->graphics, 1);
+        x = &p->sprite.position.x;
         p->sprite.position = p->initialPosition;
-        h = &(p->facing);
+        h = &p->facing;
         *x += offsets.e[*h].x << 2;
-        z = &(p->sprite.position.z);
+        z = &p->sprite.position.z;
         *z += offsets.e[*h].z << 2;
         {
             s32 facing = *h;
@@ -226,28 +225,26 @@ s32 AxeArmor_InitializeFromScript(struct AxeArmor *p, void *parent)
         *((void **)(&p->update)) = AxeArmor_UpdateDeath;
         p->dead = 1;
         Anim_SetSequence(&p->sequence, *slot, 4, 0, 0);
-        *position = (p->initialPosition.x) + 0x40;
-        *zp = (p->initialPosition.z) + 0x40;
+        *position = p->initialPosition.x + 0x40;
+        *zp = p->initialPosition.z + 0x40;
         *position -= 0x60;
         *zp -= 0x60;
     }
     {
         u32 *flipFlags;
-        AxeArmor_GetFlags(&flipFlags, sprite);
+        flipFlags = &sprite->flags;
         AxeArmor_StepSequence(flipFlags, p, sprite, (struct DisplaySequenceState *)(&p->sequence));
     }
     if ((*((s16 *)&p->initialDead)) == 0)
         AxeArmor_InitCollider(p);
     if (p->terrainEnabled && p->initialDead == 0) {
         s32 cell = AxeArmor_CellIndex((struct SceneVec *)position);
-        TerrainModifiers_RegisterCell(&p->terrain, cell, 0, (p->sprite.position.y) >> 8,
-                                      0, 1);
+        TerrainModifiers_RegisterCell(&p->terrain, cell, 0, p->sprite.position.y >> 8, 0, 1);
     }
     if (p->bodyEnabled) {
-        struct SceneActorBody *body = &p->body;
-        SceneBody_Init(body, p->parent, position, 0, 4, p);
-        SceneBody_SetSprite(body, sprite);
-        TerrainOverlay_QueueAddActor(body);
+        SceneBody_Init(&p->body, p->parent, position, 0, 4, p);
+        SceneBody_SetSprite(&p->body, sprite);
+        TerrainOverlay_QueueAddActor(&p->body);
     }
     if (p->attackSchedule)
         AxeArmor_ReadScriptValueList(p);
