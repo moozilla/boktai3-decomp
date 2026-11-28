@@ -1241,11 +1241,9 @@ void NidhoggrDuel_UpdateDamageAction(struct GridAttackActor *p)
 
 void NidhoggrDuel_UpdatePassiveAction(struct GridAttackActor *p)
 {
-    u8 *q = &p->entered;
-    if (*q) {
-        *q = 0;
-        q--;
-        *q = 0;
+    if (p->entered) {
+        p->entered = 0;
+        p->finished = 0;
     }
     p->actionTimer++;
 }
