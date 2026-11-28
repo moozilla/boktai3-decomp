@@ -1,13 +1,14 @@
 #include "global.h"
 #include "engine/input.h"
+#include "bosses/hresvelgr/hresvelgr_travel.h"
 
-void sub_0819D190(u8 *p)
+void sub_0819D190(struct HresvelgrTravelActor *actor)
 {
     if (gPadState[1] & 0x100) {
-        s32 v = (p[0xab] + 1) % 39;
-        if (v == 0)
-            v = 1;
-        p[0xaa] = v;
+        s32 animation = (actor->currentAnimation + 1) % 39;
+        if (!animation)
+            animation = 1;
+        actor->requestedAnimation = animation;
     }
-    (*(u32 *)(p + 0xc4))++;
+    actor->actionTimer++;
 }
