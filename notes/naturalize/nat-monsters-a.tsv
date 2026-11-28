@@ -645,3 +645,14 @@ src/bosses/nidhoggr/duel.c	NidhoggrDuel_Update	minor	natural	2
 src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdateAnimationAndTargets	contrived	contrived	3	two actor aliases and a body pointer inside the target loop: single pointer changes allocation
 src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdateCollidersAndPalette	contrived	contrived	3	actor and transform aliases with a zero local in the palette effect
 src/bosses/nidhoggr/duel.c	NidhoggrDuel_Initialize	contrived	contrived	8	cached member pointers, actor alias and guarded do-while player loop remain
+src/bosses/nidhoggr/duel_minions.c	NidhoggrDuelMinion_SetFlags	natural	natural	0	
+src/bosses/nidhoggr/duel_minions.c	NidhoggrDuelMinion_ClearFlags	natural	natural	0	
+src/bosses/nidhoggr/duel_minions.c	NidhoggrDuelMinion_GetFlags	natural	natural	0	
+src/bosses/nidhoggr/duel_minions.c	NidhoggrDuelMinion_SetState	natural	natural	0	
+src/bosses/nidhoggr/duel_minions.c	NidhoggrDuelMinion_TakeEntryFlag	natural	natural	0	
+src/bosses/nidhoggr/duel_minions.c	NidhoggrDuelMinion_Initialize	natural	natural	0	
+src/bosses/nidhoggr/duel_minions.c	NidhoggrDuelMinion_UpdateInactive	natural	natural	0	
+src/bosses/nidhoggr/duel_minions.c	NidhoggrDuelMinion_UpdateAppearing	natural	natural	0	
+src/bosses/nidhoggr/duel_minions.c	NidhoggrDuelMinion_UpdateActive	natural	natural	0	
+src/bosses/nidhoggr/duel_minions.c	NidhoggrDuelMinion_Destroy	natural	natural	0	
+src/bosses/nidhoggr/duel_minions.c	NidhoggrDuelMinionPool_Create	natural	natural	0	
