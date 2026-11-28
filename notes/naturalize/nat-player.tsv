@@ -539,3 +539,4 @@ src/player/effects/burst/ActorDebris_Create.c	ActorDebris_Create	natural	natural
 src/player/effects/burst/ActorDebris_Hide.c	ActorDebris_Hide	natural	natural	0	-
 src/player/effects/burst/ActorDebris_Show.c	ActorDebris_Show	contrived	minor	4	mask local shared by the two clears
 src/player/effects/burst/VariantSprite_SelectAnimation.c	VariantSprite_SelectAnimation	contrived	minor	2	object pointer copy of the argument
+src/player/effects/burst/PlayerBurst_InitializeParticles.c	PlayerBurst_InitializeParticles	contrived	contrived	3	unchanged: second record cursor and per-iteration table reloads
