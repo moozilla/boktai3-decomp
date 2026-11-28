@@ -216,3 +216,4 @@ src/link/player/LinkPlayer_ResetToIdleState.c	LinkPlayer_ResetToIdleState	contri
 src/link/player/Player_AccumulateActionCharge.c	Player_AccumulateActionCharge	natural	natural	0	
 src/link/player/Player_EmitPositionEffect.c	Player_EmitPositionEffect	natural	natural	0	
 src/link/player/Player_EnterIdleAnimation.c	Player_EnterIdleAnimation	contrived	natural	1	
+src/link/player/Player_ComputeLinkedActionDelay.c	Player_ComputeLinkedActionDelay	contrived	minor	2	fixed delay flag helper keeps a goto: structured forms differ

@@ -30,24 +30,21 @@ static inline s32 IsFixedDelay(struct Player *p)
 s32 Player_ComputeLinkedActionDelay(struct Player *p)
 {
     s32 n;
-    if (IsFixedDelay(p))
-        goto full;
-    n = Div(0, 100);
-    if (n > 16) {
-    full:
-        n = 16;
 
-    } else if (n <= 8) {
-        n = 9;
+    if (IsFixedDelay(p))
+        n = 16;
+    else {
+        n = Div(0, 100);
+        if (n > 16)
+            n = 16;
+        else if (n <= 8)
+            n = 9;
     }
-    if ((p->movementModifierKind == 2) && (p->movementModifierActive != 0)) {
+    if (p->movementModifierKind == 2 && p->movementModifierActive != 0)
         n -= 4;
-    }
-    if (p->movementSpeedReduction != 0) {
+    if (p->movementSpeedReduction != 0)
         n -= p->movementSpeedReduction;
-    }
-    if (n <= 1) {
+    if (n <= 1)
         return 2;
-    }
     return n;
 }
