@@ -281,3 +281,4 @@ src/monsters/cannons/vulcan/VulcanCannon_UpdateTargeting.c	VulcanCannon_UpdateTa
 src/monsters/cannons/vulcan/VulcanCannon_UpdateDamageState.c	VulcanCannon_UpdateDamageState	contrived	contrived	12	remaining: block,constlocal
 src/monsters/garmr_statue/GarmrStatue_FireAimedVolley.c	GarmrStatue_FireAimedVolley	contrived	contrived	4	remaining: constlocal,mask
 src/monsters/garmr_statue/GarmrStatue_InitializeFromScript.c	GarmrStatue_InitializeFromScript	contrived	contrived	2	remaining: mask,structcast
+src/monsters/cannons/wind/WindCannon_Update.c	WindCannon_Update	contrived	contrived	4	remaining: goto,block,structcast

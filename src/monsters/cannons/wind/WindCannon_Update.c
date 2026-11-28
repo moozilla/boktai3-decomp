@@ -54,13 +54,12 @@ s32 WindCannon_Update(void *manager, struct FanCannon *p, s32 slot)
     }
     if (p->dead == 0 && *(u16 *)&p->activated == 0) {
         if (p->schedule) {
-            s16 *index = &p->scheduleIndex;
-            if (p->age > p->times[*index]) {
+            if (p->age > p->times[p->scheduleIndex]) {
                 WindCannon_ToggleActiveState(p);
                 p->age = 0;
-                (*index)++;
-                if (*index > p->scheduleCount - 1)
-                    *index = 0;
+                p->scheduleIndex++;
+                if (p->scheduleIndex > p->scheduleCount - 1)
+                    p->scheduleIndex = 0;
             }
         } else if (Mod(p->age, p->period) == 0)
             WindCannon_ToggleActiveState(p);
@@ -203,9 +202,6 @@ tail:
             scale = 8;
         Anim_SetDurationScale(&p->sequence, (u16)scale);
     }
-    {
-        u32 *sprite = &p->sprite.flags;
-        PlayerCue_StepSequence((struct ContactSwarmSprite *)sprite, &p->sequence);
-    }
+    PlayerCue_StepSequence((struct ContactSwarmSprite *)&p->sprite.flags, &p->sequence);
     p->age++;
 }
