@@ -18,14 +18,11 @@ void DialogueTransition_SetState(struct DialogueTransition *transition, u8 v)
 
 u8 DialogueTransition_ConsumeStateEntry(struct DialogueTransition *transition)
 {
-    u32 r;
-    if (transition->entered == 0) {
-        r = 0;
-    } else {
+    if (transition->entered) {
         transition->entered = 0;
-        r = 1;
+        return 1;
     }
-    return r;
+    return 0;
 }
 
 void DialogueTransition_UpdateFadeIn(struct DialogueTransition *transition)

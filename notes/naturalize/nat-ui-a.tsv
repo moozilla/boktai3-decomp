@@ -187,3 +187,4 @@ src/ui/dialogue/message_menu.c	MessageMenu_InitializeTransition	minor	minor	0	lo
 src/ui/dialogue/message_menu.c	MessageMenu_Update	natural	natural	0	
 src/ui/dialogue/message_menu.c	MessageMenu_Initialize	natural	natural	0	
 src/ui/dialogue/message_menu.c	Password_Create	natural	natural	0	
+src/ui/dialogue/dialogue_transition.c	DialogueTransition_ConsumeStateEntry	minor	natural	5	
