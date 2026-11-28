@@ -227,10 +227,7 @@ void SceneActors_StartUnmirroredAnimation(struct StateActor *actor, struct AnimS
 int SceneActors_UpdateAnimation(struct StateActor *actor, void *animation, int delta)
 {
     actor->animationFinished = Anim_Step(animation, (void *)delta);
-    {
-        int sequence = actor->animationSequence;
-        actor->previousAnimationSequence = sequence;
-    }
+    actor->previousAnimationSequence = actor->animationSequence;
     if (actor->animationFinished)
         actor->animationCompletions++;
     return 0;

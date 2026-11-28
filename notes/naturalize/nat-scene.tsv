@@ -361,3 +361,4 @@ src/scene/actor/scene_actors.c	SceneActors_FindAvailable	contrived	minor	1	cast 
 src/scene/actor/scene_actors.c	SceneActors_SetHealthLimits	contrived	minor	3	gGameState->unk61C pointer block: a direct store reorders the pointer load
 src/scene/actor/scene_actors.c	SceneActors_StartDirectionalAnimation	contrived	natural	6	-
 src/scene/actor/scene_actors.c	SceneActors_StartEightDirectionAnimation	contrived	natural	4	-
+src/scene/actor/scene_actors.c	SceneActors_UpdateAnimation	minor	natural	1	-
