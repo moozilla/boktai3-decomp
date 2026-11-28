@@ -192,3 +192,11 @@ src/bosses/sabata/position_effects.c	SceneActors_RemoveConvergingParticles	machi
 src/bosses/sabata/position_effects.c	SceneActors_UpdateConvergingParticles	machine-shaped	partial	6	draw alias declaration remains where the particle copy is needed
 src/bosses/sabata/position_effects.c	SceneActors_SpawnConvergingParticle	machine-shaped	partial	8	kept draw alias for position copy (ROM keeps a second pointer)
 src/bosses/sabata/position_effects.c	SabataPosition_BeginReaction	machine-shaped	partial	10	kept state/request temporaries, pointer and zero locals (constant load order)
+src/bosses/sabata/position_effects.c	SceneActors_InitConvergingParticles	natural	natural	0	
+src/bosses/sabata/position_effects.c	SabataPosition_SetOffsetPoint	natural	natural	0	
+src/bosses/sabata/position_effects.c	SabataPosition_TestPath	natural	natural	0	
+src/bosses/sabata/position_search.c	ActorProperty_GetConstant34	natural	natural	0	
+src/bosses/sabata/SceneActors_GetDefaultRadius.c	SceneActors_GetDefaultRadius	natural	natural	0	
+src/bosses/sabata/position_effects.c	SceneActors_EmitRandomBursts	natural	natural	0	minor: random table viewed through a union local
+src/bosses/sabata/SabataPosition_FindTrackedPointInBounds.c	SabataPosition_FindTrackedPointInBounds	machine-shaped	machine-shaped	6	kept offset/address arithmetic, out-parameter inline and inside flag: plain indexed loop changes the induction variable
+src/bosses/sabata/sub_0817A918.c	sub_0817A918	contrived	partial	4	kept self alias and vector helpers
