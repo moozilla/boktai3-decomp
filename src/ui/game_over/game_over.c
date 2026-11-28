@@ -375,7 +375,6 @@ u32 GameOver_OnDestroy(struct GameOver *panel)
 
 s32 GameOver_Initialize(struct GameOver *panel)
 {
-    s32 present;
     GameOver_InitSprites(panel);
     GameOver_InitOverlay(panel);
     panel->closeState = 0;
@@ -392,11 +391,10 @@ s32 GameOver_Initialize(struct GameOver *panel)
         panel->costs[1] = 250;
     }
     panel->costIndex = 0;
-    present = Script_SeekToKeyword('p');
-    if (present)
+    if (Script_SeekToKeyword('p'))
         panel->procedure = Script_GetValue();
     else
-        panel->procedure = present;
+        panel->procedure = 0;
     gGameOver = (void *)panel;
     panel->pulseFrame = 0;
     return 0;
