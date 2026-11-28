@@ -256,3 +256,4 @@ src/monsters/axe/axe.c	Axe_InitColliders	contrived	contrived	6	remaining: constl
 src/monsters/axe/axe.c	Axe_ResetMovementFlags	contrived	minor	5	remaining: constlocal
 src/monsters/axe/axe.c	SceneActorControl_CanAdvanceHover	contrived	contrived	6	remaining: goto,zeroone,structcast,maskhelper
 src/monsters/axe/axe.c	Axe_UpdateAttackFlashFade	contrived	contrived	25	remaining: block,constlocal,ptrtemp
+src/monsters/axe/axe.c	Axe_UpdatePaletteFade	contrived	contrived	8	remaining: u8cast,ptrtemp

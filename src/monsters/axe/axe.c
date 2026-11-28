@@ -1866,11 +1866,10 @@ void Axe_UpdatePaletteFade(struct S080FB4EC_Actor *a)
     }
     cur = ++ctx->unkECE;
     if (cur > 9) {
-        u8 raw = ctx->unkECF;
         if ((s8)ctx->unkECF > 5)
             ctx->unkECF = 0;
         else
-            ctx->unkECF = raw + 1;
+            ctx->unkECF = ctx->unkECF + 1;
         ctx->unkECE = 0;
     }
 }
