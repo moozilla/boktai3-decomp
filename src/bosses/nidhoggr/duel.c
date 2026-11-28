@@ -1712,11 +1712,10 @@ s32 NidhoggrDuel_Initialize(struct GridAttackActor *p, u32 ctx)
     {
         palette = gPaletteBankData + 0x3240;
         dst = (u32 *)p->specialDamageGraphics;
-        i = 15;
-        do {
+        for (i = 0; i < 16; i++) {
             CpuSet(palette, dst, 0x04000008);
             dst += 8;
-        } while (--i >= 0);
+        }
     }
 
     p->animData.palette = p->palette;
