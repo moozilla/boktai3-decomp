@@ -254,3 +254,9 @@ src/scene/actor/behavior/SceneActorState_InvokeBehaviorCallback.c	SceneActorStat
 src/scene/actor/behavior/SceneActorState_DispatchTable29CState.c	SceneActorState_DispatchTable29CState	minor	natural	1	-
 src/scene/actor/behavior/SceneActorState_InvokePrimaryPhaseCallback.c	SceneActorState_InvokePrimaryPhaseCallback	minor	natural	1	-
 src/scene/actor/behavior/SceneActorState_InvokeSecondaryPhaseCallback.c	SceneActorState_InvokeSecondaryPhaseCallback	minor	natural	1	-
+src/scene/actor/behavior/SceneActorState_DispatchTable2A0State.c	SceneActorState_DispatchTable2A0State	natural	natural	0	-
+src/scene/actor/behavior/SceneActorState_OnIdle.c	SceneActorState_OnIdle	natural	natural	0	-
+src/scene/actor/behavior/SceneActor_RunControlAndFallback.c	SceneActor_RunControlAndFallback	natural	natural	0	-
+src/scene/actor/behavior/SceneActor_DispatchActivePhase.c	SceneActor_DispatchActivePhase	natural	natural	0	-
+src/scene/actor/behavior/SceneActorRoute_UpdateTimedPhase.c	SceneActorRoute_UpdateTimedPhase	natural	natural	0	-
+src/scene/actor/behavior/SceneActorRoute_UpdateWaitPhase.c	SceneActorRoute_UpdateWaitPhase	contrived	minor	3	parked status clear mask (plain &= loads the field first)

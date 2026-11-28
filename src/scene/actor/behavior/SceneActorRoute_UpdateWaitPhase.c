@@ -18,9 +18,9 @@ void SceneActorRoute_UpdateWaitPhase(struct ChaseActor *actor)
             if (kind == 1) {
                 actor->base.state2A8 = 0;
                 actor->base.phase2A9 = 0;
-                actor->base.behavior2AA = kind;
+                actor->base.behavior2AA = 1;
                 actor->base.counter2AC = 0;
-                actor->base.field2B1 = kind;
+                actor->base.field2B1 = 1;
                 {
                     u32 *flags = &actor->base.statusFlags;
                     s32 mask = ~0x20;
