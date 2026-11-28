@@ -42,8 +42,6 @@ struct ArmorPlayerPosition {
 
 s32 Math_Atan2(s32, s32);
 
-
-
 void Armor_UpdateFacingAction6(struct ArmorFacingAction6Actor *p)
 {
     u8 *q = &p->b3d;
@@ -74,8 +72,6 @@ void Armor_UpdateFacingAction6(struct ArmorFacingAction6Actor *p)
 struct P {
     u32 x : 16, y : 16, z : 16, w : 16;
 };
-
-
 
 void Armor_UpdateFacingAction9(u8 *p)
 {
@@ -136,7 +132,6 @@ struct E {
     u8 b;
 };
 
-
 void Armor_StartAction7(struct E *p)
 {
     if (p->a == 0) {
@@ -187,7 +182,8 @@ void Armor_SpawnPairedProjectiles(struct ArmorProjectileActor *p)
     s32 offsetBytes = direction << 3;
     for (; i < 2; i++) {
         const struct ArmorProjectileActorProjectileOffset *offset =
-            (const struct ArmorProjectileActorProjectileOffset *)((const u8 *)gUnk_0824EFDC + offsetBytes);
+            (const struct ArmorProjectileActorProjectileOffset *)((const u8 *)gUnk_0824EFDC +
+                                                                  offsetBytes);
         out[0] = base[0] + offset->x;
         out[1] = base[1] + offset->y;
         out[2] = base[2] + offset->z;
@@ -221,10 +217,6 @@ struct S {
     s16 y;
     s16 z;
 };
-
-
-
-
 
 void Armor_UpdatePairedProjectileAttack(struct S *p)
 {
@@ -261,21 +253,17 @@ struct ArmorScriptedActor {
     u32 attackScript;
 };
 
-
-
-
 void Script_Call(u32, void *);
 
 void Armor_UpdateScriptedAttack(struct ArmorScriptedActor *p)
 {
     s32 values[3];
     struct ScriptCallArguments args;
-    u8 state = p->state;
-    switch (state) {
+    switch (p->state) {
         case 0:
             if (Armor_TryStartAction(p, 10)) {
                 p->state = 1;
-                p->timer = state;
+                p->timer = 0;
             }
             break;
         case 1:
@@ -350,8 +338,6 @@ struct ArmorAction13Actor {
     s16 z;
 };
 
-
-
 void Armor_UpdateAction13Transition(struct ArmorAction13Actor *p)
 {
     switch (p->b3d) {
@@ -365,7 +351,6 @@ void Armor_UpdateAction13Transition(struct ArmorAction13Actor *p)
             break;
     }
 }
-
 
 void Armor_StartAction14(struct E *p)
 {
@@ -385,11 +370,9 @@ struct ArmorTargetFacingActor {
     u8 state, timer;
 };
 
-
 s32 Terrain_ApplyBlocked(void *, void *, struct PackedContactVector *);
 
 u32 NavMesh_SteerCardinal(void *, void *, u32, u32);
-
 
 void Armor_UpdateTargetFacing(struct ArmorTargetFacingActor *p)
 {
@@ -407,7 +390,6 @@ void Armor_UpdateTargetFacing(struct ArmorTargetFacingActor *p)
             p->state = 255;
     }
 }
-
 
 void Armor_UpdateAction15(struct ArmorActionController *p)
 {
@@ -444,8 +426,6 @@ struct ArmorAction16Actor {
     s16 z;
 };
 
-
-
 void Armor_UpdateAction16Transition(struct ArmorAction16Actor *p)
 {
     switch (p->b3d) {
@@ -459,7 +439,6 @@ void Armor_UpdateAction16Transition(struct ArmorAction16Actor *p)
             break;
     }
 }
-
 
 void Armor_UpdateAction17(struct ArmorActionController *p)
 {
@@ -503,7 +482,6 @@ void Armor_UpdateAction5(struct ArmorActionController *p)
     }
 }
 
-
 void Armor_StartAction4(struct E *p)
 {
     if (p->a == 0) {
@@ -527,9 +505,7 @@ struct ArmorDefeatActor {
     u32 defeatScript;
 };
 
-
 extern u32 gUnk_02000560;
-
 
 extern const u8 gUnk_0824F004[];
 
@@ -592,9 +568,6 @@ struct ArmorDeathActor {
     u8 f1[2];
     u8 b40;
 };
-
-
-
 
 void Armor_UpdateDeathSequence(struct ArmorDeathActor *p)
 {
