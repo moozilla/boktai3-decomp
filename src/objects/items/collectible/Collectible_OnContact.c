@@ -1,22 +1,16 @@
 #include "global.h"
-struct S {
-    u8 f[0xa8];
-    u16 h;
-    u8 b;
-};
-struct T {
-    u32 fl;
-    u8 p[8];
-    u16 h;
-};
-void Collectible_ApplyPickupReward(void *, void *);
-void Collectible_OnContact(struct S *s, struct T *t)
+#include "engine/engine.h"
+#include "engine/ram.h"
+#include "objects/items/collectible.h"
+
+void Collectible_OnContact(void *owner, struct SpatialEntry *other)
 {
-    u32 m = 0x20;
-    if (t->fl & m) {
-        s->b = 0;
+    struct Collectible *item = owner;
+    u32 mask = 0x20;
+    if (other->flags & mask) {
+        item->body.hit = 0;
     } else {
-        Collectible_ApplyPickupReward(s, t);
-        s->h = t->h;
+        Collectible_ApplyPickupReward(item, other);
+        item->body.kind = other->kind;
     }
 }
