@@ -463,3 +463,9 @@ src/system/clock/SunClock_GetPhase.c	SunClock_GetPhase	contrived	contrived	0	win
 src/system/clock/Time_CalculateSolarRiseTransitSet.c	Time_CalculateSolarRiseTransitSet	contrived	minor	1	one block around the transit values keeps the double stack slots in order
 src/system/clock/Time_CalculateSunriseSunset.c	Time_CalculateSunriseSunset	minor	natural	1	
 src/system/clock/Time_CalculateSunriseSunsetCore.c	Time_CalculateSunriseSunsetCore	contrived	minor	1	blocks left around the refinement passes order the double stack slots
+src/system/clock/Time_CalculateModifiedJulianDate.c	Time_CalculateModifiedJulianDate	natural	natural		
+src/system/clock/Time_CalculateEclipticObliquity.c	Time_CalculateEclipticObliquity	natural	natural		
+src/system/clock/Time_CalculateLunarLongitude.c	Time_CalculateLunarLongitude	natural	natural		
+src/system/clock/Time_CalculateSolarLongitude.c	Time_CalculateSolarLongitude	natural	natural		
+src/system/clock/Time_CalculateSolarLatitude.c	Time_CalculateSolarLatitude	natural	natural		
+src/system/clock/Time_CalculateMoonAge.c	Time_CalculateMoonAge	natural	natural		
