@@ -3,6 +3,8 @@
 #include "ui/widgets/scene_input.h"
 #include "scene/collision/contact_swarm.h"
 #include "engine/video/display_sequence.h"
+#include "engine/video/sprite.h"
+#include "ui/books/collection_display_resources.h"
 struct CollectionMenu {
     struct Task task;
     void *backgroundMap;
@@ -14,7 +16,7 @@ struct CollectionMenu {
     s16 pulseFrame;
     u16 unknown366;
     struct ContactSwarmGraphics graphics[27];
-    struct ContactSwarmSprite entries[27];
+    struct DisplaySequenceSprite entries[27];
     struct DisplaySequenceState sequence;
     void *sequenceResource;
     u32 unknownB14[27];
