@@ -1,5 +1,4 @@
 #include "npc/story_character/scene_character.h"
-#include "npc/story_character/vec081_cbe30_layout.h"
 
 s32 DisplayAnimation_TestFinished(struct DisplayAnimation *);
 u8 *TimedSpriteEffect_Create(u8 *pos, u32 flag, s32 duration, s32 arg3, s32 arg4, s32 arg5,
@@ -98,19 +97,18 @@ void StoryCharacter_UpdateKind29AttackEffect(u32 a, struct SceneNpc *actor, u32 
             break;
         case 1:
             if (DisplayAnimation_TestFinished(&actor->display)) {
-                const s16 *coords = (const s16 *)&actor->body.position;
-                s32 x = *coords++;
-                s32 y = *coords++;
-                s32 z = *coords;
-                struct Vec081CBE30 v;
-                s16 *q = (s16 *)&v;
-                s32 vx = x - 0x20;
-                s32 vy = y + 0x180;
-                s32 vz = z + 0x20;
-                v.x = vx;
-                q[1] = vy;
-                q[2] = vz;
-                TimedSpriteEffect_Create((u8 *)&v, 0xa0, 0x20, 1, 6, 0, 0, 0, 0);
+                s32 x = actor->body.position.x;
+                s32 y = actor->body.position.y;
+                s32 z = actor->body.position.z;
+                struct ContactPosition position;
+                struct ContactPosition *out = &position;
+                x -= 0x20;
+                y += 0x180;
+                z += 0x20;
+                out->x = x;
+                out->y = y;
+                out->z = z;
+                TimedSpriteEffect_Create((u8 *)&position, 0xa0, 0x20, 1, 6, 0, 0, 0, 0);
                 actor->animationPhase++;
             }
             break;

@@ -203,3 +203,6 @@ src/npc/story_character/StoryCharacter_UpdateEightWayBurst.c	StoryCharacter_Upda
 src/npc/story_character/StoryCharacter_UpdateHoverBob.c	StoryCharacter_UpdateHoverBob	contrived	minor	1	SceneActor_SetFlags (mask materialized before the load); raw 0x1CC palette buffer offset; ContactPosition view of the display position
 src/npc/story_character/StoryCharacter_UpdateRiseToTerrain.c	StoryCharacter_UpdateRiseToTerrain	contrived	minor	9	SceneActor_SetFlags; local RiseTag view of unknown20; ContactPosition view of the display position
 src/npc/story_character/StoryCharacter_SpawnRadialEffect.c	StoryCharacter_SpawnRadialEffect	contrived	contrived	24	dead origin constant 0x403B714 loaded in the prologue needs the relative-sample origin pair; table, velocity pointer and bits locals fix register order
+src/npc/story_character/SceneCharacter_UpdateAnimationThirteen.c	SceneCharacter_UpdateAnimationThirteen	natural	natural	0	
+src/npc/story_character/SceneCharacter_UpdateAnimationSeven.c	SceneCharacter_UpdateAnimationSeven	natural	natural	0	
+src/npc/story_character/StoryCharacter_UpdateKind29AttackEffect.c	StoryCharacter_UpdateKind29AttackEffect	contrived	minor	20	position out pointer (member stores on the stack struct would rewrite whole words)
