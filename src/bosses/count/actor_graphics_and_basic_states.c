@@ -474,14 +474,13 @@ void ImpactBurst_EmitBurst(void *, s32, s32, s32, s32, s32, s32, s32);
 void TransientSpriteEffects_Spawn(int, int, void *, void *, int, int);
 
 /* Emit particles away from a point above the center of the burst. */
-static inline void BurstNormalize(struct ContactPosition *v, s32 speed)
+static inline void BurstNormalize(BurstVec *v, s32 speed)
 {
-    struct ContactPosition *out = v;
-    u16 len = Sqrt(v->x * v->x + out->y * out->y + out->z * out->z);
+    u16 len = Sqrt(v->x * v->x + v->y * v->y + v->z * v->z);
     if (len) {
         v->x = Div(v->x * speed, len);
-        out->y = Div(out->y * speed, len);
-        out->z = Div(out->z * speed, len);
+        v->y = Div(v->y * speed, len);
+        v->z = Div(v->z * speed, len);
     }
 }
 
@@ -508,7 +507,7 @@ void sub_08022878(BurstVec *p)
         vel.x = pos.x - center.x;
         vel.y = pos.y - center.y;
         vel.z = pos.z - center.z;
-        BurstNormalize((struct ContactPosition *)&vel, 5);
+        BurstNormalize(&vel, 5);
         TransientSpriteEffects_Spawn(2, 0, &pos, &vel, 0x20, 0x100);
     }
 }
