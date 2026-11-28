@@ -1,31 +1,29 @@
-#include "global.h"
-struct Vm {
-    u8 pad[0x88];
-    s32 numbers[16];
-};
-int TextState_GetNumberWidth(struct Vm *p, int index)
+#include "ui/dialogue/message_window.h"
+
+int TextState_GetNumberWidth(struct MessagePlaybackState *state, int index)
 {
-    int value = p->numbers[index];
-    u32 n = (u32)value >> 31;
-    int abs = value;
+    int value = state->numbers[index];
+    int width = (u32)value >> 31;
+    int magnitude = value;
+
     if (value < 0)
-        abs = -value;
-    value = abs;
+        magnitude = -value;
+    value = magnitude;
     if (value > 9999999)
-        n += 8;
+        width += 8;
     else if (value > 999999)
-        n += 7;
+        width += 7;
     else if (value > 99999)
-        n += 6;
+        width += 6;
     else if (value > 9999)
-        n += 5;
+        width += 5;
     else if (value > 999)
-        n += 4;
+        width += 4;
     else if (value > 99)
-        n += 3;
+        width += 3;
     else if (value > 9)
-        n += 2;
+        width += 2;
     else
-        n++;
-    return n;
+        width++;
+    return width;
 }
