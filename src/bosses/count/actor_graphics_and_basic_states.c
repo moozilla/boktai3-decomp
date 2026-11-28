@@ -615,29 +615,22 @@ void SceneActorState_StepTableByte(struct StateActor *p, const u8 *tbl);
 
 int SceneActorState_StepTableByKind(struct StateActor *p)
 {
-    const u8 *tbl;
     switch (((struct SceneGraphicsActor *)p)->graphics.stepTableKind) {
         case 0:
-            tbl = gUnk_08604DC4;
-            break;
+            SceneActorState_StepTableByte(p, gUnk_08604DC4);
+            return 1;
         case 1:
-            tbl = gUnk_08604DE4;
-            break;
+            SceneActorState_StepTableByte(p, gUnk_08604DE4);
+            return 1;
         case 2:
-            tbl = gUnk_08604E04;
-            break;
+            SceneActorState_StepTableByte(p, gUnk_08604E04);
+            return 1;
         case 3:
-            tbl = gUnk_08604E24;
-            break;
-        default:
-            goto fail;
+            SceneActorState_StepTableByte(p, gUnk_08604E24);
+            return 1;
     }
-    SceneActorState_StepTableByte(p, tbl);
-    return 1;
-fail:
     return 0;
 }
-
 // confidence=low: chooses the next action phase from the reaction kind and flash state.
 static inline s32 SceneActorState_GetHealthRatio(const struct StateActor *actor)
 {
