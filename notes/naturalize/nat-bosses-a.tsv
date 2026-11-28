@@ -175,3 +175,4 @@ src/bosses/count/CountBats_Initialize.c	CountBats_Initialize	minor	natural	3
 src/bosses/count/CountBats_Create.c	CountBats_Create	minor	natural	3	
 src/bosses/count/CountBats_SpawnCharge.c	CountBats_SpawnCharge	natural	natural	0	
 src/bosses/count/CountBats_SpawnPairedAdvance.c	CountBats_SpawnPairedAdvance	contrived	contrived	38	random draw keeps shared table/headings pointer temp (ROM loads the table before the cursor address); fade tail keeps active pointer and zero local; resource collider temp
+src/bosses/count/CountBats_SpawnPairedAdvanceCount.c	CountBats_SpawnPairedAdvanceCount	contrived	contrived	12	random draw keeps shared table/headings pointer temp (ROM loads the table before the cursor address); fade tail keeps active pointer and zero local; resource collider temp
