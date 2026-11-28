@@ -92,3 +92,11 @@ src/effects/bursts/large_fragment_effect.c	LargeFragmentEffect_SpawnRandomPartic
 src/effects/bursts/large_fragment_effect.c	FragmentSpritePool_UpdateTask	contrived	minor	5	slot array pointer kept in a local; mask-argument test helper
 src/effects/bursts/large_fragment_effect.c	FragmentSpritePool_DestroyTask	contrived	natural	3	-
 src/effects/bursts/large_fragment_effect.c	ScriptedColliderActor_Create	contrived	minor	1	manager and slot casts between the two views of the pool
+src/effects/bursts/large_fragment_effect.c	LargeFragmentEffect_OnCollision	natural	natural	0	
+src/effects/bursts/large_fragment_effect.c	LargeFragmentEffect_RunIdleHook	natural	natural	0	
+src/effects/bursts/large_fragment_effect.c	SceneSlot_UpdateTimedPulse	natural	natural	0	
+src/effects/bursts/large_fragment_effect.c	SceneSlot_Remove	natural	natural	0	
+src/effects/bursts/large_fragment_effect.c	FragmentSpritePool_Init	natural	natural	0	
+src/effects/bursts/large_fragment_effect.c	FragmentSpritePool_GetOrCreate	natural	natural	0	
+src/effects/bursts/large_fragment_effect.c	FragmentSpritePool_ResetSingleton	natural	natural	0	
+src/effects/bursts/large_fragment_effect.c	LargeFragmentEffect_UpdateAnimation	minor	minor	0	left: views the slot through a second struct (Feather) and casts to the other effect types
