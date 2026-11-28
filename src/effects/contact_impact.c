@@ -331,61 +331,21 @@ static inline s32 EffectProjectScale(s32 x)
 
 void ContactImpactEffect_UpdateInterpolatedPosition(struct ContactImpactEffect *effect)
 {
-    {
-        u16 *base = &effect->rampFrom;
-        s32 rampTo = effect->rampTo;
-        s32 threshold = effect->shakeThreshold;
-        s32 rampFrom = *(u16 *)base;
-        s32 *timerPtr = &effect->timer;
-        s32 timer = *timerPtr;
-        s32 result;
-        result = Fixed8_Interpolate(rampFrom, rampTo, threshold, timer);
-        effect->sprite.scaleX = result;
-        effect->sprite.scaleY = result;
-    }
-    {
-        struct ContactImpactPackedPosition pos;
-        u16 *q;
-        struct ContactPosition *p;
-        s32 x;
-        s32 z;
-        s32 y;
-        s32 sum;
-        pos.x = Fixed8_Interpolate(effect->world.x, effect->target.x, effect->shakeThreshold,
-                                   effect->timer);
-        pos.y = Fixed8_Interpolate(effect->world.y, effect->target.y, effect->shakeThreshold,
-                                   effect->timer);
-        pos.z = Fixed8_Interpolate(effect->world.z, effect->target.z, effect->shakeThreshold,
-                                   effect->timer);
-        q = (u16 *)&effect->sprite.position.x;
-        p = (struct ContactPosition *)&pos;
-        x = ((s16 *)&pos)[0];
-        z = p->z;
-        q[0] = EffectProjectScale(x - z);
-        sum = EffectProjectScale(x + z);
-        {
-            struct ContactPosition *source = p;
-            y = EffectProjectScale(source->y);
-        }
-        {
-            s32 sy = sum - y;
-            s32 depth = sum + y;
-            q[0] = q[0] - gCameraOrigin[0] + 120;
-            q[1] = sy - gCameraOrigin[1] + 80;
-            q[2] = depth - gCameraOrigin[2];
-        }
-    }
-    {
-        s32 *timer = &effect->timer;
-        s32 t = ++*timer;
-        {
-            u16 *limitp = &effect->shakeThreshold;
-            s32 limit;
-            limit = *limitp;
-            if (t > limit)
-                effect->stateResult = 1;
-        }
-    }
+    struct ContactPosition position;
+    s32 scale =
+        Fixed8_Interpolate(effect->rampFrom, effect->rampTo, effect->shakeThreshold, effect->timer);
+
+    effect->sprite.scaleX = scale;
+    effect->sprite.scaleY = scale;
+    position.x = Fixed8_Interpolate(effect->world.x, effect->target.x, effect->shakeThreshold,
+                                    effect->timer);
+    position.y = Fixed8_Interpolate(effect->world.y, effect->target.y, effect->shakeThreshold,
+                                    effect->timer);
+    position.z = Fixed8_Interpolate(effect->world.z, effect->target.z, effect->shakeThreshold,
+                                    effect->timer);
+    ToScreen(&effect->sprite.position, &position);
+    if (++effect->timer > effect->shakeThreshold)
+        effect->stateResult = 1;
 }
 
 void ContactImpactEffect_UpdateContact(struct ContactImpactEffect *effect)
