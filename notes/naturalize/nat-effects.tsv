@@ -287,3 +287,4 @@ src/effects/orbits/orbiting_particles.c	OrbitingParticles_Destroy	contrived	natu
 src/effects/orbits/orbiting_particles.c	OrbitingParticles_Initialize	contrived	natural	150	
 src/effects/orbits/orbiting_particles.c	OrbitingParticles_Create	minor	natural	1	
 src/effects/orbits/orbiting_particles.c	OrbitingParticles_CreateFromScript	minor	natural	1	
+src/effects/orbits/orbiting_particles.c	OrbitingParticles_Stop	natural	natural	0	
