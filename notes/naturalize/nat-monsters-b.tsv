@@ -126,3 +126,4 @@ src/monsters/mummy/mummy_entry.c	Mummy_ResumeSavedTarget	contrived	contrived	11	
 src/monsters/mummy/mummy_entry.c	Mummy_UpdateRevival	minor	minor	5	flag peek helper stays
 src/monsters/mummy/mummy_entry.c	Mummy_ResumeRouteAfterRecovery	contrived	contrived	15	flag accessors remain
 src/monsters/mummy/mummy_entry.c	Mummy_UpdateDefeat	contrived	contrived	46	flag accessors, parked temps and speed/half helpers fix load order
+src/monsters/mummy/mummy_entry.c	Mummy_UpdatePlayerRoute	contrived	contrived	19	mask-first accessors and block remain

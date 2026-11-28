@@ -1032,12 +1032,10 @@ void Mummy_UpdatePlayerRoute(struct ChaseActor *actor)
     actor->base.field2C2 = 32;
     if (!body->savedTick) {
         SceneActorChase_TrackPlayer(actor);
-        {
-            SetHalf((u16 *)&group->common.gate.flags, 4);
-        }
+        SetHalf((u16 *)&group->common.gate.flags, 4);
         actor->base.statusFlags = ClearWordValue(&actor->base.statusFlags, 4);
         {
-            struct ChaseFlags40 *field = (void *)&body->flags6F2;
+            struct ChaseFlags40 *field = &body->flags6F2;
             s32 mask = ~0x1400;
             field->bits = mask & field->bits;
         }
