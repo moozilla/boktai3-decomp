@@ -1,6 +1,6 @@
 #include "global.h"
-extern u8 *gGameState;
+#include "system/game_state/game_state.h"
 u32 GameState_HasEquipment(u32 i)
 {
-    return *(u32 *)(gGameState + 0x4c) & (1 << i);
+    return gGameState->unlockMask & (1 << i);
 }
