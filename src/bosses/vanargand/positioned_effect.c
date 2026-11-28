@@ -32,19 +32,21 @@ void Collider_SetBodyProperties(void *, s32, s32, s32);
 void PositionedEffect_InitContactCollider(struct VanargandPairAttack *actor)
 {
     struct PositionedPackedVector size, offset;
-    void *collider = &actor->damageSource;
+    struct ContactCollider *collider = &actor->damageSource;
+
     size.x = 256;
     size.y = 256;
     size.z = 256;
-    *(u32 *)&offset = 0x800000;
-    ((u32 *)&offset)[1] &= 0xffff0000;
+    offset.x = 0;
+    offset.y = 128;
+    offset.z = 0;
     Collider_Init(collider, 0, 0x5001, 0, 16, &size, &offset);
     Collider_SetPosition(collider, &actor->animation.position, 0);
     Collider_SetCallback(collider, PositionedEffect_ReceiveContact, actor);
     Collider_SetBodyProperties(collider, 10, 2048, 0);
     {
-        u32 flags = 32;
-        actor->damageSource.direction = flags;
+        u8 direction = 32;
+        actor->damageSource.direction = direction;
     }
     Collider_Refresh(collider);
 }
