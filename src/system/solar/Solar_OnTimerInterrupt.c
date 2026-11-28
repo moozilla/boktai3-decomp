@@ -1,12 +1,13 @@
 #include "global.h"
 #include "engine/runtime.h"
+#include "gba/io_reg.h"
 void Solar_OnTimerInterrupt(void)
 {
     u32 pins = *(vu16 *)0x080000C4;
     u32 shadow = gSolarGpioShadow;
     u32 light;
     *(vu16 *)0x080000C4 = shadow;
-    *(vu16 *)0x0400010C = -gSolarTimerPeriod;
+    REG_TM3CNT_L = -gSolarTimerPeriod;
     light = 8;
     light &= pins;
     gSolarLightBit = light;
