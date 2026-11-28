@@ -411,11 +411,10 @@ s32 PasswordMenu_AppendSelection(struct PasswordMenu *p)
 {
     s32 full;
     s32 index;
-    s32 *cursor = &p->position;
     p->selections[p->position] = p->selection;
-    index = *cursor;
+    index = p->position;
     if (index <= 22) {
-        *cursor = 1 + index;
+        p->position++;
         full = 0;
     } else {
         full = 1;
