@@ -346,3 +346,4 @@ src/link/score_panel/RecordList_InitializeSprites.c	RecordList_InitializeSprites
 src/link/score_panel/LinkMenu_LoadSelectionSprite.c	LinkMenu_LoadSelectionSprite	contrived	minor	1	validSelection goto inline stays
 src/link/score_panel/LinkScorePanel_HideSprites.c	LinkScorePanel_HideSprites	contrived	natural	1	
 src/link/score_panel/LinkScorePanel_RemoveSprites.c	LinkScorePanel_RemoveSprites	contrived	natural	1	
+src/link/score_panel/LinkScorePanel_SetNumber.c	LinkScorePanel_SetNumber	minor	natural	3	local prototype keeps AnimSprite_SelectGlyph taking u16

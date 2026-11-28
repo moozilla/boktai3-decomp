@@ -1,37 +1,32 @@
 #include "global.h"
-struct E {
-    u8 f[0x60];
-};
-struct S {
-    u8 f[0x24];
-    struct E e[8];
-};
-void AnimSprite_SelectGlyph(void *, void *, u16);
-void LinkScorePanel_SetNumber(struct S *s, s32 k, s32 v)
+#include "ui/save/save_menu.h"
+void AnimSprite_SelectGlyph(struct AnimSprite *, struct AnimSpriteResource *, u16);
+
+void LinkScorePanel_SetNumber(struct SaveMenu *menu, s32 row, s32 value)
 {
-    s32 idx = k * 4 + 1;
-    u32 d = 0x3e;
-    while (v > 999) {
-        d++;
-        v -= 1000;
+    s32 slot = row * 4 + 1;
+    u32 glyph = 0x3e;
+    while (value > 999) {
+        glyph++;
+        value -= 1000;
     }
-    AnimSprite_SelectGlyph(&s->e[idx], (u8 *)s + 0x704, d);
-    d = 0x3e;
-    while (v > 99) {
-        d++;
-        v -= 100;
+    AnimSprite_SelectGlyph(&menu->widgets[slot], &menu->widgetResource, glyph);
+    glyph = 0x3e;
+    while (value > 99) {
+        glyph++;
+        value -= 100;
     }
-    AnimSprite_SelectGlyph(&s->e[idx + 1], (u8 *)s + 0x704, d);
-    d = 0x3e;
-    while (v > 9) {
-        d++;
-        v -= 10;
+    AnimSprite_SelectGlyph(&menu->widgets[slot + 1], &menu->widgetResource, glyph);
+    glyph = 0x3e;
+    while (value > 9) {
+        glyph++;
+        value -= 10;
     }
-    AnimSprite_SelectGlyph(&s->e[idx + 2], (u8 *)s + 0x704, d);
-    d = 0x3e;
-    while (v > 0) {
-        d++;
-        v -= 1;
+    AnimSprite_SelectGlyph(&menu->widgets[slot + 2], &menu->widgetResource, glyph);
+    glyph = 0x3e;
+    while (value > 0) {
+        glyph++;
+        value -= 1;
     }
-    AnimSprite_SelectGlyph(&s->e[idx + 3], (u8 *)s + 0x704, d);
+    AnimSprite_SelectGlyph(&menu->widgets[slot + 3], &menu->widgetResource, glyph);
 }
