@@ -25,10 +25,9 @@ static inline void Actor_SetScreenPosition(struct RegistryActor *actor, struct S
         actor->stats.movementOffset = 0;
         actor->stats.position.x = pos->x << 12;
     } else {
-        s32 *offset = &actor->stats.movementOffset;
-        *offset = (pos->x << 12) - (state->x + *(s32 *)(player + 0x5F4));
-        actor->stats.position.x = state->x + *(s32 *)(player + 0x5F4) + *offset;
-        actor->stats.relativeOrigin[0] = *offset;
+        actor->stats.movementOffset = (pos->x << 12) - (state->x + *(s32 *)(player + 0x5F4));
+        actor->stats.position.x = state->x + *(s32 *)(player + 0x5F4) + actor->stats.movementOffset;
+        actor->stats.relativeOrigin[0] = actor->stats.movementOffset;
         actor->stats.relativeOrigin[2] = actor->stats.position.z;
     }
 }
