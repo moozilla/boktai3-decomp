@@ -11,19 +11,14 @@ void Palette_RefreshObjectBanks(void)
 {
     s32 i;
     s32 j;
-    s32 next;
     u16 *src;
     u16 *dst;
 
     gBgPaletteSource = Palette_GetBackgroundBuffer();
-    for (i = 0; i < gPaletteBanksInUse; i = next) {
-        src = (u16 *)((u8 *)gPaletteBankData + (gObjPaletteKeys[i] << 5));
+    for (i = 0; i < gPaletteBanksInUse; i++) {
+        src = gPaletteBankData + gObjPaletteKeys[i] * 16;
         dst = gObjPaletteBuffer[i];
-        next = i + 1;
-        j = 15;
-        do {
+        for (j = 0; j < 16; j++)
             *dst++ = *src++;
-            j--;
-        } while (j >= 0);
     }
 }
