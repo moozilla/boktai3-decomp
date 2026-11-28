@@ -1,9 +1,9 @@
 #include "global.h"
+#include "engine/engine.h"
+#include "objects/deck_cannons/script_value_rotation_layout.h"
 
-void Anim_Remove(u8 *);
-
-u32 BackgroundAnimation_Destroy(u8 *p)
+u32 BackgroundAnimation_Destroy(struct ScriptValueRotation *rotation)
 {
-    Anim_Remove(p + 0x18);
+    Anim_Remove(rotation->animation);
     return 0;
 }

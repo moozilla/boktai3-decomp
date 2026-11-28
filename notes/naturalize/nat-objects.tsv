@@ -198,3 +198,4 @@ src/objects/deck_cannons/CallbackSlot_BeginPaletteTransition.c	CallbackSlot_Begi
 src/objects/deck_cannons/sub_08199BD8.c	sub_08199BD8	minor	minor	1	constant state local materializes the value before the field address
 src/objects/deck_cannons/DeckCannon_InitCannon.c	DeckCannon_InitCannon	minor	minor	1	local update/destroy pair loads both addresses before either store
 src/objects/deck_cannons/ScriptValues_LoadRotatedArray.c	ScriptValues_LoadRotatedArray	contrived	natural	6	
+src/objects/deck_cannons/BackgroundAnimation_Destroy.c	BackgroundAnimation_Destroy	contrived	natural	1	
