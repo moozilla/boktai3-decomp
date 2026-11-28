@@ -315,13 +315,13 @@ s32 LightFixture_ScriptCreate(void)
         return -1;
     slot = LightFixture_FindFreeSlot(manager);
     if (!slot)
-        goto fail;
+        return -1;
     slot->motion = 0;
     placed = 0;
     if (Script_SeekToKeyword('r')) {
         s32 route = Script_GetValue(), point = Script_GetValue(), mode = Script_GetValue();
         if (!Route_Start(&slot->route, route, point, mode))
-            goto fail;
+            return -1;
         slot->motion = 1;
         slot->delay = Route_GetCurrentPointNodeId(&slot->route);
         slot->speed = Script_GetValue();
@@ -334,7 +334,7 @@ s32 LightFixture_ScriptCreate(void)
         slot->offset = Script_GetValue();
         slot->target = MovingPlatform_GetPositionByName(target);
         if (!slot->target)
-            goto fail;
+            return -1;
         slot->motion = 2;
         position = *slot->target;
         placed = 1;
@@ -345,10 +345,8 @@ s32 LightFixture_ScriptCreate(void)
         position.z = Script_GetValue();
         placed = 1;
     }
-    if (!placed) {
-    fail:
+    if (!placed)
         return -1;
-    }
     LightFixture_EnterState(slot, Script_GetKeywordValue('m', 1));
     slot->flags = Script_GetKeywordValue('f', 0);
     slot->timeout = Script_GetKeywordValue('d', 120);

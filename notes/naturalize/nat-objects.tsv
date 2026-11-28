@@ -454,3 +454,4 @@ src/objects/items/sprite_drop/sub_081160CC.c	sub_081160CC	contrived	natural	7
 src/objects/light_fixtures.c	LightFixture_ConsumeEnteredFlag	minor	natural	1	
 src/objects/light_fixtures.c	LightFixture_Activate	contrived	natural	5	
 src/objects/light_fixtures.c	LightFixture_UpdateRouteMotion	minor	minor	8	step pointer and movement struct fix the stack order
+src/objects/light_fixtures.c	LightFixture_ScriptCreate	contrived	natural	1	
