@@ -22,3 +22,8 @@ src/ui/books/monster_book/PaletteTransition_InitDisplays.c	PaletteTransition_Ini
 src/ui/books/monster_book/PaletteTransition_StartDisplay.c	PaletteTransition_StartDisplay	contrived	natural	5	origin pointer kept
 src/ui/books/monster_book/BestiaryDisplay_UpdateAnimations.c	BestiaryDisplay_UpdateAnimations	contrived	natural	2	
 src/ui/books/monster_book/PaletteTransition_UpdateFade.c	PaletteTransition_UpdateFade	minor	natural	1	
+src/ui/books/monster_book/PaletteTransition_UpdateWobble.c	PaletteTransition_UpdateWobble	minor	minor	3	second y store copies the first; chain assignment and plain restore do not match
+src/ui/books/monster_book/PaletteTransition_SetVariantParameters.c	PaletteTransition_SetVariantParameters	natural	natural	0	
+src/ui/books/monster_book/PaletteTransition_SetAlternateVariantParameters.c	PaletteTransition_SetAlternateVariantParameters	natural	natural	0	
+src/ui/books/monster_book/PaletteTransition_UpdateOutIn.c	PaletteTransition_UpdateOutIn	natural	natural	0	
+src/ui/books/monster_book/DisplayEntry_SetAnim.c	DisplayEntry_SetAnim	contrived	natural	8	sprite pointer assigned in each case (ROM forms the address per case)
