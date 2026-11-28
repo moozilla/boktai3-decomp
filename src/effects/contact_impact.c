@@ -201,31 +201,23 @@ static inline void SetFrame(struct OrbitEffectSprite *sprite, s32 frame)
 
 void ContactImpactEffect_UpdateBlinkFrame(struct ContactImpactEffect *effect)
 {
-    u32 flags = effect->sprite.flags;
-    flags &= 1;
-    if (!flags) {
-        switch (effect->blinkState) {
-            case 0:
-                if (++effect->blinkTimer > 1) {
-                    {
-                        s32 frame = effect->blinkState;
-                        SetFrame(&effect->sprite, frame);
-                    }
-                    effect->blinkState = 1;
-                    effect->blinkTimer = flags;
-                }
-                break;
-            case 1:
-                if (++effect->blinkTimer > 0) {
-                    {
-                        s32 frame = effect->blinkState;
-                        SetFrame(&effect->sprite, frame);
-                    }
-                    effect->blinkState = flags;
-                    effect->blinkTimer = flags;
-                }
-                break;
-        }
+    if (effect->sprite.flags & 1)
+        return;
+    switch (effect->blinkState) {
+        case 0:
+            if (++effect->blinkTimer > 1) {
+                SetFrame(&effect->sprite, effect->blinkState);
+                effect->blinkState = 1;
+                effect->blinkTimer = 0;
+            }
+            break;
+        case 1:
+            if (++effect->blinkTimer > 0) {
+                SetFrame(&effect->sprite, effect->blinkState);
+                effect->blinkState = 0;
+                effect->blinkTimer = 0;
+            }
+            break;
     }
 }
 
