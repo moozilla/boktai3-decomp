@@ -1,40 +1,33 @@
 #include "global.h"
-typedef struct {
-    s16 x, y, z, pad;
-} Vec;
+#include "minigames/result_game/result_tutorial.h"
 int Script_GetKeywordValue(int, int);
 int Script_SeekToKeyword(int);
 int Script_GetValue(void);
 void Camera_SetPosition(void *);
-int ResultMenu_ReadScript(u8 *p)
+int ResultMenu_ReadScript(struct ResultMenu *menu)
 {
-    int found, result;
-    *(u16 *)(p + 0x7ac) = Script_GetKeywordValue(0x6e, 0x6740);
-    *(u16 *)(p + 0x7ae) = 5;
-    found = Script_SeekToKeyword(0x70);
-    if (found) {
-        *(s16 *)(p + 0x18) = Script_GetValue();
-        *(s16 *)(p + 0x1a) = Script_GetValue();
-        *(s16 *)(p + 0x1c) = Script_GetValue();
+    struct SceneVec *camera;
+    menu->receiverId = Script_GetKeywordValue('n', 0x6740);
+    menu->receiverKind = 5;
+    if (Script_SeekToKeyword('p')) {
+        menu->cameraPosition.x = Script_GetValue();
+        menu->cameraPosition.y = Script_GetValue();
+        menu->cameraPosition.z = Script_GetValue();
     } else {
-        *(s16 *)(p + 0x18) = found;
-        *(s16 *)(p + 0x1a) = found;
-        *(s16 *)(p + 0x1c) = found;
+        menu->cameraPosition.x = 0;
+        menu->cameraPosition.y = 0;
+        menu->cameraPosition.z = 0;
     }
-    {
-        Vec *position = (Vec *)(p + 0x18);
-        *(Vec *)(p + 0x20) = *(Vec *)(p + 0x18);
-        Camera_SetPosition(position);
+    camera = &menu->cameraPosition;
+    menu->initialCameraPosition = menu->cameraPosition;
+    Camera_SetPosition(camera);
+    menu->completionScript = Script_GetKeywordValue('e', 0);
+    menu->difficulty = Script_GetKeywordValue('l', 0);
+    if (Script_SeekToKeyword('s')) {
+        menu->equipmentSlot = Script_GetValue();
+        menu->consumableSlot = Script_GetValue();
+        menu->wideTimingWindow = Script_GetKeywordValue('b', 0);
+        return 0;
     }
-    *(u16 *)(p + 0x7a0) = Script_GetKeywordValue(0x65, 0);
-    p[0xae] = Script_GetKeywordValue(0x6c, 0);
-    if (!Script_SeekToKeyword(0x73))
-        result = -1;
-    else {
-        p[0xba] = Script_GetValue();
-        p[0xbb] = Script_GetValue();
-        p[0xbc] = Script_GetKeywordValue(0x62, 0);
-        result = 0;
-    }
-    return result;
+    return -1;
 }
