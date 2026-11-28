@@ -1,5 +1,3 @@
-#define gLinkDefaultSlotValues  gUnk_08606544
-#define gLinkSelectedSlotValues gUnk_08606548
 #include "global.h"
 extern const u8 gUnk_08606544[], gUnk_08606548[];
 void LinkSession_GetSlotValues(s32 selected, s32 *a, s32 *b, s32 *c, s32 *d)
