@@ -421,3 +421,5 @@ src/ui/status_screen/status_screen.c	StatusScreen_Close	contrived	contrived	2	di
 src/ui/results/time_result.c	TimeResult_InitializeBackground	contrived	contrived	2	display control write: plain &=/
 src/ui/town/shop/SceneInputPanel_InitBackground.c	SceneInputPanel_InitBackground	natural	natural	0	
 src/ui/town/shop/SceneInputPanel_InitWidgets.c	SceneInputPanel_InitWidgets	contrived	minor	3	parameter copied into a local (copy order); zero priority read back from a playback struct
+src/ui/town/shop/SceneInputPanel_SetMeterGlyph.c	SceneInputPanel_SetMeterGlyph	natural	natural	0	
+src/ui/town/shop/SceneInputPanel_PositionModeCursor.c	SceneInputPanel_PositionModeCursor	contrived	minor	6	second local copy of the panel pointer used by every case but the default

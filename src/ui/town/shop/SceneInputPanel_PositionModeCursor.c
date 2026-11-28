@@ -1,48 +1,32 @@
 #include "ui/widgets/scene_input_panel.h"
-void SceneInputPanel_PositionModeCursor(struct SceneInputPanel *owner, u32 mode)
+void SceneInputPanel_PositionModeCursor(struct SceneInputPanel *panel, u32 mode)
 {
-    struct SceneInputPanel *panel = owner;
-    struct SceneInputPanel *base;
-    base = panel;
+    struct SceneInputPanel *base = panel;
+
     switch (mode) {
         case 4:
-        case 5: {
-            struct AnimSprite *cursor = &base->modeCursor;
-            cursor->flags &= ~1;
-        }
+        case 5:
+            AnimSprite_Show(&base->modeCursor);
             base->modeCursor.position.x = 216;
             base->modeCursor.position.y = 32;
             break;
-        case 1: {
-            u32 offset = (u32) & ((struct SceneInputPanel *)0)->modeCursor;
-            struct AnimSprite *cursor;
-            cursor = (void *)((u8 *)base + offset);
-            cursor->flags &= ~1;
-        }
+        case 1:
+            AnimSprite_Show(&base->modeCursor);
             base->modeCursor.position.x = 216;
             base->modeCursor.position.y = 56;
             break;
-        case 3: {
-            u32 offset = (u32) & ((struct SceneInputPanel *)0)->modeCursor;
-            struct AnimSprite *cursor;
-            cursor = (void *)((u8 *)base + offset);
-            cursor->flags &= ~1;
-        }
+        case 3:
+            AnimSprite_Show(&base->modeCursor);
             base->modeCursor.position.x = 216;
             base->modeCursor.position.y = 80;
             break;
-        case 2: {
-            u32 offset = (u32) & ((struct SceneInputPanel *)0)->modeCursor;
-            struct AnimSprite *cursor;
-            cursor = (void *)((u8 *)base + offset);
-            cursor->flags &= ~1;
-        }
+        case 2:
+            AnimSprite_Show(&base->modeCursor);
             base->modeCursor.position.x = 216;
             base->modeCursor.position.y = 104;
             break;
-        default: {
-            struct AnimSprite *cursor = &panel->modeCursor;
-            cursor->flags |= 1;
-        } break;
+        default:
+            AnimSprite_Hide(&panel->modeCursor);
+            break;
     }
 }
