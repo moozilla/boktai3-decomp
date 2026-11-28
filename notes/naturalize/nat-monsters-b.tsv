@@ -51,3 +51,4 @@ src/monsters/ivy/ivy.c	ColorPulse_FinishRedFade	contrived	minor	3	finished flag:
 src/monsters/ivy/ivy.c	ColorPulse_FadeRed	contrived	natural	1	
 src/monsters/ivy/ivy.c	Ivy_UpdateRedBrightening	natural	natural	1	
 src/monsters/ivy/ivy.c	ColorPulse_UnpackColor	contrived	minor	1	u8* parameter kept for the prototype
+src/monsters/ivy/ivy.c	Ivy_UpdateBobbing	minor	natural	1	

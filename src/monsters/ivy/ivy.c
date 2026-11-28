@@ -2104,13 +2104,11 @@ void Ivy_InitBobbing(struct PhaseObject *s)
 
 void Ivy_UpdateBobbing(struct PhaseObject *s)
 {
-    u32 *c = &s->bobbingTimer;
-    if ((*c & 3) == 0)
+    if ((s->bobbingTimer & 3) == 0)
         s->unknown66 += s->unknown6E;
-    *c = *c - 1;
-    if (*c == 0) {
+    if (--s->bobbingTimer == 0) {
         s->unknown6E = -s->unknown6E;
-        *c = 0x28;
+        s->bobbingTimer = 0x28;
     }
     s->position.y += s->unknown66;
 }
