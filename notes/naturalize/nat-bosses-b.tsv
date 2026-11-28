@@ -58,3 +58,4 @@ src/bosses/ratatosk/SceneActors_UpdateTimedAnimationReset.c	SceneActors_UpdateTi
 src/bosses/ratatosk/SceneActor_UpdateAnimationDTimer.c	SceneActor_UpdateAnimationDTimer	minor	natural	1	
 src/bosses/ratatosk/SceneActors_UpdateOrbitingParticleAnimation.c	SceneActors_UpdateOrbitingParticleAnimation	contrived	natural	3	
 src/bosses/ratatosk/Ratatosk_UpdateDecayingShake.c	Ratatosk_UpdateDecayingShake	contrived	minor	33	flag accessors stay
+src/bosses/ratatosk/SceneActor_UpdateAnimation15Cycle.c	SceneActor_UpdateAnimation15Cycle	contrived	natural	2	
