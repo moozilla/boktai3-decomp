@@ -241,3 +241,4 @@ src/monsters/golem/golem_main.c	Golem_UpdateChargeStop	contrived	contrived	3	rem
 src/monsters/golem/golem_main.c	Golem_UpdateChargeRecovery	contrived	contrived	4	remaining: block,constlocal,maskhelper
 src/monsters/golem/golem_main.c	Golem_ResumeSavedTarget	contrived	minor	4	remaining: maskhelper
 src/monsters/golem/golem_2.c	Golem_UpdateDefeat	contrived	contrived	11	remaining: block,maskhelper
+src/monsters/golem/golem_2.c	Golem_UpdateScriptedAction	contrived	contrived	3	remaining: u8cast,block,constlocal

@@ -485,10 +485,7 @@ void Golem_UpdateScriptedAction(struct ChaseActor *obj)
     if (SceneActorControl_TakeFlag(&obj->base.field2B1)) {
         u16 *h;
         SceneActorChase_SetControl(obj, SceneActorReaction_PlayAnimationBUntilComplete, 10);
-        {
-            u32 byte = obj->base.tracking.heading;
-            obj->base.body.direction = byte;
-        }
+        obj->base.body.direction = obj->base.tracking.heading;
         SceneActorAttachment_ReplaceResponseSlot((u8 *)obj, 0, 0, obj->base.category);
         SceneActorBehavior_CallActionScript((u8 *)obj);
         h = (u16 *)&obj->group.common.gate.flags;
@@ -499,9 +496,8 @@ void Golem_UpdateScriptedAction(struct ChaseActor *obj)
         }
         {
             u32 flag = 0x80;
-            u16 *flags = &obj->base.motionFlags;
-            flag |= *flags;
-            *flags = flag;
+            flag |= obj->base.motionFlags;
+            obj->base.motionFlags = flag;
         }
         obj->group.common.gate.counter = obj->group.common.gate.duration;
     }
