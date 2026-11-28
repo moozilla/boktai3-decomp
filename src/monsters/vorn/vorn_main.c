@@ -1451,8 +1451,6 @@ void Vorn_SelectRouteAwayFromTarget(struct ChaseActor *actor)
     struct SceneActorRoutePoint *entry;
     s32 i;
     u8 found;
-    struct SceneActorRouteCursor *cursor;
-    void *nav;
     t = actor->base.tracking.target;
     angle = Math_Atan2(t->position.x - actor->base.body.position.x,
                        t->position.z - actor->base.body.position.z);
@@ -1475,17 +1473,14 @@ void Vorn_SelectRouteAwayFromTarget(struct ChaseActor *actor)
     }
 
     if (!found) {
-        cursor = (void *)&group->homeRoute;
-        Route_SelectRandom(cursor);
+        Route_SelectRandom((void *)&group->homeRoute);
     } else {
         route->pointIndex = selected;
         route->unknown3 = 0;
         route->point = entry;
-        cursor = (void *)&group->homeRoute;
     }
-    Chase_SnapToRoute_(group->destination, cursor);
-    nav = group->route;
-    if (!Chase_TryRoute(actor, nav, &actor->base.body.position,
+    Chase_SnapToRoute_(group->destination, (void *)&group->homeRoute);
+    if (!Chase_TryRoute(actor, group->route, &actor->base.body.position,
                         group->destination)) {
         Chase_SetCtl(actor, SceneActorControl_OnIdle, 0);
         Chase_SetState(actor, 3, 0, 0);
