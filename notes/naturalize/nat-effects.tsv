@@ -230,3 +230,4 @@ src/effects/healing/FlickerParticle_UpdateVerticalMotion.c	FlickerParticle_Updat
 src/effects/healing/HealthRestoreEffect_InitRisingParticle.c	HealthRestoreEffect_InitRisingParticle	minor	natural	6	
 src/effects/healing/FlickerParticle_UpdateStationary.c	FlickerParticle_UpdateStationary	minor	natural	2	
 src/effects/healing/HealthRestoreEffect_InitSparkle.c	HealthRestoreEffect_InitSparkle	minor	natural	4	
+src/effects/healing/HealthRestoreEffect_UpdateParticles.c	HealthRestoreEffect_UpdateParticles	minor	natural	2	
