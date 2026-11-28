@@ -111,3 +111,14 @@ src/link/panel/link_panel.c	LinkPanel_UpdateAnimations	contrived	contrived	6	got
 src/link/panel/link_panel.c	LinkPanel_UpdateLastEntry	natural	natural	0	
 src/link/panel/link_panel.c	LinkPanel_InitMessageDisplay	natural	natural	0	
 src/link/panel/link_panel.c	LinkPanel_GetConnectionStatus	contrived	natural	3	
+src/link/panel/link_panel.c	LinkPanel_UpdateStatusMessage	minor	minor	0	(s8) casts of the u8 message field; repeated message blocks
+src/link/panel/link_panel.c	LinkPanel_Close	natural	natural	0	
+src/link/panel/link_panel.c	LinkPanel_RunCompletionScript	natural	natural	0	
+src/link/panel/link_panel.c	LinkPanel_UpdateExitTransition	natural	natural	0	
+src/link/panel/link_panel.c	LinkPanel_UpdateConnection	natural	natural	0	
+src/link/panel/link_panel.c	LinkPanel_Update	natural	natural	0	
+src/link/panel/link_panel.c	LinkPanel_Destroy	natural	natural	0	
+src/link/panel/link_panel.c	LinkPanel_InitFromScript	natural	natural	0	
+src/link/panel/link_panel.c	LinkPanel_Create	natural	natural	0	
+src/link/player/Player_UpdateActionFacingSide.c	Player_UpdateActionFacingSide	natural	natural	0	
+src/link/player/Player_SetAnimationIndex.c	Player_SetAnimationIndex	contrived	natural	6	
