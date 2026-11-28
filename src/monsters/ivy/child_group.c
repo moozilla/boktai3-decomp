@@ -401,26 +401,16 @@ void ChildGroup_UpdateTrailingMembers(struct PhaseObject *p)
     if (p->transition)
         Callback_InvokeActor(p, p->transition);
     if (p->frame & 1) {
-        s16 *x0;
-        s16 *y0;
-        s16 *z0;
-        u8 *b0;
-        i = 3;
-        x0 = &p->entries[0].presentation.x;
-        y0 = &p->entries[0].presentation.y;
-        z0 = &p->entries[0].presentation.z;
-        b0 = &p->entries[0].phase;
-        for (; i > 0; i--) {
+        for (i = 3; i > 0; i--) {
             p->entries[i].presentation.x = p->entries[i - 1].presentation.x;
             p->entries[i].presentation.y = p->entries[i - 1].presentation.y;
             p->entries[i].presentation.z = p->entries[i - 1].presentation.z;
             p->entries[i].phase = p->entries[i - 1].phase;
         }
-
-        *x0 = p->position.x;
-        *y0 = p->position.y;
-        *z0 = p->position.z;
-        *b0 = p->rotation;
+        p->entries[0].presentation.x = p->position.x;
+        p->entries[0].presentation.y = p->position.y;
+        p->entries[0].presentation.z = p->position.z;
+        p->entries[0].phase = p->rotation;
     }
 }
 
