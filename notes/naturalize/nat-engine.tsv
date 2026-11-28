@@ -444,3 +444,4 @@ src/system/clock/SunClock_GetSunsetSpanFromScript.c	SunClock_GetSunsetSpanFromSc
 src/system/clock/SunClock_GetLightPhaseFromScript.c	SunClock_GetLightPhaseFromScript	minor	natural	1	
 src/system/clock/SunClock_GetMoonAgeTenths.c	SunClock_GetMoonAgeTenths	minor	natural	1	
 src/system/clock/SunClock_GetMoonPhase.c	SunClock_GetMoonPhase	minor	natural	1	
+src/system/clock/SunClock_GetMoonPhaseIndex.c	SunClock_GetMoonPhaseIndex	minor	natural	1	
