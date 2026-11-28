@@ -4,17 +4,23 @@
 #include "global.h"
 
 struct LinkScriptPanel {
-    u8 pad0[0x23];
+    u8 pad0[0x1d];
+    u8 role; /* confidence=low; serial multiplayer role */
+    u8 pad1e[5];
     u8 selection;
-    u8 pad24[0xc];
+    u8 pad24[0xa];
+    u16 retryTimer; /* confidence=low */
     u32 counter;
     u8 pad34[0xa];
     u16 scale; /* confidence=low */
-    u8 pad40[0x11];
+    u8 pad40[8];
+    s32 playerSlot; /* confidence=low */
+    u8 pad4c[5];
     u8 windowReady;
     u8 pad52[0x12];
     u8 buttons[4]; /* confidence=low */
-    u8 pad68[0x10];
+    u16 masks[2];  /* confidence=low */
+    u8 pad6c[0xc];
     u8 hudReady;
     u8 pad79[0x3f];
     s32 window;

@@ -1,61 +1,50 @@
 #include "global.h"
+#include "link/link_script_panel.h"
 
-struct PollPanel {
-    u8 pad0[0x1d];
-    u8 role;
-    u8 pad1e[0x10];
-    u16 retryTimer;
-    u32 counter;
-    u8 pad34[10];
-    u16 f3e;
-    u8 pad40[0x24];
-    u8 buttons[2];
-    u8 pad66[2];
-    u16 masks[2];
-};
-
-u8 LinkSession_ConsumeStateEntry(struct PollPanel *);
-void LinkSession_SetState(struct PollPanel *, u32, void *);
+u8 LinkSession_ConsumeStateEntry(struct LinkScriptPanel *);
+void LinkSession_SetState(struct LinkScriptPanel *, u32, void *);
 void SerialLink_InitMultiplayer(void);
 s32 Serial_DetectRoleAndEnableInterrupt(void);
 void Serial_StopCommunication(void);
 void ScriptPanel_WaitForSelectionData(void);
+s32 ScriptPanel_PollSelection(struct LinkScriptPanel *p);
 
-s32 ScriptPanel_PollSelection(struct PollPanel *p);
-static inline void ScriptPanel_Retry(struct PollPanel *q)
+static inline void ScriptPanel_Retry(struct LinkScriptPanel *p)
 {
-    q->retryTimer++;
-    if (q->retryTimer > 29) {
+    p->retryTimer++;
+    if (p->retryTimer > 29) {
         u8 *base, *button;
         u32 zero;
-        LinkSession_SetState(q, 2, ScriptPanel_PollSelection);
+        LinkSession_SetState(p, 2, ScriptPanel_PollSelection);
         Serial_StopCommunication();
-        base = q->buttons;
+        base = p->buttons;
         zero = 0;
-        button = &q->buttons[1];
+        button = &p->buttons[1];
         do {
             *button-- = zero;
         } while ((s32)button >= (s32)base);
     }
 }
+
 // confidence=low: starts multiplayer serial, then waits for a role and retries on timeout.
-s32 ScriptPanel_PollSelection(struct PollPanel *p)
+s32 ScriptPanel_PollSelection(struct LinkScriptPanel *p)
 {
-    struct PollPanel *q = p;
+    struct LinkScriptPanel *q = p;
     s32 i;
     s32 role;
+
     if (LinkSession_ConsumeStateEntry(p)) {
         SerialLink_InitMultiplayer();
         i = 0;
         do {
             p->buttons[i] = 0;
-            p->masks[i] |= 0xffff;
+            p->masks[i] |= 0xFFFF;
         } while (++i <= 1);
-        p->f3e = 0;
+        p->scale = 0;
         p->retryTimer = 0;
         return 0;
     }
-    if (p->counter > 0x13) {
+    if (p->counter > 19) {
         role = Serial_DetectRoleAndEnableInterrupt();
         if (role >= 0) {
             p->role = role;
