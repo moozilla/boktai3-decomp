@@ -15,15 +15,14 @@ static inline s32 TransitionCellHeight(s32 cell, const struct ContactPosition *p
     height = mask << 8;
     switch (kind) {
         case 1:
-            height -= ((const u8 *)position)[4];
+            height -= (u8)position->z;
             break;
         case 2:
-            height -= ((const u8 *)position)[0];
+            height -= (u8)position->x;
             break;
     }
     return height;
 }
-
 
 // confidence=low: steps an actor toward a neighboring cell when the height step and path allow it; returns -1 when blocked.
 s32 SceneActorTerrain_CheckHeightTransition(struct SceneActorTerrainView *actor,
@@ -38,55 +37,52 @@ s32 SceneActorTerrain_CheckHeightTransition(struct SceneActorTerrainView *actor,
     h0 = TransitionCellHeight(actorCell, pos);
     h1 = TransitionCellHeight(targetCell, target);
     flag = 0;
-    if (h0 == h1)
-        goto finish;
-    if (h0 > h1) {
-        SceneActorTerrain_Subtract(&delta, target, pos);
-        dh = h0 - h1;
-        if (dh > 255) {
-            dh >>= 8;
-            if (dh > 1)
+    if (h0 != h1) {
+        if (h0 > h1) {
+            SceneActorTerrain_Subtract(&delta, target, pos);
+            dh = h0 - h1;
+            if (dh > 255) {
+                dh >>= 8;
+                if (dh > 1)
+                    return -1;
+                flag = 1;
+            }
+            SceneActorTerrain_GetCenter(actor->terrainCell, &centerA);
+            SceneActorTerrain_GetCenter(targetCell, &centerT);
+            centerA.y = h0;
+            centerT.y = h1;
+            SceneActorTerrain_Subtract(&e, &centerA, &centerT);
+            dir = ((Math_Atan2(e.x, e.z) + 0x20) >> 6) & 3;
+            if (!SceneActorTerrain_CheckNeighborHeight(dir, targetCell, &centerT))
                 return -1;
-            flag = 1;
+            SceneActorTerrain_Subtract(&e, &centerT, &centerA);
+            dir2 = ((Math_Atan2(e.x, e.z) + 0x20) >> 6) & 3;
+            if (!SceneActorTerrain_CheckNeighborHeight(dir2, actor->terrainCell, &actor->position))
+                return -1;
+            if (SceneTerrain_IsPathBlocked(&centerA, &centerT, dir2, targetCell))
+                return -1;
+        } else {
+            dh = h1 - h0;
+            if (dh > 0x17F)
+                return -1;
+            SceneActorTerrain_GetCenter(actor->terrainCell, &centerA);
+            SceneActorTerrain_GetCenter(targetCell, &centerT);
+            centerA.y = h0;
+            centerT.y = h1;
+            SceneActorTerrain_Subtract(&e, &centerT, &centerA);
+            dir = ((Math_Atan2(e.x, e.z) + 0x20) >> 6) & 3;
+            if (!SceneActorTerrain_CheckNeighborHeight(dir, actor->terrainCell, &actor->position))
+                return -1;
+            dir2 = (dir + 2) & 3;
+            if (SceneTerrain_IsPathBlocked(&centerT, &centerA, dir2, actor->terrainCell))
+                return -1;
+            if (dh > 255)
+                flag = 2;
+            else {
+                pos->y = target->y;
+                flag = 0;
+            }
         }
-        SceneActorTerrain_GetCenter(actor->terrainCell, &centerA);
-        SceneActorTerrain_GetCenter(targetCell, &centerT);
-        centerA.y = h0;
-        centerT.y = h1;
-        SceneActorTerrain_Subtract(&e, &centerA, &centerT);
-        dir = ((Math_Atan2(e.x, e.z) + 0x20) >> 6) & 3;
-        if (!SceneActorTerrain_CheckNeighborHeight(dir, targetCell, &centerT))
-            return -1;
-        SceneActorTerrain_Subtract(&e, &centerT, &centerA);
-        dir2 = ((Math_Atan2(e.x, e.z) + 0x20) >> 6) & 3;
-        if (!SceneActorTerrain_CheckNeighborHeight(dir2, actor->terrainCell, &actor->position))
-            return -1;
-        if (SceneTerrain_IsPathBlocked(&centerA, &centerT, dir2, targetCell))
-            return -1;
-        goto finish;
-    } else {
-        dh = h1 - h0;
-        if (dh > 0x17F)
-            return -1;
-        SceneActorTerrain_GetCenter(actor->terrainCell, &centerA);
-        SceneActorTerrain_GetCenter(targetCell, &centerT);
-        centerA.y = h0;
-        centerT.y = h1;
-        SceneActorTerrain_Subtract(&e, &centerT, &centerA);
-        dir = ((Math_Atan2(e.x, e.z) + 0x20) >> 6) & 3;
-        if (!SceneActorTerrain_CheckNeighborHeight(dir, actor->terrainCell, &actor->position))
-            return -1;
-        dir2 = (dir + 2) & 3;
-        if (SceneTerrain_IsPathBlocked(&centerT, &centerA, dir2, actor->terrainCell))
-            return -1;
-        if (dh > 255)
-            flag = 2;
-        else {
-            pos->y = target->y;
-            flag = 0;
-        }
-        goto finish;
     }
-finish:
     return flag;
 }
