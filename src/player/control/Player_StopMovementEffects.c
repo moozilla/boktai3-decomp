@@ -1,12 +1,12 @@
 #include "global.h"
+#include "player/player.h"
 
-void Player_StopActionSounds(u8 *);
-void Player_RestoreCameraFollow(u8 *);
+void Player_StopActionSounds(struct Player *);
+void Player_RestoreCameraFollow(struct Player *);
 
-void Player_StopMovementEffects(u8 *p)
+void Player_StopMovementEffects(struct Player *p)
 {
     Player_StopActionSounds(p);
-    if (*(s16 *)(p + 0x4B6) != 0) {
+    if (p->cameraOffsetActive != 0)
         Player_RestoreCameraFollow(p);
-    }
 }

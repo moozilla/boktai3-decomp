@@ -181,3 +181,4 @@ src/player/clone.c	PlayerClone_UpdateBehavior	contrived	minor	55	bare return whe
 src/player/clone.c	PlayerClone_BeginActiveReactions	minor	natural	1	
 src/player/control/Player_GetInputDirection.c	Player_GetInputDirection	contrived	minor	20	u16 mask helper and constant-first AND for the last key: plain & drops the 16-bit truncation or swaps the AND operands
 src/player/control/Player_UpdateDirectionHistory.c	Player_UpdateDirectionHistory	contrived	natural	8	
+src/player/control/Player_StopMovementEffects.c	Player_StopMovementEffects	minor	natural	1	
