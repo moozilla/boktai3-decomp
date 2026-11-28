@@ -39,7 +39,7 @@ s32 PlayerClone_SetAnimation(struct PlayerCloneSlot *s, s32 index, u32 frame, u3
     if (s->animationIndex == index)
         same = 1;
     s->animationIndex = index;
-    Anim_SetKeyframes(&s->animation, &s->resource, (u16)((u16)(*(&index)) + s->foldedFacing),
+    Anim_SetKeyframes(&s->animation, &s->resource, (u16)(s->animationIndex + s->foldedFacing),
                       (u16)mode, same);
     if (s->mirrored)
         s->animation.flags |= 4;
@@ -96,8 +96,8 @@ int SceneParticles_SpawnAtPosition(u8 *, void *);
 
 u8 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
 
-void TrapSpellParticles_CreateDefaultBurst(void *, u32, u32, u32, u32, u32, u32, u32, u32, u32,
-                                             u32, u32);
+void TrapSpellParticles_CreateDefaultBurst(void *, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32,
+                                           u32);
 
 static inline s32 Clone_ScaleCoordinate(s32 x)
 {
@@ -218,8 +218,8 @@ s32 PlayerClone_UpdateBehavior(struct PlayerCloneSlot *clone, s32 index)
             struct AnimSprite *display;
             if (clone->timer & 1)
                 TrapSpellParticles_CreateDefaultBurst(&clone->position, 0x28, 0x20, 0xc, 4, 0x18,
-                                                        Clone_NextRandomByte(), 0x20, 0x20, 3, 2,
-                                                        0x200);
+                                                      Clone_NextRandomByte(), 0x20, 0x20, 3, 2,
+                                                      0x200);
             display = Clone_GetAnimation(clone);
             Clone_EnableRiseFlag(display);
             {
@@ -352,8 +352,8 @@ s32 PlayerClone_UpdateBehavior(struct PlayerCloneSlot *clone, s32 index)
             s16 *height;
             if (clone->timer & 1)
                 TrapSpellParticles_CreateDefaultBurst(&clone->position, 0x28, 0x20, 0xc, 4, 0x18,
-                                                        Clone_NextRandomByte(), 0x20, 0x20, 3, 2,
-                                                        0x200);
+                                                      Clone_NextRandomByte(), 0x20, 0x20, 3, 2,
+                                                      0x200);
             {
                 s32 delay = index * 30;
                 s32 elapsed = clone->timer - 0x2b2;
@@ -764,7 +764,6 @@ static inline void PlayerClone_ClearVelocity(const u32 *zero, struct ContactPosi
 {
     CpuSet(zero, velocity, 0x05000002);
 }
-
 
 s32 PlayerClone_Spawn(struct PlayerCloneConfiguration *resource, struct ContactPosition *pos)
 {

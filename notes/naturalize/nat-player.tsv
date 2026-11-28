@@ -158,3 +158,7 @@ src/player/attack/Player_GetAttackEffectType.c	Player_GetAttackEffectType	natura
 src/player/attack/Player_GetAttackAttributeFlags.c	Player_GetAttackAttributeFlags	natural	natural	0	-
 src/player/attack/Player_GetAttackElementType.c	Player_GetAttackElementType	natural	natural	0	-
 src/player/attack/Player_UpdateAttackColliderMotion.c	Player_UpdateAttackColliderMotion	minor	minor	5	second heading pointer and staged sum stay: folding them changes the register order
+src/player/clone.c	PlayerClone_GetActiveCount	natural	natural	0	-
+src/player/clone.c	PlayerClone_IsSlotActive	natural	natural	0	-
+src/player/clone.c	PlayerClone_FoldFacing	natural	natural	0	-
+src/player/clone.c	PlayerClone_SetAnimation	contrived	natural	6	-
