@@ -1,18 +1,12 @@
 #include "global.h"
-struct Args {
-    s32 x, y, z, a, b, c, d, e;
-};
-struct Message {
-    u32 type : 16;
-    u32 reserved : 16;
-    struct Args *args;
-};
-extern u8 *gGameState;
-void Script_Call(u32, struct Message *);
+#include "engine/engine.h"
+#include "monsters/poison_hand.h"
+#include "script/script_utility.h"
+#include "system/game_state/game_state.h"
+
 void Bestiary_UnlockEntry(s32);
 void Player_AddExperience(s32);
-#define H(p, n) (*(s16 *)((p) + (n)))
-#define W(p, n) (*(u32 *)((p) + (n)))
+
 static inline s32 clamp(s32 v)
 {
     if (v > 9999)
@@ -21,43 +15,49 @@ static inline s32 clamp(s32 v)
         v = 0;
     return v;
 }
-#define INC(n) H(gGameState, n) = clamp(H(gGameState, n) + 1)
-void PoisonHand_RecordDefeat(u8 *p)
+/* Capped at 9999; the comparison reads the counter as signed. */
+static inline void IncrementCounter(u16 *value)
 {
-    struct Args a;
-    struct Message m;
-    u32 q = W(p, 0x164);
-    if (q) {
-        a.x = H(p, 0x40);
-        a.y = H(p, 0x42);
-        a.z = H(p, 0x44);
-        a.a = W(p, 0x158);
-        a.b = W(p, 0x15C);
-        a.c = W(p, 0x160);
-        a.d = W(p, 0x150);
-        a.e = W(p, 0x14C);
-        m.type = 8;
-        m.args = &a;
-        Script_Call(q, &m);
+    *value = (s16)*value < 9999 ? *value + 1 : 9999;
+}
+
+void PoisonHand_RecordDefeat(struct PoisonHand *hand)
+{
+    s32 values[8];
+    struct ScriptUtilityArguments args;
+    u32 script = hand->unknown164;
+
+    if (script) {
+        values[0] = hand->sprite.position.x;
+        values[1] = hand->sprite.position.y;
+        values[2] = hand->sprite.position.z;
+        values[3] = hand->unknown158;
+        values[4] = hand->unknown15C;
+        values[5] = hand->unknown160;
+        values[6] = hand->reaction;
+        values[7] = (s32)hand->hud;
+        args.count = 8;
+        args.values = values;
+        Script_Call(script, &args);
     }
     Bestiary_UnlockEntry(32);
-    if (W(p, 0x150) & 1) {
+    if (hand->reaction & 1) {
         u16 flags;
-        Player_AddExperience(H(p, 0x148));
-        H(gGameState, 0x87C) = H(gGameState, 0x87C) < 9999 ? H(gGameState, 0x87C) + 1 : 9999;
-        H(gGameState, 0x538) = H(gGameState, 0x538) < 9999 ? H(gGameState, 0x538) + 1 : 9999;
-        flags = H(p, 0x13A);
-        H(gGameState, 0x56C) = H(gGameState, 0x56C) < 9999 ? H(gGameState, 0x56C) + 1 : 9999;
+        Player_AddExperience(hand->unknown148);
+        IncrementCounter(&gGameState->counter87C);
+        IncrementCounter(&gGameState->counter538);
+        flags = hand->bodyReactionFlags;
+        IncrementCounter(&gGameState->counter56C);
         if (flags & 0x80) {
-            INC(0x58A);
+            gGameState->targetFlagBonuses[0] = clamp(gGameState->targetFlagBonuses[0] + 1);
         } else if (flags & 0x100) {
-            INC(0x58C);
+            gGameState->targetFlagBonuses[1] = clamp(gGameState->targetFlagBonuses[1] + 1);
         } else if (flags & 0x200) {
-            INC(0x58E);
+            gGameState->targetFlagBonuses[2] = clamp(gGameState->targetFlagBonuses[2] + 1);
         } else if (flags & 0x400) {
-            INC(0x590);
+            gGameState->targetFlagBonuses[3] = clamp(gGameState->targetFlagBonuses[3] + 1);
         } else if (flags & 0x800) {
-            INC(0x592);
+            gGameState->targetFlagBonuses[4] = clamp(gGameState->targetFlagBonuses[4] + 1);
         }
     }
 }
