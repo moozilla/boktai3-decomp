@@ -191,7 +191,7 @@ void PaletteFlash_SelectPalette(struct CharacterPreviewPalette *flash, s32 mode)
     switch (mode) {
         case 0:
             CpuSet(flash->normalPalette, target->normalPalette, 16);
-            flash->framesRemaining = mode;
+            flash->framesRemaining = 0;
             break;
         case 1:
             CpuSet(flash->flashPalette, target->normalPalette, 16);
