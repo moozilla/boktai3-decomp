@@ -1678,9 +1678,6 @@ void TetherActor_InitBodyFromScript(struct TetherActor *actor)
 {
     s32 found = Script_SeekToKeyword('p');
     struct ContactPosition *position;
-    s32 x, z, cell;
-    u8 *properties;
-    u32 surface, height;
     struct TetherBodyConfig *initialConfig;
     struct TetherBodyConfig *config;
     u32 displayKind;
@@ -1689,38 +1686,13 @@ void TetherActor_InitBodyFromScript(struct TetherActor *actor)
         actor->savedPosition.y = Script_GetValue();
         actor->savedPosition.z = Script_GetValue();
     } else {
-        actor->savedPosition.x = found;
-        actor->savedPosition.y = found;
-        actor->savedPosition.z = found;
+        actor->savedPosition.x = 0;
+        actor->savedPosition.y = 0;
+        actor->savedPosition.z = 0;
     }
     position = &actor->savedPosition;
-    x = position->x >> 8;
-    z = position->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        cell = 0;
-    else {
-        u32 row = gTerrainMap->rows[z];
-        cell = row + x;
-    }
-    properties = TerrainModifiers_FindCellOverride(cell, 1);
-    if (properties)
-        properties += 4;
-    else {
-        struct EngineMap *map = gTerrainMap;
-        u32 offset = cell * 4 + 12;
-        properties = map->cells + offset;
-    }
-    surface = *properties >> 4;
-    height = (*properties & 15) << 8;
-    switch (surface) {
-        case 1:
-            height -= (u8)position->z;
-            break;
-        case 2:
-            height -= (u8)position->x;
-            break;
-    }
-    actor->savedPosition.y = height;
+    actor->savedPosition.y =
+        SceneActorTerrain_GetHeight(SceneActorTerrain_GetCellIndex(position), position);
 
     *(struct ContactPosition *)actor->display.animation.position = actor->savedPosition;
     actor->origin = actor->savedPosition;
@@ -1729,13 +1701,12 @@ void TetherActor_InitBodyFromScript(struct TetherActor *actor)
     SceneBody_Init(initialConfig, actor->entry, &actor->savedPosition, 0, 6, actor);
     displayKind = actor->display.animation.kind;
     config = initialConfig;
-    if (displayKind == 0)
-        goto displayDone;
-    if (displayKind == 1)
-        SceneBody_SetSprite(config, (u8 *)&actor->display.animation.resource + 0x1C);
-    else if (displayKind == 2)
-        SceneBody_SetKeyframeDisplay(config, (u8 *)&actor->display.animation.resource + 0x20);
-displayDone:
+    if (displayKind != 0) {
+        if (displayKind == 1)
+            SceneBody_SetSprite(config, (u8 *)&actor->display.animation.resource + 0x1C);
+        else if (displayKind == 2)
+            SceneBody_SetKeyframeDisplay(config, (u8 *)&actor->display.animation.resource + 0x20);
+    }
     actor->bodyConfig.angle = ((actor->heading + 5) & 7) << 5;
     actor->interactionProbe.bodyId = actor->bodyConfig.id;
     if (actor->kind != 3) {

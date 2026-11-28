@@ -111,3 +111,4 @@ src/objects/coffin/tether_actor.c	TetherActor_GetSavedKind	natural	natural	0
 src/objects/coffin/tether_actor.c	TetherActor_GetConfiguredKind	natural	natural	0	
 src/objects/coffin/tether_actor.c	TetherActor_InitKindFromScript	minor	minor	7	selectedKind pointer temps stay: plain gGameState->unk5AA stores reload the base and offset for the read
 src/objects/coffin/tether_actor.c	TetherActor_InitDisplayFromScript	contrived	natural	4	
+src/objects/coffin/tether_actor.c	TetherActor_InitBodyFromScript	contrived	minor	9	initialConfig/config copy stays: one pointer gives a 3-insn difference after the display-kind branch
