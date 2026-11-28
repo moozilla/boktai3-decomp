@@ -262,3 +262,4 @@ src/link/player/Player_RunConfiguredActionHandler.c	Player_RunConfiguredActionHa
 src/link/player/Player_UpdateSolarBombCharge.c	Player_UpdateSolarBombCharge	minor	natural	3	
 src/link/player/Player_UpdateLinkedScreenTransition.c	Player_UpdateLinkedScreenTransition	contrived	natural	2	
 src/link/player/Player_UpdateTetherRecoil.c	Player_UpdateTetherRecoil	minor	minor	3	magnitude pointer passed to the reverse-motion helper stays: reading the field changes load order
+src/link/player/Player_UpdateKnockback.c	Player_UpdateKnockback	minor	natural	3	

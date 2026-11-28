@@ -41,20 +41,19 @@ void Player_UpdateKnockback(struct Player *p)
                 Player_SetTetherMode(p, 0x1E, 1);
             break;
         case 1: {
-            u32 a;
+            u32 angle;
             if (p->tetherFrame == 0)
                 p->terrainRecoveryCounter = 300;
             Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 0x2B), 0x40);
-            a = ((p->facing + 5) & 7) << 5;
-            p->velocityX = -Truncate12(gUnk_086149C4[(a + 0x40) & 0xFF] * p->directionFrame);
-            p->velocityZ = -Truncate12(gUnk_086149C4[a] * p->directionFrame);
+            angle = ((p->facing + 5) & 7) << 5;
+            p->velocityX = -Truncate12(gUnk_086149C4[(angle + 0x40) & 0xFF] * p->directionFrame);
+            p->velocityZ = -Truncate12(gUnk_086149C4[angle] * p->directionFrame);
             p->directionFrame = p->directionFrame * 3 >> 2;
             if (p->tetherFrame > 3) {
-                u16 *c = &p->terrainRecoveryCounter;
-                if (*c >= (s32)(p->tetherFrame << 3))
-                    *c = *c - (p->tetherFrame << 3);
+                if (p->terrainRecoveryCounter >= p->tetherFrame << 3)
+                    p->terrainRecoveryCounter -= p->tetherFrame << 3;
                 else
-                    *c = 0;
+                    p->terrainRecoveryCounter = 0;
             }
             p->tetherFrame++;
             if (p->directionFrame <= 0x13 && p->terrainRecoveryCounter == 0) {
@@ -65,9 +64,9 @@ void Player_UpdateKnockback(struct Player *p)
             break;
         }
         case 2: {
-            u32 a = ((p->facing + 5) & 7) << 5;
-            p->velocityX = -Truncate12(gUnk_086149C4[(a + 0x40) & 0xFF] * p->directionFrame);
-            p->velocityZ = -Truncate12(gUnk_086149C4[a] * p->directionFrame);
+            u32 angle = ((p->facing + 5) & 7) << 5;
+            p->velocityX = -Truncate12(gUnk_086149C4[(angle + 0x40) & 0xFF] * p->directionFrame);
+            p->velocityZ = -Truncate12(gUnk_086149C4[angle] * p->directionFrame);
             if (Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 0x2C),
                                          0x40)) {
                 p->directionFrame = 0;
