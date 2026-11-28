@@ -24,7 +24,7 @@ struct ContactImpactPackedPosition {
     u32 x : 16, y : 16, z : 16, pad : 16;
 };
 u32 PopInSprite_GetStateResult(struct ContactImpactEffect *);
-void ContactImpactEffect_BeginMotion(struct ContactImpactEffect *, struct ContactPosition *,
+void ContactImpactEffect_BeginMotion(void *object, struct ContactPosition *,
                                      struct ContactPosition *, u32, u32, u32, s32, u32);
 void SceneTarget_BeginMove(struct ContactImpactEffect *, struct ContactPosition *,
                            struct ContactPosition *, s32, u32, u32, u32);

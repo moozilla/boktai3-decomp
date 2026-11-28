@@ -59,30 +59,26 @@ static inline void ContactImpactEffect_EnterUpdate(struct ContactImpactEffect *e
     effect->stateResult = 0;
 }
 
-void ContactImpactEffect_BeginMotion(struct ContactImpactEffect *input,
-                                     struct ContactPosition *source,
-                                     struct ContactPosition *destination, u32 time, u32 trackMode,
+void ContactImpactEffect_BeginMotion(void *object, struct ContactPosition *from,
+                                     struct ContactPosition *to, u32 duration, u32 trackMode,
                                      u32 rampDuration, s32 rampFrom, u32 rampTo)
 {
-    struct ContactPosition *from = source;
-    struct ContactPosition *to = destination;
-    u32 duration = time;
-    struct ContactImpactEffect *effect = input;
+    struct ContactImpactEffect *effect = object;
+
     if (!effect)
         return;
     if (from) {
         if (!effect->coordinateMode)
             FromScreen(&effect->world, from, 0);
         else
-            *&effect->world = *from;
+            effect->world = *from;
     } else {
         FromScreen(&effect->world, &effect->sprite.position, 512);
     }
-    if (!effect->coordinateMode) {
+    if (!effect->coordinateMode)
         FromScreen(&effect->target, to, 0);
-    } else if (effect->coordinateMode == 1) {
-        *&effect->target = *to;
-    }
+    else if (effect->coordinateMode == 1)
+        effect->target = *to;
     ToScreen(&effect->sprite.position, &effect->world);
     OrbitMotion_BeginDistanceWave(&effect->motion, &effect->world, &effect->target, duration,
                                   trackMode);
