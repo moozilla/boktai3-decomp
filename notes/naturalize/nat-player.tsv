@@ -200,3 +200,7 @@ src/player/control/Player_UpdateInteractionCallbacks.c	Player_UpdateInteractionC
 src/player/control/Player_SelectAlternateInteractionMode.c	Player_SelectAlternateInteractionMode	minor	natural	1	
 src/player/control/Player_SynchronizeInteractionDisplay.c	Player_SynchronizeInteractionDisplay	minor	natural	1	
 src/player/control/Player_UpdateAlternateInteractionCallbacks.c	Player_UpdateAlternateInteractionCallbacks	contrived	natural	1	
+src/player/control/Player_ResetLinkState.c	Player_ResetLinkState	natural	natural	0	
+src/player/control/Player_BeginTerrainInteraction.c	Player_BeginTerrainInteraction	natural	natural	0	
+src/player/control/Player_BeginDirectionSequence.c	Player_BeginDirectionSequence	natural	natural	0	
+src/player/control/sub_08158E68.c	sub_08158E68	contrived	minor	1	followTarget halfword read at +6 (source type unknown)
