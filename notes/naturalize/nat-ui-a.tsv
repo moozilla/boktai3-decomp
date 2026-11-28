@@ -85,3 +85,4 @@ src/ui/books/collection/collection.c	Collection_UnlockEntryFromScript	contrived	
 src/ui/books/collection/collection.c	Collection_IsComplete	contrived	natural	1	
 src/ui/books/collection/collection.c	Collection_UpdatePageIndicator	contrived	natural	1	
 src/ui/books/collection/collection.c	Collection_UpdateHighlightPulse	contrived	natural	1	
+src/ui/books/collection/collection.c	Collection_CountUnlockedEntries	contrived	natural	5	

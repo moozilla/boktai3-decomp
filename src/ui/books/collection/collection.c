@@ -30,15 +30,15 @@ void Collection_UnlockEntryFromScript(void)
 
 s32 Collection_CountUnlockedEntries()
 {
-    s32 n = 0;
+    s32 count = 0;
     s32 i = 0;
-    s32 v = (s32)gGameState->flags728;
-    do {
-        if ((v >> i) & 1)
-            n++;
-        i++;
-    } while (i <= 0x1a);
-    return n;
+    s32 unlocked = gGameState->flags728;
+
+    for (; i < 27; i++) {
+        if ((unlocked >> i) & 1)
+            count++;
+    }
+    return count;
 }
 
 u32 Collection_IsComplete(void)
