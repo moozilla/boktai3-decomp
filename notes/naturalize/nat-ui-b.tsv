@@ -215,3 +215,4 @@ src/ui/title/password_menu.c	PasswordDisplay_Update	natural	natural	0	-
 src/ui/title/password_menu.c	PasswordDisplay_Destroy	natural	natural	0	-
 src/ui/title/password_menu.c	PasswordDisplay_SetParametersFromScript	natural	natural	0	-
 src/ui/title/password_menu.c	PasswordDisplay_Create	natural	natural	0	-
+src/ui/title/game_start.c	GameStart_LoadAvailableSave	contrived	natural	4	-

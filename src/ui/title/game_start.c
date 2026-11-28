@@ -15,29 +15,23 @@ u8 Save_LoadAlternateSlot(void);
 
 s32 GameStart_LoadAvailableSave(struct GameStart *unused)
 {
-    s32 r;
-    s16 flag;
-    int failure;
+    s32 result;
     if (Save_LoadSelectedSlot()) {
         gGameState->flag86E = 1;
-        r = 1;
+        result = 1;
+    } else if (Save_LoadAlternateSlot()) {
+        gGameState->flag86E = 1;
+        result = 0;
     } else {
-        u8 v = Save_LoadAlternateSlot();
-        if (v) {
-            gGameState->flag86E = 1;
-            r = 0;
-        } else {
-            gGameState->flag86E = v;
-            failure = -1;
-            r = failure;
-        }
+        gGameState->flag86E = 0;
+        result = -1;
     }
-    flag = (s16)gGameState->flag86E;
-    if (flag) {
-        flag = (s16)gGameState->flag86E;
-        GameState_BackupActiveRegions(flag);
+    {
+        s16 flag = gGameState->flag86E;
+        if (flag)
+            GameState_BackupActiveRegions(flag);
     }
-    return r;
+    return result;
 }
 
 void GameStart_RunInitHook(struct GameStart *unused)
@@ -327,9 +321,11 @@ s32 GameStart_Init(struct GameStart *p)
     res = ScriptProc_Start(0xcb05, 0xe2ab);
     ResourceHeader_Relocate((u8 *)&p->backgroundResource, res);
     p->itemResource = p->backgroundResource;
-    AnimSprite_InitLinked((u8 *)&p->background, (u8 *)&p->backgroundResource, 0x36, 0x10, 0, 0, 0, 0);
+    AnimSprite_InitLinked((u8 *)&p->background, (u8 *)&p->backgroundResource, 0x36, 0x10, 0, 0, 0,
+                          0);
     ResourceHeader_Relocate((u8 *)&p->decorationResource, res);
-    AnimSprite_InitLinked((u8 *)&p->decoration, (u8 *)&p->decorationResource, 0x28, 0x10, 0, 0, 0, 0);
+    AnimSprite_InitLinked((u8 *)&p->decoration, (u8 *)&p->decorationResource, 0x28, 0x10, 0, 0, 0,
+                          0);
     p->decoration.flags |= 1;
     p->decoration.position.x = 0;
     {
@@ -358,8 +354,8 @@ s32 GameStart_Init(struct GameStart *p)
     pos.x = 0xa8;
     pos.y = 0x28;
     for (i = 0; i <= 4; i++) {
-        AnimSprite_InitLinked((u8 *)&p->timeDigits[i], (u8 *)&p->itemResource, (i == 2) ? (0x14) : (0),
-                          0x30, 1, 0, 0x3c, &pos);
+        AnimSprite_InitLinked((u8 *)&p->timeDigits[i], (u8 *)&p->itemResource,
+                              (i == 2) ? (0x14) : (0), 0x30, 1, 0, 0x3c, &pos);
         p->timeDigits[i].position.x += i * 8;
         p->timeDigits[i].flags |= 1;
     }
@@ -368,7 +364,7 @@ s32 GameStart_Init(struct GameStart *p)
     pos.y = 0x38;
     for (i = 0; i <= 1; i++) {
         AnimSprite_InitLinked((u8 *)&p->levelDigits[i], (u8 *)&p->itemResource, 0, 0x30, 1, 0, 0x3c,
-                          &pos);
+                              &pos);
         p->levelDigits[i].position.x += i * 8;
         p->levelDigits[i].flags |= 1;
     }
