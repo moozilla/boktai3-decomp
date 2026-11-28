@@ -395,8 +395,10 @@ void Skeleton_ClearPendingFlag(struct ChaseActor *actor)
         return;
     if ((*(const u32 *)&actor->base.state2A8 & 0x00FFFFFF) == 0x200)
         return;
-    SceneActorChase_ClearWordFlags(
-        &((struct SceneActorRouteContext *)actor->base.context)->flags628, 0x80000);
+    {
+        struct SceneActorRouteContext *context = actor->base.context;
+        SceneActorChase_ClearWordFlags(&context->flags628, 0x80000);
+    }
 }
 
 struct Z {
