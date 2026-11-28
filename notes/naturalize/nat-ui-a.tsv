@@ -528,3 +528,4 @@ src/ui/hud/display/hud.c	Hud_DrawWarningMeter	fudged	partial	20	blink bit local,
 src/ui/hud/display/hud.c	Hud_DrawTwoDigitCounter	fudged	natural	8	
 src/ui/hud/display/hud.c	Hud_ClearCounterTiles	natural	natural	0	
 src/ui/hud/display/hud.c	Hud_DrawStoredEnergyGauge	fudged	partial	22	state pointer, scale literal local, previous palette color via [-1] (register assignment of hud and background)
+src/ui/hud/display/hud.c	Hud_UpdateTransientStatGauge	fudged	partial	18	dead zero initializers and scale locals (register assignment)

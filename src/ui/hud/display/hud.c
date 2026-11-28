@@ -365,8 +365,6 @@ s32 Player_CalculateTotalAttackPower(struct Player *, s32);
 
 s32 Player_GetAttackPower(struct Player *);
 
-enum { GAUGE_TILE_PALETTE = 13 << 12 };
-
 void Hud_DrawTwoDigitCounter(s32 value)
 {
     u16 *tiles;
@@ -525,14 +523,13 @@ void Hud_UpdateTransientStatGauge(struct SceneHudState *hud)
             (&gBgPaletteBank13Color14)[-1] = foreground;
         cell = Hud_GetTilemapCell(0, 29, 1);
         for (n = 0; n < 3; n++) {
-            *cell = tile | (s16)GAUGE_TILE_PALETTE;
-            cell--;
+            *cell-- = tile | 0xD000;
             tile--;
         }
         for (n = 0; n < full; n++)
             *cell-- = 0xd089;
         if (partial) {
-            *cell-- = (partial + 0x81) | -0x3000;
+            *cell-- = (partial + 0x81) | 0xD000;
             n++;
         }
         for (; n < width; n++)
@@ -544,10 +541,8 @@ void Hud_UpdateTransientStatGauge(struct SceneHudState *hud)
         Hud_DrawTwoDigitCounter((s16)hud->timedStateParameter);
     } else if (hud->transientGaugeVisible) {
         cell = Hud_GetTilemapCell(0, 29, 1);
-        for (n = 0; n < 14; n++) {
-            *cell = GAUGE_TILE_PALETTE;
-            cell--;
-        }
+        for (n = 0; n < 14; n++)
+            *cell-- = 0xD000;
         Hud_ClearCounterTiles();
         hud->transientGaugeVisible = 0;
     }
