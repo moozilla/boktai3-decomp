@@ -3499,7 +3499,7 @@ s32 Mummy_Init(void *object)
     if (Script_GetKeywordValue(0x53, 0) != 0 || !MonsterInit_IsInCurrentRegion(&actor->chase))
         SceneActorPlacement_HideActor(actor, 0);
     SceneActorAnimation_SelectDirectionalEntry(&actor->chase.base, 0);
-    if (MonsterInit_GetDrawableKind(&actor->chase) == 0)
+    if (actor->chase.base.drawableKind == 0)
         DisplaySequence_Step(actor->chase.base.drawable);
     else {
         struct SceneActorAnimationTileDrawable *drawable = actor->chase.base.drawable;
