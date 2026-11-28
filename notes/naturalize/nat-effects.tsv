@@ -135,3 +135,6 @@ src/effects/bursts/fragment_burst/SpritePool4_UpdateActive.c	SpritePool4_UpdateA
 src/effects/bursts/fragment_burst/SpriteGroupPool_Destroy.c	SpriteGroupPool_Destroy	minor	minor	3	u8 occupancy test
 src/effects/bursts/fragment_burst/FragmentBurst_InitPool.c	FragmentBurst_InitPool	minor	natural	2	-
 src/effects/bursts/fragment_burst/FragmentBurst_EnsurePool.c	FragmentBurst_EnsurePool	minor	natural	1	-
+src/effects/bursts/fragment_burst/FragmentBurst_OnContact.c	FragmentBurst_OnContact	natural	natural	0	
+src/effects/bursts/fragment_burst/FragmentBurst_NoOpState.c	FragmentBurst_NoOpState	natural	natural	0	
+src/effects/bursts/fragment_burst/FragmentBurst_ResetPool.c	FragmentBurst_ResetPool	natural	natural	0	
