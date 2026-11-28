@@ -29,24 +29,19 @@ void Player_UpdateHeldInteraction(struct Player *p)
             s32 speed = Player_GetMovementSpeed(p);
             p->actionVariant = 0;
             if (x * x + z * z <= speed * speed) {
-                speed = 0;
                 p->velocityX = x;
                 p->velocityZ = z;
-                {
-                    u32 facing = p->resourceStationFacing;
-                    u8 *direction = &p->facing;
-                    *direction = facing;
-                    Player_UpdateFacingSide(p);
-                    Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0), 64, 1);
-                    if (*direction > 4) {
-                        p->heading = speed;
-                        p->side = 1;
-                    } else {
-                        p->heading = speed;
-                        p->side = speed;
-                    }
-                    ActorSequence_Begin(p, 8, 1);
+                p->facing = p->resourceStationFacing;
+                Player_UpdateFacingSide(p);
+                Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0), 64, 1);
+                if (p->facing > 4) {
+                    p->heading = 0;
+                    p->side = 1;
+                } else {
+                    p->heading = 0;
+                    p->side = 0;
                 }
+                ActorSequence_Begin(p, 8, 1);
             } else {
                 s32 angle = Math_Atan2(x, z);
                 p->velocityX = scale(gUnk_086149C4[(angle + 64) & 255] * speed);
@@ -57,7 +52,7 @@ void Player_UpdateHeldInteraction(struct Player *p)
             }
             break;
         }
-        case 1: {
+        case 1:
             if (Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 12), 64, 1)) {
                 Sound_PlaySong(0xCB);
                 if (!(p->inputKeys[0] & 1)) {
@@ -78,8 +73,7 @@ void Player_UpdateHeldInteraction(struct Player *p)
                 }
             }
             break;
-        }
-        case 2: {
+        case 2:
             Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 13), 64, 1);
             if (!(p->inputKeys[0] & 1)) {
                 Sound_StopSong(0xD8);
@@ -99,20 +93,17 @@ void Player_UpdateHeldInteraction(struct Player *p)
                 Player_AddStatusFlags(p, 0x40);
             }
             break;
-        }
-        case 3: {
+        case 3:
             Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 14), 64, 1);
             if (!(p->inputKeys[0] & 1)) {
                 ActorSequence_Begin(p, 8, 4);
             }
             break;
-        }
-        case 4: {
+        case 4:
             if (Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 15), 64, 1)) {
                 ActorSequence_Begin(p, 0, 0);
                 Player_UpdateFacingSide(p);
             }
             break;
-        }
     }
 }

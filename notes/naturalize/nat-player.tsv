@@ -609,3 +609,7 @@ src/player/interaction/Player_UpdateObjectPushRecovery.c	Player_UpdateObjectPush
 src/player/interaction/Player_UpdateObjectPush.c	Player_UpdateObjectPush	contrived	contrived	22	probe pointer blocks for the height lookup, CellHasFlag/isTwo/status-bit helpers (mask loaded before the field) and the angle alias fix the register allocation
 src/player/interaction/Player_UpdateFlaggedResourceRecovery.c	Player_UpdateFlaggedResourceRecovery	contrived	minor	6	Player_SetStatusBits: ROM loads the mask before the status word
 src/player/interaction/Player_UpdateUnflaggedResourceRecovery.c	Player_UpdateUnflaggedResourceRecovery	contrived	minor	6	Player_SetStatusBits: ROM loads the mask before the status word
+src/player/interaction/Player_SetActionOrigin.c	Player_SetActionOrigin	natural	natural	0	-
+src/player/interaction/Player_CanRecoverResourceWhileFlagged.c	Player_CanRecoverResourceWhileFlagged	minor	minor	1	Player_ReadStatusBits: ROM loads the mask before the status word
+src/player/interaction/Player_CanRecoverResourceWhileUnflagged.c	Player_CanRecoverResourceWhileUnflagged	minor	minor	1	Player_ReadStatusBits: ROM loads the mask before the status word
+src/player/interaction/Player_UpdateHeldInteraction.c	Player_UpdateHeldInteraction	contrived	minor	4	Player_AddStatusFlags: ROM loads the mask before the status word
