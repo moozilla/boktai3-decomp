@@ -53,3 +53,4 @@ src/bosses/ratatosk/SceneActor_UpdateAnimation33Timer.c	SceneActor_UpdateAnimati
 src/bosses/ratatosk/SceneActor_UpdateAnimation7Timer.c	SceneActor_UpdateAnimation7Timer	minor	natural	1	
 src/bosses/ratatosk/SceneActor_BeginConditionalAnimation8.c	SceneActor_BeginConditionalAnimation8	minor	minor	1	palette blend helper keeps a local 32 temp
 src/bosses/ratatosk/SceneActor_UpdateAnimation0Timer.c	SceneActor_UpdateAnimation0Timer	contrived	minor	12	actor alias and flag accessors stay
+src/bosses/ratatosk/SceneActors_UpdateSpawnShake.c	SceneActors_UpdateSpawnShake	contrived	minor	24	one mask-parameter flag accessor stays
