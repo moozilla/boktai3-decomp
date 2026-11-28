@@ -41,21 +41,18 @@ void Player_EnterKindTwo(struct Player *player)
     player->kindTwoEntered = 1;
     player->terrainRecoveryCounter = 0;
     player->actionCountdown = 0;
-    if ((*(struct PlayerPendingNotification **)&gPlayerPendingActor) &&
-        gPlayerNotificationPending) {
-        if (!((*(struct PlayerPendingNotification **)&gPlayerPendingActor)->flags & 1)) {
-            if ((*(struct PlayerPendingNotification **)&gPlayerPendingActor)->flags & 0x10)
-                (*(struct PlayerPendingNotification **)&gPlayerPendingActor)
-                    ->callback(
-                        (*(struct PlayerPendingNotification **)&gPlayerPendingActor)->receiver, 1,
-                        60);
+    if (gPlayerPendingActor && gPlayerNotificationPending) {
+        if (!(((struct PlayerPendingNotification *)gPlayerPendingActor)->flags & 1)) {
+            if (((struct PlayerPendingNotification *)gPlayerPendingActor)->flags & 0x10)
+                ((struct PlayerPendingNotification *)gPlayerPendingActor)
+                    ->callback(((struct PlayerPendingNotification *)gPlayerPendingActor)->receiver,
+                               1, 60);
             else
-                (*(struct PlayerPendingNotification **)&gPlayerPendingActor)
-                    ->callback(
-                        (*(struct PlayerPendingNotification **)&gPlayerPendingActor)->receiver, 1,
-                        60);
+                ((struct PlayerPendingNotification *)gPlayerPendingActor)
+                    ->callback(((struct PlayerPendingNotification *)gPlayerPendingActor)->receiver,
+                               1, 60);
         }
-        (*(struct PlayerPendingNotification **)&gPlayerPendingActor) = 0;
+        gPlayerPendingActor = 0;
         gPlayerNotificationPending = 0;
     }
     Player_StopActionSounds(player);
@@ -601,8 +598,7 @@ void PlayerCue_Shoot(struct Player *player, s32 projectileParameter, u32 paramet
         Sound_PlaySong(0xCD);
         spriteId = 0x4B;
     }
-    MovingGlyph_Create(&position, spriteId, 0, player->facing, 0x20, 0,
-                                 projectileParameter);
+    MovingGlyph_Create(&position, spriteId, 0, player->facing, 0x20, 0, projectileParameter);
     player->cueParameter = parameter;
     Player_EnterKindTwo(player);
     ActorSequence_Begin(player, 3, 2);

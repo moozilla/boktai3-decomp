@@ -375,3 +375,7 @@ src/player/cutscene/player_script_actions.c	ScriptActor_EnterKindFourFromScript	
 src/player/cutscene/player_script_actions.c	ScriptActor_PlayKindFourSequenceFromScript	minor	minor	1	unchanged: actor/player alias pair
 src/player/cutscene/player_script_actions.c	ScriptActor_TestFlagBit20FromScript	natural	natural	0	-
 src/player/cutscene/player_script_actions.c	ScriptActor_TestFacingPointFromScript	contrived	contrived	8	unchanged: dead actor = NULL and actor/player alias pair steer register reuse
+src/player/cutscene/player_cue_commands.c	Player_EnableStatGaugeFromScript	natural	natural	0	-
+src/player/cutscene/player_cue_commands.c	Player_EnableStatGaugeAndHistoryFromScript	natural	natural	0	-
+src/player/cutscene/player_cue_commands.c	Player_RestrictActionRequestsFromScript	natural	natural	0	-
+src/player/cutscene/player_cue_commands.c	Player_EnterKindTwo	minor	minor	4	identical flag branches (ROM keeps both calls)
