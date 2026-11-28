@@ -62,10 +62,9 @@ void PlayerCue_AcknowledgePendingTrigger(struct Player *player)
 
 void PlayerCue_CompleteAction(struct Player *player)
 {
-    u8 kind = player->kindTwoState;
-    if (kind == 1)
+    if (player->kindTwoState == 1)
         ScriptActor_CallCompletionScript(player);
-    else if (kind == 2)
+    else if (player->kindTwoState == 2)
         PlayerCue_AcknowledgePendingTrigger(player);
 }
 

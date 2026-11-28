@@ -290,3 +290,4 @@ src/player/cutscene/player_cue_actions.c	ScriptActor_EnableCompletionScript	natu
 src/player/cutscene/player_cue_actions.c	ScriptActor_CallCompletionScript	minor	minor	1	parameter slot pointer: member access changes register allocation
 src/player/cutscene/player_cue_actions.c	PlayerCue_BeginAcknowledgement	natural	natural	0	
 src/player/cutscene/player_cue_actions.c	PlayerCue_AcknowledgePendingTrigger	minor	natural	1	
+src/player/cutscene/player_cue_actions.c	PlayerCue_CompleteAction	minor	natural	1	
