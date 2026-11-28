@@ -200,3 +200,4 @@ src/effects/bursts/spiral_burst/SpiralBurst_Create.c	SpiralBurst_Create	minor	na
 src/effects/bursts/spiral_burst/SpiralBurst_InitParticles.c	SpiralBurst_InitParticles	contrived	contrived	40	phase-masked table copy, sine union and walking sprite/frame pointers: cse constant tracking and register allocation
 src/effects/bursts/spiral_burst/SpiralBurst_UpdateParticles.c	SpiralBurst_UpdateParticles	contrived	contrived	0	unchanged: indexed rewrite keeps a different flag address and loop pointers than the byte offset form
 src/effects/directional_effect/DirectionalEffect_Update.c	DirectionalEffect_Update	contrived	natural	1	-
+src/effects/directional_effect/Player_OnDirectionalEffectAnimationEvent.c	Player_OnDirectionalEffectAnimationEvent	contrived	natural	1	-

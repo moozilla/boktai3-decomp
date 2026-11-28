@@ -1,15 +1,9 @@
-#include "global.h"
+#include "player/player.h"
 
-struct S08238B28 {
-    u32 f0;
-    u8 f4[0x60];
-    u8 f64;
-};
-
-void Player_OnDirectionalEffectAnimationEvent(struct S08238B28 *p)
+void Player_OnDirectionalEffectAnimationEvent(struct DirectionalSpriteEffect *effect)
 {
-    if (p->f64 != 0)
-        p->f64 = 0;
+    if (effect->active)
+        effect->active = 0;
     else
-        p->f0 |= 1;
+        effect->sprite.flags |= 1;
 }
