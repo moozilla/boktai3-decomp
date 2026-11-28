@@ -110,3 +110,4 @@ src/npc/actor_sequence.c	SceneActorSequence_BeginFadeIn	natural	natural	0
 src/npc/actor_sequence.c	SceneActorSequence_UpdateFadeIn	minor	natural	1	
 src/npc/actor_sequence.c	SceneActorSequence_BeginDownwardMotion	contrived	natural	6	
 src/npc/actor_sequence.c	SceneActorSequence_UpdateFadeInHold	minor	natural	1	
+src/npc/actor_sequence.c	SceneActorSequence_BeginCornerMotion	contrived	natural	5	
