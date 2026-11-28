@@ -366,3 +366,4 @@ src/bosses/vanargand/ActorSoundPhase_EnterPhase21.c	ActorSoundPhase_EnterPhase21
 src/bosses/vanargand/Vanargand_DispatchSecondaryState.c	Vanargand_DispatchSecondaryState	contrived	natural	1	
 src/bosses/vanargand/Vanargand_RunSecondaryPhaseCallback.c	Vanargand_RunSecondaryPhaseCallback	contrived	natural	1	
 src/bosses/vanargand/Vanargand_RunInterruptibleModeCallback.c	Vanargand_RunInterruptibleModeCallback	contrived	natural	1	
+src/bosses/vanargand/Vanargand_RunSecondaryModeCallback.c	Vanargand_RunSecondaryModeCallback	contrived	natural	1	

@@ -1,7 +1,10 @@
 #include "global.h"
+#include "bosses/vanargand/vanargand_pair_attack.h"
+
 extern const u32 gUnk_08612008[];
 void Callback_InvokeActor(void *, u32);
-void Vanargand_RunSecondaryModeCallback(u8 *p)
+
+void Vanargand_RunSecondaryModeCallback(struct VanargandPairAttack *boss)
 {
-    Callback_InvokeActor(p, gUnk_08612008[p[0xAD]]);
+    Callback_InvokeActor(boss, gUnk_08612008[boss->actionIndex]);
 }
