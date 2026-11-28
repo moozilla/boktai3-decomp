@@ -379,3 +379,4 @@ src/npc/otenko/Otenko_EnterProjectedIdle.c	Otenko_EnterProjectedIdle	contrived	c
 src/npc/otenko/sub_081D0864.c	sub_081D0864	contrived	contrived	0	union reuse of one register for flags and counter plus parked masks; not attempted beyond reading
 src/npc/otenko/Otenko_OnStateEffectUpdate.c	Otenko_OnStateEffectUpdate	contrived	contrived	0	sample-origin wrapper struct, reused context register and pointer temps; not attempted beyond reading
 src/npc/otenko/Otenko_CreateFromScript.c	Otenko_CreateFromScript	contrived	contrived	1	parked one/mode/update locals per state change, body pointer block and box helper
+src/npc/otenko/Otenko_CommandFromScript.c	Otenko_CommandFromScript	contrived	minor	2	mode and update locals for the state change; position pointer for the player angle

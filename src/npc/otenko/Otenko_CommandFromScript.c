@@ -2,32 +2,16 @@
 #include "engine/engine.h"
 #include "player/player.h"
 #include "engine/ram.h"
+#include "scene/motion/scene_facing.h"
 struct OtenkoActor *Actor_FindById(void *manager, s32 name);
 s32 Math_Atan2(s32 dx, s32 dz);
 void sub_081CEE50(void);
 /* Set the motion angle and its directional animation rows. */
 static inline void setAngle(struct OtenkoActor *npc, s32 angle)
 {
-    u16 a;
     npc->body.direction = angle;
-    a = angle;
-    {
-        s32 t;
-        u32 m;
-        t = a + 0x70;
-        t >>= 5;
-        m = 7;
-        m &= t;
-        npc->facing8 = m;
-    }
-    {
-        s32 t = a + 0x60;
-        u32 m;
-        t >>= 6;
-        m = 3;
-        m &= t;
-        npc->facing4 = m;
-    }
+    npc->facing8 = SceneFacing_EightWay(angle);
+    npc->facing4 = SceneFacing_FourWay(angle);
     npc->targetAngle = npc->body.direction;
 }
 /* Registry routine 8918: puts scene NPC -n (default: the last one created,
