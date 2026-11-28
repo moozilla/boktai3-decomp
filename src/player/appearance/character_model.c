@@ -529,8 +529,7 @@ static inline u32 ClearDamageFlag(u8 *flags, u32 mask)
 void ActorStats_ApplyPendingDamage(struct ActorStats *actor)
 {
     if (ActorStats_TestDamageFlags(actor, 1)) {
-        u32 cleared = ClearDamageFlag(&actor->damageFlags, 1);
-        actor->damageFlags = cleared;
+        actor->damageFlags = ClearDamageFlag(&actor->damageFlags, 1);
         PaletteFlash_SelectPalette((void *)&actor->pendingDamage, 1);
         actor->amount -= ModifierStats_ApplyKinds4And14(actor, actor->pendingDamage);
         actor->damageTimer = 0;

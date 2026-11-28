@@ -26,3 +26,5 @@ src/player/appearance/character_model.c	ScenePool_ClampMotionSpeeds	natural	natu
 src/player/appearance/character_model.c	Character_GetHeightAdjustedPosition	natural	natural	0	-
 src/player/appearance/character_model.c	Position_GetHeightAdjustedCoordinates	natural	natural	0	-
 src/player/appearance/character_model.c	Character_UpdateLoopingSound	minor	natural	1	-
+src/player/appearance/character_model.c	SceneMotion_PlayKindSound	minor	minor	2	inline kind predicate: ROM materializes each comparison as a bool; plain || or switch does not
+src/player/appearance/character_model.c	ActorStats_ApplyPendingDamage	contrived	contrived	8	flag accessors and clear helper: ROM loads the s32 mask before the byte and materializes the test; plain &= folds the mask to 0xFE
