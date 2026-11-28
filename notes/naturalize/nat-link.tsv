@@ -367,3 +367,4 @@ src/link/selection/LinkSelection_WaitForInputCompletion.c	LinkSelection_WaitForI
 src/link/selection/LinkSelection_WaitForReadyParticipants.c	LinkSelection_WaitForReadyParticipants	contrived	contrived	3	session copy and counter pointer stay; falls off the end with the validity result
 src/link/selection/LinkSelection_WaitForParticipantChoices.c	LinkSelection_WaitForParticipantChoices	contrived	natural	7	
 src/link/selection/SceneMenu_BeginTimedMessage.c	SceneMenu_BeginTimedMessage	contrived	natural	1	
+src/link/selection/SceneMenu_UpdateRecords.c	SceneMenu_UpdateRecords	contrived	minor	8	falls off the end
