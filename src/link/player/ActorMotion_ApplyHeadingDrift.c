@@ -1,33 +1,16 @@
 #include "global.h"
+#include "player/player.h"
 
 /* tentative: drifts an offset along an 8-way heading and sets facing from it */
 
 s32 Math_Atan2(s32, s32);
 extern const s16 gUnk_086149C4[];
 
-struct ActorMotionDirection {
+void LinkPlayer_ClampCameraOffsets(struct Player *);
+
+struct PlayerFacingByte {
     u8 index;
 } __attribute__((packed));
-
-struct Obj {
-    u8 unk0[0x30];
-    s16 x, y, z;
-    u8 unk36[0x34C - 0x36];
-    s16 heading;
-    u8 unk34E[0x3A2 - 0x34E];
-    u8 frame;
-    u8 flip;
-    struct ActorMotionDirection dir;
-    u8 unk3A5[0x4A8 - 0x3A5];
-    s16 baseX, baseY, baseZ;
-    u8 unk4AE[2];
-    s16 offX, offY, offZ;
-    s16 init;
-    u8 unk4B8;
-    u8 enabled;
-};
-
-void LinkPlayer_ClampCameraOffsets(struct Obj *);
 
 static inline s32 scale(s32 v)
 {
@@ -36,39 +19,39 @@ static inline s32 scale(s32 v)
     return -((-v) >> 12);
 }
 
-void ActorMotion_ApplyHeadingDrift(struct Obj *p)
+void ActorMotion_ApplyHeadingDrift(struct Player *p)
 {
-    if (p->init == 0) {
-        p->baseX = p->x;
-        p->baseY = p->y + 150;
-        p->baseZ = p->z;
-        p->offX = 0;
-        p->offY = 0;
-        p->offZ = 0;
-        p->init = 1;
+    if (p->cameraOffsetActive == 0) {
+        p->cameraTarget.x = p->position.x;
+        p->cameraTarget.y = p->position.y + 150;
+        p->cameraTarget.z = p->position.z;
+        p->cameraOffsetX = 0;
+        p->cameraOffsetY = 0;
+        p->cameraOffsetZ = 0;
+        p->cameraOffsetActive = 1;
         LinkPlayer_ClampCameraOffsets(p);
     }
-    if (p->heading != -1) {
-        u32 a = ((p->heading + 1) & 7) * 32;
-        p->offX -= scale(gUnk_086149C4[(a + 64) & 255] * 30);
-        p->offZ -= scale(gUnk_086149C4[a] * 30);
+    if ((s16)p->directionHistory[0] != -1) {
+        u32 a = (((s16)p->directionHistory[0] + 1) & 7) * 32;
+        p->cameraOffsetX -= scale(gUnk_086149C4[(a + 64) & 255] * 30);
+        p->cameraOffsetZ -= scale(gUnk_086149C4[a] * 30);
         LinkPlayer_ClampCameraOffsets(p);
     }
-    if ((p->offX != 0 || p->offZ != 0) && p->enabled) {
-        s32 angle = ((u16)Math_Atan2(p->offX, p->offZ) + 0x70) >> 5;
+    if ((p->cameraOffsetX != 0 || p->cameraOffsetZ != 0) && p->cameraInputProcessed) {
+        s32 angle = ((u16)Math_Atan2(p->cameraOffsetX, p->cameraOffsetZ) + 0x70) >> 5;
         u32 direction = 7;
         s32 signedDirection;
-        struct ActorMotionDirection *dir;
+        struct PlayerFacingByte *facing;
         direction &= angle;
-        dir = &p->dir;
+        facing = (struct PlayerFacingByte *)&p->facing;
         signedDirection = (s8)direction;
-        dir->index = direction;
+        facing->index = direction;
         if ((u16)signedDirection > 4) {
-            p->frame = 8 - signedDirection;
-            p->flip = 1;
+            p->heading = 8 - signedDirection;
+            p->side = 1;
         } else {
-            p->frame = direction;
-            p->flip = 0;
+            p->heading = direction;
+            p->side = 0;
         }
     }
 }

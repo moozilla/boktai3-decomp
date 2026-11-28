@@ -195,3 +195,4 @@ src/link/player/keyframe_actor.c	KeyframeActor_InitBodyFromScript	contrived	natu
 src/link/player/Player_InitConfiguredAction.c	Player_InitConfiguredAction	contrived	minor	1	second config entry is reached by byte offset
 src/link/player/Player_InitBodyCollider.c	Player_InitBodyCollider	contrived	natural	1	
 src/link/player/Player_SpawnActionSpark.c	Player_SpawnActionSpark	contrived	natural	1	
+src/link/player/ActorMotion_ApplyHeadingDrift.c	ActorMotion_ApplyHeadingDrift	contrived	minor	100	packed one-byte facing view and mask local stay: a plain store differs by one instruction
