@@ -2081,19 +2081,6 @@ void PlayerCue_UpdateSideRecoil(struct Player *player)
 
 // confidence=low: tentative cue role from callback phases.
 
-static inline void PlayerCue_AdvanceRecoveryCounters(struct Player *player, u16 trailLimit,
-                                                     u16 timerLimit)
-{
-    if ((player->actionEighteenDuration += 3) > trailLimit)
-        player->actionEighteenDuration = trailLimit;
-    if (++player->tetherFrame > timerLimit) {
-        player->actionLatch464 = 1;
-        player->actionLatch465 = 1;
-        PlayerCue_EnterStandUpdate(player);
-        player->pendingAnimationTrigger = 1;
-    }
-}
-
 // confidence=low: inferred from the side-facing cue callbacks and effects.
 
 void PlayerCue_UpdateSpiralRecovery(struct Player *player)
@@ -2105,7 +2092,7 @@ void PlayerCue_UpdateSpiralRecovery(struct Player *player)
     }
     if ((player->tetherFrame & 7) >= 7 - (player->tetherFrame >> 2)) {
         Player_AddControlFlags(player, 0x41);
-        player->animation.position = (*(struct ContactPosition *)&player->position);
+        player->animation.position = *(struct ContactPosition *)&player->position;
     }
     Player_SetAnimation(player, 0x9A, 0x40, 1);
     player->animation.paletteBank = 0x16F;
@@ -2115,7 +2102,14 @@ void PlayerCue_UpdateSpiralRecovery(struct Player *player)
     PlayerCue_StepSequence((struct ContactSwarmSprite *)&player->secondaryDrawFlags,
                            &player->cueCollider.sequence);
     player->actionEighteenParameter = 0x16F;
-    PlayerCue_AdvanceRecoveryCounters(player, 32, 31);
+    if ((player->actionEighteenDuration += 3) > 32)
+        player->actionEighteenDuration = 32;
+    if (++player->tetherFrame > 31) {
+        player->actionLatch464 = 1;
+        player->actionLatch465 = 1;
+        PlayerCue_EnterStandUpdate(player);
+        player->pendingAnimationTrigger = 1;
+    }
 }
 
 void PlayerCue_RestartAlternateAnimation(struct Player *player)
