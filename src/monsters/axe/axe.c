@@ -3052,21 +3052,18 @@ void ActorGroup_ResetActivePhase(struct ChaseActor *actor)
     if (actor->base.field2B1)
         actor->base.field2B1 = 0;
     if (actor->base.stepDone) {
-        u32 z3, z4;
         {
             u32 m;
             u16 *f = &actor->base.motionFlags;
             m = ~0x100;
             actor->base.motionFlags = m & *f;
-            z3 = 0;
-            z4 = 0;
         }
         {
             u32 *g = &group->flagsE4C;
             u32 m = ~0x400;
             *g &= m;
         }
-        ResetPhase(actor, z3, z3, 3, z4);
+        ResetPhase(actor, 0, 0, 3, 0);
     } else {
         actor->base.counter2AC++;
     }
