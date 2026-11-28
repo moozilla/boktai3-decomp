@@ -3,12 +3,9 @@ extern const u32 gUnk_08603300[];
 
 void Script_InitActorRegistry(void)
 {
-    vu16 *c = (vu16 *)0x030025F4;
-    u32 *p;
-    *c = 0;
-    p = (u32 *)gUnk_08603300;
-    while (p[1] != 0) {
-        *c = *c + 1;
-        p += 2;
-    }
+    vu16 *count = (vu16 *)0x030025F4;
+    const u32 *entry;
+    *count = 0;
+    for (entry = gUnk_08603300; entry[1] != 0; entry += 2)
+        (*count)++;
 }

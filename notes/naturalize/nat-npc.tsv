@@ -647,3 +647,4 @@ src/script/runtime/SceneLifecycle_LoadFromScript.c	SceneLifecycle_LoadFromScript
 src/script/runtime/Script_CreateActorFromRegistry.c	Script_CreateActorFromRegistry	minor	natural	2	
 src/script/runtime/Script_RestartScene.c	Script_RestartScene	minor	natural	1	
 src/script/runtime/Trap_CreateFromScript.c	Trap_CreateFromScript	contrived	minor	16	trap.flags |= 0 reproduces the original reload and store
+src/script/runtime/Script_InitActorRegistry.c	Script_InitActorRegistry	contrived	minor	3	volatile u16 at a literal RAM address (no symbol): a plain u16 hoists the count out of the loop
