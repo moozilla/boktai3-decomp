@@ -614,11 +614,7 @@ void Sprite_RenderFlipAwareList(void)
 {
     struct ContactPosition pos;
     struct DisplaySequenceSprite *p;
-    u32 parity = gSceneEffectPalettePhase & 1;
-    u32 skip = 0x401;
-    if (parity) {
-        skip = 0x201;
-    }
+    u32 skip = (gSceneEffectPalettePhase & 1) ? 0x201 : 0x401;
     p = gSpriteListHeads[gRenderListIndex];
     if (!p) {
         return;
@@ -648,17 +644,14 @@ void Sprite_RenderFlipAwareList(void)
             s32 top;
             u32 width;
             u32 height;
-            s32 bot;
             if (p->flags & 4) {
-                s32 edge = x + resource->offsetX;
-                left = edge - resource->width;
+                left = x + resource->offsetX - resource->width;
             } else {
                 left = x - resource->offsetX;
             }
             width = resource->width;
             if (p->flags & 8) {
-                s32 t = y + resource->offsetY;
-                top = t - resource->height;
+                top = y + resource->offsetY - resource->height;
                 height = resource->height;
             } else {
                 short t = resource->offsetY;
@@ -666,7 +659,7 @@ void Sprite_RenderFlipAwareList(void)
                 height = resource->height;
             }
             if ((((left > 240) || (top > 160)) || ((left + ((s32)width)) < 0)) ||
-                ((bot = top + ((s32)height)) < 0)) {
+                ((top + ((s32)height)) < 0)) {
                 continue;
             }
         }
