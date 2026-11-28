@@ -1,4 +1,5 @@
 #include "objects/bat_curtain/breakable_barrier.h"
+#include "engine/math/monster_particle_random.h"
 
 void BreakableBarrier_SetState(struct BreakableBarrier *s, u8 v)
 {
@@ -120,19 +121,11 @@ void BreakableBarrier_Hide(void *m, struct BreakableBarrier *p)
     }
 }
 
-static inline void enable(struct ContactCollider *c)
-{
-    u32 mask = ~4;
-    c->flags = mask & c->flags;
-}
-
-static inline void BreakableBarrier_NextRandomIndex(u32 cursor, u32 *next)
-{
-    *next = (cursor + 1) & 1023;
-}
 void BreakableBarrier_Update(struct BreakableBarrierManager *m, struct BreakableBarrier *p)
 {
     struct BarrierExtent size;
+    int angle, count, speed;
+
     if (BreakableBarrier_ConsumeEntered(p)) {
         p->sprite.flags &= ~1;
         AnimData_SelectPaletteBank(&p->resource, 136);
@@ -149,36 +142,16 @@ void BreakableBarrier_Update(struct BreakableBarrierManager *m, struct Breakable
         p->flash = 10;
         p->health--;
         if ((s16)p->health <= 0) {
-            int angle, speed;
-            int count;
-            const u16 *table;
-            u32 *indexPtr;
-            u32 smallMask;
-            u32 index;
             size.x = 164;
             size.y = 16;
             size.z = 164;
-            table = gRandomTable;
-            indexPtr = &gRandomIndex;
-            index = *indexPtr;
-            index++;
-            index &= 1023;
-            angle = (u8)table[index];
-            index = (index + 1) & 1023;
-            count = table[index];
-            smallMask = 3;
-            count = (count & smallMask) + 2;
-            index = (index + 1) & 1023;
-            *indexPtr = index;
-            speed = (table[index] & smallMask) + 20;
+            angle = (u8)ParticleRandom_ReadDirectSample(gRandomTable);
+            count = (ParticleRandom_ReadDirectSample(gRandomTable) & 3) + 2;
+            speed = (ParticleRandom_ReadDirectSample(gRandomTable) & 3) + 20;
             SparkParticle_Spawn(&p->sprite.position, 3, &size, angle, count, speed, 2, 2);
-            BreakableBarrier_NextRandomIndex(*indexPtr, &index);
-            angle = (u8)table[index];
-            index = (index + 1) & 1023;
-            count = (table[index] & smallMask) + 2;
-            index = (index + 1) & 1023;
-            *indexPtr = index;
-            speed = (table[index] & smallMask) + 20;
+            angle = (u8)ParticleRandom_ReadDirectSample(gRandomTable);
+            count = (ParticleRandom_ReadDirectSample(gRandomTable) & 3) + 2;
+            speed = (ParticleRandom_ReadDirectSample(gRandomTable) & 3) + 20;
             SparkParticle_Spawn(&p->sprite.position, 3, &size, angle, count, speed, 2, 2);
             BreakableBarrier_SetState(p, 2);
             return;
@@ -194,7 +167,7 @@ void BreakableBarrier_Update(struct BreakableBarrierManager *m, struct Breakable
         p->flash--;
         if (!p->flash) {
             AnimData_SelectPaletteBank(&p->resource, 136);
-            enable(&p->collider);
+            ContactCollider_ClearFlags(&p->collider, 4);
         } else
             disable(&p->collider);
     }

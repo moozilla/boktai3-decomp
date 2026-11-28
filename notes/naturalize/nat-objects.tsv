@@ -19,3 +19,12 @@ src/objects/bat_curtain/breakable_barrier.c	BreakableBarrier_ConsumeEntered	cont
 src/objects/bat_curtain/breakable_barrier.c	BreakableBarriers_Update	minor	natural	4	
 src/objects/bat_curtain/breakable_barrier.c	BreakableBarriers_Destroy	minor	natural	1	
 src/objects/bat_curtain/breakable_barrier.c	BreakableBarriers_Initialize	contrived	natural	6	barrier pointer walks with i
+src/objects/bat_curtain/breakable_barrier.c	BreakableBarrier_SetState	natural	natural	0	
+src/objects/bat_curtain/breakable_barrier.c	BreakableBarrier_OnColliderHit	natural	natural	0	
+src/objects/bat_curtain/breakable_barrier.c	BreakableBarrier_Initialize	natural	natural	0	
+src/objects/bat_curtain/breakable_barrier.c	BreakableBarrier_Destroy	natural	natural	0	
+src/objects/bat_curtain/breakable_barrier.c	BreakableBarrier_Hide	natural	natural	0	
+src/objects/bat_curtain/breakable_barrier.c	BreakableBarrier_UpdateSprite	natural	natural	0	
+src/objects/bat_curtain/breakable_barrier.c	BatCurtain_Create	natural	natural	0	
+src/objects/bat_curtain/BreakableBarriers_Reset.c	BreakableBarriers_Reset	natural	natural	0	
+src/objects/bat_curtain/breakable_barrier.c	BreakableBarrier_Update	contrived	minor	12	ContactCollider_ClearFlags kept to re-enable the collider: plain &= ~4 loads a halfword mask literal
