@@ -235,8 +235,8 @@ void TownMap_OnDestroy(struct RegistryChoiceMenu *menu)
 void TownMap_CreateSelectionCursor(struct RegistryChoiceMenu *menu, s32 selection)
 {
     struct MenuCursorEntry entries[11];
-    memcpy(entries, gUnk_0824F878, 0xb0);
-    menu->cursor = MenuCursor_Create(1, selection, 0xb, entries);
+    memcpy(entries, gUnk_0824F878, sizeof(entries));
+    menu->cursor = MenuCursor_Create(1, selection, 11, entries);
 }
 
 s32 TownMap_InitFromScript(struct RegistryChoiceMenu *menu, void *arg)
