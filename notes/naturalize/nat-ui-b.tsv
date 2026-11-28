@@ -495,3 +495,16 @@ src/ui/town/shop/Shop_ConfirmItemAction.c	Shop_ConfirmItemAction	minor	natural	1
 src/ui/town/shop/Shop_ConfirmConsumableAction.c	Shop_ConfirmConsumableAction	minor	natural	1	
 src/ui/town/shop/Shop_TickModeMenu.c	Shop_TickModeMenu	minor	minor	2	highlight view and display casts
 src/ui/town/shop/Shop_TickActionSelection.c	Shop_TickActionSelection	minor	natural	1	
+src/ui/town/shop/Shop_BeginExitConfirmation.c	Shop_BeginExitConfirmation	natural	natural	0	
+src/ui/town/shop/Shop_BeginRemovalConfirmation.c	Shop_BeginRemovalConfirmation	natural	natural	0	
+src/ui/town/shop/Shop_BeginCatalogTransition.c	Shop_BeginCatalogTransition	minor	minor	0	view casts to the move functions
+src/ui/town/shop/Shop_BeginSpecialTransition.c	Shop_BeginSpecialTransition	minor	minor	0	view casts to the move functions
+src/ui/town/shop/Shop_BeginSwapTransition.c	Shop_BeginSwapTransition	minor	minor	0	view casts to the move functions
+src/ui/town/shop/Shop_BeginRemovalTransition.c	Shop_BeginRemovalTransition	minor	minor	0	view casts to the move functions
+src/ui/town/shop/Shop_BeginAlternateSelection.c	Shop_BeginAlternateSelection	natural	natural	0	
+src/ui/town/shop/Shop_BeginAlternateItemSelection.c	Shop_BeginAlternateItemSelection	natural	natural	0	
+src/ui/town/shop/Shop_BeginThirdSelection.c	Shop_BeginThirdSelection	natural	natural	0	
+src/ui/town/shop/Shop_BeginAlternateConsumableSelection.c	Shop_BeginAlternateConsumableSelection	natural	natural	0	
+src/ui/town/shop/Shop_HandleClockShortcut.c	Shop_HandleClockShortcut	natural	natural	0	
+src/ui/town/shop/Shop_HandlePageKeys.c	Shop_HandlePageKeys	natural	natural	0	
+src/ui/town/shop/Shop_TickMoveSelection.c	Shop_TickMoveSelection	natural	natural	0	
