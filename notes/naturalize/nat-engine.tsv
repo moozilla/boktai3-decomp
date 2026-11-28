@@ -435,3 +435,4 @@ src/system/clock/SunClock_GetSunriseMinute.c	SunClock_GetSunriseMinute	minor	nat
 src/system/clock/SunClock_GetSunsetHour.c	SunClock_GetSunsetHour	minor	natural	1	
 src/system/clock/SunClock_GetSunsetMinute.c	SunClock_GetSunsetMinute	minor	natural	1	
 src/system/clock/SunClock_GetPackedDate.c	SunClock_GetPackedDate	minor	natural	1	
+src/system/clock/SunClock_GetWeekday.c	SunClock_GetWeekday	minor	natural	1	
