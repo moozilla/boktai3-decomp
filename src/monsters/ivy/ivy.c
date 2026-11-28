@@ -109,18 +109,18 @@ void Ivy_UpdateInactiveState(void)
 
 /* Ivy_EnterDisabledState: Consumes the entry flag and switches drawable and collision flags to directional animation 20; disabled role tentative */
 
+// scope: put Ivy_EnterDisabledState begin
 void Ivy_EnterDisabledState(struct ChaseActor *actor)
 {
     if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
-        ((u8 *)actor->base.drawable)[7] = 3;
-        {
-            u16 v = 4 | actor->base.colliderA.flags;
-            actor->base.colliderA.flags = v & 0xfff7;
-        }
+        ((struct IvyDrawable *)actor->base.drawable)->mode = 3;
+        actor->base.colliderA.flags |= 4;
+        actor->base.colliderA.flags &= ~8;
         HalfwordFlags_Set(0x800, &actor->base.placementFlags);
         SceneActorAnimation_SelectDirectionalFlags(&actor->base, 20);
     }
 }
+// scope: put Ivy_EnterDisabledState end
 
 struct Player;
 
