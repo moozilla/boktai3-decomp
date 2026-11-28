@@ -1842,10 +1842,10 @@ void TetherActor_UpdateChargeAndCooldown(struct TetherActor *actor)
         TetherActor_UpdateChargeDecay(actor);
         TetherActor_UpdateInteractionCooldown(actor);
         if (actor->contactCooldown) {
-            actor->chargeCollider.flags = 4 | actor->chargeCollider.flags;
+            actor->chargeCollider.flags |= 4;
             --actor->contactCooldown;
         } else
-            actor->chargeCollider.flags = 0xFFFB & actor->chargeCollider.flags;
+            actor->chargeCollider.flags &= ~4;
     } else
         actor->pendingEffectHandle = ActorAttachment_UpdateFromDescriptor(
             actor->pendingEffectHandle, &actor->bodyConfig, 127, 0, 0, 0, 250, 290);
