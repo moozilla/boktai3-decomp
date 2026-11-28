@@ -1,6 +1,7 @@
 #include "global.h"
 #include "engine/ram.h"
 #include "engine/runtime.h"
+#include "gba/io_reg.h"
 #include "engine/video/render.h"
 struct Snapshot {
     u32 a, b;
@@ -12,16 +13,16 @@ u32 Solar_ResumeMeasurement(void);
 u32 Save_ResumeRuntimeAfterTransfer(void)
 {
     struct Snapshot *snap = &gSnapshot;
-    *(volatile u16 *)0x04000202 = 1;
+    REG_IF = 1;
     gVideoTransferControl = 1;
     m4aSoundVSyncOn();
     InterruptsAndVideo_WaitForVBlank();
-    *(volatile u16 *)0x04000208 = 0;
+    REG_IME = 0;
     gScanlineDmaSource = snap->a;
     gScanlineDmaTarget = snap->b;
     gScanlineDmaCount = snap->c;
     gScanlineDmaMode = snap->d;
     gClockSynced = gTransferSavedRuntimeFlag;
-    *(volatile u16 *)0x04000208 = 1;
+    REG_IME = 1;
     return Solar_ResumeMeasurement();
 }
