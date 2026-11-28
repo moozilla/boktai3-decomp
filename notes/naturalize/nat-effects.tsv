@@ -225,3 +225,5 @@ src/effects/feathers/FeatherEffectPool_Init.c	FeatherEffectPool_Init	minor	natur
 src/effects/feathers/FeatherEffectPool_GetOrCreate.c	FeatherEffectPool_GetOrCreate	minor	natural	1	-
 src/effects/feathers/FeatherEffectPool_ResetSingleton.c	FeatherEffectPool_ResetSingleton	natural	natural	0	-
 src/effects/healing/FlickerParticle_UpdateMotion.c	FlickerParticle_UpdateMotion	minor	natural	3	
+src/effects/healing/HealthRestoreEffect_StartParticleBurst.c	HealthRestoreEffect_StartParticleBurst	contrived	contrived	0	unchanged: typed indexed loop leaves the random-table load order (union/table pseudo hoisted after the induction inits and spilled); thousands of spellings, walking offsets and the union stay
+src/effects/healing/FlickerParticle_UpdateVerticalMotion.c	FlickerParticle_UpdateVerticalMotion	minor	natural	2	
