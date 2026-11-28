@@ -565,3 +565,4 @@ src/ui/town/solar_bank/SolarBank_BeginSelection.c	SolarBank_BeginSelection	natur
 src/ui/town/solar_bank/SolarBank_Create.c	SolarBank_Create	natural	natural	0	
 src/ui/town/solar_bank/SolarBank_UpdateTransferInput.c	SolarBank_UpdateTransferInput	contrived	contrived	40	u32 pointer locals over s32 amounts, per-direction reset labels, repeat mask local, cast stores to the game state: each plain form changes registers or merges blocks
 src/ui/town/storage/Storage_RefreshItemSlots.c	Storage_RefreshItemSlots	contrived	contrived	40	byte-offset row pointers, rowBytes counter and a goto: plain nested loops reverse the column counter and split the flags pointer
+src/ui/town/storage/Storage_RefreshConsumableSlots.c	Storage_RefreshConsumableSlots	contrived	contrived	1	byte-offset cell pointers and gotos (not reworked)
