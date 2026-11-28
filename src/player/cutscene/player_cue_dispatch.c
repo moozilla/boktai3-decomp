@@ -365,10 +365,8 @@ s32 Player_ScaleLevelValue(u32 flags, s32 scale)
     s32 adjustment;
     if (flags & 2)
         adjustment = (10 - gGameState->unk876) * (value << 1);
-    else {
-        s32 amount = gGameState->unk876;
-        adjustment = (value << 1) * amount;
-    }
+    else
+        adjustment = gGameState->unk876 * (value << 1);
     value += Div(adjustment, 100);
     value = TruncateQ6(value * scale);
     return value;

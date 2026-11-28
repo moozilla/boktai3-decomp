@@ -486,3 +486,10 @@ src/player/cutscene/player_script_cues.c	ScriptActor_StandDiagonalFromScript	nat
 src/player/cutscene/player_script_cues.c	ScriptActor_FaceSideFromScript	natural	natural	0	-
 src/player/cutscene/player_script_cues.c	ScriptActor_SetModeFromScript	natural	natural	0	-
 src/player/cutscene/player_script_cues.c	ScriptActor_ResetActionStateFromScript	natural	natural	0	-
+src/player/cutscene/player_cue_dispatch.c	Player_RegisterSceneMessageReceiver	natural	natural	0	-
+src/player/cutscene/player_cue_dispatch.c	Player_UnregisterSceneMessageReceiver	natural	natural	0	-
+src/player/cutscene/player_cue_dispatch.c	PlayerCue_Dispatch	minor	minor	4	unchanged: guarded do-while (a for loop reorders the bound reload); controller local
+src/player/cutscene/player_cue_dispatch.c	Player_SendSceneMessage	natural	natural	0	-
+src/player/cutscene/player_cue_dispatch.c	PlayerCue_InitCollider	natural	natural	0	-
+src/player/cutscene/player_cue_dispatch.c	Player_OnStateOneEvent	natural	natural	0	-
+src/player/cutscene/player_cue_dispatch.c	Player_ScaleLevelValue	minor	natural	11	-
