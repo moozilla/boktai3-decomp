@@ -350,9 +350,7 @@ int BatFlockBats_StartActorChase(struct GroupObjects *m, struct GroupQueue *q, s
     for (i = 15, p = m->pieces; i >= 0; i--, p++) {
         int angle;
         int random;
-        p->state = 3;
-        p->active = 1;
-        p->timer = 0;
+        BatFlockBat_SetState(p, 3);
         p->target = position;
         angle = Math_Atan2(p->target.x - p->position.x, p->target.z - p->position.z);
         p->direction = angle;
