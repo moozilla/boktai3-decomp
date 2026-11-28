@@ -271,19 +271,11 @@ void Actor_RecomputeScriptedValue(struct ScenePoolActor *actor)
 
 s32 ModifierStats_ApplyKind0(struct ScenePoolActor *stats, s32 value)
 {
-    struct StatModifier *base = (*&stats)->modifiers;
-    s32 i = 0;
-    if (i < stats->modifierCount) {
-        struct StatModifier *modifier = base;
-        struct StatModifier *entry = base;
-        do {
-            if (entry->state.record.kind == 0)
-                value = entry->callback(modifier, value);
-            entry++;
-            modifier++;
-            i++;
-        } while (i < stats->modifierCount);
-    }
+    struct StatModifier *modifiers = stats->modifiers;
+    s32 i;
+    for (i = 0; i < stats->modifierCount; i++)
+        if (modifiers[i].state.record.kind == 0)
+            value = modifiers[i].callback(&modifiers[i], value);
     return value;
 }
 
