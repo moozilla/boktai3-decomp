@@ -212,3 +212,4 @@ src/objects/dungeon_prop/scenery.c	DungeonScenery_Update	natural	natural	0
 src/objects/dungeon_prop/scenery.c	DungeonProp_Destroy	natural	natural	0	
 src/objects/dungeon_prop/scenery.c	DungeonScenery_InitHitCollider	natural	natural	0	
 src/objects/dungeon_prop/scenery.c	DungeonScenery_UpdateFade	contrived	minor	39	collider widget pointer plus ClearFlags(w, -5) and `4 | flags` keep the flag register order; constant-first mask local in the fading branch; Next() helper and dest local
+src/objects/coffin/tether_presentation.c	ScenePaletteFade_InitFromScript	natural	natural	1	

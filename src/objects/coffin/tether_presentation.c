@@ -1,6 +1,7 @@
 #include "objects/coffin/tether_presentation.h"
 #include "scene/motion/scene_actor_terrain.h"
 #include "engine/video/render.h"
+#include "gba/io_reg.h"
 #include "gba/macro.h"
 
 /* Tentative: caller derives quadrant from x/y, then selects a sprite animation. */
@@ -315,7 +316,7 @@ s32 ScenePaletteFade_InitFromScript(struct ScenePaletteFade *fade, void *unused)
 {
     s32 blendShift, delay;
 
-    Bg_DisableDisplay(0xF00);
+    Bg_DisableDisplay(DISPCNT_BG_ALL_ON);
     PaletteScreen_LoadResources(fade);
     if (Script_SeekToKeyword('f'))
         blendShift = Script_GetValue();
