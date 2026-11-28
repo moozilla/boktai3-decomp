@@ -1,20 +1,10 @@
-#include "global.h"
+#include "scene/actor/scene_actor_reaction.h"
+#include "npc/manager/scene_actor_animation.h"
 
-void SceneActorAnimation_SelectDirectionalEntry(void *, u32);
-
-static inline u8 TakeFlag(u8 *flag)
+void SceneActorReaction_PlayAnimationBUntilComplete(struct ChaseActor *actor)
 {
-    if (*flag) {
-        *flag = 0;
-        return TRUE;
-    }
-    return FALSE;
-}
-
-void SceneActorReaction_PlayAnimationBUntilComplete(u8 *p)
-{
-    if (TakeFlag(p + 0x2B2))
-        SceneActorAnimation_SelectDirectionalEntry(p, 0xB);
-    if (*(u8 *)(p + 0x2B3))
-        *(u8 *)(p + 0x2B0) = 1;
+    if (SceneActorReaction_TakePrepared(actor))
+        SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0xB);
+    if (actor->base.restart)
+        actor->base.stepDone = 1;
 }

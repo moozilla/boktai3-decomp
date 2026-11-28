@@ -458,3 +458,8 @@ src/scene/actor/reaction/SceneActorTarget_ApplyResetCommand.c	SceneActorTarget_A
 src/scene/actor/reaction/SceneActorControl_DispatchControl.c	SceneActorControl_DispatchControl	contrived	natural	3	-
 src/scene/actor/reaction/SceneActorControl_OnIdle.c	SceneActorControl_OnIdle	contrived	natural	1	-
 src/scene/actor/reaction/SceneActorControl_UpdateContactRelease.c	SceneActorControl_UpdateContactRelease	contrived	minor	8	drawable offsets and the SetActorFlags helper stay (plain |= loads the field first)
+src/scene/actor/reaction/SceneActorReaction_RestoreAfterDelay.c	SceneActorReaction_RestoreAfterDelay	natural	natural	0	-
+src/scene/actor/reaction/SceneActorReaction_RestoreAndClearRestart.c	SceneActorReaction_RestoreAndClearRestart	natural	natural	0	-
+src/scene/actor/reaction/SceneActorReaction_RestoreAlternateAfterDelay.c	SceneActorReaction_RestoreAlternateAfterDelay	natural	natural	0	-
+src/scene/actor/reaction/SceneActorReaction_UpdateAnimationGate.c	SceneActorReaction_UpdateAnimationGate	minor	minor	0	mask-first locals stay: plain |= and &= load the field first and the two stores cross-jump
+src/scene/actor/reaction/SceneActorReaction_PlayAnimationBUntilComplete.c	SceneActorReaction_PlayAnimationBUntilComplete	contrived	natural	2	-
