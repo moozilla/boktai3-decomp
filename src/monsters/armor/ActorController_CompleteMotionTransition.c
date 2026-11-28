@@ -11,13 +11,13 @@ void ActorController_CompleteMotionTransition(struct SceneCombatActor *actor)
     u8 *p = (void *)actor;
     u8 *state = p + 0xB40;
     if (*state == 0) {
-        Armor_SetAnimationFromStart(actor, &gUnk_0824EEF0[((p[0xB39] + 0x60) >> 6) & 3]);
+        Armor_SetAnimationFromStart(actor, &gUnk_0824EEF0[((actor->heading + 0x60) >> 6) & 3]);
         *state = 255;
-        p[0xB41] = 1;
+        actor->actionReady = 1;
         SceneCombatActor_SelectFirstCollider((struct SceneCombatActor *)p);
-        *(u16 *)(p + 0xB32) &= 0xFFDF;
+        actor->flags &= ~0x20;
 
-        switch (p[0xB38]) {
+        switch (actor->kind) {
             case 3:
             case 5:
             case 7:

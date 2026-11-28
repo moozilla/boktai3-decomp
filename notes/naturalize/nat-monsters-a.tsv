@@ -165,3 +165,4 @@ src/monsters/armor/Armor_UpdateDefeatSequence.c	Armor_UpdateDefeatSequence	contr
 src/monsters/armor/ActorController_UpdateBreakApartTransition.c	ActorController_UpdateBreakApartTransition	contrived	contrived	84	raw pointer, constant locals and layer helper remain
 src/monsters/armor/ActorController_UpdateChargeAttackTransition.c	ActorController_UpdateChargeAttackTransition	contrived	contrived	33	raw pointer, parked masks remain
 src/monsters/armor/ActorController_FinishDelayedTransition.c	ActorController_FinishDelayedTransition	contrived	minor	5	phase pointer kept: flags address reuse
+src/monsters/armor/ActorController_CompleteMotionTransition.c	ActorController_CompleteMotionTransition	contrived	minor	6	phase pointer kept: flags address reuse
