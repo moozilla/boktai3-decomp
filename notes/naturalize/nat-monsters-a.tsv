@@ -545,3 +545,4 @@ src/monsters/centipede/Centipede_OnUpdate.c	Centipede_OnUpdate	contrived	natural
 src/monsters/centipede/SceneActor_TryRequestFacingReaction.c	SceneActor_TryRequestFacingReaction	contrived	contrived	4	second sensor pointer, mask local and halfword views for the delta
 src/monsters/centipede/Centipede_InitStateHandlers.c	Centipede_InitStateHandlers	contrived	natural	1	
 src/monsters/centipede/Centipede_InitPlayerReference.c	Centipede_InitPlayerReference	contrived	natural	2	
+src/monsters/centipede/CentipedeBody_Destroy.c	CentipedeBody_Destroy	contrived	minor	2	mask and value locals before the overlay removal
