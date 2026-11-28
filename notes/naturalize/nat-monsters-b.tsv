@@ -74,3 +74,4 @@ src/monsters/ivy/PhaseObject_ApproachTarget.c	PhaseObject_ApproachTarget	minor	n
 src/monsters/ivy/PhaseObject_BeginEntryMotion.c	PhaseObject_BeginEntryMotion	contrived	natural	1	
 src/monsters/ivy/PhaseObject_EndApproachPause.c	PhaseObject_EndApproachPause	minor	natural	1	
 src/monsters/ivy/Ivy_UpdatePositionTransition.c	Ivy_UpdatePositionTransition	contrived	natural	1	
+src/monsters/ivy/PhaseObject_TickCountdown.c	PhaseObject_TickCountdown	contrived	contrived	3	callback assigned inside the loop (loop.c hoist order); remaining local for the clamp (reload from the field)
