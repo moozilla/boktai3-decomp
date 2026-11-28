@@ -153,3 +153,8 @@ src/ui/status_screen/numeric_overlay.c	NumericOverlay_Create	natural	natural	0	-
 src/ui/title/password.c	Text_CopyWithoutTags	contrived	minor	10	signed-byte test for the lead byte and the separate *dst = c; dst++ stay
 src/ui/title/password.c	GlyphTable_FindPair	minor	natural	1	-
 src/ui/title/password.c	Password_DecodeEntry	contrived	contrived	8	goto layout and the first PASSWORD_REQUIRE stay: plain if swaps src and script registers
+src/ui/title/password.c	Password_EncodeSymbols	minor	minor	3	k = 2 step stays: literal step saves a register (5 insns)
+src/ui/title/password.c	Password_ValidateNameGlyphs	natural	natural	0	-
+src/ui/title/password.c	NameEntry_DecodeAndValidate	natural	natural	0	-
+src/ui/title/password.c	Password_ApplyDecoded	contrived	contrived	9	field pointer temps stay: member stores skip the gGameState reloads (10-14 insns)
+src/ui/title/password.c	Password_DecodeWordList	minor	minor	1	PASSWORD_REQUIRE kept: removing it would leave the macro single-use
