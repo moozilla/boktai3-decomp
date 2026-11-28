@@ -6,16 +6,14 @@ void SceneCombatActor_SpawnBouncingParticle(void *);
 void ActorController_UpdateBounceParticle(struct SceneCombatActor *actor)
 {
     u8 *p = (void *)actor;
-    u8 *s = &actor->actionPhase;
-    u8 st = *s;
-    switch (st) {
+    switch (actor->actionPhase) {
         case 0: {
             u32 four;
             Armor_SetAnimationFromStart(
                 actor, &gActorBounceAnimations[((actor->heading + 0x60) >> 6) & 3]);
             four = 0xb32;
-            (*s)++;
-            actor->actionReady = st;
+            actor->actionPhase++;
+            actor->actionReady = 0;
             SceneCombatActor_SpawnBouncingParticle(p);
             *(u16 *)(p + four) &= ~1;
             four = 4;
@@ -33,8 +31,8 @@ void ActorController_UpdateBounceParticle(struct SceneCombatActor *actor)
         }
         case 1:
             if (actor->animationComplete) {
-                *s = 0xff;
-                actor->actionReady = st;
+                actor->actionPhase = 0xff;
+                actor->actionReady = 1;
             }
             break;
     }
