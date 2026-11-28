@@ -382,3 +382,4 @@ src/objects/interaction_prompts.c	InteractionPrompt_CheckInput	contrived	minor	2
 src/objects/interaction_prompts.c	InteractionPrompt_CheckRemaining	contrived	minor	1	repeated facing test remains
 src/objects/interaction_prompts.c	InteractionPrompt_InitManager	minor	natural	1	
 src/objects/interaction_prompts.c	InteractionPrompt_ScriptCreate	minor	minor	4	drawable flag pointer: plain member access spills differently
+src/objects/interaction_prompts.c	InteractionPrompt_ScriptMove	minor	natural	1	

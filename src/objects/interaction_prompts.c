@@ -452,12 +452,10 @@ s32 InteractionPrompt_ScriptMove(void)
     struct DirectionalManager *manager = gDirectionalManager;
     struct DirectionalController *p;
     if (!manager)
-        goto fail;
-    p = InteractionPrompt_FindByScriptId(manager, Script_GetKeywordValue('n', 0), 0);
-    if (!p) {
-    fail:
         return -1;
-    }
+    p = InteractionPrompt_FindByScriptId(manager, Script_GetKeywordValue('n', 0), 0);
+    if (!p)
+        return -1;
     if (Script_SeekToKeyword('p')) {
         position.x = Script_GetValue();
         position.y = Script_GetValue();
