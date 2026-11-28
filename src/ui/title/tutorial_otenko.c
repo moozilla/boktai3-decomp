@@ -1293,9 +1293,6 @@ void TutorialOtenko_UpdateShadowedRestAnimation(struct ActorAnimController *p)
 
 void TutorialOtenko_UpdateLargeRestAnimation(struct ActorAnimController *p)
 {
-    struct DisplaySequenceSprite *o;
-    struct DisplaySequenceState *a;
-    u8 done;
     if (take(p)) {
         p->obj.flags &= ~1;
         p->obj.flags |= 48;
@@ -1304,27 +1301,18 @@ void TutorialOtenko_UpdateLargeRestAnimation(struct ActorAnimController *p)
         ActorShadow_Disable(p->p2);
         TutorialOtenko_SetInteractionControlFlag(p);
         AnimData_SelectPaletteBank(p->effect, 343);
-        p->phase = 0;
-        if (p->oldMode == 3 && p->mode == 3) {
-            p->savedFrame = p->anim.index;
-            p->savedTimer = p->anim.elapsed;
-        }
+        TutorialOtenko_SetPhase(p, 0);
         {
             u8 one = 1;
             p->flags |= one;
         }
         Anim_SetSequence(&p->anim, p->arg, 0, 4, 0);
     }
-    o = &p->obj;
-    a = &p->anim;
-    done = DisplaySequence_StepSprite(o, a);
-    p->done = done;
-    {
-        if (p->handle) {
-            void *h = p->handle;
-            p->handle = 0;
-            Script_Call(h, 0);
-        }
+    p->done = DisplaySequence_StepSprite(&p->obj, &p->anim);
+    if (p->handle) {
+        void *handle = p->handle;
+        p->handle = 0;
+        Script_Call(handle, 0);
     }
 }
 

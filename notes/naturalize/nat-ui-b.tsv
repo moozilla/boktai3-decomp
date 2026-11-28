@@ -294,3 +294,4 @@ src/ui/title/tutorial_otenko.c	TutorialOtenko_UpdateCompactEntryAnimation	contri
 src/ui/title/tutorial_otenko.c	TutorialOtenko_UpdateProjectedEntryAnimation	contrived	minor	3	u8 one for the state flag
 src/ui/title/tutorial_otenko.c	TutorialOtenko_UpdateSilentProjectedEntryAnimation	contrived	minor	3	u8 one for the state flag
 src/ui/title/tutorial_otenko.c	TutorialOtenko_UpdateShadowedRestAnimation	contrived	minor	3	u8 one for the state flag
+src/ui/title/tutorial_otenko.c	TutorialOtenko_UpdateLargeRestAnimation	contrived	minor	3	u8 one for the state flag
