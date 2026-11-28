@@ -9,7 +9,7 @@ void SceneHud_SetTimedState(void *, s32, s32, s32, s32, s32);
 void PlayerStats_AddContactHundredths(void *, void *, s32);
 void SparkParticle_Spawn(void *, s32, void *, s32, s32, s32, s32, s32);
 void AxeArmor_ApplyHitReaction(struct ContactCollider *sourceInput, struct ContactCollider *input,
-                               struct AxeArmor *targetInput)
+                                struct AxeArmor *targetInput)
 {
     struct {
         struct ContactPosition position;
@@ -34,7 +34,8 @@ void AxeArmor_ApplyHitReaction(struct ContactCollider *sourceInput, struct Conta
             target->flashTimer = 8;
             Sound_PlaySong(0x211);
             DamageNumberDisplay_Show(&target->collider, target->pendingDamage, 0,
-                                     &target->collider.position, &target->collider.offset, 1);
+                                     &target->collider.position,
+                                     &target->collider.offset, 1);
             hud = target->parent;
             health = target->health;
             a = target->maxHealth;
@@ -52,6 +53,8 @@ void AxeArmor_ApplyHitReaction(struct ContactCollider *sourceInput, struct Conta
             s32 i;
             struct ContactPosition *vel = &frame.velocity;
             struct ContactPosition *pos = &frame.position;
+            u32 *index = &gRandomIndex;
+            u32 limit = 0x3ff;
             for (i = 0; i < 3; i++) {
                 u32 random;
                 u32 value;
@@ -60,16 +63,16 @@ void AxeArmor_ApplyHitReaction(struct ContactCollider *sourceInput, struct Conta
                 frame.velocity = gUnk_0824FE54;
                 frame.position = target->sprite.position;
                 value = (u32)gRandomTable;
-                random = HitSpark_NextIndex(gRandomIndex, 0x3ff);
+                random = HitSpark_NextIndex(*index, limit);
                 sample = HitSpark_Sample(value, random);
                 x = (u16)pos->x - 0x40;
                 sample &= 0x7F;
                 x += sample;
                 pos->x = x;
-                random = HitSpark_NextIndex(random, 0x3ff);
+                random = HitSpark_NextIndex(random, limit);
                 pos->y += (u8)HitSpark_Sample(value, random);
-                random = HitSpark_NextIndex(random, 0x3ff);
-                gRandomIndex = random;
+                random = HitSpark_NextIndex(random, limit);
+                *index = random;
                 {
                     u32 last = HitSpark_Sample(value, random);
                     x = (u16)pos->z - 0x40;

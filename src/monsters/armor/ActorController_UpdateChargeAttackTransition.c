@@ -27,10 +27,7 @@ void ActorController_UpdateChargeAttackTransition(struct SceneCombatActor *actor
             Armor_SetAnimationFromStart(actor, &gUnk_0824EE80[((actor->heading + 0x60) >> 6) & 3]);
             actor->actionPhase++;
             actor->actionReady = 0;
-            ActorController_SetColliderFlags(&actor->colliderGroup.colliders[2], 4);
-            ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[1], 4);
-            ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[3], 4);
-            ActorController_SetColliderFlags(&actor->colliderGroup.colliders[0], 4);
+            ActorController_SelectPairedColliders(actor);
             {
                 struct ActorControllerMotion *motion = &actor->colliderGroup.motion;
                 u32 mask = 1;

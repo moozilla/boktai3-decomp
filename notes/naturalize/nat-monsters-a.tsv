@@ -274,7 +274,7 @@ src/monsters/armor/Armor_InitPartLunge.c	Armor_InitPartLunge	contrived	contrived
 src/monsters/armor/Armor_InitPartStretch.c	Armor_InitPartStretch	contrived	contrived	2	remaining: u8cast,zeroone
 src/monsters/armor/Armor_UpdatePartFlash.c	Armor_UpdatePartFlash	contrived	contrived	10	remaining: u8cast,zeroone
 src/monsters/armor/Armor_UpdatePart.c	Armor_UpdatePart	contrived	contrived	5	remaining: constlocal,mask
-src/monsters/axe_armor/AxeArmor_ApplyHitReaction.c	AxeArmor_ApplyHitReaction	contrived	contrived	8	remaining: goto,block
+src/monsters/axe_armor/AxeArmor_ApplyHitReaction.c	AxeArmor_ApplyHitReaction	contrived	contrived	8	spark loop keeps random index/limit locals with HitSpark_NextIndex: plain (gRandomIndex+1)&0x3ff and RANDOM_NEXT() change when the table base and cursor address are loaded
 src/monsters/axe_armor/AxeArmor_UpdateAttackTiming.c	AxeArmor_UpdateAttackTiming	minor	natural	1	
 src/monsters/axe_armor/AxeArmor_InitializeFromScript.c	AxeArmor_InitializeFromScript	contrived	contrived	17	remaining: block,ptrtemp,structcast
 src/monsters/cannons/vulcan/VulcanCannon_UpdateTargeting.c	VulcanCannon_UpdateTargeting	contrived	minor	8	remaining: constlocal
