@@ -468,3 +468,10 @@ src/monsters/axe/axe.c	ActorGroup_BeginMotionPhase	contrived	contrived	2	flag co
 src/monsters/axe/axe.c	Axe_UpdateRecoverTimer	contrived	contrived	1	flag constant parked in a local: direct updates load the mask after the field
 src/monsters/axe/axe.c	Axe_UpdateRecoverTimer2	contrived	contrived	1	flag constant parked in a local: direct updates load the mask after the field
 src/monsters/axe/axe.c	ActorGroup_ResetActivePhase	contrived	contrived	3	mask and address blocks for the two flag clears: direct updates change load order
+src/monsters/axe/axe.c	ActorGroup_BeginExtendedMotion	contrived	contrived	2	flag constant or address parked in a block: direct updates change constant load order
+src/monsters/axe/axe.c	SceneActorControl_EndExtendedPhase	contrived	contrived	1	flag constant or address parked in a block: direct updates change constant load order
+src/monsters/axe/axe.c	Axe_FollowDeceleratingRoute	contrived	contrived	0	random-origin plumbing through savedOrigin and projection helpers: the table origin is captured once and reused in a register
+src/monsters/axe/axe.c	Axe_FollowAcceleratingRoute	contrived	contrived	0	random-origin plumbing through savedOrigin and projection helpers: the table origin is captured once and reused in a register
+src/monsters/axe/axe.c	Axe_UpdateRouteDestinationPhase	contrived	contrived	2	three pointers to one stack vector: each one holds a different stack address register
+src/monsters/axe/axe.c	Axe_Init	minor	minor	0	large initializer written through MonsterInit_ accessors
+src/monsters/axe_armor/AxeArmor_RecordDefeat.c	AxeArmor_RecordDefeat	minor	minor	0	H() halfword view of the game state counters
