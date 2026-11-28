@@ -682,9 +682,10 @@ void TetherActor_EmitRandomEffect(struct TetherActor *actor)
 void TetherActor_EmitRingEffects(struct TetherActor *actor)
 {
     struct ContactPackedVector velocity, position, size;
-    s32 index = 0;
-    do {
-        u32 angle = index * 32;
+    s32 i;
+
+    for (i = 0; i < 8; i++) {
+        u32 angle = i * 32;
         velocity.x = scaleEmission(gUnk_086149C4[(angle + 64) & 255] * 16);
         velocity.y = 0;
         angle &= 255;
@@ -696,8 +697,7 @@ void TetherActor_EmitRingEffects(struct TetherActor *actor)
         size.y = 0;
         size.z = 0;
         SceneParticleBurst_CreateWhilePaused(&position, &velocity, &size, 1, 3, 4);
-        ++index;
-    } while (index <= 7);
+    }
 }
 
 void TetherActor_EmitPointEffect(const struct ContactPackedVector *source, const void *config)

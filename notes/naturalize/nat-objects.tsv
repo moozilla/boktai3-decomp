@@ -51,3 +51,4 @@ src/objects/coffin/tether_actor.c	TetherActor_RemoveAuxiliarySprite	minor	natura
 src/objects/coffin/tether_actor.c	TetherActor_UpdateShake	minor	natural	1	
 src/objects/coffin/tether_actor.c	TetherActor_EmitDirectionalEffect	contrived	natural	1	
 src/objects/coffin/tether_actor.c	TetherActor_EmitRandomEffect	contrived	natural	6	
+src/objects/coffin/tether_actor.c	TetherActor_EmitRingEffects	contrived	minor	4	angle &= 255 and (u16) velocity reads kept for the exact load widths
