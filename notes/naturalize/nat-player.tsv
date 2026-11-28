@@ -193,3 +193,5 @@ src/player/control/Player_UpdateActionModeMovement.c	Player_UpdateActionModeMove
 src/player/control/Player_UpdateInteractionMovement.c	Player_UpdateInteractionMovement	contrived	minor	2	position/cell helpers and union probe; enabled flag shared by both arms
 src/player/control/Player_UpdateLinkModeMovement.c	Player_UpdateLinkModeMovement	contrived	minor	2	position/cell helpers and union probe; enabled flag shared by both arms
 src/player/control/Player_SelectInteractionMode.c	Player_SelectInteractionMode	minor	natural	1	
+src/player/control/Player_TestMovementPosition.c	Player_TestMovementPosition	natural	natural	0	
+src/player/control/Player_ClampInteractionVelocity.c	Player_ClampInteractionVelocity	minor	natural	1	

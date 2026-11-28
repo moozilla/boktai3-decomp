@@ -1,4 +1,3 @@
-#define PooledInteractable_GetPosition MovingPlatform_GetPositionByName
 #include "global.h"
 #include "player/player.h"
 struct SceneVec *MovingPlatform_GetPositionByName(s32);
