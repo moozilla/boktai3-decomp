@@ -273,3 +273,4 @@ src/link/player/Player_GetAdjustedMovementInterval.c	Player_GetAdjustedMovementI
 src/link/player/Player_BeginWalk.c	Player_BeginWalk	contrived	minor	1	secondary sprite viewed through its draw-flags field
 src/link/player/PlayerCue_UpdateOffsetBurst.c	PlayerCue_UpdateOffsetBurst	contrived	minor	2	secondary sprite viewed through its draw-flags field
 src/link/player/PlayerCue_UpdateFacingPose.c	PlayerCue_UpdateFacingPose	contrived	minor	7	direction and heading pointer temps: plain stores reorder the address computation
+src/link/player/PlayerCue_UpdatePoseRecovery.c	PlayerCue_UpdatePoseRecovery	contrived	minor	4	secondary sprite viewed through its draw-flags field
