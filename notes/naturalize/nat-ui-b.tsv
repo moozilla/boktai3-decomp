@@ -206,3 +206,4 @@ src/ui/title/password_menu.c	PasswordMenu_EraseSelection	contrived	natural	1	-
 src/ui/title/password_menu.c	PasswordMenu_Update	minor	natural	4	-
 src/ui/title/password_menu.c	PasswordMenu_BuildLabels	natural	natural	0	-
 src/ui/title/password_menu.c	PasswordMenu_UpdateEntryCursor	natural	natural	0	-
+src/ui/title/password_menu.c	PasswordMenu_Destroy	contrived	minor	1	literal mask 3 passed to Bg_DisableDisplay
