@@ -1,14 +1,13 @@
 #include "global.h"
-void sub_08239D38(u8 *);
-void LinkPlayer_FlushPendingEffects(u8 *p)
+#include "player/player.h"
+
+void sub_08239D38(struct Player *);
+
+void LinkPlayer_FlushPendingEffects(struct Player *p)
 {
-    u8 t = p[0x5BB];
-    s32 n;
-    if (t != 0) {
-        n = t;
-        do {
-            sub_08239D38(p);
-            n--;
-        } while (n != 0);
-    }
+    s32 i;
+    s32 count = p->movementModifierActive;
+
+    for (i = 0; i < count; i++)
+        sub_08239D38(p);
 }

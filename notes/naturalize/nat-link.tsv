@@ -153,3 +153,4 @@ src/link/player/LinkPlayer_InitAnimationSlots.c	LinkPlayer_InitAnimationSlots	mi
 src/link/player/LinkPlayer_InitAnimationState.c	LinkPlayer_InitAnimationState	contrived	natural	1	
 src/link/player/sub_08239D38.c	sub_08239D38	contrived	natural	3	
 src/link/player/LinkPlayer_GetElapsedActionTicks.c	LinkPlayer_GetElapsedActionTicks	contrived	natural	1	
+src/link/player/LinkPlayer_FlushPendingEffects.c	LinkPlayer_FlushPendingEffects	minor	natural	7	
