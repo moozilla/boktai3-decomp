@@ -2,28 +2,27 @@
 #include "engine/video/palette_pulse.h"
 #include "ui/game_over/particle_pool.h"
 
-void Palette_UpdateHighlightPulse(u16 *out, u8 *c)
+void Palette_UpdateHighlightPulse(u16 *out, u8 *counter)
 {
-    u32 v = *c;
-    u32 r = 0x1f;
-    if (v > 9) {
-        r = 0x1b;
-        if (v > 0x11) {
-            r = 0x12;
-            if (v > 0x19) {
-                r = 0xa;
-                if (v > 0x21) {
-                    r = 0x1b;
-                    if (v <= 0x29)
-                        r = 0x12;
-                }
-            }
-        }
-    }
-    *c = *c + 1;
-    if (*c > 0x31)
-        *c = 0;
-    *out = r;
+    u32 frame = *counter;
+    u32 color;
+
+    if (frame < 10)
+        color = 31;
+    else if (frame < 18)
+        color = 27;
+    else if (frame < 26)
+        color = 18;
+    else if (frame < 34)
+        color = 10;
+    else if (frame < 42)
+        color = 18;
+    else
+        color = 27;
+    (*counter)++;
+    if (*counter >= 50)
+        *counter = 0;
+    *out = color;
 }
 
 extern const s16 gUnk_086149C4[];
