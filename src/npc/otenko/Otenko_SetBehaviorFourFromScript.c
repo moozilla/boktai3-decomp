@@ -7,6 +7,8 @@ void Actor_OnConfiguredAnimationUpdate(void);
 void Otenko_SetBehaviorFourFromScript(void)
 {
     struct OtenkoActor *p;
+    void (*callback)(void);
+    s32 state;
     if (!gSceneNpc)
         return;
     if (Script_SeekToKeyword(0x6e)) {
@@ -18,24 +20,17 @@ void Otenko_SetBehaviorFourFromScript(void)
             return;
     } else
         p = gSceneNpc;
-    {
-        u8 *q = &p->controlled;
-        s32 zero = 0, one = 1;
-        void (*f)(void);
-        *q = 1;
-        {
-            s32 kind = 6;
-            p->stage = 0;
-            p->stageEntered = 0;
-            p->state = kind;
-        }
-        p->timer = 0;
-        p->commandEntered = 1;
-        f = Actor_OnConfiguredAnimationUpdate;
-        p->prevState = 7;
-        p->stateCallback = f;
-        p->stateFrame = 0;
-        p->animationEntered = one;
-        p->animationPhase = zero;
-    }
+    p->controlled = 1;
+    state = 6;
+    p->stage = 0;
+    p->stageEntered = 0;
+    p->state = state;
+    p->timer = 0;
+    p->commandEntered = 1;
+    callback = Actor_OnConfiguredAnimationUpdate;
+    p->prevState = 7;
+    p->stateCallback = callback;
+    p->stateFrame = 0;
+    p->animationEntered = 1;
+    p->animationPhase = 0;
 }
