@@ -1,76 +1,34 @@
-#include "scene/collision/contact_swarm.h"
-#include "engine/engine.h"
-#include "engine/ram.h"
-#include "player/cutscene/player_cue_sequence.h"
-struct Fragment {
-    u32 flags;
-    u8 active, unknown5[3];
-    s8 scaleX, scaleY;
-    u8 unknownA[2];
-    void *graphics;
-    u16 frame;
-    u8 unknown12[10];
-    struct ContactPosition position;
-    u8 unknown24[8];
-    struct DisplaySequenceState sequence;
-    u8 collider[0x54];
-    struct ContactPosition center, offset;
-    u32 angle, angularSpeed;
-    s16 direction;
-    u16 unknownAA;
-    s16 radius, scaleTimer;
-    u32 unknownB0;
-    s32 lifetime;
-    u16 unknownB8;
-    u8 state;
-    s8 slot;
-    u16 timer;
-    u8 entered;
-};
-struct Pool {
-    u8 pad[0x38];
-    u32 used;
-};
-extern const s16 gUnk_086149C4[];
+#include "effects/bursts/fragment_effect.h"
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
+#include "player/cutscene/player_cue_sequence.h"
+
 void FragmentEffect_SpawnRandomParticle(struct ContactPosition *);
-void FragmentEffect_UpdateCollider(struct Fragment *);
-void Sprite_Remove(void *);
-static inline s32 Truncate(s32 v)
-{
-    if (v >= 0)
-        return v >> 12;
-    return -((-v) >> 12);
-}
-static inline void Step(struct Fragment *sprite)
-{
-    PlayerCue_StepSequence(sprite, &sprite->sequence);
-}
+
 // confidence=low: F422 fragment state interpolates sprite scale on appearance
-void FragmentEffect_GrowToFullSize(struct Pool *pool, struct Fragment *p)
+void FragmentEffect_GrowToFullSize(struct FragmentEffectPool *pool, struct Fragment *fragment)
 {
-    if (p->entered) {
-        p->flags = (p->flags & ~1) | 2;
-        p->scaleTimer = 30;
-        p->timer = 0;
-        p->entered = 0;
-        p->scaleX = 1;
-        p->scaleY = 1;
+    if (fragment->entered) {
+        fragment->sprite.flags = (fragment->sprite.flags & ~1) | 2;
+        fragment->scaleTimer = 30;
+        fragment->timer = 0;
+        fragment->entered = 0;
+        fragment->sprite.scaleX = 1;
+        fragment->sprite.scaleY = 1;
     }
-    if (!Mod(p->timer, 12))
-        FragmentEffect_SpawnRandomParticle(&p->position);
-    if (p->scaleTimer > 0) {
-        p->scaleX += Div(64 - p->scaleX, p->scaleTimer);
-        p->scaleY += Div(64 - p->scaleY, p->scaleTimer);
-        p->scaleTimer--;
+    if (!Mod(fragment->timer, 12))
+        FragmentEffect_SpawnRandomParticle(&fragment->sprite.position);
+    if (fragment->scaleTimer > 0) {
+        fragment->sprite.scaleX += Div(64 - fragment->sprite.scaleX, fragment->scaleTimer);
+        fragment->sprite.scaleY += Div(64 - fragment->sprite.scaleY, fragment->scaleTimer);
+        fragment->scaleTimer--;
     }
-    Step(p);
-    if (p->scaleTimer <= 0) {
-        p->state = 2;
-        p->flags &= ~2;
-        p->entered = 1;
+    PlayerCue_StepSequence((struct ContactSwarmSprite *)&fragment->sprite, &fragment->sequence);
+    if (fragment->scaleTimer <= 0) {
+        fragment->state = 2;
+        fragment->sprite.flags &= ~2;
+        fragment->entered = 1;
     } else {
-        p->timer++;
+        fragment->timer++;
     }
 }

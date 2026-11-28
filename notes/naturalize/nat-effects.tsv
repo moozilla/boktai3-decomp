@@ -149,3 +149,4 @@ src/effects/bursts/fragment_effect/FragmentEffect_UpdateManager.c	FragmentEffect
 src/effects/bursts/fragment_effect/FragmentEffect_DestroyManager.c	FragmentEffect_DestroyManager	contrived	natural	1	-
 src/effects/bursts/fragment_effect/FragmentEffect_InitManager.c	FragmentEffect_InitManager	minor	natural	1	-
 src/effects/bursts/fragment_effect/FragmentEffect_GetOrCreateManager.c	FragmentEffect_GetOrCreateManager	minor	natural	1	-
+src/effects/bursts/fragment_effect/FragmentEffect_GrowToFullSize.c	FragmentEffect_GrowToFullSize	minor	natural	1	-
