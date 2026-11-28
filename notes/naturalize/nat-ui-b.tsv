@@ -69,3 +69,4 @@ src/ui/results/time_result.c	TimeResult_UpdateDigitReveal	contrived	minor	22	gra
 src/ui/results/time_result.c	TimeResult_Destroy	contrived	natural	1	
 src/ui/results/time_result.c	TimeResult_InitializeBackground	contrived	natural	6	
 src/ui/results/time_result.c	TimeResult_LoadPalette	minor	natural	1	
+src/ui/results/time_result.c	TimeResult_SetElapsedDigits	contrived	natural	1	

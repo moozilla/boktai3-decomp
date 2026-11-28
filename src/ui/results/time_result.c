@@ -155,24 +155,19 @@ void TimeResult_LoadPalette(struct ChallengeTimeResult *result)
     CpuSet(result->paletteSource, gBgPaletteBuffer, 0x04000028);
 }
 
-union DigitLayoutSource {
-    s32 hours;
-    u16 *firstY;
-};
-
 void TimeResult_SetElapsedDigits(struct ChallengeTimeResult *result)
 {
-    u16 positions[12];
-    union DigitLayoutSource source;
+    u16 positions[6][2];
+    s32 hours;
     s32 minutes;
     s32 seconds;
     s32 i;
 
     memcpy(positions, gUnk_0824FA00, sizeof(positions));
-    source.hours = Div(result->elapsedFrames, 216000);
-    minutes = Div(result->elapsedFrames, 3600) - source.hours * 60;
-    seconds = Div(result->elapsedFrames, 60) - source.hours * 3600 - minutes * 60;
-    if (source.hours > 99) {
+    hours = Div(result->elapsedFrames, 216000);
+    minutes = Div(result->elapsedFrames, 3600) - hours * 60;
+    seconds = Div(result->elapsedFrames, 60) - hours * 3600 - minutes * 60;
+    if (hours > 99) {
         TimeResult_LoadDigit(&result->digits[5], &result->digitGraphics, 9);
         TimeResult_LoadDigit(&result->digits[4], &result->digitGraphics, 9);
         TimeResult_LoadDigit(&result->digits[3], &result->digitGraphics, 5);
@@ -180,9 +175,9 @@ void TimeResult_SetElapsedDigits(struct ChallengeTimeResult *result)
         TimeResult_LoadDigit(&result->digits[0], &result->digitGraphics, 5);
         TimeResult_LoadDigit(&result->digits[2], &result->digitGraphics, 9);
     } else {
-        TimeResult_LoadDigit(&result->digits[4], &result->digitGraphics, Mod(source.hours, 10));
-        source.hours = Div(source.hours, 10);
-        TimeResult_LoadDigit(&result->digits[5], &result->digitGraphics, source.hours);
+        TimeResult_LoadDigit(&result->digits[4], &result->digitGraphics, Mod(hours, 10));
+        hours = Div(hours, 10);
+        TimeResult_LoadDigit(&result->digits[5], &result->digitGraphics, hours);
         TimeResult_LoadDigit(&result->digits[2], &result->digitGraphics, Mod(minutes, 10));
         minutes = Div(minutes, 10);
         TimeResult_LoadDigit(&result->digits[3], &result->digitGraphics, minutes);
@@ -190,27 +185,9 @@ void TimeResult_SetElapsedDigits(struct ChallengeTimeResult *result)
         seconds = Div(seconds, 10);
         TimeResult_LoadDigit(&result->digits[1], &result->digitGraphics, seconds);
     }
-    {
-        u16 *sourceY;
-        s16 *destinationX;
-        u16 *sourceX;
-        u8 *widgetOffset;
-        u16 *firstY;
-
-        firstY = &positions[1];
-        source.firstY = firstY;
-        sourceY = source.firstY;
-        destinationX = &result->digits[0].position.x;
-        sourceX = firstY - 1;
-        widgetOffset = (u8 *)result;
-        for (i = 0; i < 6; i++) {
-            *destinationX = *sourceX + 0x90;
-            ((struct ChallengeTimeResult *)widgetOffset)->digits[0].position.y = 0x38 + *sourceY;
-            sourceY += 2;
-            destinationX += sizeof(struct AnimSprite) / sizeof(*destinationX);
-            sourceX += 2;
-            widgetOffset += sizeof(struct AnimSprite);
-        }
+    for (i = 0; i < 6; i++) {
+        result->digits[i].position.x = positions[i][0] + 0x90;
+        result->digits[i].position.y = positions[i][1] + 0x38;
     }
 }
 
