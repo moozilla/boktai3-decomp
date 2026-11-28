@@ -1,12 +1,9 @@
 // COMPILER: old_agbcc
 #include "global.h"
+#include "gba/io_reg.h"
 /* Palette_LoadWorkingColors: Copies 48 colors into the shared working palette buffer using DMA */
 
 void Palette_LoadWorkingColors(const void *src)
 {
-    vu32 *dma = (vu32 *)0x040000D4;
-    dma[0] = (u32)src;
-    dma[1] = 0x03005160;
-    dma[2] = 0x84000018;
-    dma[2];
+    DmaCopy32(3, src, 0x03005160, 48 * sizeof(u16));
 }

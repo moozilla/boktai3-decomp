@@ -364,3 +364,4 @@ src/engine/video/palette/sub_08216E54.c	sub_08216E54	contrived	contrived	0	cache
 src/engine/video/palette/Palette_CacheReservedObjectBank.c	Palette_CacheReservedObjectBank	contrived	natural	1	
 src/engine/video/palette/Palette_CacheObjectBank.c	Palette_CacheObjectBank	contrived	natural	1	
 src/engine/video/palette/Palette_UploadBuffers.c	Palette_UploadBuffers	contrived	natural	1	
+src/engine/video/palette/Palette_LoadWorkingColors.c	Palette_LoadWorkingColors	contrived	natural	1	
