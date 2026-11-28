@@ -1,15 +1,15 @@
 #include "global.h"
-/* Count_GetBarrierCount: Getter for the same offset-0x384 counter that Count_DecrementBarrierCount decrements */
+#include "bosses/count/scene_graphics_actor.h"
 
-u8 *SceneActors_GetBySlot(u32);
+struct SceneGraphicsActor *SceneActors_GetBySlot(u32);
 
 u8 Count_GetBarrierCount(void)
 {
-    u8 *p = SceneActors_GetBySlot(0);
-    u8 r;
-    if (p)
-        r = p[0x384];
+    struct SceneGraphicsActor *actor = SceneActors_GetBySlot(0);
+    u8 count;
+    if (actor)
+        count = actor->graphics.barrierCount;
     else
-        r = 0;
-    return r;
+        count = 0;
+    return count;
 }
