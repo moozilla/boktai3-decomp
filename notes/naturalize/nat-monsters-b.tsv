@@ -43,3 +43,4 @@ src/monsters/bee.c	Bee_Destroy	contrived	minor	1	MonsterInit_TestMotionFlags and
 src/monsters/crow.c	Crow_Destroy	contrived	minor	1	MonsterInit_TestMotionFlags and SceneActorPlacement_ReadFlags32 accessors (mask loaded before the field address)
 src/monsters/octopus.c	Octopus_Destroy	contrived	minor	1	MonsterInit_TestMotionFlags and SceneActorPlacement_ReadFlags32 accessors (mask loaded before the field address)
 src/monsters/slime.c	Slime_Destroy	contrived	minor	1	MonsterInit_TestMotionFlags and SceneActorPlacement_ReadFlags32 accessors (mask loaded before the field address)
+src/monsters/lun.c	Lun_Destroy	contrived	minor	1	MonsterInit_TestMotionFlags and SceneActorPlacement_ReadFlags32 accessors (mask loaded before the field address)
