@@ -346,12 +346,12 @@ void Player_InitVisualResources(void *actor)
             single = 1;
             count = 0;
             if (VisualBonusFlag(p, 0x40000000))
-                count = 1;
+                count++;
             if (VisualActionFlag(p, 1))
                 count++;
             if (VisualBonusFlag(p, 0x20000000))
                 count++;
-            if ((p && (s32)p->statBonusFlags < 0))
+            if (VisualBonusFlag(p, 0x80000000))
                 count++;
             if (count > 1)
                 single = 0;
@@ -363,7 +363,7 @@ void Player_InitVisualResources(void *actor)
                 p->menuStatusValues[0] = 0x177;
             else if (VisualBonusFlag(p, 0x20000000) && single == 1)
                 p->menuStatusValues[0] = 0x176;
-            else if ((p && (s32)p->statBonusFlags < 0) && single == 1)
+            else if (VisualBonusFlag(p, 0x80000000) && single == 1)
                 p->menuStatusValues[0] = 0x175;
             else
                 p->menuStatusValues[0] = 0x2A;

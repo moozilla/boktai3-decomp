@@ -122,3 +122,5 @@ src/player/appearance/player_visuals.c	Player_GetSelectedAbility	contrived	natur
 src/player/appearance/player_visuals.c	Player_InitActionRequest	minor	minor	0	request view cast over thresholdMode (shared Player layout used by other areas)
 src/player/appearance/player_visuals.c	Player_InitSlotFromScript	natural	natural	0	-
 src/player/appearance/player_visuals.c	Player_ClearDirectionHistory	minor	natural	2	-
+src/player/appearance/player_visuals.c	Player_InitEventProcedureFromScript	natural	natural	0	-
+src/player/appearance/player_visuals.c	Player_InitVisualResources	contrived	minor	9	VisualBonusFlag/ReadVisualFlag accessors stay: plain && tests change 81 instructions (mask loaded before the field)
