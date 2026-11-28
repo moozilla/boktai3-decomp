@@ -510,3 +510,4 @@ src/system/game_state/GameState_GetConsumableDescriptor.c	GameState_GetConsumabl
 src/system/game_state/sub_0822E420.c	sub_0822E420	minor	natural	1	
 src/system/game_state/GameState_AddEquipmentFromScript.c	GameState_AddEquipmentFromScript	minor	natural	1	
 src/system/game_state/GameState_AddUnlockFromScript.c	GameState_AddUnlockFromScript	minor	natural	1	
+src/system/game_state/SolarFruit_AddFromScript.c	SolarFruit_AddFromScript	minor	natural	1	
