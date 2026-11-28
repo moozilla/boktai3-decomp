@@ -21,13 +21,10 @@ void Actor_InitControllerFromScript(struct PooledActor *actor)
     actor->damageSource = 0;
     actor->attackFlags = 0;
     actor->targetRangeSquared = Script_GetKeywordValue(0x65, 0x10000);
-    {
-        struct PooledActor *q = actor;
-        q->targetArc = Script_GetKeywordValue(0x45, 0x80);
-        q->targetDistanceSquared = -1;
-        q->targetAngleDelta = 0x7f;
-        q->targetIndex = 0xff;
-    }
+    actor->targetArc = Script_GetKeywordValue(0x45, 0x80);
+    actor->targetDistanceSquared = -1;
+    actor->targetAngleDelta = 0x7f;
+    actor->targetIndex = -1;
     actor->targetCount = Script_GetKeywordValue(0x73, 1);
     health = Script_GetKeywordValue(0x6c, 0x64);
     Actor_SetHealthLimits(actor, health, health);
@@ -52,11 +49,9 @@ void Actor_InitControllerFromScript(struct PooledActor *actor)
     }
     actor->action = Script_GetKeywordValue(0x44, 0);
     if (Script_SeekToKeyword(0x61)) {
-        u32 *q = actor->actionParameters;
-        s32 i = 3;
-        do {
-            *q++ = Script_GetValue();
-        } while (--i >= 0);
+        s32 i;
+        for (i = 0; i < 4; i++)
+            actor->actionParameters[i] = Script_GetValue();
     }
 }
 
@@ -301,7 +296,8 @@ void Actor_OnTrackingAction(struct PooledActor *actor, u32 tick)
     }
 }
 
-static inline void ActorController_SetAction(struct PooledActor *actor, void (*action)(void *, int), u16 id)
+static inline void ActorController_SetAction(struct PooledActor *actor, void (*action)(void *, int),
+                                             u16 id)
 {
     actor->actionCallback = action;
     actor->currentAction = id;
