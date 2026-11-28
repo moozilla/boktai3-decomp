@@ -40,15 +40,14 @@ u32 LargeFragmentEffect_IsActive(void)
 
 void LargeFragmentEffect_StopAll(void)
 {
-    u8 *s = gFragmentEffectManager;
+    struct FragmentStatePool *pool = (struct FragmentStatePool *)gFragmentEffectManager;
     s32 i;
-    if (s) {
-        u8 v = 3;
-        s += 0xf6;
-        for (i = 7; i >= 0; s += 0xc0, i--) {
-            if (*s != 3 && *s != 0)
-                *s = v;
-        }
+
+    if (!pool)
+        return;
+    for (i = 0; i < 8; i++) {
+        if (pool->slots[i].state != 3 && pool->slots[i].state != 0)
+            pool->slots[i].state = 3;
     }
 }
 

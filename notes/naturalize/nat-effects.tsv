@@ -83,3 +83,4 @@ src/effects/contact_impact.c	PopInSprite_Show	natural	natural	0
 src/effects/contact_impact.c	PopInSprite_Hide	natural	natural	0	
 src/effects/contact_impact.c	ContactImpactEffect_ProcessMessages	minor	minor	0	left: plain for loop cross-jumps the two consume calls; only matched with new queue accessors, which the brief forbids; keeps the guarded do-while
 src/effects/bursts/large_fragment_effect.c	LargeFragmentEffect_IsActive	contrived	natural	1	-
+src/effects/bursts/large_fragment_effect.c	LargeFragmentEffect_StopAll	contrived	natural	1	-
