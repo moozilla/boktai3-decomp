@@ -349,3 +349,14 @@ src/objects/hit_switch.c	HitSwitch_UpdateBobbing	contrived	natural	1
 src/objects/hit_switch.c	HitSwitch_AnimateBobbingCompletion	minor	natural	1	
 src/objects/hit_switch.c	HitSwitch_InitCollider	contrived	natural	1	
 src/objects/hit_switch.c	HitSwitch_InitEntryFromScript	contrived	natural	4	
+src/objects/hit_switch.c	HitSwitch_UpdateSharedFlash	contrived	contrived	3	hand-split color channels: masked halfword locals give 56+ differing instructions
+src/objects/hit_switch.c	HitSwitch_SetUpdate	natural	natural	0	
+src/objects/hit_switch.c	HitSwitch_RegisterCompletedCell	natural	natural	0	
+src/objects/hit_switch.c	HitSwitch_AnimateStaticCompletion	natural	natural	0	
+src/objects/hit_switch.c	HitSwitch_TickCompletedStatic	natural	natural	0	
+src/objects/hit_switch.c	HitSwitch_UpdateCompletedBobbing	natural	natural	0	
+src/objects/hit_switch.c	HitSwitch_UpdateManager	natural	natural	0	
+src/objects/hit_switch.c	HitSwitch_DestroyManager	natural	natural	0	
+src/objects/hit_switch.c	HitSwitch_CreateManager	natural	natural	0	
+src/objects/hit_switch.c	HitSwitch_GetCompletionFromScript	natural	natural	0	
+src/objects/hit_switch.c	HitSwitch_AddFromScript	natural	natural	0	
