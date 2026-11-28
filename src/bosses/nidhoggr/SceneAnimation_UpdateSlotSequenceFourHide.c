@@ -13,6 +13,6 @@ void SceneAnimation_UpdateSlotSequenceFourHide(struct Nidhoggr *boss, int i)
         boss->rowInitFlag[i] = 0xff;
         boss->rowDoneFlag[i] = 1;
         Nidhoggr_DisablePartCollider(&boss->colliders[i]);
-        Nidhoggr_SetPartExtraFlags(&boss->partExtra[i], 1);
+        (boss->partExtra + i)->flags |= 1;
     }
 }
