@@ -674,25 +674,25 @@ void SceneActorStyle_InitializeFromGameState(struct SceneActorStyle *style)
 {
     s32 i;
     struct GameState *state = gGameState;
-    style->adjustedA = *(u8 *)&state->unk7A0[2] + 12;
-    style->adjustedB = *(u8 *)&state->unk7A0[0] + 6;
-    style->adjustedC = *(u8 *)&state->unk7A0[1] + 18;
+    style->adjustedA = (u8)state->unk7A0[2] + 12;
+    style->adjustedB = (u8)state->unk7A0[0] + 6;
+    style->adjustedC = (u8)state->unk7A0[1] + 18;
     style->parameterE = state->styleParameterE;
-    for (i = 0; i <= 3; i++)
+    for (i = 0; i < 4; i++)
         style->entries[i] = ((u16 *)state->modifierIdsBytes)[i];
     style->count = ModifierMenu_CountAppearanceModifiers(style);
     state = gGameState;
-    style->parameterD = (u16)state->unk81A;
+    style->parameterD = state->unk81A;
     style->parameterB = state->unk7A0[0];
     style->parameterF = state->unk7A0[3];
     style->parameterC = state->unk7A0[1];
     style->parameterA = state->unk7A0[2];
     {
-        u16 initial;
-        state = (void *)&state->unk800[12];
-        initial = *(u16 *)state;
-        style->initialHalfword = initial;
-        style->currentHalfword = initial;
+        u16 value;
+        state = (struct GameState *)&state->unk800[12];
+        value = *(u16 *)state;
+        style->initialHalfword = value;
+        style->currentHalfword = value;
     }
     style->initialWord = 0;
     style->currentWord = 0;

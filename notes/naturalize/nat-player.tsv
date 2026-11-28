@@ -39,3 +39,6 @@ src/player/appearance/character_model.c	Video_GetWrappedBackgroundMapEntry	natur
 src/player/appearance/character_model.c	PanelText_DrawDigits	contrived	minor	19	do/while(0) around the remainder: without it 'cell' outranks 'value' in register allocation (priority 7368 vs 4375)
 src/player/appearance/character_model.c	Video_DrawBackgroundRowMarkers	natural	natural	0	-
 src/player/appearance/character_model.c	CharacterModel_LoadActorAppearance	minor	natural	1	-
+src/player/appearance/character_model.c	ModifierMenu_CountAppearanceModifiers	natural	natural	4	plain do/while with break; for form rotates differently
+src/player/appearance/character_model.c	GameState_ClearSlots7A8FromScript	minor	minor	0	s16 view of modifierIdsBytes: shared header types it u8[8]
+src/player/appearance/character_model.c	SceneActorStyle_InitializeFromGameState	contrived	minor	22	halfword read through the reused state pointer: a local or member read lets cse derive the address from the earlier offset
