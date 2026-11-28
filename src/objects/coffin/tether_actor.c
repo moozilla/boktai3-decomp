@@ -635,11 +635,7 @@ void TetherActor_UpdateShake(struct TetherActor *actor)
         s32 shake;
         if (phase == 96)
             Sound_PlaySong(0x2AA);
-        gRandomIndex = (gRandomIndex + 1) & 1023;
-        {
-            u32 sample = ((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
-            shake = (sample & 1) * 11 - 5;
-        }
+        shake = (ParticleRandom_ReadDirectSample((const u16 *)RANDOM_TABLE_ADDR) & 1) * 11 - 5;
         actor->shakeX = shake;
         actor->shakeZ = -shake;
     }
