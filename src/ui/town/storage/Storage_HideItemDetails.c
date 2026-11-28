@@ -1,13 +1,10 @@
 #include "global.h"
-struct H {
-    u8 f[8];
-    u32 v;
-};
+#include "ui/town/storage_screen.h"
 void MessageWindow_Clear(void);
 void ScrollingDialogue_ClearScript(void);
-void Storage_HideItemDetails(u8 *p)
+void Storage_HideItemDetails(struct StorageScreen *screen)
 {
-    ((struct H *)p)[354].v |= 1;
+    AnimSprite_Hide(&screen->indicators[4]);
     MessageWindow_Clear();
     ScrollingDialogue_ClearScript();
 }
