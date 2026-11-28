@@ -1,29 +1,21 @@
 #include "global.h"
 #include "engine/video/render.h"
 #include "engine/engine_pause_flags.h"
-struct HudManager {
-    u8 pad0[0xA12];
-    u16 savedControl;
-    u8 padA14[0x43E0 - 0xA14];
-    u16 savedBlend[4];
-};
-s32 SceneHud_CanOpenFromStart(struct HudManager *);
-void Hud_SetUpdateCallback(struct HudManager *, void (*)(void));
+#include "ui/pause/scene_hud_display.h"
+u32 SceneHud_CanOpenFromStart(struct SceneHudState *);
+void Hud_SetUpdateCallback(struct SceneHudState *, void (*)(void));
 void SceneDialog_UpdateEntryFade(void);
-s32 Hud_BeginSavedBlend(struct HudManager *p)
+s32 Hud_BeginSavedBlend(struct SceneHudState *hud)
 {
-    s32 result;
-    if (!SceneHud_CanOpenFromStart(p)) {
-        result = 0;
-    } else {
+    if (SceneHud_CanOpenFromStart(hud)) {
         Engine_SetPauseFlags(4);
-        p->savedControl = gFadeMultiplier;
-        p->savedBlend[0] = gBgFadeColor;
-        p->savedBlend[1] = gBgFadeBankMask;
-        p->savedBlend[2] = gObjFadeColor;
-        p->savedBlend[3] = gObjFadeFlags;
-        Hud_SetUpdateCallback(p, SceneDialog_UpdateEntryFade);
-        result = 1;
+        hud->savedMenuMode = gFadeMultiplier;
+        hud->savedFade[0] = gBgFadeColor;
+        hud->savedFade[1] = gBgFadeBankMask;
+        hud->savedFade[2] = gObjFadeColor;
+        hud->savedFade[3] = gObjFadeFlags;
+        Hud_SetUpdateCallback(hud, SceneDialog_UpdateEntryFade);
+        return 1;
     }
-    return result;
+    return 0;
 }
