@@ -132,8 +132,7 @@ void TileAnimation_Configure(void)
 {
     struct TileAnimation *animation = TileAnimation_GetTask();
     struct TileAnimationChannel *channel;
-    int index, value;
-    u16 *frameValue;
+    int index;
     if (!animation)
         return;
     channel = TileAnimation_FindFreeChannel(animation);
@@ -160,61 +159,37 @@ void TileAnimation_Configure(void)
         channel->frame = channel->frameCount - 1;
 
     if (Script_SeekToKeyword('R')) {
-
-        index = 0;
-        if (index < channel->frameCount) {
-            frameValue = channel->source;
-            do {
-                value = (s32)Script_GetPc();
-                if (value)
-                    value = Script_GetValue();
-                *frameValue = value;
-                frameValue++;
-                index++;
-            } while (index < channel->frameCount);
+        for (index = 0; index < channel->frameCount; index++) {
+            if (Script_GetPc())
+                channel->source[index] = Script_GetValue();
+            else
+                channel->source[index] = 0;
         }
     } else {
-
         for (index = 0; index < channel->frameCount; index++)
             channel->source[index] = 0;
     }
 
     if (Script_SeekToKeyword('d')) {
-
-        index = 0;
-        if (index < channel->frameCount) {
-            frameValue = channel->destination;
-            do {
-                value = (s32)Script_GetPc();
-                if (value)
-                    value = Script_GetValue();
-                *frameValue = value;
-                frameValue++;
-                index++;
-            } while (index < channel->frameCount);
+        for (index = 0; index < channel->frameCount; index++) {
+            if (Script_GetPc())
+                channel->destination[index] = Script_GetValue();
+            else
+                channel->destination[index] = 0;
         }
     } else {
-
         for (index = 0; index < channel->frameCount; index++)
             channel->destination[index] = 0;
     }
 
     if (Script_SeekToKeyword('t')) {
-
-        index = 0;
-        if (index < channel->frameCount) {
-            frameValue = channel->duration;
-            do {
-                value = (s32)Script_GetPc();
-                if (value)
-                    value = Script_GetValue();
-                *frameValue = value;
-                frameValue++;
-                index++;
-            } while (index < channel->frameCount);
+        for (index = 0; index < channel->frameCount; index++) {
+            if (Script_GetPc())
+                channel->duration[index] = Script_GetValue();
+            else
+                channel->duration[index] = 0;
         }
     } else {
-
         for (index = 0; index < channel->frameCount; index++)
             channel->duration[index] = 0;
     }
