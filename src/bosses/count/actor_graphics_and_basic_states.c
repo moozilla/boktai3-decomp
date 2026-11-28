@@ -53,10 +53,9 @@ void SceneActorGraphics_SelectResource(struct SceneGraphicsActor *actor)
     if (actor->graphics.effectMode) {
         actor->graphics.effectScale = 0;
         actor->graphics.effectMode = 0;
-        actor->graphics.resourceId =
-            SceneActorGraphics_GetResourceId((struct StateActor *)actor);
-        SceneActorGraphics_SelectPalette(actor,
-                                         SceneActorGraphics_GetResourceId((struct StateActor *)actor));
+        actor->graphics.resourceId = SceneActorGraphics_GetResourceId((struct StateActor *)actor);
+        SceneActorGraphics_SelectPalette(
+            actor, SceneActorGraphics_GetResourceId((struct StateActor *)actor));
     }
 }
 void Collision_CalculateDamageResponse(void *, void *);
@@ -68,8 +67,7 @@ s32 WirelessGame_TryAddCyclingItem(void *);
 void WirelessGame_AddItem(void *, s32);
 
 void SceneActorGraphics_OnDamageContact(struct ContactCollider *source,
-                                        struct ContactCollider *contact,
-                                        void *owner)
+                                        struct ContactCollider *contact, void *owner)
 {
     struct SceneGraphicsActor *actor = owner;
     struct SceneGraphicsActor *victim = owner;
@@ -174,8 +172,7 @@ void SceneActorGraphics_InitializeBody(struct StateActor *p)
                                  actor->graphics.attackHeight0, 0, flags,
                                  actor->graphics.attackDepth0);
 }
-void SceneActorGraphics_OnDamageContact(struct ContactCollider *, struct ContactCollider *,
-                                        void *);
+void SceneActorGraphics_OnDamageContact(struct ContactCollider *, struct ContactCollider *, void *);
 
 void SceneActorGraphics_InitializeOverlay(struct StateActor *p, int resource)
 {
@@ -311,7 +308,8 @@ void SceneActors_AddHealthCost(int amount)
             return;
     }
     SceneActors_RequestContactPoolClear();
-}void SceneActors_AddResourceCost(int amount)
+}
+void SceneActors_AddResourceCost(int amount)
 {
     struct SceneGraphicsActor *actor;
     if (amount > 0) {
@@ -322,16 +320,14 @@ void SceneActors_AddHealthCost(int amount)
 }
 // confidence=low: index of the first of the count tracked positions at 0x110 that lies inside
 // the box min..max on x and z, or -1.
-static inline s32 SceneGraphicsActor_GetPlayerPosition(struct SceneGraphicsActor *actor,
-                                                       s32 index,
+static inline s32 SceneGraphicsActor_GetPlayerPosition(struct SceneGraphicsActor *actor, s32 index,
                                                        struct ContactPosition **out)
 {
     *out = actor->playerPositions[index];
     return *out != NULL;
 }
 
-s32 sub_08022624(void *owner, s32 count, struct ContactPosition *min,
-                 struct ContactPosition *max)
+s32 sub_08022624(void *owner, s32 count, struct ContactPosition *min, struct ContactPosition *max)
 {
     struct SceneGraphicsActor *actor = owner;
     s32 i;
@@ -349,7 +345,8 @@ s32 sub_08022624(void *owner, s32 count, struct ContactPosition *min,
         }
     }
     return -1;
-}typedef struct ParticleOffset {
+}
+typedef struct ParticleOffset {
     s16 x, y, z, pad;
 } ParticleOffset;
 s32 SceneParticle_CreateParticles(const void *anchor, const ParticleOffset *offset,
@@ -517,7 +514,8 @@ s32 sub_08022B18(struct StateActor *p, s32 kind, s32 damage)
     switch (kind) {
         case 0: {
             s32 shown = damage;
-            if (((struct SceneGraphicsActor *)p)->graphics.stepTableKind == 1 && gPlayers[0]->actionMode != 2) {
+            if (((struct SceneGraphicsActor *)p)->graphics.stepTableKind == 1 &&
+                gPlayers[0]->actionMode != 2) {
                 shown = 0;
                 result = 0;
             }
@@ -704,69 +702,70 @@ void SceneActors_DispatchCommands(struct StateActor *p)
     s32 i;
 
     i = 0;
-    if (i < receiver->count[gSceneEventDispatchState->phase]) do {
-        struct SceneEventDispatchState *dispatch = gSceneEventDispatchState;
-        struct SceneGraphicsCommand *command =
-            (struct SceneGraphicsCommand *)receiver->pending[dispatch->phase][i];
-        SceneMessages_SetPendingTrigger(receiver, command);
-        switch (command->kind) {
-            case 0:
+    if (i < receiver->count[gSceneEventDispatchState->phase])
+        do {
+            struct SceneEventDispatchState *dispatch = gSceneEventDispatchState;
+            struct SceneGraphicsCommand *command =
+                (struct SceneGraphicsCommand *)receiver->pending[dispatch->phase][i];
+            SceneMessages_SetPendingTrigger(receiver, command);
+            switch (command->kind) {
+                case 0:
                     SceneActorState_StartAction(p, 2, 0, 0);
                     break;
-            case 1:
+                case 1:
                     p->savedFacing = (command->arguments[0] + 5) << 5;
                     SceneActorState_StartAction(p, 2, 0, 1);
                     break;
-            case 3:
+                case 3:
                     p->savedFacing = (command->arguments[0] + 5) << 5;
                     SceneActorState_StartAction(p, 2, 0, 2);
                     break;
-            case 4:
+                case 4:
                     p->savedFacing = (command->arguments[0] + 5) << 5;
                     SceneActorState_StartAction(p, 2, 0, 3);
                     break;
-            case 5:
+                case 5:
                     p->savedFacing = (command->arguments[0] + 5) << 5;
                     SceneActorState_StartAction(p, 2, 0, 4);
                     break;
-            case 6:
+                case 6:
                     p->savedFacing = (command->arguments[0] + 5) << 5;
                     SceneActorState_StartAction(p, 2, 0, 5);
                     break;
-            case 7:
+                case 7:
                     SceneActorState_StartAction(p, 2, 0, 6);
                     break;
-            case 8:
+                case 8:
                     SceneActorState_StartAction(p, 2, 0, 7);
                     break;
-            case 10:
+                case 10:
                     SceneActorState_StartAction(p, 2, 0, 8);
                     break;
-            case 11:
+                case 11:
                     SceneActorState_StartAction(p, 2, 0, 9);
                     break;
-            case 12:
+                case 12:
                     actor->graphics.snapPosition.x = command->arguments[0];
                     actor->graphics.snapPosition.y = command->arguments[1];
                     actor->graphics.snapPosition.z = command->arguments[2];
                     SceneActorState_StartAction(p, 2, 0, 10);
                     break;
-            case 19:
+                case 19:
                     SceneActorState_StartAction(p, 2, 0, 11);
                     break;
-            case 20:
+                case 20:
                     SceneActorState_StartAction(p, 2, 0, 12);
                     break;
-            case 21:
+                case 21:
                     SceneActorState_StartAction(p, 2, 0, 13);
                     break;
-            case 23:
+                case 23:
                     SceneActorState_StartAction(p, 2, 0, 14);
                     break;
-            case 24:
+                case 24:
                     SceneActorState_StartAction(p, 2, 0, 15);
                     break;
-            case 25:
+                case 25:
                     if (command->arguments[0])
                         SceneActors_StopBackgroundFlash(actor);
                     else if (command->arguments[1])
@@ -774,22 +773,22 @@ void SceneActors_DispatchCommands(struct StateActor *p)
                     else
                         BackgroundFlash_BeginAppearance(actor->graphics.backgroundFlash);
                     break;
-            case 13:
+                case 13:
                     SceneActorState_StartAction(p, 2, 0, 16);
                     break;
-            case 14:
+                case 14:
                     SceneActorState_StartAction(p, 2, 0, 18);
                     break;
-            case 22:
+                case 22:
                     p->targetPosition.x = command->arguments[0];
                     p->targetPosition.y = command->arguments[1];
                     p->targetPosition.z = command->arguments[2];
                     SceneActorState_StartAction(p, 2, 0, 19);
                     break;
-            case 18:
+                case 18:
                     SceneActorState_StartAction(p, 2, 0, 20);
                     break;
-            case 15:
+                case 15:
                     if (command->arguments[0] == 0) {
                         actor->graphics.effectScale = 0;
                         actor->graphics.effectMode = 0;
@@ -804,7 +803,7 @@ void SceneActors_DispatchCommands(struct StateActor *p)
                     }
                     Trigger_ConsumePending(p->receiver2, 1);
                     break;
-            case 16:
+                case 16:
                     if (command->arguments[0] == 0)
                         SceneActorGraphics_SetEffect(actor, 1, 0x335, 5);
                     else if (command->arguments[1] == 0)
@@ -813,15 +812,15 @@ void SceneActors_DispatchCommands(struct StateActor *p)
                         SceneActorGraphics_SetEffect(actor, 2, 0x33A, 5);
                     Trigger_ConsumePending(p->receiver2, 1);
                     break;
-            case 9:
+                case 9:
                     SceneActors_ConfigureEffect(p, command->arguments[0], 0xB4, 0xB4);
                     Trigger_ConsumePending(p->receiver2, 1);
                     break;
-            case 17:
+                case 17:
                     actor->graphics.unk3B8 = command->arguments[0];
                     Trigger_ConsumePending(p->receiver2, 1);
                     break;
-            case 2:
+                case 2:
                     p->target.x = command->arguments[0];
                     p->target.y = command->arguments[1];
                     p->target.z = command->arguments[2];
@@ -830,13 +829,13 @@ void SceneActors_DispatchCommands(struct StateActor *p)
                     actor->animation.position.z = p->target.z;
                     Trigger_ConsumePending(p->receiver2, 1);
                     break;
-            case 66:
+                case 66:
                     actor->graphics.projectileDirection = command->arguments[0];
                     SceneActorState_StartAction(p, 2, 0, 21);
                     break;
-        }
-        i++;
-    } while (i < receiver->count[gSceneEventDispatchState->phase]);
+            }
+            i++;
+        } while (i < receiver->count[gSceneEventDispatchState->phase]);
 }
 
 void SceneActorState_AdvanceToState1A(struct StateActor *p)
@@ -1100,7 +1099,8 @@ void SceneActorState_WaitForDelayedAction(struct StateActor *p)
         else
             SceneActorState_SetAnimation(p, 2);
     }
-    if (p->actionTimer > actor->graphics.recoveryTimer && SceneActorState_StepTableByKind((struct StateActor *)actor)) {
+    if (p->actionTimer > actor->graphics.recoveryTimer &&
+        SceneActorState_StepTableByKind((struct StateActor *)actor)) {
         SceneActorState_SnapReactionPosition(actor, &actor->graphics.snapPosition);
         SceneActorState_EnterPhase(p, 1);
     } else
@@ -1242,8 +1242,7 @@ void sub_08023FE8(struct StateActor *p)
         max.x = 0x80;
         max.z = 0x80;
         ProbeAdd(&max, &off);
-        r = sub_08022624(actor, actor->playerCount, &min,
-                         &max);
+        r = sub_08022624(actor, actor->playerCount, &min, &max);
         if (r >= 0) {
             struct Player *player = gPlayers[r];
             if (!SceneActorState_TestPlayerFlags(player, 0x40000)) {
@@ -1364,7 +1363,8 @@ void SceneActorState_PlayVariantAnimation13ThenRecover(struct SceneGraphicsActor
         }
     }
     p->actionTimer++;
-}void ContactActorPool_Start();
+}
+void ContactActorPool_Start();
 
 void SceneActorState_StartContactPool(struct SceneGraphicsActor *actor)
 {
@@ -1593,14 +1593,14 @@ void SceneActorAnimation_UpdateEightDirectionCallback(struct StateActor *p)
         else
             sequence = 38;
         SceneActors_StartEightDirectionAnimation(p, &actor->animation, &actor->animationResource,
-                                              sequence, 1, 1, 4);
+                                                 sequence, 1, 1, 4);
     } else {
         if (actor->graphics.animationFlags & 1)
             sequence = 0;
         else
             sequence = 38;
         SceneActors_StartEightDirectionAnimation(p, &actor->animation, &actor->animationResource,
-                                              sequence, 1, 1, 1);
+                                                 sequence, 1, 1, 1);
     }
     if (!p->actionTryUpdate(p)) {
         SceneActorState_SetFlags(p, 0x40);

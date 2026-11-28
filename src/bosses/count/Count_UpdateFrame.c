@@ -20,22 +20,28 @@ void Count_UpdateFrame(struct StateActor *p)
     s32 i;
     SceneActors_DispatchCommands(actor);
     Obj_StepPosition(body);
-    SceneActors_UpdateAnimation((struct StateActor *)owner, &actor->animation, (int)&actor->animationResource);
+    SceneActors_UpdateAnimation((struct StateActor *)owner, &actor->animation,
+                                (int)&actor->animationResource);
     SceneActorGraphics_OscillateScale(owner);
     body->position.y = actor->graphics.recoveryGroundHeight + (actor->graphics.scale >> 4);
     actor->animation.position.y = body->position.y;
     actor->animation.position.x = body->position.x;
     actor->animation.position.z = body->position.z;
     if (SceneActorState_TestFlags((struct StateActor *)owner, 0x20000)) {
-        actor->animation.position.x += SceneActor_ChargeComponent(gUnk_086149C4[(actor->graphics.shakeAngle + 64) & 255] * (actor->graphics.shakeStrength << 2));
-        actor->animation.position.z += SceneActor_ChargeComponent(gUnk_086149C4[actor->graphics.shakeAngle] * (actor->graphics.shakeStrength << 2));
+        actor->animation.position.x +=
+            SceneActor_ChargeComponent(gUnk_086149C4[(actor->graphics.shakeAngle + 64) & 255] *
+                                       (actor->graphics.shakeStrength << 2));
+        actor->animation.position.z += SceneActor_ChargeComponent(
+            gUnk_086149C4[actor->graphics.shakeAngle] * (actor->graphics.shakeStrength << 2));
     }
     if (actor->graphics.reactionDelay) {
         u32 angle;
         gRandomIndex = (gRandomIndex + 1) & 1023;
         angle = *(u16 *)(RANDOM_TABLE_ADDR + (gRandomIndex << 1));
-        actor->animation.position.x += SceneActor_ChargeComponent(gUnk_086149C4[(angle + 64) & 255] * (actor->graphics.reactionDelay << 2));
-        actor->animation.position.z += SceneActor_ChargeComponent(gUnk_086149C4[angle & 255] * (actor->graphics.reactionDelay << 2));
+        actor->animation.position.x += SceneActor_ChargeComponent(
+            gUnk_086149C4[(angle + 64) & 255] * (actor->graphics.reactionDelay << 2));
+        actor->animation.position.z += SceneActor_ChargeComponent(
+            gUnk_086149C4[angle & 255] * (actor->graphics.reactionDelay << 2));
         actor->graphics.reactionDelay--;
     }
     SceneActors_UpdateTargetMetrics((struct StateActor *)owner);

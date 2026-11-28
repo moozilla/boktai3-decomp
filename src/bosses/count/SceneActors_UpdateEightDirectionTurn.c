@@ -30,16 +30,16 @@ void SceneActors_UpdateEightDirectionTurn(struct StateActor *p)
             sequence = 0;
         else
             sequence = 38;
-        SceneActors_StartEightDirectionAnimation(p, &actor->animation, (int)&actor->animationResource,
-                                              sequence, 1, 1, 4);
+        SceneActors_StartEightDirectionAnimation(p, &actor->animation,
+                                                 (int)&actor->animationResource, sequence, 1, 1, 4);
     } else {
         int sequence;
         if (actor->graphics.animationFlags & 1)
             sequence = 0;
         else
             sequence = 38;
-        SceneActors_StartEightDirectionAnimation(p, &actor->animation, (int)&actor->animationResource,
-                                              sequence, 1, 1, 1);
+        SceneActors_StartEightDirectionAnimation(p, &actor->animation,
+                                                 (int)&actor->animationResource, sequence, 1, 1, 1);
     }
     SceneGraphicsActor_ClearPendingDamage(actor);
     SceneActorState_SetFlags(p, 12);

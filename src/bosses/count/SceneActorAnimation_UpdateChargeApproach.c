@@ -20,8 +20,8 @@ void SceneActorAnimation_UpdateChargeApproach(struct StateActor *p, int tick)
             sequence = 0;
         else
             sequence = 38;
-        SceneActors_StartEightDirectionAnimation(p, &actor->animation,
-                                                 &actor->animationResource, sequence, 1, 1, 4);
+        SceneActors_StartEightDirectionAnimation(p, &actor->animation, &actor->animationResource,
+                                                 sequence, 1, 1, 4);
         PolarInterpolation_SetCurrentFromPoint(actor->approachMotion, &body->position);
         sub_082222BC(actor->approachMotion, &actor->graphics.snapPosition,
                      actor->graphics.approachFrames);
@@ -35,8 +35,8 @@ void SceneActorAnimation_UpdateChargeApproach(struct StateActor *p, int tick)
             sequence = 0;
         else
             sequence = 38;
-        SceneActors_StartEightDirectionAnimation(p, &actor->animation,
-                                                 &actor->animationResource, sequence, 1, 1, 1);
+        SceneActors_StartEightDirectionAnimation(p, &actor->animation, &actor->animationResource,
+                                                 sequence, 1, 1, 1);
     }
     if (!p->actionTryUpdate(p)) {
         SceneActorState_SetFlags(p, 64);

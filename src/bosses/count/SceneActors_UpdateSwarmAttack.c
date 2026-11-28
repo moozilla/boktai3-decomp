@@ -4,7 +4,8 @@
 #include "engine/engine_globals.h"
 #include "engine/ram.h"
 
-static inline void ContactPosition_Add(struct ContactPosition *dst, const struct ContactPosition *src)
+static inline void ContactPosition_Add(struct ContactPosition *dst,
+                                       const struct ContactPosition *src)
 {
     dst->x += src->x;
     dst->y += src->y;

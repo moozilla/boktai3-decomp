@@ -167,8 +167,7 @@ void SceneActorAnimation_UpdatePlayerGrab(struct StateActor *p, int tick)
                 offset.x = 24;
                 offset.y = 0;
                 offset.z = 24;
-                DamageNumberDisplay_Show(contact, amount, 1,
-                                         &actor->body.position, &offset, 1);
+                DamageNumberDisplay_Show(contact, amount, 1, &actor->body.position, &offset, 1);
             }
             sub_08022694(actor);
             Sound_PlaySongChecked(844);

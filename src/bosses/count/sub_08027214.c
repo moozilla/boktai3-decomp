@@ -96,15 +96,16 @@ void sub_08027214(struct StateActor *base, s32 tick)
                 base->animationFacing8 = direction;
             }
             sequence = (actor->graphics.animationFlags & 1) ? 0xB : 0x31;
-            SceneActors_StartDirectionalAnimation(base, &actor->animation, &actor->animationResource, sequence, 2, 1,
-                                                  4);
+            SceneActors_StartDirectionalAnimation(base, &actor->animation,
+                                                  &actor->animationResource, sequence, 2, 1, 4);
             Death_SetState((struct DeathState *)&base->reactionPhase, state);
             base->reactionTimer = 0;
             Sound_PlaySongChecked(0x359);
         } else {
             u32 flash = Death_GetMode(actor) & 1;
             s32 sequence = flash ? 0x20 : 0x46;
-            SceneActors_StartUnmirroredAnimation(base, &actor->animation, &actor->animationResource, sequence, 1, 0);
+            SceneActors_StartUnmirroredAnimation(base, &actor->animation, &actor->animationResource,
+                                                 sequence, 1, 0);
             actor->graphics.scaleMin = 0;
             actor->graphics.scaleMax = 0;
             actor->variant = 0;
@@ -137,7 +138,8 @@ void sub_08027214(struct StateActor *base, s32 tick)
         }
     }
 
-    if (Death_GetTerrainHeight((struct Pos16 *)&base->target) < (u32)actor->graphics.recoveryGroundHeight ||
+    if (Death_GetTerrainHeight((struct Pos16 *)&base->target) <
+            (u32)actor->graphics.recoveryGroundHeight ||
         Death_CellBlocks((struct Pos16 *)&base->target)) {
         actor->graphics.retreatFrames = 8;
     }
@@ -159,7 +161,8 @@ void sub_08027214(struct StateActor *base, s32 tick)
             actor->graphics.reactionDelay = 8;
             if (base->animationCompletions > 4) {
                 SceneActorState_EnterReactionPhase(base, 2);
-                SceneActors_StartUnmirroredAnimation(base, &actor->animation, &actor->animationResource, 0x21, 2, 0);
+                SceneActors_StartUnmirroredAnimation(base, &actor->animation,
+                                                     &actor->animationResource, 0x21, 2, 0);
                 Sound_PlaySongChecked(0x350);
             }
             break;
@@ -170,7 +173,8 @@ void sub_08027214(struct StateActor *base, s32 tick)
             actor->graphics.reactionDelay = 8;
             if (base->animationCompletions > 4) {
                 SceneActorState_EnterReactionPhase(base, 2);
-                SceneActors_StartUnmirroredAnimation(base, &actor->animation, &actor->animationResource, 0x21, 2, 0);
+                SceneActors_StartUnmirroredAnimation(base, &actor->animation,
+                                                     &actor->animationResource, 0x21, 2, 0);
                 actor->graphics.animationFlags &= ~1;
                 Sound_PlaySongChecked(0x359);
             }
@@ -181,14 +185,16 @@ void sub_08027214(struct StateActor *base, s32 tick)
             }
             if (actor->animation.status & 2) {
                 SceneActorState_EnterReactionPhase(base, 3);
-                SceneActors_StartUnmirroredAnimation(base, &actor->animation, &actor->animationResource, 0x22, 2, 0);
+                SceneActors_StartUnmirroredAnimation(base, &actor->animation,
+                                                     &actor->animationResource, 0x22, 2, 0);
                 sub_08022878(&actor->animation.position);
             }
             break;
         case 3:
             if (actor->animation.status & 2) {
                 SceneActorState_EnterReactionPhase(base, 4);
-                SceneActors_StartUnmirroredAnimation(base, &actor->animation, &actor->animationResource, 0x23, 2, 0);
+                SceneActors_StartUnmirroredAnimation(base, &actor->animation,
+                                                     &actor->animationResource, 0x23, 2, 0);
             }
             break;
         case 4:
@@ -197,7 +203,8 @@ void sub_08027214(struct StateActor *base, s32 tick)
             }
             if (actor->animation.status & 2) {
                 SceneActorState_EnterReactionPhase(base, 5);
-                SceneActors_StartUnmirroredAnimation(base, &actor->animation, &actor->animationResource, 0x24, 2, 0);
+                SceneActors_StartUnmirroredAnimation(base, &actor->animation,
+                                                     &actor->animationResource, 0x24, 2, 0);
             }
             break;
         case 5:

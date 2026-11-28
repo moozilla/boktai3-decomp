@@ -35,7 +35,8 @@ void SceneActors_UpdateRouteProjectileAttack(struct StateActor *p, int tick)
                 SceneActor_SetChargeOffset(p->bodyDirection, &spawn, 128);
                 spawn.y = 256;
                 add(&spawn, (struct ContactPosition *)&p->target);
-                RouteSpriteActor_Create(&spawn, ((struct SceneGraphicsActor *)p)->playerPositions[0], 6, 6,
+                RouteSpriteActor_Create(&spawn,
+                                        ((struct SceneGraphicsActor *)p)->playerPositions[0], 6, 6,
                                         actor->graphics.routeProjectileAmount,
                                         actor->graphics.routeProjectileKind, 0, 20, 20, 0, 0, 3);
             }

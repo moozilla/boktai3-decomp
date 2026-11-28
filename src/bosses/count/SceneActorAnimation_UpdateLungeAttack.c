@@ -50,8 +50,7 @@ void SceneActorAnimation_UpdateLungeAttack(struct StateActor *p, int tick)
         SceneActorState_SetFlags(p, 0x40);
         if (!p->actionReset(p)) {
             if (tick <= 63)
-                SceneActor_SetChargeOffset(body->direction, &body->motion,
-                                           -((64 - tick) >> 3));
+                SceneActor_SetChargeOffset(body->direction, &body->motion, -((64 - tick) >> 3));
             if (tick > 63)
                 p->actionFinished = 1;
         }
