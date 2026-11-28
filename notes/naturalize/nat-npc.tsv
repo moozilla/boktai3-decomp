@@ -83,3 +83,12 @@ src/npc/sabata_rider/collision.c	ActorMotion_SetKnockback	natural	natural	0
 src/npc/sabata_rider/collision.c	ActorCollision_InitBounds	contrived	natural	5	
 src/npc/sabata_rider/collision.c	ActorMotion_ApplyInput	minor	minor	3	inline ApplyBoost keeps an owner alias of actor: ROM holds a second copy of the pointer (r7) for the later boost-frame accesses
 src/npc/sabata_rider/ActorScript_ParseParams.c	ActorScript_ParseParams	contrived	minor	18	local ScriptPosition/MotionState views of the player stay, and the null test on the player sub-struct
+src/npc/sabata_rider/lookup.c	SabataRider_FindAvailableEntry	natural	natural	0	
+src/npc/sabata_rider/lookup.c	SabataRider_FindEntryByName	natural	natural	0	
+src/npc/sabata_rider/lookup.c	SabataRider_RegisterMessageReceiver	natural	natural	0	
+src/npc/sabata_rider/lookup.c	SabataRider_SetKeyframes	natural	natural	0	
+src/npc/sabata_rider/motion.c	ActorMotion_UpdateDampedFall	minor	minor	2	actor alias stays: without it allocation swaps
+src/npc/sabata_rider/motion.c	ActorMotion_UpdateFallFrame	contrived	contrived	0	actor alias (motion) and field pointer temps stay: ROM keeps a second actor copy and forms the field addresses before the speed test; looks like a shared inline that did not reproduce
+src/npc/sabata_rider/motion.c	SceneActor_UpdateFallState	contrived	contrived	0	actor alias (motion) and field pointer temps stay: ROM keeps a second actor copy and forms the field addresses before the speed test; looks like a shared inline that did not reproduce
+src/npc/sabata_rider/motion.c	SceneActor_UpdateKnockbackFall	contrived	contrived	0	actor alias (motion) and field pointer temps stay: ROM keeps a second actor copy and forms the field addresses before the speed test; looks like a shared inline that did not reproduce
+src/npc/sabata_rider/motion.c	ActorPhysics_UpdateFallMotion	contrived	contrived	8	actor alias (motion) and field pointer temps stay: ROM keeps a second actor copy and forms the field addresses before the speed test; looks like a shared inline that did not reproduce
