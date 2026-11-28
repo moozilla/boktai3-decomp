@@ -469,3 +469,5 @@ src/system/clock/Time_CalculateLunarLongitude.c	Time_CalculateLunarLongitude	nat
 src/system/clock/Time_CalculateSolarLongitude.c	Time_CalculateSolarLongitude	natural	natural		
 src/system/clock/Time_CalculateSolarLatitude.c	Time_CalculateSolarLatitude	natural	natural		
 src/system/clock/Time_CalculateMoonAge.c	Time_CalculateMoonAge	natural	natural		
+src/system/clock/Clock_GetDateDifferenceFromScript.c	Clock_GetDateDifferenceFromScript	natural	natural		
+src/system/game_state/GameState_GetChallengeBestRank.c	GameState_GetChallengeBestRank	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
