@@ -3,16 +3,11 @@
 u16 *SceneTilemap_GetWrappedCell(s32, u32, u32);
 void SceneTilemap_FillRectangle(s32 column, s32 row, s32 width, s32 height, s32 tile, s32 layer)
 {
-    s32 i;
-    for (i = 0; i < height;) {
+    s32 i, j;
+
+    for (i = 0; i < height; i++) {
         u16 *p = SceneTilemap_GetWrappedCell(layer, column, row + i);
-        s32 next = i + 1;
-        if (width > 0) {
-            s32 n = width;
-            do {
-                *p++ = tile;
-            } while (--n);
-        }
-        i = next;
+        for (j = 0; j < width; j++)
+            *p++ = tile;
     }
 }
