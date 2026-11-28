@@ -422,3 +422,4 @@ src/scene/actor/placement/SceneActorEffects_ReleaseResources.c	SceneActorEffects
 src/scene/actor/placement/SceneActorPlacement_ResetStateThree.c	SceneActorPlacement_ResetStateThree	contrived	minor	6	flag helper calls: plain &= loads the field before the mask
 src/scene/actor/placement/SceneActorEffects_InitAtActorPosition.c	SceneActorEffects_InitAtActorPosition	contrived	minor	1	effects view cast: the effect member lives in the effects view of the actor
 src/scene/actor/placement/SceneActorMovement_ResolveRoutePosition.c	SceneActorMovement_ResolveRoutePosition	contrived	contrived	18	owner copy for the motion clear and flag block, failed/done gotos: structured returns and direct &= change layout and load order
+src/scene/actor/placement/SceneActorScript_ApplyRouteStartCommand.c	SceneActorScript_ApplyRouteStartCommand	contrived	minor	2	argument locals fix the load order of the three command words
