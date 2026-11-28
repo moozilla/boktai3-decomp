@@ -188,3 +188,7 @@ src/scene/actor/attachment/ActorAttachment_CreateSpriteSlot.c	ActorAttachment_Cr
 src/scene/actor/attachment/ActorAttachment_CreateFixedSpriteSlot.c	ActorAttachment_CreateFixedSpriteSlot	minor	minor	5	existing/manager pair, placed-sprite block and the parked mode bit are needed (shared with the other sprite slot creators)
 src/scene/actor/attachment/ActorAttachment_CreateAlternateSpriteSlot.c	ActorAttachment_CreateAlternateSpriteSlot	minor	minor	5	existing/manager pair, placed-sprite block and the parked mode bit are needed (shared with the other sprite slot creators)
 src/scene/actor/attachment/ActorAttachment_CreateValueSpriteSlot.c	ActorAttachment_CreateValueSpriteSlot	contrived	contrived	6	goto/found frame search: every structured loop changes the jump layout (jump2 cross-jumps, +48 bytes)
+src/scene/actor/attachment/ActorAttachment_CreateSinglePartSlot.c	ActorAttachment_CreateSinglePartSlot	contrived	contrived	0	one local shared by both flag arms: plain |= 1 reloads the constant for the later byte store
+src/scene/actor/attachment/ActorAttachment_CreateMeterPartsSlot.c	ActorAttachment_CreateMeterPartsSlot	minor	minor	0	-
+src/scene/actor/attachment/ActorAttachment_CreateThreePartSlot.c	ActorAttachment_CreateThreePartSlot	natural	natural	0	-
+src/scene/actor/attachment/ActorAttachment_CreatePartsSlotWithCount.c	ActorAttachment_CreatePartsSlotWithCount	natural	natural	0	-
