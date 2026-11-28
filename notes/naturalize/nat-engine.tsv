@@ -482,7 +482,6 @@ src/system/game_state/GameState_EquipConsumableSlot.c	GameState_EquipConsumableS
 src/system/game_state/GameRecords_UpdateMinimum.c	GameRecords_UpdateMinimum	contrived	contrived	10	record address built as an integer sum (index-first) and goto update
 src/system/game_state/GameState_ClearEquipmentSlot.c	GameState_ClearEquipmentSlot	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
 src/system/game_state/GameState_HasEquipment.c	GameState_HasEquipment	contrived	natural	1	
-src/system/game_state/GameState_AddEquipment.c	GameState_AddEquipment	contrived	natural	1	
 src/system/game_state/GameState_ResetSlotsFromScript.c	GameState_ResetSlotsFromScript	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
 src/system/game_state/GameState_GetUnlockDescriptor.c	GameState_GetUnlockDescriptor	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
 src/system/game_state/GameState_GetUnlockEntry.c	GameState_GetUnlockEntry	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
@@ -499,7 +498,7 @@ src/system/game_state/sub_0822EB14.c	sub_0822EB14	contrived	natural	1
 src/system/game_state/SolarFruit_Command.c	SolarFruit_Command	contrived	natural	1	
 src/system/game_state/sub_0822E764.c	sub_0822E764	contrived	minor	1	s16 store through unk50; index-first array form
 src/system/game_state/SolarFruit_IsInventorySlotEquipped.c	SolarFruit_IsInventorySlotEquipped	minor	minor	1	pointer walk over the fruit slots
-src/system/game_state/GameState_AddEquipment.c	GameState_AddEquipment	contrived	minor	1	array indexed as *(i + field) for the index-first address sum; replaces the earlier row, whose commit did not change the source
+src/system/game_state/GameState_AddEquipment.c	GameState_AddEquipment	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
 src/system/game_state/sub_0822E43C.c	sub_0822E43C	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
 src/system/game_state/Equipment_AssignUniqueSlot.c	Equipment_AssignUniqueSlot	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
 src/system/game_state/Inventory_AssignUniqueSecondarySlot.c	Inventory_AssignUniqueSecondarySlot	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
@@ -511,3 +510,12 @@ src/system/game_state/sub_0822E420.c	sub_0822E420	minor	natural	1
 src/system/game_state/GameState_AddEquipmentFromScript.c	GameState_AddEquipmentFromScript	minor	natural	1	
 src/system/game_state/GameState_AddUnlockFromScript.c	GameState_AddUnlockFromScript	minor	natural	1	
 src/system/game_state/SolarFruit_AddFromScript.c	SolarFruit_AddFromScript	minor	natural	1	
+src/system/game_state/SceneState_IncrementCounters.c	SceneState_IncrementCounters	minor	minor	0	capped increment inline on u16 counters with a signed compare; fifth bonus clamped separately
+src/system/game_state/SceneState_ResetRuntimeFields.c	SceneState_ResetRuntimeFields	contrived	contrived	4	raw offsets through a halfword-address inline: struct field stores keep gGameState cached (59 insns vs 71+ in ROM); the ROM reloads it before every store
+src/system/game_state/GameState_RecordChallengeRankFromScript.c	GameState_RecordChallengeRankFromScript	natural	natural	0	
+src/system/game_state/GameState_RecordChallengeScoreFromScript.c	GameState_RecordChallengeScoreFromScript	natural	natural	0	
+src/system/game_state/GameState_SetChallengeValueFromScript.c	GameState_SetChallengeValueFromScript	natural	natural	0	
+src/system/game_state/GameState_AddListEntryFromScript.c	GameState_AddListEntryFromScript	natural	natural	0	
+src/system/game_state/GameState_HasEquipmentFromScript.c	GameState_HasEquipmentFromScript	natural	natural	0	no return value without -m, as in the ROM
+src/system/game_state/GameState_HasUnlockFromScript.c	GameState_HasUnlockFromScript	natural	natural	0	
+src/system/game_state/GameState_HasUnlockedInventoryEntry.c	GameState_HasUnlockedInventoryEntry	minor	minor	6	upper inventory half addressed as (&inventory[8])[i] for the address order
