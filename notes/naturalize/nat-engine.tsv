@@ -723,3 +723,4 @@ src/system/solar/Solar_ResetState.c	Solar_ResetState	contrived	minor	1	scalar u1
 src/system/solar/Solar_IsMeasurementReady.c	Solar_IsMeasurementReady	contrived	natural	1	
 src/system/solar/Solar_CaptureBaseline.c	Solar_CaptureBaseline	contrived	natural	1	
 src/system/solar/Solar_PauseMeasurement.c	Solar_PauseMeasurement	contrived	natural	1	
+src/system/solar/Solar_ResumeMeasurement.c	Solar_ResumeMeasurement	contrived	natural	1	
