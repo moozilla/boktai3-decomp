@@ -1,11 +1,12 @@
 #include "global.h"
-extern u8 *gGameState;
-u32 GameState_IsConsumableSlotEquipped(s32 a)
+#include "system/game_state/game_state.h"
+
+u32 GameState_IsConsumableSlotEquipped(s32 slot)
 {
-    s32 i = 0;
-    s16 *p = (s16 *)(gGameState + 0x58);
-    for (; i <= 3; p++, i++) {
-        if (*p == a)
+    s32 i;
+
+    for (i = 0; i < 4; i++) {
+        if (gGameState->party[i] == slot)
             return 1;
     }
     return 0;
