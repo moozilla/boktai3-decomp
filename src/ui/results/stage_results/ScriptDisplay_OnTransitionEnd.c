@@ -1,12 +1,8 @@
 #include "global.h"
+#include "ui/results/stage_results.h"
 
-struct S {
-    u8 filler[0x000011CA];
-    u8 f;
-};
-
-void ScriptDisplay_OnTransitionEnd(struct S *s)
+void ScriptDisplay_OnTransitionEnd(struct StageResults *results)
 {
-    if (s->f != 0)
-        s->f = 0;
+    if (results->entering != 0)
+        results->entering = 0;
 }
