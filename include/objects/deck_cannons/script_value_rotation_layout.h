@@ -4,7 +4,8 @@
 #include "global.h"
 
 struct ScriptValueRotation {
-    u8 pad0[0x78];
+    u8 pad0[0x18];
+    u8 animation[0x60]; /* confidence=low */
     s8 startIndex;
     u8 ticks;
     u8 pad7A[0x2];

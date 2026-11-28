@@ -201,3 +201,8 @@ src/objects/deck_cannons/ScriptValues_LoadRotatedArray.c	ScriptValues_LoadRotate
 src/objects/deck_cannons/BackgroundAnimation_Destroy.c	BackgroundAnimation_Destroy	contrived	natural	1	
 src/objects/deck_cannons/PaletteCycleBackground_Init.c	PaletteCycleBackground_Init	contrived	natural	3	
 src/objects/deck_cannons/PaletteCycleBackground_Create.c	PaletteCycleBackground_Create	minor	natural	1	
+src/objects/deck_cannons/DeckCannon_LoadAnimation.c	DeckCannon_LoadAnimation	natural	natural	0	
+src/objects/deck_cannons/CallbackSlot_RestorePosition.c	CallbackSlot_RestorePosition	natural	natural	0	
+src/objects/deck_cannons/CallbackSlot_StartWhenTimerReady.c	CallbackSlot_StartWhenTimerReady	natural	natural	0	
+src/objects/deck_cannons/ScriptValues_TickRotation.c	ScriptValues_TickRotation	natural	natural	0	
+src/objects/deck_cannons/SceneEffect_UpdatePulsePalette.c	SceneEffect_UpdatePulsePalette	natural	natural	0	
