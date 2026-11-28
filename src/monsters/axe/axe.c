@@ -1276,16 +1276,14 @@ void Axe_InitColliders(struct ChaseActor *actor)
     atkOff.x = 0;
     atkOff.y = 0;
     atkOff.z = 0;
-    {
-        struct ContactCollider *c = &actor->base.colliderB;
-        Collider_Init(c, actor->base.body.id, f, 0, 16, &atkSize, &atkOff);
-        Collider_SetAttackProperties(c, SceneActorCollision_ReadAttackField3C(actor, 0),
-                                     SceneActorCollision_ReadAttackField40(actor, 0), 0,
-                                     SceneActorCollision_ReadAttackReactionFlags(actor, 0),
-                                     SceneActorCollision_ReadAttackField44(actor, 0));
-        Collider_SetPosition(c, &actor->base.body.position, 0);
-        Collider_SetCallback(c, Axe_OnAttackColliderContact, actor);
-    }
+    Collider_Init(&actor->base.colliderB, actor->base.body.id, f, 0, 16, &atkSize, &atkOff);
+    Collider_SetAttackProperties(&actor->base.colliderB,
+                                 SceneActorCollision_ReadAttackField3C(actor, 0),
+                                 SceneActorCollision_ReadAttackField40(actor, 0), 0,
+                                 SceneActorCollision_ReadAttackReactionFlags(actor, 0),
+                                 SceneActorCollision_ReadAttackField44(actor, 0));
+    Collider_SetPosition(&actor->base.colliderB, &actor->base.body.position, 0);
+    Collider_SetCallback(&actor->base.colliderB, Axe_OnAttackColliderContact, actor);
     k = 0x24010000;
     for (i = 0; i < 2; i++) {
         struct ContactCollider *c = &blk->extraAttack[i];

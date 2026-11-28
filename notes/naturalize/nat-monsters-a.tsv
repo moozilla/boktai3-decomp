@@ -252,3 +252,4 @@ src/monsters/axe/axe.c	SceneActorControl_RecoverRotation	contrived	contrived	6	r
 src/monsters/axe/axe.c	SceneActorControl_FinishRotation	contrived	contrived	5	remaining: bytep,constlocal,mask,maskhelper
 src/monsters/axe/axe.c	Axe_UpdateDamageSpin	contrived	contrived	10	remaining: constlocal,mask,ptrtemp,maskhelper
 src/monsters/axe/axe.c	SceneActorControl_UpdateHoverHeight	minor	minor	9	remaining: maskhelper
+src/monsters/axe/axe.c	Axe_InitColliders	contrived	contrived	6	remaining: constlocal,maskhelper
