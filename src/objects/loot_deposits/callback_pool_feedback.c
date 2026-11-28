@@ -77,13 +77,6 @@ void LootDepositCallbackPool_ApplyDamage(struct ContactCollider *source,
 void ImpactParticleGroup_SpawnBouncing(u32, u32, struct SceneExtent *, struct SceneExtent *,
                                        struct SceneExtent *, u32, u32);
 
-static inline s32 NextRandom(void)
-{
-    const u16 *table = gRandomTable;
-    gRandomIndex = (gRandomIndex + 1) & 0x3ff;
-    return table[gRandomIndex];
-}
-
 // confidence=low: spawns a small burst of hit particles at the entry's position.
 
 void LootDepositCallbackPool_SpawnHitParticles(struct CallbackPoolEntry *entry)
