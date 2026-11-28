@@ -1166,7 +1166,7 @@ u32 Mummy_TryStimulusRoute(struct ChaseActor *a)
     a->base.field2C2 = Div(64, 3);
     SceneActorChase_ClearActorFlags(a, 0x800000);
     body->interactionFrames = 4;
-    SceneActorChase_SetFlagComponent((void *)motionFlags, 0x200);
+    SceneActorChase_SetFlagComponent(motionFlags, 0x200);
     {
         u32 mask = 0x1000000;
         a->base.statusFlags |= mask;
