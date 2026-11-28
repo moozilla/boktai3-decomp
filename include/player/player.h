@@ -412,7 +412,8 @@ struct Player {
     struct SceneVec movementStart, movementDestination; /* 0xA8C, 0xA94 */
     u16 movementDuration;                               /* 0xA9C */
     u16 cueSpeed;                                       /* 0xA9E */
-    u8 unkAA0[0xE];
+    u8 targetOrbitAngle; /* 0xAA0: circling angle of the target motion (tentative) */
+    u8 unkAA1[0xD];
     u16 actionResetCounter;  /* 0xAAE: reset when starting a variant action (tentative) */
     u16 menuStatusValues[8]; /* 0xAB0: panel selects indices 0, 2 or 6 (tentative) */
     u8 unkAC0[2];
