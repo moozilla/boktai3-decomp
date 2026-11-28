@@ -72,9 +72,12 @@ static inline void Scale(struct ChaseActor *actor)
 {
     u16 *scale = SceneActorChase_PrepareAnimationScale(actor, 0xA02F);
     if (actor->base.drawableKind == 0)
-        Anim_SetDurationScale(&((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence, *scale);
+        Anim_SetDurationScale(
+            &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence,
+            *scale);
     else
-        Anim_SetFrameDurationScale(&((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile, *scale);
+        Anim_SetFrameDurationScale(
+            &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile, *scale);
 }
 // confidence=low: approaches a saved waypoint and requests a turn when the target heading differs.
 void CentipedeBody_ApproachWaypoint(struct ChaseActor *actor)
@@ -112,14 +115,11 @@ void CentipedeBody_ApproachWaypoint(struct ChaseActor *actor)
         }
     }
     Centipede_AdvanceMotionPhase(actor, speed);
-    {
-        u16 *p = &body->routeMotionTimer;
-        if (*p) {
-            Centipede_UpdateSegmentPositions(actor, 18, 0x1000);
-            --*p;
-        } else
-            Centipede_UpdateSegmentPositions(actor, 20, 0x6400);
-    }
+    if (body->routeMotionTimer) {
+        Centipede_UpdateSegmentPositions(actor, 18, 0x1000);
+        --body->routeMotionTimer;
+    } else
+        Centipede_UpdateSegmentPositions(actor, 20, 0x6400);
     Centipede_UpdateOscillation(actor, 120, 10);
     actor->base.counter2AC++;
 }

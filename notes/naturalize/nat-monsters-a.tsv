@@ -219,3 +219,4 @@ src/monsters/centipede/tentacle_body.c	CentipedeBody_OnBodyContact	minor	natural
 src/monsters/centipede/tentacle_body.c	ActorTrail_RestoreSavedState	contrived	contrived	7	remaining: zeroone,block,constlocal,mask,ptrtemp
 src/monsters/centipede/tentacle_body.c	CentipedeBody_BeginDirectedAttack	contrived	contrived	23	remaining: bytep,block,constlocal,mask,ptrtemp,maskhelper
 src/monsters/centipede/CentipedeBody_UpdateDefeat.c	CentipedeBody_UpdateDefeat	contrived	contrived	9	remaining: bytep,block,maskhelper
+src/monsters/centipede/CentipedeBody_ApproachWaypoint.c	CentipedeBody_ApproachWaypoint	contrived	minor	1	remaining: u8cast
