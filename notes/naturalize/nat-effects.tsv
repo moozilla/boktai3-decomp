@@ -288,3 +288,4 @@ src/effects/orbits/orbiting_particles.c	OrbitingParticles_Initialize	contrived	n
 src/effects/orbits/orbiting_particles.c	OrbitingParticles_Create	minor	natural	1	
 src/effects/orbits/orbiting_particles.c	OrbitingParticles_CreateFromScript	minor	natural	1	
 src/effects/orbits/orbiting_particles.c	OrbitingParticles_Stop	natural	natural	0	
+src/effects/orbits/converging_effects.c	ConvergingEffects_UpdateParticles	minor	minor	40	draw alias of the particle pointer: register copy

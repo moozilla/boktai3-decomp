@@ -1,5 +1,6 @@
 #include "effects/orbits/converging_effects.h"
 #include "monsters/ghoul_disc.h"
+#include "engine/math/math_shift.h"
 
 extern const s16 gUnk_086149C4[];
 
@@ -24,13 +25,14 @@ void ConvergingEffects_UpdateParticles(struct Player *player)
         struct ConvergingParticle *e = &player->convergingEffects.particles[i];
         if (e->active) {
             struct ConvergingParticle *draw = e;
-            if (Ghoul_Abs(draw->offsetX) <= 15 && Ghoul_Abs(draw->offsetZ) <= 15) {
+            if (abs(draw->offsetX) <= 15 && abs(draw->offsetZ) <= 15) {
                 draw->flags |= 1;
                 e->active = 0;
             } else {
                 s32 angle = Math_Atan2(e->offsetX, e->offsetZ);
-                e->offsetX -= scale(e->speed * gUnk_086149C4[(angle + 64) & 255]);
-                e->offsetZ -= scale(e->speed * gUnk_086149C4[angle & 255]);
+                e->offsetX -=
+                    Math_ShiftTowardZero(e->speed * gUnk_086149C4[(angle + 64) & 255], 12);
+                e->offsetZ -= Math_ShiftTowardZero(e->speed * gUnk_086149C4[angle & 255], 12);
                 draw->position.x = player->actionOrigin.x + (u16)e->offsetX;
                 draw->position.z = player->actionOrigin.z + (u16)e->offsetZ;
                 if (++e->ticks == 4)
@@ -87,7 +89,6 @@ static inline s32 random_value(void)
     gRandomIndex = (gRandomIndex + 1) & 1023;
     return *(u16 *)((u8 *)gRandomTable + (gRandomIndex << 1));
 }
-
 
 void ConvergingEffects_EmitFarParticle(struct Player *player, struct SceneVec *position)
 {
