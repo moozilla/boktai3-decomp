@@ -10,7 +10,7 @@ void SceneActors_UpdateReleasePose(struct StateActor *p)
         SceneActors_StartDirectionalAnimation(p, &actor->animation, (int)&actor->animationResource,
                                               72, 2, 1, 4);
     }
-    SceneGraphicsActor_ClearPendingDamage((struct SceneGraphicsActor *)p);
+    SceneGraphicsActor_ClearPendingDamage(actor);
     SceneActorState_SetFlags(p, 12);
     if (p->animationFinished) {
         SceneActors_StartDirectionalAnimation(p, &actor->animation, (int)&actor->animationResource,
