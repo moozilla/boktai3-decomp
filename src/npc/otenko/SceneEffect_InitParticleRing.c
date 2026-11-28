@@ -10,30 +10,24 @@ void Effect_SetPalette(void *, s32);
 s32 SceneEffect_InitParticleRing(struct TransitionEffect *effect,
                                  const struct ContactPosition *origin)
 {
-    struct SceneAnimation *anim;
-    struct TransitionParticle *particle;
-    s32 i, neg;
+    s32 i;
     effect->origin = *origin;
     effect->frame = 0;
-    anim = &effect->animation;
-    AnimData_Load(anim, 0x3641);
-    Sprite_Init(&effect->sprite, anim, 2);
+    AnimData_Load(&effect->animation, 0x3641);
+    Sprite_Init(&effect->sprite, &effect->animation, 2);
     effect->sprite.position = *origin;
     effect->sprite.palette = 0x40;
     effect->sprite.paletteVariant = 0x40;
     effect->sprite.priority = 3;
     effect->graphics = AnimData_FindEntry(0x1C1E);
-    neg = -4;
-    particle = effect->particles;
-    i = 7;
-    do {
+    for (i = 0; i < 8; i++) {
+        struct TransitionParticle *particle = &effect->particles[i];
         ParticleSprite_Initialize(particle, effect->graphics, 1);
-        Effect_SetOrigin(particle, neg, neg);
+        Effect_SetOrigin(particle, -4, -4);
         SpriteDrawable_SelectTileFrame(particle, effect->graphics, 2);
         Effect_SetPalette(particle, 1);
         particle->motion.active = 0;
-        particle++;
-    } while (--i >= 0);
+    }
     effect->state = 0;
     effect->stateFrame = 0;
     effect->enter = 1;
