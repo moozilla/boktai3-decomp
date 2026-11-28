@@ -63,7 +63,6 @@ void DungeonScenery_UpdateFade(struct SceneScriptObject *object)
     s32 songs[15];
     s32 index;
     s32 amount;
-    s32 zero;
     u8 *dest;
     if (object->fadeTimer > 0 && (u16)--object->fadeTimer == 0) {
         index = PaletteIndex(object->state, object->parameter);
@@ -82,7 +81,8 @@ void DungeonScenery_UpdateFade(struct SceneScriptObject *object)
     }
     switch (object->state) {
         case 12:
-            object->sprite.position.y += VanargandProjectile_Scale(gUnk_086149C4[*(u8 *)&object->counter] * 2);
+            object->sprite.position.y +=
+                VanargandProjectile_Scale(gUnk_086149C4[(u8)object->counter] * 2);
             break;
         case 14:
             if (object->fadeTimer == 0) {
@@ -95,9 +95,7 @@ void DungeonScenery_UpdateFade(struct SceneScriptObject *object)
                     m &= phase;
                     amount = 0x80 - m;
                 } else {
-                    s32 m = 0x7f;
-                    m &= phase;
-                    amount = m;
+                    amount = phase & 0x7f;
                 }
                 dest = gPaletteBankData + bank * 32;
                 Palette_InterpolateBanks(object->resource.palette, dest,
@@ -105,23 +103,19 @@ void DungeonScenery_UpdateFade(struct SceneScriptObject *object)
             }
             break;
     }
-    if (object->lifetime > 0)
-        goto increment;
-    zero = object->fadeTimer;
-    if (zero != 0)
-        goto increment;
-    memcpy(songs, gUnk_0824F7A4, 0x3c);
-    Sound_PlaySong(songs[object->state]);
-    object->sprite.flags |= 1;
-    if (object->state == 12)
-        ActorShadow_Disable(object->shadow);
-    object->finished = 1;
-    object->counter = zero;
-    widget->flags |= 4;
-    if (object->pendingScript)
-        DungeonScenery_RunPendingScript(object);
-    return;
-increment:
+    if (object->lifetime <= 0 && object->fadeTimer == 0) {
+        memcpy(songs, gUnk_0824F7A4, sizeof(songs));
+        Sound_PlaySong(songs[object->state]);
+        object->sprite.flags |= 1;
+        if (object->state == 12)
+            ActorShadow_Disable(object->shadow);
+        object->finished = 1;
+        object->counter = 0;
+        widget->flags |= 4;
+        if (object->pendingScript)
+            DungeonScenery_RunPendingScript(object);
+        return;
+    }
     object->counter++;
 }
 
@@ -214,7 +208,7 @@ void DungeonProp_Destroy(struct SceneScriptObject *object)
 }
 
 void DungeonScenery_ApplyHitFlash(struct ContactCollider *source, void *unused,
-                                     struct SceneScriptObject *object)
+                                  struct SceneScriptObject *object)
 {
     u8 scratch[4]; /* unused; the original reserves a 4-byte frame */
     struct {

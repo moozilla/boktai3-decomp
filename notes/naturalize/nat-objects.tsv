@@ -206,3 +206,9 @@ src/objects/deck_cannons/CallbackSlot_RestorePosition.c	CallbackSlot_RestorePosi
 src/objects/deck_cannons/CallbackSlot_StartWhenTimerReady.c	CallbackSlot_StartWhenTimerReady	natural	natural	0	
 src/objects/deck_cannons/ScriptValues_TickRotation.c	ScriptValues_TickRotation	natural	natural	0	
 src/objects/deck_cannons/SceneEffect_UpdatePulsePalette.c	SceneEffect_UpdatePulsePalette	natural	natural	0	
+src/objects/dungeon_prop/scenery.c	DungeonScenery_UpdateBurst	contrived	contrived	16	pointer locals, shared mask local and Sample()/AdvanceAndSample() decide which addresses the loop hoists; every single simplification changes register allocation
+src/objects/dungeon_prop/scenery.c	DungeonScenery_RunPendingScript	natural	natural	0	
+src/objects/dungeon_prop/scenery.c	DungeonScenery_Update	natural	natural	0	
+src/objects/dungeon_prop/scenery.c	DungeonProp_Destroy	natural	natural	0	
+src/objects/dungeon_prop/scenery.c	DungeonScenery_InitHitCollider	natural	natural	0	
+src/objects/dungeon_prop/scenery.c	DungeonScenery_UpdateFade	contrived	minor	39	collider widget pointer plus ClearFlags(w, -5) and `4 | flags` keep the flag register order; constant-first mask local in the fading branch; Next() helper and dest local
