@@ -23,15 +23,13 @@ u32 EffectManager_RemoveEffect(struct EffectManager *manager, struct Effect *eff
 s32 EffectManager_RemoveActiveEffects(void *unused)
 {
     struct EffectManager *manager = gEffectManager;
-    struct Effect *effect;
     s32 i;
-    if (manager == 0)
+
+    if (manager == NULL)
         return -1;
-    effect = manager->effects;
-    for (i = 5; i >= 0; i--) {
-        if (effect->active != 0)
-            EffectManager_RemoveEffect(manager, effect);
-        effect++;
+    for (i = 0; i < 6; i++) {
+        if (manager->effects[i].active)
+            EffectManager_RemoveEffect(manager, &manager->effects[i]);
     }
     return 0;
 }
