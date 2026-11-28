@@ -559,3 +559,4 @@ src/ui/town/solar_bank/SolarBank_GetBalance.c	SolarBank_GetBalance	minor	natural
 src/ui/town/solar_bank/SolarBank_SetBalanceFromScript.c	SolarBank_SetBalanceFromScript	minor	natural	1	
 src/ui/town/solar_bank/SolarBank_ApplyInterestFromScript.c	SolarBank_ApplyInterestFromScript	contrived	natural	6	
 src/ui/town/solar_bank/SolarBank_UpdateSelection.c	SolarBank_UpdateSelection	minor	natural	2	
+src/ui/town/solar_bank/sub_081BB248.c	sub_081BB248	minor	natural	1	
