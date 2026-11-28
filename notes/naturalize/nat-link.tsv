@@ -203,3 +203,4 @@ src/link/player/Player_InitOptionalComponents.c	Player_InitOptionalComponents	na
 src/link/player/Player_SmoothCameraAnchor.c	Player_SmoothCameraAnchor	contrived	minor	24	the y axis keeps a split sum: a single expression folds the 150 bias early
 src/link/player/Player_CanUseAction.c	Player_CanUseAction	contrived	natural	10	
 src/link/player/sub_0823B728.c	sub_0823B728	contrived	natural	1	
+src/link/player/LinkPlayer_ClampToRecoveryTerrainCell.c	LinkPlayer_ClampToRecoveryTerrainCell	minor	natural	1	

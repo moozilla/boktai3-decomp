@@ -1,4 +1,3 @@
-#define Player_TestTerrainRecoveryEnabled Player_IsFlaggedWithGlobalModifier10
 #include "global.h"
 /* LinkPlayer_ClampToRecoveryTerrainCell: same code as Player_ClampPositionToStoredTerrainCell at another address (ported by relatives.py; provisional name) */
 #include "player/player.h"
