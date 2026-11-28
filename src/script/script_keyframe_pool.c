@@ -135,15 +135,14 @@ void ScriptKeyframe_AddFromScript(void)
     struct ScriptKeyframeEntry *entry;
     struct ProjectedDisplayResource *resource;
     struct ContactPosition *position;
-    u32 value, frame, mode, priority;
+    u32 frame, mode, priority;
     if (!manager || manager->count >= manager->capacity)
         return;
     entry = &manager->entries[manager->count];
-    value = Script_SeekToKeyword('n');
-    if (value)
+    if (Script_SeekToKeyword('n'))
         entry->tag = Script_GetValue();
     else
-        entry->tag = value;
+        entry->tag = 0;
     if (!Script_SeekToKeyword('d'))
         return;
     {
@@ -187,11 +186,10 @@ void ScriptKeyframe_AddFromScript(void)
     }
     AnimSprite_InitLinked(&entry->animation, &entry->resource, (u16)frame, mode, (u8)priority, 0,
                           60, position);
-    value = Script_SeekToKeyword('A');
-    if (value)
+    if (Script_SeekToKeyword('A'))
         entry->conditionalVisibility = Script_GetValue();
     else
-        entry->conditionalVisibility = value;
+        entry->conditionalVisibility = 0;
     entry->hidden = 0;
     gScriptKeyframeManager->count++;
 }

@@ -469,3 +469,13 @@ src/script/script_selector.c	ScriptSelector_UpdateTask	minor	natural	4
 src/script/demo_manager.c	SceneMessages_SetPendingTrigger	natural	natural	0	
 src/script/script_keyframe_pool.c	ScriptKeyframe_TickManager	contrived	natural	1	
 src/script/script_keyframe_pool.c	ScriptKeyframe_DestroyManager	contrived	natural	1	
+src/script/script_keyframe_pool.c	ScriptKeyframe_FindFromScript	contrived	contrived	3	goto search with hand-stepped tag pointer: a for loop with return puts the found block elsewhere
+src/script/script_keyframe_pool.c	ScriptKeyframe_SetMirrorFromScript	natural	natural	0	
+src/script/script_keyframe_pool.c	ScriptKeyframe_HideFromScript	natural	natural	0	
+src/script/script_keyframe_pool.c	ScriptKeyframe_ShowFromScript	natural	natural	0	
+src/script/script_keyframe_pool.c	ScriptKeyframe_SetPriorityFromScript	natural	natural	0	
+src/script/script_keyframe_pool.c	ScriptKeyframe_SetTargetFromScript	natural	natural	0	
+src/script/script_keyframe_pool.c	ScriptKeyframe_UpdateEntry	natural	natural	0	
+src/script/script_keyframe_pool.c	ScriptKeyframe_InitManager	natural	natural	0	
+src/script/script_keyframe_pool.c	ScriptKeyframe_CreateManagerFromScript	natural	natural	0	
+src/script/script_keyframe_pool.c	ScriptKeyframe_AddFromScript	contrived	minor	4	mirror block, resource id block and position pointer: plain forms change register allocation
