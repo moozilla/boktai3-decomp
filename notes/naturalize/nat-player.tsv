@@ -310,3 +310,10 @@ src/player/cutscene/player_cue_actions.c	Player_UpdateSongCueAnimation	minor	nat
 src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateKnockdownRecovery	natural	natural	0	-
 src/player/cutscene/player_cue_actions.c	Player_UpdateRecoilAction	minor	natural	3	-
 src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateRecoilRecovery	minor	natural	4	-
+src/player/cutscene/player_cue_actions.c	Player_UpdateFourPhaseAction	natural	natural	0	-
+src/player/cutscene/player_cue_actions.c	Player_UpdateSixPhaseAction	natural	natural	0	-
+src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateAim	natural	natural	0	-
+src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateAimHoldA	natural	natural	0	-
+src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateAimHoldB	natural	natural	0	-
+src/player/cutscene/player_cue_actions.c	Player_UpdateThreePhaseBaseAnimationAction	natural	natural	0	-
+src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateRunTo	contrived	minor	22	arrival facing mask loaded before the shifted angle keeps a mask local (plain & merges the two stores)

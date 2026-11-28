@@ -1079,14 +1079,10 @@ void PlayerCue_UpdateRunTo(struct Player *player)
             player->facing = player->targetFacing;
             player->targetFacing = -1;
         } else {
-            {
-                s32 t = ((u16)angle) + 0x70;
-                u32 mask;
-                t >>= 5;
-                mask = 7;
-                mask &= t;
-                player->facing = mask;
-            }
+            s32 sector = ((u16)angle + 0x70) >> 5;
+            u32 mask = 7;
+            mask &= sector;
+            player->facing = mask;
         }
         if (player->facing > 4) {
             player->heading = 8 - player->facing;
@@ -1113,34 +1109,18 @@ void PlayerCue_UpdateRunTo(struct Player *player)
         Player_AddControlFlags(player, 1);
     }
     player->tetherFrame++;
-    {
-        s32 vy;
-        player->velocityX = TruncateQ12(MultiplyMotion(gUnk_086149C4[(angle + 64) & 255], speed));
-        {
-            s32 sine;
-
-            sine = gUnk_086149C4[angle & 255];
-
-            vy = TruncateQ12(MultiplyMotion(sine, speed));
-        }
-        player->velocityZ = vy;
-        {
-            u32 axis;
-
-            axis = player->velocityScaleAxis;
-
-            if (axis == 1) {
-                if (vy < 0)
-                    player->velocityZ = ScaleDirectionalMotion(player->velocityZ, 40);
-                else
-                    player->velocityZ = ScaleDirectionalMotion(player->velocityZ, 0x34);
-            } else if (axis == 2) {
-                if (player->velocityX < 0)
-                    player->velocityX = ScaleDirectionalMotion(player->velocityX, 40);
-                else
-                    player->velocityX = ScaleDirectionalMotion(player->velocityX, 0x34);
-            }
-        }
+    player->velocityX = TruncateQ12(MultiplyMotion(gUnk_086149C4[(angle + 64) & 255], speed));
+    player->velocityZ = TruncateQ12(MultiplyMotion(gUnk_086149C4[angle & 255], speed));
+    if (player->velocityScaleAxis == 1) {
+        if (player->velocityZ < 0)
+            player->velocityZ = ScaleDirectionalMotion(player->velocityZ, 40);
+        else
+            player->velocityZ = ScaleDirectionalMotion(player->velocityZ, 0x34);
+    } else if (player->velocityScaleAxis == 2) {
+        if (player->velocityX < 0)
+            player->velocityX = ScaleDirectionalMotion(player->velocityX, 40);
+        else
+            player->velocityX = ScaleDirectionalMotion(player->velocityX, 0x34);
     }
     player->facing = ((((angle + 16) & 255) >> 5) + 3) & 7;
     if (player->facing > 4) {
