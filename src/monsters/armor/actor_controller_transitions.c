@@ -396,28 +396,22 @@ extern u32 gUnk_0824ED88[];
 
 void ActorController_UpdateSoundedAnimationTransition(struct SceneCombatActor *actor)
 {
-    u8 *phase = &actor->actionPhase;
-    u8 initialPhase = *phase;
-
-    switch (initialPhase) {
-        case 0: {
+    switch (actor->actionPhase) {
+        case 0:
             Armor_SetAnimationFromStart(actor, &gUnk_0824ED78[((actor->heading + 0x60) >> 6) & 3]);
-            (*phase)++;
-            actor->actionReady = initialPhase;
+            actor->actionPhase++;
+            actor->actionReady = 0;
             ActorController_SelectDefenseColliders(actor);
-            {
-                ActorController_ClearMotionFlags(&actor->colliderGroup.motion, 1);
-            }
+            ActorController_ClearMotionFlags(&actor->colliderGroup.motion, 1);
             actor->flags &= ~0x20;
             Sound_PlaySongChecked(0xC1);
             break;
-        }
         case 1:
             if (actor->animationComplete != 0) {
                 Armor_SetAnimationFromStart(actor,
                                             &gUnk_0824ED88[((actor->heading + 0x60) >> 6) & 3]);
-                *phase = 0xFF;
-                actor->actionReady = initialPhase;
+                actor->actionPhase = 0xFF;
+                actor->actionReady = 1;
             }
             break;
     }

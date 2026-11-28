@@ -84,3 +84,4 @@ src/monsters/armor/actor_controller_transitions.c	ActorController_UpdateHeavyAtt
 src/monsters/armor/actor_controller_transitions.c	ActorController_UpdateMovementVelocity	natural	natural	0	
 src/monsters/armor/actor_controller_transitions.c	ActorController_UpdateFixedAnimationTransition	contrived	natural	12	
 src/monsters/armor/actor_controller_transitions.c	ActorController_UpdateFadeAnimationTransition	contrived	natural	9	
+src/monsters/armor/actor_controller_transitions.c	ActorController_UpdateSoundedAnimationTransition	contrived	natural	7	
