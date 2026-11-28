@@ -279,15 +279,10 @@ void SpriteOam_QueueFlaggedProjectedSprites(void)
 {
     struct ContactPosition pos;
     struct SpriteDrawable *sprite;
-    s32 *matrixCount;
-    u32 parity = gSceneEffectPalettePhase & 1;
-    u32 skip = 0x401;
-    if (parity)
-        skip = 0x201;
+    u32 skip = (gSceneEffectPalettePhase & 1) ? 0x201 : 0x401;
     sprite = gDrawableListHeads[gRenderListIndex];
     if (!sprite)
         return;
-    matrixCount = &gAffineRequestCount;
     do {
         s32 x, y;
         s32 z;
@@ -296,15 +291,14 @@ void SpriteOam_QueueFlaggedProjectedSprites(void)
         s32 depth;
         s32 ox, oy;
         s32 tmp;
-        u32 initialFlags = sprite->flags;
-        if (initialFlags & skip) {
+        if (sprite->flags & skip) {
             sprite = sprite->next;
             continue;
         }
-        if (!(initialFlags & 0x1000))
+        if (!(sprite->flags & 0x1000))
             goto next;
 
-        if (!(initialFlags & 16)) {
+        if (!(sprite->flags & 16)) {
             SpriteOam_ProjectPosition(&pos, &sprite->position);
             x = pos.x;
             y = pos.y;
@@ -331,35 +325,17 @@ void SpriteOam_QueueFlaggedProjectedSprites(void)
         y += oy;
         depth = z;
         x &= 511;
-        {
-            u32 shifted = x << 16;
-            attr = sprite->attributes | shifted;
-        }
+        attr = sprite->attributes | (x << 16);
         y &= 255;
         attr |= y;
         if (flags & 2) {
             u32 matrix;
-            u32 angle;
-            s32 sx, sy;
             if (!(flags & 0x20000) && (UnsignedScale(sprite->scaleX) > 60 ||
                                        UnsignedScale(sprite->scaleY) > 60 || sprite->angle != 0))
                 attr |= 0x300;
             else
                 attr |= 0x100;
-            angle = sprite->angle;
-            sx = (s8)sprite->scaleX;
-            sy = (s8)sprite->scaleY;
-            if (*matrixCount > 31)
-                matrix = 0;
-            else {
-                s32 *count = matrixCount;
-                gSpriteAffineParams[*count].angle = angle;
-                gSpriteAffineParams[*count].scaleX = sx;
-                gSpriteAffineParams[*count].scaleY = sy;
-                tmp = *count;
-                matrix = tmp++;
-                *count = tmp;
-            }
+            matrix = SpriteOam_AllocateAffineMatrix(sprite->angle, sprite->scaleX, sprite->scaleY, &gAffineRequestCount);
             attr |= matrix << 25;
             flags = sprite->flags;
         }
