@@ -318,3 +318,4 @@ src/scene/actor/control/SceneActorControl_RestoreMotion.c	SceneActorControl_Rest
 src/scene/actor/control/SceneActorControl_TickRandomMotion.c	SceneActorControl_TickRandomMotion	contrived	minor	18	ClearMotionVector CpuSet wrapper: ZeroFill8 uses a different stack slot pattern
 src/scene/actor/control/SceneActorControl_TickGroundBob.c	SceneActorControl_TickGroundBob	contrived	contrived	16	flag tests through a pointer and the ground-delta block: plain tests load the field before the mask and reorder the ground load
 src/scene/actor/control/SceneActorControl_ConsumeLiftFlag.c	SceneActorControl_ConsumeLiftFlag	contrived	contrived	7	materialized 0/1 flag predicate and widened flag stores: plain tests and |= lose the predicate and load the field first
+src/scene/actor/control/SceneActorControl_InitContactColliders.c	SceneActorControl_InitContactColliders	contrived	minor	2	contact callbacks passed as void *: their prototypes differ from the init parameters
