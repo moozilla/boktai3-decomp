@@ -426,3 +426,6 @@ src/scene/actor/placement/SceneActorScript_ApplyRouteStartCommand.c	SceneActorSc
 src/scene/actor/placement/SceneActorPlacement_PlayResponseAndResetState.c	SceneActorPlacement_PlayResponseAndResetState	contrived	contrived	3	flag mask helpers and fallback goto into a case: plain &= and & tests reorder the load
 src/scene/actor/placement/SceneActorPlacement_ResumeResetControl.c	SceneActorPlacement_ResumeResetControl	minor	minor	3	parked bit mask and collider helper: plain & and &= load the field before the mask
 src/scene/actor/placement/SceneActorPlacement_ShowActor.c	SceneActorPlacement_ShowActor	contrived	contrived	4	masked-zero local and flags pointer: a combined flag test loses the single load
+src/scene/actor/placement/SceneActorPlacement_HideActor.c	SceneActorPlacement_HideActor	minor	minor	0	flags local and collider helper: plain &|= reload the field
+src/scene/actor/placement/SceneActorScript_ApplyTargetResetCommand.c	SceneActorScript_ApplyTargetResetCommand	natural	natural	0	-
+src/scene/actor/placement/SceneActorControl_RestoreInactiveDefaults.c	SceneActorControl_RestoreInactiveDefaults	contrived	contrived	0	masked-zero local reused as the stored value: a combined flag test reloads the flags
