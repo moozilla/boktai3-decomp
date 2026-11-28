@@ -272,3 +272,4 @@ src/player/core/PlayerContact_ApplyStatReward.c	PlayerContact_ApplyStatReward	na
 src/player/core/PlayerContact_ApplySyntheticContact.c	PlayerContact_ApplySyntheticContact	natural	natural	0	
 src/player/core/Player_EnterKindFour.c	Player_EnterKindFour	minor	natural	1	
 src/player/core/PlayerContact_ApplyTerrainDamage.c	PlayerContact_ApplyTerrainDamage	contrived	minor	5	flag helper takes a field offset: plain tests and a pointer parameter change the branch layout
+src/player/core/Player_UpdateResetBlink.c	Player_UpdateResetBlink	contrived	minor	11	player alias q before the countdown fixes register allocation
