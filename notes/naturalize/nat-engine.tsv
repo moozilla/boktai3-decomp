@@ -719,3 +719,4 @@ src/system/solar/solar_calibration_menu.c	Menu_SetTextRect	natural	natural	1	fie
 src/system/solar/solar_calibration_menu.c	Menu_SetBackgroundMap	natural	natural	0	
 src/system/solar/solar_calibration_menu.c	Menu_StartFadeIn	natural	natural	0	
 src/system/solar/solar_calibration_menu.c	Menu_StartFadeOut	natural	natural	0	
+src/system/solar/Solar_ResetState.c	Solar_ResetState	contrived	minor	1	scalar u16 view of the s16 field: a member store keeps gGameState cached
