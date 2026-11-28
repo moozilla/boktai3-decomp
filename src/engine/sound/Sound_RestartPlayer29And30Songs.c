@@ -1,11 +1,12 @@
 #include "global.h"
+#include "gba/m4a_internal.h"
 #include "engine/ram.h"
 void m4aSongNumStart(u16);
+
 void Sound_RestartPlayer29And30Songs(void)
 {
-    u16 *p = gMusicSlotSongs;
-    if (p[0x3a / 2] != 0)
-        m4aSongNumStart(p[0x3a / 2]);
-    if (p[0x3c / 2] != 0)
-        m4aSongNumStart(p[0x3c / 2]);
+    if (gMusicSlotSongs[29] != 0)
+        m4aSongNumStart(gMusicSlotSongs[29]);
+    if (gMusicSlotSongs[30] != 0)
+        m4aSongNumStart(gMusicSlotSongs[30]);
 }
