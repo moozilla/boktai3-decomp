@@ -89,3 +89,4 @@ src/bosses/count/SceneActorAnimation_UpdateHomingLunge.c	SceneActorAnimation_Upd
 src/bosses/count/SceneActorAnimation_UpdateRecoilSlide.c	SceneActorAnimation_UpdateRecoilSlide	contrived	natural	1	typed body in the slide
 src/bosses/count/SceneActorAnimation_UpdateChargeSlide.c	SceneActorAnimation_UpdateChargeSlide	contrived	natural	1	typed body, plain branches
 src/bosses/count/SceneActorAnimation_UpdateSwingLight.c	SceneActorAnimation_UpdateSwingLight	contrived	natural	1	fake ActorAnimation view and unused helpers removed
+src/bosses/count/SceneActorAnimation_UpdateSwingHeavy.c	SceneActorAnimation_UpdateSwingHeavy	contrived	natural	1	fake ActorAnimation view and unused helpers removed
