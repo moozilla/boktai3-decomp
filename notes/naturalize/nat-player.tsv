@@ -391,3 +391,18 @@ src/player/cutscene/player_cue_commands.c	PlayerCue_StandVariant2	natural	natura
 src/player/cutscene/player_cue_commands.c	PlayerCue_StandVariant3	contrived	contrived	13	unchanged: heading/side pointer locals and the two quadrant helpers order the address and test
 src/player/cutscene/player_cue_commands.c	PlayerCue_WalkTo	minor	natural	1	-
 src/player/cutscene/player_cue_commands.c	PlayerCue_MoveTo	minor	natural	1	-
+src/player/cutscene/player_cue_commands.c	PlayerCue_Motion7Front	natural	natural	0	-
+src/player/cutscene/player_cue_commands.c	PlayerCue_Motion7	natural	natural	0	-
+src/player/cutscene/player_cue_commands.c	PlayerCue_Motion7End	natural	natural	0	-
+src/player/cutscene/player_cue_commands.c	PlayerCue_Kneel	natural	natural	0	-
+src/player/cutscene/player_cue_commands.c	PlayerCue_KneelGasp	natural	natural	0	-
+src/player/cutscene/player_cue_commands.c	PlayerCue_KneelDown	natural	natural	0	-
+src/player/cutscene/player_cue_commands.c	PlayerCue_GetUp	natural	natural	0	-
+src/player/cutscene/player_cue_commands.c	PlayerCue_BeginMode27	natural	natural	0	-
+src/player/cutscene/player_cue_commands.c	PlayerCue_BeginMode28	natural	natural	0	-
+src/player/cutscene/player_cue_commands.c	PlayerCue_Motion29	natural	natural	0	-
+src/player/cutscene/player_cue_commands.c	PlayerCue_Motion30	natural	natural	0	-
+src/player/cutscene/player_cue_commands.c	PlayerCue_Motion30End	natural	natural	0	-
+src/player/cutscene/player_cue_commands.c	PlayerCue_Motion29B	natural	natural	0	-
+src/player/cutscene/player_cue_commands.c	PlayerCue_BeginOddDirection	natural	natural	0	-
+src/player/cutscene/player_cue_commands.c	PlayerCue_Motion7Turn	minor	minor	3	facing pointer around GetSideFacing

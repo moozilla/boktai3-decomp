@@ -426,14 +426,7 @@ void PlayerCue_Motion7Turn(struct Player *player, s32 facing, u32 parameter)
     Player_EnterKindTwo(player);
     ActorSequence_Begin(player, 7, 0);
     if (player->actionMode == 3) {
-        player->facing |= 1;
-        if (player->facing > 4) {
-            player->heading = (8 - player->facing) >> 1;
-            player->side = 1;
-        } else {
-            player->heading = player->facing >> 1;
-            player->side = 0;
-        }
+        SetOddSideFacing(player);
         player->triggerAnimationCallback = PlayerCue_UpdateMotionFade;
     } else {
         u8 *facingValue = &player->facing;
