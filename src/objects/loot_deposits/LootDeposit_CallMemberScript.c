@@ -1,25 +1,20 @@
-/* Provisional ActorGroup names: static behavior established; semantic ownership tentative. */
 #include "global.h"
-#include "objects/directional_controller.h"
-struct ActorGroupMember {
-    u8 unk0[0x1C];
-    s16 x, y, z;
-    u8 unk22[0x13E];
-    u32 script;
-    s32 parameters[3];
-};
-void LootDeposit_CallMemberScript(struct ActorGroupMember *member)
+#include "engine/engine.h"
+#include "engine/ram.h"
+#include "objects/loot_deposits/callback_pool.h"
+
+void LootDeposit_CallMemberScript(struct CallbackPoolEntry *entry)
 {
     s32 values[12];
-    struct DirectionalScriptArgs arguments;
-    u32 script = member->script;
+    struct CallbackPoolScriptArgs arguments;
+    u32 script = entry->script;
     if (script) {
-        values[0] = member->x;
-        values[1] = member->y;
-        values[2] = member->z;
-        values[3] = member->parameters[0];
-        values[4] = member->parameters[1];
-        values[5] = member->parameters[2];
+        values[0] = entry->sprite.position.x;
+        values[1] = entry->sprite.position.y;
+        values[2] = entry->sprite.position.z;
+        values[3] = entry->arguments[0];
+        values[4] = entry->arguments[1];
+        values[5] = entry->arguments[2];
         values[6] = -1;
         values[7] = 0;
         values[8] = 0;
