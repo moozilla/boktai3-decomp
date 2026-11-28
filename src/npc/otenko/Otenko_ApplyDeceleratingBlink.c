@@ -1,28 +1,18 @@
-#include "global.h"
-struct S {
-    u8 f[0xe];
-    u16 h;
-};
-u32 Otenko_ApplyDeceleratingBlink(struct S *p, s32 b, s32 c)
+#include "npc/otenko/otenko_actor.h"
+
+u32 Otenko_ApplyDeceleratingBlink(struct OtenkoActor *npc, s32 tick, s32 count)
 {
-    s32 n;
-    if (b > (c * (c + 1)) >> 1)
+    s32 phase;
+    if (tick > (count * (count + 1)) >> 1)
         return 1;
-    n = 0;
-    if (n < c) {
-        b -= c;
-        if (b > 0) {
-            do {
-                n++;
-                if (n >= c)
-                    break;
-                b -= c - n;
-            } while (b > 0);
-        }
+    for (phase = 0; phase < count; phase++) {
+        tick -= count - phase;
+        if (tick <= 0)
+            break;
     }
-    if ((n & 1) == 0) {
-        u32 m = 0x100;
-        p->h = m | p->h;
+    if ((phase & 1) == 0) {
+        u32 mask = 0x100;
+        npc->displayFlags = mask | npc->displayFlags;
     }
     return 0;
 }

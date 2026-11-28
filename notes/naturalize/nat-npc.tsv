@@ -347,3 +347,5 @@ src/npc/otenko/Otenko_UpdateState31.c	Otenko_UpdateState31	natural	natural	0
 src/npc/otenko/Otenko_UpdateState32.c	Otenko_UpdateState32	natural	natural	0	
 src/npc/otenko/Otenko_UpdateState33.c	Otenko_UpdateState33	natural	natural	0	
 src/npc/otenko/Otenko_DispatchModeHandler.c	Otenko_DispatchModeHandler	contrived	natural	2	
+src/npc/otenko/Otenko_UpdateMode.c	Otenko_UpdateMode	natural	natural	0	
+src/npc/otenko/Otenko_ApplyDeceleratingBlink.c	Otenko_ApplyDeceleratingBlink	contrived	minor	1	u32 mask parked before the display flag OR
