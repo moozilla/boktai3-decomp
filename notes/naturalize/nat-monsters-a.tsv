@@ -348,3 +348,30 @@ src/monsters/axe/axe.c	Axe_InitActionCallbacks	minor	minor	0	casts, paired x/z t
 src/monsters/axe/axe.c	Axe_UpdatePlayerDestinationPhase	minor	minor	0	casts, paired x/z temps or one-line flag wrappers remain
 src/monsters/axe/axe.c	Axe_OnUpdate	minor	minor	0	casts, paired x/z temps or one-line flag wrappers remain
 src/monsters/axe/axe.c	Axe_OnRender	minor	minor	0	casts, paired x/z temps or one-line flag wrappers remain
+src/monsters/cannons/vulcan/VulcanCannon_UpdateFacingTurn.c	VulcanCannon_UpdateFacingTurn	minor	minor	2	loop = 0 in an argument and no return on one path: plain 0 shares the register differently
+src/monsters/axe_armor/AxeArmor_UpdateDeath.c	AxeArmor_UpdateDeath	minor	minor	2	q pointer to the burst position and byte read of the random entry: direct member and (u8) cast reorder the table load
+src/monsters/cannons/wind/WindCannonManager_FindFreeSlot.c	WindCannonManager_FindFreeSlot	natural	natural	0	
+src/monsters/cannons/wind/WindCannonManager_Create.c	WindCannonManager_Create	natural	natural	0	
+src/monsters/cannons/wind/WindCannonSlot_ActivateFromScript.c	WindCannonSlot_ActivateFromScript	natural	natural	0	
+src/monsters/cannons/wind/WindCannonSlot_DeactivateFromScript.c	WindCannonSlot_DeactivateFromScript	natural	natural	0	
+src/monsters/cannons/wind/WindCannonSlot_ResetFromScript.c	WindCannonSlot_ResetFromScript	natural	natural	0	
+src/monsters/cannons/wind/WindCannonManager_IsCreated.c	WindCannonManager_IsCreated	natural	natural	0	
+src/monsters/cannons/plasma/PlasmaCannon_UpdateRecoveryDelay.c	PlasmaCannon_UpdateRecoveryDelay	natural	natural	0	
+src/monsters/cannons/plasma/PlasmaCannon_Create.c	PlasmaCannon_Create	natural	natural	0	
+src/monsters/centipede/tentacle_body.c	CentipedeBody_OnIdleState	natural	natural	0	
+src/monsters/centipede/tentacle_body.c	CentipedeBody_UpdateInactiveState	natural	natural	0	
+src/monsters/centipede/tentacle_body.c	CentipedeBody_UpdateTimedAction	natural	natural	0	
+src/monsters/centipede/tentacle_body.c	CentipedeBody_UpdateAnimationEleven	natural	natural	0	
+src/monsters/centipede/tentacle_body.c	CentipedeBody_UpdateSpreadPreparation	natural	natural	0	
+src/monsters/centipede/CentipedeBody_ConvergeReactionMotion.c	CentipedeBody_ConvergeReactionMotion	natural	natural	0	
+src/monsters/centipede/CentipedeBody_UpdateSpiral.c	CentipedeBody_UpdateSpiral	natural	natural	0	
+src/monsters/centipede/CentipedeBody_GetDirectionFrame.c	CentipedeBody_GetDirectionFrame	natural	natural	0	
+src/monsters/centipede/Centipede_SelectWanderRoute.c	Centipede_SelectWanderRoute	natural	natural	0	
+src/monsters/centipede/CentipedeBody_UpdateSegmentMotion.c	CentipedeBody_UpdateSegmentMotion	natural	natural	0	
+src/monsters/centipede/CentipedeBody_RemoveSegmentSprites.c	CentipedeBody_RemoveSegmentSprites	natural	natural	0	
+src/monsters/centipede/Centipede_UpdateSegmentHeadings.c	Centipede_UpdateSegmentHeadings	natural	natural	0	
+src/monsters/centipede/Centipede_ShiftSegmentTrail.c	Centipede_ShiftSegmentTrail	natural	natural	0	
+src/monsters/centipede/tentacle_body.c	CentipedeBody_UpdateAttackWindup	minor	minor	0	struct casts between actor views and an out-flag profile entry remain
+src/monsters/centipede/tentacle_body.c	CentipedeBody_ResetDirectionalPose	minor	minor	0	struct casts between actor views and an out-flag profile entry remain
+src/monsters/centipede/tentacle_body.c	CentipedeBody_UpdateAttackRecovery	minor	minor	0	struct casts between actor views and an out-flag profile entry remain
+src/monsters/cannons/plasma/PlasmaCannon_InitCollider.c	PlasmaCannon_InitCollider	contrived	natural	1	
