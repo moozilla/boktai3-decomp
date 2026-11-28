@@ -1,8 +1,9 @@
 #include "global.h"
 #include "engine/ram.h"
+#include "ui/pause/scene_hud_display.h"
 void Hud_StartMessageDisplayTimer(void)
 {
-    u8 *g = gFieldHud;
-    if (g != 0)
-        g[0xa6d] = 0x5a;
+    struct SceneHudState *hud = (struct SceneHudState *)gFieldHud;
+    if (hud)
+        hud->messageDisplayTimer = 90;
 }
