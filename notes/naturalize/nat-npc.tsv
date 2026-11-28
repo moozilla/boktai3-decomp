@@ -7,3 +7,12 @@ src/npc/manager/scene_actor_lifecycle.c	Actor_UnlinkFromManager	natural	natural	
 src/npc/manager/scene_actor_lifecycle.c	Actor_FindById	natural	natural	0	
 src/npc/manager/scene_actor_lifecycle.c	Actor_Allocate	natural	natural	0	
 src/npc/manager/scene_actor_lifecycle.c	Actor_RunCallbacks	contrived	natural	1	
+src/npc/manager/scene_actor_lifecycle.c	Actor_DestroyShadow	natural	natural	0	
+src/npc/manager/scene_actor_lifecycle.c	Actor_DisableShadow	natural	natural	0	
+src/npc/manager/scene_actor_lifecycle.c	Actor_EnableShadow	natural	natural	0	
+src/npc/manager/scene_actor_lifecycle.c	Actor_RegisterMotion	natural	natural	0	
+src/npc/manager/scene_actor_lifecycle.c	Actor_UnregisterMotion	natural	natural	0	
+src/npc/manager/scene_actor_lifecycle.c	Actor_SetDefaultPaletteBank	natural	natural	0	
+src/npc/manager/scene_actor_lifecycle.c	Actor_ResetPaletteBank	natural	natural	0	
+src/npc/manager/scene_actor_lifecycle.c	Actor_Destroy	natural	natural	0	
+src/npc/manager/scene_actor_lifecycle.c	Actor_InitShadow	contrived	natural	1	

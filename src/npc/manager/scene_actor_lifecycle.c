@@ -121,18 +121,15 @@ int Actor_InitDrawable(struct SceneActor *actor, int kind, int resourceId, int s
 int Actor_InitShadow(struct SceneActor *actor, int resourceId, int shadowKind, int graphicId,
                      int size)
 {
-    u8 kind;
     actor->shadowKind = shadowKind;
-    kind = shadowKind;
-    if (kind == 1) {
-        void *shadow = &actor->shadow;
-        Shadow_Initialize(shadow, resourceId, 1, size);
-        ActorShadow_Enable(shadow);
-    } else if (kind == 2) {
-        void *shadow = &actor->shadow;
-        ScaledShadow_Initialize(shadow, resourceId, size, size, size, size, 2000, 400, 2, 4, 1);
-        ScaledShadow_SetGraphic(shadow, 0x1c1b, graphicId);
-        ScaledShadow_Enable(shadow);
+    if (actor->shadowKind == 1) {
+        Shadow_Initialize(&actor->shadow, resourceId, 1, size);
+        ActorShadow_Enable(&actor->shadow);
+    } else if (actor->shadowKind == 2) {
+        ScaledShadow_Initialize(&actor->shadow, resourceId, size, size, size, size, 2000, 400, 2, 4,
+                                1);
+        ScaledShadow_SetGraphic(&actor->shadow, 0x1c1b, graphicId);
+        ScaledShadow_Enable(&actor->shadow);
     }
     return 0;
 }
