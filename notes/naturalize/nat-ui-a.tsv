@@ -285,3 +285,4 @@ src/ui/dialogue/text_interpreter/Text_ExtractDecimalDigit.c	Text_ExtractDecimalD
 src/ui/dialogue/text_interpreter/Text_CopyStringPair.c	Text_CopyStringPair	contrived	minor	7	last character variable stored as the terminator
 src/ui/dialogue/text_interpreter/Text_DecodeGlyphEscape.c	Text_DecodeGlyphEscape	minor	natural	1	
 src/ui/dialogue/text_interpreter/Text_FormatDecimal.c	Text_FormatDecimal	minor	natural	1	
+src/ui/dialogue/text_interpreter/Text_ParseDecimal.c	Text_ParseDecimal	contrived	natural	6	
