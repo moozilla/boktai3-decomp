@@ -293,12 +293,11 @@ void SpriteColliderGroup_ActivateParts(void *, s32);
 
 void Armor_UpdateDelayedAction12(struct S *p)
 {
-    u8 s = p->b3d;
-    switch (s) {
+    switch (p->b3d) {
         case 0:
             if (Armor_TryStartAction(p, 0xa)) {
                 p->b3d = 1;
-                p->b3e = s;
+                p->b3e = 0;
             }
             break;
         case 1:
