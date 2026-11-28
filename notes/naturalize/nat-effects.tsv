@@ -221,3 +221,4 @@ src/effects/feathers/FadingSprite_UpdateExpiry.c	FadingSprite_UpdateExpiry	minor
 src/effects/feathers/FeatherEffectPool_CreateDirectional.c	FeatherEffectPool_CreateDirectional	contrived	natural	30	-
 src/effects/feathers/FeatherEffectPool_UpdateTask.c	FeatherEffectPool_UpdateTask	contrived	natural	4	-
 src/effects/feathers/FeatherEffectPool_DestroyTask.c	FeatherEffectPool_DestroyTask	contrived	natural	1	-
+src/effects/feathers/FeatherEffectPool_Init.c	FeatherEffectPool_Init	minor	natural	2	-
