@@ -9,8 +9,7 @@ void SceneActorAnimation_UpdateSwoopMotion(struct Ratatosk *p, s32 tick)
     if (p->actionChanged) {
         p->actionChanged = 0;
         if (p->locked) {
-            int angle = p->savedAngle;
-            Ratatosk_SetFacing(p, angle);
+            Ratatosk_SetFacing(p, p->savedAngle);
         }
         if (q->scaleMode == 0) {
             q->scaleMode = 1;
