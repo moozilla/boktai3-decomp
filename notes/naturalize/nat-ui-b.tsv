@@ -70,3 +70,20 @@ src/ui/results/time_result.c	TimeResult_Destroy	contrived	natural	1
 src/ui/results/time_result.c	TimeResult_InitializeBackground	contrived	natural	6	
 src/ui/results/time_result.c	TimeResult_LoadPalette	minor	natural	1	
 src/ui/results/time_result.c	TimeResult_SetElapsedDigits	contrived	natural	1	
+src/ui/results/time_result.c	TimeResult_SetState	natural	natural	0	
+src/ui/results/time_result.c	TimeResult_LoadDigit	natural	natural	0	
+src/ui/results/time_result.c	TimeResult_BeginFadeIn	natural	natural	0	
+src/ui/results/time_result.c	TimeResult_BeginFadeOut	natural	natural	0	
+src/ui/results/time_result.c	TimeResult_BeginDigitReveal	natural	natural	0	
+src/ui/results/time_result.c	TimeResult_UpdateResultHold	natural	natural	0	
+src/ui/results/time_result.c	TimeResult_UpdateFadeIn	natural	natural	0	
+src/ui/results/time_result.c	TimeResult_UpdateFadeOut	natural	natural	0	
+src/ui/results/time_result.c	TimeResult_UpdateInput	natural	natural	0	
+src/ui/results/time_result.c	TimeResult_ShowLabel	minor	minor	1	label pointer: a direct member update computes the address differently
+src/ui/results/time_result.c	TimeResult_UpdateBackground	natural	natural	0	
+src/ui/results/time_result.c	TimeResult_Update	natural	natural	0	
+src/ui/results/time_result.c	TimeResult_InitCategoryDisplay	natural	natural	0	
+src/ui/results/time_result.c	TimeResult_InitAnimations	natural	natural	0	
+src/ui/results/time_result.c	TimeResult_InitializeFromScript	natural	natural	0	
+src/ui/results/time_result.c	TimeResult_Create	natural	natural	0	
+src/ui/results/time_result.c	Actor_DispatchPrimaryState	natural	natural	0	
