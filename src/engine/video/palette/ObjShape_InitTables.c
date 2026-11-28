@@ -8,16 +8,15 @@ void ObjShape_InitTables(void)
 {
     s32 i;
     for (i = 0; i < 16; i++) {
-        u32 e = gUnk_086140EC[i];
-        s32 lo = *(const u8 *)&gUnk_086140EC[i];
-        s32 hi = e >> 8;
-        s32 tw = lo >> 3;
-        s32 th = hi >> 3;
-        gSpriteWidthPixels[i] = lo;
-        gSpriteHeightPixels[i] = hi;
-        gSpriteWidthTiles[i] = tw;
-        gSpriteHeightTiles[i] = th;
-        gSpriteTileArea[i] = tw * th;
+        s32 width = gUnk_086140EC[i] & 0xFF;
+        s32 height = gUnk_086140EC[i] >> 8;
+        s32 widthTiles = width >> 3;
+        s32 heightTiles = height >> 3;
+        gSpriteWidthPixels[i] = width;
+        gSpriteHeightPixels[i] = height;
+        gSpriteWidthTiles[i] = widthTiles;
+        gSpriteHeightTiles[i] = heightTiles;
+        gSpriteTileArea[i] = widthTiles * heightTiles;
         gSpriteShapeAttr[i] = ((i & 3) << 14) | ((i & 12) << 28);
     }
 }
