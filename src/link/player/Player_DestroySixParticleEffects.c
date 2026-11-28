@@ -1,12 +1,16 @@
 #include "global.h"
+
+struct SixParticle {
+    u8 unknown0[0x34];
+};
 void Effect_Remove(void *);
-void Player_DestroySixParticleEffects(u8 *s)
+void Player_DestroySixParticleEffects(u8 *player)
 {
-    u8 *p = s + 0x870;
-    s32 i = 5;
-    do {
-        Effect_Remove(p);
-        p += 0x34;
-        i--;
-    } while (i >= 0);
+    struct SixParticle *particle = (struct SixParticle *)(player + 0x870);
+    s32 i;
+
+    for (i = 0; i < 6; i++) {
+        Effect_Remove(particle);
+        particle++;
+    }
 }

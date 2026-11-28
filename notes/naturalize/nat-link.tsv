@@ -132,3 +132,10 @@ src/link/player/Player_StopLocalSong.c	Player_StopLocalSong	contrived	natural	1
 src/link/player/Player_StopLocalActionSounds.c	Player_StopLocalActionSounds	minor	natural	1	
 src/link/player/ContactCollider_GetImpactDirection.c	ContactCollider_GetImpactDirection	minor	natural	9	early returns keep their own ImpactDirection call
 src/link/player/Player_ApplyLinkedContactResponse.c	Player_ApplyLinkedContactResponse	contrived	minor	5	flagBits accessor stays for the status flag test
+src/link/player/PlayerLink_IsActionModeAllowed.c	PlayerLink_IsActionModeAllowed	natural	natural	0	
+src/link/player/SpriteEffect_UpdateBriefAnimation.c	SpriteEffect_UpdateBriefAnimation	natural	natural	0	
+src/link/player/SpriteEffect_StartBriefAnimation.c	SpriteEffect_StartBriefAnimation	natural	natural	0	
+src/link/player/Player_InitPrimaryAuraEffect.c	Player_InitPrimaryAuraEffect	minor	minor	0	local effect views of the player
+src/link/player/Player_UpdateOrbitingAuraEffect.c	Player_UpdateOrbitingAuraEffect	minor	minor	0	local effect views of the player
+src/link/player/Player_InitOrbitingAuraEffect.c	Player_InitOrbitingAuraEffect	minor	minor	0	local effect views of the player
+src/link/player/Player_DestroySixParticleEffects.c	Player_DestroySixParticleEffects	minor	natural	5	
