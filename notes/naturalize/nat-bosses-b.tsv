@@ -20,3 +20,4 @@ src/bosses/ratatosk/SceneDistance_UpdateLinkedDistances.c	SceneDistance_UpdateLi
 src/bosses/ratatosk/SceneDistance_UpdateLinkedTargetDistances.c	SceneDistance_UpdateLinkedTargetDistances	contrived	natural	2	
 src/bosses/ratatosk/Ratatosk_GetRandomMovementPoint.c	Ratatosk_GetRandomMovementPoint	contrived	natural	4	
 src/bosses/ratatosk/sub_081F348C.c	sub_081F348C	minor	minor	7	copy goes through a one-line position copy helper: a direct struct assignment swaps the address add operands
+src/bosses/ratatosk/Ratatosk_UpdateDirectionalAnimation.c	Ratatosk_UpdateDirectionalAnimation	minor	minor	6	second actor alias and mask-parameter flag accessor stay: allocation needs the copy in r6 and the mask is loaded before the field
