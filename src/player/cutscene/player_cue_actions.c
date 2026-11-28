@@ -54,10 +54,9 @@ void PlayerCue_BeginAcknowledgement(struct Player *player)
 
 void PlayerCue_AcknowledgePendingTrigger(struct Player *player)
 {
-    u8 *pending = &player->cueAcknowledgementPending;
-    if (*pending != 0) {
+    if (player->cueAcknowledgementPending != 0) {
         Trigger_ConsumePending(&player->cueReceiver, 1);
-        *pending = 0;
+        player->cueAcknowledgementPending = 0;
     }
 }
 

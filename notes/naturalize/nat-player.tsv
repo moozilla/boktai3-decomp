@@ -285,3 +285,8 @@ src/player/core/Player_Create.c	Player_Create	natural	natural	0
 src/player/core/Player_GetBasePosition.c	Player_GetBasePosition	natural	natural	0	
 src/player/core/sub_0815F588.c	sub_0815F588	natural	natural	0	
 src/player/core/sub_0815F5A0.c	sub_0815F5A0	natural	natural	0	
+src/player/cutscene/player_cue_actions.c	PlayerCue_EnterStandUpdate	natural	natural	0	
+src/player/cutscene/player_cue_actions.c	ScriptActor_EnableCompletionScript	natural	natural	0	
+src/player/cutscene/player_cue_actions.c	ScriptActor_CallCompletionScript	minor	minor	1	parameter slot pointer: member access changes register allocation
+src/player/cutscene/player_cue_actions.c	PlayerCue_BeginAcknowledgement	natural	natural	0	
+src/player/cutscene/player_cue_actions.c	PlayerCue_AcknowledgePendingTrigger	minor	natural	1	
