@@ -265,3 +265,4 @@ src/objects/floor_traps.c	FloorTrapPool_ResetInstance	natural	natural	0
 src/objects/hazards/animated_hazard.c	AnimatedHazard_AnimateAttack	contrived	natural	1	
 src/objects/hazards/animated_hazard.c	AnimatedHazard_AnimateHold	contrived	natural	1	
 src/objects/hazards/animated_hazard.c	AnimatedHazard_AnimateRetraction	contrived	natural	1	
+src/objects/hazards/animated_hazard.c	AnimatedHazard_CreateProximity	contrived	contrived	1	open-coded ground height: see next row
