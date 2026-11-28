@@ -404,11 +404,9 @@ void TutorialOtenko_SetInteractionControlFlag(u8 *p)
 
 void TutorialOtenko_RestoreSavedAnimationPlayback(u8 *p)
 {
-    u32 a = *(u8 *)(p + 0xF86);
-    u32 b;
-    *(u16 *)(p + 0xE2C) = a;
-    b = *(u8 *)(p + 0xF87);
-    *(u16 *)(p + 0xE32) = b;
+    struct ActorAnimController *g = (struct ActorAnimController *)p;
+    g->anim.index = g->savedFrame;
+    g->anim.elapsed = g->savedTimer;
 }
 
 /* Tentative role: arm the idle animation transition at its resting position. */
