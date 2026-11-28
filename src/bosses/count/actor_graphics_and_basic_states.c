@@ -1605,31 +1605,26 @@ void SceneActors_StartEightDirectionAnimation(void *, void *, void *, int, int, 
 void SceneActorAnimation_UpdateEightDirectionCallback(struct StateActor *p)
 {
     struct SceneGraphicsActor *actor = (struct SceneGraphicsActor *)p;
+    int sequence;
     if (!p->locked)
         SceneActors_SetFacing(p, p->requestedAngle);
     if (p->actionChanged) {
-        int sequence;
         p->actionChanged = 0;
         if (p->locked)
             SceneActors_SetFacing(p, p->savedFacing);
-        {
-            int test = actor->graphics.animationFlags & 1;
+        if (actor->graphics.animationFlags & 1)
+            sequence = 0;
+        else
             sequence = 38;
-            if (test)
-                sequence = 0;
-        }
-        SceneActors_StartEightDirectionAnimation(p, (u8 *)p + 0x240, (u8 *)p + 0x220, sequence, 1,
-                                                 1, 4);
+        SceneActors_StartEightDirectionAnimation(p, &actor->animation, &actor->animationResource,
+                                              sequence, 1, 1, 4);
     } else {
-        int sequence;
-        {
-            int test = actor->graphics.animationFlags & 1;
+        if (actor->graphics.animationFlags & 1)
+            sequence = 0;
+        else
             sequence = 38;
-            if (test)
-                sequence = 0;
-        }
-        SceneActors_StartEightDirectionAnimation(p, (u8 *)p + 0x240, (u8 *)p + 0x220, sequence, 1,
-                                                 1, 1);
+        SceneActors_StartEightDirectionAnimation(p, &actor->animation, &actor->animationResource,
+                                              sequence, 1, 1, 1);
     }
     if (!p->actionTryUpdate(p)) {
         SceneActorState_SetFlags(p, 0x40);
