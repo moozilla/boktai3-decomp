@@ -570,3 +570,4 @@ src/ui/town/storage/Storage_RefreshEquipmentSlots.c	Storage_RefreshEquipmentSlot
 src/ui/town/storage/Storage_BeginSwapTransition.c	Storage_BeginSwapTransition	contrived	minor	40	array base pointers set in the loop header; flags pointer for the consumable markers; slots pointer local
 src/ui/town/storage/Storage_BeginItemSpecialMove.c	Storage_BeginItemSpecialMove	contrived	minor	12	widget-run view for the flag write
 src/ui/town/storage/Storage_BeginEquipmentSpecialMove.c	Storage_BeginEquipmentSpecialMove	contrived	natural	12	
+src/ui/town/storage/sub_081BE730.c	sub_081BE730	contrived	minor	12	widget-run view for the flag write; index-first pointer sum into table160
