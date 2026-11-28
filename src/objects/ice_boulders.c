@@ -1,6 +1,7 @@
 #include "objects/region_actor.h"
 #include "player/cutscene/player_cue_sequence.h"
 #include "engine/ram.h"
+#include "scene/motion/scene_actor_terrain.h"
 
 void ImpactBurst_EmitChargeSparkle(s32, s32, s32, s32, void *);
 
@@ -16,7 +17,7 @@ static inline u32 Mask(u32 *p, u32 mask)
 // confidence=low: collider callback applies damage and emits contact sparkles for both variants.
 
 void IceBoulder_ApplyContactDamage(struct ContactCollider *a, struct ContactCollider *b,
-                                       struct RegionActor *p)
+                                   struct RegionActor *p)
 {
     u32 blocked;
     if (RegionActor_HasBehavior(p, 8))
@@ -149,7 +150,7 @@ void IceBoulder_UpdateDamageAnimation(struct RegionActor *p)
         if (p->health <= 0) {
             p->behaviorFlags = 0x28;
             Anim_SetSequence(&p->sequence, ctx->sequenceResource, 1, 0, 0);
-            Step(&p->sprite, &p->sequence);
+            PlayerCue_StepSequence(&p->sprite, &p->sequence);
             p->kind = 3;
             p->entered = 1;
             p->collider.costFlags = 0;
@@ -172,7 +173,7 @@ void IceBoulder_UpdateDamageAnimation(struct RegionActor *p)
                 frame = 3 - frame;
                 Anim_SetSequence(&p->sequence, ctx->sequenceResource, 1, 0, test);
                 if (p->sequence.index < frame)
-                    Step(&p->sprite, &p->sequence);
+                    PlayerCue_StepSequence(&p->sprite, &p->sequence);
             }
         }
     }

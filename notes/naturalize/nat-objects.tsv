@@ -360,3 +360,4 @@ src/objects/hit_switch.c	HitSwitch_DestroyManager	natural	natural	0
 src/objects/hit_switch.c	HitSwitch_CreateManager	natural	natural	0	
 src/objects/hit_switch.c	HitSwitch_GetCompletionFromScript	natural	natural	0	
 src/objects/hit_switch.c	HitSwitch_AddFromScript	natural	natural	0	
+src/objects/ice_boulders.c	IceBoulder_UpdateDamageAnimation	minor	natural	1	
