@@ -1,29 +1,25 @@
 #include "global.h"
-void ForgingBook_UpdateCursorPulse(u8 *arg)
+#include "ui/books/collection_book.h"
+
+void ForgingBook_UpdateCursorPulse(struct CollectionBook *book)
 {
-    u8 *p = arg;
-    s32 v = *((s16 *)(p + 0x3e4));
-    u32 out = 0x1f;
-    do {
-        if (v > 9) {
-            out = 0x1b;
-            if (v > 0x11) {
-                out = 0x12;
-                if (v > 0x19) {
-                    out = 10;
-                    if (v > 0x21) {
-                        out = 0x1b;
-                        if (v <= 0x29) {
-                            out = 0x12;
-                        }
-                    }
-                }
-            }
-        }
-        (*((u16 *)(p + 0x3e4)))++;
-        if ((*((s16 *)(p + 0x3e4))) > 0x31) {
-            *((u16 *)(p + 0x3e4)) = 0;
-        }
-    } while (0);
-    *((u16 *)(p + 0x3dc)) = out;
+    s16 frame = book->pulseFrame;
+    u32 color;
+
+    if (frame <= 9)
+        color = 0x1f;
+    else if (frame <= 0x11)
+        color = 0x1b;
+    else if (frame <= 0x19)
+        color = 0x12;
+    else if (frame <= 0x21)
+        color = 10;
+    else if (frame <= 0x29)
+        color = 0x12;
+    else
+        color = 0x1b;
+    book->pulseFrame++;
+    if (book->pulseFrame > 0x31)
+        book->pulseFrame = 0;
+    book->cursorColors[12] = color;
 }
