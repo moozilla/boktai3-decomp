@@ -1577,31 +1577,20 @@ void SceneActorState_UpdateActionController(struct StateActor *p)
 void SceneActorAnimation_UpdateDirectionalCallback(struct StateActor *p)
 {
     struct SceneGraphicsActor *actor = (struct SceneGraphicsActor *)p;
+    int sequence;
     if (!p->locked)
         SceneActors_SetFacing(p, p->requestedAngle);
     if (p->actionChanged) {
-        int sequence;
         p->actionChanged = 0;
         if (p->locked)
             SceneActors_SetFacing(p, p->savedFacing);
-        {
-            int test = actor->graphics.animationFlags & 1;
-            sequence = 43;
-            if (test)
-                sequence = 5;
-        }
-        SceneActors_StartDirectionalAnimation(p, (u8 *)p + 0x240, (u8 *)p + 0x220, sequence, 1, 1,
-                                              4);
+        sequence = (actor->graphics.animationFlags & 1) ? 5 : 43;
+        SceneActors_StartDirectionalAnimation(p, &actor->animation, &actor->animationResource,
+                                              sequence, 1, 1, 4);
     } else {
-        int sequence;
-        {
-            int test = actor->graphics.animationFlags & 1;
-            sequence = 43;
-            if (test)
-                sequence = 5;
-        }
-        SceneActors_StartDirectionalAnimation(p, (u8 *)p + 0x240, (u8 *)p + 0x220, sequence, 1, 1,
-                                              1);
+        sequence = (actor->graphics.animationFlags & 1) ? 5 : 43;
+        SceneActors_StartDirectionalAnimation(p, &actor->animation, &actor->animationResource,
+                                              sequence, 1, 1, 1);
     }
     actor->graphics.scaleMin = 0;
     actor->graphics.scaleMax = 0;
@@ -1611,7 +1600,6 @@ void SceneActorAnimation_UpdateDirectionalCallback(struct StateActor *p)
         p->actionReset(p);
     }
 }
-
 void SceneActors_StartEightDirectionAnimation(void *, void *, void *, int, int, int, int);
 
 void SceneActorAnimation_UpdateEightDirectionCallback(struct StateActor *p)
