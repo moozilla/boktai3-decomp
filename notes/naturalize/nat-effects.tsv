@@ -262,3 +262,5 @@ src/effects/healing/HealthBurstEffect_Create.c	HealthBurstEffect_Create	minor	mi
 src/effects/orbits/homing_effect.c	EffectManager_ClearGlobal	natural	natural	0	
 src/effects/orbits/homing_effect.c	EffectManager_RemoveEffect	minor	natural	1	
 src/effects/orbits/homing_effect.c	EffectManager_RemoveActiveEffects	minor	natural	1	
+src/effects/orbits/homing_effect.c	GunDelHell_Create	natural	natural	0	
+src/effects/orbits/homing_effect.c	EffectManager_UpdateParticles	minor	natural	2	particle pointer local: pointer strength reduction

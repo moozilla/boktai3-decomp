@@ -42,13 +42,14 @@ u32 GunDelHell_Create(void *p)
 s32 EffectManager_UpdateParticles(struct EffectManager *manager, struct Effect *effect,
                                   struct EffectContext *context)
 {
-    u32 one = manager->counter & 1, mask = manager->counter & 3;
+    u32 odd = manager->counter & 1, phase = manager->counter & 3;
     s32 i;
-    struct EffectParticle *p;
-    i = 0;
-    p = effect->particles;
-    for (; i < 4; p++, i++)
-        gUnk_08604A78[effect->type][p->state](manager, effect, i, one, mask, context);
+
+    for (i = 0; i < 4; i++) {
+        struct EffectParticle *particle = &effect->particles[i];
+
+        gUnk_08604A78[effect->type][particle->state](manager, effect, i, odd, phase, context);
+    }
 }
 
 static inline s32 projectScale(s32 input)
