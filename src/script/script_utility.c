@@ -106,14 +106,7 @@ s32 ScriptUtility_ReadIndexed(void)
     size = Script_GetValue();
     if (!size)
         return base[index];
-    {
-        s32 offset;
-        if (size != 1)
-            offset = index * 4;
-        else
-            offset = index * 2;
-        return *(s16 *)((u32)base + offset);
-    }
+    return ((s16 *)base)[size != 1 ? index * 2 : index];
 }
 
 void Sound_SuspendPlayer30Song(void);
