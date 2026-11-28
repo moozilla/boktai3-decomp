@@ -1758,8 +1758,9 @@ void TetherActor_InitSecondaryCollider(struct TetherActor *p)
     s1.a.lo = 0x80;
     s1.a.hi = 0x20;
     s1.b.lo = 0x80;
-    *(u32 *)&s2.a = 0x200000;
-    *(u32 *)&s2.b &= 0xFFFF0000;
+    s2.a.lo = 0;
+    s2.a.hi = 0x20;
+    s2.b.lo = 0;
     Collider_Init(q, p->entry, 0x2001, 0, 0x10, &s1, &s2);
     Collider_SetAttackProperties(q, p->valueA, p->valueB, 0, 0x40000, 0x1e);
     Collider_SetCallback(q, 0, p);
