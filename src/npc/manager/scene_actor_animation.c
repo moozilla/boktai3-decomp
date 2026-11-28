@@ -1569,48 +1569,24 @@ static inline int SceneActor_IsNearBodyPosition(struct SceneActor *actor, struct
                                                 struct SceneActorBody *body)
 {
     struct ContactPosition *a = &actor->body.position;
-    int limit = actor->rateB;
-    int x = b->x - body->position.x;
-    int result;
-    if (x < 0)
-        x = -x;
-    if (x >= limit)
-        goto fail;
-    {
-        int y = b->y - a->y;
-        if (y < 0)
-            y = -y;
-        if (y > 255)
-            goto fail;
-    }
-    {
-        int z = b->z - a->z;
-        if (z < 0)
-            z = -z;
-        result = 1;
-        if (z < limit)
-            goto done;
-    }
-fail:
-    result = 0;
-done:
-    return result;
+    int range = actor->rateB;
+    if (Abs(b->x - body->position.x) < range && Abs(b->y - a->y) <= 255 && Abs(b->z - a->z) < range)
+        return 1;
+    return 0;
 }
 
 void SceneCharacter_UpdateTargetProximityState(struct SceneActorManager *manager,
                                                struct SceneActor *actor)
 {
-    struct SceneActorBody *body = (struct SceneActorBody *)&actor->body;
+    struct SceneActorBody *body = &actor->body;
     if (actor->commandEntered) {
         actor->commandEntered = 0;
         actor->finished = 0;
         actor->action = 9;
     }
     if (manager->player && manager->target) {
-        int close = SceneActor_IsNearBodyPosition(actor, manager->target, body);
-        if (!close) {
-            int registered = actor->registered;
-            if (registered) {
+        if (!SceneActor_IsNearBodyPosition(actor, manager->target, body)) {
+            if (actor->registered) {
                 actor->direction = actor->savedAngle;
                 SceneCharacter_EnterState(actor, 3);
             } else {
