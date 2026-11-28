@@ -2,11 +2,10 @@
 #include "system/game_state/game_state.h"
 void GameState_ResetChallengeRecords(void)
 {
-    s32 i = 0;
-    do {
-        u8 *g = gGameState;
-        *(s32 *)(g + i * 4 + 0x7c8) = -1;
-        *(s16 *)(g + i * 2 + 0x800) = -1;
-        i++;
-    } while (i <= 11);
+    s32 i;
+
+    for (i = 0; i < 12; i++) {
+        *(i + gGameState->unk7C8) = -1;
+        *(i + gGameState->unk800) = -1;
+    }
 }
