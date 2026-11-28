@@ -482,3 +482,4 @@ src/script/script_keyframe_pool.c	ScriptKeyframe_AddFromScript	contrived	minor	4
 src/script/script_keyframe_pool.c	ScriptKeyframe_SetFrameFromScript	minor	natural	1	
 src/script/script_utility.c	ScriptUtility_ReadIndexed	contrived	natural	8	
 src/script/script_utility.c	ScriptUtility_SetPauseLatch	contrived	natural	5	non-void with no return in the matching build (r0 is left untouched)
+src/script/script_utility.c	ScriptUtility_CallRepeatedFromScript	contrived	natural	18	

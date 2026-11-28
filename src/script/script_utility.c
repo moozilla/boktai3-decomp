@@ -17,37 +17,23 @@ s32 ScriptUtility_CallRepeatedFromScript(void)
     s32 count = Script_GetKeywordValue('a', 0);
     s32 repeats = Script_GetKeywordValue('r', 0);
     s32 values[count];
+    s32 i, j;
     args.count = count;
     args.values = values;
     if (Script_SeekToKeyword('e')) {
         u32 script = Script_GetValue();
         if (Script_SeekToKeyword('d')) {
             u8 *pc = Script_GetPc();
-            s32 current = 0;
-            if (current < repeats)
-                do {
-                    s32 next;
-                    s32 *destination;
-                    current++;
-                    next = current;
-                    if (count > 0) {
-                        destination = values;
-                        current = count;
-                        do {
-                            *destination++ = Script_ReadValue(pc);
-                            pc = Script_GetPc();
-                        } while (--current != 0);
-                    }
-                    Script_RunBlock(script, &args);
-                    current = next;
-                } while (current < repeats);
-        } else {
-            if (repeats > 0) {
-                s32 index = repeats;
-                do {
-                    Script_RunBlock(script, &args);
-                } while (--index != 0);
+            for (i = 0; i < repeats; i++) {
+                for (j = 0; j < count; j++) {
+                    values[j] = Script_ReadValue(pc);
+                    pc = Script_GetPc();
+                }
+                Script_RunBlock(script, &args);
             }
+        } else {
+            for (i = 0; i < repeats; i++)
+                Script_RunBlock(script, &args);
         }
     }
     return 0;
