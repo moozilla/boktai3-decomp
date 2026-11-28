@@ -325,3 +325,4 @@ src/engine/video/anim/Random_InitValueTable.c	Random_InitValueTable	contrived	co
 src/engine/video/anim/Palette_BlendBank.c	Palette_BlendBank	minor	natural	1	
 src/engine/video/anim/Math_Atan2.c	Math_Atan2	minor	natural	1	
 src/engine/video/anim/sub_08221548.c	sub_08221548	minor	natural	1	
+src/engine/video/anim/Input_UpdateKeyRepeat.c	Input_UpdateKeyRepeat	contrived	natural	1	

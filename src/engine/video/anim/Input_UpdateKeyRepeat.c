@@ -1,29 +1,22 @@
 #include "global.h"
-#include "engine/input.h"
-struct E {
-    u16 a;
-    u16 b;
-    u32 c;
-};
-u32 Input_UpdateKeyRepeat(u32 idx, u8 *p, u32 m, u32 c, s32 max)
+#include "engine/runtime_input.h"
+
+u32 Input_UpdateKeyRepeat(u32 pad, u8 *count, u32 mask, u32 result, s32 delay)
 {
     u32 ret = 0;
-    s32 v = *p;
-    struct E *t = gPadState;
-    struct E *e = t + idx;
-    if (e->b & m)
-        v = max;
-    else if (e->a & m) {
-        if (v >= max)
-            goto wrap;
-        v++;
+    s32 held = *count;
+
+    if (gPadState[pad].pressed & mask)
+        held = delay;
+    else if (gPadState[pad].held & mask) {
+        if (held < delay)
+            held++;
     } else
-        v = 0;
-    if (v >= max) {
-    wrap:
-        v = 0;
-        ret = c;
+        held = 0;
+    if (held >= delay) {
+        held = 0;
+        ret = result;
     }
-    *p = v;
+    *count = held;
     return ret;
 }
