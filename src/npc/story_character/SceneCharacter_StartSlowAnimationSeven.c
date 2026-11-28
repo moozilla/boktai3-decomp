@@ -1,12 +1,11 @@
-#include "global.h"
-void Actor_PlayAnimationEntry(void *, int, int, int, int);
-void SceneCharacter_StartSlowAnimationSeven(void *unused, u8 *p)
+#include "npc/manager/scene_actor_lifecycle.h"
+void SceneCharacter_StartSlowAnimationSeven(void *unused, struct SceneActor *p)
 {
-    if (p[9]) {
+    if (p->animationEntered) {
         int r;
-        p[9] = 0;
-        p[7] = 0;
-        switch (p[1]) {
+        p->animationEntered = 0;
+        p->finished = 0;
+        switch (p->variant) {
             case 15:
                 r = 7;
                 break;
@@ -40,6 +39,6 @@ void SceneCharacter_StartSlowAnimationSeven(void *unused, u8 *p)
                 break;
         }
         Actor_PlayAnimationEntry(p, r, 2, 0, 1);
-        p[0x18] = 0;
+        p->animationPhase = 0;
     }
 }
