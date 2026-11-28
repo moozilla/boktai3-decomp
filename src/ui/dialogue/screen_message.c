@@ -14,8 +14,6 @@ void ScreenMessage_UpdateChoiceHighlight(struct ScreenMessage *p)
 
 void ScreenMessage_Update(struct ScreenMessage *s)
 {
-    struct ScreenParams *g;
-
     switch (s->state) {
         case 0:
             if (gPadState[1] & 1) {
@@ -67,17 +65,16 @@ void ScreenMessage_Update(struct ScreenMessage *s)
         case 1:
             if (s->fadeTimer > (1 << s->fadeSpeed) || s->fadeSpeed == 0) {
                 TextWindow_Destroy(s->textWindow);
-                g = &gScreenParams;
-                if (g->showChoices != 0) {
+                if (gScreenParams.showChoices != 0) {
                     s->choices[0].sprite.flags |= 1;
                     s->choices[1].sprite.flags |= 1;
                 }
                 if (s->result == 0)
-                    Script_Call(g->cancelScript, 0);
+                    Script_Call(gScreenParams.cancelScript, 0);
                 else if (s->result == 1)
-                    Script_Call(g->confirmScript, 0);
+                    Script_Call(gScreenParams.confirmScript, 0);
                 else
-                    Script_Call(g->alternateScript, 0);
+                    Script_Call(gScreenParams.alternateScript, 0);
                 Task_Kill(s);
             }
             s->fadeTimer++;
