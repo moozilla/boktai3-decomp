@@ -138,3 +138,4 @@ src/bosses/count/contact_actor_display.c	ContactActor_ApplyHealthContact	contriv
 src/bosses/count/contact_actor_display.c	ContactActor_InitializeSlot	contrived	minor	6	keeps initialFrame array, SlotSpritePosition and SelectSlotPalette helpers: plain forms differ
 src/bosses/count/contact_actor_display.c	ContactActor_HideSlot	minor	natural	6	
 src/bosses/count/contact_actor_display.c	ContactActorPool_HideSlots	minor	natural	6	
+src/bosses/count/contact_actor_display.c	ContactActor_UpdateDisplay	minor	natural	6	

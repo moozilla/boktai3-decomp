@@ -1,6 +1,7 @@
 #include "bosses/count/scene_graphics_actor.h"
 #include "scene/collision/contact_actor.h"
 #include "player/player.h"
+#include "scene/motion/scene_actor_charge_offset.h"
 #include "scene/collision/contact_swarm.h"
 #include "engine/video/display_sprite_playback.h"
 
@@ -218,9 +219,8 @@ void ContactActor_SetDirectionalSequence(struct ContactActorPool *pool, struct C
 
 void ContactActor_UpdateDisplay(struct ContactActor *owner)
 {
-    struct ContactSwarmSprite *sprite = (struct ContactSwarmSprite *)&owner->sprite;
+    struct ContactSwarmSprite *sprite = &owner->sprite;
     s32 diff;
-    s32 wave, offset;
     owner->sprite.position = owner->position;
     owner->finished = PlayerCue_StepSequenceEnded(sprite, &owner->sequence);
     diff = owner->position.y - owner->targetHeight;
@@ -230,12 +230,7 @@ void ContactActor_UpdateDisplay(struct ContactActor *owner)
         owner->position.y -= 4;
     else
         owner->position.y = owner->targetHeight;
-    wave = gUnk_086149C4[owner->bobPhase] * 32;
-    if (wave >= 0)
-        offset = wave >> 12;
-    else
-        offset = -((-wave) >> 12);
-    sprite->position.y += offset;
+    sprite->position.y += SceneActor_ChargeComponent(gUnk_086149C4[owner->bobPhase] * 32);
     owner->bobPhase += 4;
 }
 
