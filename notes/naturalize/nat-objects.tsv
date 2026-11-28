@@ -433,3 +433,4 @@ src/objects/items/collectible/Collectible_OnDeactivate.c	Collectible_OnDeactivat
 src/objects/items/collectible/Collectible_StartDeath.c	Collectible_StartDeath	contrived	natural	8	(u8) casts on the sequence arguments; local camera view
 src/objects/items/collectible/Collectible_IsNearPlayer.c	Collectible_IsNearPlayer	contrived	minor	8	shared fail label: every structured form emits a second return-0 path
 src/objects/items/collectible/Collectible_UpdateEntry.c	Collectible_UpdateEntry	contrived	minor	25	body pointer and mask locals fix the constant-before-load order; local camera view
+src/objects/items/collectible/CallbackPool_InvokeActive.c	CallbackPool_InvokeActive	minor	natural	1	
