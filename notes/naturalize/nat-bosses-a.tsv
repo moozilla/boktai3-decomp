@@ -254,3 +254,4 @@ src/bosses/hresvelgr/OffsetActor_UpdateRepeatedAnimation.c	OffsetActor_UpdateRep
 src/bosses/hresvelgr/OffsetActor_UpdateAnimationSequence.c	OffsetActor_UpdateAnimationSequence	contrived	minor	3	a second actor pointer (self) stays: the ROM keeps two registers
 src/bosses/hresvelgr/OffsetActor_UpdateExtendedAnimationSequence.c	OffsetActor_UpdateExtendedAnimationSequence	contrived	minor	3	a second actor pointer (self) stays: the ROM keeps two registers
 src/bosses/hresvelgr/Hresvelgr_UpdateTerrainManeuver.c	Hresvelgr_UpdateTerrainManeuver	contrived	minor	3	a second actor pointer (self) stays: the ROM keeps two registers
+src/bosses/hresvelgr/OffsetActor_UpdateFacingWait.c	OffsetActor_UpdateFacingWait	contrived	minor	3	a second actor pointer (self) stays: the ROM keeps two registers
