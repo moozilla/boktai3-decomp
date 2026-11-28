@@ -547,3 +547,7 @@ src/player/effects/orbit_effect.c	PlayerOrbitEffect_SpawnParticle	minor	minor	3	
 src/player/effects/orbit_effect.c	PlayerOrbitEffect_UpdateParticles	contrived	contrived	6	unchanged: second motion cursor advanced by the particle size
 src/player/effects/orbit_effect.c	PlayerOrbitEffect_UpdateIntro	natural	natural	0	-
 src/player/effects/orbit_effect.c	PlayerOrbitEffect_UpdateStatTransfer	contrived	minor	14	camera origin offset blocks
+src/player/effects/particle_cloud/SabataFrost_InitModule.c	SabataFrost_InitModule	natural	natural	0	-
+src/player/effects/particle_cloud/SabataFrost_ShutdownModule.c	SabataFrost_ShutdownModule	natural	natural	0	-
+src/player/effects/particle_cloud/PlayerParticleCloud_InitModule.c	PlayerParticleCloud_InitModule	natural	natural	0	-
+src/player/effects/particle_cloud/sub_081D31EC.c	sub_081D31EC	contrived	minor	6	player pointer and parked 0x80 mask: ROM loads the mask before the flag word

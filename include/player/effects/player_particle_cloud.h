@@ -8,7 +8,8 @@ struct CloudPosition {
     s16 x, y, z, pad;
 } __attribute__((aligned(4)));
 struct CloudSprite {
-    u8 pad0[0x18];
+    u32 flags;
+    u8 pad4[0x14];
     struct CloudPosition position;
     u8 pad20[8];
 };
@@ -22,7 +23,9 @@ struct CloudParticle {
     struct CloudSprite sprite;
 };
 struct CloudPlayer {
-    u8 pad0[0x30];
+    u8 pad0[0x20];
+    u32 statusFlags;
+    u8 pad24[0xC];
     struct CloudPosition position;
 };
 struct CloudTask {

@@ -1,115 +1,75 @@
+// confidence=low: moves the cloud anchor with the player and animates the forty particles.
 #include "global.h"
+#include "engine/ram.h"
+#include "engine/engine_globals.h"
+#include "player/effects/player_particle_cloud.h"
+#include "system/game_state/game_state.h"
 
-union CloudPosition {
-    u32 words[2];
-    struct {
-        u16 x, y, z, pad;
-    } coordinates;
-};
-struct CloudSource {
-    u8 pad0[0x20];
-    u32 flags;
-    u8 pad24[0xC];
-    union CloudPosition position;
-};
-struct CloudParticle {
-    u8 kind;
-    u8 frame;
-    u8 timer;
-    u8 pad3[0x1D];
-    u8 sprite[0x28];
-};
-struct CloudTask {
-    u8 pad0[0x18];
-    u32 ticks;
-    u16 mode;
-    u8 spawnInterval;
-    u8 stopFlag;
-    u32 frameBase;
-    union CloudPosition position;
-    u32 sheet;
-    struct CloudParticle particles[40];
-    struct CloudSource *source;
-};
-extern u8 *gGameState;
 extern const u16 gUnk_086126C8[];
-extern const u32 gUnk_086126BC[];
-void SpriteDrawable_SelectTileFrame(void *, u32, u32);
-void sub_08249240(void *, void *, u32);
-void Task_Kill(void *);
-static inline u32 CloudParticle_NextFrame(struct CloudParticle *p)
-{
-    return p->frame + 1;
-}
+extern void (*const gUnk_086126BC[])(struct CloudTask *, struct CloudParticle *);
+void SpriteDrawable_SelectTileFrame(void *, void *, u32);
+
 u32 sub_081D31EC(struct CloudTask *task)
 {
-    u8 *p = (u8 *)task;
-    struct CloudParticle *e;
+    struct CloudParticle *particle;
     s32 i;
+
     switch (task->mode) {
-        case 1: {
-            struct CloudSource *src = task->source;
-            task->position = src->position;
-            task->position.coordinates.y += 0x80;
-        } break;
+        case 1:
+            task->anchor = task->player->position;
+            task->anchor.y += 0x80;
+            break;
         case 2: {
-            struct CloudSource *src = task->source;
-            u32 bit = 0x80;
-            if (src->flags & bit) {
-                task->position = src->position;
-                if (*(s16 *)(gGameState + 0x85e) == 0) {
-                    task->position.coordinates.x += 0x14;
-                    task->position.coordinates.y += 0x1e0;
-                    task->position.coordinates.z -= 0x14;
+            struct CloudPlayer *player = task->player;
+            u32 mask = 0x80;
+            if (player->statusFlags & mask) {
+                task->anchor = task->player->position;
+                if (gGameState->unk85E == 0) {
+                    task->anchor.x += 0x14;
+                    task->anchor.y += 0x1E0;
+                    task->anchor.z -= 0x14;
                 } else {
-                    task->position.coordinates.x -= 0x14;
-                    task->position.coordinates.y += 0x1e0;
-                    task->position.coordinates.z += 0x14;
+                    task->anchor.x -= 0x14;
+                    task->anchor.y += 0x1E0;
+                    task->anchor.z += 0x14;
                 }
-                p[0x1e] = 6;
+                task->duration = 6;
             } else {
-                task->position = src->position;
-                task->position.coordinates.y += 0x80;
-                p[0x1e] = 4;
+                task->anchor = task->player->position;
+                task->anchor.y += 0x80;
+                task->duration = 4;
             }
         } break;
-        case 3: {
-            struct CloudSource *src = task->source;
-            task->position = src->position;
-            if (*(s16 *)(gGameState + 0x85e) == 0) {
-                task->position.coordinates.x += 0x14;
-                task->position.coordinates.y += 0x1e0;
-                task->position.coordinates.z -= 0x14;
+        case 3:
+            task->anchor = task->player->position;
+            if (gGameState->unk85E == 0) {
+                task->anchor.x += 0x14;
+                task->anchor.y += 0x1E0;
+                task->anchor.z -= 0x14;
             } else {
-                task->position.coordinates.x -= 0x14;
-                task->position.coordinates.y += 0x1e0;
-                task->position.coordinates.z += 0x14;
+                task->anchor.x -= 0x14;
+                task->anchor.y += 0x1E0;
+                task->anchor.z += 0x14;
             }
-            p[0x1e] = 4;
-        } break;
+            task->duration = 4;
+            break;
     }
-    e = (struct CloudParticle *)(p + 0x30);
-    for (i = 39; i >= 0; i--, e++) {
-        if (e->kind) {
-            u32 value, mask, frame;
-            value = e->timer + 1;
-            e->timer = value;
-            mask = 255;
-            frame = e->frame;
-            if ((u8)value >= gUnk_086126C8[frame & mask]) {
-                e->timer = 0;
-                value = CloudParticle_NextFrame(e);
-                e->frame = value;
-                if ((value & mask) > 1)
-                    e->frame = 0;
-                SpriteDrawable_SelectTileFrame(e->sprite, *(u32 *)(p + 0x2c),
-                                               *(u32 *)(p + 0x20) + e->frame);
+
+    particle = task->particles;
+    for (i = 0; i < 40; i++, particle++) {
+        if (particle->kind) {
+            if (++particle->timer >= gUnk_086126C8[particle->frame]) {
+                particle->timer = 0;
+                if (++particle->frame > 1)
+                    particle->frame = 0;
+                SpriteDrawable_SelectTileFrame(&particle->sprite, task->sheet,
+                                               task->frameBase + particle->frame);
             }
-            sub_08249240(p, e, gUnk_086126BC[e->kind]);
+            gUnk_086126BC[particle->kind](task, particle);
         }
     }
-    if (p[0x1f])
-        Task_Kill(p);
-    *(u32 *)(p + 0x18) += 1;
+    if (task->stop)
+        Task_Kill(&task->task);
+    task->ticks++;
     return 0;
 }
