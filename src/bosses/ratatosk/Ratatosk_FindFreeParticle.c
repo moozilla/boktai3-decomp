@@ -1,27 +1,16 @@
 #include "global.h"
-struct E {
-    u8 p[0x74];
-};
-struct A {
-    u8 p0[0x18];
-    u32 w18;
-    u8 p1[0x38 - 0x1c];
-    struct E e[24];
-};
-struct E *Ratatosk_FindFreeParticle(struct A *a, s32 *out)
+#include "bosses/ratatosk/ratatosk_small_particle.h"
+#include "engine/ram.h"
+
+struct Particle *Ratatosk_FindFreeParticle(struct ParticlePool *pool, s32 *slot)
 {
-    struct E *e = a->e;
-    s32 i = 0;
-    u32 m = 1;
-    u32 w = a->w18;
-    do {
-        if ((m << i & w) != 0) {
-            i++;
-            e++;
-            continue;
+    struct Particle *e = pool->particles;
+    s32 i;
+    for (i = 0; i < 24; i++, e++) {
+        if (!(pool->mask & (1 << i))) {
+            *slot = i;
+            return e;
         }
-        *out = i;
-        return e;
-    } while (i <= 0x17);
+    }
     return 0;
 }

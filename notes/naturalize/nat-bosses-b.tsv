@@ -142,3 +142,4 @@ src/bosses/ratatosk/RatatoskParticle_Remove.c	RatatoskParticle_Remove	contrived	
 src/bosses/ratatosk/RatatoskParticle_Destroy.c	RatatoskParticle_Destroy	contrived	natural	2	
 src/bosses/ratatosk/RatatoskParticle_Init.c	RatatoskParticle_Init	contrived	natural	2	
 src/bosses/ratatosk/Ratatosk_CreateParticlePool.c	Ratatosk_CreateParticlePool	contrived	natural	2	falls off the end when the task is not created
+src/bosses/ratatosk/Ratatosk_FindFreeParticle.c	Ratatosk_FindFreeParticle	contrived	natural	2	
