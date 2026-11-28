@@ -137,3 +137,5 @@ src/objects/coffin/tether_actor.c	TetherActor_TestStepDelta	contrived	natural	2
 src/objects/coffin/tether_actor.c	TetherActor_TestStepPosition	minor	minor	9	local surfaceHeight helper stays for the second lookup: writing the terrain helpers there swaps candidate/mask registers (global alloc priority)
 src/objects/coffin/tether_actor.c	TetherActor_TestNearDelta	natural	natural	0	
 src/objects/coffin/tether_actor.c	TetherActor_UpdateWanderingState	minor	natural	3	
+src/objects/coffin/tether_actor.c	TetherActor_UpdateRoamingState	minor	minor	8	sector/mask block for the heading stays: plain & 7 loads the mask before the shifted angle
+src/objects/coffin/tether_actor.c	TetherActor_UpdateAuxiliaryTransition	contrived	minor	60	frame/frameBits pair, mask local and goto show stay: each shifts allocation or the visible test

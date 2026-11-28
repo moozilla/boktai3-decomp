@@ -2560,12 +2560,10 @@ void TetherActor_UpdateAuxiliaryTransition(struct TetherActor *actor)
 {
     u32 visible;
     u32 emit;
-    struct DisplayAnimation *display;
-    struct DisplayAnimation *activeDisplay;
-    u16 *frame;
-    u32 rawFrame;
-    u32 highFrame;
-    u32 current;
+    u32 frameBits;
+    u32 mask;
+    u16 frame;
+    struct ContactPosition *position;
     if (actor->state != 5)
         TetherActor_SetState(actor, 5);
     if (gEngineFlags & 512)
@@ -2573,80 +2571,46 @@ void TetherActor_UpdateAuxiliaryTransition(struct TetherActor *actor)
     actor->glowMode = 2;
     actor->heading = 0;
     actor->chargeCollider.flags |= 4;
-    visible = 0;
-    emit = visible;
-    frame = &actor->stateFrame;
-    rawFrame = *frame;
-    highFrame = rawFrame << 16;
-    current = highFrame >> 16;
-    if (current <= 63) {
+    visible = FALSE;
+    emit = FALSE;
+    frameBits = actor->stateFrame;
+    frame = frameBits;
+    if (frame <= 63) {
         actor->position.y = (actor->position.y * 7 + actor->auxiliaryOrigin.y) >> 3;
         goto show;
     }
-    if (current <= 127) {
-        s32 shake;
-        gRandomIndex = (gRandomIndex + 1) & 1023;
-        {
-            u32 bit = ((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
-            bit &= 1;
-            shake = (bit << 4) + bit - 8;
-        }
+    if (frame <= 127) {
+        s32 shake = (ParticleRandom_ReadDirectSample((const u16 *)RANDOM_TABLE_ADDR) & 1) * 17 - 8;
         actor->shakeX = shake;
         actor->shakeZ = -shake;
-        visible = 1;
-        if ((*frame & 15) == 0)
-            emit = visible;
-    } else if (current <= 191) {
-        if ((highFrame >> 17) & 3)
-            visible = 1;
-        {
-            u32 mask = 15;
-            mask &= rawFrame;
-            if (!mask)
-                emit = 1;
-        }
+        visible = TRUE;
+        if (!(actor->stateFrame & 15))
+            emit = TRUE;
+    } else if (frame <= 191) {
+        if ((actor->stateFrame >> 1) & 3)
+            visible = TRUE;
+        mask = 15;
+        mask &= frameBits;
+        if (!mask)
+            emit = TRUE;
     } else {
-        if ((highFrame >> 17) & 1)
-            visible = 1;
-        {
-            u32 mask = 15;
-            mask &= rawFrame;
-            if (!mask)
-                emit = 1;
-        }
+        if ((actor->stateFrame >> 1) & 1)
+            visible = TRUE;
+        mask = 15;
+        mask &= frameBits;
+        if (!mask)
+            emit = TRUE;
     }
     if (visible) {
     show:
-        activeDisplay = &actor->display.animation;
-        DisplayAnimation_ClearFlags(activeDisplay, 1);
+        DisplayAnimation_ClearFlags(&actor->display.animation, 1);
         actor->auxiliarySprite.flags &= ~1;
-        {
-            struct ContactPosition *position = &actor->auxiliarySprite.position;
-            s32 x, z;
-            u8 *properties;
-            u32 surface;
-            s32 height;
-            x = position->x >> 8;
-            z = position->z >> 8;
-            display = activeDisplay;
-            properties = propertiesAt_0804C748(x, z);
-            surface = *properties >> 4;
-            height = (*properties & 15) << 8;
-            switch (surface) {
-                case 1:
-                    height -= (u8)position->z;
-                    break;
-                case 2:
-                    height -= (u8)position->x;
-                    break;
-            }
-            actor->auxiliarySprite.position.y = height;
-        }
+        position = &actor->auxiliarySprite.position;
+        actor->auxiliarySprite.position.y =
+            SceneActorTerrain_GetHeight(SceneActorTerrain_GetCellIndex(position), position);
     } else {
-        struct DisplayAnimation *shown = &actor->display.animation;
-        DisplayAnimation_SetFlags(shown, 1);
+        DisplayAnimation_SetFlags(&actor->display.animation, 1);
         actor->auxiliarySprite.flags |= 1;
-        display = shown;
     }
     if (emit)
         TetherActor_EmitPointEffect((const struct ContactPackedVector *)&actor->position,
@@ -2660,9 +2624,9 @@ void TetherActor_UpdateAuxiliaryTransition(struct TetherActor *actor)
             actor->interactionScriptId = 0;
             Script_Call(script, 0);
             actor->destroyRequested = 1;
-            DisplayAnimation_SetFlags(display, 1);
+            DisplayAnimation_SetFlags(&actor->display.animation, 1);
         } else {
-            DisplayAnimation_SetFlags(display, 1);
+            DisplayAnimation_SetFlags(&actor->display.animation, 1);
             actor->destroyRequested = 1;
         }
     }
