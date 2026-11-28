@@ -87,7 +87,6 @@ static inline u32 CellHasFlag(u16 flags, u32 mask)
 void Player_UpdateObjectPush(struct Player *p)
 {
     s32 animation;
-    u8 state;
     struct PackedVec v;
     struct PackedVec a;
     struct PackedVec b;
@@ -98,8 +97,7 @@ void Player_UpdateObjectPush(struct Player *p)
     }
     if ((p->tetherPhase == 1) && (p->inputKeys[1] & 1))
         Player_SetActionPhase(p, 2);
-    state = p->tetherPhase;
-    switch (state) {
+    switch (p->tetherPhase) {
         case 0:
             Player_SetStatusBits(&p->statusFlags, 4);
             animation = ActorVariant_GetTableValue(p->actionMode, 2);
@@ -111,7 +109,7 @@ void Player_UpdateObjectPush(struct Player *p)
                     p->side = 1;
                 } else {
                     p->heading = p->coordinateAxis >> 1;
-                    p->side = state;
+                    p->side = 0;
                 }
             }
             if (Player_SetAnimation(p, animation, 0x40, 1) == 0)
@@ -126,12 +124,12 @@ void Player_UpdateObjectPush(struct Player *p)
             s32 height;
             int nextHeight;
             Player_SetStatusBits(&p->statusFlags, 8);
-            p->actionFourEnabled = state;
+            p->actionFourEnabled = 1;
             t = (s16)p->directionHistory[0];
             previousDirection = (p->coordinateAxis + 7) & 7;
             nextDirection = (p->coordinateAxis + 1) & 7;
             animation = ActorVariant_GetTableValue(p->actionMode, 3);
-            p->visualEffects7A0[0].pending = state;
+            p->visualEffects7A0[0].pending = 1;
             if ((t != previousDirection) && (t != nextDirection)) {
                 if (Player_IsWithinCoordinateBand(p)) {
                     if (PuzzleBlock_TryPushNeighborByIndex(&p->position, p->facing) > 0) {
@@ -148,14 +146,13 @@ void Player_UpdateObjectPush(struct Player *p)
                 int idx;
                 int d;
                 int angle, scaled;
+                int turn;
                 d = p->coordinateAxis;
-                {
-                    int turn = (t - d) * 2 + 8;
-                    d += turn;
-                    d &= 7;
-                    t = d + 1;
-                    t &= 7;
-                }
+                turn = (t - d) * 2 + 8;
+                d += turn;
+                d &= 7;
+                t = d + 1;
+                t &= 7;
                 v = *(struct PackedVec *)&p->position;
                 v.x -= scale(gUnk_086149C4[((t << 5) + 0x40) & 0xff] * 50);
                 angle = t << 5;

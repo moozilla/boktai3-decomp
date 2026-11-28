@@ -606,3 +606,4 @@ src/player/gun/Player_UpdateAttachedChargeTiers.c	Player_UpdateAttachedChargeTie
 src/player/gun/Player_UpdateSustainedSpinAttack.c	Player_UpdateSustainedSpinAttack	contrived	natural	1	-
 src/player/gun/Player_UpdateAttachedAttackCharge.c	Player_UpdateAttachedAttackCharge	contrived	natural	4	-
 src/player/interaction/Player_UpdateObjectPushRecovery.c	Player_UpdateObjectPushRecovery	contrived	minor	2	IsTwo link-mode helper: the u8 result computed from a saved halfword fixes the double test
+src/player/interaction/Player_UpdateObjectPush.c	Player_UpdateObjectPush	contrived	contrived	22	probe pointer blocks for the height lookup, CellHasFlag/isTwo/status-bit helpers (mask loaded before the field) and the angle alias fix the register allocation
