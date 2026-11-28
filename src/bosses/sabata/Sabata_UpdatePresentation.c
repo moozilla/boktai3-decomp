@@ -42,12 +42,11 @@ void Sabata_UpdatePresentation(struct SabataActorState *p)
     } else
         q->effectDuration = 0;
     {
-        struct SabataActorState *a = q;
-        u32 v = a->contactHoldoff;
+        u32 v = q->contactHoldoff;
         flags = &p->flags;
         if (v) {
             WordFlags_Set(4, flags);
-            a->contactHoldoff--;
+            q->contactHoldoff--;
         }
     }
     collider = &q->bodyCollider;
@@ -98,14 +97,13 @@ void Sabata_UpdatePresentation(struct SabataActorState *p)
     } else {
         unfade(&q->graphics);
         {
-            struct SabataActorState *shadowActor = q;
             u32 val = p->special;
             grounded = &p->special;
             if (val) {
-                ActorShadow_Enable(shadowActor->shadow);
+                ActorShadow_Enable(q->shadow);
                 CameraTracking_ClearRequests(&q->camera, 1);
             } else {
-                ActorShadow_Enable(shadowActor->shadow);
+                ActorShadow_Enable(q->shadow);
                 CameraTracking_ClearRequests(&q->camera, 1);
             }
         }
