@@ -2,7 +2,6 @@
 #include "link/lobby/record_menu.h"
 void *ScriptProc_Start(u16, u16);
 #include "engine/video/display_resource.h"
-void AnimSprite_InitLinked(void *, void *, int, int, int, int, int, void *);
 void RecordMenu_InitializeSprites(struct RecordMenu *menu)
 {
     void *proc;

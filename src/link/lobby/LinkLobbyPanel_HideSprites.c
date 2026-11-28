@@ -6,7 +6,7 @@ void LinkLobbyPanel_HideSprites(struct RecordMenu *menu)
     u8 *p;
     for (i = 0; i < 9; i++)
         menu->sprites[i].displayFlags |= 1;
-    p = menu->panelStorage;
+    p = (u8 *)&menu->previews[0].model;
     i = 1;
     do {
         CharacterModel_SetAnimationFlags(p, 1);

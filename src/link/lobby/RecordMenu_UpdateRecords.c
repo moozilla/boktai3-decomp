@@ -21,9 +21,9 @@ void RecordMenu_UpdateRecords(struct RecordMenu *menu)
         menu->inputDelay = 0;
         menu->redraw = 0;
     }
-    for (i = 0, panel = menu->panelStorage; i <= 1; panel += 0x850, i++)
+    for (i = 0, panel = (u8 *)&menu->previews[0].model; i <= 1; panel += 0x850, i++)
         CharacterModel_UpdatePairedAnimations(panel, i);
-    PaletteFade_CycleMenuColors(menu->textPanel);
+    PaletteFade_CycleMenuColors(&menu->paletteCycle);
     if (menu->inputDelay <= 59)
         menu->inputDelay++;
     else if (gPadState[1] & 11) {

@@ -2,6 +2,7 @@
 #define FOUNDRY_RECORD_MENU_H
 
 #include "engine/task.h"
+#include "link/records/link_record_panel.h"
 struct RecordMenuSprite {
     u8 unknown0[8];
     u32 displayFlags;
@@ -27,8 +28,8 @@ struct RecordMenu {
     void *cursorProc;
     u8 pad3f0[4];
     u16 palette[16];
-    u8 textPanel[0x61c];
-    u8 panelStorage[0xaa8];
+    struct LinkRecordPaletteCycle paletteCycle;
+    struct CharacterPreviewActor previews[2];
     void (*update)(struct RecordMenu *);
     const u8 *titleScript, *choiceScript, *recordScript;
     u8 pad14e8[4];

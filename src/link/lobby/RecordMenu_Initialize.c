@@ -2,10 +2,7 @@
 #include "link/lobby/record_menu.h"
 #include "scene/areas/area_effect_link.h"
 #include "engine/ram.h"
-s32 Script_SeekToKeyword(u32);
-u32 Script_GetTextSourcePc(void);
-u32 Script_GetPc(void);
-s32 Script_GetKeywordValue(u32, s32);
+const u8 *Script_GetTextSourcePc(void);
 void Bg_ClearTilemap(s32);
 void LinkLobbyPanel_LoadBackground(struct RecordMenu *);
 void LinkLobbyPanel_InitGlyphFrames(struct RecordMenu *);
@@ -80,7 +77,7 @@ s32 RecordMenu_Initialize(struct RecordMenu *menu)
         RecordMenu_InitializeSprites(menu);
         RecordMenu_LoadPlayerSprites(menu);
         RecordMenu_PositionSprites(menu);
-        ModifierMenu_InitSelectionSnapshot(menu->textPanel, menu->paletteResource);
+        ModifierMenu_InitSelectionSnapshot(&menu->paletteCycle, menu->paletteResource);
         LinkLobbyPanel_CreateTextWindows(menu);
         LinkLobbyPanel_RefreshPlayerNames(menu);
         {

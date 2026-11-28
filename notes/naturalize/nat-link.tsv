@@ -31,3 +31,4 @@ src/link/lobby/LinkLobbyPanel_ClearTextWindows.c	LinkLobbyPanel_ClearTextWindows
 src/link/lobby/LinkLobbyPanel_InitGlyphFrames.c	LinkLobbyPanel_InitGlyphFrames	minor	natural	1	
 src/link/lobby/RecordMenu_InitializeSprites.c	RecordMenu_InitializeSprites	minor	natural	3	cursor sprite indexes i (== 8 after the loop) for its id and state
 src/link/lobby/RecordMenu_PositionSprites.c	RecordMenu_PositionSprites	minor	natural	1	
+src/link/lobby/RecordMenu_LoadPlayerSprites.c	RecordMenu_LoadPlayerSprites	contrived	natural	2	validSelection inline keeps its goto spelling (shared with record panel)

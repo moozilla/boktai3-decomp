@@ -8,7 +8,6 @@ s32 Div(s32, s32);
 u16 *Video_GetWrappedBackgroundMapEntry(u32, u32, u32);
 void PanelText_DrawDigits(s32, s32, s32, u32, s32);
 void Video_DrawBackgroundRowMarkers(s32, u32);
-void AnimSprite_SelectGlyph(void *, void *, u16);
 void Sound_PlayTrackedSong(u32);
 
 void TimerDisplay_DrawRecord(struct AreaEffectLinkState *records, s32 x, u32 y, s32 unused,

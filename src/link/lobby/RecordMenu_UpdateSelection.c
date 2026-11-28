@@ -10,8 +10,6 @@ void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 void LinkLobbyPanel_ClearTextWindows(struct RecordMenu *);
 void LinkLobbyPanel_HideSprites(struct RecordMenu *);
 void TextWindow_SetBounds(s32, s32, s32, s32, s32);
-void TextWindow_SetScript(s32, const u8 *);
-void TextWindow_Refresh(u32, u32);
 void TextWindow_StartPlayback(s32);
 s32 AnimSprite_SelectGlyph(void *, void *, u32);
 void LinkSession_SetSelectionResponse(s32);
