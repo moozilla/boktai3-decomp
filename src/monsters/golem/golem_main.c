@@ -1162,7 +1162,6 @@ void Golem_UpdateChargeWindup(struct ChaseActor *actor, u32 frame)
     struct GolemChargeContext *context = actor->base.context;
     struct SceneActorBody *body = &actor->base.body;
     u8 directionVariant, mirror;
-    s16 *speed;
     if (SceneActorReaction_TakePrepared(actor)) {
         actor->base.restart = 0;
         context->pendingHits = 0;
@@ -1192,10 +1191,9 @@ void Golem_UpdateChargeWindup(struct ChaseActor *actor, u32 frame)
             2;
         SceneParticleBurst_CreateWithPause(&body->position, &velocity, &size, 2, count, 4);
     }
-    speed = &context->charge.speed;
-    if (*speed <= 383)
-        *speed += 16;
-    actor->base.field2C2 = 0x40 >> (*speed >> 7);
+    if (context->charge.speed <= 383)
+        context->charge.speed += 16;
+    actor->base.field2C2 = 0x40 >> (context->charge.speed >> 7);
     Golem_ApplyDuration(actor);
 }
 
