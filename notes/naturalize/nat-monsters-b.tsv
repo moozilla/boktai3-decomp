@@ -40,3 +40,4 @@ src/monsters/ivy/ivy.c	Ivy_Update	natural	natural	0
 src/monsters/ivy/ivy.c	Ivy_UpdateInteraction	natural	natural	0	
 src/monsters/ivy/ivy.c	Ivy_Destroy	contrived	minor	40	MonsterInit_TestMotionFlags and SceneActorPlacement_ReadFlags32 accessors (mask loaded before the field address)
 src/monsters/bee.c	Bee_Destroy	contrived	minor	1	MonsterInit_TestMotionFlags and SceneActorPlacement_ReadFlags32 accessors (mask loaded before the field address)
+src/monsters/crow.c	Crow_Destroy	contrived	minor	1	MonsterInit_TestMotionFlags and SceneActorPlacement_ReadFlags32 accessors (mask loaded before the field address)
