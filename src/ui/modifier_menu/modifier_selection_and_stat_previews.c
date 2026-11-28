@@ -435,10 +435,9 @@ void LinkSession_SetMenuRequest(u32);
 
 void ModifierMenu_CloseScript(struct ModifierMenu *menu)
 {
-    void **script = &menu->script;
-    if (*script) {
-        Script_Call(*script, 0);
-        *script = 0;
+    if (menu->script) {
+        Script_Call(menu->script, 0);
+        menu->script = 0;
     }
     if (Engine_PauseBits(0x800))
         LinkSession_SetMenuRequest(1);
