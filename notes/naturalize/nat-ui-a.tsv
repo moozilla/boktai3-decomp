@@ -238,3 +238,4 @@ src/ui/dialogue/message_window/message_window.c	MessageWindow_ShowMessage	contri
 src/ui/dialogue/message_window/message_window.c	MessageWindow_SetBounds	contrived	minor	8	existing TextState_SetBounds return cast kept
 src/ui/dialogue/message_window/message_window.c	MessageWindow_SetNumberArgument	minor	natural	5	
 src/ui/dialogue/message_window/message_window.c	MessageWindow_SetStringArgument	minor	natural	4	
+src/ui/dialogue/message_window/message_window.c	MessageWindow_SetStringArgumentFromScript	minor	natural	5	
