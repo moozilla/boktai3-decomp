@@ -58,7 +58,7 @@ void SceneEffect_CreateLinkedEntry(struct LinkEffect *effect)
         RisingActorManager_BeginRaise(entry);
         effect->orb = entry;
     }
-    effect->phase |= -1;
+    effect->phase = 255;
 }
 
 s32 Mod(s32, s32);

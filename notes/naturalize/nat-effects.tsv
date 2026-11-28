@@ -36,3 +36,4 @@ src/effects/floating_item_effect.c	FloatingEffectManager_Create	natural	natural	
 src/effects/floating_item_effect.c	FloatingEffectManager_GetOrCreate	natural	natural	0	
 src/effects/floating_item_effect.c	ScanlineWave_Reset	natural	natural	0	
 src/effects/floating_item_effect.c	FloatingItemEffect_Spawn	minor	minor	2	do/while slot search and idx temp: a for loop reallocates the whole function
+src/effects/link_effect.c	SceneEffect_CreateLinkedEntry	minor	natural	1	
