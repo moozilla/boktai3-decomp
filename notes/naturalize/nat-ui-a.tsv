@@ -504,3 +504,4 @@ src/ui/hud/level_advance/LevelAdvanceDisplay_UpdateManager.c	LevelAdvanceDisplay
 src/ui/hud/level_advance/LevelAdvanceDisplay_DestroyManager.c	LevelAdvanceDisplay_DestroyManager	natural	natural	0	
 src/ui/hud/level_advance/LevelAdvanceDisplay_InitSprite.c	LevelAdvanceDisplay_InitSprite	natural	natural	0	
 src/ui/hud/level_advance/LevelAdvanceDisplay_InitParticles.c	LevelAdvanceDisplay_InitParticles	natural	natural	0	
+src/ui/hud/display/hud_stat_display.c	Hud_SetInteractionCallback	fudged	natural	1	

@@ -13,7 +13,7 @@ void Hud_SetInteractionCallback(struct SceneHudState *hud, u32 callback, u32 com
     hud->pageCallback = (void *)callback;
     hud->actionTransferDelay = 0;
     hud->comparisonModifier = comparison;
-    if ((comparison << 24) != 0) {
+    if ((u8)comparison) {
         PauseMenu_LoadSpriteKeyframe(hud, 1, 0x43);
         PauseMenu_LoadSpriteKeyframe(hud, 2, 0x44);
     } else {
