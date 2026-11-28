@@ -406,3 +406,14 @@ src/monsters/golem/golem_main.c	SceneActorControl_RefreshMotionRoute	minor	minor
 src/monsters/golem/golem_main.c	Golem_TurnTowardRouteFacing	minor	minor	0	halfword view casts and small flag/getter wrappers remain
 src/monsters/golem/golem_main.c	Golem_UpdateSlideImpact	minor	minor	0	halfword view casts and small flag/getter wrappers remain
 src/monsters/golem/golem_main.c	Skeleton_LookupAnimationEntry	minor	minor	1	second pointer to the sequence for the second table read: one pointer drops the reload
+src/monsters/golem/golem_2.c	Golem_OnUnusedState	natural	natural	0	
+src/monsters/golem/golem_2.c	Golem_InitActionHandlers	natural	natural	0	
+src/monsters/golem/golem_2.c	Golem_UpdateEffectsAndContacts	natural	natural	0	
+src/monsters/golem/golem_main_2.c	Golem_UpdateHoldTimer	natural	natural	0	
+src/monsters/golem/golem_main_2.c	Golem_BeginSlideState	natural	natural	0	
+src/monsters/golem/golem_main_2.c	Golem_ArriveAndRestore	natural	natural	0	
+src/monsters/golem/golem_main_2.c	Golem_InitSpecialActionHandlers	natural	natural	0	
+src/monsters/golem/golem_main_2.c	Golem_OnSharedActorUpdate	natural	natural	0	
+src/monsters/golem/golem_main_2.c	Golem_Create	natural	natural	0	
+src/monsters/golem/golem_2.c	Golem_UpdateHitReaction	minor	minor	1	void *object alias of actor for the route calls: passing actor itself changes register allocation across the function
+src/monsters/golem/golem_main_2.c	Golem_OnUpdate	minor	minor	1	mask local: literal 0x2000 is loaded after the flags
