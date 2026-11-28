@@ -272,3 +272,4 @@ src/ui/dialogue/message_window/message_window.c	MessageWindow_SetAutoAdvance	nat
 src/ui/dialogue/message_window/sub_0803198C.c	sub_0803198C	contrived	minor	28	one pointer variable reused for the queued message and the callback value (the function address must land in r1)
 src/ui/dialogue/message_window/MessageWindow_Create.c	MessageWindow_Create	minor	natural	1	
 src/ui/dialogue/message_window/MessageWindow_GetTextBounds.c	MessageWindow_GetTextBounds	contrived	natural	1	
+src/ui/dialogue/message_window/MessageWindow_GetNumberWidth.c	MessageWindow_GetNumberWidth	minor	natural	2	
