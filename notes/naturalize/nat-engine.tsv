@@ -442,3 +442,4 @@ src/system/clock/Clock_GetWeekdayFromScript.c	Clock_GetWeekdayFromScript	minor	n
 src/system/clock/SunClock_GetSunriseSpanFromScript.c	SunClock_GetSunriseSpanFromScript	minor	natural	1	
 src/system/clock/SunClock_GetSunsetSpanFromScript.c	SunClock_GetSunsetSpanFromScript	minor	natural	1	
 src/system/clock/SunClock_GetLightPhaseFromScript.c	SunClock_GetLightPhaseFromScript	minor	natural	1	
+src/system/clock/SunClock_GetMoonAgeTenths.c	SunClock_GetMoonAgeTenths	minor	natural	1	
