@@ -111,13 +111,13 @@ s32 Explosion_InitWithCollisionFlags(struct Explosion *explosion, struct Contact
                                      s32 force, s32 reactionFlags, s32 hitDuration, s32 palette,
                                      u32 delay)
 {
-    struct ContactCollider *collider;
     Explosion_InitSprite(&explosion->sprite, &explosion->graphics, position, palette);
-    collider = &explosion->collider;
-    Explosion_InitColliderWithFlags(explosion, collider, contactFlags, collisionProperties, power,
-                                    force, reactionFlags | 0x40000, hitDuration);
-    Collider_SetPosition(collider, position, 0);
-    InitializeDelay(&explosion->delay, 0, delay);
+    Explosion_InitColliderWithFlags(explosion, &explosion->collider, contactFlags,
+                                    collisionProperties, power, force, reactionFlags | 0x40000,
+                                    hitDuration);
+    Collider_SetPosition(&explosion->collider, position, 0);
+    explosion->delay = delay;
+    explosion->age = 0;
     return 0;
 }
 
