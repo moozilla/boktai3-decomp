@@ -293,3 +293,4 @@ src/player/cutscene/player_cue_actions.c	PlayerCue_AcknowledgePendingTrigger	min
 src/player/cutscene/player_cue_actions.c	PlayerCue_CompleteAction	minor	natural	1	
 src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateHidden	natural	natural	0	
 src/player/cutscene/player_cue_actions.c	PlayerCue_UpdatePeriodicParticles	minor	natural	1	
+src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateFaceSide	minor	natural	1	

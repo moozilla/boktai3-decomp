@@ -196,10 +196,7 @@ void PlayerCue_UpdateStandDiagonal(struct Player *player)
 
 void PlayerCue_UpdateFaceSide(struct Player *player)
 {
-    s32 r;
-
-    r = ActorVariant_GetTableValue(player->actionMode, 0x34);
-    Player_SetAnimation(player, r, 0x40, 1);
+    Player_SetAnimation(player, ActorVariant_GetTableValue(player->actionMode, 0x34), 0x40, 1);
     Player_AddControlFlags(player, 4);
 }
 
