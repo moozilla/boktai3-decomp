@@ -1,3 +1,4 @@
+#include "scene/motion/scene_facing.h"
 #include "global.h"
 #include "engine/engine.h"
 #include "scene/collision/packed_contact_vector.h"
@@ -76,25 +77,8 @@ s32 StoryCharacter_CreateFromScriptEntry(void *manager, void *name)
     Actor_InitShadow(npc, npc->shadow, 1, 0, 0x40);
     SceneMessages_RegisterReceiver(npc->receiver, name, 5);
     npc->motionAngle = angle;
-    {
-        u16 a = angle;
-        {
-            s32 t;
-            u32 m;
-            t = a + 0x70;
-            t >>= 5;
-            m = 7;
-            m &= t;
-            npc->facing8 = m;
-        }
-        {
-            s32 t = (a + 0x60) >> 6;
-            u32 m;
-            m = 3;
-            m &= t;
-            npc->facing4 = m;
-        }
-    }
+    npc->facing8 = SceneFacing_EightWay(angle);
+    npc->facing4 = SceneFacing_FourWay(angle);
     setHandler(StoryCharacter_EnterPendingState, &npc->callbacks[5]);
     setHandler(StoryCharacter_OnUpdateDisplay, &npc->callbacks[0]);
     setHandler(StoryCharacter_OnCommand, &npc->callbacks[1]);

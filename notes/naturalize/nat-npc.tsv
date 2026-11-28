@@ -132,3 +132,7 @@ src/npc/story_character/StoryCharacter_OnCommand.c	StoryCharacter_OnCommand	natu
 src/npc/story_character/StoryCharacter_EnterPendingState.c	StoryCharacter_EnterPendingState	contrived	natural	7	
 src/npc/story_character/StoryCharacter_OnUpdateState.c	StoryCharacter_OnUpdateState	minor	natural	1	
 src/npc/story_character/StoryCharacter_ProcessDirectionMessages.c	StoryCharacter_ProcessDirectionMessages	contrived	contrived	14	enter/height value locals, guarded do-while and callback local stay: constant load order and loop test shape differ without them
+src/npc/story_character/StoryCharacter_OnUpdateDisplay.c	StoryCharacter_OnUpdateDisplay	natural	natural	0	
+src/npc/story_character/StoryCharacter_OnRender.c	StoryCharacter_OnRender	natural	natural	0	
+src/npc/story_character/StoryCharacter_OnUnregisterReceiver.c	StoryCharacter_OnUnregisterReceiver	natural	natural	0	
+src/npc/story_character/StoryCharacter_CreateFromScriptEntry.c	StoryCharacter_CreateFromScriptEntry	contrived	contrived	13	setHandler, ten/fail/model locals stay: callback stores and state constants reorder without them
