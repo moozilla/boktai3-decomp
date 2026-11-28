@@ -84,3 +84,4 @@ src/link/message_panel/message_panel.c	MessagePanel_InitFromScript	natural	natur
 src/link/message_panel/message_panel.c	MessagePanel_CreateFromScript	natural	natural	0	
 src/link/message_panel/ClockPanel_CaptureSnapshot.c	ClockPanel_CaptureSnapshot	contrived	contrived	40	partial: pointer locals src/dest/values, bikeNameOffset, style computed by byte offset and the nested party value block stay; removing any one changes register allocation (snapshot r5 / style pointer r7)
 src/link/message_panel/ClockPanel_CaptureTime.c	ClockPanel_CaptureTime	contrived	minor	1	local views of the link session stay
+src/link/message_panel/LinkSession_InitSessionSettings.c	LinkSession_InitSessionSettings	contrived	minor	1	u8 write into the u16 exchangeValue field
