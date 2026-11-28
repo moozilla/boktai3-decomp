@@ -286,3 +286,4 @@ src/bosses/vanargand/positioned_effect.c	PositionedEffect_InitContactCollider	ma
 src/bosses/vanargand/positioned_effect.c	PositionedEffect_InitRadialAttackColliders	near-natural	natural	3	
 src/bosses/vanargand/positioned_effect.c	PositionedEffect_InterpolateArcNodes	contrived	natural	7	
 src/bosses/vanargand/positioned_effect.c	PositionedEffect_EmitParticles	machine-shaped	partial	8	fill source/destination temporaries and single table load kept: ROM forms &center before the zero store and writes gRandomIndex once
+src/bosses/vanargand/positioned_effect.c	PositionedEffect_UpdateVectors	near-natural	near-natural	3	per-animation helper kept: calling AddVector at the site does not match

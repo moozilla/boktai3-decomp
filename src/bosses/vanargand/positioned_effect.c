@@ -217,9 +217,7 @@ static inline void AddVector(struct ContactPosition *p, struct ContactPosition *
 static inline void UpdateAnimation(struct PositionedEffectAnimation *a,
                                    struct PositionedVectorEffect *p)
 {
-    struct ContactPosition *out = &a->sprite.position;
-    struct ContactPosition *offset = a->offset;
-    AddVector(out, offset, &p->base);
+    AddVector(&a->sprite.position, a->offset, &p->base);
 }
 
 void PositionedEffect_UpdateVectors(struct PositionedVectorEffect *p)
