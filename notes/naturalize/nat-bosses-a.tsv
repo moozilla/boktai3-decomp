@@ -112,3 +112,4 @@ src/bosses/count/SceneActors_UpdateEightDirectionTurn.c	SceneActors_UpdateEightD
 src/bosses/count/SceneActors_UpdateContractingShake.c	SceneActors_UpdateContractingShake	contrived	natural	2	
 src/bosses/count/SceneActors_UpdateExpandingShake.c	SceneActors_UpdateExpandingShake	contrived	minor	22	charge offset written out (int angle is not narrowed like the shared helper); direction local ordered before velocity pointer
 src/bosses/count/SceneActors_UpdateStationaryReaction.c	SceneActors_UpdateStationaryReaction	minor	natural	1	
+src/bosses/count/SceneActors_UpdateHazardAttack.c	SceneActors_UpdateHazardAttack	contrived	natural	1	
