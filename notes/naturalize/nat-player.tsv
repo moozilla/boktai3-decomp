@@ -309,3 +309,4 @@ src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateMoveDestination	contriv
 src/player/cutscene/player_cue_actions.c	Player_UpdateSongCueAnimation	minor	natural	3	-
 src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateKnockdownRecovery	natural	natural	0	-
 src/player/cutscene/player_cue_actions.c	Player_UpdateRecoilAction	minor	natural	3	-
+src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateRecoilRecovery	minor	natural	4	-

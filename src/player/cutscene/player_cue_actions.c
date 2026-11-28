@@ -831,32 +831,28 @@ void PlayerCue_UpdateKnockdownRecovery(struct Player *player)
 void PlayerCue_UpdateRecoilRecovery(struct Player *player)
 {
     s32 value, angle;
-    s32 phase = player->tetherPhase;
-    switch (phase) {
-        case 0: {
-            u32 frame = player->tetherFrame;
-            if (!frame) {
-                if ((u8)(s8)player->facing > 4) {
+    switch (player->tetherPhase) {
+        case 0:
+            if (!player->tetherFrame) {
+                if (player->facing > 4) {
                     player->heading = (8 - player->facing) >> 1;
                     player->side = 1;
                 } else {
-                    player->heading = (u8)(s8)player->facing >> 1;
-                    player->side = frame;
+                    player->heading = player->facing >> 1;
+                    player->side = 0;
                 }
                 Player_SetAnimation(player, ActorVariant_GetTableValue(player->actionMode, 0x29),
                                     0x40, 1);
                 if (player->actionMode != 6)
                     Sound_PlaySong(0xE7);
             }
-        }
             angle = ((player->facing + 5) & 7) << 5;
             value = gUnk_086149C4[(angle + 0x40) & 0xFF] * player->recoilSpeed;
             player->velocityX = -TruncateQ12(value);
             value = gUnk_086149C4[angle] * player->recoilSpeed;
             player->velocityZ = -TruncateQ12(value);
-            value = (player->recoilSpeed * 3) >> 2;
-            player->recoilSpeed = value;
-            if (!value)
+            player->recoilSpeed = (player->recoilSpeed * 3) >> 2;
+            if (!player->recoilSpeed)
                 ActorSequence_Begin(player, 0x1D, 1);
             break;
         case 1:
