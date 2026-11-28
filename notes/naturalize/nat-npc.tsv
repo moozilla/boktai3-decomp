@@ -187,3 +187,4 @@ src/npc/story_character/Actor_UpdateKindNineteenEntrySeven.c	Actor_UpdateKindNin
 src/npc/story_character/Actor_UpdateKindTwentyPairEntryFour.c	Actor_UpdateKindTwentyPairEntryFour	minor	natural	1	
 src/npc/story_character/Actor_BeginKindFifteenEntryNine.c	Actor_BeginKindFifteenEntryNine	contrived	natural	1	
 src/npc/story_character/Actor_UpdateKindFifteenEntryTenTimed.c	Actor_UpdateKindFifteenEntryTenTimed	contrived	natural	1	
+src/npc/story_character/SceneCharacter_UpdateAnimationFiveSixFive.c	SceneCharacter_UpdateAnimationFiveSixFive	contrived	natural	1	
