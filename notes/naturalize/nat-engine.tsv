@@ -251,3 +251,4 @@ src/engine/video/background_layers.c	Bg_SetTilemapEntry	natural	natural
 src/engine/video/background_layers.c	Bg_UploadTileEntries	contrived	natural	9	
 src/engine/video/background_layers.c	Bg_CopyTiles	minor	natural	9	
 src/engine/video/background_layers.c	Bg_SetupLayers	contrived	minor	12	origin and size pass through locals: storing the expressions directly reorders the entry reads
+src/engine/video/background_layers.c	Bg_SetLayerMap	contrived	minor	4	size through u16 locals: reading entry fields twice emits extra loads

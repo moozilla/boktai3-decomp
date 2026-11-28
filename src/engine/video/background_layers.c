@@ -612,6 +612,7 @@ void Bg_SetLayerMap(s32 bg, struct BgMapResource *res, s32 index)
     struct BgMapResource hdr;
     struct BgMapEntry entry;
     struct BackgroundLayer *layer;
+    u16 width, height;
     if (bg == 0)
         Text_ClearGlyphCache();
     hdr = *res;
@@ -624,11 +625,8 @@ void Bg_SetLayerMap(s32 bg, struct BgMapResource *res, s32 index)
     layer->scaleX = 0x1000;
     layer->scaleY = 0x1000;
     layer->mapData = (u16 *)entry.data;
-    {
-        u16 w, h;
-        layer->width = w = entry.width;
-        layer->height = h = entry.height;
-        layer->halfWidth = w;
-        layer->halfHeight = h;
-    }
+    layer->width = width = entry.width;
+    layer->height = height = entry.height;
+    layer->halfWidth = width;
+    layer->halfHeight = height;
 }
