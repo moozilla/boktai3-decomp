@@ -323,3 +323,9 @@ src/link/records/link_record_panel.c	LinkRecordPanel_RunExitScript	natural	natur
 src/link/records/link_record_panel.c	LinkRecordPanel_RunCompletionScript	natural	natural	0	
 src/link/records/link_record_panel.c	LinkRecordPanel_UpdateExit	natural	natural	0	
 src/link/records/link_record_panel.c	LinkRecordPanel_InitializeFromScript	minor	minor	6	SetUpdate and clamp inlines stay: plain stores reorder the constants
+src/link/records/link_record_panel.c	LinkRecordPanel_Update	natural	natural	0	
+src/link/records/link_record_panel.c	LinkRecordPanel_Destroy	natural	natural	0	
+src/link/records/link_record_panel.c	LinkRecordPanel_Create	natural	natural	0	
+src/link/records/Registry30AC_ResetInstance.c	Registry30AC_ResetInstance	natural	natural	0	old_agbcc marker preexisting
+src/link/records/sub_0810D554.c	sub_0810D554	natural	natural	0	
+src/link/records/RecordPanel_LoadBackground.c	RecordPanel_LoadBackground	contrived	natural	2	
