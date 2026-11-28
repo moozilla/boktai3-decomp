@@ -30,3 +30,4 @@ src/ui/books/monster_book/DisplayEntry_SetAnim.c	DisplayEntry_SetAnim	contrived	
 src/ui/books/monster_book/BestiaryDisplay_UpdateEntry.c	BestiaryDisplay_UpdateEntry	contrived	natural	1	
 src/ui/books/monster_book/BestiaryDisplay_OnTaskDestroy.c	BestiaryDisplay_OnTaskDestroy	minor	natural	1	
 src/ui/books/monster_book/PaletteTransition_Restart.c	PaletteTransition_Restart	contrived	natural	2	origin pointer kept
+src/ui/books/monster_book/sub_081D4CE0.c	sub_081D4CE0	contrived	minor	8	CpuSetArgs kept: argument evaluation order puts mov r0,sp before the control load

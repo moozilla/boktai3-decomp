@@ -1,59 +1,39 @@
 #include "global.h"
+#include "ui/books/bestiary_display.h"
 
-struct PalTrans081D4CE0 {
-    u8 pad0[0x18];
-    u32 w18;
-    u32 index;
-    u8 pad20[5];
-    u8 b25;
-    u16 h26;
-    u8 pad28[0x9a4 - 0x28];
-    u8 sprite[0x9c0 - 0x9a4];
-    u16 h9c0, h9c2, h9c4;
-    u8 pad9c6[0x9d0 - 0x9c6];
-    u8 animData[0x9ec - 0x9d0];
-    u16 origin[4];
-    u8 pad9f4[0xa03 - 0x9f4];
-    u8 bA03;
-};
-
-void PaletteTransition_StartDisplay(void *, u32);
+void PaletteTransition_StartDisplay(struct BestiaryDisplay *, u32);
 void AnimData_Load(void *, u32);
-void Sprite_Init(void *, void *, u32);
-void CpuSet(const void *, void *, u32);
+void Sprite_Init(struct DisplaySequenceSprite *, void *, u32);
 
 static inline void CpuSetArgs(void *dest, u32 control, void *src)
 {
     CpuSet(src, dest, control);
 }
 
-int sub_081D4CE0(struct PalTrans081D4CE0 *p)
+int sub_081D4CE0(struct BestiaryDisplay *p)
 {
+    struct DisplaySequenceSprite *sprite;
     u32 fill;
-    u8 *anim, *spr;
-    u16 *org, *q;
-    p->index = 0;
-    p->bA03 = 0;
-    p->b25 = 0;
-    if (p->index > 0x52)
-        p->index = 0;
-    PaletteTransition_StartDisplay(p, p->index);
-    anim = p->animData;
-    AnimData_Load(anim, 0x1c1b);
-    spr = p->sprite;
-    Sprite_Init(spr, anim, 0x212);
-    *(s16 *)(spr + 0x10) = 5;
-    ((u8 *)p)[0x9ab] = 3;
-    org = p->origin;
-    p->h9c0 = org[0];
-    q = &org[1];
-    p->h9c2 = *q;
-    p->h9c4 = *q;
-    ((u8 *)p)[0x9ac] = 0x80;
-    ((u8 *)p)[0x9ad] = 0x40;
-    p->w18 = 0;
-    p->h26 = 0;
+
+    p->entry = 0;
+    p->entryChanged = 0;
+    p->hidden = 0;
+    if ((u32)p->entry > 0x52)
+        p->entry = 0;
+    PaletteTransition_StartDisplay(p, p->entry);
+    AnimData_Load(p->animData, 0x1c1b);
+    sprite = &p->sprite;
+    Sprite_Init(sprite, p->animData, 0x212);
+    sprite->frame = 5;
+    p->sprite.priority = 3;
+    p->sprite.position.x = p->origin[0];
+    p->sprite.position.y = p->origin[1];
+    p->sprite.position.z = p->origin[1];
+    p->sprite.palette = 0x80;
+    p->sprite.paletteVariant = 0x40;
+    p->swayPhase = 0;
+    p->mode = 0;
     fill = 0;
-    CpuSetArgs(org, 0x05000002, &fill);
+    CpuSetArgs(p->origin, 0x05000002, &fill);
     return 0;
 }
