@@ -6,18 +6,18 @@ void Anim_Remove(void *);
 void Sprite_Remove(void *);
 void Collider_Remove(void *);
 void SceneBody_Unregister(void *);
-void LinkPlayer_RemoveAuxiliaryResources(void *);
-void Player_StopLocalActionSounds(void *);
-s32 Player_OnDestroy(u8 *p)
+void LinkPlayer_RemoveAuxiliaryResources(struct Player *);
+void Player_StopLocalActionSounds(struct Player *);
+s32 Player_OnDestroy(struct Player *p)
 {
-    SceneActorContacts_RemoveNode(p + 0x2E8);
-    Anim_Remove(p + 0x8C);
-    Sprite_Remove(p + 0x14C);
-    Collider_Remove(p + 0x230);
-    SceneBody_Unregister(p + 0x24);
+    SceneActorContacts_RemoveNode(p->contactListNode);
+    Anim_Remove(&p->animation);
+    Sprite_Remove(&p->secondaryDrawFlags);
+    Collider_Remove(&p->collider);
+    SceneBody_Unregister(&p->positionalEffectGroup);
     LinkPlayer_RemoveAuxiliaryResources(p);
     Player_StopLocalActionSounds(p);
-    gPlayers[*(u32 *)(p + 0x18)] = 0;
+    gPlayers[p->slot] = NULL;
     gPlayerCount--;
     return 0;
 }
