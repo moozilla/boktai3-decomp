@@ -1,40 +1,38 @@
 #include "scene/actor/actor_attachment.h"
-void ActorAttachment_GetAction25Offset(u32 a, s32 *x, s32 *y, s32 d)
+void ActorAttachment_GetAction25Offset(u32 kind, s32 *x, s32 *y, s32 direction)
 {
-    s32 v;
-    switch (a) {
+    switch (kind) {
         case 0:
             *x = -4;
-            *y = -0xf;
+            *y = -15;
             break;
         case 1:
         case 4:
         case 5:
-            *x = -0x10;
+            *x = -16;
             *y = -8;
             break;
         case 2:
-            v = -4;
-            goto st;
+            *x = -4;
+            *y = -4;
+            break;
         case 3:
-            switch (d) {
+            switch (direction) {
                 case 0:
-                    v = -8;
-                    goto st2;
+                    *x = -8;
+                    *y = 0;
+                    break;
                 case 1:
-                    v = 0;
-                st:
-                    *x = v;
-                    *y = v;
+                    *x = 0;
+                    *y = 0;
                     break;
                 case 2:
-                    v = 0;
-                    goto st2;
+                    *x = 0;
+                    *y = 2;
+                    break;
                 case 3:
-                    v = -6;
-                st2:
-                    *x = v;
-                    *y = d;
+                    *x = -6;
+                    *y = 3;
                     break;
             }
             break;

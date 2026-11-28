@@ -152,3 +152,13 @@ src/scene/actor/attachment/ActorAttachment_TickWideShake.c	ActorAttachment_TickW
 src/scene/actor/attachment/ActorAttachment_TickNarrowShake.c	ActorAttachment_TickNarrowShake	contrived	minor	1	same as wide shake
 src/scene/actor/attachment/ActorAttachment_NotifySourceState.c	ActorAttachment_NotifySourceState	natural	natural	0	u8 region predicate kept: plain compare drops the ROM's materialized 0/1
 src/scene/actor/attachment/ActorAttachment_TickRemoval.c	ActorAttachment_TickRemoval	contrived	minor	12	IsRemoving keeps its bit local (plain & writes the wrong operand register); one id local for the slot bit
+src/scene/actor/attachment/ActorAttachment_GetAction4Offset.c	ActorAttachment_GetAction4Offset	natural	natural	0	-
+src/scene/actor/attachment/ActorAttachment_GetAction1Offset.c	ActorAttachment_GetAction1Offset	natural	natural	0	-
+src/scene/actor/attachment/ActorAttachment_GetAction3Offset.c	ActorAttachment_GetAction3Offset	natural	natural	0	-
+src/scene/actor/attachment/ActorAttachment_GetActionGroupOffset.c	ActorAttachment_GetActionGroupOffset	natural	natural	0	-
+src/scene/actor/attachment/ActorAttachment_GetAction21Offset.c	ActorAttachment_GetAction21Offset	natural	natural	0	-
+src/scene/actor/attachment/ActorAttachment_GetUnusedOffset.c	ActorAttachment_GetUnusedOffset	natural	natural	0	-
+src/scene/actor/attachment/ActorAttachment_GetDefaultOffset.c	ActorAttachment_GetDefaultOffset	natural	natural	0	-
+src/scene/actor/attachment/ActorAttachment_GetActionOffset.c	ActorAttachment_GetActionOffset	natural	natural	0	-
+src/scene/actor/attachment/ActorAttachment_NoOp.c	ActorAttachment_NoOp	natural	natural	0	-
+src/scene/actor/attachment/ActorAttachment_GetAction25Offset.c	ActorAttachment_GetAction25Offset	contrived	natural	2	-
