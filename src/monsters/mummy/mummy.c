@@ -51,8 +51,7 @@ void Mummy_OnAttackCollision(u8 *unused, struct ContactCollider *obj, u8 *input)
             u32 mask = ~0x800;
             *flags &= mask;
         }
-        if ((!SceneActor_ActionsBlocked((struct ChaseActor *)input)) &&
-            (obj->contactFlags & 15)) {
+        if ((!SceneActor_ActionsBlocked((struct ChaseActor *)input)) && (obj->contactFlags & 15)) {
             ((struct ChaseActor *)input)->base.counter304 = obj->collisionId;
             SceneActorChase_ClearWordFlags(&((struct ChaseActor *)input)->base.statusFlags,
                                            ROOM_ACTOR_STATUS_INTERACTING);

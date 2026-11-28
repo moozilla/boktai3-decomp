@@ -441,8 +441,8 @@ void Ivy_UpdateHold(struct ChaseActor *actor, s32 frame)
             status = Ivy_GetAnimationStatus(actor);
             power = actor->base.attacks.first[1];
             flags = actor->base.attacks.flags[1];
-            Player_BeginPositionRequest(player, (struct SceneVec *)&position, 0, status, flip, 0,
-                                        0, power, flags);
+            Player_BeginPositionRequest(player, (struct SceneVec *)&position, 0, status, flip, 0, 0,
+                                        power, flags);
         } else {
             Player_BeginPositionRequest(player, (struct SceneVec *)&position, 0,
                                         Ivy_GetAnimationStatus(actor), flip, 0, 0, 0, 0);
@@ -1479,7 +1479,6 @@ void SceneActorRegistry_UnlinkActor(void *);
 u32 Ivy_Destroy(struct ChaseActor *actor)
 {
     u8 *drawable = actor->base.drawable;
-    
 
     if (actor->base.drawableKind == 0)
         Sprite_Remove(drawable);
