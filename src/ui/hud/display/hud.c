@@ -593,16 +593,14 @@ void Hud_PlayActionChangeCue(struct SceneHudState *hud, u32 group, u32 mode, u32
     if (gEngineFlags & 0x1000) {
         if (group == 0 && mode == 0 && selection - 1 <= 2 && selection != hud->previousCueSelection)
             Sound_PlaySong(0x21C);
-    } else {
-        if (hud->actionCueInitialized == 0) {
-            if (hud->actionCueSuppressed == 0)
+    } else if (hud->actionCueInitialized == 0) {
+        if (hud->actionCueSuppressed == 0)
+            Sound_PlaySong(0x21C);
+        hud->actionCueInitialized = 1;
+    } else if (group == 0) {
+        if (mode == 0 || (mode == 1 && selection == 0)) {
+            if (selection != hud->previousCueSelection)
                 Sound_PlaySong(0x21C);
-            hud->actionCueInitialized = 1;
-        } else if (group == 0) {
-            if (mode == 0 || (mode == 1 && selection == 0)) {
-                if (selection != hud->previousCueSelection)
-                    Sound_PlaySong(0x21C);
-            }
         }
     }
     hud->previousCueGroup = group;
