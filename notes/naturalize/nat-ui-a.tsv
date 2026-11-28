@@ -280,3 +280,4 @@ src/ui/dialogue/message_window/MessageWindow_GetSoundMode.c	MessageWindow_GetSou
 src/ui/dialogue/text_interpreter/TextState_PushStream.c	TextState_PushStream	minor	natural	1	
 src/ui/dialogue/text_interpreter/TextState_PopStream.c	TextState_PopStream	minor	natural	1	
 src/ui/dialogue/text_interpreter/TextState_AdvanceLine.c	TextState_AdvanceLine	contrived	natural	3	
+src/ui/dialogue/text_interpreter/TextState_PlayGlyphSound.c	TextState_PlayGlyphSound	contrived	minor	14	goto into the toggle-clear arm: jump2 only shares that block this way
