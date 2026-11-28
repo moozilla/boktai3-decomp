@@ -23,7 +23,6 @@ void SceneActors_StartEightDirectionAnimation(void *, void *, void *, int, int, 
 // confidence=low: turns toward the saved direction 8 steps a frame, finishing within 8.
 void sub_0817F330(struct SabataAttackActor *p)
 {
-    struct SabataAttackActor *actor = p;
     struct SceneActorBody *body = (struct SceneActorBody *)((u8 *)p + 0x48);
     if (p->restart) {
         p->restart = 0;
@@ -33,21 +32,21 @@ void sub_0817F330(struct SabataAttackActor *p)
         SceneActors_StartEightDirectionAnimation(p, &p->animation, p->animationState, 0xF4, 1, 1,
                                                  1);
     }
-    Sabata_SetFlags(actor, 0x400004);
+    Sabata_SetFlags(p, 0x400004);
     {
-        int delta = (s8)(body->direction - (u8)actor->alternateDirection), distance = delta;
+        int delta = (s8)(body->direction - (u8)p->alternateDirection), distance = delta;
         if (distance < 0)
             distance = -distance;
         if (distance <= 7) {
-            SetDirection(actor, actor->alternateDirection);
-            actor->pending = 1;
+            SetDirection(p, p->alternateDirection);
+            p->pending = 1;
         } else {
             int angle;
             if (delta < 0)
                 angle = body->direction + 8;
             else
                 angle = body->direction - 8;
-            SetDirection(actor, angle);
+            SetDirection(p, angle);
         }
     }
 }
