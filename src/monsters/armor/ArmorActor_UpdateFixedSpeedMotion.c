@@ -11,7 +11,7 @@ void ArmorActor_UpdateFixedSpeedMotion(struct SceneCombatActor *p)
     u8 *s = &p->actionPhase;
     struct ActorControllerVelocity *w;
 
-    if (*s == 0) {
+    if (p->actionPhase == 0) {
         Armor_SetAnimationFromStart(p, &gUnk_0824EDF8[((p->heading + 0x60) >> 6) & 3]);
         *s = 0xFF;
         p->actionReady = 1;
@@ -42,7 +42,8 @@ void ArmorActor_UpdateFixedSpeedMotion(struct SceneCombatActor *p)
             else if (distance < -16)
                 p->velocity.z = -3;
         }
-        SceneParticleBurst_CreateWithPause(&p->navigation.referencePosition, 0, &gUnk_0824EE08, 8, 3, 0);
+        SceneParticleBurst_CreateWithPause(&p->navigation.referencePosition, 0, &gUnk_0824EE08, 8,
+                                           3, 0);
     } else {
         p->flags &= ~0x20;
     }
