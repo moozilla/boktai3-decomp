@@ -315,3 +315,4 @@ src/ui/dialogue/scrolling_dialogue/scrolling_dialogue.c	ScrollingDialogue_ResetP
 src/ui/dialogue/scrolling_dialogue/scrolling_dialogue.c	ScrollingDialogue_UpdatePlayback	contrived	minor	5	tag loop written as while (1) with continue
 src/ui/dialogue/scrolling_dialogue/scrolling_dialogue.c	ScrollingDialogue_Show	minor	natural	3	
 src/ui/dialogue/scrolling_dialogue/scrolling_dialogue.c	ScrollingDialogue_Hide	minor	natural	3	
+src/ui/dialogue/scrolling_dialogue/scrolling_dialogue.c	ScrollingDialogue_OnTaskDestroy	minor	natural	1	

@@ -172,9 +172,8 @@ int ScrollingDialogue_OnTaskUpdate(struct ScrollingDialogue *dialogue)
 
 int ScrollingDialogue_OnTaskDestroy(struct ScrollingDialogue *dialogue)
 {
-    u8 *active = &dialogue->active;
-    if (*active)
-        *active = 0;
+    if (dialogue->active)
+        dialogue->active = 0;
     gDialogueScrollOffset = 0;
     gScrollingDialogue = 0;
     return 0;
