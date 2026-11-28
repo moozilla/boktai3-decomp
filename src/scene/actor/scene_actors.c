@@ -89,26 +89,15 @@ int SceneActors_SetHealthLimits(struct StateActor *actor, int current, int maxim
     actor->extraHealth = extra;
     if (actor->health > actor->maxHealth)
         actor->health = actor->maxHealth;
-    {
-        int ratio;
-        u8 *dst;
-        if (actor->maxHealth) {
-            ratio = Div(actor->health << 7, actor->maxHealth);
-            dst = &actor->healthRatio;
-        } else {
-            dst = &actor->healthRatio;
-            ratio = 0;
-        }
-        *dst = ratio;
-    }
+    if (actor->maxHealth)
+        actor->healthRatio = Div(actor->health << 7, actor->maxHealth);
+    else
+        actor->healthRatio = 0;
     {
         int *maximumOut = &gGameState->unk61C;
         *maximumOut = actor->maxHealth;
     }
-    {
-        int *healthOut = &gGameState->unk618;
-        *healthOut = actor->health;
-    }
+    gGameState->unk618 = actor->health;
     return 0;
 }
 
