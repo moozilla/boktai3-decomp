@@ -1487,16 +1487,13 @@ void SceneActorState_UpdateAction21Recovery(struct SceneGraphicsActor *actor)
     if (p->actionFinished) {
         if (((struct StateActor *)actor)->actionState == 3) {
             SceneActorState_SetAnimation((struct StateActor *)actor, 21);
-            goto tick;
         } else {
             SceneActorState_StartRecovery(actor, 90);
+            return;
         }
-    } else {
-    tick:
-        p->actionTimer++;
     }
+    p->actionTimer++;
 }
-
 void SceneActorState_UpdateAction22(struct StateActor *p)
 {
     if (StateActor_ConsumeActionEntry(p))
