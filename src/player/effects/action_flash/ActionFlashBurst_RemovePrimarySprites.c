@@ -1,7 +1,17 @@
 #include "global.h"
-void Sprite_Remove(void *);
-void ActionFlashBurst_RemovePrimarySprites(u8 *s)
+#include "engine/video/sprite.h"
+
+struct ActionFlashSpriteOwner {
+    u8 unknown0[0x20];
+    struct DisplaySequenceSprite orbit;
+    u8 orbitResource[0x1C];
+    struct DisplaySequenceSprite flash;
+};
+
+void Sprite_Remove(struct DisplaySequenceSprite *);
+
+void ActionFlashBurst_RemovePrimarySprites(struct ActionFlashSpriteOwner *burst)
 {
-    Sprite_Remove(s + 0x20);
-    Sprite_Remove(s + 0x68);
+    Sprite_Remove(&burst->orbit);
+    Sprite_Remove(&burst->flash);
 }
