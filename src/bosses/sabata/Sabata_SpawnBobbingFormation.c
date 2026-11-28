@@ -58,8 +58,7 @@ void Sabata_SpawnBobbingFormation(struct FormationActor *p)
     direction = base + 16;
     offset = 0;
     origin = &p->position;
-    remaining = 3;
-    do {
+    for (remaining = 0; remaining < 4; remaining++) {
         u32 angle = (offset + base) & mask;
         GetOffset(vector, angle, 256, mask);
         vector->x += origin->x;
@@ -70,5 +69,5 @@ void Sabata_SpawnBobbingFormation(struct FormationActor *p)
                                               1, 16, p->parameter, 128, 4, 30);
         direction += 64;
         offset += 64;
-    } while (--remaining >= 0);
+    }
 }

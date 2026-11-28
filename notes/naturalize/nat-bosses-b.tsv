@@ -202,3 +202,16 @@ src/bosses/sabata/SabataPosition_FindTrackedPointInBounds.c	SabataPosition_FindT
 src/bosses/sabata/sub_0817A918.c	sub_0817A918	contrived	partial	4	kept self alias and vector helpers
 src/bosses/sabata/Sabata_SpawnDestructionParticles.c	Sabata_SpawnDestructionParticles	contrived	natural	8	
 src/bosses/sabata/Sabata_FindNearbyAttackPosition.c	Sabata_FindNearbyAttackPosition	contrived	natural	3	minor: result variable needed
+src/bosses/sabata/Sabata_TestPlayerInAttackArea.c	Sabata_TestPlayerInAttackArea	natural	natural	0	
+src/bosses/sabata/SceneActors_ConsumePendingSignal.c	SceneActors_ConsumePendingSignal	natural	natural	0	minor: byte pointer and result variable needed
+src/bosses/sabata/Sabata_GetAttackActivity.c	Sabata_GetAttackActivity	machine-shaped	machine-shaped	2	goto and local mask stay: structured returns change the branch layout
+src/bosses/sabata/Sabata_ConfigureAttackCollider.c	Sabata_ConfigureAttackCollider	natural	natural	0	minor: local mask needed
+src/bosses/sabata/sub_0817AAB8.c	sub_0817AAB8	natural	natural	0	minor: raw health offset
+src/bosses/sabata/ActorAttachment_PlayEffect.c	ActorAttachment_PlayEffect	natural	natural	0	
+src/bosses/sabata/ActorEffect_SpawnAtAngle.c	ActorEffect_SpawnAtAngle	natural	natural	0	
+src/bosses/sabata/Sabata_CanStartAttack.c	Sabata_CanStartAttack	natural	natural	0	
+src/bosses/sabata/Sabata_TakeReachedTarget.c	Sabata_TakeReachedTarget	natural	natural	0	
+src/bosses/sabata/Sabata_ResetAttackSequence.c	Sabata_ResetAttackSequence	natural	natural	0	
+src/bosses/sabata/SceneActors_SetParticleControlMode.c	SceneActors_SetParticleControlMode	natural	natural	0	
+src/bosses/sabata/Sabata_UpdateSequencePalette.c	Sabata_UpdateSequencePalette	natural	natural	0	
+src/bosses/sabata/Sabata_SpawnBobbingFormation.c	Sabata_SpawnBobbingFormation	contrived	partial	7	kept second actor alias, position pointers, mask local and random helper (plain forms change allocation)
