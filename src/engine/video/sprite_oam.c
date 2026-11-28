@@ -176,15 +176,10 @@ void SpriteOam_QueueCameraRelativeSprites(void)
 {
 
     struct SpriteDrawable *sprite;
-    s32 *matrixCount;
-    u32 parity = gSceneEffectPalettePhase & 1;
-    u32 skip = 0x401;
-    if (parity)
-        skip = 0x201;
+    u32 skip = (gSceneEffectPalettePhase & 1) ? 0x201 : 0x401;
     sprite = gDrawableListHeads[gRenderListIndex];
     if (!sprite)
         return;
-    matrixCount = &gAffineRequestCount;
     do {
         s32 x, y;
         s32 z;
@@ -221,25 +216,17 @@ void SpriteOam_QueueCameraRelativeSprites(void)
         y += oy;
         depth = z;
         x &= 511;
-        {
-            u32 shifted = x << 16;
-            attr = sprite->attributes | shifted;
-        }
+        attr = sprite->attributes | (x << 16);
         y &= 255;
         attr |= y;
         if (flags & 2) {
             u32 matrix;
-            u32 angle;
-            s32 sx, sy;
             if (!(flags & 0x20000) && (UnsignedScale(sprite->scaleX) > 60 ||
                                        UnsignedScale(sprite->scaleY) > 60 || sprite->angle != 0))
                 attr |= 0x300;
             else
                 attr |= 0x100;
-            angle = sprite->angle;
-            sx = (s8)sprite->scaleX;
-            sy = (s8)sprite->scaleY;
-            matrix = SpriteOam_AllocateAffineMatrix(angle, sx, sy, &gAffineRequestCount);
+            matrix = SpriteOam_AllocateAffineMatrix(sprite->angle, sprite->scaleX, sprite->scaleY, &gAffineRequestCount);
             attr |= matrix << 25;
             flags = sprite->flags;
         }

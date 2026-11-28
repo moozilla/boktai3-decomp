@@ -260,3 +260,4 @@ src/engine/video/background_tilemap.c	BgGfx_LoadTilemap	minor	minor	5	screenX re
 src/engine/video/background_tilemap.c	BgGfx_LoadTilemapAtPosition	natural	natural		
 src/engine/video/background_tilemap.c	BgGfx_LoadTilemapSimple	natural	natural		
 src/engine/video/sprite_oam.c	SpriteOam_QueueProjectedSprites	contrived	contrived	12	goto/continue-with-advance, parked matrix pointer and flag copies: see the next commits
+src/engine/video/sprite_oam.c	SpriteOam_QueueCameraRelativeSprites	contrived	contrived	12	goto/continue-with-advance, parked matrix pointer and flag copies: see the next commits
