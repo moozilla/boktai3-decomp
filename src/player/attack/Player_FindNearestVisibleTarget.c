@@ -35,54 +35,51 @@ static inline void ProjectPosition(struct TargetPosition *screen,
     screen->z = depth - gCameraOrigin[2];
 }
 
-struct MotionTarget *Player_FindNearestVisibleTarget(struct Player *arg)
+struct MotionTarget *Player_FindNearestVisibleTarget(struct Player *p)
 {
-    struct Player *p = arg;
     s32 distance = 1960000;
     struct MotionTarget *best;
     struct MotionTarget *entry;
+
     if (!gSceneLinkList)
-        return 0;
+        return NULL;
     entry = gSceneLinkList->first;
-    best = 0;
-    if (entry)
-        do {
-            u32 loadedFlags = entry->flags;
-            u32 disabled = loadedFlags & 1;
-            u32 flags = loadedFlags;
-            if (!disabled) {
-                s32 x;
-                s32 z;
-                s32 square;
-                if (flags & MOTION_TARGET_COLLIDER) {
-                    x = entry->target.collider->position.x - p->position.x;
-                    z = entry->target.collider->position.z - p->position.z;
+    best = NULL;
+    while (entry) {
+        if (!(entry->flags & 1)) {
+            s32 x;
+            s32 z;
+            s32 square;
+
+            if (entry->flags & MOTION_TARGET_COLLIDER) {
+                x = entry->target.collider->position.x - p->position.x;
+                z = entry->target.collider->position.z - p->position.z;
+            } else {
+                x = entry->target.actor->position.x - p->position.x;
+                z = entry->target.actor->position.z - p->position.z;
+            }
+            square = x * x + z * z;
+            if (square < distance) {
+                if (gEngineFlags & 0x1000) {
+                    distance = square;
+                    best = entry;
                 } else {
-                    x = entry->target.actor->position.x - p->position.x;
-                    z = entry->target.actor->position.z - p->position.z;
-                }
-                square = (x * x) + (z * z);
-                if (square < distance) {
-                    if (gEngineFlags & 0x1000) {
+                    struct TargetPosition screen;
+                    const struct TargetPosition *world;
+
+                    if (entry->flags & MOTION_TARGET_COLLIDER)
+                        world = (const struct TargetPosition *)&entry->target.collider->position;
+                    else
+                        world = (const struct TargetPosition *)&entry->target.actor->position;
+                    ProjectPosition(&screen, world);
+                    if ((u16)(screen.x - 1) <= 238 && (u16)(screen.y - 1) <= 158) {
                         distance = square;
                         best = entry;
-                    } else {
-                        struct TargetPosition screen;
-                        const struct TargetPosition *world;
-                        if (flags & MOTION_TARGET_COLLIDER)
-                            world =
-                                (const struct TargetPosition *)&entry->target.collider->position;
-                        else
-                            world = (const struct TargetPosition *)&entry->target.actor->position;
-                        ProjectPosition(&screen, world);
-                        if ((((u16)(screen.x - 1)) <= 238) && (((u16)(screen.y - 1)) <= 158)) {
-                            distance = square;
-                            best = entry;
-                        }
                     }
                 }
             }
-            entry = entry->next;
-        } while (entry);
+        }
+        entry = entry->next;
+    }
     return best;
 }
