@@ -394,3 +394,4 @@ src/engine/video/sprite_component/SpriteComponent_Destroy.c	SpriteComponent_Dest
 src/engine/video/sprite_component/SceneActorAttachment_MarkContact.c	SceneActorAttachment_MarkContact	natural	natural		
 src/engine/video/sprite_component/ProximityVolume_InitializeCallbacks.c	ProximityVolume_InitializeCallbacks	minor	minor	1	file-local callback setter keeps both addresses loaded before the stores
 src/engine/video/sprite_component/ProximityVolume_ContainsPlayer.c	ProximityVolume_ContainsPlayer	minor	natural	1	
+src/engine/video/sprite_component/ProximityVolume_DispatchUpdate.c	ProximityVolume_DispatchUpdate	minor	natural	1	
