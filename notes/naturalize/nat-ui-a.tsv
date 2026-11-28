@@ -81,3 +81,4 @@ src/ui/books/monster_book/monster_book.c	MonsterBook_DrawCompletionCounts	natura
 src/ui/books/monster_book/monster_book.c	MonsterBook_DrawListWindows	natural	natural	0	
 src/ui/books/monster_book/monster_book.c	MonsterBook_HideCategoryWidgets	natural	natural	0	
 src/ui/books/monster_book/monster_book.c	MonsterBook_DrawCategoryWidgets	natural	natural	0	
+src/ui/books/collection/collection.c	Collection_UnlockEntryFromScript	contrived	natural	1	

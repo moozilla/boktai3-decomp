@@ -22,9 +22,9 @@ u32 Collection_IsEntryUnlocked(u32 i)
 void Collection_UnlockEntryFromScript(void)
 {
     if (Script_SeekToKeyword(0x69)) {
-        u32 v = Script_GetValue();
-        u32 *q = &gGameState->flags728;
-        *q = *q | (1 << v);
+        u32 entry = Script_GetValue();
+
+        gGameState->flags728 |= 1 << entry;
     }
 }
 
