@@ -614,3 +614,4 @@ src/player/interaction/Player_CanRecoverResourceWhileFlagged.c	Player_CanRecover
 src/player/interaction/Player_CanRecoverResourceWhileUnflagged.c	Player_CanRecoverResourceWhileUnflagged	minor	minor	1	Player_ReadStatusBits: ROM loads the mask before the status word
 src/player/interaction/Player_UpdateHeldInteraction.c	Player_UpdateHeldInteraction	contrived	minor	4	Player_AddStatusFlags: ROM loads the mask before the status word
 src/player/interaction/Player_UpdateHeldEnergyBurst.c	Player_UpdateHeldEnergyBurst	minor	natural	1	-
+src/player/interaction/Player_CalculateMovementSpeed.c	Player_CalculateMovementSpeed	contrived	minor	2	IsFixedSpeed link-mode helper fixes the double test

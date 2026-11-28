@@ -1,10 +1,6 @@
 #include "global.h"
 #include "player/player.h"
 #include "objects/coffin/tether_actor.h"
-struct MovementSpeedContext {
-    u8 unknown0[0x1E];
-    u16 reduction;
-};
 s32 Div(s32, s32);
 static inline u8 IsFixedSpeed(struct Player *p)
 {
@@ -23,7 +19,7 @@ s32 Player_CalculateMovementSpeed(struct Player *p)
         speed = p->derivedStats[2];
         speed += 100;
         speed -= p->movementLoadPercent;
-        speed -= ((struct MovementSpeedContext *)gTetherActor)->reduction;
+        speed -= gTetherActor->kindLimit;
         speed = Div(speed * 12, 100);
         if (speed > 16)
             speed = 16;
