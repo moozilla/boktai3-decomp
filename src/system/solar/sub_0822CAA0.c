@@ -1,23 +1,23 @@
 #include "global.h"
-extern u8 *gGameState;
-extern u8 gSunClock[];
+#include "system/game_state/game_state.h"
+#include "system/clock/sun_clock.h"
 u32 SunClock_GetPackedDate(void);
-s32 SunClock_GetBaseHour(void), SunClock_GetBaseMinute(void);
 s32 sub_0822CAA0(void)
 {
     s32 minute;
-    u32 flag;
+    u32 beforeSunrise;
     s32 sunHour, sunMinute;
-    u8 *gs;
-    *(u32 *)(gGameState + 0x4e0) = SunClock_GetPackedDate();
-    *(s32 *)(gGameState + 0x4e4) = SunClock_GetBaseHour();
+    struct GameState *state;
+
+    gGameState->unk4E0 = SunClock_GetPackedDate();
+    gGameState->unk4E4 = SunClock_GetBaseHour();
     minute = SunClock_GetBaseMinute();
-    gs = gGameState;
-    *(s32 *)(gs + 0x4e8) = minute;
-    sunHour = gSunClock[12];
-    sunMinute = gSunClock[13];
-    flag = 0;
-    if (*(s32 *)(gs + 0x4e4) < sunHour || (*(s32 *)(gs + 0x4e4) == sunHour && minute < sunMinute))
-        flag = 1;
-    *(u32 *)(gGameState + 0x4ec) = flag;
+    state = gGameState;
+    state->unk4E8 = minute;
+    sunHour = gSunClock.hourB;
+    sunMinute = gSunClock.minuteB;
+    beforeSunrise = 0;
+    if (state->unk4E4 < sunHour || (state->unk4E4 == sunHour && minute < sunMinute))
+        beforeSunrise = 1;
+    gGameState->unk4EC = beforeSunrise;
 }
