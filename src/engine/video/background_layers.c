@@ -99,33 +99,22 @@ void Bg_ResetDisplay(void)
 
 void Bg_UpdateScrollShadow(void)
 {
-    u16 *dst = gBgScrollShadow;
-    struct BackgroundLayer *src = gBgRecords;
-    dst[0] = ((u16)src[0].x) & 0xff;
-    dst[1] = 0xff & ((u16)src[0].y);
-    dst[2] = 0xff & ((u16)src[1].x);
-    dst[3] = 0xff & ((u16)src[1].y);
+    gBgScrollShadow[0] = gBgRecords[0].x & 0xff;
+    gBgScrollShadow[1] = gBgRecords[0].y & 0xff;
+    gBgScrollShadow[2] = gBgRecords[1].x & 0xff;
+    gBgScrollShadow[3] = gBgRecords[1].y & 0xff;
     if (!gBgAffineMode) {
-        dst[4] = 0xff & ((u16)src[2].x);
-        dst[5] = 0xff & ((u16)src[2].y);
-        {
-            u16 *scroll = (u16 *)&src[3].x;
-            dst[6] = 0xff & (u16)*scroll;
-        }
-        {
-            u16 *scroll = (u16 *)&src[3].y;
-            dst[7] = 0xff & (u16)*scroll;
-        }
+        gBgScrollShadow[4] = gBgRecords[2].x & 0xff;
+        gBgScrollShadow[5] = gBgRecords[2].y & 0xff;
+        gBgScrollShadow[6] = gBgRecords[3].x & 0xff;
+        gBgScrollShadow[7] = gBgRecords[3].y & 0xff;
     } else {
-        u16 *a = gBgAffineMatrixBuffer, *b = gBgAffineMatrix;
-        u32 *c;
-        a[0] = b[0];
-        a[1] = b[1];
-        a[2] = b[2];
-        a[3] = b[3];
-        c = gBgAffineRefBuffer;
-        c[0] = gBgAffineRefX;
-        c[1] = gBgAffineRefY;
+        gBgAffineMatrixBuffer[0] = gBgAffineMatrix[0];
+        gBgAffineMatrixBuffer[1] = gBgAffineMatrix[1];
+        gBgAffineMatrixBuffer[2] = gBgAffineMatrix[2];
+        gBgAffineMatrixBuffer[3] = gBgAffineMatrix[3];
+        gBgAffineRefBuffer[0] = gBgAffineRefX;
+        gBgAffineRefBuffer[1] = gBgAffineRefY;
     }
 }
 

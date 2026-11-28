@@ -235,3 +235,4 @@ src/engine/video/sprite.c	AnimData_Load	contrived	minor	3	entry->offset + base10
 src/engine/video/sprite.c	SpriteOam_FinalizeQueue	contrived	minor	24	base reused for the OAM buffer and sine table (gcse/cprop would fold a typed pointer); clear cursor built by integer sum for the ROM operand order
 src/engine/video/background_layers.c	Bg_ClearAllTilemaps	minor	natural	1	
 src/engine/video/background_layers.c	Bg_ResetDisplay	contrived	natural	3	
+src/engine/video/background_layers.c	Bg_UpdateScrollShadow	contrived	natural	12	
