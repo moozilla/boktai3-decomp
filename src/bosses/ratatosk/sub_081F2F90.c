@@ -1,10 +1,6 @@
 #include "global.h"
 #include "bosses/ratatosk/ratatosk.h"
 
-struct RatatoskPoint {
-    s16 x, y, z, pad;
-};
-
 s32 sub_081F2F90(struct Ratatosk *self)
 {
     s32 selected = -1;
