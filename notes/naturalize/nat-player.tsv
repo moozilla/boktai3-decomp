@@ -406,3 +406,5 @@ src/player/cutscene/player_cue_commands.c	PlayerCue_Motion30End	natural	natural	
 src/player/cutscene/player_cue_commands.c	PlayerCue_Motion29B	natural	natural	0	-
 src/player/cutscene/player_cue_commands.c	PlayerCue_BeginOddDirection	natural	natural	0	-
 src/player/cutscene/player_cue_commands.c	PlayerCue_Motion7Turn	minor	minor	3	facing pointer around GetSideFacing
+src/player/cutscene/player_cue_commands.c	PlayerCue_Motion7Variant7	natural	natural	0	-
+src/player/cutscene/player_cue_commands.c	PlayerCue_Motion7Variant3	minor	natural	1	-
