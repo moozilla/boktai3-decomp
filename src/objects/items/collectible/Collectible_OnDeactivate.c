@@ -1,8 +1,12 @@
 #include "global.h"
-void Collectible_OnDeactivate(u8 *p)
+#include "engine/engine.h"
+#include "engine/ram.h"
+#include "objects/items/collectible.h"
+
+void Collectible_OnDeactivate(struct Collectible *item)
 {
-    if (p[0xf1]) {
-        p[0xf0] = 0;
-        p[0xf1] = 0;
+    if (item->entered) {
+        item->active = 0;
+        item->entered = 0;
     }
 }
