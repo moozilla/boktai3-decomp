@@ -1,6 +1,5 @@
 #include "global.h"
 #include "scene/areas/area_effect_link.h"
-#include "link/selection/link_selection_mode.h"
 u8 LinkSession_ConsumeStateEntry(void *);
 s32 LinkSession_CheckSessionReady(void *);
 void LinkSession_BeginShutdown(void *, void (*)(void));
@@ -10,6 +9,13 @@ void Sound_FadeOutChannel10(u32);
 void ScriptPanel_OpenTextWindow(void);
 void LinkMenu_ExchangeChoices(void);
 void LinkMenu_WaitForReadyPeers(void);
+static inline u8 IsExchangeChoicesMode(u16 value)
+{
+    value &= 0x3c00;
+    if (value == 0x1000)
+        return 1;
+    return 0;
+}
 static inline u8 IsWaitForPeersMode(u16 value)
 {
     value &= 0x3c00;
@@ -25,7 +31,7 @@ s32 LinkMenu_UpdateSelection(struct AreaEffectLinkState *p)
         LinkSession_BeginShutdown(p, ScriptPanel_OpenTextWindow);
         return -1;
     }
-    if (LinkSelection_IsReady(*p->selection, 0x3c00))
+    if (IsExchangeChoicesMode(*p->selection))
         LinkSession_SetState(p, 9, LinkMenu_ExchangeChoices);
     else if (IsWaitForPeersMode(*p->selection)) {
         LinkSession_SetState(p, 4, LinkMenu_WaitForReadyPeers);
