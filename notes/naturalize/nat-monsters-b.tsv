@@ -149,3 +149,4 @@ src/monsters/mummy/mummy_entry.c	Mummy_ResumePlayerPursuit	minor	minor	9	flag co
 src/monsters/mummy/mummy_entry.c	Mummy_ResumeRouteAfterCheckpoint	contrived	contrived	23	parked masks and clear helper remain
 src/monsters/mummy/mummy_entry.c	Mummy_Init	contrived	contrived	59	MonsterInit helpers fix spill slot order
 src/monsters/mummy/mummy_entry.c	BouncingObject_RefreshNearbyHeading	contrived	contrived	1	repeated context locals and parked masks
+src/monsters/muspell_head/MuspellHead_InitializeColliders.c	MuspellHead_InitializeColliders	contrived	natural	2	

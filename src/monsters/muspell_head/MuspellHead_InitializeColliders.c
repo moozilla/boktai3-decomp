@@ -1,48 +1,37 @@
 #include "global.h"
-#include "scene/collision/packed_contact_halfwords.h"
-#include "scene/collision/packed_collider_extents.h"
-struct Q {
-    u8 pad[6];
-    u16 flags;
-};
-void Collider_Init(u8 *, u16, u32, u32, u32, struct PackedColliderExtents *,
-                   struct PackedColliderExtents *);
-void Collider_SetCallback(u8 *, void (*)(void), u8 *);
-void Collider_SetAttackProperties(u8 *, s32, s32, u32, u32, s32);
-void Collider_SetPosition(u8 *, u8 *, u32);
+#include "monsters/muspell_head.h"
+#include "engine/engine.h"
+void Collider_SetAttackProperties(void *, s32, s32, u32, u32, s32);
 void Collider_SetBodyProperties(void *, u32, u32, u32);
-s32 Collider_Refresh(u8 *);
 void MuspellHead_OnPassiveColliderContact(void);
 void MuspellHead_ApplyHitReaction(void);
 // confidence=low: initializes passive and damage-response colliders embedded in the actor.
-void MuspellHead_InitializeColliders(u8 *pArg)
+void MuspellHead_InitializeColliders(struct MuspellHead *head)
 {
-    u8 *p = pArg;
-    struct PackedColliderExtents a, b;
-    u8 *q = p + 0x6c;
-    u16 *v, *r;
-    a.xy.lo = 120;
-    a.xy.hi = 120;
-    a.zAndPad.lo = 120;
-    *(u32 *)&b.xy = 0x780000;
-    *(u32 *)&b.zAndPad &= 0xffff0000;
-    Collider_Init(q, 0, 0x2001, 0, 0x10, &a, &b);
-    Collider_SetCallback(q, MuspellHead_OnPassiveColliderContact, p);
-    Collider_SetAttackProperties(q, *(s16 *)(p + 0x174), *(s16 *)(p + 0x176), 0, 0,
-                                 *(s16 *)(p + 0x178));
-    q += 0x54;
-    v = (u16 *)&a;
-    r = (u16 *)&b;
-    v[0] = 100;
-    v[1] = 200;
-    v[2] = 100;
-    r[0] = 0;
-    r[1] = 100;
-    r[2] = 0;
-    Collider_Init(q, 0, 0x5009, 0, 0x10, &a, &b);
-    Collider_SetPosition(q, p + 0x40, 0);
-    Collider_SetCallback(q, MuspellHead_ApplyHitReaction, p);
-    Collider_SetBodyProperties(q, 0, *(u16 *)(p + 0x19a), *(u16 *)(p + 0x19c));
-    Collider_Refresh(q);
-    ((struct Q *)q)->flags |= 4;
+    struct ContactCollider *collider = &head->passiveCollider;
+    struct ContactPosition bounds, offset;
+
+    bounds.x = 120;
+    bounds.y = 120;
+    bounds.z = 120;
+    offset.x = 0;
+    offset.y = 120;
+    offset.z = 0;
+    Collider_Init(collider, 0, 0x2001, 0, 0x10, &bounds, &offset);
+    Collider_SetCallback(collider, MuspellHead_OnPassiveColliderContact, head);
+    Collider_SetAttackProperties(collider, head->attackA, head->attackB, 0, 0, head->attackC);
+
+    collider = &head->bodyCollider;
+    bounds.x = 100;
+    bounds.y = 200;
+    bounds.z = 100;
+    offset.x = 0;
+    offset.y = 100;
+    offset.z = 0;
+    Collider_Init(collider, 0, 0x5009, 0, 0x10, &bounds, &offset);
+    Collider_SetPosition(collider, &head->sprite.position, 0);
+    Collider_SetCallback(collider, MuspellHead_ApplyHitReaction, head);
+    Collider_SetBodyProperties(collider, 0, head->damageType, head->damageFlags);
+    Collider_Refresh(collider);
+    collider->flags |= 4;
 }
