@@ -8,15 +8,15 @@ static inline s32 ReadOrZero(void)
 void SceneActorScript_SetControlBytesFromScript(void)
 {
     u32 id = Script_GetKeywordValue('n', 0);
-    struct ChaseActor *actor;
+    struct SceneActorScriptPropertiesView *actor;
     struct SceneActorScriptControlView *control;
     s32 first, second;
     if (!id)
         return;
-    actor = SceneActorRegistry_FindById(id);
+    actor = (void *)SceneActorRegistry_FindById(id);
     if (!actor)
         return;
-    control = (void *)((u32)actor + 0x3D4);
+    control = &actor->control;
     if (!Script_SeekToKeyword('r'))
         return;
     first = ReadOrZero();

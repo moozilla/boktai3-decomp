@@ -144,3 +144,4 @@ src/scene/actor/animation/SceneActorScript_ClearManagerFlagsFromScript.c	SceneAc
 src/scene/actor/animation/SceneActorScript_GetManagerField62.c	SceneActorScript_GetManagerField62	natural	natural	0	
 src/scene/actor/animation/SceneActorScript_SetManagerFlagsFromScript.c	SceneActorScript_SetManagerFlagsFromScript	natural	natural	0	
 src/scene/actor/animation/SceneActorScript_SetManagerModeFromScript.c	SceneActorScript_SetManagerModeFromScript	natural	natural	0	
+src/scene/actor/animation/SceneActorScript_SetControlBytesFromScript.c	SceneActorScript_SetControlBytesFromScript	contrived	natural	1	
