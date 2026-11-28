@@ -112,3 +112,4 @@ src/effects/bursts/explosion.c	Explosion_CreateDelayed	natural	natural	0
 src/effects/bursts/explosion.c	Explosion_Create	natural	natural	0	
 src/effects/bursts/explosion.c	Explosion_CreateAt	natural	natural	0	
 src/effects/bursts/explosion.c	Explosion_CreateWithCollisionFlags	natural	natural	0	
+src/effects/bursts/charged_burst/ChargedBurst_SetState.c	ChargedBurst_SetState	minor	natural	1	-

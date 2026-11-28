@@ -1,11 +1,7 @@
-#include "global.h"
-struct S {
-    u8 p[0x20a];
-    u16 h;
-    u32 a;
-};
-void ChargedBurst_SetState(struct S *s, u32 v)
+#include "effects/bursts/charged_burst.h"
+
+void ChargedBurst_SetState(struct ChargedBurst *burst, void (*state)(struct ChargedBurst *))
 {
-    s->a = v;
-    s->h = 0;
+    burst->state = state;
+    burst->timer = 0;
 }
