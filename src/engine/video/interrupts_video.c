@@ -83,41 +83,25 @@ void Task_LinkToPriorityList(void *);
 
 void InterruptsAndVideo_InitRuntime(void)
 {
-    u32 fill;
-    struct VideoDmaRegisters *dma;
-    u32 mask;
-    struct RuntimeTask *a;
-    struct RuntimeTask *b;
-    fill = 0;
-    dma = (struct VideoDmaRegisters *)REG_ADDR_DMA3SAD;
-    dma->source = (u32)&fill;
-    dma->destination = 0x06000000;
-    dma->control = 0x85006000;
-    (void)dma->control;
-    fill = 0xa0;
-    dma->source = (u32)&fill;
-    dma->destination = 0x07000000;
-    dma->control = 0x85000100;
-    (void)dma->control;
-    fill = 0;
-    dma->source = (u32)&fill;
-    dma->destination = 0x05000000;
-    dma->control = 0x85000100;
-    (void)dma->control;
+    u16 interrupts;
+
+    DmaFill32(3, 0, VRAM, 0x18000);
+    DmaFill32(3, 0xA0, OAM, 0x400);
+    DmaFill32(3, 0, PLTT, 0x400);
     REG_IME = 0;
     (void)REG_IE;
     REG_IE = 0;
     gVideoInterruptsEnabled = 1;
     gVideoIrqPhase = 0;
     gVideoTransferControl = 1;
-    mask = 0x2000;
-    REG_IE = mask;
-    REG_IE |= 0x1000;
-    REG_IE |= 1;
-    REG_IE |= 2;
-    REG_DISPSTAT = 8;
-    REG_DISPSTAT |= 0x10;
-    REG_DISPSTAT |= 0x20;
+    interrupts = INTR_FLAG_GAMEPAK;
+    REG_IE = interrupts;
+    REG_IE |= INTR_FLAG_KEYPAD;
+    REG_IE |= INTR_FLAG_VBLANK;
+    REG_IE |= INTR_FLAG_HBLANK;
+    REG_DISPSTAT = DISPSTAT_VBLANK_INTR;
+    REG_DISPSTAT |= DISPSTAT_HBLANK_INTR;
+    REG_DISPSTAT |= DISPSTAT_VCOUNT_INTR;
     REG_DISPSTAT = (REG_DISPSTAT & 0xff) | 0x4000;
     REG_IME = 1;
     REG_KEYCNT = 0;
@@ -138,18 +122,16 @@ void InterruptsAndVideo_InitRuntime(void)
                              sub_08219624);
     gSceneEffectPalettePhase = 0;
     gVBlankFrameCounter = 0;
-    a = &gVideoUploadTask;
-    Task_SetCallbacks(a, InterruptsAndVideo_OnVideoUploadTask, 0);
-    b = &gGraphicsUpdateTask;
-    Task_SetCallbacks(b, InterruptsAndVideo_OnGraphicsUpdateTask, 0);
-    a->priority = 0;
-    a->unk16 = 1;
-    a->id = 0;
-    b->priority = 13;
-    b->unk16 = 1;
-    b->id = 0;
-    Task_LinkToPriorityList(a);
-    Task_LinkToPriorityList(b);
+    Task_SetCallbacks(&gVideoUploadTask, InterruptsAndVideo_OnVideoUploadTask, 0);
+    Task_SetCallbacks(&gGraphicsUpdateTask, InterruptsAndVideo_OnGraphicsUpdateTask, 0);
+    gVideoUploadTask.priority = 0;
+    gVideoUploadTask.unk16 = 1;
+    gVideoUploadTask.id = 0;
+    gGraphicsUpdateTask.priority = 13;
+    gGraphicsUpdateTask.unk16 = 1;
+    gGraphicsUpdateTask.id = 0;
+    Task_LinkToPriorityList(&gVideoUploadTask);
+    Task_LinkToPriorityList(&gGraphicsUpdateTask);
 }
 
 void InterruptsAndVideo_WaitForVBlank(void)
