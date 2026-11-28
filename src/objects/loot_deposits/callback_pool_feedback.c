@@ -222,12 +222,11 @@ void LootDepositFeedback_SetState(struct CallbackPoolEntry *entry, s32 count)
 
 void LootDepositCallbackPool_RefreshHealthDisplay(struct CallbackPoolEntry *entry)
 {
-    u8 *level;
-    if (entry->spawnTarget > *(level = &entry->spawnIndex)) {
+    if (entry->spawnTarget > entry->spawnIndex) {
         s32 diff = entry->maxHealth - entry->health;
         if (!(u8)LootDepositPool_TestStatusFlags(entry, 1))
             LootDepositFeedback_SetState(entry, 2);
-        if (diff >= entry->damageThreshold * (*level - 1))
+        if (diff >= entry->damageThreshold * (entry->spawnIndex - 1))
             LootDepositFeedback_SetState(entry, 1);
     }
 }
