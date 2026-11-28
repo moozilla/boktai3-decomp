@@ -239,3 +239,4 @@ src/link/player/Player_UpdateSweepAction.c	Player_UpdateSweepAction	contrived	mi
 src/link/player/Player_UpdateThrowAction.c	Player_UpdateThrowAction	minor	natural	1	
 src/link/player/SceneVec_OffsetPolar.c	SceneVec_OffsetPolar	minor	natural	1	
 src/link/player/Player_GetTerrainHeightAtPosition.c	Player_GetTerrainHeightAtPosition	minor	natural	2	
+src/link/player/Terrain_ClassifyOffsetHeight.c	Terrain_ClassifyOffsetHeight	minor	natural	1	
