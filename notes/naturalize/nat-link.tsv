@@ -145,3 +145,4 @@ src/link/player/sub_082392E8.c	sub_082392E8	contrived	contrived	9	do/while(0) ar
 src/link/player/Player_EmitConvergingParticle.c	Player_EmitConvergingParticle	minor	minor	0	draw alias and u16 radius sample
 src/link/player/Player_DestroyConvergingParticles.c	Player_DestroyConvergingParticles	contrived	natural	1	
 src/link/player/Player_InitConvergingParticles.c	Player_InitConvergingParticles	contrived	natural	2	
+src/link/player/Player_UpdateConvergingParticles.c	Player_UpdateConvergingParticles	minor	natural	1	draw alias stays: the ROM keeps both registers
