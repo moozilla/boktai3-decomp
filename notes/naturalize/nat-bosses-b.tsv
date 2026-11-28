@@ -168,3 +168,6 @@ src/bosses/ratatosk/Ratatosk_InitAnimatedParticleParams.c	Ratatosk_InitAnimatedP
 src/bosses/ratatosk/Ratatosk_ConfigureAnimatedParticle.c	Ratatosk_ConfigureAnimatedParticle	natural	natural	0	
 src/bosses/ratatosk/SceneDistance_UpdateActor.c	SceneDistance_UpdateActor	contrived	natural	1	
 src/bosses/ratatosk/Ratatosk_Destroy.c	Ratatosk_Destroy	contrived	natural	1	
+src/bosses/ratatosk/Ratatosk_Create.c	Ratatosk_Create	natural	natural	0	
+src/bosses/ratatosk/Ratatosk_InitializeFromScript.c	Ratatosk_InitializeFromScript	machine-shaped	partial	5	removed one pointer temp; still local struct copies and slot/value default stores. Resume: build/scope/drafts/nb/init_conv.py converts to struct Ratatosk but is 4 bytes off (id spilled instead of kept in sb)
+src/bosses/ratatosk/Ratatosk_UpdateFlagWaitState18.c	Ratatosk_UpdateFlagWaitState18	natural	natural	0	minor: StateActor cast for p->interval, SceneActorState helpers

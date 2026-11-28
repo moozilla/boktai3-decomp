@@ -501,8 +501,7 @@ s32 Ratatosk_InitializeFromScript(struct RatatoskInit *actor, u32 id)
     if (self->specialMode == 0) {
         struct RatatoskCamera *camera = &actor->camera;
         const void *targetPosition = RatatoskInit_GetTargetPosition(self);
-        struct ContactPosition *origin = &actor->base.body.position;
-        CameraFollow_Initialize(camera, targetPosition, origin, 1);
+        CameraFollow_Initialize(camera, targetPosition, &actor->base.body.position, 1);
         RatatoskInit_SetCameraOrbit(camera, 140, 255);
         camera->duration = 30;
     }
