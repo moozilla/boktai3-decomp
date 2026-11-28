@@ -315,3 +315,4 @@ src/scene/actor/control/SceneActorControl_UpdatePersistentPhase.c	SceneActorCont
 src/scene/actor/control/SceneActorControl_UpdateShadowReturnPhase.c	SceneActorControl_UpdateShadowReturnPhase	contrived	minor	3	status flag pointer block: plain &= loads the field before the mask
 src/scene/actor/control/SceneActorControl_SetDefaultPreset.c	SceneActorControl_SetDefaultPreset	contrived	natural	1	-
 src/scene/actor/control/SceneActorControl_RestoreMotion.c	SceneActorControl_RestoreMotion	contrived	minor	5	drawable kind branch casts to the two drawable layouts
+src/scene/actor/control/SceneActorControl_TickRandomMotion.c	SceneActorControl_TickRandomMotion	contrived	minor	18	ClearMotionVector CpuSet wrapper: ZeroFill8 uses a different stack slot pattern
