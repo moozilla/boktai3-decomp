@@ -89,3 +89,4 @@ src/effects/bursts/large_fragment_effect.c	LargeFragmentEffect_UpdateCollider	co
 src/effects/bursts/large_fragment_effect.c	SceneSlot_Allocate	minor	natural	4	-
 src/effects/bursts/large_fragment_effect.c	SceneSlot_EmitPulse	contrived	minor	12	recovered random bank origin, its late copy and the planar velocity pointer: needed for the dead origin load and the velocity base register
 src/effects/bursts/large_fragment_effect.c	LargeFragmentEffect_SpawnRandomParticle	contrived	minor	5	same random bank origin, copy and planar pointer as SceneSlot_EmitPulse
+src/effects/bursts/large_fragment_effect.c	FragmentSpritePool_UpdateTask	contrived	minor	5	slot array pointer kept in a local; mask-argument test helper

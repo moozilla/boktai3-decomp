@@ -339,21 +339,16 @@ static inline u8 test(u32 *p, u32 mask)
     return 0;
 }
 
-u32 FragmentSpritePool_UpdateTask(u8 *s)
+u32 FragmentSpritePool_UpdateTask(struct LargeFragmentSlotPool *pool)
 {
-    u8 *first = s + 0x3C;
-    if (*(u32 *)(s + 0x38)) {
-        s32 i = 0;
-        void (*const *table)(void) = gUnk_086107F8;
-        u8 *kind = s + 0xD2;
-        u8 *entry = first;
-        do {
-            if (test((u32 *)(s + 0x38), 1 << i))
-                sub_08249240(s, entry, table[*kind]);
-            kind += 0xA0;
-            entry += 0xA0;
-            ++i;
-        } while (i <= 7);
+    struct LargeFragmentSlot *slots = pool->slots;
+    s32 i;
+
+    if (pool->occupied) {
+        for (i = 0; i < 8; i++) {
+            if (test(&pool->occupied, 1 << i))
+                sub_08249240(pool, &slots[i], gUnk_086107F8[slots[i].state]);
+        }
     }
     return 0;
 }
