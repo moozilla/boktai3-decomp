@@ -85,3 +85,4 @@ src/engine/math/ScalarApproach_UnwrapAngle.c	ScalarApproach_UnwrapAngle	natural	
 src/engine/math/sub_082218A8.c	sub_082218A8	natural	natural	0	
 src/engine/math/ScalarApproach_ApplyProfile.c	ScalarApproach_ApplyProfile	natural	natural	0	
 src/engine/math/sub_08221AB8.c	sub_08221AB8	natural	natural	0	
+src/engine/sound/Sound_IsSongPlaying.c	Sound_IsSongPlaying	contrived	natural	1	
