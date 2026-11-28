@@ -555,3 +555,4 @@ src/ui/town/solar_bank/SpriteMenu_InitBackground.c	SpriteMenu_InitBackground	min
 src/ui/town/solar_bank/SpriteMenu_LoadPalette.c	SpriteMenu_LoadPalette	minor	natural	1	
 src/ui/town/solar_bank/SpriteMenu_InitText.c	SpriteMenu_InitText	minor	natural	1	
 src/ui/town/solar_bank/SolarBank_Init.c	SolarBank_Init	contrived	minor	1	else branch stores the zero keyword result
+src/ui/town/solar_bank/SolarBank_GetBalance.c	SolarBank_GetBalance	minor	natural	1	
