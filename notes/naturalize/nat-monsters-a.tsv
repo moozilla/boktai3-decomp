@@ -480,3 +480,8 @@ src/monsters/cannons/vulcan/VulcanCannon_ApplyHitReaction.c	VulcanCannon_ApplyHi
 src/monsters/cannons/vulcan/VulcanCannon_ReadScriptValueList.c	VulcanCannon_ReadScriptValueList	contrived	natural	3	
 src/monsters/cannons/vulcan/VulcanCannon_RecordDefeat.c	VulcanCannon_RecordDefeat	contrived	minor	3	H() halfword view for the unnamed game-state counters
 src/monsters/axe_armor/AxeArmor_ReadScriptValueList.c	AxeArmor_ReadScriptValueList	contrived	natural	1	
+src/monsters/axe_armor/AxeArmor_Destroy.c	AxeArmor_Destroy	minor	minor	0	byte-offset destroy argument
+src/monsters/axe_armor/AxeArmor_Update.c	AxeArmor_Update	contrived	contrived	0	collider alias in both branches, struct copy through a v pointer and cached position pointers for the explosion
+src/monsters/cannons/vulcan/VulcanCannon_FireProjectile.c	VulcanCannon_FireProjectile	minor	minor	0	config byte buffer and one-line vector helpers
+src/monsters/cannons/vulcan/VulcanCannon_HasClearShot.c	VulcanCannon_HasClearShot	natural	natural	0	
+src/monsters/cannons/vulcan/VulcanCannon_UpdateDefeatEffects.c	VulcanCannon_UpdateDefeatEffects	minor	minor	0	byte read of the random entry through integer address arithmetic
