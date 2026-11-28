@@ -1,6 +1,3 @@
-#define Save_AlignBlockSize Save_AlignSizeToEightBytes
-#define Save_BeginTransfer  Save_SuspendRuntimeForTransfer
-#define Save_EndTransfer    Save_ResumeRuntimeAfterTransfer
 #include "global.h"
 u32 Save_AlignSizeToEightBytes(u32);
 u32 Save_SuspendRuntimeForTransfer(void);
