@@ -660,3 +660,4 @@ src/player/motions/Player_UpdateDecayingRecoil.c	Player_UpdateDecayingRecoil	nat
 src/player/motions/Player_UpdateSpiralDisorientation.c	Player_UpdateSpiralDisorientation	natural	natural	0	-
 src/player/motions/sub_08148E4C.c	sub_08148E4C	minor	natural	1	-
 src/player/motions/Player_GetWalkSpeed.c	Player_GetWalkSpeed	contrived	natural	1	-
+src/player/motions/Player_UpdateWalkFootsteps.c	Player_UpdateWalkFootsteps	minor	natural	3	-
