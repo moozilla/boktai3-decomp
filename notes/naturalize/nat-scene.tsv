@@ -306,3 +306,4 @@ src/scene/actor/control/SceneActorControl_CreateFromScript.c	SceneActorControl_C
 src/scene/actor/control/SceneActorControl_UpdateDirectionalAnimation.c	SceneActorControl_UpdateDirectionalAnimation	contrived	minor	1	keeps the take-flag helper and direction local shared with UpdateFacingAnimation
 src/scene/actor/control/SceneActorControl_ResetDirectionalAnimation.c	SceneActorControl_ResetDirectionalAnimation	contrived	natural	1	-
 src/scene/actor/control/SceneActorControl_UpdateTimedResponseAnimation.c	SceneActorControl_UpdateTimedResponseAnimation	contrived	minor	4	HalfwordFlags_Set stays: plain |= loads the field before the mask
+src/scene/actor/control/SceneActorControl_UpdateTimedFacing.c	SceneActorControl_UpdateTimedFacing	contrived	minor	20	collider &= 0xFFFB through a pointer: plain &= loads the field before the mask; now/start locals fix the load order
