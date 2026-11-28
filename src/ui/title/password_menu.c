@@ -427,20 +427,15 @@ s32 PasswordMenu_AppendSelection(struct PasswordMenu *p)
 s32 PasswordMenu_EraseSelection(struct PasswordMenu *p)
 {
     s32 empty = 0;
-    s32 index = p->position;
-    u32 offset = index * 4;
-    u32 *entries = p->selections;
-    u32 *entry = (u32 *)((u32)entries + offset);
-    u32 value = *entry;
-    if (value == 0x41) {
-        if (index == 0) {
+    if (p->selections[p->position] == 0x41) {
+        if (p->position == 0) {
             empty = 1;
         } else {
-            p->position = index - 1;
-            *(u32 *)((u32)entries + (p->position << 2)) = value;
+            p->position--;
+            p->selections[p->position] = 0x41;
         }
     } else {
-        *entry = 0x41;
+        p->selections[p->position] = 0x41;
     }
     PasswordMenu_RedrawSelection(p, p->position);
     PasswordMenu_BuildLabels(p);
