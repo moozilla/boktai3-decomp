@@ -212,3 +212,4 @@ src/npc/story_character/StoryCharacter_StartAnimStep.c	StoryCharacter_StartAnimS
 src/npc/story_character/SceneCharacter_StartAnimationThree.c	SceneCharacter_StartAnimationThree	contrived	natural	1	
 src/npc/story_character/StoryCharacter_SimpleStep.c	StoryCharacter_SimpleStep	contrived	natural	1	
 src/npc/story_character/SceneCharacter_UpdateSlowingBlink.c	SceneCharacter_UpdateSlowingBlink	contrived	minor	1	
+src/npc/story_character/SceneCharacter_UpdateAcceleratingBlink.c	SceneCharacter_UpdateAcceleratingBlink	contrived	natural	1	
