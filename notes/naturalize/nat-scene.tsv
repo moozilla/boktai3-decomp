@@ -291,3 +291,12 @@ src/scene/actor/control/SceneActorControl_NoOp.c	SceneActorControl_OnContact	nat
 src/scene/actor/control/SceneActorControl_IsEnabledForScene.c	SceneActorControl_IsEnabledForScene	minor	minor	0	MatchesScene predicate (materialized test)
 src/scene/actor/control/SceneActorControl_TickJitter.c	SceneActorControl_TickJitter	contrived	contrived	0	random-table union and sample blocks: the mask is loaded after the first seed read, only the explicit steps give that
 src/scene/actor/control/SceneActorControl_TryActivateNearby.c	SceneActorControl_TryActivateNearby	contrived	contrived	22	input aliases, SignedZ helper, packed delta pointer/zero-extension temporaries and the player location pointer
+src/scene/actor/control/SceneActorControl_TickActive.c	SceneActorControl_TickActive	contrived	contrived	0	flag pointer helpers and applyMask goto: plain &= loads the field first and splits the shared clear
+src/scene/actor/control/SceneActorControl_TickDeparture.c	SceneActorControl_TickDeparture	minor	minor	0	scoped flag clear (plain &= loads the field first)
+src/scene/actor/control/SceneActorControl_DecodeDirection.c	SceneActorControl_DecodeDirection	natural	natural	0	-
+src/scene/actor/control/SceneActorControl_Initialize.c	SceneActorControl_Initialize	natural	natural	0	-
+src/scene/actor/control/SceneActorControl_EnsureSingleton.c	SceneActorControl_EnsureSingleton	natural	natural	0	-
+src/scene/actor/control/SceneActorControl_ResetSingleton.c	SceneActorControl_ResetSingleton	natural	natural	0	-
+src/scene/actor/control/SceneActorControl_RequestAllDepartures.c	SceneActorControl_RequestAllDepartures	natural	natural	0	-
+src/scene/actor/control/SceneActorControl_ReturnImmediately.c	SceneActorControl_ReturnImmediately	natural	natural	0	-
+src/scene/actor/control/SceneActorControl_Destroy.c	SceneActorControl_Destroy	minor	natural	1	-
