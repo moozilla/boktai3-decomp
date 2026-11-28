@@ -1,11 +1,9 @@
 #include "ui/hud/stage_icon_display.h"
 void StageIconDisplay_TickDelay(struct StageIconDisplay *display)
 {
-    u16 *frame = &display->stateFrame;
-    if (!*frame)
+    if (!display->stateFrame)
         Sound_PlaySong(1260);
-    (*frame)++;
-    if (*frame > 89) {
+    if (++display->stateFrame > 89) {
         StageIconDisplay_NotifyCompletion(display);
         Task_Kill(display);
     }
