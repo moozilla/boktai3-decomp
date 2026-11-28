@@ -17,26 +17,26 @@ s32 DirectionMarker_GetAnimation(s32 base, s32 group)
 s32 DirectionMarker_Update(struct TetherRequestIndicator *indicator)
 {
     s32 quadrant;
-    s32 newIndex;
-    s16 *position = &indicator->projected.x;
+    s32 animationIndex;
+    struct ContactPosition *position = &indicator->projected;
 
-    if (position[0] > 0x77) {
-        if (position[1] > 0x4f) {
+    if (position->x > 0x77) {
+        if (position->y > 0x4f) {
             quadrant = 1;
         } else {
             quadrant = 0;
         }
     } else {
-        if (position[1] > 0x4f) {
+        if (position->y > 0x4f) {
             quadrant = 2;
         } else {
             quadrant = 3;
         }
     }
 
-    newIndex = DirectionMarker_GetAnimation(quadrant, indicator->request);
-    if (newIndex != indicator->animationIndex) {
-        indicator->animationIndex = newIndex;
+    animationIndex = DirectionMarker_GetAnimation(quadrant, indicator->request);
+    if (animationIndex != indicator->animationIndex) {
+        indicator->animationIndex = animationIndex;
         Anim_SetKeyframes(&indicator->animation, &indicator->resource,
                           (u16)indicator->animationIndex, 1, 0);
     }

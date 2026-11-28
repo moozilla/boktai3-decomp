@@ -162,3 +162,4 @@ src/objects/coffin/tether_presentation.c	ScenePaletteFade_InitFromScript	contriv
 src/objects/coffin/tether_presentation.c	PaletteScreen_LoadResources	minor	natural	2	
 src/objects/coffin/tether_presentation.c	TetherActor_CreateRequestIndicator	minor	natural	1	
 src/objects/coffin/tether_presentation.c	ScenePaletteFade_Create	minor	natural	1	
+src/objects/coffin/tether_presentation.c	DirectionMarker_Update	minor	natural	3	
