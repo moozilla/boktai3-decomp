@@ -1537,14 +1537,10 @@ void TetherActor_AddStatusFlags(u32 a, u32 b)
 
 void TetherActor_RemoveStatusFlags(u32 m)
 {
-    struct TetherActor *g = gTetherActor;
-    if (g != 0) {
-        u8 *q = &g->statusFlags;
-        u32 z;
-        u8 v = *q & ~m;
-        z = 0;
-        *q = v;
-        gTetherActor->statusTag = z;
+    struct TetherActor *p = gTetherActor;
+    if (p) {
+        p->statusFlags &= ~m;
+        gTetherActor->statusTag = 0;
     }
 }
 

@@ -57,3 +57,14 @@ src/objects/coffin/tether_actor.c	TetherActor_UpdateGlow	minor	minor	9	level = 1
 src/objects/coffin/tether_actor.c	TetherActor_SelectPalette	contrived	contrived	20	source-field, saved-display and buffer pointers kept: ROM copies both before the loop
 src/objects/coffin/tether_actor.c	TetherActor_UpdateMovingEffects	contrived	natural	4	
 src/objects/coffin/tether_actor.c	TetherActor_UpdateSegments	minor	natural	3	
+src/objects/coffin/tether_actor.c	TetherActor_BlendPalette	contrived	contrived	10	parked masks and shifted-copy channel extraction: color bitfields and plain shifts reallocate
+src/objects/coffin/tether_actor.c	TetherActor_InitializeSegments	natural	natural	0	
+src/objects/coffin/tether_actor.c	TetherActor_UpdatePalette	natural	natural	0	
+src/objects/coffin/tether_actor.c	TetherActor_UpdateEffects	natural	natural	0	
+src/objects/coffin/tether_actor.c	TetherActor_SetState	natural	natural	0	
+src/objects/coffin/tether_actor.c	TetherActor_SetHeadingEntry	natural	natural	0	
+src/objects/coffin/tether_actor.c	TetherActor_SetEntry	natural	natural	0	
+src/objects/coffin/tether_actor.c	TetherActor_ApplyPendingEffect	natural	natural	0	
+src/objects/coffin/tether_actor.c	TetherActor_UpdatePendingEffect	natural	natural	0	
+src/objects/coffin/tether_actor.c	TetherActor_SetCardinalEntry	contrived	contrived	8	saved/second flag pointers and bare block: ROM keeps &flags[1] in its own register
+src/objects/coffin/tether_actor.c	TetherActor_RemoveStatusFlags	contrived	natural	1	
