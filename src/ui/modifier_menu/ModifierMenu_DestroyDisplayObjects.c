@@ -1,15 +1,12 @@
 #include "global.h"
 
-void Anim_Remove(u8 *);
+#include "scene/actor/modifier_list.h"
 
-u32 ModifierMenu_DestroyDisplayObjects(u8 *p)
+u32 ModifierMenu_DestroyDisplayObjects(struct ModifierMenu *menu)
 {
-    u8 *e = p + 0x17C;
-    s32 i = 0x11;
-    do {
-        Anim_Remove(e);
-        i--;
-        e += 0x60;
-    } while (i >= 0);
+    struct ModifierDisplayObject *object = menu->displays;
+    s32 i;
+    for (i = 0; i < 18; i++, object++)
+        Anim_Remove(object);
     return 0;
 }
