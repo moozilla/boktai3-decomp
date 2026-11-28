@@ -177,3 +177,4 @@ src/link/player/LinkPlayer_HasSlotValueAtLeast.c	LinkPlayer_HasSlotValueAtLeast	
 src/link/player/LinkPlayer_GetSessionPlayerData.c	LinkPlayer_GetSessionPlayerData	contrived	minor	2	per-slot data starts inside the exchange buffer fields, so a byte offset stays
 src/link/player/Player_GetActionIndex.c	Player_GetActionIndex	contrived	natural	2	
 src/link/player/LinkPlayer_InitAbilityState.c	LinkPlayer_InitAbilityState	contrived	minor	6	ability view overlays a signed id on the player fields
+src/link/player/LinkPlayer_ReadSlotFromScript.c	LinkPlayer_ReadSlotFromScript	contrived	natural	1	
