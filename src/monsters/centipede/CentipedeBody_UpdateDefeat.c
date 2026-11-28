@@ -123,12 +123,10 @@ void CentipedeBody_UpdateDefeat(struct ChaseActor *actor, s32 frame)
         arguments.values = values;
         Script_Call(script, &arguments);
     }
-    {
-        if (!SceneActorChase_QueryMotionFlagComponent(actor, 0x4000) &&
-            (u32)(actor->base.category - 11) > 2)
-            Bestiary_UnlockEntry(
-                Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
-    }
+    if (!SceneActorChase_QueryMotionFlagComponent(actor, 0x4000) &&
+        (u32)(actor->base.category - 11) > 2)
+        Bestiary_UnlockEntry(
+            Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
     actor->base.attachmentTimer = 0;
     SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 16);
     SceneActorTerrain_EnterState(actor, 1, 0, 2);
