@@ -1,22 +1,17 @@
 #include "global.h"
-struct StorageCategoryMenu {
-    u8 unknown0[0xF3A];
-    s16 introY;
-    u8 unknownF3C[0x812];
-    u16 introFrame;
-};
-void Storage_BeginCategoryBrowse(struct StorageCategoryMenu *);
-void Storage_UpdateBrowseIntro(struct StorageCategoryMenu *p)
+#include "ui/town/storage_screen.h"
+void Storage_BeginCategoryBrowse(struct StorageScreen *);
+void Storage_UpdateBrowseIntro(struct StorageScreen *screen)
 {
-    p->introFrame++;
-    if (p->introFrame <= 11) {
-        if ((p->introFrame >> 1) & 1)
-            p->introY = 104;
+    screen->timer++;
+    if (screen->timer <= 11) {
+        if ((screen->timer >> 1) & 1)
+            screen->indicators[0].position.y = 104;
         else
-            p->introY = 104 - ((20 - p->introFrame) >> 3);
-    } else if (p->introFrame <= 15) {
-        p->introY = 104;
+            screen->indicators[0].position.y = 104 - ((20 - screen->timer) >> 3);
+    } else if (screen->timer <= 15) {
+        screen->indicators[0].position.y = 104;
     } else {
-        Storage_BeginCategoryBrowse(p);
+        Storage_BeginCategoryBrowse(screen);
     }
 }
