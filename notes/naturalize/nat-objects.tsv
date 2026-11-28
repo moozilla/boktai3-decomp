@@ -471,3 +471,4 @@ src/objects/light_fixtures.c	LightFixture_InitManager	natural	natural	0
 src/objects/light_fixtures.c	LightFixture_GetOrCreateManager	natural	natural	0	
 src/objects/light_fixtures.c	LightFixture_ScriptSetTimeout	natural	natural	0	
 src/objects/light_fixtures.c	LightFixture_ScriptSetState	natural	natural	0	
+src/objects/loot_deposits/LootDepositPool_AddStatusFlags.c	LootDepositPool_AddStatusFlags	contrived	natural	1	
