@@ -394,3 +394,4 @@ src/npc/otenko/Otenko_SpawnTransitionParticle.c	Otenko_SpawnTransitionParticle	c
 src/npc/otenko/Otenko_UpdateTransitionEffect.c	Otenko_UpdateTransitionEffect	contrived	natural	5	table pointer local: the ROM forms the table address before the cursor
 src/npc/otenko/Otenko_OnTransitionEffectDestroy.c	Otenko_OnTransitionEffectDestroy	minor	natural	1	
 src/npc/otenko/SceneEffect_InitParticleRing.c	SceneEffect_InitParticleRing	contrived	natural	2	
+src/npc/otenko/Otenko_IsTransitionEffectFinished.c	Otenko_IsTransitionEffectFinished	minor	natural	1	
