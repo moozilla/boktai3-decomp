@@ -1,36 +1,28 @@
 #include "global.h"
-struct ScriptPanel {
-    u8 unk0[0x2E];
-    u16 retryTimer;
-    u8 unk30[0x18];
-    s32 selection;
-    u8 unk4C[0x18];
-    u8 buttons[2];
-};
-u8 LinkSession_ConsumeStateEntry(struct ScriptPanel *);
-void LinkSession_SetState(struct ScriptPanel *, u32, void *);
+#include "link/link_script_panel.h"
+
+u8 LinkSession_ConsumeStateEntry(struct LinkScriptPanel *);
+void LinkSession_SetState(struct LinkScriptPanel *, u32, void *);
 s32 Serial_ReadLatestPacket(u16 *);
 void LinkMenu_WaitForReadyPeers(void);
 void ScriptPanel_PollSelection(void);
 void Serial_StopCommunication(void);
-s32 ScriptPanel_WaitForSelectionData(struct ScriptPanel *p)
+s32 ScriptPanel_WaitForSelectionData(struct LinkScriptPanel *p)
 {
-    u16 selections[4];
+    u16 packets[4];
     s32 result;
+    s32 i;
+
     if (LinkSession_ConsumeStateEntry(p))
         p->retryTimer = 0;
-    result = Serial_ReadLatestPacket(selections);
-    if (p->selection >= 0 && result >= 0 && selections[p->selection] != 0xFFFF) {
+    result = Serial_ReadLatestPacket(packets);
+    if (p->playerSlot >= 0 && result >= 0 && packets[p->playerSlot] != 0xFFFF) {
         LinkSession_SetState(p, 4, LinkMenu_WaitForReadyPeers);
-    } else {
-        p->retryTimer++;
-        if (p->retryTimer > 29) {
-            s32 i;
-            LinkSession_SetState(p, 2, ScriptPanel_PollSelection);
-            Serial_StopCommunication();
-            for (i = 0; i < 2; i++)
-                p->buttons[i] = 0;
-        }
+    } else if (++p->retryTimer > 29) {
+        LinkSession_SetState(p, 2, ScriptPanel_PollSelection);
+        Serial_StopCommunication();
+        for (i = 0; i < 2; i++)
+            p->buttons[i] = 0;
     }
     return 0;
 }
