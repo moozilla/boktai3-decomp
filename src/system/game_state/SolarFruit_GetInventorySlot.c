@@ -1,6 +1,6 @@
 #include "global.h"
-extern u8 *gGameState;
+#include "system/game_state/game_state.h"
 s32 SolarFruit_GetInventorySlot(u32 i)
 {
-    return *(s16 *)(gGameState + i * 2 + 0x828);
+    return *(i + gGameState->unk828);
 }

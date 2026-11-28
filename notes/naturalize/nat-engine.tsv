@@ -492,3 +492,4 @@ src/system/game_state/sub_0822E6E4.c	sub_0822E6E4	contrived	natural	1
 src/system/game_state/GameState_ResetUnlocksFromScript.c	GameState_ResetUnlocksFromScript	contrived	natural	1	
 src/system/game_state/SolarFruit_SetInventorySlot.c	SolarFruit_SetInventorySlot	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
 src/system/game_state/GameState_InsertUniqueListEntry.c	GameState_InsertUniqueListEntry	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
+src/system/game_state/SolarFruit_GetInventorySlot.c	SolarFruit_GetInventorySlot	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
