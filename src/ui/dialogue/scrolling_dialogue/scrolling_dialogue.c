@@ -238,14 +238,11 @@ u32 ScrollingDialogue_ClearScript(void)
 int ScrollingDialogue_SetNumberArgument(int index, int value)
 {
     struct ScrollingDialogue *dialogue = (void *)gScrollingDialogue;
-    int result;
-    if (dialogue) {
-        TextState_SetNumber(&dialogue->text, index, value);
-        result = 0;
-    } else {
-        result = -1;
-    }
-    return result;
+
+    if (!dialogue)
+        return -1;
+    TextState_SetNumber(&dialogue->text, index, value);
+    return 0;
 }
 
 s32 ScrollingDialogue_SetNumberArgumentFromScript(void)
