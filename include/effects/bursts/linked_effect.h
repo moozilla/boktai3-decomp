@@ -38,4 +38,13 @@ static inline u8 LinkedEffectPool_IsOccupied(struct LinkedEffectPool *pool, s32 
     return FALSE;
 }
 
+static inline void LinkedEffect_Subtract(struct ContactPosition *out,
+                                         const struct ContactPosition *from,
+                                         const struct ContactPosition *to)
+{
+    out->x = to->x - from->x;
+    out->y = to->y - from->y;
+    out->z = to->z - from->z;
+}
+
 #endif
