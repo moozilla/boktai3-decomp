@@ -188,11 +188,9 @@ void Mummy_UpdateHiddenRecovery(struct ChaseActor *actor, s32 frame)
     if (queued) {
         ActorShadow_Disable(actor->base.shadow);
     } else if (frame > 0x1A) {
-        {
-            u8 directionVariant, mirror;
-            Mummy_GetDirectionVariant(actor, &directionVariant, &mirror);
-            Mummy_SelectAnimation(actor, 8, directionVariant, mirror | 4);
-        }
+        u8 directionVariant, mirror;
+        Mummy_GetDirectionVariant(actor, &directionVariant, &mirror);
+        Mummy_SelectAnimation(actor, 8, directionVariant, mirror | 4);
         SceneActorChase_SetControl(actor, Mummy_UpdateRevival, 13);
     } else
         actor->base.restart = queued;
