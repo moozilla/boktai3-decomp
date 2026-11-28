@@ -15,14 +15,13 @@ struct P *Armor_Create(u16 a, u16 b)
 {
     struct P *p = Task_Create(8, 0x1134);
     if (p != 0) {
-        u32 *q = &p->v;
-        *q = a;
+        p->v = a;
         Task_SetCallbacks(p, sub_0818A820, Armor_Destroy);
         if (Armor_InitFromScript(p, a, b) < 0) {
             Task_Kill(p);
             return 0;
         }
-        SceneMessages_RegisterReceiver(p->g, *q, 3);
+        SceneMessages_RegisterReceiver(p->g, p->v, 3);
     }
     return p;
 }
