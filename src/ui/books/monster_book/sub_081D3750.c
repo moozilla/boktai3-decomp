@@ -22,29 +22,15 @@ struct TurnParticle {
 };
 extern const s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
-static inline u32 randomBits(void)
-{
-    u32 v;
-    gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-    v = ((const u16 *)0x0203B400)[gRandomIndex];
-    v &= 0x3F;
-    return v;
-}
-static inline s32 randomNeg(void)
-{
-    u32 v;
-    gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-    v = ((const u16 *)0x0203B400)[gRandomIndex];
-    v &= 0x3F;
-    return -(s32)v;
-}
+/* Turns the particle toward its target by at most the emitter's turn rate while
+ * it moves there, weaving the other way while turn is negative. */
 void sub_081D3750(u8 *actor, struct TurnParticle *p)
 {
     struct TurnTarget *target = p->target;
     struct BestiaryHomingSprite *sprite = &p->sprite_at20;
     u8 *angle = &p->angle;
     s32 diff;
-    s32 abs;
+    s32 magnitude;
     s32 vx;
     s32 height;
     u8 current;
@@ -57,28 +43,39 @@ void sub_081D3750(u8 *actor, struct TurnParticle *p)
         diff = heading - current;
     }
     if (p->turn < 0) {
-        abs = diff;
+        magnitude = diff;
         if (diff < 0)
-            abs = -diff;
-        if (abs > actor[0x1e]) {
+            magnitude = -diff;
+        if (magnitude > actor[0x1e]) {
             *angle = current;
             *angle = (*angle) + actor[0x1e];
-        } else
+        } else {
             *angle = current + diff;
+        }
         p->turn++;
-        if (p->turn == 0)
-            p->turn = randomBits() + 0x40;
+        if (p->turn == 0) {
+            u32 random;
+
+            gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+            random = ((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
+            p->turn = (random & 0x3F) + 0x40;
+        }
     } else {
-        abs = diff;
+        magnitude = diff;
         if (diff < 0)
-            abs = -diff;
-        if (abs > actor[0x1e])
+            magnitude = -diff;
+        if (magnitude > actor[0x1e])
             *angle = current - actor[0x1e];
         else
             *angle = current - diff;
         p->turn--;
-        if (p->turn == 0)
-            p->turn = randomNeg() - 0x40;
+        if (p->turn == 0) {
+            u32 random;
+
+            gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+            random = ((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
+            p->turn = -(random & 0x3F) - 0x40;
+        }
     }
     vx = (gUnk_086149C4[(*angle + 0x40) & 0xFF] * p->speed) >> 12;
     p->vx = vx;
