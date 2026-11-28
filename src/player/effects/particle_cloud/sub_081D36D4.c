@@ -1,29 +1,17 @@
 #include "global.h"
 #include "engine/ram.h"
-struct Entry {
-    u8 state;
-    u8 pad[0x1f];
-    u32 flags;
-    u8 pad2[0x24];
-};
-struct Manager {
-    u8 pad[0x1c];
-    u16 mode;
-    u8 pad2[0x12];
-    struct Entry entries[40];
-};
+#include "player/effects/player_particle_cloud.h"
 
 s32 sub_081D36D4(void)
 {
-    struct Manager *m = gCloudTask;
-    struct Entry *e;
-    u32 value;
+    struct CloudTask *task = gCloudTask;
+    struct CloudParticle *particle;
     s32 i;
-    if (m == NULL)
+
+    if (task == NULL)
         return -1;
-    e = m->entries;
-    value = 1;
-    for (i = 39; i >= 0; i--, e++)
-        e->flags |= value;
+    particle = task->particles;
+    for (i = 0; i < 40; i++, particle++)
+        particle->sprite.flags |= 1;
     return 0;
 }
