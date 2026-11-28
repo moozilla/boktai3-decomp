@@ -119,3 +119,5 @@ src/ui/books/forging_book/ForgingBook_RecordWeaponDiscoveryFromScript.c	ForgingB
 src/ui/books/forging_book/ForgingBook_RecordItemDiscoveryFromScript.c	ForgingBook_RecordItemDiscoveryFromScript	contrived	natural	1	
 src/ui/books/forging_book/ForgingBook_SetItemNameText.c	ForgingBook_SetItemNameText	minor	natural	1	
 src/ui/books/forging_book/ForgingBook_SetAnimation.c	ForgingBook_SetAnimation	minor	minor	14	pointer locals for preview sprite and resource keep the sum operand order
+src/ui/books/forging_book/ForgingBook_HasDiscoveredAllWeapons.c	ForgingBook_HasDiscoveredAllWeapons	natural	natural	0	
+src/ui/books/forging_book/ForgingBook_HasDiscoveredAllItems.c	ForgingBook_HasDiscoveredAllItems	natural	natural	0	
