@@ -1,29 +1,21 @@
 #include "global.h"
 #include "engine/input.h"
+#include "ui/town/storage_screen.h"
+#include "gba/io_reg.h"
 
-#define MenuPanel_CyclePage Storage_TickCategorySelection
-struct MenuPanel {
-    u8 pad0[0x1754];
-    u8 page;
-    u8 pageCount;
-};
-
-s32 Storage_TickCategorySelection(struct MenuPanel *panel)
+s32 Storage_TickCategorySelection(struct StorageScreen *screen)
 {
-    u32 left = (u16)(gPadState[1] & 0x200);
-    if (left) {
-        u32 page = panel->page;
-        if (page == 0) {
-            page = panel->pageCount;
-        }
-        panel->page = page - 1;
+    if (gPadState[1] & L_BUTTON) {
+        u32 category = screen->category;
+        if (category == 0)
+            category = screen->categoryCount;
+        screen->category = category - 1;
         return 1;
     }
-    if (((s32)gPadState[1]) & 0x100) {
-        panel->page++;
-        if (panel->page >= panel->pageCount) {
-            panel->page = left;
-        }
+    if (gPadState[1] & R_BUTTON) {
+        screen->category++;
+        if (screen->category >= screen->categoryCount)
+            screen->category = 0;
         return 1;
     }
     return 0;
