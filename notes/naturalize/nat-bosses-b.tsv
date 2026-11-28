@@ -285,3 +285,4 @@ src/bosses/vanargand/positioned_effect.c	PositionedEffect_InitAttackCollider	mac
 src/bosses/vanargand/positioned_effect.c	PositionedEffect_InitContactCollider	machine-shaped	natural	4	u8 direction local: ROM loads the constant before forming the field address
 src/bosses/vanargand/positioned_effect.c	PositionedEffect_InitRadialAttackColliders	near-natural	natural	3	
 src/bosses/vanargand/positioned_effect.c	PositionedEffect_InterpolateArcNodes	contrived	natural	7	
+src/bosses/vanargand/positioned_effect.c	PositionedEffect_EmitParticles	machine-shaped	partial	8	fill source/destination temporaries and single table load kept: ROM forms &center before the zero store and writes gRandomIndex once

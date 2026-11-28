@@ -117,10 +117,8 @@ void PositionedEffect_EmitParticles(struct VanargandPairAttack *actor)
     for (i = 0; i < 4; i++) {
         const u16 *table = gRandomTable;
         u16 index = (gRandomIndex + 1) & 0x3FF;
-        {
-            u16 random = table[index];
-            offset.x = ((random & 0xFF) + center.x) - 0x80;
-        }
+        u16 random = table[index];
+        offset.x = ((random & 0xFF) + center.x) - 0x80;
         offset.y = center.y;
         index = (index + 1) & 0x3FF;
         gRandomIndex = index;
