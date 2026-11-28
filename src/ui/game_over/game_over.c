@@ -362,14 +362,11 @@ s32 GameOver_OnUpdate(struct GameOver *panel)
 
 u32 GameOver_OnDestroy(struct GameOver *panel)
 {
-    struct GameOverSprite *q;
-    s32 i;
-    if (panel->graphicsLinked != 0) {
-        q = panel->sprites;
-        for (i = 7; i >= 0; i--) {
-            Sprite_Remove(q);
-            q++;
-        }
+    if (panel->graphicsLinked) {
+        s32 i;
+
+        for (i = 0; i < 8; i++)
+            Sprite_Remove(&panel->sprites[i]);
         Anim_Remove(&panel->overlay);
     }
     gGameOver = 0;

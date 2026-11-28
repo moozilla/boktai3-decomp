@@ -370,3 +370,4 @@ src/ui/game_over/game_over.c	GameOver_StartFromScript	fudged	natural	1
 src/ui/game_over/game_over.c	GameOver_TryBeginClose	fudged	natural	1	
 src/ui/game_over/game_over.c	GameOver_FinishDelay	fudged	natural	1	
 src/ui/game_over/game_over.c	GameOver_UpdateCostSelection	fudged	natural	4	
+src/ui/game_over/game_over.c	GameOver_OnDestroy	fudged	natural	1	
