@@ -455,3 +455,19 @@ src/objects/light_fixtures.c	LightFixture_ConsumeEnteredFlag	minor	natural	1
 src/objects/light_fixtures.c	LightFixture_Activate	contrived	natural	5	
 src/objects/light_fixtures.c	LightFixture_UpdateRouteMotion	minor	minor	8	step pointer and movement struct fix the stack order
 src/objects/light_fixtures.c	LightFixture_ScriptCreate	contrived	natural	1	
+src/objects/light_fixtures.c	LightFixture_OnHit	minor	minor	4	second slot alias: without it the argument registers swap
+src/objects/light_fixtures.c	LightFixture_FindFreeSlot	natural	natural	0	
+src/objects/light_fixtures.c	LightFixture_EnterState	natural	natural	0	
+src/objects/light_fixtures.c	LightFixture_InitSlot	natural	natural	0	
+src/objects/light_fixtures.c	LightFixture_RunScript	natural	natural	0	
+src/objects/light_fixtures.c	LightFixture_NullCallback	natural	natural	0	
+src/objects/light_fixtures.c	LightFixture_UpdateAnimation	natural	natural	0	
+src/objects/light_fixtures.c	LightFixture_Idle	natural	natural	0	
+src/objects/light_fixtures.c	LightFixture_React	natural	natural	0	
+src/objects/light_fixtures.c	LightFixture_UpdateFollowMotion	natural	natural	0	
+src/objects/light_fixtures.c	LightFixture_UpdateAll	natural	natural	0	
+src/objects/light_fixtures.c	LightFixture_DestroyManager	natural	natural	0	
+src/objects/light_fixtures.c	LightFixture_InitManager	natural	natural	0	
+src/objects/light_fixtures.c	LightFixture_GetOrCreateManager	natural	natural	0	
+src/objects/light_fixtures.c	LightFixture_ScriptSetTimeout	natural	natural	0	
+src/objects/light_fixtures.c	LightFixture_ScriptSetState	natural	natural	0	
