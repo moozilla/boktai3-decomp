@@ -3,6 +3,7 @@
 #include "engine/engine.h"
 #include "engine/input.h"
 #include "engine/ram.h"
+#include "link/wireless/random.h"
 s32 Mod(s32, s32);
 u32 HomingProjectile_GetActiveCount(void);
 static inline u32 NextRandom(const u16 *table)
@@ -23,7 +24,7 @@ void Player_ClearScriptToggle(void);
 void Ratatosk_UpdateCloneAttack(struct Ratatosk *p)
 {
     struct Ratatosk *q = p;
-    if (Ratatosk_ConsumeActionEntry(q) == 1) {
+    if (Ratatosk_ConsumeActionEntry(p) == 1) {
         if (p->healthPhase > 0) {
             Ratatosk_SetAnimation(q, 10);
             p->sequence = 0;
@@ -34,66 +35,56 @@ void Ratatosk_UpdateCloneAttack(struct Ratatosk *p)
         p->sequence = 0;
         p->repeat = 0;
     }
-    {
-        s32 *sequence = &p->sequence;
-        switch (*sequence) {
-            case 0:
-                if (q->actionFinished) {
-                    *sequence = 1;
-                    Ratatosk_SetAnimation(q, 6);
-                }
-                break;
-            case 1:
-                if (q->actionFinished) {
-                    *sequence = 2;
-                    Ratatosk_SetAnimation(q, 4);
-                    p->cloneTimer = 0;
-                }
-                break;
-            case 2:
-                if (q->actionFinished) {
-                    if (++p->repeat > 5) {
-                        *sequence = 3;
-                        Ratatosk_SetAnimation(q, 8);
-                        p->duration = 128;
-                        {
-                            s32 x = 1060;
-                            x += RandomModulo(2230);
-                            p->body.position.x = x;
-                        }
-                        {
-                            s32 z = 1320;
-                            z += RandomModulo(1710);
-                            p->body.position.z = z;
-                        }
-                    } else {
-                        p->duration = 32;
-                        gRandomIndex = (gRandomIndex + 1) & 1023;
-                        p->destination =
-                            *(struct ContactPosition *)((Mod(*(const u16 *)(gRandomIndex * 2 +
-                                                                            (u32)gRandomTable),
-                                                             9) *
-                                                             8 +
-                                                         (u32)p) +
-                                                        0xccc);
-                        Ratatosk_SetAnimation(q, 4);
+    switch (p->sequence) {
+        case 0:
+            if (q->actionFinished) {
+                p->sequence = 1;
+                Ratatosk_SetAnimation(q, 6);
+            }
+            break;
+        case 1:
+            if (q->actionFinished) {
+                p->sequence = 2;
+                Ratatosk_SetAnimation(q, 4);
+                p->cloneTimer = 0;
+            }
+            break;
+        case 2:
+            if (q->actionFinished) {
+                if (++p->repeat > 5) {
+                    p->sequence = 3;
+                    Ratatosk_SetAnimation(q, 8);
+                    p->duration = 128;
+                    {
+                        s32 x = 1060;
+                        x += RandomModulo(2230);
+                        p->body.position.x = x;
                     }
-                }
-                break;
-            case 3:
-                if (p->frameDamage > 0) {
-                    p->pendingAttack = 1;
-                    PlayerClone_BeginActiveReactions();
-                }
-                if (PlayerClone_GetActiveCount() == 0) {
-                    p->sequenceDone = 1;
-                    p->flashTimer = 60;
-                    Player_SetScriptToggle();
+                    {
+                        s32 z = 1320;
+                        z += RandomModulo(1710);
+                        p->body.position.z = z;
+                    }
                 } else {
-                    Player_ClearScriptToggle();
+                    p->duration = 32;
+                    p->destination = *(Mod(RANDOM_NEXT(), 9) + p->points);
+                    Ratatosk_SetAnimation(q, 4);
                 }
-                p->cloneTimer++;
-                break;
-        }
+            }
+            break;
+        case 3:
+            if (p->frameDamage > 0) {
+                p->pendingAttack = 1;
+                PlayerClone_BeginActiveReactions();
+            }
+            if (PlayerClone_GetActiveCount() == 0) {
+                p->sequenceDone = 1;
+                p->flashTimer = 60;
+                Player_SetScriptToggle();
+            } else {
+                Player_ClearScriptToggle();
+            }
+            p->cloneTimer++;
+            break;
     }
 }
