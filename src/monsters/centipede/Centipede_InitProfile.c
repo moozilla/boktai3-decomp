@@ -1,6 +1,5 @@
-#include "global.h"
-u32 SceneActorProfiles_FindOrAdd(u32, u32);
-void Centipede_InitProfile(u8 *p)
+#include "monsters/centipede/centipede_body.h"
+void Centipede_InitProfile(struct RoomActor *actor)
 {
-    *(u32 *)(p + 0x308) = SceneActorProfiles_FindOrAdd(p[0x98], 0);
+    actor->profileId = SceneActorProfiles_FindOrAdd(actor->category, 0);
 }
