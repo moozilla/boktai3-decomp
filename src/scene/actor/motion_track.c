@@ -113,11 +113,7 @@ void OrbitMotion_BeginVerticalDistanceWave(struct OrbitMotion *motion, struct Or
         *target = *end;
         motion->angle = angle;
         difference(&delta, target, motion->position);
-        {
-            s32 length = OrbitMotion_DistanceXY(&delta);
-            s32 factor = 314 * speed;
-            motion->radius = __divsi3(length * factor, 25600);
-        }
+        motion->radius = OrbitMotion_DistanceXY(&delta) * 314 * speed / 25600;
         if (motion->radius <= 1)
             motion->radius = 2;
         motion->speed = speed;
