@@ -394,15 +394,16 @@ s32 sub_08022624(void *owner, s32 count, struct BoxSearchPosition *min,
 s32 SceneParticle_CreateParticles(const void *anchor, const ParticleOffset *offset,
                                   const void *range, const void *jitter, s32 count, u32 priority);
 
-// confidence=low: emits four particles from the anchor at p + 0x54 around a facing-dependent
+// confidence=low: emits four particles from the body position around a facing-dependent
 // center, each offset by a random -64..63 in x and z.
-void sub_08022694(u8 *p)
+void sub_08022694(void *owner)
 {
-    u8 *base = p + 0x48;
+    struct StateActor *p = owner;
+    struct SceneActorBody *body = &((struct SceneGraphicsActor *)owner)->body;
     ParticleOffset center;
     ParticleOffset offset;
     s32 i;
-    if (p[0xa8] <= 1) {
+    if (p->animationFacing4 <= 1) {
         center.x = 0x40;
         center.y = 0xc8;
         center.z = -0x80;
@@ -413,23 +414,18 @@ void sub_08022694(u8 *p)
     }
     for (i = 0; i < 4; i++) {
         const u16 *table = gRandomTable;
-        u16 index = (gRandomIndex + 1) & 0x3FF;
-        {
-            u16 random = table[index];
-            offset.x = ((random & 0x7F) + center.x) - 0x40;
-        }
+        u16 index = (gRandomIndex + 1) & 1023;
+        u16 random = table[index];
+        offset.x = (random & 0x7F) + center.x - 0x40;
         offset.y = center.y;
-        index = (index + 1) & 0x3FF;
+        index = (index + 1) & 1023;
         gRandomIndex = index;
-        {
-            u16 random = table[index];
-            offset.z = ((random & 0x7F) + center.z) - 0x40;
-        }
-        table = 0;
-        SceneParticle_CreateParticles(base + 0xC, &offset, table, table, 1, 1);
+        random = table[index];
+        offset.z = (random & 0x7F) + center.z - 0x40;
+        table = NULL;
+        SceneParticle_CreateParticles(&body->position, &offset, table, table, 1, 1);
     }
 }
-
 // confidence=low: five sparks 300 units above the actor; the large burst for big, otherwise a
 // smaller one shifted by the facing kept at 0xA8.
 void sub_08022790(u8 *p, s32 big)
