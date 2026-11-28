@@ -251,28 +251,25 @@ static inline s32 Magnitude(s32 a)
 
 void SceneActorControl_TiltRotation(struct ChaseActor *actor, s32 elapsed)
 {
-    s32 angle_2;
-    u8 *state = actor->base.context;
+    s32 turn;
+    struct Axe *axe = actor->base.context;
     struct RotatingDrawable *drawable = actor->base.drawable;
     s32 angle, magnitude;
     if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
-        u8 saved;
         drawable->flags |= 2;
-        saved = actor->base.tracking.heading;
-        state[0xED3] = saved;
+        axe->savedAngle = actor->base.tracking.heading;
     }
     angle = FoldAngle(drawable->angle);
     magnitude = angle;
-    if (magnitude < 0) {
+    if (magnitude < 0)
         magnitude = -magnitude;
-    }
     if (magnitude > 48) {
         if (elapsed > 42) {
             RotationPhase_Change(actor, SceneActorControl_RecoverRotation, 50);
         }
     } else {
-        angle_2 = FoldAngle(32 - state[0xED3]);
-        if (angle_2 < 0) {
+        turn = FoldAngle(32 - axe->savedAngle);
+        if (turn < 0) {
             drawable->angle -= 2;
         } else {
             drawable->angle += 2;
