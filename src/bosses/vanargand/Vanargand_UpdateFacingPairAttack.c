@@ -1,47 +1,10 @@
 #include "global.h"
+#include "bosses/vanargand/vanargand_pair_attack.h"
 #include "engine/engine_globals.h"
 // confidence=low: facing and active-half mask choose the side for randomized commands 8/11.
-struct Pair {
-    u8 pad0[0x205];
-    u8 first;
-    u8 pad206[0x421 - 0x206];
-    u8 second;
-};
-struct Vanargand {
-    u8 pad0[0x9C];
-    u32 flags;
-    u8 padA0[2];
-    u8 phase;
-    u8 padA3;
-    u32 timer;
-    u8 padA8[7];
-    u8 finished;
-    u8 entered;
-    u8 pending;
-    u8 padB2[0xCC - 0xB2];
-    u8 requestedAngle;
-    u8 padCD[0x104 - 0xCD];
-    void *callback;
-    u8 pad108[0x18C - 0x108];
-    u8 animation[0x60];
-    u8 drawable[0x56C - 0x1EC];
-    struct Pair *pair;
-    u8 pad570[0x580 - 0x570];
-    u32 selected;
-    u16 parameter584;
-    u16 parameter;
-    u16 parameter588;
-    u8 pad58A[0x5B4 - 0x58A];
-    s16 repeats;
-    s16 selectedHalf;
-    u8 pad5B8[0x5C2 - 0x5B8];
-    s16 mode;
-};
 void Vanargand_SetPendingCue(void *, u16);
 u8 Callback_InvokeActor(void *, void *);
-void Vanargand_SetPairedMotionParameter(void *, u16);
-void PairedSceneActor_ApplyToSelectedHalves(void *, s32, s32);
-s32 PairedSceneActor_AreSelectedHalvesFinished(void *);
+void Vanargand_SetPairedMotionParameter(struct VanargandAttackPair *, u16);
 static inline s32 RandomValue(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 0x3FF;
@@ -52,19 +15,18 @@ static inline s32 RandomValue(void)
 }
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, int, int, int);
 void Sound_PlaySong(u32);
-s32 ScenePair_CountPositiveCounters(void *);
-u32 PairedSceneActor_GetActiveMask(void *);
-static inline u8 preferSecond(struct Vanargand *p)
+u32 PairedSceneActor_GetActiveMask(struct VanargandAttackPair *);
+static inline u8 preferSecond(struct VanargandPairAttack *p)
 {
-    u32 direction = p->requestedAngle - 32;
+    u32 direction = p->targetBearings[0] - 32;
     u8 result = 1;
     if (direction <= 127)
         result = 0;
     return result;
 }
-void Vanargand_UpdateFacingPairAttack(struct Vanargand *p)
+void Vanargand_UpdateFacingPairAttack(struct VanargandPairAttack *p)
 {
-    struct Vanargand *self = p;
+    struct VanargandPairAttack *self = p;
     s32 phase;
     u8 result;
     if (p->mode == 1) {
@@ -101,13 +63,11 @@ void Vanargand_UpdateFacingPairAttack(struct Vanargand *p)
             if (p->timer == 0) {
                 s32 command;
                 u32 active;
-                struct Pair **pp;
-                {
-                    s32 bits = (RandomValue() >> 4) & 3;
-                    command = 11;
-                    if (bits)
-                        command = 8;
-                }
+                struct VanargandAttackPair **pp;
+                s32 bits = (RandomValue() >> 4) & 3;
+                command = 11;
+                if (bits)
+                    command = 8;
                 pp = &p->pair;
                 active = PairedSceneActor_GetActiveMask(*pp);
                 if (!preferSecond(p)) {
