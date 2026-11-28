@@ -18,22 +18,17 @@ s32 ActorTrail_RemoveLastSegment(struct ChaseActor *actor)
     struct TentacleBody *trail = actor->base.context;
     struct TentacleAnimationSegment *segments = trail->segments;
     s32 i;
-    if (trail->spreadStage > 2)
-        goto scan;
-    goto failure;
-removeSegment: {
-    struct TentacleAnimationSegment *segment = &segments[i];
-    Collider_Remove(&segment->bodyCollider);
-    setFlag(segment, 1);
-    trail->spreadStage--;
-    Centipede_SpawnSparkBurst(&segment->position);
-    return 1;
-}
-scan:
+    if (trail->spreadStage <= 2)
+        return 0;
     for (i = trail->segmentCount - 1; i >= 0; i--) {
-        if (!isUnavailable(&segments[i]))
-            goto removeSegment;
+        if (!isUnavailable(&segments[i])) {
+            struct TentacleAnimationSegment *segment = &segments[i];
+            Collider_Remove(&segment->bodyCollider);
+            setFlag(segment, 1);
+            trail->spreadStage--;
+            Centipede_SpawnSparkBurst(&segment->position);
+            return 1;
+        }
     }
-failure:
     return 0;
 }
