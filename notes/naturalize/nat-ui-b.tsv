@@ -314,3 +314,4 @@ src/ui/title/tutorial_otenko.c	TutorialOtenko_UpdateRotatingAnimation9	contrived
 src/ui/title/tutorial_otenko.c	TutorialOtenko_UpdateBlinkBurstDisappearance	contrived	minor	5	parked duration constant, (u16) interval decrement, child view/callback/u8 one
 src/ui/title/tutorial_otenko.c	TutorialOtenko_OnAnimationNoOp	natural	natural	0	
 src/ui/title/tutorial_otenko.c	TutorialOtenko_UpdateFinishingAnimation	contrived	minor	1	child view/callback/u8 one
+src/ui/title/tutorial_otenko.c	TutorialOtenko_UpdateRotatingGrowth	contrived	minor	1	scale kept in the palette fields of the shared sprite struct
