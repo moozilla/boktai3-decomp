@@ -81,7 +81,7 @@ s32 PlayerContact_ApplyResponse(struct Player *p, struct ContactCollider *source
         shift = -1;
     else
         shift = 0;
-    if (((source->reactionFlags & 0x80010)) && !(gEngineFlags & 0x1000))
+    if ((source->reactionFlags & 0x80010) && !(gEngineFlags & 0x1000))
         p->positionResetState = 1;
     else
         p->positionResetState = 0;
@@ -89,14 +89,14 @@ s32 PlayerContact_ApplyResponse(struct Player *p, struct ContactCollider *source
         p->contactActionTag = 0;
     else {
         p->contactActionTag = 230;
-        if (*(s8 *)&p->movementAnimationState >= 0)
-            SceneActorControl_RequestDeparture(*(s8 *)&p->movementAnimationState);
+        if ((s8)p->movementAnimationState >= 0)
+            SceneActorControl_RequestDeparture((s8)p->movementAnimationState);
         if (specialState(p, 6)) {
             p->sceneMode = 0;
             p->active = 0;
             p->secondaryDrawFlags &= ~0x400;
         }
-        if ((ContactCollider_TestReactionFlags(source, 0x80000)) && !(playerFlag(p, 0x20000000))) {
+        if (ContactCollider_TestReactionFlags(source, 0x80000) && !playerFlag(p, 0x20000000)) {
             Player_RequestTimedReset(p, resetDuration(source->unknown3C));
             p->positionResetCounter = 1;
         }
@@ -117,7 +117,7 @@ s32 PlayerContact_ApplyResponse(struct Player *p, struct ContactCollider *source
             Player_EmitQueuedEffects(p);
         goto done;
     }
-    if ((specialState(p, 5)) || p->tetherMode == 2 || p->actionMode == 3 || p->actionMode == 4)
+    if (specialState(p, 5) || p->tetherMode == 2 || p->actionMode == 3 || p->actionMode == 4)
         shift++;
     if (ContactCollider_TestReactionFlags(source, 0x200000)) {
         if (!(target->costFlags & 2)) {
@@ -125,22 +125,22 @@ s32 PlayerContact_ApplyResponse(struct Player *p, struct ContactCollider *source
                 p->contactActionTag = 0x191;
             Player_QueueStatusEffect(p, 1);
         }
-    } else if ((source->reactionFlags & 0x400000)) {
+    } else if (ContactCollider_TestReactionFlags(source, 0x400000)) {
         if (!(target->costFlags & 2)) {
             if (!p->contactSpecial)
                 p->contactActionTag = 0x133;
             Player_QueueStatusEffect(p, 2);
         }
-    } else if ((source->reactionFlags & 0x4000)) {
+    } else if (ContactCollider_TestReactionFlags(source, 0x4000)) {
         p->contactActionTag = 0x133;
         Player_QueueStatusEffect(p, 3);
         p->contactSpecial = 0;
-    } else if ((source->reactionFlags & 0x40000))
+    } else if (ContactCollider_TestReactionFlags(source, 0x40000))
         Player_EmitQueuedEffects(p);
-    if ((ContactCollider_TestReactionFlags(source, 0x8000)) && !(playerFlag(p, 0x100)) &&
-        !(playerFlag(p, 0x20000000)))
+    if (ContactCollider_TestReactionFlags(source, 0x8000) && !playerFlag(p, 0x100) &&
+        !playerFlag(p, 0x20000000))
         sub_0813D834(p, 0, 1800);
-    if ((ContactCollider_TestReactionFlags(source, 0x100000)) && !(playerFlag(p, 0x20000000)))
+    if (ContactCollider_TestReactionFlags(source, 0x100000) && !playerFlag(p, 0x20000000))
         sub_0813D834(p, 1, 900);
     if (ContactCollider_TestReactionFlags(source, 0x20000)) {
         s32 angle = ((p->facing + 5) & 7) << 5;

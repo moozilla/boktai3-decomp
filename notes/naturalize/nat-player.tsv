@@ -261,3 +261,4 @@ src/player/core/Player_RefreshActionEquipment.c	Player_RefreshActionEquipment	co
 src/player/core/Player_InitActionMode.c	Player_InitActionMode	minor	natural	3	
 src/player/core/Player_InitBodyFromScript.c	Player_InitBodyFromScript	contrived	minor	3	id halfword written to positionTracker through casts; body pointer kept in two locals; inline terrain height lookup
 src/player/core/sub_0813FE30.c	sub_0813FE30	minor	minor	5	flags set through (&p->animation)->flags: plain member form changes the branch layout
+src/player/core/PlayerContact_ApplyResponse.c	PlayerContact_ApplyResponse	minor	minor	7	contact power helper, response duration block, reset-duration helper whose capped value is unused in the ROM
