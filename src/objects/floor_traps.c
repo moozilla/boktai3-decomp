@@ -375,22 +375,19 @@ void FloorTrap_StepHold(struct TileTrigger *trigger)
     self = trigger;
     if (trigger->triggerFlags & 0x20) {
         trigger->sprite.flags &= ~1;
-        {
-            u8 *forced = &trigger->forced;
-            if (*forced) {
-                FloorTrap_EmitParticles(trigger);
-                Anim_SetSequence(&trigger->animation, manager->animationData, 0,
-                                 (u8)trigger->sequence, 0);
-                *forced = 0;
-                switch (trigger->sequence) {
-                    case 0:
-                    case 1:
-                        if (gEngineFlags & 0x800)
-                            Sound_PlaySong(0x26D);
-                        else
-                            Sound_PlaySong(0x1AB);
-                        break;
-                }
+        if (trigger->forced) {
+            FloorTrap_EmitParticles(trigger);
+            Anim_SetSequence(&trigger->animation, manager->animationData, 0, (u8)trigger->sequence,
+                             0);
+            trigger->forced = 0;
+            switch (trigger->sequence) {
+                case 0:
+                case 1:
+                    if (gEngineFlags & 0x800)
+                        Sound_PlaySong(0x26D);
+                    else
+                        Sound_PlaySong(0x1AB);
+                    break;
             }
         }
         if ((trigger->animation.index == 0 && trigger->animation.elapsed > 2) ||

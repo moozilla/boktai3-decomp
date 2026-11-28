@@ -238,3 +238,4 @@ src/objects/floor_switch/FloorSwitch_InitHooks.c	FloorSwitch_InitHooks	natural	n
 src/objects/floor_switch/FloorSwitch_UpdateOccupancy.c	FloorSwitch_UpdateOccupancy	contrived	natural	10	found flag is never set but gives the original tail
 src/objects/floor_switch/FloorSwitch_Create.c	FloorSwitch_Create	contrived	contrived	8	found block placed before the scan loop (goto layout), duplicate placed pointer and per-component stack vector pointer; index loops and shared subtract change register allocation
 src/objects/floor_traps.c	FloorTrap_IsTetherNearby	contrived	natural	1	
+src/objects/floor_traps.c	FloorTrap_StepHold	contrived	minor	4	self alias of the trigger is still needed for the sprite step
