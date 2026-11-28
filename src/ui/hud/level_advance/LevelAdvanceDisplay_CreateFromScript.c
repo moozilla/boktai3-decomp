@@ -4,7 +4,7 @@ struct LevelAdvanceManager *LevelAdvanceDisplay_CreateFromScript(void)
     struct LevelAdvanceManager *manager;
     if (gLevelAdvanceManager)
         return gLevelAdvanceManager;
-    manager = Task_Create(9, 0x260);
+    manager = Task_Create(9, sizeof(struct LevelAdvanceManager));
     if (manager) {
         Task_SetCallbacks(manager, (void (*)(void *))LevelAdvanceDisplay_UpdateManager,
                           (void (*)(void *))LevelAdvanceDisplay_DestroyManager);
