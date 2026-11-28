@@ -83,3 +83,4 @@ src/monsters/armor/actor_controller_transitions.c	ActorController_UpdateDecaying
 src/monsters/armor/actor_controller_transitions.c	ActorController_UpdateHeavyAttackCollider	contrived	minor	33	existing flag helpers and mask local fix register choices
 src/monsters/armor/actor_controller_transitions.c	ActorController_UpdateMovementVelocity	natural	natural	0	
 src/monsters/armor/actor_controller_transitions.c	ActorController_UpdateFixedAnimationTransition	contrived	natural	12	
+src/monsters/armor/actor_controller_transitions.c	ActorController_UpdateFadeAnimationTransition	contrived	natural	9	

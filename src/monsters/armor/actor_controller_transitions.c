@@ -362,32 +362,22 @@ extern u32 gUnk_0824ED68[];
 
 void ActorController_UpdateFadeAnimationTransition(struct SceneCombatActor *actor)
 {
-    u8 *phase = &actor->actionPhase;
-    u8 initialPhase = *phase;
-
-    switch (initialPhase) {
-        case 0: {
+    switch (actor->actionPhase) {
+        case 0:
             Armor_SetAnimationFromStart(actor, &gUnk_0824ED58[((actor->heading + 0x60) >> 6) & 3]);
-            (*phase)++;
-            actor->actionReady = initialPhase;
+            actor->actionPhase++;
+            actor->actionReady = 0;
             ActorController_SelectDefenseColliders(actor);
-            {
-                ActorController_ClearMotionFlags(&actor->colliderGroup.motion, 1);
-            }
+            ActorController_ClearMotionFlags(&actor->colliderGroup.motion, 1);
             actor->flags &= ~0x20;
             Sound_PlaySongChecked(0xC1);
             break;
-        }
         case 1:
             if (actor->animationComplete != 0) {
                 Armor_SetAnimationFromStart(actor,
                                             &gUnk_0824ED68[((actor->heading + 0x60) >> 6) & 3]);
-                {
-                    u32 next = *phase + 1;
-                    u32 zero = 0;
-                    *phase = next;
-                    actor->actionCounter = zero;
-                }
+                actor->actionPhase++;
+                actor->actionCounter = 0;
                 Armor_StartFastWhiteFade(actor);
             } else
                 break;
