@@ -35,25 +35,15 @@ void PursuingActor_RetireAll(void)
 void PursuingActor_RecoilAll(void)
 {
     struct PursuingActorManager *manager = gPursuingActorManager;
-    u8 *active;
-    s32 i, state, stride;
-    u32 enteredOffset;
-    u8 *cursor;
-    if (manager) {
-        state = 2;
-        active = &manager->actors[0].active;
-        cursor = (u8 *)manager;
-        enteredOffset = (u32) & ((struct PursuingActorManager *)0)->actors[0].entered;
-        stride = sizeof(struct PursuingActor);
-        i = 7;
-        do {
-            if (*active == 1) {
-                *active = state;
-                cursor[enteredOffset] = 1;
-            }
-            active += stride;
-            cursor += stride;
-        } while (--i >= 0);
+    s32 i;
+
+    if (!manager)
+        return;
+    for (i = 0; i < 8; i++) {
+        if (manager->actors[i].active == 1) {
+            manager->actors[i].active = 2;
+            manager->actors[i].entered = 1;
+        }
     }
 }
 
