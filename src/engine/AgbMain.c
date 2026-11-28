@@ -28,16 +28,17 @@ void AgbMain(void)
 {
     u32 saved0, saved1;
     u32 *cookie0, *cookie1;
-    *(vu16 *)0x04000204 = 0x4014;
-    {
-        u32 anchor = 0x0401fb14;
-        u32 offset = anchor + 0xfdfe0c00;
-        cookie0 = (u32 *)(anchor - offset);
-        saved0 = *cookie0;
-        anchor += 4;
-        cookie1 = (u32 *)(anchor - offset);
-        saved1 = *cookie1;
-    }
+    u32 anchor, offset;
+
+    REG_WAITCNT = 0x4014;
+    /* Keep the two words after the heap (0x0201F400 and 0x0201F404) across the RAM reset. */
+    anchor = 0x0401fb14;
+    offset = anchor + 0xfdfe0c00;
+    cookie0 = (u32 *)(anchor - offset);
+    saved0 = *cookie0;
+    anchor += 4;
+    cookie1 = (u32 *)(anchor - offset);
+    saved1 = *cookie1;
     RegisterRamReset(1);
     *cookie0 = saved0;
     *cookie1 = saved1;
@@ -59,17 +60,13 @@ void AgbMain(void)
     AnimData_InitPalettePool();
     SpriteTiles_LoadResource(ScriptProc_Start(0xceaa, 0x3002));
     AnimData_SetResourceBank(ScriptProc_Start(0x98f5, 0xff54));
+    REG_IME = 0;
     {
-        vu16 *ime = (vu16 *)0x04000208;
-        vu16 *ie;
-        u16 flags;
-        *ime = 0;
-        ie = (vu16 *)0x04000200;
-        flags = *ie;
-        *ie = 0;
-        *ie = 4 | flags;
-        *ime = 1;
+        u16 flags = REG_IE;
+        REG_IE = 0;
+        REG_IE = flags | 4;
     }
+    REG_IME = 1;
     Serial_InitMultiplayer();
     Time_CalculateSunriseSunset(0x23a666, 0x8bc000, 0);
     Script_InitRuntime();
