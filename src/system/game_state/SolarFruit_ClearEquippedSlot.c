@@ -1,6 +1,6 @@
 #include "global.h"
-extern u8 *gGameState;
+#include "system/game_state/game_state.h"
 void SolarFruit_ClearEquippedSlot(u32 i)
 {
-    *(s16 *)(gGameState + i * 2 + 0x90) = -1;
+    (&gGameState->slots88[4])[i] = -1;
 }
