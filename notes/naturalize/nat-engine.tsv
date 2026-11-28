@@ -72,3 +72,4 @@ src/engine/math/ScalarApproach_Snap8Array.c	ScalarApproach_Snap8Array	contrived	
 src/engine/math/ScalarApproach_Snap16Array.c	ScalarApproach_Snap16Array	contrived	natural	1	
 src/engine/math/sub_08221CC8.c	sub_08221CC8	contrived	natural	8	
 src/engine/math/sub_08221F54.c	sub_08221F54	contrived	natural	3	
+src/engine/math/ScalarApproach_DivideAngleStep.c	ScalarApproach_DivideAngleStep	contrived	natural	3	
