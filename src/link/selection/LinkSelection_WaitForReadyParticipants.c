@@ -1,4 +1,3 @@
-#define gLinkMenuFlags gEnginePauseFlags
 #include "link/selection/link_selection_mode.h"
 #include "global.h"
 #include "scene/areas/area_effect_link.h"
