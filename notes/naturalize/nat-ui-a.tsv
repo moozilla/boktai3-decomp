@@ -464,3 +464,4 @@ src/ui/hud/damage_numbers/damage_number_display.c	DamageNumberDisplay_RemoveGrou
 src/ui/hud/damage_numbers/damage_number_display.c	DamageNumberDisplay_UpdateBouncing	fudged	natural	7	
 src/ui/hud/damage_numbers/damage_number_display.c	DamageNumberDisplay_Update	fudged	natural	7	
 src/ui/hud/damage_numbers/damage_number_display.c	DamageNumberDisplay_Destroy	fudged	natural	1	
+src/ui/hud/damage_numbers/damage_number_display.c	DamageNumberDisplay_Initialize	fudged	natural	6	

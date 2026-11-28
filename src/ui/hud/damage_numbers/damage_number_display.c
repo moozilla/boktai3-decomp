@@ -278,43 +278,26 @@ void Effect_SetOrigin(void *, s32, s32);
 
 s32 DamageNumberDisplay_Initialize(struct DamageNumberDisplay *display)
 {
-    struct DamageNumberGroup *group;
-    struct DamageNumberGlyph *digit;
     s32 i;
-    s32 remaining;
-    struct DamageNumberGroup *nextGroup;
-    s32 nextIndex;
+    s32 j;
+    struct DamageNumberGroup *group;
+
     gDamageNumberDisplay = display;
     display->resource = AnimData_FindEntry(0x1C1C);
     display->activeMask = 0;
     group = display->groups;
-    i = 0;
-    do {
-        digit = group->digits;
-        {
-            u32 next = i + 1;
-            nextIndex = next;
+    for (i = 0; i < 4; i++, group++) {
+        struct DamageNumberGlyph *glyph = group->digits;
+
+        for (j = 0; j < 4; j++, glyph++) {
+            Effect_Initialize(glyph, display->resource, 0x10010);
+            Effect_SetOrigin(glyph, -4, -4);
+            SpriteDrawable_SelectTileFrame(glyph, display->resource, 0x20);
+            glyph->priority = 1;
         }
-        {
-            u32 offset = sizeof(*group);
-            nextGroup = (struct DamageNumberGroup *)(offset + (u32)group);
-        }
-        remaining = 3;
-        do {
-            Effect_Initialize(digit, display->resource, 0x10010);
-            Effect_SetOrigin(digit, -4, -4);
-            SpriteDrawable_SelectTileFrame(digit, display->resource, 0x20);
-            digit->priority = 1;
-            --remaining;
-            ++digit;
-        } while (remaining >= 0);
         group->priority = 3;
-        {
-            group->digitCount = 0;
-        }
-        i = nextIndex;
-        group = nextGroup;
-    } while (i <= 3);
+        group->digitCount = 0;
+    }
     return 0;
 }
 
