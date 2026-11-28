@@ -1,16 +1,14 @@
+#include "engine/word_flags.h"
 #include "scene/actor/scene_actor_control_helpers.h"
-void SceneActorControl_ResetCollisionPhase(struct ChaseActor *input)
+void SceneActorControl_ResetCollisionPhase(struct ChaseActor *actor)
 {
-    struct ChaseActor *actor = input;
-    u32 *state = (void *)SceneActorControl_GetMotionState(actor);
-    u32 mask = 0x100000;
-    u32 *flags = &actor->base.statusFlags;
-    *flags |= mask;
+    struct SceneActorControlMotionState *state = SceneActorControl_GetMotionState(actor);
+    WordFlags_Set(0x100000, &actor->base.statusFlags);
     {
         u32 mask;
-        state = (void *)((u8 *)state + 0x3D4);
+        u32 *stateFlags = &state->flags3D4;
         mask = ~7;
-        *state &= mask;
+        *stateFlags &= mask;
     }
     {
         struct ContactCollider *collider = &actor->base.colliderB;
