@@ -472,3 +472,4 @@ src/scene/actor/reaction/SceneActorReaction_BeginDefeatBurst.c	SceneActorReactio
 src/scene/actor/reaction/SceneActorReaction_ResumeAfterAnimation.c	SceneActorReaction_ResumeAfterAnimation	contrived	contrived	3	partial: motion/behavior mask locals stay; plain operators load the field first
 src/scene/actor/reaction/SceneActorReaction_RestoreAfterTurns.c	SceneActorReaction_RestoreAfterTurns	contrived	contrived	9	partial: random loop locals, entry/table pointer reuse and the final mask stay (register allocation)
 src/scene/actor/reaction/SceneActorReaction_SinkAndRemove.c	SceneActorReaction_SinkAndRemove	contrived	contrived	12	partial: mask-first locals and IsControlled stay; plain operators load the field first
+src/scene/actor/reaction/SceneActorReaction_BeginHiddenDefeat.c	SceneActorReaction_BeginHiddenDefeat	contrived	contrived	5	partial: Flag selector helper, IsPrimary, show flag and duplicate sound cases stay; direct forms change code

@@ -30,9 +30,7 @@ void SceneActorReaction_BeginHiddenDefeat(struct ChaseActor *actor)
         return;
     }
     if (IsPrimary(actor)) {
-        {
-            SceneActorReaction_ResetRouteControl(actor, &actor->group.common.control);
-        }
+        SceneActorReaction_ResetRouteControl(actor, &actor->group.common.control);
         /* Frame127 releases attachments without consuming offset outputs. */
         SceneActorAttachment_ReplaceResponseSlot(actor, 0, 127, 0);
         SceneActorAttachment_ReplaceResponseSlot(actor, 1, 127, 0);
