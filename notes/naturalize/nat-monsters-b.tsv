@@ -72,3 +72,4 @@ src/monsters/ivy/sub_080F2D00.c	sub_080F2D00	minor	natural	1	(u8) cast on the ca
 src/monsters/ivy/Ivy_WaitForSecondaryActionCompletion.c	Ivy_WaitForSecondaryActionCompletion	minor	natural	1	(u8) cast on the callback result
 src/monsters/ivy/PhaseObject_ApproachTarget.c	PhaseObject_ApproachTarget	minor	natural	1	
 src/monsters/ivy/PhaseObject_BeginEntryMotion.c	PhaseObject_BeginEntryMotion	contrived	natural	1	
+src/monsters/ivy/PhaseObject_EndApproachPause.c	PhaseObject_EndApproachPause	minor	natural	1	

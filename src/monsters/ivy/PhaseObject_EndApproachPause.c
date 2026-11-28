@@ -5,13 +5,13 @@ void PhaseObject_ApproachTarget(struct PhaseObject *);
 void PhaseObject_EndApproachPause(struct PhaseObject *p)
 {
     s32 i;
+
     if (!(p->frame & 3)) {
         if (--p->countdown == 0) {
             p->turnSpeed = -p->turnSpeed;
             PhaseObject_EnterMode(p, 1, 2);
             p->update = ChildGroup_UpdateTrailingMembers;
-            i = 0;
-            for (; i <= 3; i++) {
+            for (i = 0; i < 4; i++) {
                 p->entries[i].flags |= 1;
                 p->memberCollidersA[i].flags |= 4;
                 p->memberCollidersB[i].flags |= 4;
