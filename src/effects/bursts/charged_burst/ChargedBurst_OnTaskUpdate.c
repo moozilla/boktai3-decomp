@@ -1,7 +1,7 @@
-#include "global.h"
-void Callback_InvokeActor(void *, u32);
-u32 ChargedBurst_OnTaskUpdate(u8 *s)
+#include "effects/bursts/charged_burst.h"
+
+u32 ChargedBurst_OnTaskUpdate(struct ChargedBurst *burst)
 {
-    Callback_InvokeActor(s, *(u32 *)(s + 0x20c));
+    Callback_InvokeActor(burst, burst->state);
     return 0;
 }
