@@ -140,3 +140,4 @@ src/monsters/mummy/mummy_entry.c	SceneActor_EnterMotionPhase	contrived	contrived
 src/monsters/mummy/mummy_entry.c	Mummy_TryEngageTarget	contrived	contrived	39	gotos and many flag accessors remain
 src/monsters/mummy/mummy_entry.c	Mummy_UpdateBurnDamage	contrived	contrived	106	CASE_BODY tallies, parked values and flag helpers remain
 src/monsters/mummy/mummy_entry.c	SceneActor_StartAdjacentCellRoute	contrived	minor	13	parked 0xFFFFFDFF masks: mask loaded before the field
+src/monsters/mummy/mummy_entry.c	BouncingObject_RefreshNearbyHeading	contrived	contrived	13	repeated context locals and parked masks
