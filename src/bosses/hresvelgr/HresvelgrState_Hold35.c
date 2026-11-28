@@ -1,14 +1,14 @@
 #include "global.h"
 #include "bosses/hresvelgr/hresvelgr_travel.h"
 
-void HresvelgrState_Hold35(struct HresvelgrTravelActor *p)
+void HresvelgrState_Hold35(struct HresvelgrTravelActor *actor)
 {
-    struct HresvelgrTravelActor *base = p;
-    if (Hresvelgr_ConsumeActionEntry(p))
-        Hresvelgr_SetActionAnimation(p, 0x23);
-    if (p->finished) {
-        Hresvelgr_StartAction(p, 0, 0, base->savedPhase);
-        base->behaviorFinished = 1;
+    struct HresvelgrTravelActor *self = actor;
+    if (Hresvelgr_ConsumeActionEntry(actor))
+        Hresvelgr_SetActionAnimation(actor, 0x23);
+    if (actor->finished) {
+        Hresvelgr_StartAction(actor, 0, 0, self->savedPhase);
+        self->behaviorFinished = 1;
     }
-    p->actionTimer++;
+    actor->actionTimer++;
 }
