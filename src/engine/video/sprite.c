@@ -148,6 +148,7 @@ void Video_SetRenderCallbacks(u16 mode, u32 projected, u32 sprites, u32 extra)
 
 void Sprite_Init(struct DisplaySequenceSprite *sprite, const u8 *resource, u32 flags)
 {
+    u32 list;
     if (sprite->unknown4[0] == 0) {
         sprite->flags = flags;
         sprite->unknown4[1] = 1;
@@ -157,12 +158,10 @@ void Sprite_Init(struct DisplaySequenceSprite *sprite, const u8 *resource, u32 f
         sprite->attribute = 0;
         sprite->priority = 2;
         Sprite_ApplyAnimation(sprite, resource);
-        {
-            u32 list = (u32) - (flags & 0x80) >> 31;
-            sprite->previous = 0;
-            sprite->next = 0;
-            Sprite_LinkToList(sprite, list);
-        }
+        list = (u32) - (flags & 0x80) >> 31;
+        sprite->previous = 0;
+        sprite->next = 0;
+        Sprite_LinkToList(sprite, list);
     }
 }
 

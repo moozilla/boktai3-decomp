@@ -196,3 +196,4 @@ src/engine/video/interrupts_video.c	InterruptsAndVideo_OnVCount	contrived	contri
 src/engine/video/interrupts_video.c	InterruptsAndVideo_RunIdleHook	natural	natural	0	
 src/engine/video/interrupts_video.c	InterruptsAndVideo_RunFrameHook	natural	natural	0	
 src/engine/video/interrupts_video.c	InterruptsAndVideo_OnUnusedInterrupt	natural	natural	0	
+src/engine/video/sprite.c	Sprite_Init	contrived	minor	10	negate-and-shift list flag: (flags & 0x80) != 0 evaluates in another order (22 insns); stores of previous/next between the choice and the link stay
