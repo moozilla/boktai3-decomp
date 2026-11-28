@@ -347,3 +347,4 @@ src/bosses/vanargand/Vanargand_UpdateModeCycle.c	Vanargand_UpdateModeCycle	near-
 src/bosses/vanargand/Vanargand_UpdateProximityTransition.c	Vanargand_UpdateProximityTransition	near-natural	near-natural	2	object casts kept: reads from the incoming pointer
 src/bosses/vanargand/ActorSoundPhase_UpdateConditionalStop.c	ActorSoundPhase_UpdateConditionalStop	unchanged	unchanged	140	local struct and single-pass loop kept: the shared-struct form reads the mode from the other boss register
 src/bosses/vanargand/Vanargand_UpdateQueuedActionTransition.c	Vanargand_UpdateQueuedActionTransition	near-natural	near-natural	3	second boss alias kept
+src/bosses/vanargand/Vanargand_UpdateTimedAlternateTransition.c	Vanargand_UpdateTimedAlternateTransition	near-natural	near-natural	2	object cast kept: variant read from the incoming pointer

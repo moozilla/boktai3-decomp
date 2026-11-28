@@ -6,8 +6,7 @@ void Vanargand_UpdateTimedAlternateTransition(void *object)
     if (Vanargand_ConsumeActionEntry(p))
         Vanargand_EnterAction(p, 20);
     if (p->finished && p->actionTimer > 120) {
-        const struct VanargandPairAttack *source = object;
-        if (!source->variant) {
+        if (!((struct VanargandPairAttack *)object)->variant) {
             Vanargand_StartAction(p, 0, 0, 13);
             Vanargand_EnterAction(p, 1);
         } else {
