@@ -1,30 +1,24 @@
 #include "global.h"
-#include "scene/collision/packed_contact_halfwords.h"
-#include "scene/collision/packed_collider_extents.h"
-void Collider_Init(u8 *, u16, u32, u32, u32, struct PackedColliderExtents *,
-                   struct PackedColliderExtents *);
-void Collider_SetCallback(u8 *, void (*)(void), u8 *);
-void Collider_SetPosition(u8 *, u8 *, u32);
-s32 Collider_Refresh(u8 *);
+#include "monsters/cannons/vulcan_cannon_worker.h"
+#include "scene/collision/contact_actor.h"
+#include "engine/engine.h"
 void VulcanCannon_ApplyHitReaction(void);
-void Collider_SetBodyProperties(void *, u32, u32, u32);
-struct Q {
-    u8 pad[6];
-    u16 flags;
-};
-void VulcanCannon_InitCollider(u8 *p)
+
+void VulcanCannon_InitCollider(struct VulcanCannon *p)
 {
-    struct PackedColliderExtents a, b;
-    u8 *q = p + 0xb4;
-    a.xy.lo = 100;
-    a.xy.hi = 120;
-    a.zAndPad.lo = 100;
-    *(u32 *)&b.xy = 0x800000;
-    *(u32 *)&b.zAndPad &= 0xffff0000;
-    Collider_Init(q, 0, 0x5009, 0, 0x10, &a, &b);
-    Collider_SetPosition(q, p + 0x88, 0);
-    Collider_SetCallback(q, VulcanCannon_ApplyHitReaction, p);
-    Collider_SetBodyProperties(q, 0, *(u16 *)(p + 0x146), *(u16 *)(p + 0x148));
-    Collider_Refresh(q);
-    ((struct Q *)q)->flags |= 4;
+    struct ContactPackedVector size, offset;
+    struct ContactCollider *collider = &p->collider;
+
+    size.x = 100;
+    size.y = 120;
+    size.z = 100;
+    offset.x = 0;
+    offset.y = 128;
+    offset.z = 0;
+    Collider_Init(collider, 0, 0x5009, 0, 0x10, &size, &offset);
+    Collider_SetPosition(collider, &p->display.position, 0);
+    Collider_SetCallback(collider, VulcanCannon_ApplyHitReaction, p);
+    Collider_SetBodyProperties(collider, 0, (u16)p->bodyFlags, (u16)p->bodyPower);
+    Collider_Refresh(collider);
+    collider->flags |= 4;
 }

@@ -475,3 +475,4 @@ src/monsters/axe/axe.c	Axe_FollowAcceleratingRoute	contrived	contrived	0	random-
 src/monsters/axe/axe.c	Axe_UpdateRouteDestinationPhase	contrived	contrived	2	three pointers to one stack vector: each one holds a different stack address register
 src/monsters/axe/axe.c	Axe_Init	minor	minor	0	large initializer written through MonsterInit_ accessors
 src/monsters/axe_armor/AxeArmor_RecordDefeat.c	AxeArmor_RecordDefeat	minor	minor	0	H() halfword view of the game state counters
+src/monsters/cannons/vulcan/VulcanCannon_InitCollider.c	VulcanCannon_InitCollider	contrived	natural	4	
