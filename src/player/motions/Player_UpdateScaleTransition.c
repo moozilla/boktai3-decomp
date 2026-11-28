@@ -2,9 +2,6 @@
 #include "player/player.h"
 #include "player/player_status_flags.h"
 
-#define Player_ConsumePhaseEntry     Player_ConsumeStateEntry
-#define Player_SetSequenceCallback   Player_SetPendingCallback
-#define Player_ClearAnimationFlagTwo Player_OnFadeMotionExit
 u32 Player_ConsumeStateEntry(struct Player *);
 void Player_SetPendingCallback(struct Player *, void (*)(struct Player *));
 void Player_OnFadeMotionExit(struct Player *);
@@ -22,31 +19,23 @@ void Player_UpdateScaleTransition(struct Player *p)
     p->statusFlags |= 0x1100;
     Player_AddControlFlags(p, 28);
     switch (p->tetherPhase) {
-        case 0: {
-            u16 frame = p->tetherFrame;
-            if (frame <= 63) {
-                s32 scale = 64 - frame;
-                p->animation.scaleX = scale;
-                p->animation.scaleY = scale;
+        case 0:
+            if (p->tetherFrame <= 63) {
+                p->animation.scaleY = p->animation.scaleX = 64 - p->tetherFrame;
                 p->tetherFrame++;
             } else
                 Player_SetActionPhase(p, 1);
-        } break;
+            break;
         case 1:
             Player_AddControlFlags(p, 1);
             break;
         case 2:
             animation->flags &= ~1;
-            {
-                s32 n = p->tetherFrame + 1;
-                long long scale = n;
-                if ((p->tetherFrame = n) <= 63) {
-                    p->animation.scaleX = scale;
-                    p->animation.scaleY = scale;
-                } else {
-                    animation->flags &= ~2;
-                    ActorSequence_Begin(p, 0, 0);
-                }
+            if (++p->tetherFrame < 64) {
+                p->animation.scaleY = p->animation.scaleX = p->tetherFrame;
+            } else {
+                animation->flags &= ~2;
+                ActorSequence_Begin(p, 0, 0);
             }
             break;
     }
