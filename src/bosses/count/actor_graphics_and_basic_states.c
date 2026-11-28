@@ -351,14 +351,13 @@ void SceneActors_AddHealthCost(int amount)
 }
 void SceneActors_AddResourceCost(int amount)
 {
-    struct StateActor *p;
+    struct SceneGraphicsActor *actor;
     if (amount > 0) {
-        p = SceneActors_GetBySlot(0);
-        if (p)
-            ((struct SceneGraphicsActor *)p)->graphics.resourceCostAccumulator += amount;
+        actor = (struct SceneGraphicsActor *)SceneActors_GetBySlot(0);
+        if (actor)
+            actor->graphics.resourceCostAccumulator += amount;
     }
 }
-
 // confidence=low: index of the first of the count tracked positions at 0x110 that lies inside
 // the box min..max on x and z, or -1.
 struct BoxSearchPosition {

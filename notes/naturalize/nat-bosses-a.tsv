@@ -14,3 +14,4 @@ src/bosses/count/actor_graphics_and_basic_states.c	SceneActorState_SetValueClamp
 src/bosses/count/actor_graphics_and_basic_states.c	SceneActors_StartDisappearEffect	minor	natural	1	
 src/bosses/count/actor_graphics_and_basic_states.c	SceneActors_RequestContactPoolClear	minor	natural	1	
 src/bosses/count/actor_graphics_and_basic_states.c	SceneActors_AddHealthCost	contrived	natural	3	
+src/bosses/count/actor_graphics_and_basic_states.c	SceneActors_AddResourceCost	minor	natural	1	
