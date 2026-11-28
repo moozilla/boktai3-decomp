@@ -359,3 +359,4 @@ src/scene/actor/motion_track.c	OrbitMotion_BeginArc	minor	minor	0	target-pointer
 src/scene/actor/motion_track.c	PositionMotion_InitParameterizedApproach	natural	natural	0	-
 src/scene/actor/scene_actors.c	SceneActors_FindAvailable	contrived	minor	1	cast from the byte-pointer registry to the actor type
 src/scene/actor/scene_actors.c	SceneActors_SetHealthLimits	contrived	minor	3	gGameState->unk61C pointer block: a direct store reorders the pointer load
+src/scene/actor/scene_actors.c	SceneActors_StartDirectionalAnimation	contrived	natural	6	-

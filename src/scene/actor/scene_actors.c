@@ -158,9 +158,7 @@ void SceneActors_StartDirectionalAnimation(struct StateActor *actor, struct Anim
                                            int resource, int sequence, int speed, int offset,
                                            int flags)
 {
-    int savedFlags = flags;
-    flags = savedFlags;
-    if (((u8)(actor->animationFacing4 - 1)) <= 1) {
+    if (actor->animationFacing4 == 1 || actor->animationFacing4 == 2) {
         actor->animationOffset = offset;
     } else {
         actor->animationOffset = 0;
@@ -170,17 +168,11 @@ void SceneActors_StartDirectionalAnimation(struct StateActor *actor, struct Anim
     } else {
         actor->animationMirrored = 0;
     }
-    {
-        int selected = actor->animationOffset + sequence;
-        actor->animationSequence = selected;
-    }
+    actor->animationSequence = actor->animationOffset + sequence;
     Anim_SetKeyframes(animation, (void *)resource, actor->animationSequence, (u16)speed,
                       (u16)flags);
-    flags &= 1;
-    savedFlags = 0;
-    if (!flags) {
-        actor->animationCompletions = savedFlags;
-    }
+    if (!(flags & 1))
+        actor->animationCompletions = 0;
     if (actor->animationMirrored) {
         animation->flags |= 4;
     } else {
