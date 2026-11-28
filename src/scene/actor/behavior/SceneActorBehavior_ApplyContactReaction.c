@@ -1,14 +1,10 @@
 #include "scene/collision/collision_response.h"
 #include "scene/actor/scene_actor_behavior.h"
 #include "scene/actor/scene_actor_placement.h"
-void SceneActor_SetContactReactionDirection(struct RoomActor *,
-                                            struct ContactCollider *,
+void SceneActor_SetContactReactionDirection(struct RoomActor *, struct ContactCollider *,
                                             struct ContactCollider *);
 void PlayerStats_AddContactHundredths(struct ContactCollider *, void *, u32);
-static inline u32 Unavailable(struct RoomActor *actor)
-{
-    return SceneActorPlacement_IsUnavailable(actor);
-}
+
 static inline u32 ReadReactionFlags(u32 inputMask, struct ContactCollider *source)
 {
     u32 mask = inputMask;
@@ -19,11 +15,11 @@ void SceneActorBehavior_ApplyContactReaction(struct ContactCollider *source,
                                              struct RoomActor *actor)
 {
     struct ContactCollider *primary;
-    u32 unavailable = Unavailable(actor);
+    u32 unavailable = SceneActorPlacement_IsUnavailable(actor);
     if (unavailable)
         return;
     primary = &actor->colliderA;
-    if (actor->colliderA.responseValue) {
+    if (primary->responseValue) {
         if (actor->field2E6) {
             destination->cost = unavailable;
             destination->costFlags = 0;
@@ -42,10 +38,7 @@ void SceneActorBehavior_ApplyContactReaction(struct ContactCollider *source,
     }
     Collision_CalculateDamageResponse(source, destination);
     destination->responseValue = source->responseValue;
-    {
-        u32 mode = destination->costFlags;
-        actor->field2E6 = mode;
-    }
+    actor->field2E6 = destination->costFlags;
     if ((u32)(actor->category - 18) <= 2 || actor->category == 23) {
         destination->responseParameter = source->responseParameter;
     } else if (ReadReactionFlags(0x40000, source)) {
@@ -63,9 +56,7 @@ void SceneActorBehavior_ApplyContactReaction(struct ContactCollider *source,
         u32 parameter = source->statRewardFlags;
         u32 reaction = source->reactionFlags;
         actor->hitAttributes = parameter;
-        {
-            actor->hitReactionFlags = reaction;
-        }
+        actor->hitReactionFlags = reaction;
     }
     {
         u32 mask = 0x800;
@@ -81,8 +72,6 @@ void SceneActorBehavior_ApplyContactReaction(struct ContactCollider *source,
     PlayerStats_AddContactHundredths(source, destination, actor->contactReward);
     {
         u32 mask = 0x2000;
-        u32 *field;
-        field = &actor->behaviorFlags;
-        *field |= mask;
+        actor->behaviorFlags |= mask;
     }
 }
