@@ -13,3 +13,4 @@ src/effects/bat_flock.c	BatFlockBat_ApproachTarget	contrived	minor	6	one positio
 src/effects/bat_flock.c	BatFlockBat_ConvergeOnTarget	contrived	minor	1	one position pointer for the dz read
 src/effects/bat_flock.c	BatFlockBat_HomeToTarget	contrived	minor	2	one position pointer for the dz read
 src/effects/bat_flock.c	BatFlockBat_ChasePlayer	contrived	minor	20	active flag local, position/target pointers and the split vector add: the ROM keeps both addresses in registers
+src/effects/bat_flock.c	BatFlockBat_Launch	minor	natural	1	

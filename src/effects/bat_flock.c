@@ -424,15 +424,14 @@ static inline struct ContactPosition *addPositionN(struct ContactPosition *d,
 void BatFlockBat_Launch(struct GroupObjects *m, struct GroupPiece *p, int delay)
 {
     struct ContactPosition delta;
+
     if (p->active)
         p->active = 0;
     polar(&delta, p->direction, p->duration * 2);
     addPosition(&p->position, &delta);
     BatFlockBat_SetFacingAnim(m, p, 0);
     if (p->timer >= delay + 2) {
-        p->state = 1;
-        p->active = 1;
-        p->timer = 0;
+        BatFlockBat_SetState(p, 1);
     }
     p->timer++;
 }
