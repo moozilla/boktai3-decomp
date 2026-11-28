@@ -578,7 +578,7 @@ void FloorTrap_CreateFromScript(void)
             break;
     }
     Sprite_Init(sprite, &manager->graphics, 0);
-    Anim_SetSequence(&trigger->animation, manager->animationData, 0, *(u8 *)&trigger->sequence, 0);
+    Anim_SetSequence(&trigger->animation, manager->animationData, 0, (u8)trigger->sequence, 0);
     f = &trigger->animation;
     frame = &f->commands[f->index];
     DisplaySequence_ApplyFrame((void *)sprite, (void *)f, (const u16 *)frame);

@@ -254,3 +254,4 @@ src/objects/floor_traps.c	FloorTrap_RestartHold	natural	natural	0
 src/objects/floor_traps.c	FloorTrapPool_EnterStateThree	natural	natural	0	
 src/objects/floor_traps.c	FloorTrap_SetStateFromScript	contrived	natural	7	
 src/objects/floor_traps.c	Tile_SetEnabledFromScript	minor	natural	1	
+src/objects/floor_traps.c	FloorTrap_CreateFromScript	contrived	contrived	345	inlined sequence step and countdown argument loops: PlayerCue_StepSequence() and index loops come within 9 instructions but gcse spill-slot order differs
