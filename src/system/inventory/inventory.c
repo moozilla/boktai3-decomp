@@ -196,12 +196,6 @@ void SceneHud_ApplyTimedSceneMode(struct SceneHudState *s, s32 mode, s32 duratio
     }
 }
 
-struct StatBlock {
-    u8 pad[0x18];
-    s16 base[4];
-    s16 bonus[4];
-};
-
 s32 Mod(s32, s32);
 
 static inline int nextRandom(void)
@@ -214,26 +208,23 @@ static inline int nextRandom(void)
 
 s32 SceneHud_SelectUpgradeableStat(s32 amount)
 {
-    s32 start, i, a;
-    struct StatBlock *g;
-    a = amount;
-    start = Mod(nextRandom() >> 3, 3);
-    g = gGameState;
-    {
-        s16 *e = (s16 *)(start * 2 + (u32)g);
-        if (e[12] + e[16] + a > 100)
-            a = 100 - e[12] - e[16];
-    }
-    if (a > 0)
+    s32 increase = amount;
+    s32 start = Mod(nextRandom() >> 3, 3);
+    s32 i;
+
+    if (*(s16 *)&gGameState->baseStats[start] + *(s16 *)&gGameState->statBonuses[start] + increase >
+        100)
+        increase =
+            100 - *(s16 *)&gGameState->baseStats[start] - *(s16 *)&gGameState->statBonuses[start];
+    if (increase > 0)
         return start;
-    for (i = 0; i <= 2; i++) {
-        a = amount;
-        {
-            s16 *e = (s16 *)(i * 2 + (u8 *)g);
-            if (e[12] + e[16] + a > 100)
-                a = 100 - e[12] - e[16];
-        }
-        if (a > 0)
+    for (i = 0; i < 3; i++) {
+        increase = amount;
+        if (*(s16 *)&gGameState->baseStats[i] + *(s16 *)&gGameState->statBonuses[i] + increase >
+            100)
+            increase =
+                100 - *(s16 *)&gGameState->baseStats[i] - *(s16 *)&gGameState->statBonuses[i];
+        if (increase > 0)
             return i;
     }
     return 0xff;
