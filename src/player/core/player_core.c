@@ -117,17 +117,12 @@ void Player_RunPendingCallback(struct Player *player)
     }
 }
 
-static inline struct GameState *EventCounterBase(u32 slot, struct GameState *state)
-{
-    return (void *)((slot * sizeof(state->counters628[0])) + (u32)state);
-}
-
 void Player_ResetStatus(struct Player *player)
 {
     player->statusFlags = 1;
-    if (*(s32 *)(u32)&EventCounterBase(player->timedEventSlot, gGameState)->counters628[0] < 0)
-        *(s32 *)(u32)&EventCounterBase(player->timedEventSlot, gGameState)->counters628[0] = 0;
-    if (*(s32 *)(u32)&EventCounterBase(player->timedEventSlot, gGameState)->counters628[0] == 0 &&
+    if (*(gGameState->counters628 + player->timedEventSlot) < 0)
+        *(gGameState->counters628 + player->timedEventSlot) = 0;
+    if (*(gGameState->counters628 + player->timedEventSlot) == 0 &&
         AreaEffect_TestPlayerCoverage((u8 *)player))
         Player_SetStatusBits(&player->statusFlags, 0x10);
     if (player && Player_ReadStatusBits(&player->statBonusFlags, 0x2000))
