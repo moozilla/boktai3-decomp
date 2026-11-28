@@ -613,3 +613,4 @@ src/player/interaction/Player_SetActionOrigin.c	Player_SetActionOrigin	natural	n
 src/player/interaction/Player_CanRecoverResourceWhileFlagged.c	Player_CanRecoverResourceWhileFlagged	minor	minor	1	Player_ReadStatusBits: ROM loads the mask before the status word
 src/player/interaction/Player_CanRecoverResourceWhileUnflagged.c	Player_CanRecoverResourceWhileUnflagged	minor	minor	1	Player_ReadStatusBits: ROM loads the mask before the status word
 src/player/interaction/Player_UpdateHeldInteraction.c	Player_UpdateHeldInteraction	contrived	minor	4	Player_AddStatusFlags: ROM loads the mask before the status word
+src/player/interaction/Player_UpdateHeldEnergyBurst.c	Player_UpdateHeldEnergyBurst	minor	natural	1	-
