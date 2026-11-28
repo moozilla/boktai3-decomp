@@ -1,17 +1,11 @@
 #include "global.h"
+#include "ui/results/stage_results.h"
 #include "system/game_state/game_state.h"
 
-struct StageResults {
-    u8 pad0[0x11C0];
-    u32 summaryScript;
-    u8 pad11C4[8];
-    u32 textWindows[3];
-};
-
-void TextWindow_SetScript(u32, u32);
-void TextWindow_Refresh(u32, u32);
-void TextWindow_SetString(u32, u32, void *);
-void TextWindow_StartPlayback(u32);
+void TextWindow_SetScript(s32, u8 *);
+void TextWindow_Refresh(s32, s32);
+void TextWindow_SetString(s32, s32, u8 *);
+void TextWindow_StartPlayback(s32);
 
 void StageResults_ShowSummaryText(struct StageResults *results)
 {
