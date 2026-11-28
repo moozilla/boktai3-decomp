@@ -22,7 +22,6 @@ s32 Trap_CreateFromScript(u8 *top)
     s32 result;
     s32 i;
     u8 *pc;
-    u16 *list, *names, *count;
     s32 type, value;
     Trap_GetDispatchStarted();
     Memory_Clear(&trap, sizeof(trap));
@@ -40,31 +39,16 @@ s32 Trap_CreateFromScript(u8 *top)
         trap.event = 0x14C9;
     else if (trap.event == '*')
         trap.event = 0x1516;
-    list = trap.w;
-    names = trap.names;
-    count = &trap.count;
-    {
-        u16 *base = list;
-        s32 zero = 0;
-        u16 *out = trap.w + 3;
-        do {
-            *out-- = zero;
-        } while ((s32)out >= (s32)base);
-    }
+    for (i = 0; i < 4; i++)
+        trap.w[i] = 0;
     if (Script_SeekToKeyword('w'))
         for (i = 0; i < 4 && (pc = Script_GetPc()); i++)
-            *list++ = Script_ReadValue(pc);
-    {
-        u16 *base = *&names; /* taking the address keeps names+3 from being hoisted */
-        s32 zero = 0;
-        u16 *out = names + 3;
-        do {
-            *out-- = zero;
-        } while ((s32)out >= (s32)base);
-    }
+            trap.w[i] = Script_ReadValue(pc);
+    for (i = 0; i < 4; i++)
+        trap.names[i] = 0;
     if (Script_SeekToKeyword('s'))
-        for (i = 0, list = names; i < 4 && (pc = Script_GetPc()); i++)
-            *list++ = Script_ReadValue(pc);
+        for (i = 0; i < 4 && (pc = Script_GetPc()); i++)
+            trap.names[i] = Script_ReadValue(pc);
     if (Script_SeekToKeyword('b')) {
         trap.flags |= 0x10;
         trap.b = Script_GetValue();
@@ -78,7 +62,7 @@ s32 Trap_CreateFromScript(u8 *top)
     }
     trap.flags |= 0; /* reproduces the original's reload and store */
     trap.count = 0;
-    trap.region = Terrain_FindBoxesById(trap.id, count);
+    trap.region = Terrain_FindBoxesById(trap.id, &trap.count);
     if (trap.region) {
         Trap_Register(&trap, top);
         result = 0;
