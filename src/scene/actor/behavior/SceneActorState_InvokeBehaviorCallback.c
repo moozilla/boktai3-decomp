@@ -1,13 +1,9 @@
 #include "global.h"
-struct S {
-    u8 filler[0x294];
-    u32 *tbl;
-    u8 f2[0x12];
-    u8 idx;
-};
-void Callback_InvokeActor(void *, u32);
-void SceneActorState_InvokeBehaviorCallback(struct S *p)
+#include "scene/motion/scene_actor_terrain_reaction.h"
+
+s32 Callback_InvokeActor(void *, void *);
+
+void SceneActorState_InvokeBehaviorCallback(struct ChaseActor *actor)
 {
-    u32 i = p->idx;
-    Callback_InvokeActor(p, p->tbl[i]);
+    Callback_InvokeActor(actor, actor->base.callbacks294[actor->base.behavior2AA]);
 }
