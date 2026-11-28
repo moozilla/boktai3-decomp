@@ -476,7 +476,7 @@ src/monsters/axe/axe.c	Axe_UpdateRouteDestinationPhase	contrived	contrived	2	thr
 src/monsters/axe/axe.c	Axe_Init	minor	minor	0	large initializer written through MonsterInit_ accessors
 src/monsters/axe_armor/AxeArmor_RecordDefeat.c	AxeArmor_RecordDefeat	minor	minor	0	H() halfword view of the game state counters
 src/monsters/cannons/vulcan/VulcanCannon_InitCollider.c	VulcanCannon_InitCollider	contrived	natural	4	
-src/monsters/cannons/vulcan/VulcanCannon_ApplyHitReaction.c	VulcanCannon_ApplyHitReaction	contrived	natural	3	
+src/monsters/cannons/vulcan/VulcanCannon_ApplyHitReaction.c	VulcanCannon_ApplyHitReaction	contrived	minor	3	spark loop keeps random index/limit/mask locals
 src/monsters/cannons/vulcan/VulcanCannon_ReadScriptValueList.c	VulcanCannon_ReadScriptValueList	contrived	natural	3	
 src/monsters/cannons/vulcan/VulcanCannon_RecordDefeat.c	VulcanCannon_RecordDefeat	contrived	minor	3	H() halfword view for the unnamed game-state counters
 src/monsters/axe_armor/AxeArmor_ReadScriptValueList.c	AxeArmor_ReadScriptValueList	contrived	natural	1	
@@ -491,6 +491,11 @@ src/monsters/dragon_puppy/DragonPuppy_InitCollider.c	DragonPuppy_InitCollider	co
 src/monsters/garmr_statue/GarmrStatue_InitCollider.c	GarmrStatue_InitCollider	contrived	natural	2	
 src/monsters/cannons/wind/WindCannon_ReadToggleSchedule.c	WindCannon_ReadToggleSchedule	contrived	natural	2	
 src/monsters/dragon_puppy/DragonPuppy_ReadAttackSchedule.c	DragonPuppy_ReadAttackSchedule	contrived	natural	2	
-src/monsters/dragon_puppy/DragonPuppy_ApplyHitReaction.c	DragonPuppy_ApplyHitReaction	contrived	natural	2	
-src/monsters/garmr_statue/GarmrStatue_ApplyHitReaction.c	GarmrStatue_ApplyHitReaction	contrived	natural	2	
-src/monsters/cannons/wind/WindCannon_ApplyHitReaction.c	WindCannon_ApplyHitReaction	contrived	natural	2	
+src/monsters/dragon_puppy/DragonPuppy_ApplyHitReaction.c	DragonPuppy_ApplyHitReaction	contrived	minor	2	spark loop keeps random index/limit/mask locals
+src/monsters/garmr_statue/GarmrStatue_ApplyHitReaction.c	GarmrStatue_ApplyHitReaction	contrived	minor	2	spark loop keeps random index/limit/mask locals
+src/monsters/cannons/wind/WindCannon_ApplyHitReaction.c	WindCannon_ApplyHitReaction	contrived	minor	2	spark loop keeps random index/limit/mask locals
+src/monsters/cannons/plasma/PlasmaCannon_ApplyHitReaction.c	PlasmaCannon_ApplyHitReaction	contrived	contrived	0	allocation-only parameter reuse and a dead bounded guard: typed form without them changes reload registers
+src/monsters/dragon_puppy/DragonPuppy_OnTaskDestroy.c	DragonPuppy_OnTaskDestroy	minor	minor	0	byte-offset Sprite_Remove argument with a local s32 prototype that the header declares void
+src/monsters/cannons/vulcan/VulcanCannon_Destroy.c	VulcanCannon_Destroy	minor	minor	0	byte-offset Sprite_Remove argument with a local s32 prototype that the header declares void
+src/monsters/garmr_statue/GarmrStatue_OnTaskDestroy.c	GarmrStatue_OnTaskDestroy	natural	natural	0	
+src/monsters/cannons/plasma/PlasmaCannon_OnTaskDestroy.c	PlasmaCannon_OnTaskDestroy	natural	natural	0	
