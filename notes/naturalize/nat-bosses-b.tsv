@@ -46,3 +46,4 @@ src/bosses/ratatosk/Ratatosk_UpdateKnockbackRecovery.c	Ratatosk_UpdateKnockbackR
 src/bosses/ratatosk/Ratatosk_UpdateOrbitingParticlePose.c	Ratatosk_UpdateOrbitingParticlePose	contrived	minor	8	one mask-parameter flag accessor stays
 src/bosses/ratatosk/Ratatosk_UpdateLongTimedPose.c	Ratatosk_UpdateLongTimedPose	minor	natural	2	
 src/bosses/ratatosk/Ratatosk_UpdateTimedPose.c	Ratatosk_UpdateTimedPose	minor	minor	2	actor alias stays: ROM keeps a second copy
+src/bosses/ratatosk/Ratatosk_UpdateTimedPoseVariant.c	Ratatosk_UpdateTimedPoseVariant	minor	minor	2	actor alias stays: ROM keeps a second copy
