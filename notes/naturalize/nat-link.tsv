@@ -257,3 +257,4 @@ src/link/player/sub_0823EE80.c	sub_0823EE80	contrived	natural	34	collider calls 
 src/link/player/Player_UpdateTetherRecall.c	Player_UpdateTetherRecall	contrived	natural	1	
 src/link/player/Player_UpdateChargedTetherStrike.c	Player_UpdateChargedTetherStrike	contrived	natural	2	
 src/link/player/Player_UpdateChargedDashAttack.c	Player_UpdateChargedDashAttack	contrived	natural	25	
+src/link/player/Player_UpdateChargedSpinAttack.c	Player_UpdateChargedSpinAttack	contrived	natural	4	
