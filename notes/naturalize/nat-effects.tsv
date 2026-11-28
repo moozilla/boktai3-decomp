@@ -214,3 +214,4 @@ src/effects/directional_effect/DirectionalEffect_AddParticle.c	DirectionalEffect
 src/effects/feathers/sub_08128B48.c	sub_08128B48	natural	natural	0	-
 src/effects/feathers/FeatherEffectPool_AllocEntry.c	FeatherEffectPool_AllocEntry	contrived	natural	2	-
 src/effects/feathers/FeatherEffectPool_UpdateOpeningAnimation.c	FeatherEffectPool_UpdateOpeningAnimation	minor	natural	6	-
+src/effects/feathers/FeatherEffectPool_ClipScatterPath.c	FeatherEffectPool_ClipScatterPath	contrived	partial	40	cell variable reused for the random table address (constant-pseudo priority); UBFIX return
