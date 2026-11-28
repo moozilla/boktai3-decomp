@@ -172,3 +172,4 @@ src/link/player/sub_0823A830.c	sub_0823A830	contrived	natural	1	field names come
 src/link/player/LinkPlayer_GetSelectedAbilityCost.c	LinkPlayer_GetSelectedAbilityCost	contrived	natural	2	
 src/link/player/LinkPlayer_HasAbilityEnergy.c	LinkPlayer_HasAbilityEnergy	contrived	natural	1	
 src/link/player/Player_ConsumeActionResource.c	Player_ConsumeActionResource	minor	natural	1	
+src/link/player/sub_0823ABA8.c	sub_0823ABA8	contrived	natural	2	

@@ -1,8 +1,9 @@
 #include "global.h"
+#include "player/player.h"
 
-bool32 sub_0823ABA8(u8 *p, s32 value)
+bool32 sub_0823ABA8(struct Player *p, s32 amount)
 {
-    if (*(u16 *)(p + 0x428) < value)
+    if (p->currentStatB < amount)
         return FALSE;
     return TRUE;
 }
