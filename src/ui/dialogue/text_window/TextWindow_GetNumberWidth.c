@@ -1,13 +1,17 @@
 #include "global.h"
+#include "engine/ram.h"
+#include "ui/dialogue/text_window.h"
+#include "ui/dialogue/text_window_manager.h"
 /* TextWindow_GetNumberWidth: Returns the decimal display width of an indexed number including its sign */
 
-u8 *TextWindow_Find(u32);
-s32 TextState_GetNumberWidth(void *, u32);
+struct TextWindow *TextWindow_Find(int);
+int TextState_GetNumberWidth(struct TextState *, int);
 
-s32 TextWindow_GetNumberWidth(u32 id, u32 arg)
+int TextWindow_GetNumberWidth(int id, int index)
 {
-    u8 *w = TextWindow_Find(id);
-    if (w == NULL)
+    struct TextWindow *window = TextWindow_Find(id);
+
+    if (!window)
         return -1;
-    return TextState_GetNumberWidth(w + 0x60, arg);
+    return TextState_GetNumberWidth(&window->text, index);
 }

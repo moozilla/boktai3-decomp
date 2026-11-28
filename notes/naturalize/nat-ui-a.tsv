@@ -350,3 +350,4 @@ src/ui/dialogue/text_window/TextWindow_SetNumber.c	TextWindow_SetNumber	fudged	n
 src/ui/dialogue/text_window/TextWindow_SetString.c	TextWindow_SetString	fudged	natural	4	
 src/ui/dialogue/text_window/TextWindow_SetPlaybackRate.c	TextWindow_SetPlaybackRate	fudged	partial	1	int function returns no value on success; needed for the match
 src/ui/dialogue/text_window/TextWindow_GetBounds.c	TextWindow_GetBounds	fudged	natural	2	
+src/ui/dialogue/text_window/TextWindow_GetNumberWidth.c	TextWindow_GetNumberWidth	fudged	natural	1	
