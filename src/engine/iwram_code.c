@@ -15,12 +15,14 @@ extern struct PaletteBank gObjPaletteBuffer[];
 /* Same cache as Palette_CacheObjectBank, with a word copy instead of CpuFastSet. */
 u32 Palette_CacheObjectBankArm(u32 key, u32 *src)
 {
-    s32 i = 0;
-    for (; i < gObjPaletteBankCount; i++)
+    s32 i;
+
+    for (i = 0; i < gObjPaletteBankCount; i++) {
         if (gObjPaletteKeys[i] == key)
-            goto found;
+            return i;
+    }
     if (gObjPaletteBankCount > 15)
-        goto overflow;
+        return 0;
     {
         s32 n = gObjPaletteBankCount;
         u32 *dst = gObjPaletteBuffer[n].words;
@@ -35,10 +37,6 @@ u32 Palette_CacheObjectBankArm(u32 key, u32 *src)
         dst[7] = src[7];
         return gObjPaletteBankCount++;
     }
-found:
-    return i;
-overflow:
-    return 0;
 }
 
 struct IwVec {
