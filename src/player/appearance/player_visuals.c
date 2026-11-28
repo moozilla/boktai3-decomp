@@ -1973,11 +1973,10 @@ s32 Player_CanAffordEnchantment(struct Player *p)
 void Player_SpendEnchantmentEnergy(struct Player *p)
 {
     s32 cost = Player_GetEnchantmentEnergyCost(p);
-    u16 *energy = &p->currentStatB;
-    if (*energy < cost)
-        *energy = 0;
+    if (p->currentStatB < cost)
+        p->currentStatB = 0;
     else
-        *energy -= cost;
+        p->currentStatB -= cost;
 }
 
 s32 Player_IsEnchantmentAvailable(struct Player *unused, s32 kind)
