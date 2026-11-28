@@ -280,11 +280,9 @@ void ScriptActor_ClearSlotsFromScript(void)
     s32 index = Script_GetActorIndex();
     player = gPlayers[index];
     if (player) {
-        s32 slot = 0;
-        do {
+        s32 slot;
+        for (slot = 0; slot < 2; slot++)
             Player_ClearStateTimer(player, slot);
-            slot++;
-        } while (slot <= 1);
     }
 }
 

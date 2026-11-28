@@ -345,3 +345,21 @@ src/player/cutscene/player_script_stats.c	Script_GetActorIndex	contrived	natural
 src/player/cutscene/player_script_stats.c	Script_ReadPositionOption	minor	natural	3	-
 src/player/cutscene/player_script_stats.c	ScriptActor_SetPositionFromScript	natural	natural	0	-
 src/player/cutscene/player_script_stats.c	ScriptActor_GetFacingFromScript	minor	minor	3	actor/player alias pair fixes register copy order
+src/player/cutscene/player_script_stats.c	PlayerCue_IsStateFour	natural	natural	0	-
+src/player/cutscene/player_script_stats.c	ScriptActor_IsLocomotionActiveFromScript	natural	natural	0	-
+src/player/cutscene/player_script_stats.c	ScriptActor_SetLifeEnergyFromScript	minor	minor	4	unchanged: save-field casts select the halfword store forms
+src/player/cutscene/player_script_stats.c	ScriptActor_SetLevelFromScript	natural	natural	0	-
+src/player/cutscene/player_script_stats.c	ScriptActor_SetEnergyMaxFromScript	natural	natural	0	-
+src/player/cutscene/player_script_stats.c	Player_AddExpFromScript	natural	natural	0	-
+src/player/cutscene/player_script_stats.c	ScriptActor_TestFlagFromScript	minor	minor	1	unchanged: second actor alias
+src/player/cutscene/player_script_stats.c	Player_InitField42C	natural	natural	0	-
+src/player/cutscene/player_script_stats.c	Player_SetStatScaleFromScript	natural	natural	0	-
+src/player/cutscene/player_script_stats.c	ScriptActor_ApplyItemFromScript	natural	natural	0	-
+src/player/cutscene/player_script_stats.c	ScriptActor_GetActiveSceneMode	minor	minor	1	unchanged: actor/player alias pair
+src/player/cutscene/player_script_stats.c	ScriptActor_ClearSceneModeAndActivity	natural	natural	0	-
+src/player/cutscene/player_script_stats.c	ScriptActor_SetActionFlagsFromScript	minor	minor	1	unchanged: actor/player alias pair
+src/player/cutscene/player_script_stats.c	ScriptActor_EmitEffectsFromScript	natural	natural	0	-
+src/player/cutscene/player_script_stats.c	Player_TestScriptStatus	contrived	contrived	5	unchanged: shared fail label orders the return-zero block
+src/player/cutscene/player_script_stats.c	Player_SetSlotValueFromScript	natural	natural	0	-
+src/player/cutscene/player_script_stats.c	ScriptActor_ClearSlotFromScript	natural	natural	0	-
+src/player/cutscene/player_script_stats.c	ScriptActor_ClearSlotsFromScript	minor	natural	1	-
