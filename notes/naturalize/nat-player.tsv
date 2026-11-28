@@ -178,3 +178,4 @@ src/player/clone.c	PlayerClone_BeginActiveReactions	contrived	natural	3	-
 src/player/clone.c	PlayerClone_InitSlot	contrived	minor	20	velocity clear, sprite pointer and shared collider pointer stay: direct forms change register allocation
 src/player/clone.c	PlayerClone_UpdatePool	contrived	contrived	28	do/goto loop, animation/collider pointer copies, area work struct, direction/callback/pause locals: plain forms change register allocation
 src/player/clone.c	PlayerClone_UpdateBehavior	contrived	minor	55	bare return when the drawable pool is missing (returning pool changes layout); CpuSet wrapper and fill word: direct call changes the stack address order; animation pointer in the rise case
+src/player/clone.c	PlayerClone_BeginActiveReactions	minor	natural	1	

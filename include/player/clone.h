@@ -11,13 +11,6 @@ struct CloneCallback {
     u16 attack, element;
 };
 
-/* Reset the base animation and start its idle keyframe. */
-#define PLAYER_CLONE_START_IDLE(index_, base_, sprite_, resource_)                                 \
-    do {                                                                                           \
-        (index_) = (base_);                                                                        \
-        Anim_LoadKeyframe((sprite_), (resource_), 0, 1);                                           \
-    } while (0)
-
 struct PlayerCloneConfiguration {
     u16 flags, lifetime;
     u8 unknown4[2];

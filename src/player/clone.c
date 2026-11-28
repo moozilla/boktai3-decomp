@@ -745,7 +745,8 @@ void PlayerClone_BeginActiveReactions(void)
                 slot->configuration.speed = 0;
                 slot->flags |= 1;
                 ContactCollider_SetFlags(&slot->collider, 4);
-                PLAYER_CLONE_START_IDLE(slot->animationIndex, 0, &slot->animation, &slot->resource);
+                slot->animationIndex = 0;
+                Anim_LoadKeyframe(&slot->animation, &slot->resource, 0, 1);
                 slot->timer = i * 30 + 660;
             }
         }
