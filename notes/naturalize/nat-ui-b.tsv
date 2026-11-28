@@ -139,3 +139,4 @@ src/ui/status_screen/status_screen_fade.c	StatusScreen_UpdateScanlineNoise	contr
 src/ui/status_screen/status_screen_fade.c	StatusScreen_UpdateScanlineNoise	contrived	contrived	1	StatusScreen_Random byte-offset read and the amplitude/delta pointer helper stay
 src/ui/status_screen/status_screen_fade.c	StatusScreen_ClearScanlineNoise	minor	natural	1	-
 src/ui/status_screen/status_screen_fade.c	StatusScreen_Destroy	minor	natural	1	-
+src/ui/status_screen/status_screen_fade.c	StatusScreen_Update	minor	natural	2	-

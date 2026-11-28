@@ -175,10 +175,7 @@ int StatusScreen_Update(struct StatusScreen *p)
         p->effect(p);
     if (p->noise)
         p->noise(p);
-    {
-        u16 next = 1 - p->active;
-        p->active = next;
-    }
+    p->active = 1 - p->active;
     StatusScreen_RefreshDirtyDisplays(p);
     BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0);
 }
