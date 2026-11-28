@@ -292,11 +292,9 @@ s32 Actor_TryStartPendingAction(struct PooledActor *actor)
 {
     s32 started;
     if (actor->pendingAction) {
-        void (*const *table)(void *, int) = gUnk_08605050;
+        void (*const *actions)(void *, int) = gUnk_08605050;
         u16 id = actor->pendingAction;
-        void (*action)(void *, int);
-        action = table[id];
-        ActorController_SetAction(actor, action, id);
+        ActorController_SetAction(actor, actions[id], id);
         started = 1;
     } else
         started = 0;

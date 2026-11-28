@@ -66,3 +66,4 @@ src/scene/actor/actor_pool/pooled_actor_helpers.c	Actor_UpdateSelectedTarget	min
 src/scene/actor/actor_pool/pooled_actor_controller.c	Actor_InitControllerFromScript	contrived	natural	1	
 src/scene/actor/actor_pool/pooled_actor_controller.c	Actor_UpdateCollisionAndEffectTimers	contrived	minor	4	ContactCollider_Set/ClearFlags: plain |= on actor->bodyCollider.flags folds the field offset (ROM keeps collider base+6); selected flag as in ROM
 src/scene/actor/actor_pool/pooled_actor_controller.c	Actor_UpdateDrawable	minor	minor	1	PooledActor_TestFlags accessor
+src/scene/actor/actor_pool/pooled_actor_controller.c	Actor_TryStartPendingAction	contrived	minor	9	actions table pointer (ROM loads the table before copying the id) and started flag
