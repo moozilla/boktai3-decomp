@@ -20,7 +20,7 @@ s32 Player_InitActionMode(struct Player *p)
     p->statGaugeFull = 0;
     if (Script_SeekToKeyword('k')) {
         p->actionMode = Script_GetValue();
-        if ((u8)(p->actionMode - 1) <= 1)
+        if (p->actionMode == 1 || p->actionMode == 2)
             p->statGaugeFull = 1;
     } else {
         p->actionMode = gGameState->form;
@@ -31,10 +31,9 @@ s32 Player_InitActionMode(struct Player *p)
         p->timedEventSlot = 0;
     Player_RecalculateDerivedStats(p);
     if (gEngineFlags & 0x1000) {
-        void (*update)(struct Player *) = Player_UpdateLinkModeMovement;
         for (i = 0; i < 2; i++)
             gPlayerInitialSlotValues[i] = 0;
-        p->updateCallback = update;
+        p->updateCallback = Player_UpdateLinkModeMovement;
     } else {
         p->updateCallback = gUnk_08610964[p->actionMode];
     }
