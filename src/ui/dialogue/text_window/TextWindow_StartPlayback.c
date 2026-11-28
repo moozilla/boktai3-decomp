@@ -1,14 +1,17 @@
 #include "global.h"
-u8 *TextWindow_Find(u32);
-void TextWindow_OnPlayback(void);
-s32 TextWindow_StartPlayback(u32 id)
+#include "engine/ram.h"
+#include "ui/dialogue/text_window.h"
+#include "ui/dialogue/text_window_manager.h"
+
+struct TextWindow *TextWindow_Find(int);
+void TextWindow_OnPlayback(struct WindowManager *, struct TextWindow *);
+
+int TextWindow_StartPlayback(int id)
 {
-    u32 *p = (u32 *)TextWindow_Find(id);
-    s32 r;
-    if (p) {
-        p[0x5c / 4] = (u32)TextWindow_OnPlayback;
-        r = 0;
-    } else
-        r = -1;
-    return r;
+    struct TextWindow *window = TextWindow_Find(id);
+
+    if (!window)
+        return -1;
+    window->callback = TextWindow_OnPlayback;
+    return 0;
 }
