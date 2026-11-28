@@ -1,20 +1,13 @@
 #include "global.h"
 #include "engine/ram.h"
-
-struct S {
-    u8 pad[0x1f];
-    u8 b1f;
-};
+#include "player/effects/player_particle_cloud.h"
 
 s32 PlayerParticleCloud_RequestStop(void)
 {
-    struct S *p = gCloudTask;
-    s32 r;
-    if (p) {
-        p->b1f = 1;
-        r = 0;
-    } else {
-        r = -1;
-    }
-    return r;
+    struct CloudTask *task = gCloudTask;
+
+    if (task == NULL)
+        return -1;
+    task->stop = 1;
+    return 0;
 }

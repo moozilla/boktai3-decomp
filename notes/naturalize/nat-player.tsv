@@ -555,3 +555,4 @@ src/player/effects/particle_cloud/PlayerParticleCloud_Destroy.c	PlayerParticleCl
 src/player/effects/particle_cloud/sub_081D36A4.c	sub_081D36A4	minor	natural	3	-
 src/player/effects/particle_cloud/sub_081D36D4.c	sub_081D36D4	contrived	natural	3	-
 src/player/effects/particle_cloud/sub_081D3704.c	sub_081D3704	minor	natural	1	-
+src/player/effects/particle_cloud/PlayerParticleCloud_RequestStop.c	PlayerParticleCloud_RequestStop	minor	natural	1	-
