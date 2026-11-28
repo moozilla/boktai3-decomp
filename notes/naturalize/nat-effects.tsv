@@ -178,3 +178,4 @@ src/effects/bursts/linked_effect/LinkedEffect_SetVariant.c	LinkedEffect_SetVaria
 src/effects/bursts/linked_effect/LinkedEffect_BeginRisingTravel.c	LinkedEffect_BeginRisingTravel	contrived	minor	20	random value read through the table's constant address
 src/effects/bursts/linked_effect/LinkedEffect_FollowTarget.c	LinkedEffect_FollowTarget	contrived	minor	20	sprite and sequence locals, target-delta wrapper and constant-address random reads (register allocation)
 src/effects/bursts/radial_burst/sub_08235E20.c	sub_08235E20	contrived	natural	1	-
+src/effects/bursts/radial_burst/RadialBurstEffect_UpdateBurstParticle.c	RadialBurstEffect_UpdateBurstParticle	minor	natural	1	-
