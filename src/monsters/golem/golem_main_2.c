@@ -444,15 +444,11 @@ void Golem_ChargeOrApproach(struct ChaseActor *actor)
     if (actor->base.stepDone) {
         Golem_Charge(body);
         if (CanCharge(body)) {
-            void *target = Golem_UpdateChargeWindup;
-            SceneActorChase_SetControl(actor, target, 0x28);
+            SceneActorChase_SetControl(actor, Golem_UpdateChargeWindup, 0x28);
             SceneActorChase_SetPhase(actor, 2, 4);
             return;
         }
-        {
-            void *target = Golem_UpdateRouteMotion;
-            SceneActorChase_SetControl(actor, target, 0x23);
-        }
+        SceneActorChase_SetControl(actor, Golem_UpdateRouteMotion, 0x23);
         SceneActorChase_SetPhase(actor, 2, 1);
     } else
         actor->base.counter2AC++;

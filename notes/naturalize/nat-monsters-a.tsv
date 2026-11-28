@@ -244,3 +244,4 @@ src/monsters/golem/golem_2.c	Golem_UpdateDefeat	contrived	contrived	11	remaining
 src/monsters/golem/golem_2.c	Golem_UpdateScriptedAction	contrived	contrived	3	remaining: u8cast,block,constlocal
 src/monsters/golem/golem_main_2.c	Golem_ReturnHome	minor	natural	3	
 src/monsters/golem/golem_main_2.c	Golem_UpdateChargeSettle	minor	natural	2	
+src/monsters/golem/golem_main_2.c	Golem_ChargeOrApproach	contrived	minor	5	remaining: bytep
