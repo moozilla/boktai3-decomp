@@ -64,3 +64,4 @@ src/engine/math/ScalarApproach_QuarterArray.c	ScalarApproach_QuarterArray	minor	
 src/engine/math/ScalarApproach_EighthArray.c	ScalarApproach_EighthArray	minor	natural	1	
 src/engine/math/ScalarApproach_SixteenthArray.c	ScalarApproach_SixteenthArray	minor	natural	1	
 src/engine/math/ScalarApproach_UnwrapAngleArray.c	ScalarApproach_UnwrapAngleArray	minor	natural	1	
+src/engine/math/sub_08221D04.c	sub_08221D04	minor	natural	1	
