@@ -1,16 +1,10 @@
 #include "global.h"
-void Storage_InitSlotMapping(u8 *p, s32 b)
+#include "ui/town/storage_screen.h"
+void Storage_InitSlotMapping(struct StorageScreen *screen, s32 base)
 {
-    s32 i = 0xf;
-    u8 *q = p + 0x179f;
-    u8 *r;
-    do {
-        *q = i;
-        q--;
-        i--;
-    } while (i >= 0);
-    i = 0x10;
-    r = p + 0x1790;
-    for (; i < 0x20; i++)
-        r[i] = i + b;
+    s32 i;
+    for (i = 0; i < 16; i++)
+        screen->slots[i] = i;
+    for (i = 16; i < 32; i++)
+        screen->slots[i] = i + base;
 }
