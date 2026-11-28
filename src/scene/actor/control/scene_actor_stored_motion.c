@@ -238,20 +238,16 @@ static inline u8 IsUnavailable(struct ChaseActor *input)
 
 /* actor must be nonnull: its control context is loaded before the availability gate. */
 
-void SceneActorControl_RequestVisibility(struct ChaseActor *input, const u16 *inputRequest)
+void SceneActorControl_RequestVisibility(struct ChaseActor *actor, const u16 *request)
 {
-    struct ChaseActor *actor = input;
-    const u16 *request = inputRequest;
     struct SceneActorControlMotionState *state = SceneActorControl_GetMotionState(actor);
-    u32 unavailable = IsUnavailable(actor);
-    if (unavailable)
+    if (IsUnavailable(actor))
         return;
     if (!SceneActor_MaskedHalfword(0x4000, &actor->base.motionFlags))
         return;
     SceneActorPlacement_SetFlags(0x800, &actor->base);
     {
-        u32 requested = request[1];
-        if (requested == 0) {
+        if (request[1] == 0) {
             u32 mask = 0x20;
             u32 *flags;
             u32 active;
@@ -261,8 +257,7 @@ void SceneActorControl_RequestVisibility(struct ChaseActor *input, const u16 *in
             savedFlags = flags;
             active = SceneActorControl_TestFlags(active, ~0);
             if (!active) {
-                u32 hidden = SceneActorVisibility_IsHidden(actor);
-                if (hidden) {
+                if (SceneActorVisibility_IsHidden(actor)) {
                     state->visibilityFrame = 0;
                     {
                         u32 mask = ~0x50;
@@ -274,7 +269,7 @@ void SceneActorControl_RequestVisibility(struct ChaseActor *input, const u16 *in
                     Sound_PlaySong(0x21E);
                 }
             }
-        } else if (requested == 1) {
+        } else if (request[1] == 1) {
             u32 mask = 0x40;
             u32 *flags;
             u32 active;
@@ -284,8 +279,7 @@ void SceneActorControl_RequestVisibility(struct ChaseActor *input, const u16 *in
             savedFlags = flags;
             active = SceneActorControl_TestFlags(active, ~0);
             if (!active) {
-                u32 hidden = SceneActorVisibility_IsHidden(actor);
-                if (!hidden) {
+                if (!SceneActorVisibility_IsHidden(actor)) {
                     state->visibilityFrame = 0;
                     {
                         u32 mask = ~0x30;
