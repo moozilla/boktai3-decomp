@@ -442,3 +442,9 @@ src/scene/actor/reaction/SceneActorContacts_SetDistanceGate.c	SceneActorContacts
 src/scene/actor/reaction/SceneActorContacts_TestPlayerCondition.c	SceneActorContacts_TestPlayerCondition	contrived	contrived	16	partial: the result variable with gotos and the player copy stay; structured returns merge the result=1 paths the ROM keeps apart
 src/scene/actor/reaction/SceneActorContacts_SelectForActor.c	SceneActorContacts_SelectForActor	contrived	contrived	14	partial: parked clear masks, the owner copy and selectionStatus stay; if (best) drops the -1 sentinel register and plain &= loads the field before the mask
 src/scene/actor/reaction/SceneActorContacts_TickCooldowns.c	SceneActorContacts_TickCooldowns	minor	natural	1	-
+src/scene/actor/reaction/SceneActorContacts_Update.c	SceneActorContacts_Update	natural	natural	0	-
+src/scene/actor/reaction/SceneActorContacts_Reset.c	SceneActorContacts_Reset	natural	natural	0	-
+src/scene/actor/reaction/SceneActorContacts_Destroy.c	SceneActorContacts_Destroy	natural	natural	0	-
+src/scene/actor/reaction/SceneActorContacts_SetOwner.c	SceneActorContacts_SetOwner	minor	minor	0	returns the void reset call's leftover r0; the shared header declares both void, so struct fields need a header signature change
+src/scene/actor/reaction/SceneActorContacts_Create.c	SceneActorContacts_Create	minor	minor	0	size and callbacks use local prototypes that conflict with the header's signatures
+src/scene/actor/reaction/SceneActorContacts_EvaluateCandidate.c	SceneActorContacts_EvaluateCandidate	contrived	contrived	17	partial: base/self copy, delta/own pointers, PlayerMask, PlayerSlot, SquareDistance and the plain/gate gotos stay; replacing them moves registers or the shared threshold block
