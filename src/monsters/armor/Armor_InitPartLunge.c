@@ -17,11 +17,7 @@ void Armor_InitPartLunge(struct Motion0818Object *p)
     p->angle = Math_Atan2(*(s16 *)(target + 0x30) - p->x, *(s16 *)(target + 0x34) - p->z);
     p->targetRotation = 0xA0 - p->angle;
     gRandomIndex = (gRandomIndex + 1) & 1023;
-    {
-        u32 offset = gRandomIndex * 2;
-        const u16 *table = (const u16 *)RANDOM_TABLE_ADDR;
-        choice = *(const u16 *)(offset + (u32)table);
-    }
+    choice = *(const u16 *)((gRandomIndex * 2) + (u32)((const u16 *)RANDOM_TABLE_ADDR));
     choice &= 1;
     p->turnDirection = Sword_OrbitDirection(choice);
     p->done = 1;
