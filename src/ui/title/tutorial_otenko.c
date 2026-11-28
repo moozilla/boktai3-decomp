@@ -1963,20 +1963,21 @@ void TutorialOtenko_UpdateRotatingGrowth(struct ActorAnimController *p)
 
 void TutorialOtenko_UpdateRotatingShrink(struct ActorAnimController *p)
 {
-    s32 x, y;
+    /* the sprite's scale bytes, which this struct names palette fields */
+    s32 scaleX, scaleY;
     if (take(p))
         ActorShadow_Disable(p->p2);
     rotate(p);
-    x = *(s8 *)((u8 *)&p->obj + 8);
-    y = *(s8 *)((u8 *)&p->obj + 9);
-    x--;
-    y--;
-    if (x < 64) {
-        y = 64;
-        x = 64;
+    scaleX = (s8)p->obj.palette;
+    scaleY = (s8)p->obj.paletteVariant;
+    scaleX--;
+    scaleY--;
+    if (scaleX < 64) {
+        scaleY = 64;
+        scaleX = 64;
     }
-    *((u8 *)&p->obj + 8) = x;
-    *((u8 *)&p->obj + 9) = y;
+    p->obj.palette = scaleX;
+    p->obj.paletteVariant = scaleY;
 }
 
 /* Tentative role: initialize and advance an animation with a previous-state callback.
