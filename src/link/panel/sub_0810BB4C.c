@@ -8,12 +8,9 @@ struct LinkResults {
 static inline u8 Valid(s32 i)
 {
     if (i < 0)
-        goto no;
-    if (i <= 1)
-        goto yes;
-no:
-    return 0;
-yes:
+        return 0;
+    if (i > 1)
+        return 0;
     return 1;
 }
 
@@ -25,17 +22,13 @@ static inline u16 LinkResults_LimitCounter(u16 value, s32 min, s32 max)
         value = min;
     return value;
 }
+
 // Tentative: increments one side's positive result counter, then caps it at 20.
 void sub_0810BB4C(struct LinkResults *p, s32 i)
 {
     if (p && Valid(i)) {
-        s32 offset = i * sizeof(u16);
-        u16 *counter = p->positive;
-        s32 value;
-        counter = (u16 *)((u8 *)counter + offset);
-        (*counter)++;
-        value = LinkResults_LimitCounter(*counter, 0, 20);
-        p->positive[i] = value;
+        p->positive[i]++;
+        p->positive[i] = LinkResults_LimitCounter(p->positive[i], 0, 20);
     }
 }
 
@@ -43,12 +36,7 @@ void sub_0810BB4C(struct LinkResults *p, s32 i)
 void sub_0810BB90(struct LinkResults *p, s32 i)
 {
     if (p && Valid(i)) {
-        s32 offset = i * sizeof(u16);
-        u16 *counter = p->negative;
-        s32 value;
-        counter = (u16 *)((u8 *)counter + offset);
-        (*counter)++;
-        value = LinkResults_LimitCounter(*counter, 0, 20);
-        p->negative[i] = value;
+        p->negative[i]++;
+        p->negative[i] = LinkResults_LimitCounter(p->negative[i], 0, 20);
     }
 }
