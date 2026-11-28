@@ -15,3 +15,4 @@ src/scene/actor/actor_ability.c	Modifier_EvaluateThirdSourceModeTwo	natural	natu
 src/scene/actor/actor_ability.c	ActorAction_TickRecovery	minor	minor	0	ClearDamageFlag(u8*, s32) accessor: plain &= on the u8 emits mov 0xfe, ROM builds -2 in SImode (probably a bitfield in actor_stats.h)
 src/scene/actor/actor_ability.c	ModifierAction_InitializeSecondary	minor	minor	0	secondary record viewed through (void *)&stats field: needs shared actor_stats.h nesting
 src/scene/actor/actor_ability.c	Modifier_InitSourceInfo	minor	minor	0	secondary record viewed through (void *)&stats field: needs shared actor_stats.h nesting
+src/scene/actor/actor_emitter.c	ActorEmitter_TryEmit	contrived	minor	1	raw owner offsets (animation state) and local struct views

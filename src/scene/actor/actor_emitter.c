@@ -92,8 +92,8 @@ struct ActorEmitter {
 
 u8 Modifier_IsFirstSourceReady();
 
-s32 ProjectileEffect_CreateFromProfile(struct EmitterVector *, s32, struct EmitterVector *, void *, s32,
-                                   s32, s32, s32);
+s32 ProjectileEffect_CreateFromProfile(struct EmitterVector *, s32, struct EmitterVector *, void *,
+                                       s32, s32, s32, s32);
 
 void CallbackList_SubtractClampedValue();
 
@@ -105,25 +105,24 @@ s32 ActorEmitter_TryEmit(struct ActorEmitter *emitter)
     struct EmitterVector velocity;
     s32 height;
     if (!Modifier_IsFirstSourceReady(emitter))
-        goto fail;
+        return 0;
     owner = emitter->owner;
     actor = &owner->actor;
     cost = CallbackList_RunMatchingState(actor, emitter->id, 9);
     if (owner->actor.energy < cost)
-        goto fail;
+        return 0;
     velocity.x = owner->velocity;
     velocity.y = 0;
     velocity.z = 0;
     height = actor->height - 0x16000;
-    if (ProjectileEffect_CreateFromProfile(&owner->actor.position, height, &velocity, owner->actor.profile.data,
-                                       owner->kind + 1, 0, 1, 0) >= 0)
-        goto success;
-fail:
+    if (ProjectileEffect_CreateFromProfile(&owner->actor.position, height, &velocity,
+                                           owner->actor.profile.data, owner->kind + 1, 0, 1,
+                                           0) >= 0) {
+        CallbackList_SubtractClampedValue(actor, emitter, cost);
+        emitter->timer = emitter->duration;
+        return 1;
+    }
     return 0;
-success:
-    CallbackList_SubtractClampedValue(actor, emitter, cost);
-    emitter->timer = emitter->duration;
-    return 1;
 }
 
 u8 Modifier_IsFirstSourceReady();
@@ -148,8 +147,9 @@ s32 ActorEmitter_TryEmitLow(struct ActorEmitter *emitter)
     velocity.y = 0;
     velocity.z = 0;
     height = actor->height - 0x12000;
-    if (ProjectileEffect_CreateFromProfile(&owner->actor.position, height, &velocity, owner->actor.profile.data,
-                                       owner->kind + 1, 0, 1, 0) >= 0)
+    if (ProjectileEffect_CreateFromProfile(&owner->actor.position, height, &velocity,
+                                           owner->actor.profile.data, owner->kind + 1, 0, 1,
+                                           0) >= 0)
         goto success;
 fail:
     return 0;
@@ -236,13 +236,13 @@ s32 ActorEmitter_TryEmitPair(struct ActorEmitter *emitter)
     else
         height = actor->height - 0x16000;
     if (ProjectileEffect_CreateFromProfile(&actor->position, height, &velocity, actor->profile.data,
-                                       owner->kind + 1, 1, 2, 0) >= 0)
+                                           owner->kind + 1, 1, 2, 0) >= 0)
         goto success;
 fail:
     return 0;
 success:
     ProjectileEffect_CreateFromProfile(&actor->position, height, &velocity, actor->profile.data,
-                                   owner->kind + 1, 0, 1, 1);
+                                       owner->kind + 1, 0, 1, 1);
     CallbackList_SubtractClampedValue(actor, emitter, cost);
     emitter->timer = emitter->duration;
     return 1;
@@ -269,14 +269,15 @@ s32 ActorEmitter_TryEmitAnimatedPair(struct ActorEmitter *emitter)
     velocity.y = 0;
     velocity.z = 0;
     height = actor->height - 0x8000;
-    if (ProjectileEffect_CreateFromProfile(&owner->actor.position, height, &velocity, owner->actor.profile.data,
-                                       owner->kind + 1, 1, 2, 0) >= 0)
+    if (ProjectileEffect_CreateFromProfile(&owner->actor.position, height, &velocity,
+                                           owner->actor.profile.data, owner->kind + 1, 1, 2,
+                                           0) >= 0)
         goto success;
 fail:
     return 0;
 success:
-    ProjectileEffect_CreateFromProfile(&owner->actor.position, height, &velocity, owner->actor.profile.data,
-                                   owner->kind + 1, 0, 1, 1);
+    ProjectileEffect_CreateFromProfile(&owner->actor.position, height, &velocity,
+                                       owner->actor.profile.data, owner->kind + 1, 0, 1, 1);
     Anim_SetKeyframes((u8 *)owner + 0x670, (u8 *)owner + 0x7F0, emitter->animation, 2, 0);
     CallbackList_SubtractClampedValue(actor, emitter, cost);
     emitter->timer = emitter->duration;
