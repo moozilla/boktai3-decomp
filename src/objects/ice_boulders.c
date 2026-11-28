@@ -288,37 +288,31 @@ void IceBoulder_AnimateSparkleTransition(struct RegionActor *p)
     if (manager) {
         if (p->entered) {
             IceBoulder_UnregisterTerrain(p);
-            {
-                p->frames = 0;
-                p->entered = 0;
-            }
+            p->frames = 0;
+            p->entered = 0;
         }
         done = PlayerCue_StepSequenceEnded(&p->sprite, &p->sequence);
         if (p->frames <= 31) {
-            union SparkPosition position;
+            struct ContactPosition position;
             if (Mod(p->frames, 6) == 0) {
-                position.position = p->origin;
-                position.packed.x -= 64;
-                {
-                    union SparkPosition *output = &position;
-                    ImpactBurst_EmitChargeSparkle(1, 0, 0, 64, output);
-                }
+                position = p->origin;
+                position.x -= 64;
+                ImpactBurst_EmitChargeSparkle(1, 0, 0, 64, &position);
             }
             if (Mod(p->frames, 10) == 0) {
-                position.position = p->origin;
-                position.position.x += 64;
+                position = p->origin;
+                position.x += 64;
                 ImpactBurst_EmitChargeSparkle(1, 0, 0, 64, &position);
             }
             if (Mod(p->frames, 16) == 0) {
-                position.position = p->origin;
-                position.position.z += 32;
+                position = p->origin;
+                position.z += 32;
                 ImpactBurst_EmitChargeSparkle(1, 0, 0, 64, &position);
             }
             if (Mod(p->frames, 7) == 0) {
-                s8 *sound = &manager->cursor;
-                if (*sound < 0) {
+                if (manager->cursor < 0) {
                     Sound_PlaySong(0x15C);
-                    *sound = 1;
+                    manager->cursor = 1;
                 }
             }
             p->frames++;
