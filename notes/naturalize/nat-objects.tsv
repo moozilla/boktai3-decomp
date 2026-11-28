@@ -430,3 +430,4 @@ src/objects/items/item_container.c	Trigger_MoveDropsByItem	natural	natural	0
 src/objects/items/collectible/EffectPool_ClearManager.c	EffectPool_ClearManager	natural	natural	0	
 src/objects/items/collectible/ActorParticles_SpawnAlternatingBurst.c	ActorParticles_SpawnAlternatingBurst	minor	natural	5	local ROM-table random helper (distinct cursor and table)
 src/objects/items/collectible/Collectible_OnDeactivate.c	Collectible_OnDeactivate	contrived	natural	1	
+src/objects/items/collectible/Collectible_StartDeath.c	Collectible_StartDeath	contrived	natural	8	(u8) casts on the sequence arguments; local camera view
