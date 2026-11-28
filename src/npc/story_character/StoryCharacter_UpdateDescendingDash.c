@@ -122,10 +122,8 @@ void StoryCharacter_UpdateDescendingDash(void *ctx, struct Npc *npc, s32 tick)
                 break;
         }
         Actor_PlayAnimationEntry(npc, anim, 1, 0, 4);
-        {
-            tag->height = 300;
-            npc->phase = 0;
-        }
+        tag->height = 300;
+        npc->phase = 0;
     }
     {
         u32 mask = 0x400;
