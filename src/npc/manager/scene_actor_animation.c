@@ -386,13 +386,6 @@ static inline s32 PlayerKind(void)
 
 // confidence=low: highlights the nearest eligible actor and invokes its script on input.
 
-// The mask as an inline argument matches (found by tools/fix.py).
-
-static inline u32 ActorFlag(u32 mask, struct SceneActor *actor)
-{
-    return actor->flags & mask;
-}
-
 static inline s32 TargetAllowsInteraction(struct Player *p)
 {
     if ((u8)(p->actionMode - 3) <= 2)
@@ -401,111 +394,67 @@ static inline s32 TargetAllowsInteraction(struct Player *p)
         return 0;
     if (p->active && (u16)(p->sceneMode - 5) <= 1)
         return 0;
-    {
-        u8 mode = p->tetherMode;
-        u8 allow = 1;
-        if (mode > 1 && mode != 7)
-            allow = 0;
-        return allow;
-    }
+    if (p->tetherMode > 1 && p->tetherMode != 7)
+        return 0;
+    return 1;
 }
 
-void Actor_UpdateInteractionCue(struct SceneActorManager *input)
+void Actor_UpdateInteractionCue(struct SceneActorManager *manager)
 {
-    struct SceneActorManager *context = input;
-    s32 buttons = gPadState[1];
-    s32 pressed = 1;
+    s32 pressed = gPadState[1] & 1;
     s32 kind;
     struct SceneActor *nearest;
     struct SceneActor *actor;
-    s32 playerKind;
-    {
-        s32 scratch = pressed;
-        scratch &= buttons;
-        pressed = scratch;
-    }
-    playerKind = PlayerKind();
-    if (playerKind == 10)
-        goto disableInput;
-    if (playerKind != 11)
-        goto inputReady;
-disableInput:
-    pressed = 0;
-inputReady:;
-    {
-        if (!context->player)
-            goto blocked;
-        if (!TargetAllowsInteraction(context->player))
-            goto blocked;
-        {
-            u8 state = context->player->actionMode;
+    if (PlayerKind() == 10 || PlayerKind() == 11)
+        pressed = 0;
+    if (manager->player && TargetAllowsInteraction(manager->player)) {
+        if (manager->player->actionMode == 0)
             kind = 0;
-            if (state == 0)
-                goto selected;
+        else if (manager->player->actionMode == 1)
             kind = 1;
-            if (state == 1)
-                goto selected;
-            kind = 3;
-            if (state != 6)
-                goto selected;
+        else if (manager->player->actionMode == 6)
             kind = 2;
-            goto selected;
-        }
+        else
+            kind = 3;
+    } else {
+        kind = 3;
     }
-blocked:
-    kind = 3;
-selected:
     nearest = 0;
     if (Scene_CanOpenMenu()) {
         s32 best = 1000000;
-        actor = context->head;
-        while (actor) {
-            if (ActorFlag(0x800, actor) && actor->script) {
+        for (actor = manager->head; actor; actor = actor->previous) {
+            if (SceneActor_TestFlags(actor, 0x800) && actor->script) {
                 struct ContactPosition *position = &actor->body.position;
-                struct ContactPosition *target = context->target;
+                struct ContactPosition *target = manager->target;
                 s32 x = target->x - position->x;
                 s32 z = target->z - position->z;
-                s32 distance = (s32)((u32)x * x + (u32)z * z);
+                s32 distance = x * x + z * z;
                 if (distance < best) {
                     best = distance;
                     nearest = actor;
                 }
             }
-            actor = actor->previous;
         }
     }
     if (nearest && !pressed) {
-        actor = context->head;
-        if (actor) {
-            s8 *base = nearest->interaction.cues;
-            s32 index;
-            s8 *cue;
-            u32 blockedMask;
-            index = kind;
-            cue = base + index;
-            blockedMask = 0x2000;
 
-            do {
-                if (actor == nearest && !(nearest->flags & blockedMask)) {
-                    if (!nearest->flashing) {
-                        Actor_SetAttachmentEffect(nearest, *cue, 180, 180);
-                        nearest->flashing = 1;
-                    }
-                } else if (actor->flashing) {
-                    Actor_SetAttachmentEffect(actor, 8, 180, 180);
-                    actor->flashing = 0;
+        for (actor = manager->head; actor; actor = actor->previous) {
+            if (actor == nearest && !(SceneActor_TestFlags(nearest, 0x2000))) {
+                if (!nearest->flashing) {
+                    Actor_SetAttachmentEffect(nearest, nearest->interaction.cues[kind], 180, 180);
+                    nearest->flashing = 1;
                 }
-                actor = actor->previous;
-            } while (actor);
+            } else if (actor->flashing) {
+                Actor_SetAttachmentEffect(actor, 8, 180, 180);
+                actor->flashing = 0;
+            }
         }
     } else {
-        actor = context->head;
-        while (actor) {
+        for (actor = manager->head; actor; actor = actor->previous) {
             if (actor->flashing) {
                 Actor_SetAttachmentEffect(actor, 8, 180, 180);
                 actor->flashing = 0;
             }
-            actor = actor->previous;
         }
     }
     if (nearest && pressed) {
@@ -514,18 +463,13 @@ selected:
             s32 x, y, z;
             struct SceneActorParameters parameters;
         } operands;
+        s32 i;
         operands.identity = nearest->body.id;
         operands.x = nearest->body.position.x;
         operands.y = nearest->body.position.y;
         operands.z = nearest->body.position.z;
-        {
-            u32 *source = nearest->parameters.values;
-            u32 *destination = operands.parameters.values;
-            s32 count = 3;
-            do {
-                *destination++ = *source++;
-            } while (--count >= 0);
-        }
+        for (i = 0; i < 4; i++)
+            operands.parameters.values[i] = nearest->parameters.values[i];
         // The prepared operands are retained even though dispatch uses a null argument block.
         Script_Call(nearest->script, 0);
     }

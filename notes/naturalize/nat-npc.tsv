@@ -36,3 +36,4 @@ src/npc/manager/scene_actor_animation.c	Packet_QueueFromScript	natural	natural	0
 src/npc/manager/scene_actor_animation.c	Actor_IsInReactionStateFromScript	contrived	natural	8	(u8)(state-13) > 2 range test: two comparisons are not folded
 src/npc/manager/scene_actor_animation.c	Actor_EndScriptControl	contrived	natural	2	
 src/npc/manager/scene_actor_animation.c	Actor_EmitTowardNearbyActors	contrived	minor	8	SceneActor_TestFlags stays (mask-first order); origin pointer: ROM keeps &emitter->position in a register
+src/npc/manager/scene_actor_animation.c	Actor_UpdateInteractionCue	contrived	minor	62	SceneActor_TestFlags twice (mask-first order in the loop)
