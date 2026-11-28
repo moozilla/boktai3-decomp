@@ -236,3 +236,4 @@ src/objects/floor_switch/FloorSwitch_SetOccupant.c	FloorSwitch_SetOccupant	natur
 src/objects/floor_switch/FloorSwitch_ResetManager.c	FloorSwitch_ResetManager	natural	natural	0	
 src/objects/floor_switch/FloorSwitch_InitHooks.c	FloorSwitch_InitHooks	natural	natural	0	
 src/objects/floor_switch/FloorSwitch_UpdateOccupancy.c	FloorSwitch_UpdateOccupancy	contrived	natural	10	found flag is never set but gives the original tail
+src/objects/floor_switch/FloorSwitch_Create.c	FloorSwitch_Create	contrived	contrived	8	found block placed before the scan loop (goto layout), duplicate placed pointer and per-component stack vector pointer; index loops and shared subtract change register allocation
