@@ -1,40 +1,41 @@
 #include "global.h"
-struct Args08228368 {
-    u16 count;
-    u32 *values;
-};
+#include "system/save/delayed_script.h"
 void *Task_CreateFromHeapEnd(u32 list,
                              u32 size); /* Task_Create variant (allocator Heap_AllocFromEnd) */
 void Task_SetCallbacks(void *, void *, void *);
-void DelayedScript_Update(u8 *);
-void DelayedScript_OnDestroy(u8 *);
+void DelayedScript_Update(struct DelayedScript *);
+void DelayedScript_OnDestroy(void);
 /* Start a task that runs `script` after `delay` frames (a negative delay
- * sets flag 0x2C), with up to `args->count` copied argument words. */
-u8 *DelayedScript_Create(u32 script, struct Args08228368 *args, s32 delay, s32 urgent)
+ * sets everyFrame), with up to `args->count` copied argument words. */
+struct DelayedScript *DelayedScript_Create(u32 script, struct DelayedScriptArguments *args,
+                                           s32 delay, s32 urgent)
 {
-    u8 *t = Task_CreateFromHeapEnd(urgent ? 3 : 5, 0x54);
-    if (t) {
-        if (!args)
-            *(u16 *)(t + 0x1c) = 0;
-        else {
-            u32 *src = args->values;
-            u32 *buf = (u32 *)(t + 0x30);
-            u32 *dst;
-            u16 n;
-            *(u32 **)(t + 0x20) = buf;
-            dst = buf;
-            *(u16 *)(t + 0x1c) = args->count;
-            for (n = args->count; n != 0; n--)
-                *dst++ = *src++;
+    struct DelayedScript *task =
+        Task_CreateFromHeapEnd(urgent ? 3 : 5, sizeof(struct DelayedScript));
+
+    if (task) {
+        if (!args) {
+            task->args.count = 0;
+        } else {
+            u32 *source = args->values;
+            u32 *dest;
+            u16 i;
+
+            task->args.values = task->values;
+            dest = task->values;
+            task->args.count = args->count;
+            for (i = args->count; i != 0; i--)
+                *dest++ = *source++;
         }
         if (delay < 0) {
-            *(u16 *)(t + 0x2c) = 1;
+            task->everyFrame = 1;
             delay = -delay;
-        } else
-            *(u16 *)(t + 0x2c) = 0;
-        *(s32 *)(t + 0x28) = delay;
-        *(u32 *)(t + 0x24) = script;
-        Task_SetCallbacks(t, DelayedScript_Update, DelayedScript_OnDestroy);
+        } else {
+            task->everyFrame = 0;
+        }
+        task->timer = delay;
+        task->script = script;
+        Task_SetCallbacks(task, DelayedScript_Update, DelayedScript_OnDestroy);
     }
-    return t;
+    return task;
 }

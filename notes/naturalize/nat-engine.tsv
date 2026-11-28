@@ -671,3 +671,4 @@ src/system/save/Save_ReadHeader.c	Save_ReadHeader	natural	natural	0
 src/system/save/Save_WriteMainState.c	Save_WriteMainState	minor	minor	2	block number narrowed by explicit 16-bit shifts: a cast or u16 local folds them away
 src/system/save/Scene_CanOpenMenu.c	Scene_CanOpenMenu	contrived	minor	1	tether mode test kept as a local boolean
 src/system/save/DelayedScript_Update.c	DelayedScript_Update	contrived	minor	1	goto into the repeat check
+src/system/save/DelayedScript_Create.c	DelayedScript_Create	contrived	natural	1	
