@@ -21,7 +21,6 @@ static inline u8 Take(u8 *p)
     return 0;
 }
 
-
 static inline void State0(struct ChaseActor *a)
 {
     a->base.state2A8 = 0;
@@ -76,9 +75,12 @@ static inline void Scale(struct ChaseActor *actor)
 {
     u16 *scale = SceneActorChase_PrepareAnimationScale(actor, 0xA02F);
     if (actor->base.drawableKind == 0)
-        Anim_SetDurationScale(&((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence, *scale);
+        Anim_SetDurationScale(
+            &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence,
+            *scale);
     else
-        Anim_SetFrameDurationScale(&((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile, *scale);
+        Anim_SetFrameDurationScale(
+            &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile, *scale);
 }
 // confidence=low: pursues saved waypoints with an 800-frame transition.
 void CentipedeBody_UpdatePursuit(struct ChaseActor *actor)
@@ -90,7 +92,7 @@ void CentipedeBody_UpdatePursuit(struct ChaseActor *actor)
         SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
         Centipede_ResetOscillation(actor);
         {
-            u32 direction = (((actor->base.tracking.heading) + 32) & 255) >> 6;
+            u32 direction = ((actor->base.tracking.heading + 32) & 255) >> 6;
             body->wanderDirection = direction;
         }
         body->wanderAttempts = 0;
@@ -110,14 +112,11 @@ void CentipedeBody_UpdatePursuit(struct ChaseActor *actor)
         actor->base.nextDirection = Math_Atan2(delta.x, delta.z);
     }
     Centipede_AdvanceMotionPhase(actor, speed);
-    {
-        u16 *p = &body->routeMotionTimer;
-        if (*p) {
-            Centipede_UpdateSegmentPositions(actor, 18, 0x1000);
-            --(*p);
-        } else
-            Centipede_UpdateSegmentPositions(actor, 20, 0x6400);
-    }
+    if (body->routeMotionTimer) {
+        Centipede_UpdateSegmentPositions(actor, 18, 0x1000);
+        --body->routeMotionTimer;
+    } else
+        Centipede_UpdateSegmentPositions(actor, 20, 0x6400);
     Centipede_UpdateOscillation(actor, 120, 10);
     if (((s32)actor->base.counter2AC) > 800) {
         Centipede_SelectWanderRoute(actor);
