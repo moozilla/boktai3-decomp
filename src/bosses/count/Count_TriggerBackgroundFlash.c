@@ -1,29 +1,24 @@
 #include "global.h"
 #include "engine/video/render.h"
-struct Actor {
-    u8 pad0[0x3b9];
-    u8 command;
-    u8 pad3ba[2];
-    int argument;
-    u8 pad3c0[0x61c];
-    void *handle;
-};
-struct Actor *SceneActors_GetBySlot(int);
+#include "bosses/count/scene_graphics_actor.h"
+
+struct SceneGraphicsActor *SceneActors_GetBySlot(int);
 int Script_GetKeywordValue(int, int);
 void SceneActors_StopBackgroundFlash(void *);
 void BackgroundFlash_BeginAlternating(void *);
 void BackgroundFlash_BeginAppearance(void *);
+
 void Count_TriggerBackgroundFlash(void)
 {
-    struct Actor *p = SceneActors_GetBySlot(0);
-    if (p && p->handle) {
-        int a = Script_GetKeywordValue(115, 0);
-        int b = Script_GetKeywordValue(104, 0);
-        if (a)
-            SceneActors_StopBackgroundFlash(p);
-        else if (b)
-            BackgroundFlash_BeginAlternating(p->handle);
+    struct SceneGraphicsActor *actor = SceneActors_GetBySlot(0);
+    if (actor && actor->graphics.backgroundFlash) {
+        int stop = Script_GetKeywordValue('s', 0);
+        int alternate = Script_GetKeywordValue('h', 0);
+        if (stop)
+            SceneActors_StopBackgroundFlash(actor);
+        else if (alternate)
+            BackgroundFlash_BeginAlternating(actor->graphics.backgroundFlash);
         else
-            BackgroundFlash_BeginAppearance(p->handle);
+            BackgroundFlash_BeginAppearance(actor->graphics.backgroundFlash);
     }
 }

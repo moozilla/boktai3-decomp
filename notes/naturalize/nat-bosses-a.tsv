@@ -126,3 +126,4 @@ src/bosses/count/SceneActors_SpawnDestructionParticles.c	SceneActors_SpawnDestru
 src/bosses/count/Count_UpdateFrame.c	Count_UpdateFrame	contrived	minor	40	typed fields; kept two views (actor and owner) of the same object: the target scan reads through the second view
 src/bosses/count/Count_DecrementBarrierCount.c	Count_DecrementBarrierCount	contrived	natural	1	
 src/bosses/count/Count_GetBarrierCount.c	Count_GetBarrierCount	minor	natural	2	
+src/bosses/count/Count_TriggerBackgroundFlash.c	Count_TriggerBackgroundFlash	contrived	natural	1	
