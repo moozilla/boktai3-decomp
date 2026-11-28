@@ -105,13 +105,13 @@ s32 NumericDisplay_InitializeWidgets(struct FieldHudWidgets *widgets, s32 *timeS
 {
     s32 i;
     s32 x;
-    s32 result, ret;
-    void *script;
-    script = ScriptProc_Start(0xCB05, 0x530D);
+    void *script = ScriptProc_Start(0xCB05, 0x530D);
+
     widgets->timeScript = script;
     ResourceHeader_Relocate(widgets->timeResource, script);
-    i = 0;
-    do {
+    for (i = 0; i < 6; i++) {
+        s32 result;
+
         switch (i) {
             case 0:
                 x = 0x58;
@@ -135,22 +135,18 @@ s32 NumericDisplay_InitializeWidgets(struct FieldHudWidgets *widgets, s32 *timeS
                 x = 0;
                 break;
         }
-        result = AnimSprite_InitLinked(&widgets->timeDigits[i], widgets->timeResource, 0x29, 0x10, 0, 0,
-                                   0, 0);
-        if (result != 0) {
-            ret = -1;
-            goto end;
-        }
+        result = AnimSprite_InitLinked(&widgets->timeDigits[i], widgets->timeResource, 0x29, 0x10,
+                                       0, 0, 0, 0);
+        if (result != 0)
+            return -1;
         widgets->timeDigits[i].position.x = x;
-        widgets->timeDigits[i].position.z = result;
-        widgets->timeDigits[i].position.y = result;
+        widgets->timeDigits[i].position.z = 0;
+        widgets->timeDigits[i].position.y = 0;
         widgets->timeDigits[i].flags &= ~1;
         widgets->timeDigits[i].palette = gPaletteBankData;
-    } while (++i <= 5);
+    }
     widgets->timeSource = timeSource;
-    ret = 0;
-end:
-    return ret;
+    return 0;
 }
 
 void Palette_InitColorTransition(struct FieldHudWidgets *widgets, u32 x, u32 y, u32 z, u32 endX,
