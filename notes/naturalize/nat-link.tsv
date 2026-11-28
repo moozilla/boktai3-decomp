@@ -226,3 +226,4 @@ src/link/player/Player_UpdateTerrainSidestep.c	Player_UpdateTerrainSidestep	cont
 src/link/player/Player_IsFlaggedBelowResourceLimit.c	Player_IsFlaggedBelowResourceLimit	minor	natural	6	
 src/link/player/Player_IsUnflaggedBelowResourceLimit.c	Player_IsUnflaggedBelowResourceLimit	minor	natural	5	
 src/link/player/Player_UpdateFacingFromInputHistory.c	Player_UpdateFacingFromInputHistory	minor	natural	1	
+src/link/player/Player_UpdateChargeAction.c	Player_UpdateChargeAction	minor	natural	3	
