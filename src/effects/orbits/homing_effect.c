@@ -1,8 +1,6 @@
 #include "player/player_slot_status.h"
 #include "effects/orbits/homing_effect.h"
 #include "engine/video/display_sequence_inline.h"
-/* EffectManager_ClearGlobal: sets the global EffectManager pointer to 0; matches an existing vetted proposal and the body's single store */
-
 static inline void EffectManager_SetGlobal(struct EffectManager *manager)
 {
     gEffectManager = manager;
@@ -15,12 +13,10 @@ void EffectManager_ClearGlobal(void)
 
 u32 EffectManager_RemoveEffect(struct EffectManager *manager, struct Effect *effect)
 {
-    struct EffectSprite *sprite = &effect->particles[0].sprite;
     s32 i;
-    for (i = 3; i >= 0; i--) {
-        Effect_Remove(sprite);
-        sprite = (struct EffectSprite *)((u8 *)sprite + sizeof(struct EffectParticle));
-    }
+
+    for (i = 0; i < 4; i++)
+        Effect_Remove(&effect->particles[i].sprite);
     effect->active = 0;
 }
 

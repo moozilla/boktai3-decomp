@@ -259,3 +259,5 @@ src/effects/healing/HealthBurstEffect_InitParticlePool.c	HealthBurstEffect_InitP
 src/effects/healing/sub_08235B34.c	sub_08235B34	minor	natural	6	
 src/effects/healing/sub_08235C30.c	sub_08235C30	contrived	natural	8	
 src/effects/healing/HealthBurstEffect_Create.c	HealthBurstEffect_Create	minor	minor	5	local prototype passes the mode as a word to the u16 parameter
+src/effects/orbits/homing_effect.c	EffectManager_ClearGlobal	natural	natural	0	
+src/effects/orbits/homing_effect.c	EffectManager_RemoveEffect	minor	natural	1	
