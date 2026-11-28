@@ -20,11 +20,6 @@ void Ratatosk_BeginDirectionalReaction(struct Ratatosk *p)
     }
     p2->frameDamage = 0;
     p2->motionFlag = 0;
-    {
-        u32 value;
-        u32 mask = 12;
-        value = p->flags | mask;
-        value |= 64;
-        p->flags = value;
-    }
+    Ratatosk_SetFlags(p, 12);
+    p->flags |= 64;
 }
