@@ -531,3 +531,26 @@ src/script/script_record.c	CallbackList_ResetDispatch	minor	natural	3
 src/script/script_record.c	ScriptRecord_GetTargetOption	minor	natural	1	
 src/script/script_record.c	ScriptRecord_GetWideOption	minor	natural	1	
 src/script/script_record.c	ScriptRecord_GetShortOption	minor	natural	1	
+src/script/script_record.c	ScriptRecord_FindModifierRecord	minor	minor	5	cursor copy of the table pointer: using table alone swaps registers
+src/script/script_record.c	ScriptRecord_FindModifier	minor	minor	0	cursor copy of the table pointer, as in ScriptRecord_FindModifierRecord
+src/script/script_record.c	ScriptRecord_FindExtendedModifier	minor	minor	0	cursor copy of the table pointer, as in ScriptRecord_FindModifierRecord
+src/script/script_record.c	ScriptRecord_FindAttributeModifier	minor	minor	0	cursor copy of the table pointer, as in ScriptRecord_FindModifierRecord
+src/script/script_record.c	ScriptRecord_FindByteModifier	minor	minor	0	cursor copy of the table pointer, as in ScriptRecord_FindModifierRecord
+src/script/script_record.c	Modifier_StartDrainIfAboveThreshold	minor	minor	1	drain pointer local: plain member stores add address instructions
+src/script/script_record.c	ScriptRecord_GetEntryOption	natural	natural	0	
+src/script/script_record.c	ScriptRecord_GetByteOption	natural	natural	0	
+src/script/script_record.c	Modifier_ScaleDefaultStat	natural	natural	0	
+src/script/script_record.c	Modifier_ScaleKindEightToTenStat	natural	natural	0	
+src/script/script_record.c	Modifier_ScaleKindFourStat	natural	natural	0	
+src/script/script_record.c	Modifier_ScaleKindSevenStat	natural	natural	0	
+src/script/script_record.c	Modifier_AddKindSixStat	natural	natural	0	
+src/script/script_record.c	Modifier_AddKindThreeStat	natural	natural	0	
+src/script/script_record.c	StatModifier_ScaleForGlobalMode	natural	natural	0	
+src/script/script_record.c	StatModifier_AddForGlobalMode	natural	natural	0	
+src/script/script_record.c	StatModifier_AddForOwnerMode	natural	natural	0	
+src/script/script_record.c	StatModifier_ScaleAtOwnerThreshold	natural	natural	0	
+src/script/script_record.c	StatModifier_InitializeCallbacks	natural	natural	0	
+src/script/script_record.c	CallbackList_RunStateEight	natural	natural	0	
+src/script/script_record.c	Modifier_UpdateIdleDrain	natural	natural	0	
+src/script/script_record.c	ActorDrain_Update	natural	natural	0	
+src/script/script_record.c	Modifier_InitDrainState	natural	natural	0	
