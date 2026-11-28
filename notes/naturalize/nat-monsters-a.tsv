@@ -524,3 +524,9 @@ src/monsters/centipede/Centipede_InitProfile.c	Centipede_InitProfile	contrived	n
 src/monsters/centipede/Centipede_InitSegmentColliders.c	Centipede_InitSegmentColliders	contrived	natural	5	
 src/monsters/centipede/Centipede_InitCollision.c	Centipede_InitCollision	contrived	natural	2	
 src/monsters/centipede/ActorTrail_RemoveLastSegment.c	ActorTrail_RemoveLastSegment	contrived	natural	6	
+src/monsters/centipede/Centipede_AssignSegmentPhases.c	Centipede_AssignSegmentPhases	minor	minor	0	local segment status predicate: the shared animation predicate computes the address differently
+src/monsters/centipede/Centipede_TargetMarkedSegment.c	Centipede_TargetMarkedSegment	minor	minor	1	attack flag mask local: the literal loads before the halfword
+src/monsters/centipede/Centipede_ActivateMarkedSegment.c	Centipede_ActivateMarkedSegment	minor	minor	1	attack flag mask local: the literal loads before the halfword
+src/monsters/centipede/CentipedeBody_RefreshDirectionalAnimations.c	CentipedeBody_RefreshDirectionalAnimations	contrived	contrived	1	hand-inlined sequence step and local body view: shared helpers read commands through a different pointer
+src/monsters/centipede/CentipedeBody_ResetDirectionalAnimations.c	CentipedeBody_ResetDirectionalAnimations	contrived	contrived	3	hand-inlined sequence step and local body view: shared helpers read commands through a different pointer
+src/monsters/centipede/CentipedeBody_RestartSegmentAnimations.c	CentipedeBody_RestartSegmentAnimations	contrived	contrived	2	local sequence step duplicates the shared one except the command table pointer, which the ROM reads through the state
