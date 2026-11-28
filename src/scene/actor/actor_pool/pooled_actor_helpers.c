@@ -102,25 +102,22 @@ int Actor_FindTargetInFacingArc(struct PooledActor *actor)
     if (!ActorPool_GetManager())
         return -1;
     for (i = 0; i < (s8)actor->targetCount; i++) {
-        struct SceneActorBody *t = Actor_GetPartyTarget(i);
-        if (t) {
-            struct ContactPosition *src = &actor->body.position;
-            struct ContactPosition *dst = &t->position;
-            int angle = Math_Atan2(dst->x - src->x, dst->z - src->z);
+        struct SceneActorBody *target = Actor_GetPartyTarget(i);
+        if (target) {
+            struct ContactPosition *from = &actor->body.position;
+            struct ContactPosition *to = &target->position;
+            s8 angle = Math_Atan2(to->x - from->x, to->z - from->z);
             int facing = actor->body.direction;
-            int signedAngle = (s8)angle;
-            u8 diff;
-            int magnitude;
-            diff = facing - signedAngle;
-            magnitude = (s8)diff;
+            u8 delta = facing - angle;
+            int magnitude = (s8)delta;
             if (magnitude < 0)
                 magnitude = -magnitude;
             if (magnitude <= actor->targetArc) {
-                int dx = dst->x - src->x;
-                int dz = dst->z - src->z;
+                int dx = to->x - from->x;
+                int dz = to->z - from->z;
                 u32 distance = dx * dx + dz * dz;
                 if (distance <= actor->targetRangeSquared) {
-                    actor->targetAngleDelta = diff;
+                    actor->targetAngleDelta = delta;
                     actor->targetDistanceSquared = distance;
                     return i;
                 }
