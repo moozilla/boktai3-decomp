@@ -367,3 +367,8 @@ src/engine/video/palette/Palette_UploadBuffers.c	Palette_UploadBuffers	contrived
 src/engine/video/palette/Palette_LoadWorkingColors.c	Palette_LoadWorkingColors	contrived	natural	1	
 src/engine/video/palette/Palette_RefreshObjectBanks.c	Palette_RefreshObjectBanks	contrived	natural	1	
 src/engine/video/palette/Palette_CopyBank.c	Palette_CopyBank	minor	natural	1	
+src/engine/video/palette/Palette_ResetObjectAllocation.c	Palette_ResetObjectAllocation	natural	natural		
+src/engine/video/palette/Palette_SetBackdropColor.c	Palette_SetBackdropColor	natural	natural		
+src/engine/video/palette/Effect_SetOrigin.c	Effect_SetOrigin	natural	natural		
+src/engine/video/palette/Effect_SetPalette.c	Effect_SetPalette	natural	natural		
+src/engine/video/palette/Effect_Initialize.c	Effect_Initialize	contrived	natural	1	
