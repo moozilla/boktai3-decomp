@@ -247,15 +247,12 @@ s32 DisplayAnimation_SetTileSource(struct DisplayAnimation *display, u32 palette
 
 u32 DisplayAnimation_GetTileIndex(struct DisplayAnimation *display)
 {
-    u32 mode = display->kind;
-    if (mode == 0) {
+    struct AnimSprite *sprite;
+
+    if (display->kind == 0)
         return 0;
-    }
-    if (mode == 1) {
+    if (display->kind == 1)
         return display->resource.sequence.graphics.paletteIndex;
-    }
-    {
-        struct AnimSprite *sprite = &display->resource.keyframes.sprite;
-        return sprite->paletteBank;
-    }
+    sprite = &display->resource.keyframes.sprite;
+    return sprite->paletteBank;
 }
