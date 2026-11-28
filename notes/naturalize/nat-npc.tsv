@@ -517,3 +517,4 @@ src/script/script_options.c	Modifier_LoadTablesFromScript	natural	natural	0
 src/script/script_options.c	Modifier_InitTableTask	natural	natural	0	
 src/script/script_options.c	Modifier_CreateTableTask	natural	natural	0	
 src/script/script_record.c	ModifierStats_ApplyKind0	contrived	natural	1	
+src/script/script_record.c	ModifierStats_ApplyKind12	contrived	natural	1	
