@@ -10,10 +10,6 @@ static inline int scale(int a, int b)
         return v >> 12;
     return -((-v) >> 12);
 }
-static inline u32 frame_factor(u16 v)
-{
-    return DisplaySequence_MaskCommand(v, 15);
-}
 int FadingParticleGroup_Update(struct FadingParticleGroup *g)
 {
     int alive = 0, i = 0;
@@ -78,7 +74,7 @@ int FadingParticleGroup_Update(struct FadingParticleGroup *g)
                         }
                     } else {
                         if (++a->index >= a->frameCount) {
-                            if ((u8)(a->flags & 8)) {
+                            if (a->flags & 8) {
                                 a->elapsed = a->duration;
                                 a->index = a->frameCount - 1;
                             } else {
@@ -87,7 +83,7 @@ int FadingParticleGroup_Update(struct FadingParticleGroup *g)
                         }
                     }
                     entry = a->commands + a->index;
-                    a->duration = ((int)frame_factor(*entry) * a->speed) >> 6;
+                    a->duration = ((*entry & 15) * a->speed) >> 6;
                 }
                 {
                     u32 raw = *life;
