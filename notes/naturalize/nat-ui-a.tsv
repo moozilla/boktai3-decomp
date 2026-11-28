@@ -362,3 +362,4 @@ src/ui/dialogue/text_window/TextWindow_Create.c	TextWindow_Create	natural	natura
 src/ui/dialogue/text_window/TextWindow_OnIdle.c	TextWindow_OnIdle	natural	natural	0	
 src/ui/dialogue/text_window/TextWindow_OnPlaybackComplete.c	TextWindow_OnPlaybackComplete	natural	natural	0	
 src/ui/dialogue/text_window/DialogueTransition_Init.c	DialogueTransition_Init	natural	natural	0	
+src/ui/game_over/game_over.c	GameOver_UpdateOpening	fudged	natural	1	

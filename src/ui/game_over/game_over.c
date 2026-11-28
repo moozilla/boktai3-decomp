@@ -105,17 +105,17 @@ void GameOver_UpdateLetterHold(struct GameOver *panel)
 
 void GameOver_UpdateOpening(struct GameOver *panel)
 {
-    u32 timer = panel->timer + 1;
-    panel->timer = timer;
-    if ((u16)timer == 30) {
+    panel->timer++;
+    if (panel->timer == 30) {
         Sound_PlaySong(0x2F9);
-    } else if ((u16)timer > 149) {
-        if ((u16)timer == 150)
+    } else if (panel->timer >= 150) {
+        if (panel->timer == 150)
             Sound_PlaySong(0x12D);
         panel->extentX += 5;
         panel->extentY -= 5;
-        if (panel->extentX > 127) {
+        if (panel->extentX >= 128) {
             s32 i;
+
             panel->extentX = 1;
             panel->extentY = 1;
             for (i = 0; i < 8; i++)
