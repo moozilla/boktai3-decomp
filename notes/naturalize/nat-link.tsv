@@ -334,3 +334,4 @@ src/link/records/RecordPanel_SetSelectedDisplayResource.c	RecordPanel_SetSelecte
 src/link/records/RecordPanel_DrawTime.c	RecordPanel_DrawTime	contrived	minor	23	value local holds the pause mask and then the saturated time: register assignment
 src/link/records/PanelText_DrawDecimal.c	PanelText_DrawDecimal	contrived	contrived	13	do-while(0) round the remainder stays: it decides whether value or the cell pointer gets r5
 src/link/records/RecordPanel_RefreshEntryLabels.c	RecordPanel_RefreshEntryLabels	minor	natural	2	
+src/link/records/RecordPanel_ShowName.c	RecordPanel_ShowName	contrived	natural	1	
