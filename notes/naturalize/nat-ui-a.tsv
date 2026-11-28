@@ -354,3 +354,4 @@ src/ui/dialogue/text_window/TextWindow_GetNumberWidth.c	TextWindow_GetNumberWidt
 src/ui/dialogue/text_window/TextWindow_GetStringWidth.c	TextWindow_GetStringWidth	fudged	natural	1	
 src/ui/dialogue/text_window/TextWindow_OnPlayback.c	TextWindow_OnPlayback	fudged	natural	1	
 src/ui/dialogue/text_window/TextWindowManager_OnUpdate.c	TextWindowManager_OnUpdate	fudged	natural	1	sub_08249240 is the indirect-call helper; kept
+src/ui/dialogue/text_window/TextWindowManager_OnDestroy.c	TextWindowManager_OnDestroy	fudged	natural	1	
