@@ -7,9 +7,8 @@ extern const s16 gUnk_08611D24[];
 static inline s32 AngleNear(s32 angle, s32 ref)
 {
     s16 d = (angle - ref) & 0xff;
-    s32 x = d;
-    if (x > 128)
-        d = x - 256;
+    if (d > 128)
+        d -= 256;
     return ref + d;
 }
 
