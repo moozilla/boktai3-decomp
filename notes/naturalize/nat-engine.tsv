@@ -708,3 +708,14 @@ src/system/save/Save_AlignSizeToEightBytes.c	Save_AlignSizeToEightBytes	natural	
 src/system/save/sub_0822F174.c	sub_0822F174	natural	natural	0	
 src/system/save/Save_WriteBlock.c	Save_WriteBlock	minor	minor	2	failure paths share one goto label: separate returns are not merged the same way
 src/system/solar/solar_calibration_menu.c	SolarCalibration_Initialize	contrived	minor	1	returns the assignment of zero to fadeSpeed, as the ROM does
+src/system/solar/solar_calibration_menu.c	SolarCalibration_Update	contrived	contrived	18	blink flag address built from byte offsets: indexing widgets[page + 1] folds the member offset differently
+src/system/solar/solar_calibration_menu.c	SolarCalibration_Destroy	minor	minor	2	mask held in a local before the and: a compound assignment loads it second
+src/system/solar/solar_calibration_menu.c	SolarCalibration_SetParametersFromScript	natural	natural	0	
+src/system/solar/solar_calibration_menu.c	SolarCalibration_Create	natural	natural	0	
+src/system/solar/solar_calibration_menu.c	Menu_EraseRect	natural	natural	0	
+src/system/solar/solar_calibration_menu.c	Menu_DrawText	minor	minor	2	byte tested through a shifted u32 copy: an s8 local reads and extends differently
+src/system/solar/solar_calibration_menu.c	Menu_DrawStringRef	natural	natural	0	
+src/system/solar/solar_calibration_menu.c	Menu_SetTextRect	natural	natural	1	field copies: a struct assignment compiles to word moves
+src/system/solar/solar_calibration_menu.c	Menu_SetBackgroundMap	natural	natural	0	
+src/system/solar/solar_calibration_menu.c	Menu_StartFadeIn	natural	natural	0	
+src/system/solar/solar_calibration_menu.c	Menu_StartFadeOut	natural	natural	0	
