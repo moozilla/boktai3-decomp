@@ -624,8 +624,7 @@ void SceneActorAnimation_SelectDirectionalEntry(struct RoomActor *, s32);
 
 void Golem_UpdateIdleState(u8 *p)
 {
-    if (p[0x2b2] != 0)
-        p[0x2b2] = 0;
+    SceneActorControl_TakeFlag(&((struct ChaseActor *)p)->base.field2B2);
     SceneActorAnimation_SelectDirectionalEntry(p, 1);
 }
 
