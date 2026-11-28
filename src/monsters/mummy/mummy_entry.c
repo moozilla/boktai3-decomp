@@ -807,9 +807,7 @@ void Mummy_UpdateDefeat(struct ChaseActor *actor, s32 frame)
         SceneActorPlacement_PlayCategoryEventSound(actor);
         if (Mummy_MotionFlags(actor, 8))
             Sound_PlaySong(0x12A);
-        {
-            collider->flags |= 4;
-        }
+        collider->flags |= 4;
     }
     if (Mod(frame, 12) == 0 && Mummy_MotionFlags(actor, 8)) {
         rangeA.x = 60;
@@ -876,16 +874,14 @@ void Mummy_UpdateDefeat(struct ChaseActor *actor, s32 frame)
         arguments.values = values;
         Script_Call(script, &arguments);
     }
-    {
-        if (!SceneActorChase_FlagComponentBits((void *)motionFlags, 0x4000) &&
-            (u32)(actor->base.category - 11) > 2)
-            Bestiary_UnlockEntry(
-                Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
-        actor->base.attachmentTimer = 0;
-        SceneActorChase_SetTypedControl(actor, SceneActorControl_OnIdle, 16);
-        SceneActorChase_SelectState(actor, 1, 0, 2);
-        SceneActorChase_ResetStateEntry(actor);
-    }
+    if (!SceneActorChase_FlagComponentBits(motionFlags, 0x4000) &&
+        (u32)(actor->base.category - 11) > 2)
+        Bestiary_UnlockEntry(
+            Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
+    actor->base.attachmentTimer = 0;
+    SceneActorChase_SetTypedControl(actor, SceneActorControl_OnIdle, 16);
+    SceneActorChase_SelectState(actor, 1, 0, 2);
+    SceneActorChase_ResetStateEntry(actor);
     ActorStatus_SetDrawableFlags(actor, 1);
     ActorShadow_Disable(actor->base.shadow);
 }
