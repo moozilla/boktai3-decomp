@@ -1130,11 +1130,6 @@ void TutorialOtenko_UpdateRotatingAnimation(struct ActorAnimController *p)
 
 void TutorialOtenko_UpdateAppearanceAnimation(struct ActorAnimController *p)
 {
-    struct DisplaySequenceSprite *o;
-    struct DisplaySequenceState *a;
-    const u16 *entry;
-    u32 flag;
-    u8 done;
     if (take(p)) {
         p->state = 1;
         Anim_SetSequence(&p->anim, p->arg, 1, 0, p->next);
@@ -1143,80 +1138,16 @@ void TutorialOtenko_UpdateAppearanceAnimation(struct ActorAnimController *p)
         p->obj.flags &= ~32;
         p->obj.paletteVariant = 64;
         p->obj.palette = 64;
-        (*(u16 *)&p->obj.position.y) += 160;
-        p->savedPosition.y = (*(u16 *)&p->obj.position.y);
+        p->obj.position.y += 160;
+        p->savedPosition.y = p->obj.position.y;
         Sound_PlaySong(286);
         TutorialOtenko_SetInteractionControlFlag(p);
         AnimData_SelectPaletteBank(p->effect, 343);
     }
-    o = &p->obj;
-    a = &p->anim;
-    entry = a->commands + a->index;
-    o->frame = *entry >> 6;
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = a->flags;
-        bit = 1;
-        first = (u8)(control.raw & bit);
-        if (first != (((*entry & 0x30) >> 4) & bit))
-            o->flags |= 4;
-        else
-            o->flags &= ~4;
-    }
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = a->flags;
-        bit = 2;
-        first = (u8)(control.raw & bit);
-        if (first != (((*entry & 0x30) >> 4) & bit))
-            o->flags |= 8;
-        else
-            o->flags &= ~8;
-    }
-    if (++a->elapsed >= a->duration) {
-        a->elapsed = 0;
-        if (a->flags & 4) {
-            if (a->index == 0) {
-                if (a->flags & 8) {
-                    a->elapsed = a->duration;
-                } else {
-                    a->index = a->frameCount - 1;
-                }
-                done = 1;
-            } else {
-                a->index--;
-                done = 0;
-            }
-        } else {
-            if (++a->index >= a->frameCount) {
-                if ((u8)(a->flags & 8)) {
-                    a->elapsed = a->duration;
-                    a->index = a->frameCount - 1;
-                    done = 1;
-                } else {
-                    a->index = 0;
-                    done = 1;
-                }
-            } else
-                done = 0;
-        }
-        entry = a->commands + a->index;
-        a->frameWeight = frame_factor(*entry);
-        a->duration = (a->frameWeight * a->speed) >> 6;
-        if (!a->duration)
-            a->duration = 1;
-    } else
-        done = 0;
-    p->done = done;
-    if (done) {
+    p->done = DisplaySequence_StepSprite(&p->obj, &p->anim);
+    if (p->done) {
         ActorShadow_Enable(p->p2);
-        p->phase = 0;
-        if (p->oldMode == 3 && p->mode == 3) {
-            p->savedFrame = p->anim.index;
-            p->savedTimer = p->anim.elapsed;
-        }
+        TutorialOtenko_SetPhase(p, 0);
         {
             u8 one = 1;
             p->flags |= one;

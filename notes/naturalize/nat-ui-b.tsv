@@ -287,3 +287,6 @@ src/ui/title/tutorial_otenko.c	TutorialOtenko_OnControllerIdle	natural	natural	0
 src/ui/title/tutorial_otenko.c	TutorialOtenko_OnInteractionChildUpdate	contrived	minor	3	controller parameter copied into a local (parameter copy order)
 src/ui/title/tutorial_otenko.c	TutorialOtenko_OnInteractionChildDelay	contrived	minor	3	controller parameter copied into a local (parameter copy order)
 src/ui/title/tutorial_otenko.c	TutorialOtenko_OnInteractionChildRelease	contrived	minor	5	callback local, u8 one and controller parameter copy (constant and register order)
+src/ui/title/tutorial_otenko.c	TutorialOtenko_OnEffectChildPaletteInit	natural	natural	0	
+src/ui/title/tutorial_otenko.c	TutorialOtenko_UpdateRotatingAnimation	minor	minor	0	take/rotate helpers
+src/ui/title/tutorial_otenko.c	TutorialOtenko_UpdateAppearanceAnimation	contrived	minor	5	u8 one for the state flag
