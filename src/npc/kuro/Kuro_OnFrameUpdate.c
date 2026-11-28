@@ -1,14 +1,12 @@
-#include "global.h"
+#include "npc/manager/scene_actor_lifecycle.h"
 
-void Kuro_DispatchCutsceneCommands(u8 *);
-void Actor_UpdateMovementAnimationAndEffects(u32, u8 *);
+void Kuro_DispatchCutsceneCommands(struct SceneActor *);
+void Actor_UpdateMovementAnimationAndEffects(void *, struct SceneActor *);
 
-s32 Kuro_OnFrameUpdate(u32 a, u8 *b)
+s32 Kuro_OnFrameUpdate(void *ctx, struct SceneActor *actor)
 {
-    s32 z;
-    Kuro_DispatchCutsceneCommands(b);
-    Actor_UpdateMovementAnimationAndEffects(a, b);
-    z = 0;
-    b[5] = z;
-    return z;
+    Kuro_DispatchCutsceneCommands(actor);
+    Actor_UpdateMovementAnimationAndEffects(ctx, actor);
+    actor->action = 0;
+    return 0;
 }
