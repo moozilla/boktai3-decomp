@@ -507,3 +507,4 @@ src/system/game_state/sub_0822E86C.c	sub_0822E86C	contrived	natural	1
 src/system/game_state/SolarFruit_SortInventorySlots.c	SolarFruit_SortInventorySlots	contrived	natural	1	
 src/system/game_state/GameState_CountCollectedConsumableTypes.c	GameState_CountCollectedConsumableTypes	contrived	natural	1	
 src/system/game_state/GameState_GetConsumableDescriptor.c	GameState_GetConsumableDescriptor	minor	natural	1	
+src/system/game_state/sub_0822E420.c	sub_0822E420	minor	natural	1	
