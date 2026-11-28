@@ -150,9 +150,8 @@ void ActorMarker_EmitIndexedEffect(struct SceneCombatActor *actor, s32 index)
 
 void Armor_SpawnRandomDirectionalParticle(struct SceneCombatActor *actor)
 {
-    u32 randomIndex;
-    gRandomIndex = randomIndex = (gRandomIndex + 1) & 0x3FF;
-    ActorMarker_EmitIndexedEffect(actor, Mod(*(u16 *)((u8 *)gRandomTable + randomIndex * 2), 10));
+    gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+    ActorMarker_EmitIndexedEffect(actor, Mod(*(gRandomTable + gRandomIndex), 10));
 }
 
 void Armor_SpawnDirectionalParticleFan(struct SceneCombatActor *actor)
