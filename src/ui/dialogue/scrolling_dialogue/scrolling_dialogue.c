@@ -137,17 +137,12 @@ int ScrollingDialogue_Show(struct ScrollingDialogue *dialogue)
 
 int ScrollingDialogue_Hide(struct ScrollingDialogue *dialogue)
 {
-    u8 *active = &dialogue->active;
-    int result;
-    if (*active) {
-        ScrollingDialogue_ClearScript();
-        gVBlankDialogueState = 0;
-        *active = 0;
-        result = 0;
-    } else {
-        result = -1;
-    }
-    return result;
+    if (!dialogue->active)
+        return -1;
+    ScrollingDialogue_ClearScript();
+    gVBlankDialogueState = 0;
+    dialogue->active = 0;
+    return 0;
 }
 
 int ScrollingDialogue_OnTaskUpdate(struct ScrollingDialogue *dialogue)
