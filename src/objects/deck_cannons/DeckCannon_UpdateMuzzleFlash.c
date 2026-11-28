@@ -1,16 +1,13 @@
 #include "global.h"
+#include "objects/deck_cannons/deck_cannon_battery.h"
 
-void Callback_InvokeActor(u8 *, u32);
-
-void DeckCannon_UpdateMuzzleFlash(u8 *p)
+void DeckCannon_UpdateMuzzleFlash(struct DeckCannonShot *shot)
 {
-    if (*(p + 0xB7)) {
-        u32 q;
-        *(u32 *)p = 0;
-        q = *(u32 *)(p + 4);
-        if (q) {
-            Callback_InvokeActor(p, q);
-            *(u32 *)(p + 4) = 0;
+    if (shot->finished) {
+        shot->update = 0;
+        if (shot->destroy) {
+            Callback_InvokeActor(shot, shot->destroy);
+            shot->destroy = 0;
         }
     }
 }
