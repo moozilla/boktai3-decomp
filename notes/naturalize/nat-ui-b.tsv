@@ -551,3 +551,4 @@ src/ui/town/solar_bank/SpriteMenu_UpdateTimedFade.c	SpriteMenu_UpdateTimedFade	c
 src/ui/town/solar_bank/SolarBank_UpdateExitDelay.c	SolarBank_UpdateExitDelay	contrived	natural	1	
 src/ui/town/solar_bank/SolarBank_OnUpdate.c	SolarBank_OnUpdate	contrived	natural	1	
 src/ui/town/solar_bank/SolarBank_OnDestroy.c	SolarBank_OnDestroy	contrived	minor	1	sprite-array view starting at the label
+src/ui/town/solar_bank/SpriteMenu_InitBackground.c	SpriteMenu_InitBackground	minor	minor	1	zero local passed by address
