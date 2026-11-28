@@ -254,3 +254,4 @@ src/monsters/axe/axe.c	Axe_UpdateDamageSpin	contrived	contrived	10	remaining: co
 src/monsters/axe/axe.c	SceneActorControl_UpdateHoverHeight	minor	minor	9	remaining: maskhelper
 src/monsters/axe/axe.c	Axe_InitColliders	contrived	contrived	6	remaining: constlocal,maskhelper
 src/monsters/axe/axe.c	Axe_ResetMovementFlags	contrived	minor	5	remaining: constlocal
+src/monsters/axe/axe.c	SceneActorControl_CanAdvanceHover	contrived	contrived	6	remaining: goto,zeroone,structcast,maskhelper

@@ -1673,11 +1673,9 @@ s32 SceneActorControl_CanAdvanceHover(struct ChaseActor *actor)
     if (!Actor_IsInactive((void *)actor)) {
         struct Axe *context = actor->base.context;
         context->target = *(struct ContactPosition *)&gPlayers[0]->position;
-        {
-            if (!(SceneActorChase_QueryMotionFlags(actor, 0x100)) &&
-                actor->base.tracking.distance < actor->base.tracking.limit)
-                goto one;
-        }
+        if (!(SceneActorChase_QueryMotionFlags(actor, 0x100)) &&
+            actor->base.tracking.distance < actor->base.tracking.limit)
+            goto one;
     }
     return 0;
 one:
