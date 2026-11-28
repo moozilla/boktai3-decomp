@@ -4,3 +4,6 @@ src/bosses/count/actor_graphics_and_basic_states.c	SceneActorGraphics_OnDamageCo
 src/bosses/count/actor_graphics_and_basic_states.c	SceneActorGraphics_GetResourceId	natural	natural	0	identical switch arms carry a concession-ok
 src/bosses/count/actor_graphics_and_basic_states.c	SceneActorGraphics_GetDefaultResourceId	minor	minor	0	integer returned as u8*; prototype shared
 src/bosses/count/actor_graphics_and_basic_states.c	SceneActorGraphics_InitializeBody	contrived	natural	2	
+src/bosses/count/actor_graphics_and_basic_states.c	SceneActorGraphics_InitBodyNoOp	natural	natural	0	
+src/bosses/count/actor_graphics_and_basic_states.c	SceneActorGraphics_InitializeOverlay	natural	natural	0	
+src/bosses/count/actor_graphics_and_basic_states.c	SceneActorGraphics_UpdateVariant	contrived	natural	2	TestFlags accessor kept (plain & loads the word before the mask)

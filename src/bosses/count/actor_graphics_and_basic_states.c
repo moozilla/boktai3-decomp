@@ -229,16 +229,14 @@ void SceneActorGraphics_InitializeOverlay(struct StateActor *p, int resource)
     Collider_Refresh(drawable);
 }
 
-void SceneActorGraphics_UpdateVariant(struct StateActor *p)
+void SceneActorGraphics_UpdateVariant(struct SceneGraphicsActor *actor)
 {
-    struct SceneGraphicsActor *actor = (struct SceneGraphicsActor *)p;
+    struct StateActor *p = (struct StateActor *)actor;
     struct ContactCollider *drawable = (struct ContactCollider *)p->bodyDrawable;
-    {
-        if (SceneActorState_TestFlags(p, 0x40000))
-            actor->graphics.variantToggle = 1;
-        else
-            actor->graphics.variantToggle = 0;
-    }
+    if (SceneActorState_TestFlags(p, 0x40000))
+        actor->graphics.variantToggle = 1;
+    else
+        actor->graphics.variantToggle = 0;
     if (actor->graphics.variantToggle != actor->graphics.variantTogglePrev) {
         switch (actor->graphics.variantToggle) {
             case 0:
@@ -252,13 +250,9 @@ void SceneActorGraphics_UpdateVariant(struct StateActor *p)
                                              actor->graphics.attackDepth1);
                 break;
         }
-        {
-            int value = actor->graphics.variantToggle;
-            actor->graphics.variantTogglePrev = value;
-        }
+        actor->graphics.variantTogglePrev = actor->graphics.variantToggle;
     }
 }
-
 /* A flat `pad[0x344]` prefix (matching groundEffect's offset) rather than
  * struct StateActor + a nested SceneActorGraphics cast: the two-step access
  * changes register allocation enough to break the match. Fields are
