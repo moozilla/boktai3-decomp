@@ -319,10 +319,7 @@ void PopInSprite_StartAppearing(struct ContactImpactEffect *p)
 
 void PopInSprite_StartDisappearing(struct ContactImpactEffect *p)
 {
-    void (*f)(struct ContactImpactEffect *) = SpriteController_AnimateShrinking;
-    p->update = f;
-    p->timer = 0;
-    p->stateResult = 0;
+    ContactImpactEffect_EnterUpdate(p, SpriteController_AnimateShrinking);
 }
 
 void PopInSprite_SetHidden(struct ContactImpactEffect *p)
