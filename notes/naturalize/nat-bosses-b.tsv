@@ -50,3 +50,4 @@ src/bosses/ratatosk/Ratatosk_UpdateTimedPoseVariant.c	Ratatosk_UpdateTimedPoseVa
 src/bosses/ratatosk/SceneActor_BeginTimedAnimation.c	SceneActor_BeginTimedAnimation	minor	minor	6	actor alias and one flag accessor stay
 src/bosses/ratatosk/Ratatosk_UpdateReactionAnimation.c	Ratatosk_UpdateReactionAnimation	contrived	contrived	2	goto into the else arm and actor alias stay
 src/bosses/ratatosk/SceneActor_UpdateAnimation33Timer.c	SceneActor_UpdateAnimation33Timer	minor	natural	1	
+src/bosses/ratatosk/SceneActor_UpdateAnimation7Timer.c	SceneActor_UpdateAnimation7Timer	minor	natural	1	
