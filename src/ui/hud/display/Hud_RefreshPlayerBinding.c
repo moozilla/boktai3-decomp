@@ -1,18 +1,14 @@
 #include "global.h"
 #include "player/player.h"
 #include "engine/video/render.h"
-struct FieldHud {
-    u8 unknown0[0xA3F];
-    u8 playerSlot;
-    struct Player *player;
-};
-void SceneHud_RefreshGameplayDisplay(struct FieldHud *);
-s32 Hud_RefreshPlayerBinding(struct FieldHud *hud)
+#include "ui/pause/scene_hud_display.h"
+void SceneHud_RefreshGameplayDisplay(struct SceneHudState *);
+s32 Hud_RefreshPlayerBinding(struct SceneHudState *hud)
 {
     if (!(gEnginePauseFlags & 1)) {
-        u32 slot = hud->playerSlot;
+        u32 slot = hud->actionOwnerIndex;
         struct Player *player = gPlayers[slot];
-        hud->player = player;
+        hud->actionOwner = player;
         SceneHud_RefreshGameplayDisplay(hud);
     }
     return 0;

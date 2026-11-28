@@ -591,3 +591,4 @@ src/ui/hud/display/Hud_ShowPanelFromScript.c	Hud_ShowPanelFromScript	fudged	natu
 src/ui/hud/display/SceneHud_RefreshActionKeyframes.c	SceneHud_RefreshActionKeyframes	natural	natural	0	
 src/ui/hud/display/SceneHud_DrawSlotMarkers.c	SceneHud_DrawSlotMarkers	fudged	natural	14	flag local read before the kind pointer is formed
 src/ui/hud/display/SceneHud_DrawSlotMeter.c	SceneHud_DrawSlotMeter	fudged	natural	1	
+src/ui/hud/display/Hud_RefreshPlayerBinding.c	Hud_RefreshPlayerBinding	fudged	natural	3	slot local before indexing gPlayers (load order)
