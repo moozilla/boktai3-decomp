@@ -42,7 +42,10 @@ struct ResultMenu {
     u8 unknownBD[2], lastTimingGrade;
     u8 pressScore;
     u8 revealPose, unknownC2[2], finishState;
-    u8 unknownC5[0x13];
+    u8 transformationOutcome; /* 0xC5: which modifier message the result shows (guess) */
+    u8 gradeRaised, unknownC7;
+    s16 rankChange; /* 0xC8: new definition rank minus the old one (guess) */
+    u8 unknownCA[0xE];
     s32 preciseCount, closeCount, missedCount;
     u16 meterPalette[16];
     struct AnimSpriteResource primaryResource, secondaryResource;

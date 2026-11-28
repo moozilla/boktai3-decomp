@@ -1,110 +1,97 @@
 #include "global.h"
 #include "ui/town/shop_item_values.h"
 #include "engine/ram.h"
-extern u8 gUnk_08E6092C[][0x20];
-extern u8 gUnk_08E60F80[][16];
+#include "minigames/result_game/result_tutorial.h"
+#include "ui/town/shop_item_values.h"
+
+extern struct SceneValueEquipmentDefinition gUnk_08E6092C[];
+extern struct SceneValueConsumableDefinition gUnk_08E60F80[];
 extern u16 gUnk_086141BC[];
-void sub_0801B600(u32 a, u32 b, struct SceneValueEquipment *c);
-void TransformMarker_CopyVector(u8 *p, u8 *q);
-void TransformMarker_ClearVector(u8 *p);
+void sub_0801B600(u32 equipmentSlot, u32 consumableSlot, struct SceneValueEquipment *result);
+void TransformMarker_CopyVector(struct SceneValueEquipment *entry,
+                                const struct SceneValueEquipmentDefinition *definition);
+void TransformMarker_ClearVector(struct SceneValueEquipment *entry);
 void Inventory_MarkEquipmentObtained(u32);
 void GameState_ClearConsumableSlot(u32);
 s32 Div(s32, s32);
 
-struct TfCtx {
-    u8 pad0[0x7c];
-    struct SceneValueEquipment cur;
-    u8 pad1[0xa0 - 0x8c];
-    u16 a0, a2, a4, a6;
-    u8 pad2[0xba - 0xa8];
-    u8 b8a, b8b, b8c;
-    u8 pad3[0xc5 - 0xbd];
-    u8 c5, c6;
-    u8 pad4;
-    u16 c8;
-};
-void sub_0801B700(struct TfCtx *p)
+void sub_0801B700(struct ResultMenu *menu)
 {
-    struct SceneValueEquipment *e = Inventory_GetEquipmentEntry(p->b8a);
-    u8 *t2 = gUnk_08E60F80[Inventory_GetConsumableId(p->b8b)];
-    u8 *t1;
-    u8 *t3;
-    s32 th;
-    s32 a, b, v;
-    u32 k;
-    u8 flag;
-
-    sub_0801B600(p->b8a, p->b8b, &p->cur);
-    t1 = gUnk_08E6092C[e->kind];
-    t3 = gUnk_08E6092C[p->cur.kind];
-    p->c8 = t3[2] - t1[2];
-    flag = 0;
-    if (p->cur.grade > e->grade)
-        flag = 1;
-    p->c6 = flag;
-    switch (t2[0xa]) {
+    struct SceneValueEquipment *entry = Inventory_GetEquipmentEntry(menu->equipmentSlot);
+    struct SceneValueConsumableDefinition *item =
+        &gUnk_08E60F80[Inventory_GetConsumableId(menu->consumableSlot)];
+    struct SceneValueEquipmentDefinition *oldDefinition, *newDefinition;
+    s32 chance;
+    s32 tracking, press, score;
+    u32 kind;
+    sub_0801B600(menu->equipmentSlot, menu->consumableSlot, &menu->transformationResult);
+    oldDefinition = &gUnk_08E6092C[entry->kind];
+    newDefinition = &gUnk_08E6092C[menu->transformationResult.kind];
+    menu->rankChange = newDefinition->descriptionStyleA - oldDefinition->descriptionStyleA;
+    menu->gradeRaised = menu->transformationResult.grade > entry->grade;
+    switch (item->unknownA[0]) {
         case 20:
-            th = 0x1999;
+            chance = 0x1999;
             break;
         case 30:
-            th = 0x2666;
+            chance = 0x2666;
             break;
         case 40:
-            th = 0x3333;
+            chance = 0x3333;
             break;
         case 50:
-            th = 0x4000;
+            chance = 0x4000;
             break;
         case 60:
-            th = 0x8000;
+            chance = 0x8000;
             break;
         case 0xff:
-            th = 0x10000;
+            chance = 0x10000;
             break;
         case 10:
         default:
-            th = 0xccc;
+            chance = 0xccc;
             break;
     }
-    if (p->b8c)
-        th <<= 1;
+    if (menu->wideTimingWindow)
+        chance <<= 1;
     gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 0x3ff;
-    if (gUnk_086141BC[gEffectRandomTableIndex] < th) {
-        TransformMarker_CopyVector((u8 *)&p->cur, t3);
+    if (gUnk_086141BC[gEffectRandomTableIndex] < chance) {
+        TransformMarker_CopyVector(&menu->transformationResult, newDefinition);
     } else {
-        if (e->kind != p->cur.kind)
-            TransformMarker_ClearVector((u8 *)&p->cur);
+        if (entry->kind != menu->transformationResult.kind)
+            TransformMarker_ClearVector(&menu->transformationResult);
     }
-    if (t3[0xc] == 0 && t3[0x10] == 0)
-        p->c5 = 0;
-    else if (e->kind == p->cur.kind) {
-        if (e->modifierA || e->modifierB)
-            p->c5 = 2;
-        else if (p->cur.modifierA || p->cur.modifierB)
-            p->c5 = 3;
+    if (newDefinition->modifierTextA == 0 && newDefinition->modifierTextB == 0)
+        menu->transformationOutcome = 0;
+    else if (entry->kind == menu->transformationResult.kind) {
+        if (entry->modifierA || entry->modifierB)
+            menu->transformationOutcome = 2;
+        else if (menu->transformationResult.modifierA || menu->transformationResult.modifierB)
+            menu->transformationOutcome = 3;
         else
-            p->c5 = 1;
-    } else if (p->cur.modifierA || p->cur.modifierB)
-        p->c5 = 3;
+            menu->transformationOutcome = 1;
+    } else if (menu->transformationResult.modifierA || menu->transformationResult.modifierB)
+        menu->transformationOutcome = 3;
     else
-        p->c5 = 1;
-    a = Div(p->a0 << 8, p->a2);
-    b = Div(p->a4 << 8, p->a6);
-    v = (a * 0x66 + b * 0x99) >> 8;
-    if (v > 0x400)
-        p->cur.condition = 1000;
-    else if (v > 0x300)
-        p->cur.condition = 750;
-    else if (v > 0x200)
-        p->cur.condition = 500;
+        menu->transformationOutcome = 1;
+    tracking = Div(menu->trackingScore << 8, menu->trackingSamples);
+    press = Div(menu->pressScoreTotal << 8, menu->pressSamples);
+    score = (tracking * 0x66 + press * 0x99) >> 8;
+    if (score > 0x400)
+        menu->transformationResult.condition = 1000;
+    else if (score > 0x300)
+        menu->transformationResult.condition = 750;
+    else if (score > 0x200)
+        menu->transformationResult.condition = 500;
     else
-        p->cur.condition = 250;
-    *e = p->cur;
-    Inventory_MarkEquipmentObtained(p->cur.kind);
-    k = p->cur.kind;
-    if ((s32)k < 0x20)
-        gGameState->unlockedEquipment[0] |= 1 << k;
+        menu->transformationResult.condition = 250;
+    *entry = menu->transformationResult;
+    Inventory_MarkEquipmentObtained(menu->transformationResult.kind);
+    kind = menu->transformationResult.kind;
+    if ((s32)kind < 0x20)
+        gGameState->unlockedEquipment[0] |= 1 << kind;
     else
-        gGameState->unlockedEquipment[1] |= 1 << (k - 0x20);
-    GameState_ClearConsumableSlot(p->b8b);
+        gGameState->unlockedEquipment[1] |= 1 << (kind - 0x20);
+    GameState_ClearConsumableSlot(menu->consumableSlot);
 }

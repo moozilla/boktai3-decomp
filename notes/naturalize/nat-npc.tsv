@@ -674,3 +674,4 @@ src/minigames/result_game/TransformMarker_SetTypeFromTable.c	TransformMarker_Set
 src/minigames/result_game/TransformMarker_ClearVector.c	TransformMarker_ClearVector	minor	natural	1	
 src/minigames/result_game/TransformMarker_CopyVector.c	TransformMarker_CopyVector	contrived	natural	1	
 src/minigames/result_game/sub_0801B600.c	sub_0801B600	contrived	natural	8	
+src/minigames/result_game/sub_0801B700.c	sub_0801B700	contrived	natural	2	
