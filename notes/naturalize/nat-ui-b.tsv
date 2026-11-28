@@ -272,3 +272,6 @@ src/ui/title/tutorial_otenko.c	TutorialOtenko_BeginAnimationPhaseTen	natural	nat
 src/ui/title/tutorial_otenko.c	TutorialOtenko_BeginAnimationPhaseEleven	natural	natural	0	
 src/ui/title/tutorial_otenko.c	TutorialOtenko_BeginCompletionAnimation	natural	natural	0	
 src/ui/title/tutorial_otenko.c	TutorialOtenko_BeginCurveToPosition	contrived	natural	1	
+src/ui/title/tutorial_otenko.c	TutorialOtenko_BeginCurveToRest	natural	natural	0	
+src/ui/title/tutorial_otenko.c	TutorialOtenko_BeginScriptedCurve	natural	natural	0	
+src/ui/title/tutorial_otenko.c	TutorialOtenko_SetFacingAndIdle	minor	natural	2	
