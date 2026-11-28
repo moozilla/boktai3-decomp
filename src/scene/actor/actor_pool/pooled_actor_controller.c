@@ -72,12 +72,11 @@ void Actor_InitializeKeyframeDrawable(struct PooledActor *actor, s32 resourceId,
 
 void Actor_UpdateDrawable(struct PooledActor *actor)
 {
-    void *drawable;
     Actor_RefreshTarget(actor);
-    drawable = &actor->drawable;
-    DisplayAnimation_SetPosition(drawable, (const struct DisplayPosition *)&actor->body.position);
+    DisplayAnimation_SetPosition(&actor->drawable,
+                                 (const struct DisplayPosition *)&actor->body.position);
     if (PooledActor_TestFlags(actor, 2))
-        DisplayAnimation_UpdatePlayback(drawable);
+        DisplayAnimation_UpdatePlayback(&actor->drawable);
 }
 
 void Actor_PrepareStateUpdate(struct PooledActor *actor)
