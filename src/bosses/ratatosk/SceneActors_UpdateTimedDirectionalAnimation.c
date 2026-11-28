@@ -5,19 +5,7 @@ void SceneActors_UpdateTimedDirectionalAnimation(struct Ratatosk *p, int tick)
 {
     if (p->actionChanged) {
         p->actionChanged = 0;
-        p->body.direction = p->requestedAngle;
-        {
-            int shifted = (p->body.direction + 0x60) >> 6;
-            u32 value = 3;
-            value &= shifted;
-            p->facing = value;
-        }
-        {
-            int shifted = (p->body.direction + 0x70) >> 5;
-            u32 value = 7;
-            value &= shifted;
-            p->facing8 = value;
-        }
+        Ratatosk_SetFacing(p, p->requestedAngle);
         SceneActors_StartDirectionalAnimation(p, p->animationData, p->animation, 13, 1, 1, 4);
     }
     if (tick > 19) {
