@@ -518,3 +518,4 @@ src/ui/hud/display/hud_stat_display.c	Hud_DrawEnergyRatio	natural	natural	0
 src/ui/hud/display/hud.c	Hud_DrawHealthMeterCells	fudged	natural	20	
 src/ui/hud/display/hud.c	Hud_DrawHealthMeter	natural	natural	0	
 src/ui/hud/display/hud.c	Hud_DrawDefaultHealthMeter	natural	natural	0	
+src/ui/hud/display/hud.c	Hud_DrawEnergyMeter	fudged	partial	38	blinkFlags mask local, actionMode local, existing HasEnergyTimer* helpers, separate meter/blank pointers (register assignment and reload order)
