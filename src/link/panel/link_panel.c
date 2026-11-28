@@ -220,7 +220,7 @@ void LinkPanel_UpdateStatusMessage(struct LinkPanel *panel)
 
 void LinkPanelSlots_HideAnimations(struct LinkPanel *);
 
-void LinkPanelSlots_RemoveAnimations(void *);
+void LinkPanelSlots_RemoveAnimations(struct LinkPanel *);
 
 void LinkSession_NotifyMenuClosed(void);
 

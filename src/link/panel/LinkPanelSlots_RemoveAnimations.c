@@ -1,14 +1,10 @@
 #include "global.h"
+#include "link/panel/link_panel.h"
 
-void Anim_Remove(u8 *);
-
-void LinkPanelSlots_RemoveAnimations(u8 *p)
+void LinkPanelSlots_RemoveAnimations(struct LinkPanel *panel)
 {
-    u8 *q = p + 0x20;
     s32 i;
 
-    for (i = 6; i >= 0; i--) {
-        Anim_Remove(q);
-        q += 0x60;
-    }
+    for (i = 0; i < 7; i++)
+        Anim_Remove(&panel->animations[i]);
 }
