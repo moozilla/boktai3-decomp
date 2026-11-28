@@ -240,3 +240,4 @@ src/link/player/Player_UpdateThrowAction.c	Player_UpdateThrowAction	minor	natura
 src/link/player/SceneVec_OffsetPolar.c	SceneVec_OffsetPolar	minor	natural	1	
 src/link/player/Player_GetTerrainHeightAtPosition.c	Player_GetTerrainHeightAtPosition	minor	natural	2	
 src/link/player/Terrain_ClassifyOffsetHeight.c	Terrain_ClassifyOffsetHeight	minor	natural	1	
+src/link/player/sub_0823C6BC.c	sub_0823C6BC	contrived	natural	4	

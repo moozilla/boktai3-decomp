@@ -1,39 +1,42 @@
 #include "global.h"
+#include "player/player.h"
 
-s32 Player_GetLinkedSmoothedDirection(u8 *);
-s32 Player_ComputeLinkedActionDelay(u8 *);
+s32 Player_GetLinkedSmoothedDirection(struct Player *);
+s32 Player_ComputeLinkedActionDelay(struct Player *);
 s32 Player_GetMovementAnimationRate(s32);
-void LinkPlayer_SetScaledDirectionalVelocity(u8 *, s32);
-void Player_PlayActionCueSound(u8 *, u32);
-void Player_UpdateActionFacingSide(u8 *);
+void LinkPlayer_SetScaledDirectionalVelocity(struct Player *, s32);
+void Player_PlayActionCueSound(struct Player *, u32);
+void Player_UpdateActionFacingSide(struct Player *);
 s32 ActorVariant_GetTableValue(u32, s32);
-s32 Player_SetAnimationIndex(u8 *, s32, s32);
+s32 Player_SetAnimationIndex(struct Player *, s32, s32);
 
-static inline s32 IsScaled(u8 *p)
+static inline s32 IsScaled(struct Player *p)
 {
-    u32 a = *(u16 *)(p + 0x538);
-    s32 r = 0;
-    if (a != 0) {
-        if (*(u16 *)(p + 0x534) == 5)
-            r = 1;
+    u32 active = p->active;
+    s32 scaled = 0;
+
+    if (active != 0) {
+        if (p->sceneMode == 5)
+            scaled = 1;
     }
-    return r;
+    return scaled;
 }
 
-void sub_0823C6BC(u8 *p)
+void sub_0823C6BC(struct Player *p)
 {
-    s32 v;
-    p[0x457] = 1;
-    *(u32 *)(p + 0x20) &= ~1;
-    p[0x3A4] = Player_GetLinkedSmoothedDirection(p);
-    if (p[0x48C] == 0) {
-        v = Player_ComputeLinkedActionDelay(p);
-        Player_GetMovementAnimationRate(v);
-        if (p != 0 && IsScaled(p) != 0)
-            v = (p[0xC0] * v) >> 6;
-        LinkPlayer_SetScaledDirectionalVelocity(p, v);
+    s32 delay;
+
+    p->tetherMode = 1;
+    p->statusFlags &= ~1;
+    p->facing = Player_GetLinkedSmoothedDirection(p);
+    if (p->movementVelocityLocked == 0) {
+        delay = Player_ComputeLinkedActionDelay(p);
+        Player_GetMovementAnimationRate(delay);
+        if (p != NULL && IsScaled(p))
+            delay = (p->animation.scaleX * delay) >> 6;
+        LinkPlayer_SetScaledDirectionalVelocity(p, delay);
     }
     Player_PlayActionCueSound(p, 0);
     Player_UpdateActionFacingSide(p);
-    Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p[0x418], 1), 0x40);
+    Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 1), 0x40);
 }
