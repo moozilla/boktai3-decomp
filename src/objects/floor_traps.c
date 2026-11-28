@@ -689,29 +689,23 @@ u32 FloorTrapPool_IsReadyFromScript(void)
 
 void FloorTrap_SetStateFromScript(void)
 {
-    s32 mode = Script_GetKeywordValue(0x73, 0);
-    struct TileTrigger *trigger = FloorTrapPool_FindByName(Script_GetKeywordValue(0x69, 0));
+    s32 mode = Script_GetKeywordValue('s', 0);
+    struct TileTrigger *trigger = FloorTrapPool_FindByName(Script_GetKeywordValue('i', 0));
     if (!trigger)
         return;
     switch (mode) {
         case 0:
             if (!(trigger->triggerFlags & 0x40)) {
-                {
-                    u32 flags = trigger->triggerFlags | 0x40;
-                    u16 mask = 0xFFDF;
-                    trigger->triggerFlags = flags & mask;
-                }
+                trigger->triggerFlags |= 0x40;
+                trigger->triggerFlags &= ~0x20;
                 trigger->state = 6;
                 trigger->forced = 1;
             }
             break;
         case 1:
             if (!(trigger->triggerFlags & 0x20)) {
-                {
-                    u32 flags = trigger->triggerFlags | 0x20;
-                    u16 mask = 0xFFBF;
-                    trigger->triggerFlags = flags & mask;
-                }
+                trigger->triggerFlags |= 0x20;
+                trigger->triggerFlags &= ~0x40;
                 trigger->state = 3;
                 trigger->forced = mode;
             }

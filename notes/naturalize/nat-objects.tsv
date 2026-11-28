@@ -241,3 +241,15 @@ src/objects/floor_traps.c	FloorTrap_IsTetherNearby	contrived	natural	1
 src/objects/floor_traps.c	FloorTrap_StepHold	contrived	minor	4	self alias of the trigger is still needed for the sprite step
 src/objects/floor_traps.c	FloorTrap_StepActivation	contrived	minor	3	self alias of the trigger is still needed for the sprite step
 src/objects/floor_traps.c	FloorTrap_StepRelease	contrived	minor	3	self alias of the trigger is still needed for the sprite step
+src/objects/floor_traps.c	ScriptTriggerActor_DispatchPendingScripts	natural	natural	0	
+src/objects/floor_traps.c	FloorTrap_ApplyContactEffects	contrived	contrived	8	kind and mask locals: plain stores or the shared control install helper move stack spill slots
+src/objects/floor_traps.c	FloorTrap_EmitParticles	minor	minor	2	one local keeps the repeated 1 arguments in a callee-saved register
+src/objects/floor_traps.c	FloorTrapPool_Allocate	natural	natural	0	
+src/objects/floor_traps.c	FloorTrapPool_UpdateIdleState	natural	natural	0	
+src/objects/floor_traps.c	FloorTrap_TickIdle	natural	natural	0	
+src/objects/floor_traps.c	FloorTrap_TickDelay	natural	natural	0	
+src/objects/floor_traps.c	FloorTrap_StepPress	natural	natural	0	
+src/objects/floor_traps.c	FloorTrapPool_RunPendingScripts	natural	natural	0	
+src/objects/floor_traps.c	FloorTrap_RestartHold	natural	natural	0	
+src/objects/floor_traps.c	FloorTrapPool_EnterStateThree	natural	natural	0	
+src/objects/floor_traps.c	FloorTrap_SetStateFromScript	contrived	natural	7	
