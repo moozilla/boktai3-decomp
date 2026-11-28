@@ -90,3 +90,11 @@ src/ui/results/time_result.c	Actor_DispatchPrimaryState	natural	natural	0
 src/ui/save/save_menu.c	SaveMenu_UpdateSaveDelay	minor	natural	1	
 src/ui/save/save_menu.c	SaveMenu_WaitForSaveTransition	minor	natural	1	
 src/ui/save/save_menu.c	SaveMenu_UpdateScoreReveal	contrived	natural	1	
+src/ui/save/save_menu.c	SaveMenu_UpdateSlotCommit	natural	natural	0	
+src/ui/save/save_menu.c	SaveMenu_UpdateExitDelay	natural	natural	0	
+src/ui/save/save_menu.c	SaveMenu_UpdateSaveFailure	natural	natural	0	
+src/ui/save/save_menu.c	SaveMenu_UpdateScoreTransfer	contrived	contrived	15	`value` holds the mask then the flag word pointer, with FlagIsSet/SetFlag: the ROM materializes the mask before the flag address and shares that address; plain tests are 5+ insns off
+src/ui/save/save_menu.c	SaveMenu_Update	natural	natural	0	
+src/ui/save/save_menu.c	SaveMenu_Destroy	natural	natural	0	
+src/ui/save/save_menu.c	SaveMenu_InitializeFromScript	natural	natural	0	
+src/ui/save/save_menu.c	SaveMenu_CreateFromScript	natural	natural	0	
