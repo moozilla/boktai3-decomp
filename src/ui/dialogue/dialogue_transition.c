@@ -133,10 +133,7 @@ int DialogueTransition_LoadFromScript(struct DialogueTransition *transition)
             }
         }
     }
-    {
-        int procedure = Script_GetKeywordValue('e', 0);
-        transition->completionProcedure = procedure;
-    }
+    transition->completionProcedure = Script_GetKeywordValue('e', 0);
     transition->skipProcedure = Script_GetKeywordValue('c', 0);
     MessageWindow_SetMessageTable(transition->script);
     MessageWindow_SetDisplayMode(1);
