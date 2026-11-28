@@ -465,3 +465,4 @@ src/ui/town/shop/Shop_FindConsumableAssignment.c	Shop_FindConsumableAssignment	c
 src/ui/town/shop/Shop_BeginConsumableRemoveMove.c	Shop_BeginConsumableRemoveMove	contrived	minor	3	widget-run view over the panel for the flag writes; index-first pointer sum into table160
 src/ui/town/shop/Shop_BeginConsumableSpecialMove.c	Shop_BeginConsumableSpecialMove	contrived	minor	3	widget-run view over the panel for the flag writes; index-first pointer sum into table160
 src/ui/town/shop/Shop_BeginConsumableSwapPair.c	Shop_BeginConsumableSwapPair	contrived	minor	3	widget-run view over the panel for the flag writes; index-first pointer sum into table160
+src/ui/town/shop/Shop_BeginConsumableCatalogMove.c	Shop_BeginConsumableCatalogMove	contrived	natural	1	
