@@ -384,71 +384,57 @@ void Armor_UpdateRunWithTrailEffect(struct ArmorWalkController *p)
 
 extern u32 gUnk_0824EBB4[];
 
-void Armor_UpdateStrafeMotion(u8 *p, s32 speed, u32 timer)
+void Armor_UpdateStrafeMotion(struct ArmorWalkController *p, s32 speed, u32 duration)
 {
-    u8 *s = p + 0xB40;
-    struct ActorMotionVector *v;
-
-    if (*s == 0) {
-        u8 a = p[0xB39];
-        u32 dir = ((a + 0x60) >> 6) & 3;
-        u32 mode;
-        s32 d = p[0xB3B] - a;
-        mode = 0;
-        if ((u32)((d & 0xFF) - 0x41) <= 0x7E)
+    if (p->walkState == 0) {
+        u32 direction = ((p->facing + 0x60) >> 6) & 3;
+        s32 turn = p->moveAngle - p->facing;
+        u32 mode = 0;
+        if ((turn & 0xFF) > 0x40 && (turn & 0xFF) < 0xC0)
             mode = 2;
-        ActorController_SetAnimation((u32)p, (u32)&gUnk_0824EBB4[dir], mode);
-        (*s)++;
-        p[0xB41] = 1;
-        *(u16 *)(p + 0xC4) = timer;
+        ActorController_SetAnimation((u32)p, (u32)&gUnk_0824EBB4[direction], mode);
+        p->walkState++;
+        p->walkComplete = 1;
+        p->animationDuration = duration;
         SceneCombatActor_SelectFirstCollider((struct SceneCombatActor *)p);
-        ((struct ActorStateFlags *)(p + 0xB32))->flags |= 0x20;
+        p->flagsB32 |= 0x20;
     }
-    {
-        u8 *ap = p + 0xB3B;
-        struct ActorMotionVector *w = v = (void *)(p + 0x50);
-        u8 a = *ap;
-        s32 t;
-        w->x = RoundMotion(gUnk_086149C4[(a + 64) & 255] * speed);
-        w->y = 0;
-        t = RoundMotion(gUnk_086149C4[a] * speed);
-        w->z = t;
+    SetMotion((struct ArmorMotionVector *)&p->motionX, p->moveAngle, speed);
+    if ((p->surfaceType & 3) == 1) {
+        p->motionX >>= 2;
+        p->motionZ >>= 2;
     }
-    if ((*(u16 *)(p + 0xC8) & 3) == 1) {
-        *(s16 *)(p + 0x50) >>= 2;
-        *(s16 *)(p + 0x54) >>= 2;
-    }
-    switch (*(u16 *)(p + 0xC8)) {
+    switch (p->surfaceType) {
         case 2:
-            if (*(u16 *)(p + 0xC0) == 0)
+            if (p->stepSoundLock == 0)
                 Sound_PlaySongChecked(0xC2);
             break;
         case 5:
-            if (*(u16 *)(p + 0xC0) == 0)
+            if (p->stepSoundLock == 0)
                 Sound_PlaySongChecked(0xC3);
             break;
     }
 }
 
-void Armor_UpdateStrafeNormal(u32 a)
+void Armor_UpdateStrafeNormal(struct ArmorWalkController *p)
 {
-    Armor_UpdateStrafeMotion(a, 0x7, 0x40);
+    Armor_UpdateStrafeMotion(p, 0x7, 0x40);
 }
 
-void Armor_UpdateStrafeFast(u32 a)
+void Armor_UpdateStrafeFast(struct ArmorWalkController *p)
 {
-    Armor_UpdateStrafeMotion(a, 0xA, 0x2A);
+    Armor_UpdateStrafeMotion(p, 0xA, 0x2A);
 }
 
-void Armor_UpdateStrafeFaster(u32 a)
+void Armor_UpdateStrafeFaster(struct ArmorWalkController *p)
 {
-    Armor_UpdateStrafeMotion(a, 0xD, 0x23);
+    Armor_UpdateStrafeMotion(p, 0xD, 0x23);
 }
 
-void Armor_UpdateStrafeNormalWithScatterEffect(u8 *p)
+void Armor_UpdateStrafeNormalWithScatterEffect(struct ArmorWalkController *p)
 {
     Armor_UpdateStrafeMotion(p, 7, 0x40);
-    if ((p[0xB42] & 0x1f) == 0)
+    if ((p->ticks & 0x1f) == 0)
         Armor_SpawnScatterEffect(p);
 }
 

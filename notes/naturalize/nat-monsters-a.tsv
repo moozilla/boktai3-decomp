@@ -42,3 +42,4 @@ src/monsters/armor/actor_palette.c	Armor_StartPaletteTransition	contrived	contri
 src/monsters/armor/actor_palette.c	Armor_InitPaletteBanks	contrived	contrived	0	tried direct arguments and BeginEffect helper: callback locals and bank temps fix load order
 src/monsters/armor/actor_palette.c	ActorPalette_PulseBlendSaved	contrived	contrived	0	direct copy arguments tried: bank-offset and source temps fix address computation order
 src/monsters/armor/armor_motion.c	Armor_UpdateRunMotion	contrived	natural	1	
+src/monsters/armor/armor_motion.c	Armor_UpdateStrafeMotion	contrived	natural	2	
