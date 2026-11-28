@@ -1,14 +1,11 @@
 #include "global.h"
 #include "engine/ram.h"
+#include "ui/pause/scene_hud_display.h"
 
-struct Hud {
-    u8 pad[0xA5E];
-    u8 mode, savedMode;
-};
-/* Copies the HUD mode (+0xA5E) to +0xA5F. */
+/* Saves the HUD control mode for Hud_RestoreMode. */
 void Hud_SaveMode(void)
 {
-    struct Hud *hud = gFieldHud;
+    struct SceneHudState *hud = (struct SceneHudState *)gFieldHud;
     if (hud)
-        hud->savedMode = hud->mode;
+        hud->previousPage = hud->controlMode;
 }
