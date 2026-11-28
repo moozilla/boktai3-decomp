@@ -1315,15 +1315,13 @@ void TetherActor_BeginDetachedState(u32 a)
 {
     struct TetherActor *p = gTetherActor;
     if (p) {
-        u8 *q;
         if (a)
             TetherActor_SetState(p, 7);
         else
             TetherActor_SetState(p, 6);
-        q = &p->auxiliaryRegistered;
-        if (*q) {
-            SceneActorContacts_RemoveNode(&p->auxiliaryRegistration);
-            *q = 0;
+        if (p->auxiliaryRegistered) {
+            SceneActorContacts_RemoveNode(p->auxiliaryRegistration);
+            p->auxiliaryRegistered = 0;
         }
         p->displayOffsetY = 0;
         TetherActor_UpdatePendingEffect(p);

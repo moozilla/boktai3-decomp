@@ -90,3 +90,4 @@ src/objects/coffin/tether_actor.c	TetherActor_RequestPaletteBlend	natural	natura
 src/objects/coffin/tether_actor.c	TetherActor_SetInteractionPathFromScript	contrived	contrived	2	comma-expression path test stays: nested ifs and calling TetherActor_TestInteractionPath both move the SetState tails
 src/objects/coffin/tether_actor.c	TetherActor_StartInteractionEffect	contrived	natural	4	
 src/objects/coffin/tether_actor.c	TetherActor_GetParameter	minor	natural	2	
+src/objects/coffin/tether_actor.c	TetherActor_BeginDetachedState	minor	natural	1	
