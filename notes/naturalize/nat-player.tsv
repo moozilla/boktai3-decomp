@@ -162,3 +162,4 @@ src/player/clone.c	PlayerClone_GetActiveCount	natural	natural	0	-
 src/player/clone.c	PlayerClone_IsSlotActive	natural	natural	0	-
 src/player/clone.c	PlayerClone_FoldFacing	natural	natural	0	-
 src/player/clone.c	PlayerClone_SetAnimation	contrived	natural	6	-
+src/player/clone.c	PlayerClone_OnBodyColliderContact	contrived	natural	2	-

@@ -52,14 +52,13 @@ s32 PlayerClone_SetAnimation(struct PlayerCloneSlot *s, s32 index, u32 frame, u3
 void PlayerClone_OnBodyColliderContact(struct ContactCollider *contact,
                                        struct ContactCollider *other, struct PlayerCloneSlot *s)
 {
-    u16 zero = other->responseValue;
-    if (zero == 0) {
+    if (other->responseValue == 0) {
         if (contact->reactionFlags & 0x40) {
             Sound_PlaySong(0x211);
             s->hitPending = 1;
-            s->hitStrength = zero;
-            s->hitEffect = zero;
-            s->hitDuration = zero;
+            s->hitStrength = 0;
+            s->hitEffect = 0;
+            s->hitDuration = 0;
         } else {
             s->hitPending = 1;
             s->hitStrength = contact->unknown3C >> 2;
