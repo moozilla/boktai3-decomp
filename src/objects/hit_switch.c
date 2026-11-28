@@ -104,17 +104,9 @@ void HitSwitch_UpdateBobbing(struct HitSwitchEntry *entry)
             entry->frame = 0;
     }
     if (entry->hitCount >= entry->requiredHits) {
-        u16 *state;
-        u32 flags;
         entry->completed = 1;
         HitSwitch_RegisterCompletedCell(entry);
-        state = &entry->collider.flags;
-        flags = *state;
-        {
-            u32 mask = 4;
-            mask |= flags;
-            *state = mask;
-        }
+        entry->collider.flags |= 4;
         HitSwitch_SetUpdate(entry, HitSwitch_AnimateBobbingCompletion);
     }
 }
