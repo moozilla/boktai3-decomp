@@ -14,7 +14,7 @@ void GameState_AddEquipment(s32 id)
     s32 i;
     gGameState->unlockMask |= 1 << id;
     for (i = 0; i < 4; i++) {
-        if (*(s16 *)(i * 2 + (u8 *)gGameState + 0x88) == -1) {
+        if (*(i + gGameState->slots88) == -1) {
             Equipment_AssignUniqueSlot(i, id);
             gGameState->selected = i;
             Hud_RefreshEquipmentDisplay();
