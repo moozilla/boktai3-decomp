@@ -1,16 +1,12 @@
 #include "global.h"
+#include "scene/actor/actor_attachment_manager.h"
 
-struct Unk08065BEC {
-    u32 unk0;
-};
-
-struct Unk08065BEC *ActorAttachment_AllocateSlot(void *);
-
-// &p->unk0 == p, but agbcc keeps the null test for the address expression
-u32 *ActorAttachment_AllocateSlotHeader(void *manager)
+struct ActorAttachmentSlotView *
+ActorAttachment_AllocateSlotHeader(struct ActorAttachmentManagerView *manager)
 {
-    struct Unk08065BEC *p = ActorAttachment_AllocateSlot(manager);
-    if (!p)
+    struct ActorAttachmentSlotView *slot = ActorAttachment_AllocateSlot(manager);
+
+    if (!slot)
         return NULL;
-    return &p->unk0;
+    return slot;
 }
