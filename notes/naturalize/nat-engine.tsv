@@ -155,3 +155,16 @@ src/engine/video/sprite_pool.c	SpritePool_Update	minor	natural	1
 src/engine/video/sprite_pool.c	SpritePool_Destroy	minor	natural	1	
 src/engine/video/sprite_pool.c	SpritePool_Initialize	minor	natural	1	
 src/engine/video/sprite_pool.c	SpritePool_FindFreeSlot	contrived	natural	1	
+src/engine/video/sprite_pool.c	SpritePool_Create	natural	natural	0	
+src/engine/video/sprite_pool.c	SpritePool_Find	natural	natural	0	
+src/engine/video/sprite_pool.c	SpritePool_Allocate	natural	natural	0	
+src/engine/video/sprite_pool.c	SpritePool_SetResource	natural	natural	0	
+src/engine/video/sprite_pool.c	SpritePool_SetFrame	natural	natural	0	
+src/engine/video/sprite_pool.c	SpritePool_SetPalette	natural	natural	0	
+src/engine/video/sprite_pool.c	SpritePool_SetPosition	natural	natural	0	
+src/engine/video/sprite_pool.c	SpritePool_StartAnimation	natural	natural	0	
+src/engine/video/sprite_pool.c	SpritePool_SetAnimationFrame	natural	natural	0	
+src/engine/video/sprite_pool.c	SpritePool_AdvanceAnimation	natural	natural	0	
+src/engine/video/sprite_pool.c	SpritePool_Activate	natural	natural	0	
+src/engine/video/sprite_pool.c	SpritePool_Remove	natural	natural	0	
+src/engine/video/display_animation.c	DisplayAnimation_InitializeSequence	contrived	natural	1	

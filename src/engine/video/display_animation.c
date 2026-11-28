@@ -102,29 +102,25 @@ s32 DisplayAnimation_InitializeSequence(struct DisplayAnimation *display, s32 re
                                         const struct DisplayPosition *position)
 {
     struct DisplayAnimationSequence *sequence;
-    struct DisplaySequenceSprite *sprite;
+
     if (display->kind)
-        goto failed;
+        return -1;
     Memory_Clear(display, sizeof(struct DisplayAnimation));
     display->kind = 1;
     sequence = &display->resource.sequence;
     if (!AnimData_Load(&sequence->graphics, resourceId))
-        goto failed;
-    if (!sequenceId)
-        goto noSequence;
-    sequence->sequence = ScriptProc_Start(0x922E, (u16)sequenceId);
-    if (sequence->sequence)
-        goto setup;
-failed:
-    return -1;
-noSequence:
-    sequence->sequence = (void *)sequenceId;
-setup:
-    sprite = &sequence->sprite;
-    Sprite_Init(sprite, &sequence->graphics, flags);
+        return -1;
+    if (sequenceId) {
+        sequence->sequence = ScriptProc_Start(0x922E, (u16)sequenceId);
+        if (!sequence->sequence)
+            return -1;
+    } else {
+        sequence->sequence = NULL;
+    }
+    Sprite_Init(&sequence->sprite, &sequence->graphics, flags);
     *(struct DisplayPosition *)&sequence->sprite.position = *position;
     display->position = (struct DisplayPosition *)&sequence->sprite.position;
-    display->displayFlags = &sprite->flags;
+    display->displayFlags = &sequence->sprite.flags;
     return 0;
 }
 
