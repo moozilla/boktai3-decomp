@@ -279,3 +279,4 @@ src/effects/orbits/homing_effect.c	EffectParticle_UpdateHomingWide	contrived	con
 src/effects/orbits/homing_effect.c	EffectParticle_UpdateHoming	contrived	contrived	48	inline copy of the frame step, sprite alias and angle temporaries: register allocation; angle clamp and alias removal change the output
 src/effects/orbits/homing_effect.c	EffectParticle_UpdateFinish	contrived	contrived	48	inline copy of the frame step, sprite alias and angle temporaries: register allocation; angle clamp and alias removal change the output
 src/effects/orbits/homing_effect.c	EffectParticle_UpdateDissipating	contrived	contrived	48	inline copy of the frame step, sprite alias and angle temporaries: register allocation; angle clamp and alias removal change the output
+src/effects/orbits/orbiting_particles.c	OrbitingParticles_HasActiveOrb	contrived	natural	1	

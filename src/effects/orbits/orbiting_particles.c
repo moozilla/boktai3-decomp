@@ -1,18 +1,15 @@
 #include "effects/orbits/orbiting_particles.h"
+#include "engine/math/math_shift.h"
+#include "engine/math/monster_particle_random.h"
+#include "scene/terrain/terrain_sampling.h"
 
-u32 OrbitingParticles_HasActiveOrb(struct OrbitingParticles *s)
+u32 OrbitingParticles_HasActiveOrb(struct OrbitingParticles *particles)
 {
-    s32 i = 0;
-    struct OrbitingParticle *e;
-    if (i < s->count) {
-        s32 n = s->count;
-        e = s->orbs;
-        do {
-            if (e->state == 1)
-                return 1;
-            e++;
-            i++;
-        } while (i < n);
+    s32 i;
+
+    for (i = 0; i < particles->count; i++) {
+        if (particles->orbs[i].state == 1)
+            return 1;
     }
     return 0;
 }
