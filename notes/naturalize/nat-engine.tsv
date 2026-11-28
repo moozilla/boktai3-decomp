@@ -384,3 +384,4 @@ src/engine/video/palette/sub_08217430.c	sub_08217430	contrived	contrived	32	unre
 src/engine/video/sprite_component/SpriteComponent_Suspend.c	SpriteComponent_Suspend	minor	natural	1	
 src/engine/video/sprite_component/SpriteComponent_Resume.c	SpriteComponent_Resume	natural	natural	1	
 src/engine/video/sprite_component/SpriteComponent_SetFramePosition.c	SpriteComponent_SetFramePosition	minor	natural	1	
+src/engine/video/sprite_component/SceneSpriteCollider_Init.c	SceneSpriteCollider_Init	contrived	minor	1	initialFrame local keeps the constant load before the store

@@ -1,61 +1,46 @@
 #include "global.h"
-struct SceneSpriteCollider {
-    u8 unknown0[8];
-    u8 sprite[0x2c];
-    u8 animation[0x26];
-    u16 state;
-    u8 collider[0x54];
-};
+#include "engine/video/sprite_component.h"
+
 struct ColliderExtent {
     u32 x : 16, y : 16, z : 16;
     u32 : 16;
 };
 s32 AnimData_Load(void *, u32);
-void Sprite_Init(void *, void *, u32);
+void Sprite_Init(struct DisplaySequenceSprite *, void *, u32);
 void AnimData_SelectPaletteBank(void *, u32);
 void Collider_Init(void *, u16, u32, u32, u32, void *, void *);
 void Collider_SetPosition(void *, void *, u32);
 void Collider_SetCallback(void *, void *, void *);
 void SceneActorAttachment_MarkContact(void);
 s32 Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
-static inline void ClearPosition(u32 value, void *dest)
+s32 SceneSpriteCollider_Init(struct SpriteComponent *component)
 {
-    CpuSet(&value, dest, 0x05000002);
-}
-s32 SceneSpriteCollider_Init(struct SceneSpriteCollider *p)
-{
+    struct DisplaySequenceSprite *sprite = &component->sprite;
+    struct ContactCollider *collider;
     struct ColliderExtent size, offset;
-    u32 zero;
+    u32 initialFrame;
     s32 result;
-    u32 clear;
-    u8 *sprite = p->sprite;
-    u8 *anim = p->animation;
-    void *position;
-    u8 *collider;
-    AnimData_Load(anim, 0x2110);
-    Sprite_Init(sprite, anim, 0x43);
-    {
-        u32 scale = 4;
-        clear = 0;
-        *(u16 *)(sprite + 0x10) = scale;
-    }
-    AnimData_SelectPaletteBank(anim, 0x51);
-    sprite[7] = 1;
-    sprite[9] = 0x7f;
-    sprite[8] = 0x7f;
-    position = sprite + 0x1c;
-    ClearPosition(clear, position);
-    collider = sprite + 0x54;
+
+    AnimData_Load(&component->resource, 0x2110);
+    Sprite_Init(sprite, &component->resource, 0x43);
+    initialFrame = 4;
+    sprite->frame = initialFrame;
+    AnimData_SelectPaletteBank(&component->resource, 0x51);
+    sprite->priority = 1;
+    sprite->paletteVariant = 0x7f;
+    sprite->palette = 0x7f;
+    ZeroFill8(&sprite->position);
+    collider = &component->collider;
     size.x = 100;
     size.y = 100;
     size.z = 100;
-    offset.x = clear;
-    offset.y = clear;
-    offset.z = clear;
+    offset.x = 0;
+    offset.y = 0;
+    offset.z = 0;
     Collider_Init(collider, 0, 0x2001, 0, 0x10, &size, &offset);
-    Collider_SetPosition(collider, position, 0);
-    Collider_SetCallback(collider, SceneActorAttachment_MarkContact, p);
+    Collider_SetPosition(collider, &sprite->position, 0);
+    Collider_SetCallback(collider, SceneActorAttachment_MarkContact, component);
     result = Collider_SetAttackProperties(collider, 30, 10, 0, 2, 10);
-    p->state = clear;
+    component->collisionStatus = 0;
     return result;
 }
