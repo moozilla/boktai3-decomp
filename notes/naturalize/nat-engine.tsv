@@ -345,3 +345,4 @@ src/engine/video/anim/Vec16_Lerp.c	Vec16_Lerp	natural	natural
 src/engine/video/palette/sub_08216F18.c	sub_08216F18	minor	natural	1	
 src/engine/video/palette/Video_SetWindowBounds.c	Video_SetWindowBounds	minor	natural	1	
 src/engine/video/palette/Video_SetWindowLayerMasks.c	Video_SetWindowLayerMasks	minor	natural	1	
+src/engine/video/palette/Video_SaveWindowLayerMasks.c	Video_SaveWindowLayerMasks	minor	natural	1	
