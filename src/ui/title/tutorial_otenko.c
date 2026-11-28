@@ -1431,9 +1431,6 @@ void TutorialOtenko_MoveAlongCurveToRest(struct ActorAnimController *p)
 
 void TutorialOtenko_MoveAlongScriptedCurve(struct ActorAnimController *p)
 {
-    struct DisplaySequenceSprite *o;
-    struct DisplaySequenceState *a;
-    u8 done;
     if (take(p)) {
         p->timer = 0;
         p->startX = p->obj.position.x;
@@ -1448,10 +1445,7 @@ void TutorialOtenko_MoveAlongScriptedCurve(struct ActorAnimController *p)
             p->scaleFn = TutorialOtenko_UpdateScaleGrowth;
     }
     p->heading = Math_Atan2(p->targetX - p->obj.position.x, p->targetY - p->obj.position.y);
-    o = &p->obj;
-    a = &p->anim;
-    done = DisplaySequence_StepSprite(o, a);
-    p->done = done;
+    p->done = DisplaySequence_StepSprite(&p->obj, &p->anim);
     if (p->timer++ > 31) {
         p->obj.position.x = p->targetX;
         p->obj.position.y = p->targetY;
