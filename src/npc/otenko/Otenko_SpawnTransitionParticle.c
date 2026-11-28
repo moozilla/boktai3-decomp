@@ -18,7 +18,6 @@ void Otenko_SpawnTransitionParticle(struct TransitionEffect *effect, s32 angle)
             union ParticleRandomTableSource source;
             const u16 *table;
             u32 *seed;
-            u32 mask;
             state->active = 1;
             state->angle = angle;
             state->age = 0;
@@ -29,27 +28,26 @@ void Otenko_SpawnTransitionParticle(struct TransitionEffect *effect, s32 angle)
             {
                 u32 index = *seed + 1;
                 const u16 *sample;
-                mask = 0x3FF;
-                index &= mask;
+                index &= 0x3FF;
                 *seed = index;
                 sample = ParticleRandom_SampleAddress(table, *seed);
                 state->lifetime = Mod(*sample, 10) + 10;
             }
             if (angle < 0) {
                 {
-                    s32 random = Mod(ParticleRandom_NextSample(table, seed, mask), 160);
+                    s32 random = Mod(ParticleRandom_NextSample(table, seed, 0x3FF), 160);
                     u32 value = (u16)effect->origin.x;
                     value -= 80;
                     state->position.x = value + random;
                 }
                 {
-                    s32 random = Mod(ParticleRandom_NextSample(table, seed, mask), 80);
+                    s32 random = Mod(ParticleRandom_NextSample(table, seed, 0x3FF), 80);
                     u32 value = (u16)effect->origin.y;
                     value -= 40;
                     state->position.y = value + random;
                 }
                 {
-                    s32 random = Mod(ParticleRandom_NextSample(table, seed, mask), 160);
+                    s32 random = Mod(ParticleRandom_NextSample(table, seed, 0x3FF), 160);
                     u32 value = (u16)effect->origin.z;
                     value -= 80;
                     state->position.z = value + random;

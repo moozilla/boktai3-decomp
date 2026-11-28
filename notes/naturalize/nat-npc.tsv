@@ -387,3 +387,5 @@ src/npc/otenko/Otenko_DispatchCommands.c	Otenko_DispatchCommands	contrived	contr
 src/npc/otenko/Otenko_SetBehaviorTwoFromScript.c	Otenko_SetBehaviorTwoFromScript	contrived	minor	2	state and callback locals: agbcc materializes the state before the stage stores and loads the callback before prevState
 src/npc/otenko/Otenko_SetBehaviorFourFromScript.c	Otenko_SetBehaviorFourFromScript	contrived	minor	2	state and callback locals: agbcc materializes the state before the stage stores and loads the callback before prevState
 src/npc/otenko/Otenko_RequestRigAction.c	Otenko_RequestRigAction	contrived	natural	2	
+src/npc/otenko/Otenko_StopFromScript.c	Otenko_StopFromScript	minor	minor	1	mode and callback locals: agbcc materializes the state before the stage stores
+src/npc/otenko/Otenko_SpawnTransitionParticle.c	Otenko_SpawnTransitionParticle	contrived	contrived	25	manual motion stride and do-while (a for loop moves the induction-variable step after the particle step), split halfword table pointer and per-axis random temporaries (plain RANDOM_NEXT changes register order)
