@@ -138,13 +138,9 @@ void SceneActorSequence_UpdateFinalWaypointMotion(struct SceneActorSequence *);
 
 void SceneActorSequence_BeginFinalWaypointMotion(struct SceneActorSequence *p)
 {
-    struct SceneActorSequencePoint v;
-    s16 *q = (s16 *)&v;
-    int a = 0x36, b = 0x52, z = 0;
-    v.x = a;
-    q[1] = b;
-    q[2] = z;
-    SceneTarget_BeginMove(p->actor, 0, (s16 *)&v, -1, 0x1, p->finalWaypointSpeed, 0x3C);
+    struct SceneActorSequencePoint end;
+    SceneActorSequence_SetPoint(&end, 54, 82, 0);
+    SceneTarget_BeginMove(p->actor, 0, &end, -1, 1, p->finalWaypointSpeed, 60);
     p->updateState = SceneActorSequence_UpdateFinalWaypointMotion;
     p->timer = 0;
 }

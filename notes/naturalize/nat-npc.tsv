@@ -115,3 +115,5 @@ src/npc/actor_sequence.c	SceneActorSequence_BeginCenterMotion	natural	natural	0
 src/npc/actor_sequence.c	SceneActorSequence_UpdateCenterMotion	natural	natural	0	
 src/npc/actor_sequence.c	SceneActorSequence_UpdateFirstWaypointMotion	natural	natural	0	
 src/npc/actor_sequence.c	SceneActorSequence_BeginSecondWaypointMotion	contrived	natural	5	
+src/npc/actor_sequence.c	SceneActorSequence_UpdateSecondWaypointMotion	natural	natural	0	
+src/npc/actor_sequence.c	SceneActorSequence_BeginFinalWaypointMotion	contrived	natural	5	
