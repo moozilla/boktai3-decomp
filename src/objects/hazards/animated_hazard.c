@@ -1,6 +1,7 @@
 #include "objects/hazards/animated_hazard.h"
 #include "engine/video/display_sequence_step.h"
 #include "scene/terrain/terrain_collision.h"
+#include "scene/motion/scene_actor_terrain.h"
 /* AnimatedHazard_Noop: Empty function with no callers or taken address; placeholder/no-op in the animated-hazard unit. */
 
 struct AnimatedHazardManager *AnimatedHazard_GetManager(void)
@@ -238,10 +239,8 @@ int AnimatedHazard_Create(struct ContactPosition *source, int damage, int hold)
 {
     struct AnimatedHazardManager *m = AnimatedHazard_GetManager();
     struct AnimatedHazard *p;
-    struct ContactPosition *pos;
+    struct ContactPosition *position;
     struct ContactCollider *effect;
-    struct TerrainCell *cell;
-    int height, slope;
     if (!m) {
         m = AnimatedHazardManager_Create();
         if (!m)
@@ -251,29 +250,11 @@ int AnimatedHazard_Create(struct ContactPosition *source, int damage, int hold)
     if (!p)
         return -1;
     p->sprite.position = *source;
-    {
-        struct ContactPosition *ground = &p->sprite.position;
-        int x = ground->x >> 8, z = ground->z >> 8, index;
-        pos = ground;
-        if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-            index = 0;
-        else
-            index = gTerrainMap->rows[z] + x;
-        cell = AnimatedHazard_GetGroundCell(index);
-        slope = cell->shapeAndHeight >> 4;
-        height = (cell->shapeAndHeight & 15) << 8;
-        switch (slope) {
-            case 1:
-                height -= (u8)ground->z;
-                break;
-            case 2:
-                height -= (u8)ground->x;
-                break;
-        }
-    }
-    p->sprite.position.y = height;
+    position = &p->sprite.position;
+    p->sprite.position.y =
+        SceneActorTerrain_GetHeight(SceneActorTerrain_GetCellIndex(position), position);
     effect = &p->collider;
-    Collider_SetPosition(effect, pos, 0);
+    Collider_SetPosition(effect, &p->sprite.position, 0);
     Collider_SetAttackPowerAndForce(effect, (u16)damage, 50);
     AnimatedHazard_SetState(m, p, 2);
     p->timer = 0;
