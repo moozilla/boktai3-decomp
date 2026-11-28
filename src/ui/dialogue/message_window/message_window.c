@@ -374,13 +374,12 @@ int MessageWindow_SetAutoAdvanceFromScript(void)
 int MessageWindow_SetPalette(int palette)
 {
     struct MessageWindow *window = (void *)gMessageWindow;
-    int result;
+
     if (window && MessageWindow_LoadPalette(window, palette) >= 0) {
         MessageWindow_ApplyPalette(window);
-        result = 0;
-    } else
-        result = -1;
-    return result;
+        return 0;
+    }
+    return -1;
 }
 
 u32 MessageWindow_SetPaletteFromScript(void)
