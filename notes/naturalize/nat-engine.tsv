@@ -222,3 +222,4 @@ src/engine/video/sprite.c	Sprite_RenderFlipAwareList	contrived	minor	7	short tem
 src/engine/video/sprite.c	Sprite_RenderUnflippedList	minor	minor	1	edge temporaries in the culling box
 src/engine/video/sprite.c	SpriteTiles_LoadResource	contrived	natural	2	
 src/engine/video/sprite.c	AnimData_FindEntry	minor	natural	1	
+src/engine/video/sprite.c	ObjGfx_LoadTiles	contrived	contrived	25	queue length saved through src, entry alias and if + do/while: a plain for loop swaps the registers of i, entry and src (global alloc priority; one copy insn remains with an entry alias)

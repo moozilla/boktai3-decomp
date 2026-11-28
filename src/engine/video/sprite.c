@@ -872,11 +872,7 @@ void ObjGfx_LoadTiles(u32 start)
             s32 j;
             src = e->src;
             for (j = 0; j < e->transfer.rows.count; j++) {
-                struct VideoDmaRegisters *dma = (struct VideoDmaRegisters *)REG_ADDR_DMA3SAD;
-                dma->source = src;
-                dma->destination = dst;
-                dma->control = (e->transfer.rows.size >> 2) | 0x84000000;
-                (void)dma->control;
+                DmaCopy32(3, src, dst, e->transfer.rows.size);
                 src += 0x200;
                 dst += e->transfer.rows.size;
             }
