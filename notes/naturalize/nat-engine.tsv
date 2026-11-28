@@ -702,3 +702,8 @@ src/system/save/Save_VerifyBlock.c	Save_VerifyBlock	contrived	natural	1
 src/system/save/Save_ReadBlock.c	Save_ReadBlock	contrived	natural	1	
 src/system/save/Save_WriteBlockWithRetries.c	Save_WriteBlockWithRetries	minor	natural	1	
 src/system/save/Save_ReadBlockWithRetries.c	Save_ReadBlockWithRetries	minor	natural	1	
+src/system/save/Region_OnListUpdate.c	Region_OnListUpdate	natural	natural	0	
+src/system/save/Region_OnDestroy.c	Region_OnDestroy	natural	natural	0	
+src/system/save/Save_AlignSizeToEightBytes.c	Save_AlignSizeToEightBytes	natural	natural	0	
+src/system/save/sub_0822F174.c	sub_0822F174	natural	natural	0	
+src/system/save/Save_WriteBlock.c	Save_WriteBlock	minor	minor	2	failure paths share one goto label: separate returns are not merged the same way
