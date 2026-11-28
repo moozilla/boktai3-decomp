@@ -483,3 +483,4 @@ src/scene/actor/reaction/SceneActorReaction_EndHitCheckDefeat.c	SceneActorReacti
 src/scene/actor/reaction/SceneActorBehavior_DispatchFlaggedCategory.c	SceneActorBehavior_DispatchFlaggedCategory	natural	natural	0	-
 src/scene/actor/reaction/SceneActorPlacement_BeginDestinationJump.c	SceneActorPlacement_BeginDestinationJump	natural	natural	0	-
 src/scene/actor/reaction/SceneActorReaction_ApplyLinkedAreaDamage.c	SceneActorReaction_ApplyLinkedAreaDamage	contrived	contrived	6	partial: link/plain gain branches keep duplicate stores and mask locals stay
+src/scene/actor/reaction/SceneActorReaction_RecordDefeat.c	SceneActorReaction_RecordDefeat	contrived	contrived	12	partial: counter macros over raw offsets (fields unnamed in the shared header), goto flow and cached pointers stay
