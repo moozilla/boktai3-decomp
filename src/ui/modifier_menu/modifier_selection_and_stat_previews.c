@@ -370,17 +370,15 @@ void ModifierMenu_ReconcileSelection(struct ModifierMenu *menu)
     }
 }
 
-s32 ModifierMenu_CommitThirdSource(struct ModifierMenu *p)
+s32 ModifierMenu_CommitThirdSource(struct ModifierMenu *menu)
 {
-    struct ModifierSelection *s = &p->pending;
-    struct ModifierSelection *d = &p->current;
-    u16 v;
-    d->valuesE[0] = s->valuesE[0];
-    d->valuesE[1] = s->valuesE[1];
-    d->valuesE[2] = s->valuesE[2];
-    v = s->sourceIds[2];
-    d->sourceIds[2] = v;
-    gGameState->unk7A0[1] = v;
+    struct ModifierSelection *pending = &menu->pending;
+    struct ModifierSelection *current = &menu->current;
+    current->valuesE[0] = pending->valuesE[0];
+    current->valuesE[1] = pending->valuesE[1];
+    current->valuesE[2] = pending->valuesE[2];
+    current->sourceIds[2] = pending->sourceIds[2];
+    gGameState->unk7A0[1] = current->sourceIds[2];
     return 0;
 }
 
