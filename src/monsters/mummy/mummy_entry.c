@@ -2377,7 +2377,7 @@ static inline void Fill(u32 *zero, void *dst)
 
 void Mummy_UpdateBurnDamage(struct ChaseActor *actor)
 {
-    struct BurnState *burn = (void *)&actor->group.common;
+    struct BurnState *burn = &actor->group.common;
     u16 *flags2C0;
     u8 *category;
     struct ContactCollider *collider;
@@ -2390,11 +2390,9 @@ void Mummy_UpdateBurnDamage(struct ChaseActor *actor)
     if (!burn->timer)
         return;
     if (actor->base.controlKind == 0x15) {
-        {
-            u32 n = 0x20;
-            actor->base.paletteTimer = n;
-            actor->base.motionFlags &= n - 0x31;
-        }
+        u32 n = 0x20;
+        actor->base.paletteTimer = n;
+        actor->base.motionFlags &= n - 0x31;
         actor->base.field2C2 = 0x40;
         SceneActorAttachment_ReplaceResponseSlot(actor, 0, 127, 0);
         SceneActorAttachment_ReplaceResponseSlot(actor, 1, 127, 0);
@@ -2428,42 +2426,36 @@ void Mummy_UpdateBurnDamage(struct ChaseActor *actor)
     }
     burn->timer--;
     if (Mod(burn->timer, 40) == 0) {
+        struct ContactCollider *initial = &actor->base.colliderA;
+        u32 masked;
+        u32 cost = 1 << burn->intensity;
+        initial->cost = cost;
+        actor->base.reactionSoundVariant = cost;
         {
-            struct ContactCollider *initial = &actor->base.colliderA;
-            u32 *flags;
-            u32 masked;
-            {
-                u32 cost = 1 << burn->intensity;
-                initial->cost = cost;
-                actor->base.reactionSoundVariant = cost;
-            }
-            {
-                u32 amount = initial->cost;
-                u16 *health;
-                health = (void *)&actor->base.health;
-                *health -= amount;
-            }
-            flags = &actor->base.hitAttributes;
-            masked = *flags & 0x20000;
-            collider = initial;
-            damageFlags = flags;
-            if (!masked) {
-                SceneActorDamage_Flash(actor);
-                SceneActorChase_SetActorFlags(actor, 0x8000);
-                if (ShouldShowDamage(actor)) {
-                    // concession-ok(const-local): CpuSet reads this fixed word twice to clear the damage buffer.
-                    u32 zero;
-                    u32 buffer[2];
-                    s32 health = actor->base.health;
-                    u32 max = (u16)actor->base.defaultHealth;
-                    s32 type = (s16)actor->base.hudKind;
-                    s32 param = (s16)actor->base.hudLabel;
-                    SceneHud_SetTimedState(actor->base.body.id, health, max, type, 0, param);
-                    Fill(&zero, buffer);
-                    if (actor->base.reactionSoundVariant || !(*damageFlags & 0x20000))
-                        DamageNumberDisplay_Show(collider, actor->base.reactionSoundVariant, 0,
-                                                 &actor->base.body.position, buffer, 1);
-                }
+            u32 amount = initial->cost;
+            u16 *health;
+            health = &actor->base.health;
+            *health -= amount;
+        }
+        masked = actor->base.hitAttributes & 0x20000;
+        collider = initial;
+        damageFlags = &actor->base.hitAttributes;
+        if (!masked) {
+            SceneActorDamage_Flash(actor);
+            SceneActorChase_SetActorFlags(actor, 0x8000);
+            if (ShouldShowDamage(actor)) {
+                // concession-ok(const-local): CpuSet reads this fixed word twice to clear the damage buffer.
+                u32 zero;
+                u32 buffer[2];
+                s32 health = actor->base.health;
+                u32 max = (u16)actor->base.defaultHealth;
+                s32 type = (s16)actor->base.hudKind;
+                s32 param = (s16)actor->base.hudLabel;
+                SceneHud_SetTimedState(actor->base.body.id, health, max, type, 0, param);
+                Fill(&zero, buffer);
+                if (actor->base.reactionSoundVariant || !(*damageFlags & 0x20000))
+                    DamageNumberDisplay_Show(collider, actor->base.reactionSoundVariant, 0,
+                                             &actor->base.body.position, buffer, 1);
             }
         }
     }
@@ -2483,12 +2475,11 @@ void Mummy_UpdateBurnDamage(struct ChaseActor *actor)
         goto done;
     }
     {
-        u8 *address = &actor->base.category;
         u32 owner;
-        kind = *address;
+        kind = actor->base.category;
         owner = actor->base.hitOwners & 1;
         collider = &actor->base.colliderA;
-        category = address;
+        category = &actor->base.category;
         flags2C0 = &actor->base.placementFlags;
         if (!owner)
             goto record;
@@ -2499,78 +2490,76 @@ void Mummy_UpdateBurnDamage(struct ChaseActor *actor)
         if (blocked)
             goto record;
     }
-    {
-        if (kind != 5 && kind != 7 && kind != 6) {
-            STAT_INC(lifetimeTotal);
-            STAT_INC(total);
-            hit = &actor->base.colliderA;
-            {
-                u32 index = *category - 1; /* category 1..25 */
-                collider = hit;
-                switch (index) {
-                    case 3:
-                        CASE_BODY(category4);
-                        break;
-                    case 0:
-                        CASE_BODY(category1);
-                        break;
-                    case 1:
-                        CASE_BODY(category2);
-                        break;
-                    case 2:
-                        CASE_BODY(category3);
-                        break;
-                    case 13:
-                        CASE_BODY(category14);
-                        break;
-                    case 23:
-                        CASE_BODY(category24);
-                        break;
-                    case 9:
-                        CASE_BODY(category10);
-                        break;
-                    case 4:
-                    case 5:
-                    case 6:
-                        CASE_BODY(category5To7);
-                        break;
-                    case 20:
-                        CASE_BODY(category21);
-                        break;
-                    case 17:
-                        CASE_BODY(category18);
-                        break;
-                    case 18:
-                        CASE_BODY(category19);
-                        break;
-                    case 16:
-                        CASE_BODY(category17);
-                        break;
-                    case 21:
-                        CASE_BODY(category22);
-                        break;
-                    case 19:
-                        CASE_BODY(category20);
-                        break;
-                    case 8:
-                        CASE_BODY(category9);
-                        break;
-                    case 22:
-                        CASE_BODY(category23);
-                        break;
-                    case 11:
-                    case 12:
-                        CASE_BODY(category12And13);
-                        break;
-                    case 24:
-                        CASE_BODY(category25);
-                        break;
-                }
+    if (kind != 5 && kind != 7 && kind != 6) {
+        STAT_INC(lifetimeTotal);
+        STAT_INC(total);
+        hit = &actor->base.colliderA;
+        {
+            u32 index = *category - 1; /* category 1..25 */
+            collider = hit;
+            switch (index) {
+                case 3:
+                    CASE_BODY(category4);
+                    break;
+                case 0:
+                    CASE_BODY(category1);
+                    break;
+                case 1:
+                    CASE_BODY(category2);
+                    break;
+                case 2:
+                    CASE_BODY(category3);
+                    break;
+                case 13:
+                    CASE_BODY(category14);
+                    break;
+                case 23:
+                    CASE_BODY(category24);
+                    break;
+                case 9:
+                    CASE_BODY(category10);
+                    break;
+                case 4:
+                case 5:
+                case 6:
+                    CASE_BODY(category5To7);
+                    break;
+                case 20:
+                    CASE_BODY(category21);
+                    break;
+                case 17:
+                    CASE_BODY(category18);
+                    break;
+                case 18:
+                    CASE_BODY(category19);
+                    break;
+                case 16:
+                    CASE_BODY(category17);
+                    break;
+                case 21:
+                    CASE_BODY(category22);
+                    break;
+                case 19:
+                    CASE_BODY(category20);
+                    break;
+                case 8:
+                    CASE_BODY(category9);
+                    break;
+                case 22:
+                    CASE_BODY(category23);
+                    break;
+                case 11:
+                case 12:
+                    CASE_BODY(category12And13);
+                    break;
+                case 24:
+                    CASE_BODY(category25);
+                    break;
             }
         }
-        Player_AddExperience(actor->base.experience);
-        Player_RefreshLifeState(actor->base.hitAttributes, actor->base.fieldA1);
     }
+    Player_AddExperience(actor->base.experience);
+    Player_RefreshLifeState(actor->base.hitAttributes, actor->base.fieldA1);
 
 record:
     if (!Test(Mask(flags2C0, 0x80), ~0) && !Test(gEngineFlags, 0x4800) && !Flag2D0(actor, 0x800))

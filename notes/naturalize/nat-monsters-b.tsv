@@ -138,3 +138,4 @@ src/monsters/mummy/mummy_entry.c	SceneActorPath_FaceAndCheckStraightPath	contriv
 src/monsters/mummy/mummy_entry.c	Mummy_RequestStraightRoute	minor	natural	10	
 src/monsters/mummy/mummy_entry.c	SceneActor_EnterMotionPhase	contrived	contrived	36	parked masks and flag accessors fix load order
 src/monsters/mummy/mummy_entry.c	Mummy_TryEngageTarget	contrived	contrived	39	gotos and many flag accessors remain
+src/monsters/mummy/mummy_entry.c	Mummy_UpdateBurnDamage	contrived	contrived	106	CASE_BODY tallies, parked values and flag helpers remain
