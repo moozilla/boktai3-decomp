@@ -1,30 +1,23 @@
-#include "global.h"
-#include "engine/engine_globals.h"
-#include "engine/ram.h"
-#include "effects/healing/elem_layout.h"
-void SpriteDrawable_SelectTileFrame(struct Elem *, void *, u32);
-void FlickerParticle_UpdateVerticalMotion(struct Elem *);
+#include "effects/healing/healing_effect.h"
+#include "engine/math/monster_particle_random.h"
+#include "engine/engine.h"
+
 s32 Mod(s32, s32);
-static inline s32 rnd(u16 *table)
+
+void HealthRestoreEffect_InitRisingParticle(struct HealingParticle *particle)
 {
-    s32 v;
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    v = table[gRandomIndex];
-    return v >> 3;
-}
-void HealthRestoreEffect_InitRisingParticle(struct Elem *p)
-{
-    u16 *table;
-    p->flags &= ~1;
-    SpriteDrawable_SelectTileFrame(p, p->data, 6);
+    const u16 *table;
+
+    particle->drawable.flags &= ~1;
+    SpriteDrawable_SelectTileFrame(&particle->drawable, particle->resource, 6);
     table = gRandomTable;
-    p->x = Mod(rnd(table), 16) + 8;
-    p->y = Mod(rnd(table), 16) + 24;
-    p->z = 0;
-    p->dx = 0;
-    p->dy = -(Mod(rnd(table), 2) + 2);
-    p->dz = 0;
-    p->active = 1;
-    p->age = 0;
-    p->update = FlickerParticle_UpdateVerticalMotion;
+    particle->drawable.position.x = Mod(HealingEffect_Random(table), 16) + 8;
+    particle->drawable.position.y = Mod(HealingEffect_Random(table), 16) + 24;
+    particle->drawable.position.z = 0;
+    particle->velocity.x = 0;
+    particle->velocity.y = -(Mod(HealingEffect_Random(table), 2) + 2);
+    particle->velocity.z = 0;
+    particle->active = 1;
+    particle->age = 0;
+    particle->update = FlickerParticle_UpdateVerticalMotion;
 }
