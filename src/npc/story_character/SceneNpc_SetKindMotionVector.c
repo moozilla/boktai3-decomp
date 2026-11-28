@@ -13,12 +13,11 @@ void SceneNpc_SetKindMotionVector(struct SceneNpc *p, s32 kind)
         case 43:
             height = 200;
             break;
-        case 29: {
-            s32 variant = p->effects.tag;
-            height = 400;
-            if (variant != 1)
+        case 29:
+            if (p->effects.tag != 1) {
+                height = 400;
                 break;
-        }
+            }
         case 9:
             height = 528;
             break;

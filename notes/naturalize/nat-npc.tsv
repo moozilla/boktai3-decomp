@@ -318,3 +318,8 @@ src/npc/story_character/SceneCharacter_UpdatePaletteFade.c	SceneCharacter_Update
 src/npc/story_character/sub_081CDEF8.c	sub_081CDEF8	contrived	minor	4	effects view of unknown20; ContactPosition view of the display position
 src/npc/story_character/SceneCharacter_UpdateDisplay.c	SceneCharacter_UpdateDisplay	contrived	natural	1	
 src/npc/story_character/SceneCharacter_OnDestroy.c	SceneCharacter_OnDestroy	contrived	natural	1	falls off the end without a return value, as before
+src/npc/story_character/SceneNpc_UpdateCommands.c	SceneNpc_UpdateCommands	natural	natural	0	
+src/npc/story_character/SceneCharacter_GetModelId.c	SceneCharacter_GetModelId	minor	minor	0	external table copied to a stack array with memcpy (a local const array would move the data)
+src/npc/story_character/SceneCharacter_GetPaletteIndex.c	SceneCharacter_GetPaletteIndex	minor	minor	0	external table copied to a stack array with memcpy (a local const array would move the data)
+src/npc/story_character/SceneCharacter_GetResourceVariant.c	SceneCharacter_GetResourceVariant	minor	minor	0	external table copied to a stack array with memcpy (a local const array would move the data)
+src/npc/story_character/SceneNpc_SetKindMotionVector.c	SceneNpc_SetKindMotionVector	minor	minor	3	body pointer temp for the three offset stores
