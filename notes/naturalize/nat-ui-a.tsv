@@ -147,3 +147,4 @@ src/ui/books/forging_book/CollectionBook_CountCollectedEntries.c	CollectionBook_
 src/ui/books/forging_book/CollectionBook_IsComplete.c	CollectionBook_IsComplete	minor	natural	1	
 src/ui/books/forging_book/CollectionBook_RefreshCollectedEntryVisibility.c	CollectionBook_RefreshCollectedEntryVisibility	natural	natural	1	
 src/ui/books/forging_book/CollectionBook_RefreshCompletionDigits.c	CollectionBook_RefreshCompletionDigits	contrived	natural	1	
+src/ui/books/forging_book/CollectionBook_RefreshPageHeading.c	CollectionBook_RefreshPageHeading	minor	natural	1	
