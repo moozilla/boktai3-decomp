@@ -1,13 +1,7 @@
 #include "global.h"
-struct DigitWidget {
-    u8 p0[8];
-    u32 flags;
-    u8 pc[0x14];
-    s16 x, y;
-    u8 p24[0x3c];
-};
+#include "engine/video/anim_sprite.h"
 s32 Anim_LoadKeyframe(void *, void *, u32, u32);
-void Anim_DrawDecimalDigits(struct DigitWidget *widget, void *graphics, s32 value, s32 width,
+void Anim_DrawDecimalDigits(struct AnimSprite *widget, void *graphics, s32 value, s32 width,
                             s32 baseFrame, s32 x, s32 y, s32 spacing, u32 suppressZero)
 {
     s32 digits[8];
@@ -39,18 +33,15 @@ void Anim_DrawDecimalDigits(struct DigitWidget *widget, void *graphics, s32 valu
     leading = ((0 - suppressZero) | suppressZero) >> 31;
     screenX = x;
     for (digitIndex = 0; digitIndex < width; screenX += spacing, digitIndex++, widget++) {
-        if (leading) {
-            if (digits[firstDigit + digitIndex] != 0) {
-                leading = 0;
-            }
-        }
+        if (leading && digits[firstDigit + digitIndex] != 0)
+            leading = 0;
         if (leading) {
             widget->flags |= 1;
         } else {
             widget->flags &= ~1;
             Anim_LoadKeyframe(widget, graphics, (u16)digits[firstDigit + digitIndex], 0);
-            widget->x = screenX;
-            widget->y = y;
+            widget->position.x = screenX;
+            widget->position.y = y;
         }
     }
 }
