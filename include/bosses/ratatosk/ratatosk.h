@@ -117,7 +117,9 @@ struct Ratatosk {
     struct ContactPosition points[9]; /* 0xCCC: path points from script keyword 'm'. */
     u8 unknownD14[4];
     struct RatatoskSlot orbPoints[9]; /* 0xD18 */
-    struct RatatoskSlot targets[3];   /* 0xDF0 */
+    /* 0xDF0: the searches run over four target slots; the fourth one's unused last word
+     * holds the two selections. */
+    struct RatatoskSlot targets[3];
     u8 unknownE38[0xE4C - 0xE38];
     s16 selectedPoint, selectedTarget; /* 0xE4C */
     s16 distance;
