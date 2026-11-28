@@ -608,8 +608,7 @@ void TetherActor_RemoveSegments(struct TetherActor *actor)
 
 void TetherActor_CreateAuxiliarySprite(struct TetherActor *actor)
 {
-    u8 *active = &actor->auxiliaryActive;
-    if (!*active) {
+    if (!actor->auxiliaryActive) {
         struct ContactSwarmGraphics *graphics = &actor->auxiliaryGraphics;
         struct ContactSwarmSprite *sprite;
         AnimData_Load(graphics, 0x1C1B);
@@ -617,7 +616,7 @@ void TetherActor_CreateAuxiliarySprite(struct TetherActor *actor)
         Sprite_Init(sprite, graphics, 512);
         Sprite_SetOriginStub(sprite, -8, -8);
         sprite->frame = 6;
-        *active = 1;
+        actor->auxiliaryActive = 1;
     }
 }
 

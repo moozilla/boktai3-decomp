@@ -46,3 +46,4 @@ src/objects/bouncing_bombs/BouncingBomb_EnsurePool.c	BouncingBomb_EnsurePool	nat
 src/objects/bouncing_bombs/BouncingBomb_ResetPool.c	BouncingBomb_ResetPool	natural	natural	0	
 src/objects/bouncing_bombs/BouncingBomb_TickActive.c	BouncingBomb_TickActive	contrived	minor	18	sprite/pos/velocity/cellPtr pointer locals kept: direct fields reallocate the whole physics step
 src/objects/coffin/tether_actor.c	TetherActor_RemoveSegments	minor	natural	1	
+src/objects/coffin/tether_actor.c	TetherActor_CreateAuxiliarySprite	minor	minor	4	graphics/sprite pointers kept: ROM forms them around the load call
