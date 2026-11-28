@@ -176,3 +176,16 @@ src/bosses/count/CountBats_Create.c	CountBats_Create	minor	natural	3
 src/bosses/count/CountBats_SpawnCharge.c	CountBats_SpawnCharge	natural	natural	0	
 src/bosses/count/CountBats_SpawnPairedAdvance.c	CountBats_SpawnPairedAdvance	contrived	contrived	38	random draw keeps shared table/headings pointer temp (ROM loads the table before the cursor address); fade tail keeps active pointer and zero local; resource collider temp
 src/bosses/count/CountBats_SpawnPairedAdvanceCount.c	CountBats_SpawnPairedAdvanceCount	contrived	contrived	12	random draw keeps shared table/headings pointer temp (ROM loads the table before the cursor address); fade tail keeps active pointer and zero local; resource collider temp
+src/bosses/hresvelgr/DamageNumberDisplay_ShowDefaultSize.c	DamageNumberDisplay_ShowDefaultSize	minor	minor	4	u16 SetVec helper stays: plain field writes differ
+src/bosses/hresvelgr/ActionState_Reset.c	ActionState_Reset	natural	natural	0	
+src/bosses/hresvelgr/ActionState_SetState.c	ActionState_SetState	natural	natural	0	
+src/bosses/hresvelgr/ActionState_AdvanceState.c	ActionState_AdvanceState	natural	natural	0	
+src/bosses/hresvelgr/ActionState_ResetSubstate.c	ActionState_ResetSubstate	natural	natural	0	
+src/bosses/hresvelgr/sub_0819AE84.c	sub_0819AE84	natural	natural	0	
+src/bosses/hresvelgr/ActionState_AdvanceSubstate.c	ActionState_AdvanceSubstate	natural	natural	0	
+src/bosses/hresvelgr/sub_0819AEA0.c	sub_0819AEA0	natural	natural	0	
+src/bosses/hresvelgr/sub_0819AEA8.c	sub_0819AEA8	natural	natural	0	
+src/bosses/hresvelgr/ActionState_AdvanceStep.c	ActionState_AdvanceStep	natural	natural	0	
+src/bosses/hresvelgr/sub_0819AEBC.c	sub_0819AEBC	natural	natural	0	
+src/bosses/hresvelgr/sub_0819AEE0.c	sub_0819AEE0	natural	natural	0	
+src/bosses/hresvelgr/Math_ApproachEighth.c	Math_ApproachEighth	contrived	natural	3	
