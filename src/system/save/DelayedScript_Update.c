@@ -1,53 +1,36 @@
 #include "global.h"
 #include "engine/engine.h"
-
-struct Msg082282DC {
-    u32 a;
-    u16 *b;
-};
-struct Task082282DC {
-    u8 pad0[0x18];
-    u32 channel;
-    u8 args[8];
-    u32 script;
-    s32 counter;
-    u16 pad2c;
-    u16 flags;
-    u8 pad30[0x20];
-    struct Msg082282DC *msgs;
-};
-s32 MessageQueue_GetMessagesById(u32, struct Msg082282DC **);
+#include "engine/message_queue.h"
+#include "system/save/delayed_script.h"
 s32 Script_RunBlock(u32, void *);
-
-void DelayedScript_Update(struct Task082282DC *t)
+void DelayedScript_Update(struct DelayedScript *task)
 {
-    s32 n = MessageQueue_GetMessagesById(t->channel, &t->msgs);
-    s32 k = n;
-    struct Msg082282DC *m = t->msgs;
-    k--;
-    if (n > 0) {
+    s32 count = MessageQueue_GetMessagesById(task->owner, &task->messages);
+    s32 remaining = count;
+    struct QueueMessage *message = task->messages;
+    remaining--;
+    if (count > 0) {
         do {
-            if (*m->b == 0xFFFF)
+            if (*(u16 *)message->values == 0xFFFF)
                 goto kill;
-            m++;
-        } while (k-- > 0);
+            message++;
+        } while (remaining-- > 0);
     }
     {
-        s32 c = --t->counter;
-
-        s32 r;
-        if (c > 0 && !(2 & t->flags))
+        s32 timer = --task->timer;
+        s32 result;
+        if (timer > 0 && !(task->flags & DELAYED_SCRIPT_REPEAT))
             return;
-        if (1 & (*t).flags)
-            r = Script_Call(t->script, t->args);
+        if (task->flags & DELAYED_SCRIPT_CALL)
+            result = Script_Call(task->script, &task->args);
         else
-            r = Script_RunBlock(t->script, t->args);
-        if (r == 0) {
-            if ((t->flags & 2) && t->counter > 0)
+            result = Script_RunBlock(task->script, &task->args);
+        if (result == 0) {
+            if ((task->flags & DELAYED_SCRIPT_REPEAT) && task->timer > 0)
                 return;
         kill:
-            Task_Kill(t);
+            Task_Kill(task);
         } else
-            t->counter = r;
+            task->timer = result;
     }
 }
