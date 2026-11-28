@@ -2816,7 +2816,6 @@ void Mummy_ResetResponseState(struct ChaseActor *actor)
     struct SceneActorChaseTracking *body = &actor->base.tracking;
     u32 mask = ~0x18;
     u32 *flags;
-    u16 *motion;
     struct SceneActorRegistryControl *response;
     body->flags &= mask;
     flags = &actor->base.statusFlags;
@@ -2824,18 +2823,17 @@ void Mummy_ResetResponseState(struct ChaseActor *actor)
     actor->base.field2C2 = 64;
     actor->group.common.gate.flags = 0;
     actor->group.common.gate.counter = 0;
-    motion = &actor->base.motionFlags;
-    ClearHalf(motion, 0xFFFFFC7F);
+    ClearHalf(&actor->base.motionFlags, 0xFFFFFC7F);
     body->flags &= mask;
     response = &actor->group.common.control;
     if (SceneActorTurn_ActorFlags(actor, 0x200000)) {
-        SceneActorChase_ClearWordFlags(flags, ROOM_ACTOR_STATUS_INTERACTING);
-        ClearHalf(motion, 0xFFFFFDFF);
+        *flags &= ~ROOM_ACTOR_STATUS_INTERACTING;
+        ClearHalf(&actor->base.motionFlags, 0xFFFFFDFF);
         response->mode = 0;
         response->counter = 0;
         response->timer = 0;
     }
-    ClearHalf(motion, 0xFFFFFBFF);
+    ClearHalf(&actor->base.motionFlags, 0xFFFFFBFF);
     actor->group.turn.turnsRemaining = -1;
 }
 
