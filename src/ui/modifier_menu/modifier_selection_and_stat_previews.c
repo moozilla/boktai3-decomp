@@ -498,15 +498,15 @@ void Bg_FillTilemapRectangle(s32, s32, s32, s32, s32, s32, s32, s32);
 
 void Text_DrawNumber(s32, s32, s32, s32, s32, s32, s32);
 
-void ModifierMenu_DrawStatComparison(s32 a, s32 b, s32 c, s32 d, u32 k)
+void ModifierMenu_DrawStatComparison(s32 current, s32 next, s32 x, s32 y, u32 kind)
 {
-    s32 df;
-    s32 f;
-    switch (k) {
+    s32 change;
+    s32 palette;
+    switch (kind) {
         case 1:
         case 8:
         case 10:
-            df = a - b;
+            change = current - next;
             break;
         case 0:
         case 2:
@@ -517,28 +517,27 @@ void ModifierMenu_DrawStatComparison(s32 a, s32 b, s32 c, s32 d, u32 k)
         case 7:
         case 9:
         default:
-            df = b - a;
+            change = next - current;
             break;
     }
-    f = 0x31;
-    if (df <= 0) {
-        f = 0x11;
-        if (df < 0)
-            f = 0x21;
-    }
-    if (k == 9)
-        goto chk;
-    if (k != 10)
-        goto B;
-chk:
-    if (a < 0) {
-        if (b < 0) {
-            Bg_FillTilemapRectangle(2, c, d, 3, 1, 0x10, 0, 0);
+    if (change > 0)
+        palette = 0x31;
+    else if (change < 0)
+        palette = 0x21;
+    else
+        palette = 0x11;
+    if (kind == 9) {
+        if (current < 0 && next < 0) {
+            Bg_FillTilemapRectangle(2, x, y, 3, 1, 0x10, 0, 0);
+            return;
+        }
+    } else if (kind == 10) {
+        if (current < 0 && next < 0) {
+            Bg_FillTilemapRectangle(2, x, y, 3, 1, 0x10, 0, 0);
             return;
         }
     }
-B:
-    Text_DrawNumber(2, c, d, b, f, 3, 0);
+    Text_DrawNumber(2, x, y, next, palette, 3, 0);
 }
 
 void Bg_FillTilemapRectangle(s32, s32, s32, s32, s32, s32, s32, s32);
