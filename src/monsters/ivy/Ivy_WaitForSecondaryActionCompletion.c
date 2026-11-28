@@ -1,23 +1,13 @@
-#include "global.h"
-u32 Callback_InvokeActor(void *, u32);
-void sub_080F2BE4(void);
-struct S2B94 {
-    u8 f0[0xCDC];
-    void (*fp)(void);
-    u8 f1[0xCF0 - 0xCE0];
-    u32 v;
-    u8 f2[0xD53 - 0xCF4];
-    s8 b;
-};
-void Ivy_WaitForSecondaryActionCompletion(struct S2B94 *s)
+#include "monsters/ivy/phase_object.h"
+u32 Callback_InvokeActor(void *, void *);
+void sub_080F2BE4(struct PhaseObject *);
+
+void Ivy_WaitForSecondaryActionCompletion(struct PhaseObject *p)
 {
-    u32 v = s->v;
-    if (v != 0) {
-        if ((u8)Callback_InvokeActor(s, v) != 0)
-            s->b++;
-    }
-    if (s->b > 1) {
-        s->b = 0;
-        s->fp = sub_080F2BE4;
+    if (p->phaseUpdate && (u8)Callback_InvokeActor(p, p->phaseUpdate))
+        p->actionCompletions++;
+    if (p->actionCompletions > 1) {
+        p->actionCompletions = 0;
+        p->secondaryTransition = (void *)sub_080F2BE4;
     }
 }
