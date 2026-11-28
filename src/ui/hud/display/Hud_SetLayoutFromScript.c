@@ -1,10 +1,12 @@
 #include "global.h"
 #include "engine/ram.h"
-void SceneHud_ReadPageVisibility(u8 *);
-/* Script: applies the -o element visibility list (SceneHud_ReadPageVisibility) unless the
-   HUD is busy (+0xA5C). */
+#include "ui/pause/scene_hud_display.h"
+void SceneHud_ReadPageVisibility(struct SceneHudState *);
+/* Script: applies the -o element visibility list (SceneHud_ReadPageVisibility)
+   unless the HUD is still initializing. */
 void Hud_SetLayoutFromScript(void)
 {
-    if (gFieldHud && !*(u16 *)(gFieldHud + 0xA5C))
-        SceneHud_ReadPageVisibility(gFieldHud);
+    struct SceneHudState *hud = (struct SceneHudState *)gFieldHud;
+    if (hud && !hud->initializationState)
+        SceneHud_ReadPageVisibility(hud);
 }

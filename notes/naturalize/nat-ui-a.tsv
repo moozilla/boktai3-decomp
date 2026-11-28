@@ -566,3 +566,4 @@ src/ui/hud/display/Hud_RefreshSpriteFromScript.c	Hud_RefreshSpriteFromScript	fud
 src/ui/hud/display/Hud_SaveMode.c	Hud_SaveMode	fudged	natural	1	
 src/ui/hud/display/Hud_RestoreMode.c	Hud_RestoreMode	fudged	natural	1	
 src/ui/hud/display/Hud_ReapplyCurrentMode.c	Hud_ReapplyCurrentMode	fudged	natural	2	gFieldHud is declared u8* in a shared header, so each typed use casts it
+src/ui/hud/display/Hud_SetLayoutFromScript.c	Hud_SetLayoutFromScript	fudged	natural	2	gFieldHud is declared u8* in a shared header, so each typed use casts it
