@@ -604,3 +604,4 @@ src/system/inventory/Inventory_SetEntryFromScript.c	Inventory_SetEntryFromScript
 src/system/inventory/Inventory_ContainsFromScript.c	Inventory_ContainsFromScript	natural	natural	0	
 src/system/inventory/Inventory_IsEquipmentAssigned.c	Inventory_IsEquipmentAssigned	contrived	natural	1	
 src/system/inventory/Inventory_ResetEquipmentAssignments.c	Inventory_ResetEquipmentAssignments	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
+src/system/inventory/Inventory_GetConsumableObtainedFlag.c	Inventory_GetConsumableObtainedFlag	contrived	natural	1	

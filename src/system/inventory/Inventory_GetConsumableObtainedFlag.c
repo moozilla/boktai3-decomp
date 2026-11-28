@@ -1,13 +1,14 @@
-#include "global.h"
-extern u8 *gGameState;
-u32 Inventory_GetConsumableObtainedFlag(s32 i)
+#include "system/game_state/game_state.h"
+
+u32 Inventory_GetConsumableObtainedFlag(s32 id)
 {
-    u32 *p;
-    if (i <= 0x1f)
-        p = (u32 *)(gGameState + 0x720);
-    else {
-        p = (u32 *)(gGameState + 0x724);
-        i -= 0x20;
+    u32 *flags;
+
+    if (id < 32) {
+        flags = &gGameState->flags720;
+    } else {
+        flags = &gGameState->flags724;
+        id -= 32;
     }
-    return *p & (1 << i);
+    return *flags & (1 << id);
 }
