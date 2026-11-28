@@ -111,10 +111,9 @@ void Player_SetPendingCallback(struct Player *player, void (*callback)(struct Pl
 
 void Player_RunPendingCallback(struct Player *player)
 {
-    void (**callback)(struct Player *) = &player->pendingCallback;
-    if (*callback) {
-        (*callback)(player);
-        *callback = 0;
+    if (player->pendingCallback) {
+        player->pendingCallback(player);
+        player->pendingCallback = NULL;
     }
 }
 

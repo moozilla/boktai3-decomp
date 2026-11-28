@@ -214,3 +214,5 @@ src/player/core/player_core.c	Player_SetAnimation	contrived	contrived	3	unchange
 src/player/core/player_core.c	PlayerAnimation_SelectSecondaryKeyframes	contrived	contrived	2	unchanged so far: plain forms change register use; retry
 src/player/core/player_core.c	Player_SetAnimation	contrived	natural	16	
 src/player/core/player_core.c	PlayerAnimation_SelectSecondaryKeyframes	contrived	natural	8	
+src/player/core/player_core.c	Player_SetPendingCallback	natural	natural	0	
+src/player/core/player_core.c	Player_RunPendingCallback	minor	natural	1	
