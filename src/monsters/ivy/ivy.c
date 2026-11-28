@@ -1784,9 +1784,8 @@ s32 SceneActor_RampColorRed(struct PhaseObject *actor);
 
 s32 Ivy_InitColorTransition(struct PhaseObject *p)
 {
-    u16 *s = &p->color;
-    p->green = (*s >> 5) & 0x1f;
-    p->blue = (*s >> 10) & 0x1f;
+    p->green = (p->color >> 5) & 0x1f;
+    p->blue = (p->color >> 10) & 0x1f;
     p->phaseUpdate = (void *)SceneActor_RampColorRed;
 }
 
