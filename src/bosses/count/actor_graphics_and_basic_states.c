@@ -1403,30 +1403,28 @@ void ContactActorPool_Start();
 void SceneActorState_StartContactPool(struct SceneGraphicsActor *actor)
 {
     struct StateActor *p = (struct StateActor *)actor;
+    struct SceneActorBody *body = &actor->body;
     struct ContactPosition pos;
     struct ContactPosition pos2;
-    u8 *src = (u8 *)&p->bodyId;
 
     if (StateActor_ConsumeActionEntry(p))
         SceneActorState_SetAnimation(p, 14);
     if (p->actionFinished) {
-        struct ContactPosition *pp = &pos;
-        struct ContactPosition *pp2;
-        pos = *(struct ContactPosition *)(src + 0xC);
-        pp->y += 200;
-        pp2 = &pos2;
-        pos2 = *pp;
-        {
-            s32 health = p->health;
-            actor->graphics.healthCostBaseline = health;
-        }
+        struct ContactPosition *center = &pos;
+        struct ContactPosition *spread;
+        s32 health;
+        pos = body->position;
+        center->y += 200;
+        spread = &pos2;
+        pos2 = pos;
+        health = p->health;
+        actor->graphics.healthCostBaseline = health;
         if (actor->graphics.contactPool)
-            ContactActorPool_Start(actor->graphics.contactPool, pp, pp2, 10, 10);
+            ContactActorPool_Start(actor->graphics.contactPool, center, spread, 10, 10);
         SceneActorState_EnterPhase(p, 12);
     } else
         p->actionTimer++;
 }
-
 void SceneActorState_HoldAnimation15(struct StateActor *p)
 {
     if (StateActor_ConsumeActionEntry(p))
