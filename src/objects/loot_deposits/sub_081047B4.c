@@ -1,25 +1,18 @@
 #include "global.h"
+#include "engine/engine.h"
+#include "engine/ram.h"
+#include "objects/loot_deposits/callback_pool.h"
 
-struct PoolActor {
-    u32 flags;
-    u8 pad4[0x15C - 4];
-    u16 frame;
-    u8 started;
-};
-void sub_08104748(struct PoolActor *);
-void LootDepositCallbackPool_UpdateShake(struct PoolActor *);
-void LootDepositFeedback_CheckPlayerRange(struct PoolActor *);
-
-void sub_081047B4(void *unused, struct PoolActor *o)
+void sub_081047B4(void *unused, struct CallbackPoolEntry *entry)
 {
-    if (o->started) {
-        o->frame = 0;
-        o->flags &= ~1;
-        o->started = 0;
+    if (entry->defeated) {
+        entry->frame = 0;
+        entry->sprite.flags &= ~1;
+        entry->defeated = 0;
     }
-    sub_08104748(o);
-    LootDepositCallbackPool_UpdateShake(o);
-    if (o->frame & 1)
-        LootDepositFeedback_CheckPlayerRange(o);
-    o->frame++;
+    sub_08104748(entry);
+    LootDepositCallbackPool_UpdateShake(entry);
+    if (entry->frame & 1)
+        LootDepositFeedback_CheckPlayerRange(entry);
+    entry->frame++;
 }
