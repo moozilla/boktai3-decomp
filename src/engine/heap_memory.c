@@ -191,20 +191,11 @@ void Memory_Copy(u8 *dst, u8 *src, s32 n)
 void BgGfx_LoadTiles(u8 *source, u8 *destination, u32 bytes)
 {
     while (bytes > 512) {
-        struct VideoDmaRegisters *dma = (struct VideoDmaRegisters *)0x040000D4;
-        dma->source = (u32)source;
-        dma->destination = (u32)destination;
-        dma->control = 0x84000080;
-        dma->control;
+        DmaCopy32(3, source, destination, 512);
         source += 512;
         destination += 512;
         bytes -= 512;
     }
-    if (bytes) {
-        struct VideoDmaRegisters *dma = (struct VideoDmaRegisters *)0x040000D4;
-        dma->source = (u32)source;
-        dma->destination = (u32)destination;
-        dma->control = (bytes >> 2) | 0x84000000;
-        dma->control;
-    }
+    if (bytes)
+        DmaCopy32(3, source, destination, bytes);
 }
