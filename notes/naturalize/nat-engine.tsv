@@ -366,3 +366,4 @@ src/engine/video/palette/Palette_CacheObjectBank.c	Palette_CacheObjectBank	contr
 src/engine/video/palette/Palette_UploadBuffers.c	Palette_UploadBuffers	contrived	natural	1	
 src/engine/video/palette/Palette_LoadWorkingColors.c	Palette_LoadWorkingColors	contrived	natural	1	
 src/engine/video/palette/Palette_RefreshObjectBanks.c	Palette_RefreshObjectBanks	contrived	natural	1	
+src/engine/video/palette/Palette_CopyBank.c	Palette_CopyBank	minor	natural	1	
