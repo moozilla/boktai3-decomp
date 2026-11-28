@@ -2,7 +2,6 @@
 #include "player/player.h"
 #include "link/session/link_session_state.h"
 #include "scene/collision/scene_actor_damage_visibility.h"
-extern struct AreaEffectLinkState *gLinkSession;
 void Sound_StopSong(u32);
 void Player_StopLocalActionSounds(struct Player *p)
 {

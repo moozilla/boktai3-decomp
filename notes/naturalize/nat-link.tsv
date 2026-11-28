@@ -129,3 +129,4 @@ src/link/player/Player_SetSecondaryActionFlags.c	Player_SetSecondaryActionFlags	
 src/link/player/Player_GetSecondaryActionFlags.c	Player_GetSecondaryActionFlags	minor	natural	1	
 src/link/player/Player_PlayLocalSong.c	Player_PlayLocalSong	contrived	natural	1	
 src/link/player/Player_StopLocalSong.c	Player_StopLocalSong	contrived	natural	1	
+src/link/player/Player_StopLocalActionSounds.c	Player_StopLocalActionSounds	minor	natural	1	
