@@ -48,3 +48,6 @@ src/npc/manager/scene_actor_animation.c	Actor_OnRisingFadeUpdate	contrived	minor
 src/npc/manager/scene_actor_animation.c	Actor_OnConfiguredAnimationUpdate	natural	natural	0	
 src/npc/manager/scene_actor_animation.c	Actor_OnPathFollowUpdate	contrived	minor	5	(u16*) route point cast: ROM reads x/z with ldrh; u16 casts of radiusA
 src/npc/manager/scene_actor_animation.c	Actor_UpdateTargetFacing	contrived	minor	3	range test kept as a near flag (ROM materializes it); SetFlags
+src/npc/manager/scene_actor_animation.c	Actor_OnTimedIdleUpdate	natural	natural	0	
+src/npc/manager/scene_actor_animation.c	Actor_OnTimedIdleUpdate	natural	natural	0	
+src/npc/manager/scene_actor_animation.c	Actor_UpdateNavigationStep	contrived	minor	8	distance/limit locals and from copy of pos: ROM keeps them across the range compare

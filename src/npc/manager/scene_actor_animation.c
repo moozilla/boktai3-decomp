@@ -1214,49 +1214,44 @@ static inline s32 RouteWalk_Scale12(s32 value)
 
 void Actor_UpdateNavigationStep(void *unused, struct SceneActor *actor)
 {
-    struct SceneActorBody *motion = &actor->body;
+    struct SceneActorBody *body = &actor->body;
     struct SceneActorNavigationProbe *probe = &actor->probe;
-    u32 *animType = &actor->drawable.common.kind;
+    union SceneActorDisplay *drawable = &actor->drawable;
     if (actor->animationEntered) {
-        struct ContactPosition *pos;
         actor->animationEntered = 0;
         actor->finished = 0;
         Actor_PlayAnimationEntry(actor, 1, 1, 0, 4);
         actor->routeProgress = 0;
-        pos = &actor->body.position;
-        ProximityVolume_TranslateBounds(probe, pos);
-        Terrain_ApplyBlocked(probe, pos, &actor->destination);
+        ProximityVolume_TranslateBounds(probe, &actor->body.position);
+        Terrain_ApplyBlocked(probe, &actor->body.position, &actor->destination);
         actor->probeReady = 1;
     }
     SceneActor_SetFlags(actor, 0x1000);
     if ((u8)actor->query(actor) != 1) {
         struct ContactPosition *pos = &actor->body.position;
-        struct ContactPosition *probePos = &actor->probe.current;
-        s32 x = probe->current.x - motion->position.x;
-        s32 z = probePos->z - pos->z;
-        s32 distance = (s32)((u32)x * x + (u32)z * z);
+        struct ContactPosition *current = &actor->probe.current;
+        s32 x = probe->current.x - body->position.x;
+        s32 z = current->z - pos->z;
+        s32 distance = x * x + z * z;
         s32 limit = 0x9C3;
-        struct ContactPosition *current = pos;
+        struct ContactPosition *from = pos;
         if (distance <= limit) {
-            motion->position.x = actor->probe.target.x;
-            motion->position.z = actor->probe.target.z;
+            body->position.x = actor->probe.target.x;
+            body->position.z = actor->probe.target.z;
             actor->finished = 1;
-        } else if (*animType == 2) {
-            struct DisplayKeyframeState *anim = &actor->drawable.keyframe.keyframes;
-            if (anim->status & 4) {
+        } else if (drawable->common.kind == 2) {
+            struct DisplayKeyframeState *keyframes = &actor->drawable.keyframe.keyframes;
+            if (keyframes->status & 4) {
                 struct ContactPosition *target = &actor->probe.target;
-                s32 angle =
-                    Math_Atan2(probe->target.x - motion->position.x, target->z - current->z);
                 struct ContactPosition step;
-                actor->body.direction = angle;
-                actor->facing8 = SceneFacing_EightWay(angle);
-                actor->facing4 = SceneFacing_FourWay(angle);
-                SceneActor_SetChargeOffset(motion->direction, &step, 48);
-                motion->position.x += step.x;
-                motion->position.z += step.z;
+                SceneActorAnimation_SetAngle(
+                    actor, Math_Atan2(probe->target.x - body->position.x, target->z - from->z));
+                SceneActor_SetChargeOffset(body->direction, &step, 48);
+                body->position.x += step.x;
+                body->position.z += step.z;
             }
         }
-        NavMesh_UpdateProbe(probe, current);
+        NavMesh_UpdateProbe(probe, from);
         Actor_PlayFootstepSound(actor, 1);
         Actor_PlayAnimationEntry(actor, 1, 1, 0, 1);
     }
