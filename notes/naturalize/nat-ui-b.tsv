@@ -494,3 +494,4 @@ src/ui/town/shop/Shop_ConfirmEquipmentAction.c	Shop_ConfirmEquipmentAction	minor
 src/ui/town/shop/Shop_ConfirmItemAction.c	Shop_ConfirmItemAction	minor	natural	1	
 src/ui/town/shop/Shop_ConfirmConsumableAction.c	Shop_ConfirmConsumableAction	minor	natural	1	
 src/ui/town/shop/Shop_TickModeMenu.c	Shop_TickModeMenu	minor	minor	2	highlight view and display casts
+src/ui/town/shop/Shop_TickActionSelection.c	Shop_TickActionSelection	minor	natural	1	

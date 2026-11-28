@@ -1,3 +1,4 @@
+#include "gba/io_reg.h"
 #include "ui/town/shop_tail.h"
 s32 Shop_TickActionSelection(struct ShopTail *p)
 {
@@ -8,10 +9,10 @@ s32 Shop_TickActionSelection(struct ShopTail *p)
         Shop_UpdateModePrompt(p, 1);
         return 0;
     }
-    if (gPadState[1] & 2) {
+    if (gPadState[1] & B_BUTTON) {
         Sound_PlaySong(0xDE);
         Shop_BeginBrowse(p);
-    } else if (1 & gPadState[1]) {
+    } else if (gPadState[1] & A_BUTTON) {
         switch (p->category) {
             case 0:
                 Shop_ConfirmEquipmentAction(p);
