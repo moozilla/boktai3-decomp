@@ -278,3 +278,4 @@ src/link/player/PlayerCue_UpdateTerrainSlide.c	PlayerCue_UpdateTerrainSlide	cont
 src/link/player/PlayerCue_UpdateSpiralPose.c	PlayerCue_UpdateSpiralPose	contrived	minor	2	secondary sprite viewed through its draw-flags field
 src/link/player/sub_082420D4.c	sub_082420D4	minor	natural	2	separate turned local for the saved-option offset
 src/link/player/Player_TryStepForward.c	Player_TryStepForward	contrived	natural	2	
+src/link/player/Player_SelectInputMode.c	Player_SelectInputMode	contrived	minor	15	goto zero stays: separate mode=0/break arms keep their own tails

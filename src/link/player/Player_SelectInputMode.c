@@ -17,7 +17,6 @@ static inline s32 IsScene5(struct Player *p)
 u32 Player_SelectInputMode(struct Player *p)
 {
     u32 mode = p->tetherMode;
-    const u16 *keys;
     if (p == NULL || !IsScene5(p)) {
         if (p->inputKeys[1] & 0x200)
             mode = Player_GetTetherMode(p);
@@ -68,27 +67,22 @@ u32 Player_SelectInputMode(struct Player *p)
             break;
         default:
             if (p && IsScene5(p)) {
-                if ((s16)p->directionHistory[0] == -1)
-                    goto zero;
-                if (p->inputKeys[0] & 0x100)
+                if ((s16)p->directionHistory[0] == -1 || p->inputKeys[0] & 0x100)
                     goto zero;
                 mode = 1;
             } else {
-                keys = p->inputKeys;
-                if (keys[1] & 2) {
+                if (p->inputKeys[1] & 2) {
                     mode = 3;
                     break;
                 }
-                if (keys[1] & 1) {
-                    s32 t = Trigger_TryOpenNearby(&p->positionalEffectGroup) << 24;
+                if (p->inputKeys[1] & 1) {
+                    u8 opened = Trigger_TryOpenNearby(&p->positionalEffectGroup);
                     mode = 7;
-                    if (t == 0)
+                    if (!opened)
                         break;
                     goto zero;
                 }
-                if ((s16)p->directionHistory[0] == -1)
-                    goto zero;
-                if (keys[0] & 0x100)
+                if ((s16)p->directionHistory[0] == -1 || p->inputKeys[0] & 0x100)
                     goto zero;
                 mode = 1;
             }
