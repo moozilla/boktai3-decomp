@@ -3053,9 +3053,7 @@ u8 Mummy_SelectMovementResponse(struct ChaseActor *actor)
         Sound_PlaySong(0x211);
     else
         Sound_PlaySong(0xFD);
-    {
-        SceneActorChase_ClearWordFlags(&actor->base.statusFlags, 4);
-    }
+    SceneActorChase_ClearWordFlags(&actor->base.statusFlags, 4);
     if (SceneActorChase_QueryMotionFlags(actor, 0x10)) {
         SceneActorChase_ChooseRoute(actor);
         SceneActorMovement_ResolveRoutePosition(actor);
