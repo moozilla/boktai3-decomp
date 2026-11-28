@@ -54,7 +54,9 @@ struct AreaEffectLinkState {
     s16 actorValues[2];        /* 0x84: drawn on the link lobby panel; confidence=low */
     u8 unknown88[4];
     s16 menuResults[2]; /* 0x8C: selected local result in 081100A0 */
-    u8 unknown90[0x24];
+    u8 unknown90[4];
+    u32 transferCounter; /* 0x94: confidence=low */
+    u8 unknown98[0x1C];
     void (*menuCallback)(void); /* 0xB4 */
     s32 menuTextWindow;         /* 0xB8 */
     u8 unknownBC[0xC];
