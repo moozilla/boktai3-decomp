@@ -40,19 +40,16 @@ void ActorPool_RefreshTargets(struct ActorPoolManager *manager)
 int ActorPool_UpdateCallback(struct ActorPoolManager *manager)
 {
     struct PooledActor *actor = manager->head;
-    if (actor) {
-        u32 mask = 1;
-        do {
-            struct PooledActor *next = actor->previous;
-            if (actor->flags & mask) {
-                if (actor->destroy)
-                    actor->destroy(actor);
-                ActorPool_UnlinkObject(manager, actor);
-                Heap_Free(actor);
-            } else if (actor->update)
-                actor->update(actor);
-            actor = next;
-        } while (actor);
+    while (actor) {
+        struct PooledActor *next = actor->previous;
+        if (PooledActor_TestFlags(actor, 1)) {
+            if (actor->destroy)
+                actor->destroy(actor);
+            ActorPool_UnlinkObject(manager, actor);
+            Heap_Free(actor);
+        } else if (actor->update)
+            actor->update(actor);
+        actor = next;
     }
     manager->ticks++;
     manager->updateSlot = manager->ticks & 3;

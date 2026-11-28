@@ -37,3 +37,4 @@ src/scene/actor/actor_particles.c	ActorParticles_SpawnImpactBurst	natural	natura
 src/scene/actor/actor_particles.c	ActorParticles_UpdateEmitter	natural	natural	0	
 src/scene/actor/actor_particles.c	Actor_SetSpriteDepthOffsets	natural	natural	0	
 src/scene/actor/actor_particles.c	Character_SetLowResourceColorEffect	minor	minor	0	names (six/four/two) and u8* field bytes
+src/scene/actor/actor_pool/actor_pool.c	ActorPool_UpdateCallback	contrived	minor	4	PooledActor_TestFlags: plain &1 loses the loop-invariant hoist of the mask into r7
