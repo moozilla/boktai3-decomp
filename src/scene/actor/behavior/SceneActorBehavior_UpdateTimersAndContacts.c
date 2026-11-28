@@ -19,10 +19,8 @@ s32 SceneActorBehavior_UpdateTimersAndContacts(struct RoomActor *actor)
             if (flags & mask)
                 control->timer = inactive;
             else {
-                struct ChaseActor *base = (void *)actor;
-                u16 *timerPtr = &base->base.hitLockTimer;
-                s16 timer;
-                timer = *timerPtr;
+                u16 *timerPtr = &actor->hitLockTimer;
+                s16 timer = *timerPtr;
                 if (timer) {
                     if (((u16)timer >> 2) & 1) {
                         u32 mask = 0x20;
@@ -31,24 +29,15 @@ s32 SceneActorBehavior_UpdateTimersAndContacts(struct RoomActor *actor)
                     }
                     (*timerPtr)--;
                 }
-                {
-                    u8 *timerPtr = &control->timer;
-                    if (*timerPtr)
-                        (*timerPtr)--;
-                }
+                if (control->timer)
+                    control->timer--;
             }
         }
         {
             struct SceneActorUpdateContact *contact = (void *)actor;
-            struct SceneActorContactNode **node;
-            node = &contact->contact;
-            if (*node) {
-                u32 registered = (u8)SceneActorContacts_ContainsActiveNode(*node);
-                if (!registered) {
-                    void *cleanup = contact->cleanup;
-                    Callback_InvokeActor(actor, cleanup);
-                    *node = (void *)registered;
-                }
+            if (contact->contact && !SceneActorContacts_ContainsActiveNode(contact->contact)) {
+                Callback_InvokeActor(actor, contact->cleanup);
+                contact->contact = NULL;
             }
         }
     }
