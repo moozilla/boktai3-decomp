@@ -456,3 +456,4 @@ src/ui/town/shop/Shop_PopulateEquipmentGrid.c	Shop_PopulateEquipmentGrid	contriv
 src/ui/town/shop/Shop_PopulateConsumableGrid.c	Shop_PopulateConsumableGrid	contrived	contrived	30	plain nested loops differ by r6/r7 between slot and sprite pointer; third loop walks pointers
 src/ui/town/shop/Shop_BeginEquipmentSpecialMove.c	Shop_BeginEquipmentSpecialMove	contrived	minor	1	widget-run view over the panel for the flag writes
 src/ui/town/shop/Shop_BeginEquipmentRemoveMove.c	Shop_BeginEquipmentRemoveMove	contrived	minor	1	widget-run view over the panel for the flag writes
+src/ui/town/shop/Shop_BeginEquipmentCatalogMove.c	Shop_BeginEquipmentCatalogMove	contrived	natural	8	
