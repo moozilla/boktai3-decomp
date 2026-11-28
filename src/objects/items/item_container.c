@@ -441,11 +441,9 @@ void Trigger_UpdateActivation(struct TriggerManager *manager, struct Trigger *p)
     if (p->flip)
         p->object->flags |= 4;
     if (p->timer == 8) {
-        u16 script;
         if (!(gEngineFlags & 2048))
             Sound_PlaySongChecked(272);
-        script = *(u16 *)&p->script;
-        Trigger_RunScript(p, script, sub_0822D490(p->id, p->kind) == 1);
+        Trigger_RunScript(p, p->script, sub_0822D490(p->id, p->kind) == 1);
     } else if (p->timer > 8) {
         if (Sprite_BlinkUntilExpired(p->object, p->timer, 30, 90))
             p->flags |= 1;
