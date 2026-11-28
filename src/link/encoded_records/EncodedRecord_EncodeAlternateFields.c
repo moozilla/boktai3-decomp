@@ -11,16 +11,14 @@ u32 Crc_ComputeCcitt16(const void *, u32, u32);
 void EncodedRecord_EncodeAlternateFields(u8 *record)
 {
     u32 bit;
-    u32 randomIndex;
     s32 skip;
-    s32 randomWord;
+    s32 random;
     s32 value;
     const u8 *name;
     u32 i;
-    randomIndex = (gRandomIndex + 1) & 1023;
-    gRandomIndex = randomIndex;
-    randomWord = ((const u16 *)RANDOM_TABLE_ADDR)[randomIndex];
-    skip = (randomWord >> 8) & 7;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    random = ((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
+    skip = (random >> 8) & 7;
     bit = 16;
     EncodedRecord_WriteBits(record, 0, &bit, 2, 6);
     EncodedRecord_WriteBits(record, 1, &bit, 3, 6);
@@ -38,29 +36,15 @@ void EncodedRecord_EncodeAlternateFields(u8 *record)
     EncodedRecord_WriteBits(record, Div(gGameState->unk614, 216000), &bit, 6, 6);
     EncodedRecord_WriteBits(record, gGameState->unk536, &bit, 16, 6);
     name = gGameState->playerName;
-    i = 0;
-    if (*name) {
+    for (i = 0; i < 5 && *name; i++) {
         name++;
-        goto checkName;
-    writeName:
+        if (*name == 0)
+            break;
         EncodedRecord_WriteBits(record, *name, &bit, 8, 6);
         name++;
-        i++;
-        if (i > 4)
-            goto namesDone;
-        if (*name == 0)
-            goto padNames;
-        name++;
-    checkName:
-        if (*name)
-            goto writeName;
     }
-padNames:
-    while (i <= 4) {
+    for (; i < 5; i++)
         EncodedRecord_WriteBits(record, 0, &bit, 8, 6);
-        i++;
-    }
-namesDone:
     EncodedRecord_WriteBits(record, 0, &bit, 144 - bit, 6);
     EncodedRecord_XorRange(record, 4, 24, 0xB8E6E, skip, 63);
     value = Crc_ComputeCcitt16(record, 3, 24);
