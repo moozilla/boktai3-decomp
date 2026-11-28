@@ -590,8 +590,9 @@ void MessageWindow_UpdateNormalPlayback(struct MessageWindow *window)
 
 void MessageWindow_ClearTextCompletion(struct MessageWindow *window)
 {
-    struct MessagePlaybackState *q = &window->state;
-    q->complete = 0;
+    struct MessagePlaybackState *state = &window->state;
+
+    state->complete = 0;
 }
 
 void MessageWindow_UpdateIdle(void)
