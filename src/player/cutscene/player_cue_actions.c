@@ -2251,7 +2251,7 @@ static inline s32 HasHighStatBonusFlag(struct Player *actor)
 
 void Player_UpdateStateMotionCue(struct Player *player)
 {
-    if (!(player->tetherFrame)) {
+    if (!player->tetherFrame) {
         Sound_PlaySong(490);
         if (player->scriptStatus[0])
             player->animation.paletteBank = 45;
@@ -2273,17 +2273,15 @@ void Player_UpdateStateMotionCue(struct Player *player)
     Player_AddControlFlags(player, 64);
     Player_SetAnimation(player, 154, 64, 1);
     player->animation.position = *(struct ContactPosition *)&player->position;
-    player->animation.palette = (u16 *)(gPaletteBankData + ((player->animation.paletteBank) * 32));
-    if ((player->tetherFrame) <= 9) {
-        struct DisplaySequenceState *s = &player->cueCollider.sequence;
-        struct ContactSwarmSprite *draw;
-        Anim_SetSequence(s, (void *)(player->cueCollider.alternateResource),
-                         (player->movementMode46B) + 9, 0, 0);
-        draw = (struct ContactSwarmSprite *)&player->secondaryDrawFlags;
-        PlayerCue_StepSequence(draw, s);
-    } else if (((player->tetherFrame) >> 2) & 1)
+    player->animation.palette = (u16 *)(gPaletteBankData + (player->animation.paletteBank * 32));
+    if (player->tetherFrame <= 9) {
+        Anim_SetSequence(&player->cueCollider.sequence, player->cueCollider.alternateResource,
+                         player->movementMode46B + 9, 0, 0);
+        PlayerCue_StepSequence((struct ContactSwarmSprite *)&player->secondaryDrawFlags,
+                               &player->cueCollider.sequence);
+    } else if ((player->tetherFrame >> 2) & 1)
         Player_AddControlFlags(player, 1);
-    if ((++(player->tetherFrame)) > 39) {
+    if (++player->tetherFrame > 39) {
         player->actionLatch464 = 1;
         player->actionLatch465 = 1;
         PlayerCue_EnterStandUpdate(player);
