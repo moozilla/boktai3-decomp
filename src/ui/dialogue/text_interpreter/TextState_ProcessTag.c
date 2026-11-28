@@ -69,325 +69,239 @@ extern const u8 gUnk_0824DE40[]; /* /UVMOJI */
 extern const u8 gUnk_0824DE48[]; /* /LABEL */
 extern const u8 gUnk_0824DE50[]; /* /PAREN */
 extern const u8 gUnk_0824DE58[]; /* /ALTER */
-const u8 *TextState_ProcessTag(struct MessagePlaybackState *p, const u8 *s)
+const u8 *TextState_ProcessTag(struct MessagePlaybackState *state, const u8 *tag)
 {
-    const u8 *end = s;
-    int value;
-    int cmp;
-    if (*s == '/')
-        goto close;
-    if (!Text_ComparePrefix(s, gUnk_0824DC80, 6)) {
-        p->palette = 1;
-        goto findS;
+    const u8 *end = tag;
+    int result;
+
+    if (*tag != '/') {
+        if (!Text_ComparePrefix(tag, gUnk_0824DC80, 6)) {
+            state->palette = 1;
+            end = Text_FindChar(tag, '>');
+        } else if (!Text_ComparePrefix(tag, gUnk_0824DC88, 6)) {
+            state->palette = 2;
+            end = Text_FindChar(tag, '>');
+        } else if (!Text_ComparePrefix(tag, gUnk_0824DC90, 6)) {
+            state->palette = 2;
+            end = Text_FindChar(tag, '>');
+        } else if (!Text_ComparePrefix(tag, gUnk_0824DC98, 4)) {
+            end = TextState_ParseTagValue(state, tag);
+            if (state->tag.hasValue && state->tag.length)
+                state->characterDelay = Text_ParseDecimal(state->tag.value, state->tag.length);
+            else {
+                int delay = (s16)gGameState->unk12;
+
+                state->characterDelay = delay;
+            }
+        } else if (!Text_ComparePrefix(tag, gUnk_0824DCA0, 4)) {
+            int choice;
+
+            end = TextState_ParseTagValue(state, tag);
+            if (state->tag.hasValue && state->tag.length)
+                choice = Text_ParseDecimal(state->tag.value, state->tag.length);
+            else
+                choice = 0;
+            state->selectedChoices[state->selectedCount] = choice;
+            state->selectedCount++;
+        } else if (!Text_ComparePrefix(tag, gUnk_0824DCA8, 4)) {
+            state->streams[0] = PlayerName_GetBuffer();
+            TextState_PushStream(state, 1);
+            end = Text_FindChar(tag, '>');
+            state->hold = 1;
+        } else if (!Text_ComparePrefix(tag, gUnk_0824DCB0, 4)) {
+            state->streams[3] = GameState_GetBikeName();
+            TextState_PushStream(state, 4);
+            end = Text_FindChar(tag, '>');
+            state->hold = 1;
+        } else if (!Text_ComparePrefix(tag, gUnk_0824DCB8, 5)) {
+            const u8 *name;
+            int speaker;
+
+            end = TextState_ParseTagValue(state, tag);
+            if (!state->tag.hasValue || !state->tag.length) {
+                speaker = 255;
+            } else {
+                name = state->tag.value;
+                if (!Text_ComparePrefix(name, gUnk_0824DCC0, 4))
+                    speaker = 255;
+                else if ((speaker = Text_ComparePrefix(name, gUnk_0824DCC8, 8)) &&
+                         (speaker = Text_ComparePrefix(name, gUnk_0824DCD4, 8)) &&
+                         (speaker = Text_ComparePrefix(name, gUnk_0824DCE0, 8))) {
+                    if (!Text_ComparePrefix(name, gUnk_0824DCEC, 6))
+                        speaker = 3;
+                    else if (!Text_ComparePrefix(name, gUnk_0824DCF4, 8))
+                        speaker = 5;
+                    else if (!Text_ComparePrefix(name, gUnk_0824DD00, 6))
+                        speaker = 4;
+                    else if (!Text_ComparePrefix(name, gUnk_0824DD08, 5))
+                        speaker = 6;
+                    else if (!Text_ComparePrefix(name, gUnk_0824DD10, 4))
+                        speaker = 7;
+                    else if (!Text_ComparePrefix(name, gUnk_0824DD18, 4))
+                        speaker = 8;
+                    else if (!Text_ComparePrefix(name, gUnk_0824DD20, 6))
+                        speaker = 9;
+                    else if (!Text_ComparePrefix(name, gUnk_0824DD28, 4))
+                        speaker = 10;
+                    else if (!Text_ComparePrefix(name, gUnk_0824DD30, 3))
+                        speaker = 11;
+                    else if (!Text_ComparePrefix(name, gUnk_0824DD34, 6))
+                        speaker = 12;
+                    else if (!Text_ComparePrefix(name, gUnk_0824DD3C, 4))
+                        speaker = 13;
+                    else if (!Text_ComparePrefix(name, gUnk_0824DD44, 6))
+                        speaker = 14;
+                    else if (!Text_ComparePrefix(name, gUnk_0824DD4C, 5))
+                        speaker = 15;
+                    else if (!Text_ComparePrefix(name, gUnk_0824DD54, 7))
+                        speaker = 16;
+                    else if (!Text_ComparePrefix(name, gUnk_0824DD5C, 7))
+                        speaker = 17;
+                    else if (!Text_ComparePrefix(name, gUnk_0824DD64, 7))
+                        speaker = 18;
+                    else if (!Text_ComparePrefix(name, gUnk_0824DD6C, 9))
+                        speaker = 19;
+                    else if (!Text_ComparePrefix(name, gUnk_0824DD78, 4))
+                        speaker = 20;
+                    else if (!Text_ComparePrefix(name, gUnk_0824DD80, 4))
+                        speaker = 21;
+                    else if (!Text_ComparePrefix(name, gUnk_0824DD88, 4))
+                        speaker = 22;
+                    else if (!Text_ComparePrefix(name, gUnk_0824DD90, 7))
+                        speaker = 23;
+                    else if (!Text_ComparePrefix(name, gUnk_0824DD98, 9))
+                        speaker = 24;
+                    else if (!Text_ComparePrefix(name, gUnk_0824DDA0, 7))
+                        speaker = 25;
+                    else if (!Text_ComparePrefix(name, gUnk_0824DDA8, 7))
+                        speaker = 26;
+                    else if (!Text_ComparePrefix(name, gUnk_0824DDB0, 6))
+                        speaker = 27;
+                    else {
+                        result = (int)name;
+                        if (!Text_ComparePrefix((const u8 *)result, gUnk_0824DDB8, 11))
+                            speaker = 30;
+                        else if (!Text_ComparePrefix((const u8 *)result, gUnk_0824DDC4, 6))
+                            speaker = TextState_GetPairSpeakerLabel();
+                        else {
+                            result = 0;
+                            if (!Text_ComparePrefix(name, gUnk_0824DDCC, 6))
+                                speaker = TextState_GetPlayerSpeakerLabel();
+                            else
+                                speaker = 255;
+                        }
+                    }
+                }
+            }
+            {
+                s8 *selection = &state->speaker;
+
+                *selection = speaker;
+            }
+            state->busy = 1;
+            state->defaultDelay = state->characterDelay;
+            state->characterDelay = 0;
+            end = Text_FindChar(end, '>');
+        } else if (!Text_ComparePrefix(tag, gUnk_0824DDD4, 7)) {
+            state->speaker = -1;
+            end = Text_FindChar(tag, '>');
+        } else if (!Text_ComparePrefix(tag, gUnk_0824DDDC, 4)) {
+            int value;
+
+            end = TextState_ParseTagValue(state, end);
+            if (state->tag.hasValue && state->tag.length)
+                value = Text_ParseDecimal(state->tag.value, state->tag.length);
+            else
+                value = 0;
+            state->frame = value;
+        } else if (!Text_ComparePrefix(tag, gUnk_0824DDE4, 6)) {
+            int value;
+
+            end = TextState_ParseTagValue(state, end);
+            if (state->tag.hasValue && state->tag.length)
+                value = Text_ParseDecimal(state->tag.value, state->tag.length);
+            else
+                value = 0;
+            state->streams[2] = state->strings[value];
+            TextState_PushStream(state, 3);
+            end = Text_FindChar(end, '>');
+            state->hold = 1;
+        } else if (!Text_ComparePrefix(tag, gUnk_0824DDEC, 5)) {
+            int value;
+
+            end = TextState_ParseTagValue(state, end);
+            if (state->tag.hasValue && state->tag.length)
+                value = Text_ParseDecimal(state->tag.value, state->tag.length);
+            else
+                value = 221;
+            Sound_PlaySong(value);
+        } else if (!Text_ComparePrefix(tag, gUnk_0824DDF4, 3)) {
+            int number;
+            u8 *buffer;
+
+            end = TextState_ParseTagValue(state, end);
+            if (state->tag.hasValue && state->tag.length)
+                number = Text_ParseDecimal(state->tag.value, state->tag.length);
+            else
+                number = 0;
+            buffer = state->tag.number;
+            Text_FormatDecimal(buffer, state->numbers[number]);
+            state->streams[1] = buffer;
+            TextState_PushStream(state, 2);
+            end = Text_FindChar(end, '>');
+            state->hold = 1;
+        } else if (!(result = Text_ComparePrefix(tag, gUnk_0824DDF8, 6))) {
+            const u8 *name;
+
+            end = TextState_ParseTagValue(state, end);
+            name = state->tag.value;
+            if (!Text_ComparePrefix(name, gUnk_0824DE00, 13))
+                state->spacing = 0;
+            else if (!Text_ComparePrefix(name, gUnk_0824DE10, 11))
+                state->spacing = 1;
+            else
+                state->spacing = 0;
+        } else if (!Text_ComparePrefix(tag, gUnk_0824DE1C, 3)) {
+            state->streams[0] = PlayerName_GetBuffer();
+            end = Text_FindChar(end, '>');
+            state->complete = 1;
+        } else if (!Text_ComparePrefix(tag, gUnk_0824DE20, 5)) {
+            if (state->unknown10) {
+                TextState_PlayGlyphSound(state, '[');
+                TextState_DrawNarrowGlyph(state, ';');
+            }
+            end = Text_FindChar(end, '>');
+        } else if (!Text_ComparePrefix(tag, gUnk_0824DE28, 5)) {
+            state->palette = 1;
+            end = Text_FindChar(end, '>');
+        }
+    } else if (!Text_ComparePrefix(tag, gUnk_0824DE30, 7)) {
+        state->palette = 0;
+        end = Text_FindChar(tag, '>');
+    } else if (!Text_ComparePrefix(tag, gUnk_0824DE38, 7)) {
+        state->palette = 0;
+        end = Text_FindChar(tag, '>');
+    } else if (!Text_ComparePrefix(tag, gUnk_0824DE40, 7)) {
+        state->palette = 0;
+        end = Text_FindChar(tag, '>');
+    } else if (!Text_ComparePrefix(tag, gUnk_0824DE48, 6)) {
+        state->busy = 0;
+        state->characterDelay = state->defaultDelay;
+        end = Text_FindChar(tag, '>');
+    } else if (!Text_ComparePrefix(tag, gUnk_0824DE50, 5)) {
+        if (state->unknown10) {
+            TextState_PlayGlyphSound(state, ']');
+            TextState_DrawNarrowGlyph(state, '=');
+        }
+        end = Text_FindChar(tag, '>');
+    } else if (!Text_ComparePrefix(tag, gUnk_0824DE58, 6)) {
+        state->palette = 0;
+        end = Text_FindChar(tag, '>');
     }
-    if (!Text_ComparePrefix(s, gUnk_0824DC88, 6)) {
-        p->palette = 2;
-        goto findS;
-    }
-    if (!Text_ComparePrefix(s, gUnk_0824DC90, 6)) {
-        p->palette = 2;
-        goto findS;
-    }
-    if (!Text_ComparePrefix(s, gUnk_0824DC98, 4)) {
-        end = TextState_ParseTagValue(p, s);
-        if (p->tag.hasValue && p->tag.length)
-            p->characterDelay = Text_ParseDecimal(p->tag.value, p->tag.length);
-        else {
-            int delay = (s16)gGameState->unk12;
-            p->characterDelay = delay;
-        }
-        goto done;
-    }
-    if (!Text_ComparePrefix(s, gUnk_0824DCA0, 4)) {
-        int value;
-        end = TextState_ParseTagValue(p, s);
-        if (p->tag.hasValue && p->tag.length)
-            value = Text_ParseDecimal(p->tag.value, p->tag.length);
-        else
-            value = 0;
-        p->selectedChoices[p->selectedCount] = value;
-        p->selectedCount++;
-        goto done;
-    }
-    if (!Text_ComparePrefix(s, gUnk_0824DCA8, 4)) {
-        p->streams[0] = PlayerName_GetBuffer();
-        TextState_PushStream(p, 1);
-        end = Text_FindChar(s, '>');
-        p->hold = 1;
-        goto done;
-    }
-    if (!Text_ComparePrefix(s, gUnk_0824DCB0, 4)) {
-        p->streams[3] = GameState_GetBikeName();
-        TextState_PushStream(p, 4);
-        end = Text_FindChar(s, '>');
-        p->hold = 1;
-        goto done;
-    }
-    if (!Text_ComparePrefix(s, gUnk_0824DCB8, 5)) {
-        const u8 *name;
-        end = TextState_ParseTagValue(p, s);
-        if (!p->tag.hasValue)
-            goto unknown;
-        if (!p->tag.length)
-            goto unknown;
-        name = p->tag.value;
-        if (!Text_ComparePrefix(name, gUnk_0824DCC0, 4))
-            goto unknown;
-        value = Text_ComparePrefix(name, gUnk_0824DCC8, 8);
-        if (!value)
-            goto selected;
-        value = Text_ComparePrefix(name, gUnk_0824DCD4, 8);
-        if (!value)
-            goto selected;
-        value = Text_ComparePrefix(name, gUnk_0824DCE0, 8);
-        if (!value)
-            goto selected;
-        if (!Text_ComparePrefix(name, gUnk_0824DCEC, 6)) {
-            value = 3;
-            goto selected;
-        }
-        if (!Text_ComparePrefix(name, gUnk_0824DCF4, 8)) {
-            value = 5;
-            goto selected;
-        }
-        if (!Text_ComparePrefix(name, gUnk_0824DD00, 6)) {
-            value = 4;
-            goto selected;
-        }
-        if (!Text_ComparePrefix(name, gUnk_0824DD08, 5)) {
-            value = 6;
-            goto selected;
-        }
-        if (!Text_ComparePrefix(name, gUnk_0824DD10, 4)) {
-            value = 7;
-            goto selected;
-        }
-        if (!Text_ComparePrefix(name, gUnk_0824DD18, 4)) {
-            value = 8;
-            goto selected;
-        }
-        if (!Text_ComparePrefix(name, gUnk_0824DD20, 6)) {
-            value = 9;
-            goto selected;
-        }
-        if (!Text_ComparePrefix(name, gUnk_0824DD28, 4)) {
-            value = 10;
-            goto selected;
-        }
-        if (!Text_ComparePrefix(name, gUnk_0824DD30, 3)) {
-            value = 11;
-            goto selected;
-        }
-        if (!Text_ComparePrefix(name, gUnk_0824DD34, 6)) {
-            value = 12;
-            goto selected;
-        }
-        if (!Text_ComparePrefix(name, gUnk_0824DD3C, 4)) {
-            value = 13;
-            goto selected;
-        }
-        if (!Text_ComparePrefix(name, gUnk_0824DD44, 6)) {
-            value = 14;
-            goto selected;
-        }
-        if (!Text_ComparePrefix(name, gUnk_0824DD4C, 5)) {
-            value = 15;
-            goto selected;
-        }
-        if (!Text_ComparePrefix(name, gUnk_0824DD54, 7)) {
-            value = 16;
-            goto selected;
-        }
-        if (!Text_ComparePrefix(name, gUnk_0824DD5C, 7)) {
-            value = 17;
-            goto selected;
-        }
-        if (!Text_ComparePrefix(name, gUnk_0824DD64, 7)) {
-            value = 18;
-            goto selected;
-        }
-        if (!Text_ComparePrefix(name, gUnk_0824DD6C, 9)) {
-            value = 19;
-            goto selected;
-        }
-        if (!Text_ComparePrefix(name, gUnk_0824DD78, 4)) {
-            value = 20;
-            goto selected;
-        }
-        if (!Text_ComparePrefix(name, gUnk_0824DD80, 4)) {
-            value = 21;
-            goto selected;
-        }
-        if (!Text_ComparePrefix(name, gUnk_0824DD88, 4)) {
-            value = 22;
-            goto selected;
-        }
-        if (!Text_ComparePrefix(name, gUnk_0824DD90, 7)) {
-            value = 23;
-            goto selected;
-        }
-        if (!Text_ComparePrefix(name, gUnk_0824DD98, 9)) {
-            value = 24;
-            goto selected;
-        }
-        if (!Text_ComparePrefix(name, gUnk_0824DDA0, 7)) {
-            value = 25;
-            goto selected;
-        }
-        if (!Text_ComparePrefix(name, gUnk_0824DDA8, 7)) {
-            value = 26;
-            goto selected;
-        }
-        if (!Text_ComparePrefix(name, gUnk_0824DDB0, 6)) {
-            value = 27;
-            goto selected;
-        }
-        cmp = (int)name;
-        if (!Text_ComparePrefix((const u8 *)cmp, gUnk_0824DDB8, 11)) {
-            value = 30;
-            goto selected;
-        }
-        if (!Text_ComparePrefix((const u8 *)cmp, gUnk_0824DDC4, 6)) {
-            value = TextState_GetPairSpeakerLabel();
-            goto selected;
-        }
-        cmp = 0;
-        if (!Text_ComparePrefix(name, gUnk_0824DDCC, 6)) {
-            value = TextState_GetPlayerSpeakerLabel();
-            goto selected;
-        }
-    unknown:
-        value = 255;
-    selected: {
-        s8 *selection = &p->speaker;
-        *selection = value;
-    }
-        p->busy = 1;
-        p->defaultDelay = p->characterDelay;
-        p->characterDelay = 0;
-        end = Text_FindChar(end, '>');
-        goto done;
-    }
-    if (!Text_ComparePrefix(s, gUnk_0824DDD4, 7)) {
-        p->speaker = -1;
-        goto findS;
-    }
-    if (!Text_ComparePrefix(s, gUnk_0824DDDC, 4)) {
-        end = TextState_ParseTagValue(p, end);
-        if (p->tag.hasValue && p->tag.length)
-            value = Text_ParseDecimal(p->tag.value, p->tag.length);
-        else
-            value = 0;
-        p->frame = value;
-        goto done;
-    }
-    if (!Text_ComparePrefix(s, gUnk_0824DDE4, 6)) {
-        end = TextState_ParseTagValue(p, end);
-        if (p->tag.hasValue && p->tag.length)
-            value = Text_ParseDecimal(p->tag.value, p->tag.length);
-        else
-            value = 0;
-        p->streams[2] = p->strings[value];
-        TextState_PushStream(p, 3);
-        end = Text_FindChar(end, '>');
-        p->hold = 1;
-        goto done;
-    }
-    if (!Text_ComparePrefix(s, gUnk_0824DDEC, 5)) {
-        end = TextState_ParseTagValue(p, end);
-        if (p->tag.hasValue && p->tag.length)
-            value = Text_ParseDecimal(p->tag.value, p->tag.length);
-        else
-            value = 221;
-        Sound_PlaySong(value);
-        goto done;
-    }
-    if (!Text_ComparePrefix(s, gUnk_0824DDF4, 3)) {
-        u8 *buffer;
-        int number;
-        end = TextState_ParseTagValue(p, end);
-        if (p->tag.hasValue && p->tag.length)
-            number = Text_ParseDecimal(p->tag.value, p->tag.length);
-        else
-            number = 0;
-        buffer = p->tag.number;
-        Text_FormatDecimal(buffer, p->numbers[number]);
-        p->streams[1] = buffer;
-        TextState_PushStream(p, 2);
-        end = Text_FindChar(end, '>');
-        p->hold = 1;
-        goto done;
-    }
-    cmp = Text_ComparePrefix(s, gUnk_0824DDF8, 6);
-    if (!cmp) {
-        const u8 *name;
-        end = TextState_ParseTagValue(p, end);
-        name = p->tag.value;
-        if (!Text_ComparePrefix(name, gUnk_0824DE00, 13)) {
-            p->spacing = cmp;
-            goto done;
-        }
-        if (!Text_ComparePrefix(name, gUnk_0824DE10, 11))
-            p->spacing = 1;
-        else
-            p->spacing = cmp;
-        goto done;
-    }
-    if (!Text_ComparePrefix(s, gUnk_0824DE1C, 3)) {
-        p->streams[0] = PlayerName_GetBuffer();
-        end = Text_FindChar(end, '>');
-        p->complete = 1;
-        goto done;
-    }
-    if (!Text_ComparePrefix(s, gUnk_0824DE20, 5)) {
-        if (p->unknown10) {
-            TextState_PlayGlyphSound(p, 91);
-            TextState_DrawNarrowGlyph(p, 59);
-        }
-        end = Text_FindChar(end, '>');
-        goto done;
-    }
-    if (!Text_ComparePrefix(s, gUnk_0824DE28, 5)) {
-        p->palette = 1;
-        end = Text_FindChar(end, '>');
-        goto done;
-    }
-    goto done;
-close:
-    if (!Text_ComparePrefix(s, gUnk_0824DE30, 7)) {
-        p->palette = 0;
-        goto findS;
-    }
-    if (!Text_ComparePrefix(s, gUnk_0824DE38, 7)) {
-        p->palette = 0;
-        goto findS;
-    }
-    if (!Text_ComparePrefix(s, gUnk_0824DE40, 7)) {
-        p->palette = 0;
-        goto findS;
-    }
-    if (!Text_ComparePrefix(s, gUnk_0824DE48, 6)) {
-        p->busy = 0;
-        p->characterDelay = p->defaultDelay;
-        goto findS;
-    }
-    if (!Text_ComparePrefix(s, gUnk_0824DE50, 5)) {
-        if (p->unknown10) {
-            TextState_PlayGlyphSound(p, 93);
-            TextState_DrawNarrowGlyph(p, 61);
-        }
-        goto findS;
-    }
-    if (Text_ComparePrefix(s, gUnk_0824DE58, 6))
-        goto done;
-    p->palette = 0;
-findS:
-    end = Text_FindChar(s, '>');
-done:
-    if (!p->unknown14)
-        p->hold = 1;
-    if (p->hold)
+    if (!state->unknown14)
+        state->hold = 1;
+    if (state->hold)
         end++;
-    s = end;
-    return s;
+    tag = end;
+    return tag;
 }
