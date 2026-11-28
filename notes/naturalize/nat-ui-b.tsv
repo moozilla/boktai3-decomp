@@ -322,3 +322,7 @@ src/ui/title/tutorial_otenko.c	TutorialOtenko_DestroyController	contrived	natura
 src/ui/title/tutorial_otenko.c	TutorialOtenko_UpdateRegionChildren	contrived	minor	5	current-region local and predicate helper (loop invariant), second children base
 src/ui/title/tutorial_otenko.c	TutorialOtenko_UpdateInactiveAnimation	natural	natural	0	
 src/ui/title/tutorial_otenko.c	TutorialOtenko_UpdateMotionPhase	natural	natural	0	
+src/ui/title/tutorial_otenko.c	TutorialOtenko_UpdateInteractionMode	natural	natural	0	
+src/ui/title/tutorial_otenko.c	TutorialOtenko_CheckResourceLifetime	natural	natural	0	
+src/ui/title/tutorial_otenko.c	TutorialOtenko_UpdateController	natural	natural	0	
+src/ui/title/tutorial_otenko.c	TutorialOtenko_ConfigureFromScript	contrived	natural	2	

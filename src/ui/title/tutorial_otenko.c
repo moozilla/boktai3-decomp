@@ -2389,32 +2389,13 @@ void TutorialOtenko_ConfigureFromScript(void)
     g->next = Script_GetKeywordValue(0x72, 0);
     g->option = Script_GetKeywordValue(0x41, 0);
     if (Script_SeekToKeyword(0x70)) {
-        {
-            s32 v = Script_GetValue();
-            g->savedPosition.x = v;
-            obj->position.x = v;
-        }
-        {
-            s32 v = Script_GetValue();
-            g->savedPosition.y = v;
-            obj->position.y = v;
-        }
-        {
-            s32 v = Script_GetValue();
-            g->savedPosition.z = v;
-            obj->position.z = v;
-        }
+        obj->position.x = g->savedPosition.x = Script_GetValue();
+        obj->position.y = g->savedPosition.y = Script_GetValue();
+        obj->position.z = g->savedPosition.z = Script_GetValue();
     } else {
-        struct Player *owner;
-        owner = g->owner;
-        g->savedPosition.x = (u16)owner->position.x;
-        obj->position.x = (u16)owner->position.x;
-        owner = g->owner;
-        g->savedPosition.y = (u16)owner->position.y;
-        obj->position.y = (u16)owner->position.y;
-        owner = g->owner;
-        g->savedPosition.z = (u16)owner->position.z;
-        obj->position.z = (u16)owner->position.z;
+        obj->position.x = g->savedPosition.x = g->owner->position.x;
+        obj->position.y = g->savedPosition.y = g->owner->position.y;
+        obj->position.z = g->savedPosition.z = g->owner->position.z;
     }
     if (Script_SeekToKeyword(0x63))
         g->handle = (void *)Script_GetValue();
