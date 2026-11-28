@@ -191,3 +191,4 @@ src/player/control/Player_SelectActionSequence.c	Player_SelectActionSequence	con
 src/player/control/Player_ApplyControlPresentation.c	Player_ApplyControlPresentation	minor	minor	5	table address read through RANDOM_TABLE_ADDR: array subscript forms the address in another order
 src/player/control/Player_UpdateActionModeMovement.c	Player_UpdateActionModeMovement	contrived	minor	18	position/cell helpers and union probe; separate break for action modes 2 and 1; enabled flag shared by both arms
 src/player/control/Player_UpdateInteractionMovement.c	Player_UpdateInteractionMovement	contrived	minor	2	position/cell helpers and union probe; enabled flag shared by both arms
+src/player/control/Player_UpdateLinkModeMovement.c	Player_UpdateLinkModeMovement	contrived	minor	2	position/cell helpers and union probe; enabled flag shared by both arms

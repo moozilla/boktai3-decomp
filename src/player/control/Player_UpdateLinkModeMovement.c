@@ -71,10 +71,6 @@ static inline u32 specialState(struct Player *p)
         result = 1;
     return result;
 }
-static inline u32 nonzero(u32 value)
-{
-    return (-value | value) >> 31;
-}
 static inline u32 terrainFlag(struct SceneVec *pos)
 {
     u32 flags = *(u16 *)(cellProperties(cellIndex(pos)) + 2);
@@ -107,22 +103,20 @@ void Player_UpdateLinkModeMovement(struct Player *p)
                 u32 enabled = 0;
                 if (!Player_IsStatusBit3ActionActive(p->movementStatus) && p->tetherMode == 1 &&
                     (p->movementContactFlags & 1))
-                    enabled = nonzero(p->facing & 1);
+                    if (p->facing & 1)
+                        enabled = 1;
                 if (enabled) {
                     if (++p->unk4A6 == 5) {
                         s32 angle;
-                        u32 flags;
                         pos.point = p->position;
                         angle = ((p->facing + 5) & 7) << 5;
                         pos.words.x += scale(gUnk_086149C4[(angle + 64) & 255] * 50);
                         pos.words.z += scale(gUnk_086149C4[angle] * 50);
-                        if ((u32)groundHeight(&pos.point) < (u32)(p->position.y + 200))
-                            break;
-                        flags = terrainFlag(&pos.point);
-                        if (flags)
+                        if ((u32)groundHeight(&pos.point) < (u32)(p->position.y + 200) ||
+                            terrainFlag(&pos.point))
                             break;
                         p->coordinateAxis = p->facing;
-                        p->actionFourEnabled = flags;
+                        p->actionFourEnabled = 0;
                         ActorSequence_Begin(p, 4, 0);
                     }
                 } else
