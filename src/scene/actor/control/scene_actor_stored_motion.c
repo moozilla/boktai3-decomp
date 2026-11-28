@@ -24,13 +24,6 @@ s32 Math_Atan2(s32, s32);
 
 s32 Callback_InvokeActor(void *, void *);
 
-static inline u32 WanderRand(void)
-{
-    u32 index = (gRandomIndex + 1) & 1023;
-    gRandomIndex = index;
-    return *(const u16 *)((index << 1) + (u32)gRandomTable);
-}
-
 /* The block at 0x3F0 of the control context; the position curve writes its position at 0x3FC. */
 struct StoredCurve {
     u8 unknown0[0xC];
@@ -42,9 +35,9 @@ static inline u8 ApproachStoredPoint(struct ChaseActor *actor, struct StoredCurv
 {
     struct SceneActorBody *motion = &actor->base.body;
     s32 speed = inSpeed;
-    s16 dx = curve->position.x - (u16)motion->position.x;
-    s16 dz = curve->position.z - (u16)motion->position.z;
-    if ((dx < 0 ? -dx : dx) <= 32 && (dz < 0 ? -dz : dz) <= 32)
+    s16 dx = curve->position.x - motion->position.x;
+    s16 dz = curve->position.z - motion->position.z;
+    if (abs(dx) <= 32 && abs(dz) <= 32)
         return 1;
     if (dx || dz) {
         motion->direction = Math_Atan2(dx, dz);
@@ -89,7 +82,8 @@ void SceneActorControl_WanderAroundPlayer(struct ChaseActor *actor)
         if ((u8)SceneActorControl_AdvancePositionCurve(actor)) {
             struct ContactPosition target;
             u32 angle;
-            angle = (u8)WanderRand();
+            gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+            angle = (u8)((u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
             target = *(struct ContactPosition *)&gPlayers[0]->position;
             target.x += Math_ShiftTowardZero(gUnk_086149C4[angle], 4);
             target.z += Math_ShiftTowardZero(gUnk_086149C4[(angle + 64) & 255], 4);

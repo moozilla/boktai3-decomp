@@ -334,3 +334,7 @@ src/scene/actor/control/SceneActorControl_TryActivateProximityResponse.c	SceneAc
 src/scene/actor/control/SceneActorControl_SetCollisionResponse.c	SceneActorControl_SetCollisionResponse	contrived	contrived	4	parked masks, zero locals and phase field pointers: plain stores and SceneActorTerrain_EnterState change register choice
 src/scene/actor/control/SceneActorControl_TickHiddenResponse.c	SceneActorControl_TickHiddenResponse	contrived	contrived	0	motion-state view of the actor and parked masks: plain flag tests lose the materialized predicate
 src/scene/actor/control/SceneActorControl_ApplyRecoveryContact.c	SceneActorControl_ApplyRecoveryContact	contrived	contrived	40	contact union reused for the health addend, actor copy and flag helpers: separate locals or plain flag operators change register choice
+src/scene/actor/control/SceneActorControl_UpdateFacingAnimation.c	SceneActorControl_UpdateFacingAnimation	minor	minor	0	take-flag helper and restart assigned the false flag
+src/scene/actor/control/SceneActorControl_UpdatePersistentAnimation.c	SceneActorControl_UpdatePersistentAnimation	natural	natural	0	-
+src/scene/actor/control/SceneActorControl_UpdateShadowReturn.c	SceneActorControl_UpdateShadowReturn	natural	natural	0	-
+src/scene/actor/control/scene_actor_stored_motion.c	SceneActorControl_WanderAroundPlayer	contrived	minor	5	StoredCurve view of the context block and the speed copy: the position is addressed through the 0x3F0 block
