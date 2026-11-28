@@ -5,13 +5,9 @@ void Effect_Remove(struct TransitionParticle *);
 
 s32 Otenko_OnTransitionEffectDestroy(struct TransitionEffect *effect)
 {
-    struct TransitionParticle *e;
     s32 i;
     Sprite_Remove((u8 *)&effect->sprite);
-    e = effect->particles;
-    for (i = 7; i >= 0; i--) {
-        Effect_Remove(e);
-        e++;
-    }
+    for (i = 0; i < 8; i++)
+        Effect_Remove(&effect->particles[i]);
     return 0;
 }

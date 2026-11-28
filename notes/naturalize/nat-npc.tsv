@@ -392,3 +392,4 @@ src/npc/otenko/Otenko_SpawnTransitionParticle.c	Otenko_SpawnTransitionParticle	c
 src/npc/otenko/Otenko_UpdateTransitionParticles.c	Otenko_UpdateTransitionParticles	contrived	natural	9	
 src/npc/otenko/Otenko_SpawnTransitionParticle.c	Otenko_SpawnTransitionParticle	contrived	contrived	32	split halfword table pointer, shared sample helper with explicit mask and per-axis random/value temporaries: plain RANDOM_NEXT loads the table late and folds the offset after the random value
 src/npc/otenko/Otenko_UpdateTransitionEffect.c	Otenko_UpdateTransitionEffect	contrived	natural	5	table pointer local: the ROM forms the table address before the cursor
+src/npc/otenko/Otenko_OnTransitionEffectDestroy.c	Otenko_OnTransitionEffectDestroy	minor	natural	1	
