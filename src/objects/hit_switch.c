@@ -55,16 +55,9 @@ void HitSwitch_ReceiveCollision(struct ContactCollider *other, void *unused,
 void HitSwitch_UpdateStatic(struct HitSwitchEntry *entry)
 {
     if (entry->hitCount >= entry->requiredHits) {
-        u16 *state;
-        u32 flags;
-        u32 mask;
         entry->completed = 1;
         HitSwitch_RegisterCompletedCell(entry);
-        state = &entry->collider.flags;
-        flags = *state;
-        mask = 4;
-        mask |= flags;
-        *state = mask;
+        entry->collider.flags |= 4;
         HitSwitch_SetUpdate(entry, HitSwitch_AnimateStaticCompletion);
     }
 }
