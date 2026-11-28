@@ -659,5 +659,6 @@ int MessageWindow_OnDestroy(struct MessageWindow *window)
 {
     Anim_Remove(&window->animSprite);
     Sprite_Remove(&window->portrait);
-    return (u32)(gMessageWindow = 0);
+    gMessageWindow = 0;
+    return 0;
 }
