@@ -535,13 +535,11 @@ typedef char IvyChildPulseSizeCheck[sizeof(struct IvyChildPulse) == 0x190 ? 1 : 
 
 void Ivy_UpdateChildBobbing(struct IvyChildPulse *s)
 {
-    u32 *c = &s->bobTicks;
-    if ((*c & 3) == 0)
+    if ((s->bobTicks & 3) == 0)
         s->verticalVelocity += s->verticalAcceleration;
-    *c = *c - 1;
-    if (*c == 0) {
+    if (--s->bobTicks == 0) {
         s->verticalAcceleration = -s->verticalAcceleration;
-        *c = 0x28;
+        s->bobTicks = 0x28;
     }
     s->y += s->verticalVelocity;
 }
