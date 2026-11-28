@@ -586,3 +586,4 @@ src/system/inventory/Inventory_GetEquipmentValueStub.c	Inventory_GetEquipmentVal
 src/system/inventory/Inventory_GetEquipmentEntry.c	Inventory_GetEquipmentEntry	minor	minor	0	unit-local view of the 16-byte entries at gGameState+0x1C0: naming them needs table160 re-split in the shared game state header
 src/system/inventory/Inventory_GetEquipmentId.c	Inventory_GetEquipmentId	natural	natural	0	
 src/system/inventory/sub_0822D6EC.c	sub_0822D6EC	natural	natural	0	
+src/system/inventory/Inventory_AddEquipmentFromRecord.c	Inventory_AddEquipmentFromRecord	contrived	minor	1	the -1 compared against is a const local so it stays in a register

@@ -9,42 +9,28 @@ void *Inventory_GetEquipmentEntry(s32);
 void Player_BeginDescriptorAction(void *, void *);
 s32 Inventory_AddEquipmentFromRecord(const void *record)
 {
-    s32 count, i;
-    s16 *q;
-    void *p;
-    u8 **gp;
-    s32 idx;
-    s32 m1;
-    for (i = 0; i <= 15; i++) {
+    s32 count, i, slot;
+    const s32 empty = -1;
+
+    for (i = 0; i < 16; i++) {
         if (Inventory_GetEquipmentId(i) == 0xFF)
             break;
     }
-    if (i > 15)
+    if (i >= 16)
         return -1;
     Inventory_SetEquipmentEntry(i, record);
-    idx = i;
+    slot = i;
     count = 0;
-    {
-        u8 **t = &gGameState;
-        q = (s16 *)*t;
-        m1 = -1;
-        gp = t;
-    }
-    q = (s16 *)((u8 *)q + 0x68);
-    i = 7;
-    do {
-        if (*q > m1)
+    for (i = 0; i < 8; i++) {
+        if (gGameState->inventory[i] > empty)
             count++;
-        q++;
-        i--;
-    } while (i >= 0);
-    if (count <= 0) {
-        *(u16 *)(*gp + 0x50) = 0;
-        Inventory_AddAssignedSlot(idx);
-        Hud_RefreshInventoryDisplay();
-        p = (*(void **)gPlayers);
-        if (p)
-            Player_BeginDescriptorAction(p, Inventory_GetEquipmentEntry(idx));
     }
-    return idx;
+    if (count <= 0) {
+        gGameState->unk50 = 0;
+        Inventory_AddAssignedSlot(slot);
+        Hud_RefreshInventoryDisplay();
+        if (gPlayers[0])
+            Player_BeginDescriptorAction(gPlayers[0], Inventory_GetEquipmentEntry(slot));
+    }
+    return slot;
 }
