@@ -62,10 +62,7 @@ void Armor_BeginPartTravelToPlayer(struct ArmorPart *p)
         p->dz = p->endZ - p->startZ;
         p->timer = 0;
         gRandomTableIndex = (gRandomTableIndex + 1) & 1023;
-        {
-            u32 index = gRandomTableIndex << 1;
-            random = *(const u16 *)(index + RANDOM_TABLE_ADDR);
-        }
+        random = *(const u16 *)((gRandomTableIndex << 1) + RANDOM_TABLE_ADDR);
         p->direction = (random & 1) ? -1 : 1;
         dx = p->dx;
         if (dx < 0)

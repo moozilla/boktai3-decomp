@@ -269,3 +269,4 @@ src/monsters/axe/axe.c	Axe_UpdateBodyColliders	contrived	contrived	20	remaining:
 src/monsters/axe/axe.c	SceneActorControl_AdvanceReactionCount	contrived	contrived	6	remaining: mask,maskhelper
 src/monsters/armor/armor_tracking.c	Armor_UpdateFacingAction	contrived	minor	2	remaining: rawoff
 src/monsters/armor/Armor_ApplySceneCommands.c	Armor_ApplySceneCommands	contrived	contrived	44	remaining: rawoff,bytep,do,block,constlocal
+src/monsters/armor/Armor_BeginPartTravelToPlayer.c	Armor_BeginPartTravelToPlayer	contrived	natural	1	
