@@ -1,31 +1,8 @@
+#include "bosses/vanargand/vanargand_pair_attack.h"
 #include "bosses/vanargand/paired_scene_actor.h"
 #include "engine/engine_globals.h"
 #include "engine/ram.h"
 // confidence=low: command 9 alternates the selected pair halves for six timed attacks.
-struct Vanargand {
-    u8 pad0[0x9C];
-    u32 flags;
-    u8 padA0[2];
-    u8 phase;
-    u8 padA3;
-    u32 timer;
-    u8 padA8[7];
-    u8 finished;
-    u8 entered;
-    u8 pending;
-    u8 padB2[0x104 - 0xB2];
-    u8 (*callback)(struct Vanargand *);
-    u8 pad108[0x56C - 0x108];
-    struct VanargandAttackPair *pair;
-    u8 pad570[0x580 - 0x570];
-    u32 selected;
-    u16 pad584;
-    u16 parameter;
-    u8 pad588[0x5B4 - 0x588];
-    s16 repeats;
-    u8 pad5B6[0x5C2 - 0x5B6];
-    s16 mode;
-};
 void Vanargand_SetPendingCue(void *, u16);
 void Vanargand_SetPairedMotionParameter(u8 *, u32);
 static inline s32 RandomValue(void)
@@ -33,7 +10,7 @@ static inline s32 RandomValue(void)
     gRandomIndex = (gRandomIndex + 1) & 0x3FF;
     return *(u16 *)((gRandomIndex << 1) + (u32)gRandomTable);
 }
-void Vanargand_UpdateRepeatedPairAttack(struct Vanargand *p)
+void Vanargand_UpdateRepeatedPairAttack(struct VanargandPairAttack *p)
 {
     s32 callbackResult;
     s32 phase;
