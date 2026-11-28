@@ -165,11 +165,8 @@ struct RuntimeTask *Task_FindById(u16);
 
 s32 Task_KillById(u16 id)
 {
-    void *task = Task_FindById(id);
-    s32 r;
-    if (task)
-        r = Task_Kill(task);
-    else
-        r = -1;
-    return r;
+    struct RuntimeTask *task = Task_FindById(id);
+    if (task == 0)
+        return -1;
+    return Task_Kill(task);
 }
