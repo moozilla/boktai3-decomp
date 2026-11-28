@@ -19,3 +19,4 @@ src/bosses/ratatosk/ActorProximity_UpdateSquaredDistances.c	ActorProximity_Updat
 src/bosses/ratatosk/SceneDistance_UpdateLinkedDistances.c	SceneDistance_UpdateLinkedDistances	contrived	natural	3	
 src/bosses/ratatosk/SceneDistance_UpdateLinkedTargetDistances.c	SceneDistance_UpdateLinkedTargetDistances	contrived	natural	2	
 src/bosses/ratatosk/Ratatosk_GetRandomMovementPoint.c	Ratatosk_GetRandomMovementPoint	contrived	natural	4	
+src/bosses/ratatosk/sub_081F348C.c	sub_081F348C	minor	minor	7	copy goes through a one-line position copy helper: a direct struct assignment swaps the address add operands
