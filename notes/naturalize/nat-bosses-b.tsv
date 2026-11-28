@@ -118,3 +118,4 @@ src/bosses/ratatosk/Ratatosk_UpdateRestartState17.c	Ratatosk_UpdateRestartState1
 src/bosses/ratatosk/SceneEffect_EnterAndRestart.c	SceneEffect_EnterAndRestart	natural	natural	0	
 src/bosses/ratatosk/Ratatosk_UpdateAttackSelection.c	Ratatosk_UpdateAttackSelection	contrived	contrived	22	second actor alias, flag accessor, snapshot/snapshotWithState pair with a savedState pointer and a table-address randomByte stay: each plain form changes register allocation
 src/bosses/ratatosk/Ratatosk_UpdateInactiveState.c	Ratatosk_UpdateInactiveState	contrived	natural	1	
+src/bosses/ratatosk/Ratatosk_UpdateInactiveMode.c	Ratatosk_UpdateInactiveMode	contrived	natural	1	
