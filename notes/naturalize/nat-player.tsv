@@ -223,3 +223,4 @@ src/player/core/player_core.c	Player_StopActionSounds	natural	natural	0
 src/player/core/player_core.c	ActorDirection_ComputeRelativeCardinal	minor	natural	1	
 src/player/core/player_core.c	Player_ApplyContactResponse	minor	minor	4	flag-mask helper: ROM loads the mask before the flag word
 src/player/core/player_core.c	Player_IsActionBlocked	contrived	natural	4	
+src/player/core/player_core.c	Player_AddEventFlags	minor	natural	1	

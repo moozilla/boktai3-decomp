@@ -258,7 +258,7 @@ void Player_CallEventScript(struct Player *player, u32 value)
 
 void Player_AddEventFlags(struct Player *player, u32 bits)
 {
-    player->eventFlags = bits | player->eventFlags;
+    player->eventFlags |= bits;
 }
 
 u16 Player_GetEventFlags(struct Player *player, u16 mask)
