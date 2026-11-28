@@ -477,3 +477,4 @@ src/objects/loot_deposits/LootDepositPool_TestStatusFlags.c	LootDepositPool_Test
 src/objects/loot_deposits/LootDepositPool_Allocate.c	LootDepositPool_Allocate	minor	natural	1	
 src/objects/loot_deposits/sub_08104280.c	sub_08104280	contrived	natural	1	
 src/objects/loot_deposits/LootDeposit_CallMemberScript.c	LootDeposit_CallMemberScript	minor	natural	1	
+src/objects/loot_deposits/LootDeposit_CreateFromScript.c	LootDeposit_CreateFromScript	contrived	minor	18	render pointer, argument address arithmetic and a script destination pointer: plain forms change 25-80 insns
