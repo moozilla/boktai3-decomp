@@ -112,3 +112,18 @@ src/scene/actor/actor_pool/pooled_motion.c	MotionPool_SetGraphics	natural	natura
 src/scene/actor/actor_pool/pooled_motion.c	MotionPool_SetCallback	natural	natural	0	
 src/scene/actor/actor_utilities.c	SceneActorRoute_ClampTargetToAnchor	minor	minor	1	repeated route-cursor cast (void * currentRoute)
 src/scene/actor/actor_utilities.c	SceneActorTerrain_CanTraverseCell	contrived	natural	3	
+src/scene/actor/actor_utilities.c	SceneActor_SetPositionXZ	minor	minor	0	FacingDelta(s16, u16) helper: direct s16 subtraction drops the target sign extension
+src/scene/actor/actor_utilities.c	InventorySlot_PickRandom	contrived	contrived	0	unchanged: duplicated if(idx) arms and goto found set the allocation of slot vs kind
+src/scene/actor/actor_utilities.c	ActorParticles_SpawnBurst	contrived	contrived	0	unchanged: random-origin macros keep the table-relative literal (0x403B714) the ROM uses
+src/scene/actor/actor_utilities.c	SceneActorRoute_SelectRandomNextPoint	minor	minor	0	random table read through offset cast in the inline
+src/scene/actor/actor_utilities.c	SceneActorAnimation_InitEnemySequence	natural	natural	0	
+src/scene/actor/actor_utilities.c	SceneActorTerrain_CheckNeighborHeight	natural	natural	0	
+src/scene/actor/actor_utilities.c	SceneActorTerrain_FindReachableCell	natural	natural	0	
+src/scene/actor/actor_utilities.c	SceneTerrain_IsPathBlocked	natural	natural	0	
+src/scene/actor/actor_utilities.c	SceneActorMotion_AimTowardTarget	natural	natural	0	
+src/scene/actor/actor_utilities.c	Math_GetVectorLength	natural	natural	0	
+src/scene/actor/actor_utilities.c	SceneActorReaction_ResetResponseState	natural	natural	0	
+src/scene/actor/actor_utilities.c	SceneActorTerrain_IsBelowForwardFloor	natural	natural	0	
+src/scene/actor/actor_utilities.c	ActorParticles_SpawnDirectionalBurst	natural	natural	0	
+src/scene/actor/actor_utilities.c	ActorMode_SelectOddStateVariant	natural	natural	0	
+src/scene/actor/actor_utilities.c	ActorParticles_SpawnWideBurst	natural	natural	0	
