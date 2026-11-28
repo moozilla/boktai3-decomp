@@ -233,3 +233,4 @@ src/engine/video/sprite.c	ObjGfx_UploadQueuedTiles	natural	natural
 src/engine/video/sprite.c	SpriteOam_ResetQueue	natural	natural		
 src/engine/video/sprite.c	AnimData_Load	contrived	minor	3	entry->offset + base10 computed twice; found flag kept in a register
 src/engine/video/sprite.c	SpriteOam_FinalizeQueue	contrived	minor	24	base reused for the OAM buffer and sine table (gcse/cprop would fold a typed pointer); clear cursor built by integer sum for the ROM operand order
+src/engine/video/background_layers.c	Bg_ClearAllTilemaps	minor	natural	1	
