@@ -90,3 +90,4 @@ src/engine/sound/Sound_PauseChannel12.c	Sound_PauseChannel12	minor	natural	1
 src/engine/sound/Sound_SetChannel10Tempo.c	Sound_SetChannel10Tempo	minor	natural	1	
 src/engine/sound/Sound_PlaySong.c	Sound_PlaySong	minor	natural	1	
 src/engine/sound/Sound_PlaySongChecked.c	Sound_PlaySongChecked	contrived	natural	1	
+src/engine/sound/Sound_PlayTrackedSong.c	Sound_PlayTrackedSong	contrived	minor	1	players pointer: without it the table address is loaded after the index

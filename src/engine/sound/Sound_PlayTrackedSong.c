@@ -3,22 +3,18 @@
 #include "engine/ram.h"
 void m4aSongNumStartOrContinue(u16);
 void m4aSongNumStart(u16);
-void m4aSongNumStop(u16);
-void m4aMPlayImmInit(struct MusicPlayerInfo *);
-void m4aMPlayFadeIn(struct MusicPlayerInfo *, u16);
-void m4aMPlayFadeOut(struct MusicPlayerInfo *, u16);
-void m4aMPlayFadeOutTemporarily(struct MusicPlayerInfo *, u16);
+
 void Sound_PlayTrackedSong(u32 song)
 {
-    u32 index;
+    const struct MusicPlayer *players;
+    u32 player;
+
     if (gSongTable[song].ms == 10)
         m4aSongNumStartOrContinue(song);
     else
         m4aSongNumStart(song);
-    {
-        const struct MusicPlayer *players = gMPlayTable;
-        index = gSongTable[song].ms;
-        m4aMPlayVolumeControl(players[index].info, 0xffff, 256);
-        gMusicSlotSongs[index] = song;
-    }
+    players = gMPlayTable;
+    player = gSongTable[song].ms;
+    m4aMPlayVolumeControl(players[player].info, 0xffff, 256);
+    gMusicSlotSongs[player] = song;
 }
