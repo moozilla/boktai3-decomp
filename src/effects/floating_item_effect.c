@@ -208,8 +208,6 @@ void FloatingItemEffect_UpdateFlight(struct LinkedWidgetSet *manager, struct Flo
     struct AnimSprite *sprite = &effect->sprite;
     struct ContactPosition to, from;
     u32 t, inv;
-    u8 *scale;
-    int xl;
     if (effect->entered) {
         effect->entered = 0;
         effect->sprite.flags &= ~1;
@@ -223,6 +221,7 @@ void FloatingItemEffect_UpdateFlight(struct LinkedWidgetSet *manager, struct Flo
     if (effect->mode == 0) {
         u32 targetIndex = effect->index;
         struct Player *target = gPlayers[targetIndex];
+
         FloatingEffect_ProjectVec(&to, (void *)&target->position);
     } else
         FloatingEffect_ProjectVec(&to, effect->target);
@@ -230,13 +229,11 @@ void FloatingItemEffect_UpdateFlight(struct LinkedWidgetSet *manager, struct Flo
     to.y -= 4;
     sprite->position.x = FloatingEffect_Scale4(from.x * inv + to.x * t);
     sprite->position.y = FloatingEffect_Scale4(from.y * inv + to.y * t);
-    scale = &sprite->scaleX;
-    if (*scale > 32)
-        *scale -= 2;
-    sprite->scaleY = *scale;
+    if (sprite->scaleX > 32)
+        sprite->scaleX -= 2;
+    sprite->scaleY = sprite->scaleX;
     sprite->rotation += 8;
-    xl = (u16)sprite->position.x - 8;
-    sprite->position.x = xl + ((64 - *scale) >> 3);
+    sprite->position.x = (s16)(sprite->position.x - 8) + ((64 - sprite->scaleX) >> 3);
     sprite->position.y -= 8;
     if (effect->timer > 15) {
         if (effect->kind == 0) {
