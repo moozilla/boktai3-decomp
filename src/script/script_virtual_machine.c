@@ -559,16 +559,13 @@ u8 *Script_ExecuteNativeCommand(u8 *p)
 
 u32 *Script_ReadProcTable(u32 *p, u32 *n)
 {
-    s32 c;
-    u32 *q;
-    u32 *o = n;
-    c = 0;
-    q = p;
+    u32 count = 0;
+    u32 *q = p;
     while (*q != (u32)-1) {
         q++;
-        c++;
+        count++;
     }
-    *o = c;
+    *n = count;
     return q + 1;
 }
 

@@ -561,3 +561,4 @@ src/script/script_virtual_machine.c	Script_ReadVector32	minor	natural	1
 src/script/script_virtual_machine.c	Script_ReadVector16	minor	natural	1	
 src/script/script_virtual_machine.c	Text_LookupString	contrived	natural	2	
 src/script/script_virtual_machine.c	sub_0821AD98	contrived	natural	1	
+src/script/script_virtual_machine.c	Script_ReadProcTable	contrived	natural	6	cursor copy q of the table pointer: advancing the parameter swaps registers
