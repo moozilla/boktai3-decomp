@@ -324,3 +324,5 @@ src/npc/story_character/SceneCharacter_GetPaletteIndex.c	SceneCharacter_GetPalet
 src/npc/story_character/SceneCharacter_GetResourceVariant.c	SceneCharacter_GetResourceVariant	minor	minor	0	external table copied to a stack array with memcpy (a local const array would move the data)
 src/npc/story_character/SceneNpc_SetKindMotionVector.c	SceneNpc_SetKindMotionVector	minor	minor	3	body pointer temp for the three offset stores
 src/npc/story_character/SceneCharacter_PlaceFromScript.c	SceneCharacter_PlaceFromScript	contrived	contrived	6	parked k2/one locals, the updates[2] callback array, keyframes and body pointer blocks all change allocation when removed
+src/npc/story_character/SceneCharacter_CommandFromScript.c	SceneCharacter_CommandFromScript	contrived	contrived	0	same shapes as PlaceFromScript: one local, updates[2] callback array, body pointer blocks; case 2 falls into case 4
+src/npc/otenko/Otenko_UpdateAnimation14.c	Otenko_UpdateAnimation14	contrived	natural	1	
