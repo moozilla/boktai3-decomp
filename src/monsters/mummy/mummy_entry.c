@@ -1359,8 +1359,7 @@ void Mummy_UpdateProbeNavigation(struct ChaseActor *actor)
     if (SceneActorControl_TakeStateEntry(actor)) {
         u16 *field = &body->flags6F2;
         u32 mask = ~0x1000;
-        u32 value = *field;
-        mask &= value;
+        mask &= *field;
         *field = mask;
     }
     if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
@@ -1374,8 +1373,8 @@ void Mummy_UpdateProbeNavigation(struct ChaseActor *actor)
             if (SceneActorRoute_TryRecoveryDetour(actor))
                 return;
             if (SceneActorChase_TestField((u16 *)&group->common.gate.flags, 1)) {
-                u32 saved = ((actor->base.nextDirection + 5) & 7) << 5;
-                Mummy_BeginProbeTurn(actor, saved, randomSamples);
+                Mummy_BeginProbeTurn(actor, (((actor->base.nextDirection + 5) & 7) << 5),
+                                     randomSamples);
                 return;
             }
         }
