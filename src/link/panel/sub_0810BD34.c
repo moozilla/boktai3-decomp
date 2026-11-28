@@ -19,7 +19,7 @@ void sub_0810BD34(struct AreaEffectLinkState *p)
         p->actorValues[i] = 0;
         gSceneSelectionDisplaySlots[i] = 0x3ff;
     }
-    p->transferCounter = 0;
+    p->energyConsumed = 0;
     p->sendBit = 0;
     p->receiveBit = 0;
     gRandomIndex = data->seed & 0x3ff;

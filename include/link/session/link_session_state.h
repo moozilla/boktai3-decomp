@@ -55,7 +55,7 @@ struct AreaEffectLinkState {
     u8 unknown88[4];
     s16 menuResults[2]; /* 0x8C: selected local result in 081100A0 */
     u8 unknown90[4];
-    u32 transferCounter; /* 0x94: confidence=low */
+    u32 energyConsumed; /* 0x94: ability energy spent this session; confidence=low */
     u8 unknown98[0x1C];
     void (*menuCallback)(void); /* 0xB4 */
     s32 menuTextWindow;         /* 0xB8 */

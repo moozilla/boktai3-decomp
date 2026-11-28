@@ -171,3 +171,4 @@ src/link/player/sub_0823A5EC.c	sub_0823A5EC	contrived	minor	6	flag set and clear
 src/link/player/sub_0823A830.c	sub_0823A830	contrived	natural	1	field names come from the local player layout
 src/link/player/LinkPlayer_GetSelectedAbilityCost.c	LinkPlayer_GetSelectedAbilityCost	contrived	natural	2	
 src/link/player/LinkPlayer_HasAbilityEnergy.c	LinkPlayer_HasAbilityEnergy	contrived	natural	1	
+src/link/player/Player_ConsumeActionResource.c	Player_ConsumeActionResource	minor	natural	1	
