@@ -32,14 +32,12 @@ void Centipede_UpdateKnockbackSlide(struct ChaseActor *p)
         p->base.field2E8 = 2;
     }
     Centipede_UpdateSegmentPositions(p, 6, 0x1000);
-    {
-        if (Flags_MaskedWord(16, &p->base.statusFlags)) {
-            Centipede_SelectWanderRoute(p);
-            SceneActorChase_SetControl(p, p->base.onAlternateEntry, 1);
-            SceneActorChase_SetState(p, 0, 0, 2);
-            Sound_PlaySong(983);
-        } else {
-            p->base.counter2AC++;
-        }
+    if (Flags_MaskedWord(16, &p->base.statusFlags)) {
+        Centipede_SelectWanderRoute(p);
+        SceneActorChase_SetControl(p, p->base.onAlternateEntry, 1);
+        SceneActorChase_SetState(p, 0, 0, 2);
+        Sound_PlaySong(983);
+    } else {
+        p->base.counter2AC++;
     }
 }
