@@ -329,3 +329,4 @@ src/bosses/vanargand/VanargandPair_UpdateTimedExit.c	VanargandPair_UpdateTimedEx
 src/bosses/vanargand/Vanargand_UpdateIdleTransition.c	Vanargand_UpdateIdleTransition	natural	natural	0	
 src/bosses/vanargand/Vanargand_UpdateActiveExitTransition.c	Vanargand_UpdateActiveExitTransition	natural	natural	0	
 src/bosses/vanargand/Vanargand_DispatchPrimaryState.c	Vanargand_DispatchPrimaryState	contrived	natural	1	
+src/bosses/vanargand/VanargandPair_DispatchTransitionCommands.c	VanargandPair_DispatchTransitionCommands	contrived	near-natural	3	trigger receiver cast and do-while loop kept
