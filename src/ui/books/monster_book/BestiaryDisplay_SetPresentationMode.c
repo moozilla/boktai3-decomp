@@ -1,11 +1,7 @@
 #include "global.h"
+#include "ui/books/bestiary_display.h"
 
-struct S {
-    u8 pad[0x26];
-    u16 h26;
-};
-
-void BestiaryDisplay_SetPresentationMode(struct S *p, u16 v)
+void BestiaryDisplay_SetPresentationMode(struct BestiaryDisplay *p, u16 mode)
 {
-    p->h26 = v;
+    p->mode = mode;
 }
