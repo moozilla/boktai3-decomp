@@ -441,3 +441,4 @@ src/scene/actor/reaction/SceneActorContacts_ReleaseNode.c	SceneActorContacts_Rel
 src/scene/actor/reaction/SceneActorContacts_SetDistanceGate.c	SceneActorContacts_SetDistanceGate	contrived	minor	30	the zero arm stores the zero call result
 src/scene/actor/reaction/SceneActorContacts_TestPlayerCondition.c	SceneActorContacts_TestPlayerCondition	contrived	contrived	16	partial: the result variable with gotos and the player copy stay; structured returns merge the result=1 paths the ROM keeps apart
 src/scene/actor/reaction/SceneActorContacts_SelectForActor.c	SceneActorContacts_SelectForActor	contrived	contrived	14	partial: parked clear masks, the owner copy and selectionStatus stay; if (best) drops the -1 sentinel register and plain &= loads the field before the mask
+src/scene/actor/reaction/SceneActorContacts_TickCooldowns.c	SceneActorContacts_TickCooldowns	minor	natural	1	-

@@ -2,12 +2,9 @@
 void SceneActorContacts_TickCooldowns(void)
 {
     if (gSceneActorContactManager) {
-        struct SceneActorContactNode *node = gSceneActorContactManager->head;
-        while (node) {
-            u16 cooldown = node->cooldown;
-            if (cooldown)
-                node->cooldown = cooldown - 1;
-            node = node->next;
-        }
+        struct SceneActorContactNode *node;
+        for (node = gSceneActorContactManager->head; node; node = node->next)
+            if (node->cooldown)
+                node->cooldown--;
     }
 }
