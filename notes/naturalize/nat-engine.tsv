@@ -2,3 +2,4 @@ path	function	verdict before	verdict after	compiles used	what stays and why
 src/engine/runtime_input.c	String_Hash	minor	natural	7	
 src/engine/AgbMain.c	AgbMain	contrived	minor	5	anchor/offset arithmetic for 0x0201F400/4: constant addresses fold to two literals and drop 8 bytes
 src/engine/runtime_input.c	TaskSystem_Initialize	contrived	natural	2	
+src/engine/heap_memory.c	Heap_Alloc	contrived	natural	4	
