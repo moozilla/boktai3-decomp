@@ -57,9 +57,9 @@ src/link/menu/LinkMenu_UpdateSelection.c	LinkMenu_UpdateSelection	contrived	natu
 src/link/menu/LinkMenu_WaitSelectionMode.c	LinkMenu_WaitSelectionMode	contrived	minor	21	mode test takes &p so gcse PRE does not reuse the selection load; double return 0 needed for the shared SetState call
 src/link/menu/LinkMenu_ExchangeChoices.c	LinkMenu_ExchangeChoices	minor	natural	2	
 src/link/menu/SessionMenu_RunEventScript.c	SessionMenu_RunEventScript	minor	natural	1	
-src/link/menu/LinkMenu_ShowReadyMessage.c	LinkMenu_ShowReadyMessage	contrived	minor	1	shared mode test takes the mask (literal-param warning): a mask-free test does not keep 0x3c00 in a register across the loop
-src/link/menu/LinkMenu_ShowChoiceMessage.c	LinkMenu_ShowChoiceMessage	contrived	minor	3	shared mode test takes the mask (literal-param warning): a mask-free test does not keep 0x3c00 in a register across the loop
-src/link/menu/LinkMenu_ExchangePayload.c	LinkMenu_ExchangePayload	contrived	minor	1	shared mode test takes the mask
+src/link/menu/LinkMenu_ShowReadyMessage.c	LinkMenu_ShowReadyMessage	contrived	minor	1	shared mode test takes the mask (literal-param warning): a mask-free test does not keep 0x3c00 in a register across the loop; mode mask stays a local/local predicate (literal argument is a linter warning; plain compare hoists the other constant)
+src/link/menu/LinkMenu_ShowChoiceMessage.c	LinkMenu_ShowChoiceMessage	contrived	minor	3	shared mode test takes the mask (literal-param warning): a mask-free test does not keep 0x3c00 in a register across the loop; mode mask stays a local/local predicate (literal argument is a linter warning; plain compare hoists the other constant)
+src/link/menu/LinkMenu_ExchangePayload.c	LinkMenu_ExchangePayload	contrived	minor	1	shared mode test takes the mask; mode mask stays a local/local predicate (literal argument is a linter warning; plain compare hoists the other constant)
 src/link/menu/LinkMenu_WaitForReadyPeers.c	LinkMenu_WaitForReadyPeers	contrived	minor	40	countdown store through a pointer to a copy (gcse PRE order of the p+0x2d/0x70/0x64 addresses); u16 mode local (constant loaded before the zero); mode helper takes the mask (kept in a register across the loop)
 src/link/message_panel/LinkSession_GetSlotValues.c	LinkSession_GetSlotValues	minor	natural	1	
 src/link/message_panel/message_panel.c	MessagePanel_LoadBackground	natural	natural	0	
@@ -223,3 +223,4 @@ src/link/player/Player_SelectHistoryDirectionB.c	Player_SelectHistoryDirectionB	
 src/link/player/Player_GetMovementAnimationRate.c	Player_GetMovementAnimationRate	natural	natural	0	
 src/link/player/Player_PlayActionCueSound.c	Player_PlayActionCueSound	natural	natural	0	
 src/link/player/Player_UpdateTerrainSidestep.c	Player_UpdateTerrainSidestep	contrived	minor	20	SetFlags mask param keeps mask loaded before flags (plain |= differs; shared accessor adds literal-param warnings); separate flags local; frame/delta locals for load order; cellProps cast for cell flags
+src/link/player/Player_IsFlaggedBelowResourceLimit.c	Player_IsFlaggedBelowResourceLimit	minor	natural	6	
