@@ -1,60 +1,12 @@
 #include "global.h"
+#include "bosses/ratatosk/ratatosk.h"
 #include "player/player.h"
 #include "scene/motion/scene_facing.h"
 #include "scene/collision/contact_position.h"
 #include "scene/collision/packed_contact_vector.h"
-struct Actor {
-    u8 pad0[0x51];
-    u8 angle;
-    u8 pad52[2];
-    struct ContactPosition position, velocity;
-    u8 pad64[0x2c];
-    u32 timer;
-    s16 health;
-    u8 pad96[6];
-    u32 flags;
-    u8 padA0[2];
-    u8 mode, padA3;
-    u32 modeTime;
-    u8 facing, facing8, padAA, animationId, state, nextState, active, finished, padB0, changed,
-        padB2, locked;
-    u8 padB4[0x18];
-    u8 requestedAngle;
-    u8 padCD[0x33];
-    void (*update)(void);
-    void *callback;
-    u8 pad108[0xc];
-    s8 savedAngle;
-    u8 pad115[0x67];
-    u32 phase;
-    u8 pad180[0x1ac];
-    u8 animation[0x20];
-    u8 animationData[0x20];
-    struct ContactPosition anchor;
-    u8 pad374[0x58];
-    struct ContactPosition home;
-    u8 pad3D4[0xa78];
-    s16 selectedPoint, selectedTarget;
-    u16 padE50;
-    u16 scaleX, scaleZ, padE56, scaleStep;
-    u8 padE5A[0x14];
-    u16 motion;
-    u8 motionFlag, padE71, targetAngle, phaseTimer;
-    s16 hitTimer, terrainTimer;
-    u8 padE78[0x36];
-    s16 collisionA, collisionB, collisionC;
-    u8 padEB4[0x46];
-    u16 shotsFired;
-};
 void SceneActors_StartDirectionalAnimation(void *, void *, void *, s32, s32, s32, s32);
 void Sound_PlaySong(u32);
 u8 Callback_InvokeActor(void *, void *);
-static inline void facing(struct Actor *p, s32 angle)
-{
-    p->angle = angle;
-    p->facing = SceneFacing_FourWay(p->angle);
-    p->facing8 = SceneFacing_EightWay(p->angle);
-}
 static inline void sum(struct ContactPosition *d, struct ContactPosition *a,
                        struct ContactPosition *b)
 {
@@ -71,15 +23,15 @@ void Projectile_SetScriptProcedure(void *, u32, u16);
 void Projectile_SetCollisionParameters(void *, u32, u32, u32, u32, u32);
 void Projectile_SetBehaviorMode(void *, u16);
 void Projectile_SpawnAtPosition(void *, struct ContactPosition *);
-void Ratatosk_UpdateHomingShot(struct Actor *p, s32 tick)
+void Ratatosk_UpdateHomingShot(struct Ratatosk *p, s32 tick)
 {
     u8 params[0x58];
     struct PackedContactVector offset;
     struct ContactPosition spawn;
-    struct Actor *p2 = p;
-    if (p->changed) {
-        p->changed = 0;
-        facing(p, p->requestedAngle);
+    struct Ratatosk *p2 = p;
+    if (p->actionChanged) {
+        p->actionChanged = 0;
+        Ratatosk_SetFacing(p, p->requestedAngle);
         SceneActors_StartDirectionalAnimation(p, p->animationData, p->animation, 13, 1, 1, 4);
     }
     if (tick == 28) {
@@ -99,10 +51,10 @@ void Ratatosk_UpdateHomingShot(struct Actor *p, s32 tick)
         Projectile_SetHomingParameters(params, 180, &gPlayers[0]->position, 4);
         Projectile_SetSpriteParameters(params, 0x8e5a, 0, 499);
         Projectile_SetScriptProcedure(params, 0x4363, 3);
-        Projectile_SetCollisionParameters(params, 0, 0x80000, p2->collisionA, p2->collisionB,
-                                          p2->collisionC);
+        Projectile_SetCollisionParameters(params, 0, 0x80000, p2->wideAttack[0], p2->wideAttack[1],
+                                          p2->wideAttack[2]);
         Projectile_SetBehaviorMode(params, 0);
-        p2->shotsFired++;
+        p2->gate++;
         switch (p->facing) {
             case 0:
                 offset.x = 96;
@@ -131,6 +83,6 @@ void Ratatosk_UpdateHomingShot(struct Actor *p, s32 tick)
         Sound_PlaySong(0x56a);
     }
     if (tick > 30)
-        p->finished = 1;
-    Callback_InvokeActor(p, p->callback);
+        p->actionFinished = 1;
+    Callback_InvokeActor(p, p->actionTryUpdate);
 }
