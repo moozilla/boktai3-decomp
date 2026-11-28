@@ -1049,13 +1049,10 @@ void Golem_UpdateChargeStop(struct ChaseActor *actor)
         actor->base.restart = 0;
     }
     if (actor->base.restart) {
-        {
-            u16 *field = &actor->base.motionFlags;
-            u32 mask = ~0x100;
-            u32 value = *field;
-            mask &= value;
-            *field = mask;
-        }
+        u16 *field = &actor->base.motionFlags;
+        u32 mask = ~0x100;
+        mask &= *field;
+        *field = mask;
         actor->base.stepDone = 1;
     }
 }
