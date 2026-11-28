@@ -1,16 +1,15 @@
 #include "global.h"
-#include "npc/story_character/state_actor.h"
-s32 Actor_PlayAnimationEntry(void *, s32, s32, s32, s32);
+#include "npc/manager/scene_actor_lifecycle.h"
 s32 Callback_InvokeActor(void *, void *);
 s32 sub_081C8FB0(void *, void *, s32);
-void StoryCharacter_StartAnimStep(void *a, struct StateActor *p)
+void StoryCharacter_StartAnimStep(void *a, struct SceneActor *p)
 {
     u32 r;
     u8 hit;
-    if (p->enter != 0) {
-        p->enter = 0;
-        p->done = 0;
-        switch (p->kind) {
+    if (p->animationEntered != 0) {
+        p->animationEntered = 0;
+        p->finished = 0;
+        switch (p->variant) {
             case 4:
             case 5:
             case 6:
@@ -49,16 +48,10 @@ void StoryCharacter_StartAnimStep(void *a, struct StateActor *p)
         }
         Actor_PlayAnimationEntry(p, r, 1, 0, 4);
     }
-    {
-        u32 m = 0x1000;
-        p->displayFlags = m | p->displayFlags;
-    }
+    SceneActor_SetFlags(p, 0x1000);
     hit = 0;
-    if ((u8)Callback_InvokeActor(p, p->animationCallback) != 1 && sub_081C8FB0(a, p, 0)) {
+    if ((u8)Callback_InvokeActor(p, p->query) != 1 && sub_081C8FB0(a, p, 0)) {
         hit = 1;
-        {
-            u32 m = 0x800;
-            p->displayFlags = m | p->displayFlags;
-        }
+        SceneActor_SetFlags(p, 0x800);
     }
 }
