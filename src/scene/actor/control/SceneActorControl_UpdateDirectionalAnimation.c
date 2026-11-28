@@ -1,29 +1,18 @@
-#include "global.h"
+#include "scene/actor/scene_actor_control_phase.h"
 /* SceneActorControl_UpdateDirectionalAnimation: Restarts directional animation 1 on preparation or heading changes and clears completion otherwise; duplicates UpdateFacingAnimation. */
 
-void SceneActorAnimation_SelectDirectionalEntry(u8 *, u32);
-
-static inline u8 Consume(u8 *flag)
+void SceneActorControl_UpdateDirectionalAnimation(struct ChaseActor *actor)
 {
-    if (*flag) {
-        *flag = 0;
-        return TRUE;
-    }
-    return FALSE;
-}
-
-void SceneActorControl_UpdateDirectionalAnimation(u8 *p)
-{
-    u8 *g = *(u8 **)(p + 0x3d0);
-    u8 c = Consume(p + 0x2b2);
-    if (c) {
-        u8 v;
-        SceneActorAnimation_SelectDirectionalEntry(p, 1);
-        v = p[0x59];
-        g[0x3dd] = v;
-    } else if (g[0x3dd] != p[0x59]) {
-        SceneActorAnimation_SelectDirectionalEntry(p, 1);
-        g[0x3dd] = p[0x59];
+    struct SceneActorControlState *control = SceneActorControl_GetState(actor);
+    u8 changed = SceneActorControl_TakeFlag(&actor->base.field2B2);
+    if (changed) {
+        u8 direction;
+        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)actor, 1);
+        direction = actor->base.body.direction;
+        control->savedDirection = direction;
+    } else if (control->savedDirection != actor->base.body.direction) {
+        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)actor, 1);
+        control->savedDirection = actor->base.body.direction;
     } else
-        p[0x2b3] = c;
+        actor->base.restart = changed;
 }

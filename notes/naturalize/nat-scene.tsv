@@ -300,3 +300,7 @@ src/scene/actor/control/SceneActorControl_ResetSingleton.c	SceneActorControl_Res
 src/scene/actor/control/SceneActorControl_RequestAllDepartures.c	SceneActorControl_RequestAllDepartures	natural	natural	0	-
 src/scene/actor/control/SceneActorControl_ReturnImmediately.c	SceneActorControl_ReturnImmediately	natural	natural	0	-
 src/scene/actor/control/SceneActorControl_Destroy.c	SceneActorControl_Destroy	minor	natural	1	-
+src/scene/actor/control/SceneActorControl_Update.c	SceneActorControl_Update	minor	minor	0	byte-arithmetic slot address (indexing orders the add differently)
+src/scene/actor/control/SceneActorControl_CreateFromPosition.c	SceneActorControl_CreateFromPosition	minor	minor	0	found/p pair and sprite alias of the slot
+src/scene/actor/control/SceneActorControl_CreateFromScript.c	SceneActorControl_CreateFromScript	minor	minor	0	sprite alias of the slot
+src/scene/actor/control/SceneActorControl_UpdateDirectionalAnimation.c	SceneActorControl_UpdateDirectionalAnimation	contrived	minor	1	keeps the take-flag helper and direction local shared with UpdateFacingAnimation
