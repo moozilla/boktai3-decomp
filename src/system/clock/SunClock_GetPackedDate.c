@@ -1,6 +1,6 @@
-#include "global.h"
+#include "system/clock/sun_clock.h"
 
 u32 SunClock_GetPackedDate(void)
 {
-    return *(u32 *)0x03005430;
+    return gSunClock.stamp;
 }
