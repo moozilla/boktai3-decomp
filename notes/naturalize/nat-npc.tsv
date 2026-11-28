@@ -680,3 +680,4 @@ src/minigames/result_game/ResultMenu_InitializeLayer.c	ResultMenu_InitializeLaye
 src/minigames/result_game/Transformation_ReportResult.c	Transformation_ReportResult	contrived	natural	1	
 src/minigames/result_game/Transformation_Finish.c	Transformation_Finish	contrived	natural	1	
 src/minigames/result_game/Transformation_Charge.c	Transformation_Charge	contrived	minor	9	positionActor copy of the player and an out pointer for the position: direct member updates change addressing
+src/minigames/result_game/Transformation_Reveal.c	Transformation_Reveal	contrived	minor	6	out and origin pointers for the dropped item position
