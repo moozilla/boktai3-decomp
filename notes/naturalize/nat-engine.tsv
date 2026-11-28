@@ -50,3 +50,4 @@ src/engine/math/ScalarApproach_ClampAngle.c	ScalarApproach_ClampAngle	contrived	
 src/engine/math/ScalarApproach_HalfAngle.c	ScalarApproach_HalfAngle	contrived	natural	1	
 src/engine/math/ScalarApproach_QuarterAngle.c	ScalarApproach_QuarterAngle	contrived	natural	1	
 src/engine/math/ScalarApproach_HalfAngle.c	ScalarApproach_HalfAngle	contrived	natural	1	
+src/engine/math/ScalarApproach_HalfAngleArray.c	ScalarApproach_HalfAngleArray	contrived	natural	1	
