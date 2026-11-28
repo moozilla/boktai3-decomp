@@ -27,7 +27,7 @@ void DateMenu_InitializeDigitWidgets(struct DateMenu *menu)
     memcpy(pos, gUnk_0824FCCC, sizeof(pos));
     for (i = 0; i < 12; i++) {
         AnimSprite_InitLinked((u8 *)&menu->digits[i], menu->widgets[0].resource, 0, 0x30, 0, 0, 0,
-                          &pos[i]);
+                              &pos[i]);
         menu->digits[i].flags |= 1;
     }
     menu->year = 0;
@@ -47,7 +47,6 @@ void DateMenu_LoadCurrentDate(struct DateMenu *p)
 {
     s32 v, t;
     s32 i;
-    u32 *flags;
     v = SunClock_GetPackedDate() >> 16;
     p->year = ((u32)v >> 12) * 1000 + ((u32)(v & 0xf00) >> 8) * 100 + ((u32)(v & 0xf0) >> 4) * 10 +
               (v & 0xf);
@@ -58,12 +57,8 @@ void DateMenu_LoadCurrentDate(struct DateMenu *p)
     p->day = ((u32)v >> 4) * 10 + (v & 0xf);
     p->hour = SunClock_GetBaseHour();
     p->minute = SunClock_GetBaseMinute();
-    t = ~1;
-    flags = &p->digits[0].flags;
-    for (i = 11; i >= 0; i--) {
-        *flags &= t;
-        flags += 0x18;
-    }
+    for (i = 0; i < 12; i++)
+        p->digits[i].flags &= ~1;
 }
 
 struct Rect16 {
@@ -418,13 +413,13 @@ s32 DateMenu_Initialize(struct DateMenu *menu)
     ResourceHeader_Relocate(menu->widgets[0].resource, resource);
     menu->digitResource = *(struct AnimSpriteResource *)menu->widgets[0].resource;
     AnimSprite_InitLinked((u8 *)&menu->widgets[0], menu->widgets[0].resource, 0x34, 0x10, 0, 0, 0,
-                      NULL);
+                          NULL);
     ResourceHeader_Relocate(menu->widgets[1].resource, resource);
     AnimSprite_InitLinked((u8 *)&menu->widgets[1], menu->widgets[1].resource, 0x26, 0x10, 0, 0, 0,
-                      NULL);
+                          NULL);
     ResourceHeader_Relocate(menu->widgets[2].resource, resource);
     AnimSprite_InitLinked((u8 *)&menu->widgets[2], menu->widgets[2].resource, 0x27, 0x10, 0, 0, 0,
-                      NULL);
+                          NULL);
     menu->widgets[1].flags |= 1;
     menu->widgets[2].flags |= 1;
     menu->savedPalette = menu->widgets[1].palette;

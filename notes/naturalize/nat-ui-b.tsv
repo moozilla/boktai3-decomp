@@ -180,3 +180,4 @@ src/ui/title/name_entry.c	NameEntry_Update	contrived	minor	3	session reset keeps
 src/ui/title/name_entry.c	NameEntry_Initialize	minor	natural	1	-
 src/ui/title/name_entry.c	NameEntryParams_SetFromScript	minor	minor	1	ScreenParams328 casts stay: gNamePlaceholderScript is a shared u32 array; a local pointer is 16 insns off
 src/ui/title/name_entry.c	NameEntry_Create	natural	natural	0	-
+src/ui/title/date_menu.c	DateMenu_LoadCurrentDate	contrived	natural	1	-
