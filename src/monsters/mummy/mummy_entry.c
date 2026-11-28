@@ -100,9 +100,8 @@ void Mummy_ResumeSavedTarget(struct ChaseActor *actor, s32 frame)
         }
     } else if (anim->index == 2) {
         u16 frame = anim->elapsed;
-        u32 loop = anim->duration;
-        if (loop) {
-            if (frame == (loop - 1)) {
+        if (anim->duration) {
+            if (frame == (anim->duration - 1)) {
                 goto rewind;
             }
             return;
@@ -980,8 +979,7 @@ static inline u8 Arrive(void *obj)
         Chase_SetBehavior(actor, 5);
         Chase_SnapToRoute(group->destination, (u8 *)&group->homeRoute);
         (group->destination)->y =
-            Chase_HeightAt(Chase_CellAt(group->destination),
-                           group->destination);
+            Chase_HeightAt(Chase_CellAt(group->destination), group->destination);
         (group->destination)->pad = 0;
     }
     {
@@ -1136,10 +1134,9 @@ u32 Mummy_TryStimulusRoute(struct ChaseActor *a)
     group->common.control.mode = 0;
     started = 0;
     body = a->base.context;
-    tag = SceneStimulus_FindOverlap(
-        a->base.body.position.x, a->base.body.position.z,
-        group->common.control.radius,
-        group->common.control.active, (u16)a->base.body.id);
+    tag = SceneStimulus_FindOverlap(a->base.body.position.x, a->base.body.position.z,
+                                    group->common.control.radius, group->common.control.active,
+                                    (u16)a->base.body.id);
     if (tag < 0)
         goto failed;
     if (!group->common.control.timer) {
@@ -1155,13 +1152,16 @@ u32 Mummy_TryStimulusRoute(struct ChaseActor *a)
     if (SceneActorStimulus_CaptureMotionFlags(a, 0x80, &motionFlags)) {
         SceneActorStimulus_ExtendGate(a);
     }
-    SceneActorPosition_ResolveTaggedPosition(&group->common.control, &a->base.body.id, group->route, tag);
-    if (SceneActor_TryTrackNearbyPlayer(a, &group->common.control.targetPosition, group->common.control.counter))
+    SceneActorPosition_ResolveTaggedPosition(&group->common.control, &a->base.body.id, group->route,
+                                             tag);
+    if (SceneActor_TryTrackNearbyPlayer(a, &group->common.control.targetPosition,
+                                        group->common.control.counter))
         goto success;
     SceneActorChase_SnapToRoute(group->destination, &group->homeRoute);
     (group->destination)->y = a->base.body.position.y;
     (group->destination)->pad = 0;
-    SceneGrid_SnapPositionToCellCenter(&group->common.control.targetPosition, group->common.control.counter);
+    SceneGrid_SnapPositionToCellCenter(&group->common.control.targetPosition,
+                                       group->common.control.counter);
     if (!Mummy_TryRoute_defeat(motionFlags, 0x200, group->route, &a->base.body.position,
                                &group->common.control.targetPosition)) {
         Callback_InvokeActor(a, group->fallback);
@@ -1565,9 +1565,9 @@ s32 Div(s32, s32);
 
 struct BouncingObject;
 struct BouncingObject *BouncingBomb_Spawn(struct ContactPosition *source,
-                                           struct ContactPosition *delta,
-                                           struct ContactPosition *target, u32 shot,
-                                           u32 category, u32 strength, u32 id);
+                                          struct ContactPosition *delta,
+                                          struct ContactPosition *target, u32 shot, u32 category,
+                                          u32 strength, u32 id);
 
 extern const s16 gUnk_086149C4[];
 
@@ -1607,7 +1607,8 @@ void Mummy_FireAcceleratingVolley(struct ChaseActor *actor)
         divisor = 27;
     else
         divisor = 34;
-    MovementCurve_SubtractPositions(&delta, &actor->base.body.position, &actor->base.tracking.target->position);
+    MovementCurve_SubtractPositions(&delta, &actor->base.body.position,
+                                    &actor->base.tracking.target->position);
     {
         s32 x = delta.x, z;
         s32 ax = Abs(x), az;
@@ -1657,7 +1658,7 @@ void Mummy_FireAcceleratingVolley(struct ChaseActor *actor)
             u32 category = actor->base.attacks.second[2];
             struct ContactPosition *target = &actor->base.tracking.target->position;
             BouncingBomb_Spawn(&source, &delta, target, shot, category, strength,
-                                 actor->base.body.id);
+                               actor->base.body.id);
         }
         strength = Div(strength << 3, 10);
         speed += Div(speed << 2, 10);
@@ -1787,12 +1788,14 @@ static inline u8 CanReach(s32 cell, s32 goal, s32 y, u32 kind, s32 total)
     if (cell < goal) {
         i = cell + 1;
         for (col = Mod(i, SceneActorTerrain_Width());
-             col < SceneActorTerrain_Width() && SceneActorTerrain_CanTraverseCell(cell, i, y, kind); i++, col++) {
+             col < SceneActorTerrain_Width() && SceneActorTerrain_CanTraverseCell(cell, i, y, kind);
+             i++, col++) {
             if (i == goal)
                 return 1;
         }
         for (i = cell + SceneActorTerrain_Width();
-             total > i && SceneActorTerrain_CanTraverseCell(cell, i, y, kind); i += SceneActorTerrain_Width()) {
+             total > i && SceneActorTerrain_CanTraverseCell(cell, i, y, kind);
+             i += SceneActorTerrain_Width()) {
             if (i == goal)
                 return 1;
         }
@@ -1803,7 +1806,8 @@ static inline u8 CanReach(s32 cell, s32 goal, s32 y, u32 kind, s32 total)
             if (i == goal)
                 return 1;
         }
-        for (i = cell - SceneActorTerrain_Width(); i >= 0 && SceneActorTerrain_CanTraverseCell(cell, i, y, kind);
+        for (i = cell - SceneActorTerrain_Width();
+             i >= 0 && SceneActorTerrain_CanTraverseCell(cell, i, y, kind);
              i -= SceneActorTerrain_Width()) {
             if (i == goal)
                 return 1;
@@ -2102,8 +2106,7 @@ u8 Mummy_TryEngageTarget(struct ChaseActor *actor)
         Mummy_SetTrackingFlags((void *)target, 0x10);
         return 1;
     }
-    if (SceneActorTurn_ActorFlags(actor, 0x80) &&
-        (!SceneActorContact_MotionFlags(actor, 0x400)))
+    if (SceneActorTurn_ActorFlags(actor, 0x80) && (!SceneActorContact_MotionFlags(actor, 0x400)))
         goto restore;
     if (Mummy_TestContext(context, 0x1400))
         goto restore;
@@ -2145,7 +2148,8 @@ void Mummy_InitCollision(struct ChaseActor *actor)
     attackOffset.x = 0;
     attackOffset.y = 0x80;
     attackOffset.z = 0;
-    SceneActorCollision_InitAttack(actor, &attackSize, &attackOffset, Mummy_OnAttackCollision, 0, actor);
+    SceneActorCollision_InitAttack(actor, &attackSize, &attackOffset, Mummy_OnAttackCollision, 0,
+                                   actor);
 }
 
 s32 SceneActorProfiles_FindOrAdd(u32, u32);
@@ -2301,20 +2305,20 @@ static inline s32 clamp(s32 v)
 #define KILL_KIND(flags)                                                                           \
     {                                                                                              \
         if ((flags) & 0x80)                                                                        \
-            STAT_ADD(reactionCounts[0]);                                                                       \
+            STAT_ADD(reactionCounts[0]);                                                           \
         else if ((flags) & 0x100)                                                                  \
-            STAT_ADD(reactionCounts[1]);                                                                       \
+            STAT_ADD(reactionCounts[1]);                                                           \
         else if ((flags) & 0x200)                                                                  \
-            STAT_ADD(reactionCounts[2]);                                                                       \
+            STAT_ADD(reactionCounts[2]);                                                           \
         else if ((flags) & 0x400)                                                                  \
-            STAT_ADD(reactionCounts[3]);                                                                       \
-        else if ((flags) & 0x800)                                                                 \
-            STAT_ADD(reactionCounts[4]);                                                                       \
+            STAT_ADD(reactionCounts[3]);                                                           \
+        else if ((flags) & 0x800)                                                                  \
+            STAT_ADD(reactionCounts[4]);                                                           \
     }
 
 #define CASE_BODY(n)                                                                               \
     {                                                                                              \
-        u32 flags = hit->reactionFlags;                                                          \
+        u32 flags = hit->reactionFlags;                                                            \
         STAT_INC(n);                                                                               \
         KILL_KIND(flags);                                                                          \
     }
@@ -2479,8 +2483,7 @@ void Mummy_UpdateBurnDamage(struct ChaseActor *actor)
                     SceneHud_SetTimedState(actor->base.body.id, health, max, type, 0, param);
                     Fill(&zero, buffer);
                     if (actor->base.reactionSoundVariant || !(*damageFlags & 0x20000))
-                        DamageNumberDisplay_Show(collider,
-                                                 actor->base.reactionSoundVariant, 0,
+                        DamageNumberDisplay_Show(collider, actor->base.reactionSoundVariant, 0,
                                                  &actor->base.body.position, buffer, 1);
                 }
             }
@@ -3323,7 +3326,7 @@ void Mummy_ResumeRouteAfterCheckpoint(struct ChaseActor *actor)
         SceneActorChase_SetControl(actor, Mummy_UpdatePlayerRoute, 0x27);
         SceneActorChase_SetBehavior(actor, 0x10);
         if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,
-                            &actor->base.body.position)) {
+                                      &actor->base.body.position)) {
             SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 0);
             SceneActorChase_SetState(actor, 3, 0, 0);
         }
@@ -3494,7 +3497,8 @@ s32 Mummy_Init(void *object)
     if (MonsterInit_GetDrawableKind(&actor->chase) == 0) {
         u8 *heap;
         actor->chase.base.drawable = Heap_Alloc(sizeof(struct SceneActorAnimationSequenceDrawable));
-        Memory_Clear(actor->chase.base.drawable, sizeof(struct SceneActorAnimationSequenceDrawable));
+        Memory_Clear(actor->chase.base.drawable,
+                     sizeof(struct SceneActorAnimationSequenceDrawable));
         heap = MonsterInit_Drawable(&actor->chase);
         MonsterInit_InitializeSprite(heap, 0x48DE, 0xA4B2);
         if (MonsterInit_GetCategory(actor) == 0x11 || MonsterInit_GetCategory(actor) == 0x17)
