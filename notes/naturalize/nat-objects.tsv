@@ -39,3 +39,4 @@ src/objects/bouncing_bombs/BouncingBomb_HandleTimerContact.c	BouncingBomb_Handle
 src/objects/bouncing_bombs/BouncingBomb_IsActive.c	BouncingBomb_IsActive	contrived	contrived	12	second object view kept: ROM copies the pointer before the null test
 src/objects/bouncing_bombs/BouncingBomb_InitializeColliders.c	BouncingBomb_InitializeColliders	natural	natural	0	
 src/objects/bouncing_bombs/BouncingBomb_Spawn.c	BouncingBomb_Spawn	contrived	minor	3	second object view for the sprite writes: ROM copies the pointer
+src/objects/bouncing_bombs/BouncingBomb_SpawnFromScript.c	BouncingBomb_SpawnFromScript	minor	natural	2	
