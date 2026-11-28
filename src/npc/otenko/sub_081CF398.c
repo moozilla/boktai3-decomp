@@ -3,22 +3,22 @@
 // confidence=low: Otenko_UpdateTransitionFade's palette fade alone: copies the start bank on
 // entry, fades to the end bank over ticks 0x50-0x6F, and shows the end bank while the
 // callback reports 1.
-void sub_081CF398(void *ctx, struct SceneNpcTransitionActor *npc, s32 tick)
+void sub_081CF398(void *ctx, struct OtenkoActor *npc, s32 tick)
 {
-    if (npc->entered) {
-        npc->entered = 0;
+    if (npc->animationEntered) {
+        npc->animationEntered = 0;
         npc->done = 0;
-        CpuSet(gPaletteBankData + 0x2B00, npc->palette, 0x04000008);
+        CpuSet(gPaletteBankData + 0x2B00, npc->workPalette, 0x04000008);
         Actor_PlayAnimationEntry(npc, 7, 1, 0, 1);
     }
-    if (npc->callback(npc) == 1) {
-        struct SceneNpcPaletteBinding *subp = &npc->binding;
-        subp->paletteDest = gPaletteBankData + 0x2AE0;
-        return;
-    }
-    Otenko_ApplyTransitionPalette(npc, tick);
-    {
-        struct SceneNpcPaletteBinding *subp = &npc->binding;
-        subp->paletteDest = npc->palette;
+    if ((u8)npc->animationCallback(npc) == 1) {
+        struct SceneAnimation *graphics = &npc->display.resource.sequence.graphics;
+        graphics->palette = gPaletteBankData + 0x2AE0;
+    } else {
+        Otenko_ApplyTransitionPalette(npc, tick);
+        {
+            struct SceneAnimation *graphics = &npc->display.resource.sequence.graphics;
+            graphics->palette = npc->workPalette;
+        }
     }
 }

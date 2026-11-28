@@ -380,3 +380,5 @@ src/npc/otenko/sub_081D0864.c	sub_081D0864	contrived	contrived	0	union reuse of 
 src/npc/otenko/Otenko_OnStateEffectUpdate.c	Otenko_OnStateEffectUpdate	contrived	contrived	0	sample-origin wrapper struct, reused context register and pointer temps; not attempted beyond reading
 src/npc/otenko/Otenko_CreateFromScript.c	Otenko_CreateFromScript	contrived	contrived	1	parked one/mode/update locals per state change, body pointer block and box helper
 src/npc/otenko/Otenko_CommandFromScript.c	Otenko_CommandFromScript	contrived	minor	2	mode and update locals for the state change; position pointer for the player angle
+src/npc/otenko/Otenko_UpdateTransitionFade.c	Otenko_UpdateTransitionFade	contrived	minor	5	origin pointer, graphics pointer and parked 0x300 masks (mask loaded before the flags)
+src/npc/otenko/sub_081CF398.c	sub_081CF398	contrived	minor	1	graphics pointer locals

@@ -2,6 +2,7 @@
 #define GUARD_SCENE_NPC_TRANSITION_PALETTE_H
 
 #include "engine/engine.h"
+#include "npc/otenko/otenko_actor.h"
 
 struct SceneNpcTransitionPosition {
     u16 x, y, z, pad;
@@ -35,21 +36,16 @@ struct SceneNpcTransitionActor {
 
 void Palette_InterpolateBanks(void *, void *, void *, u32, u32);
 
-static inline void Otenko_ApplyTransitionPalette(struct SceneNpcTransitionActor *npc, s32 tick)
+static inline void Otenko_ApplyTransitionPalette(struct OtenkoActor *npc, s32 tick)
 {
-    u32 fade;
-    if (tick == 0) {
-        CpuSet(gPaletteBankData + 0x2B00, npc->palette, 0x04000008);
-    } else {
-        fade = tick - 0x50;
-        if (fade <= 0x1F) {
-            u8 *start = gPaletteBankData + 0x2B00;
-            u8 *end = gPaletteBankData + 0x2AE0;
-            Palette_InterpolateBanks(npc->palette, start, end, fade, 5);
-        } else if (tick == 0x70) {
-            CpuSet(gPaletteBankData + 0x2AE0, npc->palette, 0x04000008);
-        }
-    }
+    if (tick == 0)
+        CpuSet(gPaletteBankData + 0x2B00, npc->workPalette, 0x04000008);
+    else if ((u32)(tick - 0x50) <= 0x1F) {
+        u8 *from = gPaletteBankData + 0x2B00;
+        u8 *to = gPaletteBankData + 0x2AE0;
+        Palette_InterpolateBanks(npc->workPalette, from, to, tick - 0x50, 5);
+    } else if (tick == 0x70)
+        CpuSet(gPaletteBankData + 0x2AE0, npc->workPalette, 0x04000008);
 }
 
 #endif
