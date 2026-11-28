@@ -1,13 +1,10 @@
-#include "global.h"
-u32 ResultMenu_IsPhaseStart(u8 *p)
+#include "minigames/result_game/result_tutorial.h"
+
+u32 ResultMenu_IsPhaseStart(struct ResultMenu *menu)
 {
-    u32 r;
-    u8 *q = p + 0x38;
-    if (*q == 0) {
-        r = 0;
-    } else {
-        *q = 0;
-        r = 1;
+    if (menu->phaseStart) {
+        menu->phaseStart = 0;
+        return 1;
     }
-    return r;
+    return 0;
 }

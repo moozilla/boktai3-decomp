@@ -669,3 +669,4 @@ src/script/runtime/GameState_ClearSessionFlags.c	GameState_ClearSessionFlags	min
 src/script/runtime/Script_GetActorFactory.c	Script_GetActorFactory	minor	minor	0	literal RAM address and u32 casts (no symbol or prototype header)
 src/script/runtime/sub_082254C8.c	sub_082254C8	minor	minor	1	id tested twice: if/else merges the branches differently; raw scene offset (no struct)
 src/minigames/result_game/ResultMenu_SetPhase.c	ResultMenu_SetPhase	contrived	natural	1	
+src/minigames/result_game/ResultMenu_IsPhaseStart.c	ResultMenu_IsPhaseStart	contrived	natural	2	
