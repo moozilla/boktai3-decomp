@@ -10,7 +10,9 @@ struct LinkPalTarget {
     u16 *palette;
 };
 struct LinkPlayerFade {
-    u8 pad0[0x20];
+    u8 pad0[0x18];
+    s32 slot;
+    u8 pad1C[4];
     u32 statusFlags;
     u8 pad24[0xc6 - 0x24];
     u16 paletteBank;
@@ -37,6 +39,8 @@ struct LinkPlayerFade {
     u16 fadeOut;
 };
 
+void LinkPlayer_InitAnimationSlots(struct LinkPlayerFade *actor);
+void LinkPlayer_InitAnimationState(struct LinkPlayerFade *actor);
 void sub_08239A20(struct LinkPlayerFade *actor, s32 mode);
 void LinkPlayer_BlendPalette(struct LinkPlayerFade *actor, const u16 *source, s32 sourceWeight,
                              s32 baseWeight, s32 shift);

@@ -1,22 +1,14 @@
 #include "global.h"
-struct Entry {
-    u16 a, b;
-};
-struct State {
-    u8 pad[0x18];
-    u32 value;
-    u8 gap[0xa94];
-    struct Entry entries[4];
-};
-void LinkPlayer_InitAnimationSlots(struct State *p)
+#include "link/player/link_player_palette.h"
+
+void LinkPlayer_InitAnimationSlots(struct LinkPlayerFade *p)
 {
-    u32 v = p->value + 47;
-    p->entries[0].a = v;
-    p->entries[0].b = 366;
-    p->entries[1].a = 45;
-    p->entries[1].b = 368;
-    p->entries[2].a = 369;
-    p->entries[2].b = 44;
-    p->entries[3].a = 46;
-    p->entries[3].b = 43;
+    p->paletteBanks[0] = p->slot + 47;
+    p->paletteBanks[1] = 366;
+    p->paletteBanks[2] = 45;
+    p->paletteBanks[3] = 368;
+    p->paletteBanks[4] = 369;
+    p->paletteBanks[5] = 44;
+    p->paletteBanks[6] = 46;
+    p->paletteBanks[7] = 43;
 }

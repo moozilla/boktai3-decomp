@@ -149,3 +149,4 @@ src/link/player/ActorEffect_SelectModeFlag.c	ActorEffect_SelectModeFlag	minor	mi
 src/link/player/LinkPlayer_LoadAnimationParameters.c	LinkPlayer_LoadAnimationParameters	contrived	natural	8	
 src/link/player/PaletteFade_ApplySelectiveBrightness.c	PaletteFade_ApplySelectiveBrightness	contrived	contrived	400	brightening loops keep the s16 casts, mask local and brightness pointer: every plain RGB555 channel helper tried changes register allocation
 src/link/player/sub_08239A20.c	sub_08239A20	contrived	natural	30	
+src/link/player/LinkPlayer_InitAnimationSlots.c	LinkPlayer_InitAnimationSlots	minor	natural	1	
