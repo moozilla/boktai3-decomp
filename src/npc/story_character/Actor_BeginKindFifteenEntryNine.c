@@ -1,12 +1,11 @@
-#include "global.h"
-void Actor_PlayAnimationEntry(void *, s32, s32, s32, s32);
-void Actor_BeginKindFifteenEntryNine(void *unused, u8 *p)
+#include "npc/manager/scene_actor_lifecycle.h"
+void Actor_BeginKindFifteenEntryNine(void *unused, struct SceneActor *p)
 {
-    if (p[9]) {
+    if (p->animationEntered) {
         s32 r;
-        p[9] = 0;
-        p[7] = 0;
-        switch (p[1]) {
+        p->animationEntered = 0;
+        p->finished = 0;
+        switch (p->variant) {
             case 4:
                 r = 0;
                 break;
