@@ -437,3 +437,4 @@ src/objects/items/collectible/CallbackPool_InvokeActive.c	CallbackPool_InvokeAct
 src/objects/items/collectible/Collectible_DestroyManager.c	Collectible_DestroyManager	contrived	natural	2	
 src/objects/items/collectible/ActorParticles_InitPool.c	ActorParticles_InitPool	minor	natural	3	
 src/objects/items/collectible/Collectible_CreateManager.c	Collectible_CreateManager	minor	natural	1	
+src/objects/items/collectible/Collectible_ApplyPickupReward.c	Collectible_ApplyPickupReward	contrived	natural	1	
