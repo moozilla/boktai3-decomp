@@ -174,35 +174,31 @@ void LargeFragmentEffect_SpawnRandomParticle(struct Vec *position)
 {
     struct Vec velocity;
     struct Vec *planar;
-    u32 randomOrigin;
+    /* The recovered bank origin cancels when converting a sample address to its table offset. */
+    u32 randomOrigin = (u32)&gHeapHead + RESOURCE_REGISTRY_ENTRIES_ADDR;
     u32 sampleOrigin;
-    s32 heading;
+    s32 heading = ParticleRandom_ReadDirectSample(gRandomTable) & 255;
     s32 speed;
     s32 lifetime;
+    const u16 *physical;
 
-    /* The recovered bank origin cancels when converting a sample address to its table offset. */
-    randomOrigin = (u32)&gHeapHead + RESOURCE_REGISTRY_ENTRIES_ADDR;
-    heading = ParticleRandom_ReadDirectSample(gRandomTable) & 255;
     {
-        s32 raw = ParticleRandom_ReadDirectSample(gRandomTable);
-        raw &= 15;
+        s32 raw = ParticleRandom_ReadDirectSample(gRandomTable) & 15;
+
         planar = &velocity;
         speed = raw + 4;
     }
     {
-        s32 x, rawX;
-        rawX = gUnk_086149C4[(heading + 64) & 255] * speed;
+        s32 x = gUnk_086149C4[(heading + 64) & 255] * speed;
+
         sampleOrigin = randomOrigin;
-        x = FragmentTruncate(rawX);
-        planar->x = x;
-        planar->y = 0;
-        planar->z = FragmentTruncate(gUnk_086149C4[heading] * speed);
+        planar->x = FragmentTruncate(x);
     }
-    {
-        const u16 *physical = (const u16 *)RANDOM_TABLE_ADDR;
-        velocity.y = (ParticleRandom_ReadRelativeSample(sampleOrigin, physical) & 31) + 12;
-        lifetime = (ParticleRandom_ReadRelativeSample(sampleOrigin, physical) & 63) + 20;
-    }
+    planar->y = 0;
+    planar->z = FragmentTruncate(gUnk_086149C4[heading] * speed);
+    physical = (const u16 *)RANDOM_TABLE_ADDR;
+    velocity.y = (ParticleRandom_ReadRelativeSample(sampleOrigin, physical) & 31) + 12;
+    lifetime = (ParticleRandom_ReadRelativeSample(sampleOrigin, physical) & 63) + 20;
     SpriteEffectController_Create(position, &velocity, 0x1C1A, 0xD1B8, 3, 0, 0x31, 0, 2, 0, 0,
                                   lifetime, 4, 1, 0x200004, 30, 8, 8);
 }
