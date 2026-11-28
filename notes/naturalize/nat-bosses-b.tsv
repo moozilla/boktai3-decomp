@@ -372,3 +372,4 @@ src/bosses/vanargand/Vanargand_RunModeCallback.c	Vanargand_RunModeCallback	contr
 src/bosses/vanargand/ActorSoundPhase_StartFlaggedAnimation.c	ActorSoundPhase_StartFlaggedAnimation	contrived	near-natural	3	flag mask local kept: constant loaded before the flags word
 src/bosses/vanargand/Vanargand_UpdateMotionTrack.c	Vanargand_UpdateMotionTrack	contrived	near-natural	2	flag mask and second alias locals kept
 src/bosses/vanargand/Vanargand_UpdateTargetDash.c	Vanargand_UpdateTargetDash	contrived	near-natural	2	flag mask and second alias locals kept
+src/bosses/vanargand/Vanargand_UpdateMovingPairAttack.c	Vanargand_UpdateMovingPairAttack	contrived	near-natural	3	flag mask and second alias locals kept
