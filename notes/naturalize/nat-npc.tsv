@@ -317,3 +317,4 @@ src/npc/story_character/SceneNpc_DispatchCutsceneCommands.c	SceneNpc_DispatchCut
 src/npc/story_character/SceneCharacter_UpdatePaletteFade.c	SceneCharacter_UpdatePaletteFade	contrived	contrived	6	s16 zero kept in a register across the interpolation call; bank index locals order the base load
 src/npc/story_character/sub_081CDEF8.c	sub_081CDEF8	contrived	minor	4	effects view of unknown20; ContactPosition view of the display position
 src/npc/story_character/SceneCharacter_UpdateDisplay.c	SceneCharacter_UpdateDisplay	contrived	natural	1	
+src/npc/story_character/SceneCharacter_OnDestroy.c	SceneCharacter_OnDestroy	contrived	natural	1	falls off the end without a return value, as before
