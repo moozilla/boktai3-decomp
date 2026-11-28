@@ -202,3 +202,6 @@ src/monsters/armor/Armor_SelectAlignedAttack.c	Armor_SelectAlignedAttack	minor	m
 src/monsters/armor/Armor_UpdateFacingDecision.c	Armor_UpdateFacingDecision	minor	minor	0	goto-shaped decision tree
 src/monsters/armor/Armor_ReceiveTargetEvent.c	Armor_ReceiveTargetEvent	minor	minor	0	goto-shaped decision tree
 src/monsters/armor/Armor_RetractPartStretch.c	Armor_RetractPartStretch	contrived	minor	2	parked one is shared by the flag stores
+src/monsters/armor/Armor_UpdatePartWaveXReturn.c	Armor_UpdatePartWaveXReturn	contrived	contrived	0	parked one shared by two byte stores and a flag OR: register choice
+src/monsters/armor/Armor_UpdatePartWaveZReturn.c	Armor_UpdatePartWaveZReturn	contrived	contrived	0	parked one shared by two byte stores and a flag OR: register choice
+src/monsters/armor/Armor_InitPartOrbitTimer.c	Armor_InitPartOrbitTimer	contrived	natural	3	

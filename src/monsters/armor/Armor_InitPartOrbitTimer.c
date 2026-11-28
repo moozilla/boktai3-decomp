@@ -31,10 +31,9 @@ struct A {
 void Armor_UpdatePartOrbit(void);
 void Armor_InitPartOrbitTimer(struct A *p)
 {
-    u32 v;
+    u16 random;
     gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-    v = *(u16 *)(((u8 *)gRandomTable) + gRandomIndex * 2);
-    v &= 0x40;
-    p->w1d6 = v + 0x1e;
+    random = *(gRandomTable + gRandomIndex);
+    p->w1d6 = (random & 0x40) + 0x1e;
     p->fn = Armor_UpdatePartOrbit;
 }
