@@ -130,24 +130,16 @@ void Player_UpdateTriggerAnimation(struct Player *player)
 void Player_TurnTowardTargetFacing(struct Player *player)
 {
     if (player->tetherFrame > 1) {
-        s32 target = player->targetFacing;
-        u8 *fp = &player->facing;
-        u32 facing = *fp;
-        u32 shifted = facing;
-        s32 delta;
-        shifted -= 8;
-        target -= shifted;
-        delta = target & 7;
-        *fp = (facing + (delta > 4 ? 7 : 1)) & 7;
-        {
-            u32 current = player->facing;
-            if (current > 4) {
-                player->heading = 8 - current;
-                player->side = 1;
-            } else {
-                player->heading = current;
-                player->side = 0;
-            }
+        if (((player->targetFacing + 8 - player->facing) & 7) > 4)
+            player->facing = (player->facing + 7) & 7;
+        else
+            player->facing = (player->facing + 1) & 7;
+        if (player->facing > 4) {
+            player->heading = 8 - player->facing;
+            player->side = 1;
+        } else {
+            player->heading = player->facing;
+            player->side = 0;
         }
         player->tetherFrame = 0;
     } else
