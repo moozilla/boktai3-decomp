@@ -628,3 +628,20 @@ src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdateWaitAction	minor	minor	1	actor ali
 src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdateActionTwo	minor	minor	1	actor alias: removing it changes the saved register
 src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdateDeathAction	minor	minor	1	actor alias: removing it changes the saved register
 src/bosses/nidhoggr/duel.c	NidhoggrDuel_EmitSpriteParticles	minor	minor	0	reused value local and index pointer in the random spark draw
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdateAnimationFive	natural	natural	0	
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_DispatchNormalAction	natural	natural	0	
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_DispatchReactionAction	natural	natural	0	
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdateNormalActions	natural	natural	0	
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdateReactionActions	natural	natural	0	
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdateSpecialActions	natural	natural	0	
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdateActionController	natural	natural	0	
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_Destroy	natural	natural	0	
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_Create	natural	natural	0	
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdateAttackAction	minor	minor	2	actor alias: removing it changes the saved register
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdateRecoveryAction	minor	minor	1	actor alias: removing it changes the saved register
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdateDamageAction	minor	minor	1	actor alias: removing it changes the saved register
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdatePassiveAction	contrived	natural	1	
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_Update	minor	natural	2	
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdateAnimationAndTargets	contrived	contrived	3	two actor aliases and a body pointer inside the target loop: single pointer changes allocation
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdateCollidersAndPalette	contrived	contrived	3	actor and transform aliases with a zero local in the palette effect
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_Initialize	contrived	contrived	8	cached member pointers, actor alias and guarded do-while player loop remain
