@@ -1,25 +1,8 @@
+#include "npc/manager/scene_actor_lifecycle.h"
+s32 DisplayAnimation_TestFinished(struct DisplayAnimation *);
 #include "scene/motion/scene_actor_terrain.h"
 #include "npc/story_character/npc_tag_layout.h"
 // confidence=low: state actor kind 28 dash with decreasing speed and height above terrain.
-struct Npc {
-    u8 pad0[1];
-    u8 kind;
-    u8 pad2[5];
-    u8 done, changed, entered;
-    u8 padA[4];
-    u16 flags;
-    u32 timer;
-    u8 pad14[4];
-    u8 phase;
-    u8 pad19[2];
-    u8 angle;
-    u8 pad1C[4];
-    struct NpcTag tag;
-    u8 pad24[0x68 - 0x24];
-    struct ContactPosition pos, vel;
-    u8 pad78[0x208 - 0x78];
-    u32 speed;
-};
 static inline s32 trunc12(s32 x)
 {
     return x >= 0 ? x >> 12 : -((-x) >> 12);
@@ -31,14 +14,14 @@ static inline void polar(struct ContactPosition *v, u32 angle, s32 speed)
     v->y = 0;
     v->z = trunc12(gUnk_086149C4[angle] * speed);
 }
-void StoryCharacter_UpdateDescendingDash(void *ctx, struct Npc *npc, s32 tick)
+void StoryCharacter_UpdateDescendingDash(void *ctx, struct SceneActor *npc, s32 tick)
 {
-    struct NpcTag *tag = &npc->tag;
-    if (npc->entered) {
+    struct NpcTag *tag = (struct NpcTag *)npc->unknown20;
+    if (npc->animationEntered) {
         u32 anim;
-        npc->entered = 0;
-        npc->done = 0;
-        switch (npc->kind) {
+        npc->animationEntered = 0;
+        npc->finished = 0;
+        switch (npc->variant) {
             case 4:
                 anim = 0;
                 break;
@@ -123,39 +106,36 @@ void StoryCharacter_UpdateDescendingDash(void *ctx, struct Npc *npc, s32 tick)
         }
         Actor_PlayAnimationEntry(npc, anim, 1, 0, 4);
         tag->height = 300;
-        npc->phase = 0;
+        npc->animationPhase = 0;
     }
-    {
-        u32 mask = 0x400;
-        npc->flags |= mask;
-    }
-    switch (npc->phase) {
+    SceneActor_SetFlags(npc, 0x400);
+    switch (npc->animationPhase) {
         case 0:
             if (tick > 3) {
-                npc->phase = 1;
-                npc->timer = 0;
+                npc->animationPhase = 1;
+                npc->stateFrame = 0;
             }
             break;
         case 1: {
             struct ContactPosition *pos;
-            polar(&npc->vel, npc->angle, npc->speed);
-            pos = &npc->pos;
-            npc->pos.y =
+            polar(&npc->body.motion, npc->direction, npc->distance);
+            pos = &npc->body.position;
+            npc->body.position.y =
                 tag->height + SceneActorTerrain_GetHeight(SceneActorTerrain_GetCellIndex(pos), pos);
-            npc->speed = (npc->speed * 3) >> 2;
+            npc->distance = (u32)npc->distance * 3 >> 2;
             if (tick > 3) {
                 if (tag->height >= (tick << 3))
                     tag->height -= tick << 3;
                 else
                     tag->height = 0;
             }
-            if (npc->speed <= 19 && tag->height == 0) {
+            if ((u32)npc->distance <= 19 && tag->height == 0) {
                 Sound_PlaySong(680);
-                npc->phase++;
+                npc->animationPhase++;
             }
         } break;
         case 2:
-            npc->done = 1;
+            npc->finished = 1;
             break;
     }
 }

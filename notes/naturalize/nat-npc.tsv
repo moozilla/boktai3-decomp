@@ -197,3 +197,4 @@ src/npc/story_character/Actor_UpdateKindFiveEntryEight.c	Actor_UpdateKindFiveEnt
 src/npc/story_character/Actor_UpdateKindFiveEntryTen.c	Actor_UpdateKindFiveEntryTen	natural	natural	0	
 src/npc/story_character/SceneCharacter_UpdateAnimationFiveToIdle.c	SceneCharacter_UpdateAnimationFiveToIdle	natural	natural	0	
 src/npc/story_character/StoryCharacter_UpdateDashAnimation13.c	StoryCharacter_UpdateDashAnimation13	contrived	minor	3	unsigned casts on distance (used as dash speed); ground position pointer
+src/npc/story_character/StoryCharacter_UpdateDescendingDash.c	StoryCharacter_UpdateDescendingDash	contrived	minor	1	unsigned casts on distance (used as dash speed); ground position pointer
