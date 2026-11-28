@@ -1,20 +1,17 @@
-#include "global.h"
+#include "minigames/result_game/result_tutorial.h"
 extern u16 gUnknown_03005260[];
 void ResultMenu_SendCommand(void *, int, int, void *);
-void ResultGame_ScorePress(void *);
-void ResultGame_ShowPressMarker(void *);
-void ResultGame_HandlePress(u8 *p)
+void ResultGame_ScorePress(struct ResultMenu *menu);
+void ResultGame_ShowPressMarker(struct ResultMenu *menu);
+
+void ResultGame_HandlePress(struct ResultMenu *menu)
 {
-    int state = (s8)p[0xb0];
-    if (state == 0 && (gUnknown_03005260[1] & 1)) {
-        ResultMenu_SendCommand(p, 0x34, 0, 0);
-        p[0xb0] = 1;
-        p[0xb1] = 1;
-        ResultGame_ScorePress(p);
-        {
-            int position = *(int *)(p + 0x8c) >> 5;
-            p[0xc0] = position;
-        }
-        ResultGame_ShowPressMarker(p);
+    if ((s8)menu->pressState == 0 && (gUnknown_03005260[1] & 1)) {
+        ResultMenu_SendCommand(menu, 0x34, 0, 0);
+        menu->pressState = 1;
+        menu->pressed = 1;
+        ResultGame_ScorePress(menu);
+        menu->pressScore = menu->playerPosition >> 5;
+        ResultGame_ShowPressMarker(menu);
     }
 }

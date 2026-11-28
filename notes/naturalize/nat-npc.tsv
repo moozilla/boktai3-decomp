@@ -700,3 +700,4 @@ src/minigames/result_game/sub_0801C24C.c	sub_0801C24C	contrived	minor	18	range p
 src/minigames/result_game/ResultGame_Update.c	ResultGame_Update	contrived	natural	2	
 src/minigames/result_game/ResultGame_UpdatePlayerMarker.c	ResultGame_UpdatePlayerMarker	contrived	natural	1	
 src/minigames/result_game/ResultGame_ScoreAlignment.c	ResultGame_ScoreAlignment	contrived	natural	2	score kept in an int local and clamped in each branch
+src/minigames/result_game/ResultGame_HandlePress.c	ResultGame_HandlePress	contrived	natural	2	
