@@ -1,6 +1,6 @@
 #include "global.h"
-extern u8 *gGameState;
+#include "system/game_state/game_state.h"
 s32 Solar_GetLevel(void)
 {
-    return *(s16 *)(gGameState + 0x876);
+    return gGameState->unk876;
 }
