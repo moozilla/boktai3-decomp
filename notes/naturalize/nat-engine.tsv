@@ -76,3 +76,12 @@ src/engine/math/ScalarApproach_DivideAngleStep.c	ScalarApproach_DivideAngleStep	
 src/engine/math/ScalarApproach_ApplyWrappedProfileArray.c	ScalarApproach_ApplyWrappedProfileArray	minor	natural	3	
 src/engine/math/ScalarApproach_ApplyClampedProfileArray.c	ScalarApproach_ApplyClampedProfileArray	contrived	minor	12	do/while(0) around ++values stays: without it count outranks values in global alloc
 src/engine/math/Math_GetTargetAngleAndDistance.c	Math_GetTargetAngleAndDistance	minor	natural	1	
+src/engine/math/Math_SetMotionPosition.c	Math_SetMotionPosition	minor	minor	0	raw +0x20/+0x24 stores on untyped pointers: needs a motion struct shared with callers
+src/engine/math/ScalarApproach_StepHalf.c	ScalarApproach_StepHalf	natural	natural	0	
+src/engine/math/ScalarApproach_StepQuarter.c	ScalarApproach_StepQuarter	natural	natural	0	
+src/engine/math/ScalarApproach_StepEighth.c	ScalarApproach_StepEighth	natural	natural	0	
+src/engine/math/ScalarApproach_StepSixteenth.c	ScalarApproach_StepSixteenth	natural	natural	0	
+src/engine/math/ScalarApproach_UnwrapAngle.c	ScalarApproach_UnwrapAngle	natural	natural	0	
+src/engine/math/sub_082218A8.c	sub_082218A8	natural	natural	0	
+src/engine/math/ScalarApproach_ApplyProfile.c	ScalarApproach_ApplyProfile	natural	natural	0	
+src/engine/math/sub_08221AB8.c	sub_08221AB8	natural	natural	0	
