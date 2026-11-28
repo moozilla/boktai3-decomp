@@ -1,13 +1,15 @@
-#include "global.h"
-void Kuro_PlayTaggedAnimation(void *, int, int, int, int);
-int DisplayAnimation_TestFinished(void *);
-void Kuro_UpdateState15Animation(void *unused, u8 *p)
+#include "npc/manager/scene_actor_lifecycle.h"
+
+void Kuro_PlayTaggedAnimation(struct SceneActor *, int, int, int, int);
+s32 DisplayAnimation_TestFinished(struct DisplayAnimation *);
+
+void Kuro_UpdateState15Animation(void *unused, struct SceneActor *actor)
 {
-    if (p[9]) {
-        p[9] = 0;
-        p[7] = 0;
-        Kuro_PlayTaggedAnimation(p, 5, 2, 0, 4);
+    if (actor->animationEntered) {
+        actor->animationEntered = 0;
+        actor->finished = 0;
+        Kuro_PlayTaggedAnimation(actor, 5, 2, 0, 4);
     }
-    if (DisplayAnimation_TestFinished(p + 0xd4))
-        p[7] = 1;
+    if (DisplayAnimation_TestFinished(&actor->drawable.common))
+        actor->finished = 1;
 }
