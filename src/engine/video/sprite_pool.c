@@ -40,18 +40,14 @@ u32 SpritePool_Destroy(struct SpritePool *pool)
 s32 SpritePool_Initialize(struct SpritePool *pool)
 {
     struct SpritePoolSlot *slot;
-    struct TransientSpriteGraphics *graphics;
     s32 index;
+
     gSpritePoolManager = (u32)pool;
     slot = pool->slots;
-    index = 0xf;
-    do {
-        graphics = &slot->graphics;
-        AnimData_Load(graphics, 0xda6d);
-        Sprite_InitUnlinked(&slot->sprite, graphics, 0);
-        index--;
-        slot++;
-    } while (index >= 0);
+    for (index = 0; index < 16; index++, slot++) {
+        AnimData_Load(&slot->graphics, 0xda6d);
+        Sprite_InitUnlinked(&slot->sprite, &slot->graphics, 0);
+    }
     return 0;
 }
 
