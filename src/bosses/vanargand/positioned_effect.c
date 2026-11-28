@@ -54,12 +54,14 @@ void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 void PositionedEffect_InitAttackCollider(struct VanargandPairAttack *actor)
 {
     struct PositionedPackedVector size, offset;
-    void *collider = &actor->attackCollider;
+    struct ContactCollider *collider = &actor->attackCollider;
+
     size.x = 128;
     size.y = 256;
     size.z = 128;
-    *(u32 *)&offset = 0x800000;
-    ((u32 *)&offset)[1] &= 0xffff0000;
+    offset.x = 0;
+    offset.y = 128;
+    offset.z = 0;
     Collider_Init(collider, 0, 0x2001, 0, 16, &size, &offset);
     Collider_SetPosition(collider, &actor->position, 0);
     Collider_SetCallback(collider, PositionedEffect_OnAttackContact, actor);

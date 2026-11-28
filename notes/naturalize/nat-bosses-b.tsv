@@ -281,3 +281,4 @@ src/bosses/sabata/Sabata_CreateFromScript.c	Sabata_CreateFromScript	natural	natu
 src/bosses/sabata/Sabata_AdvanceStepFromScript.c	Sabata_AdvanceStepFromScript	natural	natural	0	minor: step setter and cleared local
 src/bosses/vanargand/Vanargand_ResetPaletteTransition.c	Vanargand_ResetPaletteTransition	contrived	natural	1	
 src/bosses/vanargand/Vanargand_BlendPaletteBanks.c	Vanargand_BlendPaletteBanks	contrived	natural	1	
+src/bosses/vanargand/positioned_effect.c	PositionedEffect_InitAttackCollider	machine-shaped	natural	1	
