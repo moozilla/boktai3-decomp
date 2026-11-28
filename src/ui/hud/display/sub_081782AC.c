@@ -1,11 +1,12 @@
 #include "global.h"
 #include "engine/ram.h"
+#include "ui/pause/scene_hud_display.h"
 
 void sub_081782AC(void)
 {
-    u8 *hud = gFieldHud;
-    if (hud != NULL) {
-        if ((u8)(hud[0xa5e] - 1) <= 1)
-            *(u16 *)(hud + 0xa8c) = 4;
+    struct SceneHudState *hud = (struct SceneHudState *)gFieldHud;
+    if (hud) {
+        if (hud->controlMode == 1 || hud->controlMode == 2)
+            hud->storedEnergyFlash = 4;
     }
 }
