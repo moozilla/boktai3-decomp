@@ -269,3 +269,5 @@ src/bosses/sabata/reactions.c	Sabata_UpdateTimedAnimation	machine-shaped	machine
 src/bosses/sabata/reactions.c	Sabata_UpdateTimedResponse	machine-shaped	machine-shaped	5	single-use mask locals before flag updates are needed (mask loads before the field)
 src/bosses/sabata/reactions.c	Sabata_UpdateChargePaletteSequence	machine-shaped	machine-shaped	5	single-use mask locals before flag updates are needed (mask loads before the field)
 src/bosses/sabata/sub_0817F330.c	sub_0817F330	machine-shaped	partial	5	kept body pointer and delta/distance pair
+src/bosses/sabata/Sabata_RunUnpausedStateCallback.c	Sabata_RunUnpausedStateCallback	natural	natural	0	
+src/bosses/sabata/Sabata_ApplyPendingDamage.c	Sabata_ApplyPendingDamage	machine-shaped	partial	3	kept base alias and flag/health pointers

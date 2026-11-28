@@ -19,7 +19,6 @@ void Sabata_UpdateKnockbackLanding(void *, int);
 int Sabata_ApplyPendingDamage(struct SabataActorState *p)
 {
     struct StateActor *base = (struct StateActor *)p;
-    struct SabataActorState *q = p;
     u32 special;
     struct SceneActorBody *body = &p->body;
     struct ContactCollider *collider = &p->bodyCollider;
@@ -29,10 +28,10 @@ int Sabata_ApplyPendingDamage(struct SabataActorState *p)
     u32 flags;
     s16 *health;
     u32 sound;
-    damage = (s16)q->lastDamage;
-    specialPtr = &q->slowDown;
+    damage = (s16)p->lastDamage;
+    specialPtr = &p->slowDown;
     special = *specialPtr;
-    flags = q->hitAttributes;
+    flags = p->hitAttributes;
     ActorExtension_ResetState(base);
     *specialPtr = 0;
     flagsActive = SceneActorState_TestFlags(base, 0x100000);
@@ -45,11 +44,11 @@ int Sabata_ApplyPendingDamage(struct SabataActorState *p)
     } else
         sound = 0x13e;
     {
-        u16 *hitstun = &q->hitstun;
+        u16 *hitstun = &p->hitstun;
         if (*hitstun == 0) {
-            if (q->contactHoldoff == 0 && !flagsActive && SceneActors_GetEffectiveTimeStep(q)) {
+            if (p->contactHoldoff == 0 && !flagsActive && SceneActors_GetEffectiveTimeStep(p)) {
                 damage = *(s16 *)(gGameState + 0x876) * 5;
-                Sabata_SpawnDestructionParticles(&q->graphics.position);
+                Sabata_SpawnDestructionParticles(&p->graphics.position);
                 sound = 0x12a;
                 Sound_PlaySong(0x57a);
                 *hitstun = 60;
@@ -66,21 +65,21 @@ int Sabata_ApplyPendingDamage(struct SabataActorState *p)
         Sound_PlaySong(sound);
         health = &base->health;
         if (damage > 0 && base->actionState != 0xb) {
-            q->hitSequence = 0;
-            q->recentHitCount++;
+            p->hitSequence = 0;
+            p->recentHitCount++;
         }
-        if (q->recentHitCount > 2) {
-            q->recentHitCount = 0;
+        if (p->recentHitCount > 2) {
+            p->recentHitCount = 0;
             knockback = 1;
         }
-        if (ActorResource_IsBelowSelectedLimit(q, *health))
+        if (ActorResource_IsBelowSelectedLimit(p, *health))
             knockback = 1;
-        q->paletteRestoreTimer = 10;
+        p->paletteRestoreTimer = 10;
         if (special) {
-            q->graphics.palette = q->effectPalettes[2];
-            Sabata_SpawnDestructionParticles(&q->graphics.position);
+            p->graphics.palette = p->effectPalettes[2];
+            Sabata_SpawnDestructionParticles(&p->graphics.position);
         } else
-            q->graphics.palette = q->effectPalettes[1];
+            p->graphics.palette = p->effectPalettes[1];
         size.x = 16;
         size.y = 0;
         size.z = 16;
