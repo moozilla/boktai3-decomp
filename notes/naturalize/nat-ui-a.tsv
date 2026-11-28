@@ -287,3 +287,10 @@ src/ui/dialogue/text_interpreter/Text_DecodeGlyphEscape.c	Text_DecodeGlyphEscape
 src/ui/dialogue/text_interpreter/Text_FormatDecimal.c	Text_FormatDecimal	minor	natural	1	
 src/ui/dialogue/text_interpreter/Text_ParseDecimal.c	Text_ParseDecimal	contrived	natural	6	
 src/ui/dialogue/text_interpreter/TextState_MeasureTextColumns.c	TextState_MeasureTextColumns	contrived	minor	70	shift pair around the high-bit test (c <<= 24 / c >>= 24): a plain test compiles to a mask
+src/ui/dialogue/text_interpreter/TextState_AdvanceCursor.c	TextState_AdvanceCursor	natural	natural	0	int function with no return value
+src/ui/dialogue/text_interpreter/TextState_DrawNarrowGlyph.c	TextState_DrawNarrowGlyph	natural	natural	0	int function with no return value
+src/ui/dialogue/text_interpreter/TextState_DrawWideGlyph.c	TextState_DrawWideGlyph	natural	natural	0	int function with no return value
+src/ui/dialogue/text_interpreter/Text_ComparePrefix.c	Text_ComparePrefix	natural	natural	0	
+src/ui/dialogue/text_interpreter/Text_FindChar.c	Text_FindChar	natural	natural	0	
+src/ui/dialogue/text_interpreter/TextState_GetPlayerSpeakerLabel.c	TextState_GetPlayerSpeakerLabel	natural	natural	0	
+src/ui/dialogue/text_interpreter/TextState_GetPairSpeakerLabel.c	TextState_GetPairSpeakerLabel	natural	natural	0	
