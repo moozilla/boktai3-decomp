@@ -1,4 +1,5 @@
 #include "global.h"
+#include "gba/io_reg.h"
 #include "engine/video/display_sequence.h"
 #include "ui/title/actor_animation_controller.h"
 #include "engine/video/display_sequence_step.h"
@@ -241,13 +242,9 @@ void TutorialOtenko_OnInteractionChildDelay(struct ActorAnimController *, struct
 
 void TutorialOtenko_TryInteraction(struct ActorAnimController *p, struct InteractionPartner *q)
 {
-    s32 dx, dz, xOffset, height, length;
-    s32 zOffset;
-    u32 radius;
-    u32 a;
-    u32 b, c;
-    u32 sector;
-    struct Player *owner;
+    s32 dx, dz, xOffset, zOffset, height;
+    s8 a, b, c;
+    u8 angle;
     if (q->group != p->group)
         return;
     if (q->orientation == 0) {
@@ -257,12 +254,9 @@ void TutorialOtenko_TryInteraction(struct ActorAnimController *p, struct Interac
         xOffset = 128;
         zOffset = 0;
     }
-    owner = p->owner;
-    dx = owner->position.x - q->worldX - xOffset;
-    dz = owner->position.z - q->worldZ - zOffset;
-    length = dx * dx + dz * dz;
-    radius = p->speed;
-    if (length >= (s32)(radius * radius))
+    dx = p->owner->position.x - q->worldX - xOffset;
+    dz = p->owner->position.z - q->worldZ - zOffset;
+    if (dx * dx + dz * dz >= p->speed * p->speed)
         return;
     if (q->orientation == 0) {
         a = 0;
@@ -273,30 +267,21 @@ void TutorialOtenko_TryInteraction(struct ActorAnimController *p, struct Interac
         b = 1;
         c = 2;
     }
-    {
-        u32 angle = (u8)(Math_Atan2(dx, dz) - 16);
-        s32 first = (s8)a;
-        sector = angle >> 5;
-        if (first != sector && (s8)b != sector && (s8)c != sector) {
-            c = 255;
-            b = 255;
-            a = 255;
-        }
-    }
-    if ((s8)a != gGameState->unk85E && (s8)b != gGameState->unk85E && (s8)c != gGameState->unk85E)
+    angle = Math_Atan2(dx, dz) - 16;
+    if (a != angle >> 5 && b != angle >> 5 && c != angle >> 5)
+        a = b = c = -1;
+    if (a != gGameState->unk85E && b != gGameState->unk85E && c != gGameState->unk85E)
         return;
-    height = q->worldY;
-    owner = p->owner;
-    height -= owner->position.y;
+    height = q->worldY - p->owner->position.y;
     if (height < 0)
         height = -height;
     if (height > 119)
         return;
-    if (!(gPadState[1] & 1))
+    if (!(gPadState[1] & A_BUTTON))
         return;
     if (gEnginePauseFlags & 4)
         return;
-    if (owner->kind == 4)
+    if (p->owner->kind == 4)
         return;
     if (q->request)
         Script_Call(q->request, 0);
@@ -306,55 +291,29 @@ void TutorialOtenko_TryInteraction(struct ActorAnimController *p, struct Interac
     p->handle = q->handle;
     p->option = q->option;
     if (q->flags & 16) {
-        p->oldMode = p->mode;
+        TutorialOtenko_SetState(p, 1, 3);
         {
-            u32 mode = 1;
-            p->mode = mode;
-        }
-        {
-            p->phase = 3;
-            if (p->oldMode == 3) {
-                if (p->mode == 3) {
-                    p->savedFrame = p->anim.index;
-                    p->savedTimer = p->anim.elapsed;
-                }
-            }
+            void (*fn)(struct ActorAnimController *, struct ActorChildSlot *) =
+                TutorialOtenko_OnInteractionChildRelease;
+            q->fn = fn;
         }
         {
             u8 one = 1;
-            p->flags |= one;
-            {
-                void (*fn)(void *, void *) = TutorialOtenko_OnInteractionChildRelease;
-                q->fn = fn;
-            }
             q->flags |= one;
         }
-        TutorialOtenko_SetInteractionControlFlag(p);
+        TutorialOtenko_SetInteractionControlFlag((u8 *)p);
     } else {
-        p->oldMode = p->mode;
+        TutorialOtenko_SetState(p, 1, 2);
         {
-            u32 mode = 1;
-            p->mode = mode;
-        }
-        {
-            p->phase = 2;
-            if (p->oldMode == 3) {
-                if (p->mode == 3) {
-                    p->savedFrame = p->anim.index;
-                    p->savedTimer = p->anim.elapsed;
-                }
-            }
+            void (*fn)(struct ActorAnimController *, struct ActorChildSlot *) =
+                TutorialOtenko_OnInteractionChildDelay;
+            q->fn = fn;
         }
         {
             u8 one = 1;
-            p->flags |= one;
-            {
-                void (*fn)(void *, void *) = TutorialOtenko_OnInteractionChildDelay;
-                q->fn = fn;
-            }
             q->flags |= one;
         }
-        TutorialOtenko_BeginInteractionSoundSequence(p);
+        TutorialOtenko_BeginInteractionSoundSequence((u8 *)p);
     }
 }
 

@@ -244,3 +244,6 @@ src/ui/title/tutorial_otenko.c	TutorialOtenkoPalette_BeginFade	natural	natural	0
 src/ui/title/tutorial_otenko.c	TutorialOtenkoPalette_UpdateFade	natural	natural	0	
 src/ui/title/tutorial_otenko.c	TutorialOtenkoPalette_UpdateFadeAndNotify	natural	natural	0	
 src/ui/title/tutorial_otenko.c	TutorialOtenkoPalette_BeginReverseFade	contrived	natural	2	
+src/ui/title/tutorial_otenko.c	TutorialOtenkoPalette_UpdateReverseFade	natural	natural	1	
+src/ui/title/tutorial_otenko.c	TutorialOtenko_ProjectAndClampToScreen	natural	natural	0	
+src/ui/title/tutorial_otenko.c	TutorialOtenko_TryInteraction	contrived	minor	22	fn local per callback assignment (constant loaded before the field address); u8 one for the child flag (shared constant register)

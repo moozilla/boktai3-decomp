@@ -140,7 +140,7 @@ struct InteractionPartner {
     s16 worldX, worldY, worldZ;
     u8 unk4E[0xa4 - 0x4e];
     void *handle, *request;
-    void (*fn)(void *, void *);
+    void (*fn)(struct ActorAnimController *, struct ActorChildSlot *);
     u8 group, flags, orientation, option;
     u8 timer;
     u8 unkB5[0xd0 - 0xb5];
