@@ -521,3 +521,4 @@ src/system/game_state/GameState_HasUnlockFromScript.c	GameState_HasUnlockFromScr
 src/system/game_state/GameState_HasUnlockedInventoryEntry.c	GameState_HasUnlockedInventoryEntry	minor	minor	6	upper inventory half addressed as (&inventory[8])[i] for the address order
 src/system/inventory/inventory.c	Inventory_SetUsePermissionFlagsFromScript	minor	natural	1	
 src/system/inventory/inventory.c	Inventory_InitializeSelectionGrid	minor	natural	1	
+src/system/inventory/inventory.c	Inventory_RestoreLifePercent	contrived	natural	1	

@@ -93,34 +93,20 @@ s32 Div(s32, s32);
 
 void Hud_DrawDefaultHealthMeter(void *, s32, s32, s32);
 
-struct QCECC {
-    u8 f[0x424];
-    u16 done;
-    u16 total;
-};
-
-struct SCECC {
-    u8 f[0xa40];
-    struct QCECC *q;
-    u8 f2[0x4866 - 0xa44];
-    s16 value;
-};
-
-void Inventory_RestoreLifePercent(struct SCECC *s, s32 n)
+void Inventory_RestoreLifePercent(struct SceneHudState *s, s32 percent)
 {
-    struct QCECC *q = s->q;
-    s32 v;
+    struct Player *p = s->actionOwner;
     s32 sum;
-    if (q == 0)
+
+    if (p == 0)
         return;
-    v = Div(n * q->total, 100);
-    s->value = v;
-    sum = q->done + s->value;
-    if (sum > q->total) {
-        s->value = q->total - q->done;
-        q->done = q->total;
+    s->appliedStatB = Div(percent * p->maximumStatA, 100);
+    sum = p->currentStatA + s->appliedStatB;
+    if (sum > p->maximumStatA) {
+        s->appliedStatB = p->maximumStatA - p->currentStatA;
+        p->currentStatA = p->maximumStatA;
     } else {
-        q->done = sum;
+        p->currentStatA = sum;
     }
     Hud_DrawDefaultHealthMeter(s, 1, 2, 12);
 }
