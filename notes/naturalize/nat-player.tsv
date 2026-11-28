@@ -207,3 +207,4 @@ src/player/control/sub_08158E68.c	sub_08158E68	contrived	minor	1	followTarget ha
 src/player/control/SceneActorControl_OnJitterPosition.c	SceneActorControl_OnJitterPosition	natural	natural	0	
 src/player/control/Player_BeginResourceStationInteraction.c	Player_BeginResourceStationInteraction	contrived	natural	1	
 src/player/control/Player_BeginDirectionalCue.c	Player_BeginDirectionalCue	minor	natural	1	
+src/player/control/Player_NotifyActionInterruption.c	Player_NotifyActionInterruption	contrived	minor	1	both notification branches identical in the ROM

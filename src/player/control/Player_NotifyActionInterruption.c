@@ -1,20 +1,17 @@
 #include "global.h"
 #include "engine/ram.h"
+#include "player/player.h"
+#include "player/cutscene/player_cue_commands.h"
 
-struct O08158F70 {
-    u32 f0;
-    u32 f4;
-    u32 f8;
-};
-void sub_08249244(u32, u32, u32, u32);
+void sub_08249244(void *, s32, s32, void *);
 
-void Player_NotifyActionInterruption(u8 *p)
+void Player_NotifyActionInterruption(struct Player *p)
 {
-    struct O08158F70 *o = gPlayerPendingActor;
-    if (o != 0 && p[0x458] == 2 && p[0x457] == 0xc) {
-        if (o->f4 & 0x10)
-            sub_08249244(o->f0, 1, 0x3c, o->f8);
+    struct PlayerPendingNotification *notification = gPlayerPendingActor;
+    if (notification != NULL && p->tetherPhase == 2 && p->tetherMode == 12) {
+        if (notification->flags & 0x10)
+            sub_08249244(notification->receiver, 1, 60, notification->callback);
         else
-            sub_08249244(o->f0, 1, 0x3c, o->f8);
+            sub_08249244(notification->receiver, 1, 60, notification->callback);
     }
 }
