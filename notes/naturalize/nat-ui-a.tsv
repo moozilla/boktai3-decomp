@@ -60,3 +60,4 @@ src/ui/books/monster_book/bestiary.c	Bestiary_CountUnlockedGroupEntries	natural	
 src/ui/books/monster_book/bestiary.c	Bestiary_AreAllEntriesUnlocked	natural	natural	0	
 src/ui/books/monster_book/bestiary.c	Script_ConsumeOptionalKeywordValue	natural	natural	0	
 src/ui/books/monster_book/monster_book.c	MonsterBook_ClearWindows	contrived	natural	1	
+src/ui/books/monster_book/monster_book.c	MonsterBook_UpdateDescription	contrived	natural	1	

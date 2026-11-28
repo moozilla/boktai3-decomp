@@ -303,24 +303,23 @@ void MonsterBook_DrawEntryDetails(struct MonsterBook *book)
 
 void MonsterBook_UpdateDescription(struct MonsterBook *book)
 {
-    u16 *flags = &book->transitionFlags;
-    if (*flags & 1) {
-        if (*flags & 2) {
+    if (book->transitionFlags & 1) {
+        if (book->transitionFlags & 2) {
             ScrollingDialogue_ClearScript();
             ScrollingDialogue_HideImmediately();
-            *flags = (*flags & ~2) | 4;
+            book->transitionFlags = (book->transitionFlags & ~2) | 4;
         }
-    } else if (*flags & 8) {
-        if (*flags & 4) {
+    } else if (book->transitionFlags & 8) {
+        if (book->transitionFlags & 4) {
             ScrollingDialogue_ClearScript();
             ScrollingDialogue_RequestShow();
-            *flags &= ~4;
+            book->transitionFlags &= ~4;
         }
         ScrollingDialogue_ClearScript();
         ScrollingDialogue_SetScript(
             Text_LookupString(Script_ParseStringRef(book->dialogueScript) + book->entry));
-        *flags = (*flags & 0xFFF7) | 2;
-        *flags &= 0xFFFB;
+        book->transitionFlags = (book->transitionFlags & ~8) | 2;
+        book->transitionFlags &= ~4;
     }
 }
 
