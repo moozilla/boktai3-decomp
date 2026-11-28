@@ -180,3 +180,4 @@ src/effects/bursts/linked_effect/LinkedEffect_FollowTarget.c	LinkedEffect_Follow
 src/effects/bursts/radial_burst/sub_08235E20.c	sub_08235E20	contrived	natural	1	-
 src/effects/bursts/radial_burst/RadialBurstEffect_UpdateBurstParticle.c	RadialBurstEffect_UpdateBurstParticle	minor	natural	1	-
 src/effects/bursts/radial_burst/RadialBurstEffect_UpdateParticle.c	RadialBurstEffect_UpdateParticle	contrived	natural	1	-
+src/effects/bursts/radial_burst/RadialBurstEffect_RemoveParticles.c	RadialBurstEffect_RemoveParticles	contrived	natural	1	-

@@ -1,12 +1,9 @@
-#include "global.h"
-void Effect_Remove(void *);
-void RadialBurstEffect_RemoveParticles(u8 *s)
+#include "effects/bursts/radial_burst.h"
+
+void RadialBurstEffect_RemoveParticles(struct RadialBurst *burst)
 {
-    u8 *p = s + 0x140;
-    s32 i = 11;
-    do {
-        Effect_Remove(p);
-        p += 0x44;
-        i--;
-    } while (i >= 0);
+    s32 i;
+
+    for (i = 0; i < 12; i++)
+        Effect_Remove(&burst->particles[i]);
 }
