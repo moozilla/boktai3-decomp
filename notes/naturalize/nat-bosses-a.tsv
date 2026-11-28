@@ -22,3 +22,4 @@ src/bosses/count/actor_graphics_and_basic_states.c	sub_08022694	contrived	minor	
 src/bosses/count/actor_graphics_and_basic_states.c	sub_08022790	contrived	minor	12	pointer 'at' to the position kept (plain pos.y += 300 treats the 8-byte struct as a register pair)
 src/bosses/count/actor_graphics_and_basic_states.c	sub_08022878	contrived	contrived	8	table variable reused as &pos (keeps loop.c from hoisting the table address); (s16) casts on the offset sums kept; normalize helper's alias pointer removed
 src/bosses/count/actor_graphics_and_basic_states.c	SceneActors_SpawnAmbientParticlePair	contrived	minor	8	table variable reused for the kind argument 3 (keeps the table load inside the loop); existing HitSpark helpers kept
+src/bosses/count/actor_graphics_and_basic_states.c	SceneActors_StopBackgroundFlash	minor	natural	1	

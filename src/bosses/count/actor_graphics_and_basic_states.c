@@ -536,12 +536,11 @@ void SceneActors_SpawnAmbientParticlePair(struct StateActor *p)
         SparkParticle_Spawn(&animation->position, table, &size, angle, count, speed, 2, 2);
     }
 }
-void SceneActors_StopBackgroundFlash(struct StateActor *p)
+void SceneActors_StopBackgroundFlash(struct SceneGraphicsActor *actor)
 {
-    BackgroundFlash_BeginDisappearance(((struct SceneGraphicsActor *)p)->graphics.backgroundFlash);
-    ((struct SceneGraphicsActor *)p)->graphics.backgroundFlashFlag = 0;
+    BackgroundFlash_BeginDisappearance(actor->graphics.backgroundFlash);
+    actor->graphics.backgroundFlashFlag = 0;
 }
-
 struct ReactionActor {
     u8 pad0[0x90];
     u32 timer;
