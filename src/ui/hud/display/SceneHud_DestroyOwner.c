@@ -15,30 +15,23 @@ static inline u8 OwnerWidgetsEnabled(u32 mask)
 }
 s32 SceneHud_DestroyOwner(struct SceneHudState *s)
 {
-    struct AnimSprite *animSprite;
-    s32 count;
+    s32 i;
     SceneHud_RemoveAnimations(s);
     PauseMenu_RemoveHeaderAnimation(s);
     PlayerPanel_RemoveEffects(s);
     Hud_RemoveMenuGraphics(s);
     PauseMenu_RemoveEquipmentSlotAnimations(s);
     if (OwnerWidgetsEnabled(0x80) && s->initializationFlag) {
-        animSprite = s->fieldWidgets.meterWidgets;
-        count = 1;
-        do {
-            if (animSprite->active)
-                Anim_Remove(animSprite);
-            animSprite++;
-        } while (--count >= 0);
-        animSprite = s->fieldWidgets.timeDigits;
-        count = 5;
-        do {
-            if (animSprite->active)
-                Anim_Remove(animSprite);
-            animSprite++;
-        } while (--count >= 0);
+        for (i = 0; i < 2; i++) {
+            if (s->fieldWidgets.meterWidgets[i].active)
+                Anim_Remove(&s->fieldWidgets.meterWidgets[i]);
+        }
+        for (i = 0; i < 6; i++) {
+            if (s->fieldWidgets.timeDigits[i].active)
+                Anim_Remove(&s->fieldWidgets.timeDigits[i]);
+        }
     }
     gSceneHudMode = s->mode;
-    (*(struct SceneHudState **)&gFieldHud) = 0;
+    gFieldHud = 0;
     return 0;
 }

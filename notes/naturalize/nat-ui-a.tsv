@@ -595,3 +595,4 @@ src/ui/hud/display/Hud_RefreshPlayerBinding.c	Hud_RefreshPlayerBinding	fudged	na
 src/ui/hud/display/Hud_Destroy.c	Hud_Destroy	fudged	natural	1	
 src/ui/hud/display/Hud_UpdateWithCallback.c	Hud_UpdateWithCallback	fudged	natural	3	player local before storing the action owner
 src/ui/hud/display/Hud_CreateEngineFlagVariant.c	Hud_CreateEngineFlagVariant	fudged	natural	2	
+src/ui/hud/display/SceneHud_DestroyOwner.c	SceneHud_DestroyOwner	fudged	partial	1	OwnerWidgetsEnabled 0/1 predicate
