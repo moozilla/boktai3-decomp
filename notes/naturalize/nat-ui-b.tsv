@@ -138,3 +138,4 @@ src/ui/status_screen/status_screen_fade.c	StatusScreen_FadeAndExit	contrived	con
 src/ui/status_screen/status_screen_fade.c	StatusScreen_UpdateScanlineNoise	contrived	contrived	14	StatusScreen_Random byte-offset read and the amplitude/delta pointer helper stay: plain index or direct members are 11-45 insns off (address hoisting)
 src/ui/status_screen/status_screen_fade.c	StatusScreen_UpdateScanlineNoise	contrived	contrived	1	StatusScreen_Random byte-offset read and the amplitude/delta pointer helper stay
 src/ui/status_screen/status_screen_fade.c	StatusScreen_ClearScanlineNoise	minor	natural	1	-
+src/ui/status_screen/status_screen_fade.c	StatusScreen_Destroy	minor	natural	1	-
