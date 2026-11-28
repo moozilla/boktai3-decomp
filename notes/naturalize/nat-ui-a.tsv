@@ -320,3 +320,4 @@ src/ui/dialogue/scrolling_dialogue/scrolling_dialogue.c	ScrollingDialogue_Create
 src/ui/dialogue/scrolling_dialogue/scrolling_dialogue.c	ScrollingDialogue_SetScript	minor	natural	1	
 src/ui/dialogue/scrolling_dialogue/scrolling_dialogue.c	ScrollingDialogue_SetNumberArgument	minor	natural	1	
 src/ui/dialogue/scrolling_dialogue/scrolling_dialogue.c	ScrollingDialogue_SetStringArgument	minor	natural	1	
+src/ui/dialogue/scrolling_dialogue/scrolling_dialogue.c	ScrollingDialogue_SetChoicesFromScript	natural	natural	1	

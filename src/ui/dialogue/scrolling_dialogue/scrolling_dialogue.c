@@ -278,7 +278,7 @@ s32 ScrollingDialogue_SetChoicesFromScript(void)
     if (dialogue != 0) {
         struct MessagePlaybackState *text = &dialogue->text;
         text->choiceCount = 0;
-        if (Script_SeekToKeyword(0x70)) {
+        if (Script_SeekToKeyword('p')) {
             while (Script_GetPc()) {
                 text->choices[text->choiceCount] = Script_GetValue();
                 text->choiceCount++;
