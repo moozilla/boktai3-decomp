@@ -94,22 +94,6 @@ void Actor_DispatchActionCallback(struct PooledActor *actor)
         actor->actionCallback(actor, tick);
 }
 
-static inline void ActorController_DisableBodyContact(struct PooledActor *actor)
-{
-    struct ContactCollider *c = &actor->bodyCollider;
-    u16 old = c->flags;
-    u32 mask = 4;
-    mask |= old;
-    c->flags = mask;
-}
-
-static inline void ActorController_EnableBodyContact(struct PooledActor *actor)
-{
-    struct ContactCollider *c = &actor->bodyCollider;
-    int mask = ~4;
-    c->flags &= mask;
-}
-
 void Actor_UpdateCollisionAndEffectTimers(struct PooledActor *actor)
 {
     struct ActorPoolManager *manager = ActorPool_GetManager();
@@ -122,11 +106,11 @@ void Actor_UpdateCollisionAndEffectTimers(struct PooledActor *actor)
     }
     if (!actor->reaction) {
         if (PooledActor_TestFlags(actor, 8))
-            ActorController_EnableBodyContact(actor);
+            ContactCollider_ClearFlags(&actor->bodyCollider, 4);
         else
-            ActorController_DisableBodyContact(actor);
+            ContactCollider_SetFlags(&actor->bodyCollider, 4);
     } else {
-        ActorController_DisableBodyContact(actor);
+        ContactCollider_SetFlags(&actor->bodyCollider, 4);
         actor->reaction--;
     }
     if (actor->effectTimer) {

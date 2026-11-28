@@ -64,3 +64,4 @@ src/scene/actor/actor_pool/pooled_actor_helpers.c	Actor_InitHitSensor	minor	mino
 src/scene/actor/actor_pool/pooled_actor_helpers.c	Actor_InitBodyCollider	minor	minor	0	PooledActor_SetFlags accessor (shared header)
 src/scene/actor/actor_pool/pooled_actor_helpers.c	Actor_UpdateSelectedTarget	minor	minor	0	selected flag materialized in the ROM (inline bool in the original); direct comparison loses it
 src/scene/actor/actor_pool/pooled_actor_controller.c	Actor_InitControllerFromScript	contrived	natural	1	
+src/scene/actor/actor_pool/pooled_actor_controller.c	Actor_UpdateCollisionAndEffectTimers	contrived	minor	4	ContactCollider_Set/ClearFlags: plain |= on actor->bodyCollider.flags folds the field offset (ROM keeps collider base+6); selected flag as in ROM
