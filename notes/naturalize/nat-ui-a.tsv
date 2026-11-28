@@ -555,3 +555,10 @@ src/ui/hud/display/Hud_RemoveMenuGraphics.c	Hud_RemoveMenuGraphics	fudged	natura
 src/ui/hud/display/sub_08176F70.c	sub_08176F70	fudged	partial	10	dead initial = 1 write, defaults zero and ClearPosition helper (zero register lifetimes); position/w locals in the fourth loop
 src/ui/hud/display/Hud_LoadLayoutResources.c	Hud_LoadLayoutResources	fudged	natural	2	
 src/ui/hud/display/Hud_SetMode.c	Hud_SetMode	fudged	natural	9	
+src/ui/hud/display/SceneHud_ReadScriptOptions.c	SceneHud_ReadScriptOptions	natural	natural	0	
+src/ui/hud/display/SceneHud_ReadPageVisibility.c	SceneHud_ReadPageVisibility	natural	natural	0	
+src/ui/hud/display/Hud_ReadScriptQOption.c	Hud_ReadScriptQOption	natural	natural	0	
+src/ui/hud/display/Hud_ResetGlobals.c	Hud_ResetGlobals	natural	natural	0	
+src/ui/hud/display/Hud_GetManager.c	Hud_GetManager	natural	natural	0	
+src/ui/hud/display/Hud_HideAuxiliaryElements.c	Hud_HideAuxiliaryElements	natural	natural	0	
+src/ui/hud/display/sub_08177D88.c	sub_08177D88	fudged	natural	6	
