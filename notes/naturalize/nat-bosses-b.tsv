@@ -112,3 +112,4 @@ src/bosses/ratatosk/SceneSong_EnterAndWait.c	SceneSong_EnterAndWait	contrived	mi
 src/bosses/ratatosk/Ratatosk_UpdateSunOrbRelocation.c	Ratatosk_UpdateSunOrbRelocation	contrived	minor	8	second actor alias stays; ContactPosition/OrbitEffectPosition casts at the sun orb calls (two position types for one layout)
 src/bosses/ratatosk/Ratatosk_UpdateRetreatSequence.c	Ratatosk_UpdateRetreatSequence	contrived	minor	6	actor alias and two unrolled-axis search loops with v/self pointers stay (direct struct access differs)
 src/bosses/ratatosk/Ratatosk_UpdateRepeatedRetreat.c	Ratatosk_UpdateRepeatedRetreat	contrived	minor	2	as Ratatosk_UpdateRetreatSequence: actor alias and v/self pointers in the two search loops
+src/bosses/ratatosk/Ratatosk_UpdateWaitTimer.c	Ratatosk_UpdateWaitTimer	contrived	natural	1	
