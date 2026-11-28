@@ -455,11 +455,10 @@ void FloorTrap_StepRelease(struct TileTrigger *trigger)
     manager = gTileTriggerManager;
     trigger->sprite.flags &= ~1;
     if (trigger->triggerFlags & 0x40) {
-        u8 *forced = &trigger->forced;
-        if (*forced) {
+        if (trigger->forced) {
             Anim_RestartSequence(&trigger->animation, manager->animationData, 0,
                                  (u8)trigger->sequence, 4);
-            *forced = 0;
+            trigger->forced = 0;
             switch (trigger->sequence) {
                 case 0:
                 case 1:

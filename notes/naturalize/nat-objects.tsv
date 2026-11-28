@@ -240,3 +240,4 @@ src/objects/floor_switch/FloorSwitch_Create.c	FloorSwitch_Create	contrived	contr
 src/objects/floor_traps.c	FloorTrap_IsTetherNearby	contrived	natural	1	
 src/objects/floor_traps.c	FloorTrap_StepHold	contrived	minor	4	self alias of the trigger is still needed for the sprite step
 src/objects/floor_traps.c	FloorTrap_StepActivation	contrived	minor	3	self alias of the trigger is still needed for the sprite step
+src/objects/floor_traps.c	FloorTrap_StepRelease	contrived	minor	3	self alias of the trigger is still needed for the sprite step
