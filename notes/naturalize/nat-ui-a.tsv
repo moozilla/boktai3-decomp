@@ -40,3 +40,4 @@ src/ui/books/monster_book/BestiaryDisplay_SetPosition.c	BestiaryDisplay_SetPosit
 src/ui/books/monster_book/BestiaryDisplay_Create.c	BestiaryDisplay_Create	minor	natural	2	
 src/ui/books/monster_book/SceneDisplay_InitCurrentAnimation.c	SceneDisplay_InitCurrentAnimation	minor	natural	1	
 src/ui/books/monster_book/SceneDisplay_GetAlternateDescriptor.c	SceneDisplay_GetAlternateDescriptor	minor	natural	1	
+src/ui/books/monster_book/SceneDisplay_SwitchToAlternateDescriptor.c	SceneDisplay_SwitchToAlternateDescriptor	minor	natural	1	
