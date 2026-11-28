@@ -850,14 +850,12 @@ static inline void NidhoggrDuel_SelectAction(struct GridAttackActor *p, int id)
 int NidhoggrDuel_SelectNextAction(struct GridAttackActor *p)
 {
     struct GridAttackActor *base = p;
-    int trigger = p->forceAction;
-    if (trigger) {
+    if (p->forceAction) {
         p->forceAction = 0;
         NidhoggrDuel_SelectAction(p, 2);
         return 1;
     } else {
-        int active = NidhoggrDuelBurst_GetEnabled(p->contactBurst);
-        if (active) {
+        if (NidhoggrDuelBurst_GetEnabled(p->contactBurst)) {
             NidhoggrDuel_SelectAction(p, 3);
         } else if (p->attackCount >= p->attackLimit) {
             if (NidhoggrDuelMinionPool_GetActiveCount(p->contactPool) > 0)
