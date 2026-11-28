@@ -318,17 +318,6 @@ void ContactImpactEffect_UpdateShakingPosition(struct ContactImpactEffect *effec
 
 void MotionTrack_Update(u8 *);
 
-static inline s32 EffectProjectScale(s32 x)
-{
-    s32 r;
-    s32 y = x * 3;
-    if (y >= 0)
-        r = y >> 5;
-    else
-        r = -((-y) >> 5);
-    return r;
-}
-
 void ContactImpactEffect_UpdateInterpolatedPosition(struct ContactImpactEffect *effect)
 {
     struct ContactPosition position;
@@ -350,49 +339,15 @@ void ContactImpactEffect_UpdateInterpolatedPosition(struct ContactImpactEffect *
 
 void ContactImpactEffect_UpdateContact(struct ContactImpactEffect *effect)
 {
-    {
-        u16 *base = &effect->rampFrom;
-        s32 rampTo = effect->rampTo;
-        s32 threshold = effect->shakeThreshold;
-        s32 rampFrom = *(u16 *)base;
-        s32 *timerPtr = &effect->timer;
-        s32 timer = *timerPtr;
-        s32 result;
+    s32 scale =
+        Fixed8_Interpolate(effect->rampFrom, effect->rampTo, effect->shakeThreshold, effect->timer);
 
-        result = Fixed8_Interpolate(rampFrom, rampTo, threshold, timer);
-        effect->sprite.scaleX = result;
-        effect->sprite.scaleY = result;
-    }
-
-    {
-        u16 *q = (u16 *)&effect->sprite.position.x;
-        s16 *p = &effect->world.x;
-        s32 y;
-        s32 x, zz;
-        s32 z;
-        x = p[0];
-        zz = p[2];
-        q[0] = EffectProjectScale(x - zz);
-        z = EffectProjectScale(x + zz);
-        y = EffectProjectScale(p[1]);
-        q[1] = z - y;
-        z += y;
-        q[0] = q[0] - gCameraOrigin[0] + 0x78;
-        q[1] = q[1] - gCameraOrigin[1] + 0x50;
-        z -= gCameraOrigin[2];
-        q[2] = z;
-    }
-
+    effect->sprite.scaleX = scale;
+    effect->sprite.scaleY = scale;
+    ToScreen(&effect->sprite.position, &effect->world);
     MotionTrack_Update((u8 *)&effect->motion);
-
-    {
-        s32 *timer = &effect->timer;
-        s32 t = ++*timer;
-
-        if (t > effect->shakeThreshold) {
-            effect->stateResult = 1;
-        }
-    }
+    if (++effect->timer > effect->shakeThreshold)
+        effect->stateResult = 1;
 }
 
 /* ContactImpactEffect_OnUnusedHook: Empty function within the F3E4 actor implementation with no observed callers */

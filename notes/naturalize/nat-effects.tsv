@@ -69,3 +69,4 @@ src/effects/contact_impact.c	ContactImpactEffect_BeginTimedPosition	contrived	mi
 src/effects/contact_impact.c	ContactImpactEffect_BeginInterpolatedPosition	contrived	minor	2	typed local copy of a void * object parameter orders the argument copies
 src/effects/contact_impact.c	ContactImpactEffect_UpdateShakingPosition	contrived	minor	14	random cursor kept in a u16 local masked in two statements; ApplyOffset helper kept
 src/effects/contact_impact.c	ContactImpactEffect_UpdateInterpolatedPosition	contrived	natural	1	-
+src/effects/contact_impact.c	ContactImpactEffect_UpdateContact	contrived	natural	1	u8 * cast for MotionTrack_Update
