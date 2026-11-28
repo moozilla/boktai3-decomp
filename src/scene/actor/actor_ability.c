@@ -198,38 +198,38 @@ void Modifier_InitFourthSourceEffect(struct ActorStats *stats, u32 owner)
 {
     u8 *selection = stats->state48;
     struct ActorAbility *ability = &stats->ability;
-    void (*callback)(void);
-    void *config;
-    ability->callback = (void (*)(void))0;
+    ability->callback = NULL;
     ability->enabled = 0;
     ability->owner = (void *)owner;
-    config = &stats->ability.id;
-    Memory_Clear(config, 0xc);
-    if (ScriptRecord_FindAttributeModifier(config, (s8)selection[ACTOR_ABILITY_FOURTH_SOURCE]) <
-        0) {
+    Memory_Clear(&ability->id, 0xc);
+    if (ScriptRecord_FindAttributeModifier(&ability->id,
+                                           (s8)selection[ACTOR_ABILITY_FOURTH_SOURCE]) < 0) {
         ability->callback = (void (*)(void))CallbackStatus_ResetSelectorAndTest;
         ability->enabled = 0;
     } else {
         switch (ability->kind) {
             case 0:
-                callback = (void (*)(void))ActorAbility_SpawnProjectile;
-                goto set;
+                ability->callback = (void (*)(void))ActorAbility_SpawnProjectile;
+                ability->enabled = 1;
+                break;
             case 1:
-                callback = (void (*)(void))ActorAbility_ActivatePaletteEffect;
-                goto set;
+                ability->callback = (void (*)(void))ActorAbility_ActivatePaletteEffect;
+                ability->enabled = 1;
+                break;
             case 2:
-                callback = (void (*)(void))ActorAbility_SpawnAlternateProjectile;
-                goto set;
+                ability->callback = (void (*)(void))ActorAbility_SpawnAlternateProjectile;
+                ability->enabled = 1;
+                break;
             case 3:
-                callback = (void (*)(void))ActorAction_TrySpawn;
-                goto set;
+                ability->callback = (void (*)(void))ActorAction_TrySpawn;
+                ability->enabled = 1;
+                break;
             case 4:
-                callback = (void (*)(void))ModifierAction_ActivateCost;
-                goto set;
+                ability->callback = (void (*)(void))ModifierAction_ActivateCost;
+                ability->enabled = 1;
+                break;
             case 5:
-                callback = (void (*)(void))ActorAbility_UpdateRecovery;
-            set:
-                ability->callback = callback;
+                ability->callback = (void (*)(void))ActorAbility_UpdateRecovery;
                 ability->enabled = 1;
                 break;
         }
