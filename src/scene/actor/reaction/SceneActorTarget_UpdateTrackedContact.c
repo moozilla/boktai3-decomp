@@ -39,7 +39,7 @@ u8 SceneActorTarget_UpdateTrackedContact(struct ChaseActor *actor)
     u32 active;
     u32 *actionFlags;
     work = actor;
-    if (SceneActorContact_MotionFlags(SceneActorContact_ActorFromWork(&work), 0x10))
+    if (SceneActorContact_MotionFlags(actor, 0x10))
         return 0;
     if ((u8)Callback_InvokeActor(actor, actor->base.targetQuery))
         return 1;
