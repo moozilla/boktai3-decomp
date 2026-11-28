@@ -27,3 +27,4 @@ src/link/lobby/TimerDisplay_DrawRecord.c	RecordMenu_DrawRecords	contrived	minor	
 src/link/lobby/LinkLobbyPanel_DrawActorValues.c	LinkLobbyPanel_DrawActorValues	contrived	natural	2	
 src/link/lobby/LinkLobbyPanel_RefreshPlayerNames.c	LinkLobbyPanel_RefreshPlayerNames	contrived	natural	2	
 src/link/lobby/LinkLobbyPanel_CreateTextWindows.c	LinkLobbyPanel_CreateTextWindows	contrived	natural	1	
+src/link/lobby/LinkLobbyPanel_ClearTextWindows.c	LinkLobbyPanel_ClearTextWindows	contrived	natural	1	

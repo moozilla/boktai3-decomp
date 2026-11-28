@@ -1,10 +1,11 @@
 #include "global.h"
+#include "link/lobby/record_menu.h"
 
-void TextWindow_Clear(u32);
+void TextWindow_Clear(s32);
 
-void LinkLobbyPanel_ClearTextWindows(u8 *p)
+void LinkLobbyPanel_ClearTextWindows(struct RecordMenu *menu)
 {
-    TextWindow_Clear(*(u32 *)(p + 0x14F8));
-    TextWindow_Clear(*(u32 *)(p + 0x14F0));
-    TextWindow_Clear(*(u32 *)(p + 0x14F4));
+    TextWindow_Clear(menu->titleWindow);
+    TextWindow_Clear(menu->nameWindows[0]);
+    TextWindow_Clear(menu->nameWindows[1]);
 }
