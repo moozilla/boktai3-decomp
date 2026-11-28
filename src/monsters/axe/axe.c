@@ -1179,12 +1179,9 @@ void SceneActorControl_UpdatePausePhase(struct ChaseActor *actor)
         SceneActorChase_SetControl(actor, actor->base.onStanding, 0);
         control->hoverPhase = 0;
     }
-    {
-        s32 *c = (s32 *)&actor->base.counter2AC;
-        if (*c > 60)
-            Chase_SetBehavior(actor, 3);
-        ++*c;
-    }
+    if ((s32)actor->base.counter2AC > 60)
+        Chase_SetBehavior(actor, 3);
+    ++actor->base.counter2AC;
 }
 
 extern void *gUnk_08606444[];
