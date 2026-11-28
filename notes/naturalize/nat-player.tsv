@@ -331,3 +331,4 @@ src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateSideWalkTarget	minor	mi
 src/player/cutscene/player_cue_actions.c	Player_RestartAnimationFromResource	natural	natural	0	-
 src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateSideDeparture	natural	natural	1	-
 src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateSideArrival	minor	minor	8	phase passed to FoldSideFacing and the flip-mask step as the known zero (reuses the register)
+src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateSideFade	minor	natural	1	-
