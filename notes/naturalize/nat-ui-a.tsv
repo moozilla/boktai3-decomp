@@ -358,3 +358,7 @@ src/ui/dialogue/text_window/TextWindowManager_OnDestroy.c	TextWindowManager_OnDe
 src/ui/dialogue/text_window/TextWindowManager_Init.c	TextWindowManager_Init	fudged	natural	2	
 src/ui/dialogue/text_window/TextWindowManager_Create.c	TextWindowManager_Create	fudged	natural	2	
 src/ui/dialogue/text_window/TextWindowManager_DestroyAllWindows.c	TextWindowManager_DestroyAllWindows	fudged	natural	1	
+src/ui/dialogue/text_window/TextWindow_Create.c	TextWindow_Create	natural	natural	0	
+src/ui/dialogue/text_window/TextWindow_OnIdle.c	TextWindow_OnIdle	natural	natural	0	
+src/ui/dialogue/text_window/TextWindow_OnPlaybackComplete.c	TextWindow_OnPlaybackComplete	natural	natural	0	
+src/ui/dialogue/text_window/DialogueTransition_Init.c	DialogueTransition_Init	natural	natural	0	
