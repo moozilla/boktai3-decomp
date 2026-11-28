@@ -78,7 +78,8 @@ struct PlayerStatModifierContext {
     u8 unknownCA;
     u8 chargeTier;      /* owner + 0xC0F: charge attacks select tiers zero through two */
     u16 chargeDuration; /* owner + 0xC10: initialized to 60 by attached attack setup */
-    u8 unknownCE[4];
+    u16 chargeSparkTimer; /* owner + 0xC12: charge emits a spark every fifteen ticks (tentative) */
+    u8 unknownD0[2];
     s16 powerBonus; /* owner + 0xC16: added to duration-based action power (tentative) */
     u8 statBOverrideMode;            /* owner + 0xC18: seven selects GameState stat B */
     u8 thresholdSatisfied;           /* owner + 0xC19, tentative */

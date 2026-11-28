@@ -255,3 +255,4 @@ src/link/player/Player_UpdateTetherThrow.c	Player_UpdateTetherThrow	contrived	na
 src/link/player/sub_0823EDDC.c	sub_0823EDDC	natural	natural	0	
 src/link/player/sub_0823EE80.c	sub_0823EE80	contrived	natural	34	collider calls spelled through p->statModifierContext: via the context pointer gcse copies the sine table base
 src/link/player/Player_UpdateTetherRecall.c	Player_UpdateTetherRecall	contrived	natural	1	
+src/link/player/Player_UpdateChargedTetherStrike.c	Player_UpdateChargedTetherStrike	contrived	natural	2	

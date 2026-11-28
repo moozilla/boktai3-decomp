@@ -4,151 +4,133 @@
 
 // confidence=low: holding input charges recoil and release advances the tether attack.
 
-// Remaining differences: charge-duration store and particle bitfield setup instruction order.
 extern const s16 gUnk_086149C4[];
 void SceneParticleBurst_CreateWhilePaused(void *, void *, void *, u32, u32, u32);
 s32 ActorVariant_GetTableValue(u32, s32);
-s32 Player_SetAnimationIndex(u8 *, s32, s32);
-void Player_SetTetherMode(u8 *, s32, s32);
+s32 Player_SetAnimationIndex(struct Player *, s32, s32);
+void Player_SetTetherMode(struct Player *, s32, s32);
 void Player_PlayLocalSong(s32 a, u32 b);
-s32 Player_UpdateFacingFromInputHistory(u8 *p);
-void Player_SpawnActionSpark(u8 *p);
+s32 Player_UpdateFacingFromInputHistory(struct Player *p);
+void Player_SpawnActionSpark(struct Player *p);
 
-void Player_UpdateChargedTetherStrike(u8 *p)
+void Player_UpdateChargedTetherStrike(struct Player *p)
 {
     struct ContactPackedVector ba;
     struct ContactPackedVector bb;
-    u16 *t;
-    u16 *c;
-    u16 *r;
-    s32 a, id;
 
-    switch (((struct Player *)p)->tetherPhase) {
+    switch (p->tetherPhase) {
         case 0:
-            if (Player_SetAnimationIndex(
-                    p, ActorVariant_GetTableValue(((struct Player *)p)->actionMode, 0x23), 0x40))
+            if (Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 0x23), 0x40))
                 Player_SetTetherMode(p, 3, 1);
             break;
         case 1:
-            t = (u16 *)(p + 0x45A);
-            if (*t == 0)
-                Player_PlayLocalSong(*(s32 *)(p + 0x18), 0x1F7);
+            if (p->tetherFrame == 0)
+                Player_PlayLocalSong(p->slot, 0x1F7);
             Player_UpdateFacingFromInputHistory(p);
-            Player_SetAnimationIndex(
-                p, ActorVariant_GetTableValue(((struct Player *)p)->actionMode, 0x24), 0x40);
-            (*t)++;
-            if (*t <= 6)
+            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 0x24), 0x40);
+            p->tetherFrame++;
+            if (p->tetherFrame <= 6)
                 break;
-            *(u8 *)(p + 0xC0F) = 0;
-            *(u16 *)(p + 0x4D2) = 0;
-            if (*(u16 *)(p + 0x428) <= 0x18) {
-                a = *(s32 *)(p + 0x18);
-                id = 0xD5;
-                goto fin;
+            p->statModifierContext.chargeTier = 0;
+            p->contactMagnitude = 0;
+            if (p->currentStatB <= 0x18) {
+                Player_PlayLocalSong(p->slot, 0xD5);
+                Player_SetTetherMode(p, 3, 5);
+                break;
             }
-            *(u16 *)(p + 0xC12) = 0xF;
-            if (((struct Player *)p)->inputKeys[0] & 2) {
+            p->statModifierContext.chargeSparkTimer = 0xF;
+            if (p->inputKeys[0] & 2) {
                 Player_SetTetherMode(p, 3, 2);
                 break;
             }
-            goto l340;
+            Player_PlayLocalSong(p->slot, 0xCD);
+            Player_SetTetherMode(p, 3, 5);
+            break;
         case 2:
             Player_UpdateFacingFromInputHistory(p);
-            Player_SetAnimationIndex(
-                p, ActorVariant_GetTableValue(((struct Player *)p)->actionMode, 0x24), 0x40);
-            (*(u16 *)(p + 0xC12))++;
-            t = (u16 *)(p + 0x45A);
-            if (*t == 6)
-                Player_PlayLocalSong(*(s32 *)(p + 0x18), 0x1F8);
-            if (!(((struct Player *)p)->inputKeys[0] & 2))
-                goto l340;
-            (*t)++;
-            if (*t <= 0x3B)
+            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 0x24), 0x40);
+            p->statModifierContext.chargeSparkTimer++;
+            if (p->tetherFrame == 6)
+                Player_PlayLocalSong(p->slot, 0x1F8);
+            if (!(p->inputKeys[0] & 2)) {
+                Player_PlayLocalSong(p->slot, 0xCD);
+                Player_SetTetherMode(p, 3, 5);
                 break;
-            *(u8 *)(p + 0xC0F) = 1;
-            *(u16 *)(p + 0x4D2) = 0x1E;
-            ((struct Player *)p)->actionEighteenParameter = 0x16E;
-            ((struct Player *)p)->actionEighteenDuration = 0x24;
-            Player_PlayLocalSong(*(s32 *)(p + 0x18), 0x1F9);
+            }
+            p->tetherFrame++;
+            if (p->tetherFrame <= 0x3B)
+                break;
+            p->statModifierContext.chargeTier = 1;
+            p->contactMagnitude = 0x1E;
+            p->actionEighteenParameter = 0x16E;
+            p->actionEighteenDuration = 0x24;
+            Player_PlayLocalSong(p->slot, 0x1F9);
             Player_SetTetherMode(p, 3, 4);
             break;
         case 4:
             Player_UpdateFacingFromInputHistory(p);
-            Player_SetAnimationIndex(
-                p, ActorVariant_GetTableValue(((struct Player *)p)->actionMode, 0x24), 0x40);
-            (*(u16 *)(p + 0xC12))++;
-            if (((struct Player *)p)->inputKeys[0] & 2)
+            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 0x24), 0x40);
+            p->statModifierContext.chargeSparkTimer++;
+            if (p->inputKeys[0] & 2)
                 break;
-        l340:
-            a = *(s32 *)(p + 0x18);
-            id = 0xCD;
-        fin:
-            Player_PlayLocalSong(a, id);
+            Player_PlayLocalSong(p->slot, 0xCD);
             Player_SetTetherMode(p, 3, 5);
             break;
         case 5: {
             s32 ang, n;
-            Player_SetAnimationIndex(
-                p, ActorVariant_GetTableValue(((struct Player *)p)->actionMode, 0x25), 0x40);
-            if (((struct Player *)p)->inputKeys[1] & 2)
-                *(u8 *)(p + 0xBF6) = 1;
-            r = (u16 *)(p + 0x4D2);
-            if (*r != 0) {
-                if (*r > 5) {
+            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 0x25), 0x40);
+            if (p->inputKeys[1] & 2)
+                p->statModifierContext.bufferedAttack = 1;
+            if (p->contactMagnitude != 0) {
+                if (p->contactMagnitude > 5) {
                     ba.x = 0;
                     ba.y = 0;
                     ba.z = 0;
                     bb.x = 32;
                     bb.y = 32;
                     bb.z = 32;
-                    SceneParticleBurst_CreateWhilePaused(p + 0x30, &ba, &bb, 1, 3, 4);
+                    SceneParticleBurst_CreateWhilePaused(&p->position, &ba, &bb, 1, 3, 4);
                 }
-                ang = ((*(u8 *)(p + 0x3A4) + 5) & 7) << 5;
-                n = *r;
-                *(s16 *)(p + 0x38) = -scale(gUnk_086149C4[(ang + 0x40) & 0xFF] * n);
-                *(s16 *)(p + 0x3C) = -scale(*(u16 *)(p + 0x4D2) * gUnk_086149C4[ang]);
-                *(u16 *)(p + 0x4D2) = (*(u16 *)(p + 0x4D2) * 3) >> 2;
+                ang = ((p->facing + 5) & 7) << 5;
+                n = p->contactMagnitude;
+                p->velocityX = -scale(gUnk_086149C4[(ang + 0x40) & 0xFF] * n);
+                p->velocityZ = -scale(p->contactMagnitude * gUnk_086149C4[ang]);
+                p->contactMagnitude = (p->contactMagnitude * 3) >> 2;
             } else {
-                (((struct Player *)p)->tetherFrame)++;
-                if (((struct Player *)p)->tetherFrame > 4)
+                p->tetherFrame++;
+                if (p->tetherFrame > 4)
                     Player_SetTetherMode(p, 3, 6);
             }
             break;
         }
         case 6:
-            Player_SetAnimationIndex(
-                p, ActorVariant_GetTableValue(((struct Player *)p)->actionMode, 0x24), 0x40);
-            if (((struct Player *)p)->inputKeys[1] & 2)
-                *(u8 *)(p + 0xBF6) = 1;
-            {
-                u32 released = *(u8 *)(p + 0xBF6);
-                if (released) {
-                    *(u8 *)(p + 0xBF6) = 0;
-                    ((struct Player *)p)->tetherPhase = 1;
-                    break;
-                }
-                (((struct Player *)p)->tetherFrame)++;
-                if (((struct Player *)p)->tetherFrame > 0xE) {
-                    *(u8 *)(p + 0xBF6) = 0;
-                    Player_SetTetherMode(p, 3, 7);
-                }
+            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 0x24), 0x40);
+            if (p->inputKeys[1] & 2)
+                p->statModifierContext.bufferedAttack = 1;
+            if (p->statModifierContext.bufferedAttack) {
+                p->statModifierContext.bufferedAttack = 0;
+                p->tetherPhase = 1;
+                break;
+            }
+            p->tetherFrame++;
+            if (p->tetherFrame > 0xE) {
+                p->statModifierContext.bufferedAttack = 0;
+                Player_SetTetherMode(p, 3, 7);
             }
             break;
         case 7:
-            Player_SetAnimationIndex(
-                p, ActorVariant_GetTableValue(((struct Player *)p)->actionMode, 0x23), 0x40);
-            (((struct Player *)p)->tetherFrame)++;
-            if (((struct Player *)p)->tetherFrame > 4)
+            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 0x23), 0x40);
+            p->tetherFrame++;
+            if (p->tetherFrame > 4)
                 Player_SetTetherMode(p, 0, 0);
             break;
         default:
             break;
     }
-    c = (u16 *)(p + 0xC12);
-    if (*c > 0xE) {
-        if (((struct Player *)p)->actionMode == 1)
+    if (p->statModifierContext.chargeSparkTimer > 0xE) {
+        if (p->actionMode == 1)
             Player_SpawnActionSpark(p);
-        *c = 0;
+        p->statModifierContext.chargeSparkTimer = 0;
     }
-    *(u8 *)(p + 0xAC9) = 8;
+    p->actionVariant = 8;
 }
