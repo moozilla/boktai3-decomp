@@ -1,13 +1,15 @@
-#include "global.h"
-void Actor_UpdateVisibilityAndShadow(u8 *, u8 *);
-void SceneCharacter_UpdatePaletteFade(u8 *, u8 *);
-void sub_081CDEF8(u8 *, u8 *);
-s32 SceneCharacter_UpdateDisplay(u8 *a, u8 *b)
+#include "npc/story_character/scene_character.h"
+
+void Actor_UpdateVisibilityAndShadow(void *, struct SceneNpc *);
+void SceneCharacter_UpdatePaletteFade(void *, struct SceneNpc *);
+void sub_081CDEF8(void *, struct SceneNpc *);
+
+s32 SceneCharacter_UpdateDisplay(void *context, struct SceneNpc *actor)
 {
-    Actor_UpdateVisibilityAndShadow(a, b);
-    if (b[1] == 0x1d || b[1] == 9) {
-        SceneCharacter_UpdatePaletteFade(a, b);
-        sub_081CDEF8(a, b);
+    Actor_UpdateVisibilityAndShadow(context, actor);
+    if (actor->kind == 29 || actor->kind == 9) {
+        SceneCharacter_UpdatePaletteFade(context, actor);
+        sub_081CDEF8(context, actor);
     }
     return 0;
 }
