@@ -207,3 +207,5 @@ src/npc/story_character/SceneCharacter_UpdateAnimationThirteen.c	SceneCharacter_
 src/npc/story_character/SceneCharacter_UpdateAnimationSeven.c	SceneCharacter_UpdateAnimationSeven	natural	natural	0	
 src/npc/story_character/StoryCharacter_UpdateKind29AttackEffect.c	StoryCharacter_UpdateKind29AttackEffect	contrived	minor	20	position out pointer (member stores on the stack struct would rewrite whole words)
 src/npc/story_character/StoryCharacter_UpdateDelayedAttackEffect.c	StoryCharacter_UpdateDelayedAttackEffect	contrived	minor	2	position out pointer (member stores on the stack struct would rewrite whole words)
+src/npc/story_character/StoryCharacter_UpdateFacingAnimation.c	StoryCharacter_UpdateFacingAnimation	minor	minor	1	effects pointer computed once at entry (field access recomputes it per branch)
+src/npc/story_character/sub_081CB5B0.c	sub_081CB5B0	contrived	minor	5	u32 mask parked before the displayFlags OR (mask-first); callback local before the prevState store

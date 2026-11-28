@@ -3,11 +3,6 @@
 #include "engine/video/render.h"
 #include "npc/story_character/state_actor.h"
 
-struct NpcDisplayPalette {
-    u8 unk_00[0xC];
-    void *palette;
-};
-
 void Palette_InterpolateBanks(void *, void *, void *, u32, u32);
 s32 DisplayAnimation_TestFinished(void *);
 u32 PlayerParticleCloud_Create(void *, u32);
@@ -29,10 +24,8 @@ void sub_081CB5B0(void *ctx, struct StateActor *npc, s32 tick)
         case 0: {
             u32 t = npc->stateFrame;
             if (t <= 0x80) {
-                void *bank1 = gPaletteBankData + 0x680;
-                void *bank2 = gPaletteBankData + 0x2E80;
-                void *dest = npc->overlayDrawable[0].palette;
-                Palette_InterpolateBanks(dest, bank1, bank2, t, 7);
+                u8 *from = gPaletteBankData + 0x680, *to = gPaletteBankData + 0x2E80;
+                Palette_InterpolateBanks(npc->overlayDrawable[0].palette, from, to, t, 7);
             } else {
                 npc->stateFrame = 0;
                 npc->phase++;
