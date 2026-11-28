@@ -2,21 +2,11 @@
 #include "scene/collision/scene_actor_delayed_response.h"
 #include "scene/actor/scene_actor_reaction.h"
 void SceneActorReaction_PlayAnimationBUntilComplete(void *);
-static inline u8 TakePrepared(struct ChaseActor *actor)
+void SceneActorReaction_TurnBackToRoute(struct ChaseActor *actor)
 {
-    u8 *field;
-    field = &actor->base.field2B2;
-    if (*field) {
-        *field = 0;
-        return 1;
-    }
-    return 0;
-}
-static inline void SceneActorReaction_UpdateReturnToRoute(struct ChaseActor *actor,
-                                                          struct SceneActorChaseGroup *group)
-{
+    struct SceneActorChaseGroup *group = &actor->group;
     u32 mask;
-    if (TakePrepared(actor)) {
+    if (SceneActorReaction_TakePrepared(actor)) {
         actor->base.body.direction = (((actor->base.body.direction + 128) & 255) >> 6) << 6;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     }
@@ -25,7 +15,7 @@ static inline void SceneActorReaction_UpdateReturnToRoute(struct ChaseActor *act
         struct SceneActorDelayedResponse *command;
         void *callback;
         u8 one;
-        actor->base.behaviorFlags |= mask;
+        actor->base.behaviorFlags |= 0x10;
         command = (void *)&group->saved;
         callback = (void *)SceneActorReaction_PlayAnimationBUntilComplete;
         one = 1;
@@ -38,9 +28,4 @@ static inline void SceneActorReaction_UpdateReturnToRoute(struct ChaseActor *act
         SceneActorTerrain_EnterState(actor, 3, 1, 0);
         actor->base.field2C2 = 64;
     }
-}
-
-void SceneActorReaction_TurnBackToRoute(struct ChaseActor *actor)
-{
-    SceneActorReaction_UpdateReturnToRoute(actor, &actor->group);
 }

@@ -463,3 +463,4 @@ src/scene/actor/reaction/SceneActorReaction_RestoreAndClearRestart.c	SceneActorR
 src/scene/actor/reaction/SceneActorReaction_RestoreAlternateAfterDelay.c	SceneActorReaction_RestoreAlternateAfterDelay	natural	natural	0	-
 src/scene/actor/reaction/SceneActorReaction_UpdateAnimationGate.c	SceneActorReaction_UpdateAnimationGate	minor	minor	0	mask-first locals stay: plain |= and &= load the field first and the two stores cross-jump
 src/scene/actor/reaction/SceneActorReaction_PlayAnimationBUntilComplete.c	SceneActorReaction_PlayAnimationBUntilComplete	contrived	natural	2	-
+src/scene/actor/reaction/SceneActorReaction_TurnBackToRoute.c	SceneActorReaction_TurnBackToRoute	contrived	minor	9	the 0x10 mask local and the delayed-response callback/one locals stay (store order)
