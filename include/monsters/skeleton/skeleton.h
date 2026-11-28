@@ -42,6 +42,31 @@ struct Skeleton {
     u8 unknown74A[2];
 };
 
+static inline void Skeleton_ClearActionFlags(struct Skeleton *p, u32 mask)
+{
+    p->actionFlags &= ~mask;
+}
+
+static inline void Skeleton_ClearStatusFlags(struct Skeleton *p, u32 mask)
+{
+    p->chase.base.statusFlags &= ~mask;
+}
+
+static inline u32 Skeleton_TestActionFlags(struct Skeleton *p, u32 mask)
+{
+    return p->actionFlags & mask;
+}
+
+static inline u32 Skeleton_TestMotionFlags(struct Skeleton *p, u32 mask)
+{
+    return p->chase.base.motionFlags & mask;
+}
+
+static inline void Skeleton_SetActionFlags(struct Skeleton *p, u32 mask)
+{
+    p->actionFlags |= mask;
+}
+
 typedef char SkeletonSize[(sizeof(struct Skeleton) == 0x74C) ? 1 : -1];
 
 void SceneActorScript_TriggerCallOnCount(struct ChaseActor *actor);

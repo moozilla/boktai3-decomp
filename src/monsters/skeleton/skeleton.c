@@ -26,7 +26,7 @@ u8 Skeleton_ReactToContact(struct Skeleton *actor)
         actor->chase.base.body.direction = actor->chase.base.reactionDirection + 0x80;
         SceneActorAnimation_SelectDirectionalEntry(&actor->chase.base, 0);
         SceneActorChase_ClearMotionFlags(&actor->chase, 0x2020);
-        SceneActorChase_SetActorFlags(actor, 0x10);
+        SceneActorChase_SetBehaviorFlags((struct ChaseActor *)actor, 0x10);
         group->destination->pad = 0;
         SceneActorChase_TrackPlayer(&actor->chase);
         if (!SceneActorChase_Arrive(actor)) {
@@ -49,7 +49,7 @@ u8 Skeleton_ReactToContact(struct Skeleton *actor)
     if (actor->chase.base.hitReactionFlags & 0xC0000) {
         SceneActorChase_SetControl(actor, actor->chase.base.onReaction, 0x12);
         SceneActorChase_SetState(actor, 3, 0, 0);
-        SceneActorChase_ClearWordFlags(&actor->chase.base.statusFlags, 0x1000000);
+        Skeleton_ClearStatusFlags(actor, 0x1000000);
         return 1;
     }
     SceneActorChase_ClearMotionFlags(&actor->chase, 0x20);
@@ -64,7 +64,7 @@ u8 Skeleton_ReactToContact(struct Skeleton *actor)
             Sound_PlaySong(0x3A7);
         if (!actor->chase.base.tracking.target)
             return 0;
-        SceneActorChase_SetActorFlags(actor, 0x80);
+        SceneActorChase_SetBehaviorFlags((struct ChaseActor *)actor, 0x80);
         SceneActorChase_GroupSetFlags(group, 4);
         SceneActorChase_TrackPlayer(&actor->chase);
         if (!SceneActorChase_Arrive(actor)) {
@@ -203,10 +203,8 @@ void Skeleton_SetMovementControlPreset(struct ChaseActor *actor)
 
 s32 Skeleton_Update(struct Skeleton *actor)
 {
-    u32 m;
     SceneActorReaction_TickHiddenResponse(&actor->chase);
-    m = 0x2000;
-    if ((actor->chase.base.motionFlags & m) || actor->chase.base.hitLockTimer == 0) {
+    if (Skeleton_TestMotionFlags(actor, 0x2000) || actor->chase.base.hitLockTimer == 0) {
         Callback_InvokeActor(actor, actor->chase.base.stateCallbacks[actor->chase.base.state2A8]);
         SceneActorControl_DispatchControl(actor);
     }
@@ -233,8 +231,7 @@ static inline void dispatch(void **callback, void *context)
 
 static inline u8 pending(struct Skeleton *actor)
 {
-    u32 mask = 0x10;
-    if (actor->actionFlags & mask)
+    if (Skeleton_TestActionFlags(actor, 0x10))
         return 1;
     return 0;
 }

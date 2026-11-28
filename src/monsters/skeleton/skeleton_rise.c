@@ -254,10 +254,7 @@ static inline void Skeleton_ArriveAfterDelay(void *obj)
         goto reroute;
     if (SceneActorChase_MotionFlags(actor, 0x400))
         return;
-    {
-        u32 bits = 4;
-        group->common.gate.flags &= ~bits;
-    }
+    SceneActorChase_GroupClearFlags(group, 4);
     if (SceneActorChase_MotionFlags(actor, 0x80)) {
         SceneActorChase_SetControl(actor, group->common.gate.control, 0x1A);
         SceneActorChase_SetTypedState(actor, 0, 0, 12);
@@ -413,10 +410,7 @@ static inline u8 Skeleton_ArriveAfterDelay_UpdateDelayedArrival(void *obj)
         goto reroute;
     if (SceneActorChase_MotionFlags(actor, 0x400))
         return 0;
-    {
-        u32 bits = 4;
-        group->common.gate.flags &= ~bits;
-    }
+    SceneActorChase_GroupClearFlags(group, 4);
     if (SceneActorChase_MotionFlags(actor, 0x80)) {
         SceneActorChase_SetControl(actor, group->common.gate.control, 0x1A);
         SceneActorChase_SetBehavior(actor, 12);

@@ -8,6 +8,7 @@
 #include "scene/motion/scene_actor_turn.h"
 #include "scene/terrain/terrain_collision.h"
 #include "scene/motion/scene_actor_chase.h"
+#include "monsters/skeleton/flag_accessors.h"
 
 void SceneActorReaction_TickQueuedContact(void);
 
@@ -32,7 +33,7 @@ void SceneActorApproach_RunCategoryAction(struct ChaseActor *actor)
         context->pursuitTimer = context->parameters6F8[0];
     }
     if (actor->base.stepDone) {
-        SceneActorPlacement_ClearFlags(&actor->base.motionFlags, ~0x100);
+        ChaseActor_ClearMotionFlags(actor, 0x100);
         Skeleton_SelectDistanceReaction(actor);
     } else
         actor->base.counter2AC++;
@@ -50,7 +51,7 @@ void SceneActorApproach_RunTimedAction(struct ChaseActor *actor)
         Vorn_SpawnHazard(actor, 2);
     }
     if (actor->base.stepDone) {
-        SceneActorPlacement_ClearFlags(&actor->base.motionFlags, ~0x100);
+        ChaseActor_ClearMotionFlags(actor, 0x100);
         Skeleton_SelectDistanceReaction(actor);
     } else
         actor->base.counter2AC++;
@@ -68,7 +69,7 @@ void SceneActorApproach_RunAlternateTimedAction(struct ChaseActor *actor)
         Vorn_SpawnHazard(actor, 3);
     }
     if (actor->base.stepDone) {
-        SceneActorPlacement_ClearFlags(&actor->base.motionFlags, ~0x100);
+        ChaseActor_ClearMotionFlags(actor, 0x100);
         Skeleton_SelectDistanceReaction(actor);
     } else
         actor->base.counter2AC++;
@@ -87,7 +88,7 @@ void SceneActorApproach_CaptureTargetAndRunAction(struct ChaseActor *actor)
         Vorn_SpawnHazard(actor, 2);
     }
     if (actor->base.stepDone) {
-        SceneActorPlacement_ClearFlags(&actor->base.motionFlags, ~0x100);
+        ChaseActor_ClearMotionFlags(actor, 0x100);
         Skeleton_SelectDistanceReaction(actor);
     } else
         actor->base.counter2AC++;
@@ -155,10 +156,7 @@ static inline u8 Skeleton_ApproachTargetCell(void *obj)
         goto reroute;
     if (SceneActorChase_MotionFlags(actor, 0x400))
         return 0;
-    {
-        u32 bits = 4;
-        group->common.gate.flags &= ~bits;
-    }
+    SceneActorChase_GroupClearFlags(group, 4);
     if (SceneActorChase_MotionFlags(actor, 0x80)) {
         SceneActorChase_SetControl(actor, group->common.gate.control, 0x1A);
         SceneActorChase_SetBehavior(actor, 12);
@@ -197,10 +195,7 @@ static inline void Skeleton_ApplyApproachMotion(struct ChaseActor *actor,
     actor->base.body.motion.x +=
         Chase_Scale16(gUnk_086149C4[(angle + 0x40) & 0xFF] * speed);
     actor->base.body.motion.z += Chase_Scale16(gUnk_086149C4[angle & 0xFF] * speed);
-    {
-        u32 mask = 0x2000;
-        actor->base.behaviorFlags |= mask;
-    }
+    SceneActorChase_SetBehaviorFlags(actor, 0x2000);
     if (actor->base.tracking.distance > body->nearDistance &&
         actor->base.tracking.distance < body->farDistance) {
         u16 mask = 0x80;
@@ -223,8 +218,7 @@ void Skeleton_UpdateTargetApproach(struct ChaseActor *actor)
         Skeleton_ApproachTargetCell(actor);
         {
             struct Skeleton *b = actor->base.context;
-            u32 mask = 0x80;
-            b->actionFlags |= mask;
+            Skeleton_SetActionFlags(b, 0x80);
         }
     } else {
         struct ContactPosition diff;
