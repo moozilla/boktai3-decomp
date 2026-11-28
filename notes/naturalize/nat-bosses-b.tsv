@@ -23,3 +23,4 @@ src/bosses/ratatosk/sub_081F348C.c	sub_081F348C	minor	minor	7	copy goes through 
 src/bosses/ratatosk/Ratatosk_UpdateDirectionalAnimation.c	Ratatosk_UpdateDirectionalAnimation	minor	minor	6	second actor alias and mask-parameter flag accessor stay: allocation needs the copy in r6 and the mask is loaded before the field
 src/bosses/ratatosk/PaletteEffect_RefreshPalette.c	PaletteEffect_RefreshPalette	contrived	natural	11	
 src/bosses/ratatosk/Ratatosk_GetPlayerOffsetFarthestFromSelf.c	Ratatosk_GetPlayerOffsetFarthestFromSelf	minor	natural	1	
+src/bosses/ratatosk/Ratatosk_GetPlayerOffsetNearestSelf.c	Ratatosk_GetPlayerOffsetNearestSelf	minor	natural	1	
