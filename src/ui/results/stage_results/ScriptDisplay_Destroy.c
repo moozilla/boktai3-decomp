@@ -1,11 +1,14 @@
 #include "global.h"
-void StageResults_DestroyTextWindows(void *);
-void StageResults_DestroySprites(void *);
+#include "ui/results/stage_results.h"
+
+void StageResults_DestroyTextWindows(struct StageResults *);
+void StageResults_DestroySprites(struct StageResults *);
 void CharacterModel_RemoveAnimations(void *);
-u32 ScriptDisplay_Destroy(u8 *p)
+
+u32 ScriptDisplay_Destroy(struct StageResults *results)
 {
-    StageResults_DestroyTextWindows(p);
-    StageResults_DestroySprites(p);
-    CharacterModel_RemoveAnimations(p + 0xF60);
+    StageResults_DestroyTextWindows(results);
+    StageResults_DestroySprites(results);
+    CharacterModel_RemoveAnimations(results->model);
     return 1;
 }
