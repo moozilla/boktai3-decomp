@@ -501,3 +501,4 @@ src/system/game_state/sub_0822E764.c	sub_0822E764	contrived	minor	1	s16 store th
 src/system/game_state/SolarFruit_IsInventorySlotEquipped.c	SolarFruit_IsInventorySlotEquipped	minor	minor	1	pointer walk over the fruit slots
 src/system/game_state/GameState_AddEquipment.c	GameState_AddEquipment	contrived	minor	1	array indexed as *(i + field) for the index-first address sum; replaces the earlier row, whose commit did not change the source
 src/system/game_state/sub_0822E43C.c	sub_0822E43C	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
+src/system/game_state/Equipment_AssignUniqueSlot.c	Equipment_AssignUniqueSlot	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
