@@ -214,3 +214,4 @@ src/scene/actor/attachment/SceneActorPosition_ResolveTaggedPosition.c	SceneActor
 src/scene/actor/attachment/SceneActorAttachment_RetargetNearestPlayer.c	SceneActorAttachment_RetargetNearestPlayer	contrived	minor	24	delta/position pointer locals and a count local keep the loop shape; mask local for the motion flag test; player address as gPlayers[i] + 0x24
 src/scene/actor/attachment/SceneActorReaction_ApplyHitResponse.c	SceneActorReaction_ApplyHitResponse	contrived	contrived	40	remaining parked masks, motion-flag block, spark table union and tracking mask: plain operators and accessors change load order or block layout
 src/scene/actor/attachment/SceneActorRecovery_ResumePursuit.c	SceneActorRecovery_ResumePursuit	minor	minor	0	actor alias (2 shape diffs elsewhere without it), control address block and ClearGate helper (plain &= ~4 differs)
+src/scene/actor/behavior/SceneActorBehavior_IsNearParticipant.c	SceneActorBehavior_IsNearParticipant	contrived	natural	3	-

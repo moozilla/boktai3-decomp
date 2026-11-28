@@ -8,52 +8,29 @@ struct SceneActorBehaviorContactObject {
 u8 SceneActorBehavior_IsNearParticipant(struct ChaseActor *actor)
 {
     struct ContactPackedVector difference;
-    s32 index = 0;
-    s32 last;
-    s32 limit = gPlayerCount;
-    struct Player **cursor;
+    s32 i;
     struct Player *player;
     struct SceneActorContactNode *node;
-    s32 distance;
-    if (index > limit)
-        goto playersDone;
-    last = limit;
-    cursor = gPlayers;
-    do {
-        player = *cursor;
+    for (i = 0; i <= gPlayerCount; i++) {
+        player = gPlayers[i];
         if (player) {
             difference.x = (u16)actor->base.body.position.x - (u16)player->position.x;
-            distance = difference.x;
-            if (distance < 0)
-                distance = -distance;
-            if (distance <= 255) {
+            if (abs(difference.x) <= 255) {
                 difference.z = (u16)actor->base.body.position.z - (u16)player->position.z;
-                distance = difference.z;
-                if (distance < 0)
-                    distance = -distance;
-                if (distance <= 255)
+                if (abs(difference.z) <= 255)
                     return 1;
             }
         }
-        cursor++;
-        index++;
-    } while (index <= last);
-playersDone:
+    }
     node = SceneActorContacts_FindNodeByKind(4);
     if (node) {
-        u16 *positionX = (void *)&actor->base.body.position.x;
-        struct SceneActorBehaviorContactObject *object;
-        object = node->object;
-        difference.x = *positionX - (u16)object->position.x;
-        distance = difference.x;
-        if (distance < 0)
-            distance = -distance;
-        if (distance <= 255) {
-            difference.z = (u16)actor->base.body.position.z - (u16)object->position.z;
-            distance = difference.z;
-            if (distance < 0)
-                distance = -distance;
-            if (distance <= 255)
+        difference.x = (u16)actor->base.body.position.x -
+                       (u16)((struct SceneActorBehaviorContactObject *)node->object)->position.x;
+        if (abs(difference.x) <= 255) {
+            difference.z =
+                (u16)actor->base.body.position.z -
+                (u16)((struct SceneActorBehaviorContactObject *)node->object)->position.z;
+            if (abs(difference.z) <= 255)
                 return 1;
         }
     }
