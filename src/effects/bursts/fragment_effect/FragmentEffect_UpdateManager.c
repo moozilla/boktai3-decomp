@@ -1,27 +1,17 @@
-#include "global.h"
+#include "effects/bursts/fragment_effect.h"
+
 extern void (*const gUnk_086107E8[])(void);
-void sub_08249240(u8 *, u8 *, void (*)(void));
-static inline u8 test(u32 *p, u32 mask)
+
+u32 FragmentEffect_UpdateManager(struct FragmentEffectPool *pool)
 {
-    if (*p & mask)
-        return 1;
-    return 0;
-}
-u32 FragmentEffect_UpdateManager(u8 *s)
-{
-    u8 *first = s + 0x3C;
-    if (*(u32 *)(s + 0x38)) {
-        s32 i = 0;
-        void (*const *table)(void) = gUnk_086107E8;
-        u8 *kind = s + 0xF6;
-        u8 *entry = first;
-        do {
-            if (test((u32 *)(s + 0x38), 1 << i))
-                sub_08249240(s, entry, table[*kind]);
-            kind += 0xC0;
-            entry += 0xC0;
-            ++i;
-        } while (i <= 7);
+    struct Fragment *fragments = pool->fragments;
+    s32 i;
+
+    if (pool->occupied) {
+        for (i = 0; i < 8; i++) {
+            if (FragmentEffectPool_IsOccupied(pool, i))
+                sub_08249240(pool, &fragments[i], gUnk_086107E8[fragments[i].state]);
+        }
     }
     return 0;
 }

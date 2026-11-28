@@ -145,3 +145,4 @@ src/effects/bursts/fragment_effect/PursuingActor_RetireAll.c	PursuingActor_Creat
 src/effects/bursts/fragment_effect/FragmentEffect_InitCollider.c	FragmentEffect_InitCollider	contrived	natural	1	-
 src/effects/bursts/fragment_effect/FragmentEffect_UpdateCollider.c	FragmentEffect_UpdateCollider	minor	natural	1	-
 src/effects/bursts/fragment_effect/sub_0812C3D0.c	sub_0812C3D0	minor	natural	1	-
+src/effects/bursts/fragment_effect/FragmentEffect_UpdateManager.c	FragmentEffect_UpdateManager	contrived	natural	1	-
