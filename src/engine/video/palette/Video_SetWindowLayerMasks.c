@@ -1,7 +1,8 @@
 #include "global.h"
+#include "gba/io_reg.h"
 
-void Video_SetWindowLayerMasks(u32 a, u32 b, u32 c, u32 d)
+void Video_SetWindowLayerMasks(u32 window0, u32 window1, u32 outside, u32 objectWindow)
 {
-    *(vu16 *)0x04000048 = (b << 8) | a;
-    *(vu16 *)0x0400004A = (d << 8) | c;
+    REG_WININ = (window1 << 8) | window0;
+    REG_WINOUT = (objectWindow << 8) | outside;
 }
