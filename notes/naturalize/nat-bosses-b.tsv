@@ -242,3 +242,9 @@ src/bosses/sabata/combat_states.c	SabataState_UpdateTrigger	machine-shaped	machi
 src/bosses/sabata/combat_states.c	SceneActorState_UpdateAnimationRequest	natural	natural	0	minor: state constant local
 src/bosses/sabata/combat_states.c	Sabata_ClearCombatEntryTrigger	natural	natural	0	minor: state constant local
 src/bosses/sabata/combat_states.c	SabataState_UpdateConditionalTrigger	natural	natural	0	minor: state constant local
+src/bosses/sabata/sub_0817C318.c	sub_0817C318	natural	natural	0	
+src/bosses/sabata/Sabata_UpdateFlaggedRecovery.c	Sabata_UpdateFlaggedRecovery	natural	natural	0	
+src/bosses/sabata/SceneActorState_WaitForFlagClear.c	SceneActorState_WaitForFlagClear	natural	natural	0	
+src/bosses/sabata/Sabata_RunVariantCallback.c	Sabata_RunVariantCallback	natural	natural	0	
+src/bosses/sabata/Sabata_RunGuardedPhaseCallback.c	Sabata_RunGuardedPhaseCallback	natural	natural	0	
+src/bosses/sabata/Sabata_SelectCombatAction.c	Sabata_SelectCombatAction	machine-shaped	machine-shaped	9	kept address-returning accessors, second actor alias, zero local at the end and random inline: each plain replacement changes the code
