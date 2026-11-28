@@ -20,7 +20,7 @@ struct VanargandDamagePart {
     u8 unknown108[8];
     struct MotionTarget target;
     s16 targetActive;
-    u8 unknown122[2];
+    u16 targetDefense; /* subtracted from the damage a targeted hit reports (tentative) */
     u32 pendingFlags;
     u16 pendingDamage, accumulatedDamage, flashTimer;
     u16 contactCooldown;

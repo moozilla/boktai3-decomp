@@ -1,27 +1,17 @@
 #include "global.h"
+#include "bosses/vanargand/vanargand_damage_part.h"
 
-struct T {
-    u8 f[0x120];
-    u16 a;
-    u16 b;
-    u8 g[4];
-    u16 c;
-};
-struct O {
-    u8 f[0x50];
-    struct T *t;
-};
-
-s32 Vanargand_OnPartTrigger(struct O *o, s32 m, s32 v)
+s32 Vanargand_OnPartTrigger(struct ContactCollider *collider, s32 message, s32 damage)
 {
-    struct T *t = o->t;
-    if (m == 0) {
-        v -= t->b;
-        if (v > 0)
-            t->c = v;
-        t->a = 1;
-    } else if (m == 1) {
-        t->a = 0;
+    struct VanargandDamagePart *part = collider->owner;
+
+    if (message == 0) {
+        damage -= part->targetDefense;
+        if (damage > 0)
+            part->pendingDamage = damage;
+        part->targetActive = 1;
+    } else if (message == 1) {
+        part->targetActive = 0;
     }
     return 1;
 }
