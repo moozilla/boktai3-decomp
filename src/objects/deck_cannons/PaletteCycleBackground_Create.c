@@ -1,21 +1,22 @@
 #include "global.h"
+#include "engine/engine.h"
+#include "objects/deck_cannons/script_value_rotation_layout.h"
 
-void *Task_Create(s32, s32);
-void Task_SetCallbacks(void *, void *, void *);
-s32 PaletteCycleBackground_Init(void *);
-void Task_Kill(void *);
-void ScriptValues_TickRotation(void);
-void BackgroundAnimation_Destroy(void);
+s32 PaletteCycleBackground_Init(struct ScriptValueRotation *);
+s32 ScriptValues_TickRotation(struct ScriptValueRotation *);
+u32 BackgroundAnimation_Destroy(struct ScriptValueRotation *);
 
-void *PaletteCycleBackground_Create(void)
+struct ScriptValueRotation *PaletteCycleBackground_Create(void)
 {
-    void *r = Task_Create(8, 0x7c);
-    if (r != 0) {
-        Task_SetCallbacks(r, ScriptValues_TickRotation, BackgroundAnimation_Destroy);
-        if (PaletteCycleBackground_Init(r) < 0) {
-            Task_Kill(r);
+    struct ScriptValueRotation *rotation = Task_Create(8, sizeof(*rotation));
+
+    if (rotation) {
+        Task_SetCallbacks(rotation, (void (*)(void *))ScriptValues_TickRotation,
+                          (void (*)(void *))BackgroundAnimation_Destroy);
+        if (PaletteCycleBackground_Init(rotation) < 0) {
+            Task_Kill(rotation);
             return 0;
         }
     }
-    return r;
+    return rotation;
 }

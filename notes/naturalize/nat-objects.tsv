@@ -200,3 +200,4 @@ src/objects/deck_cannons/DeckCannon_InitCannon.c	DeckCannon_InitCannon	minor	min
 src/objects/deck_cannons/ScriptValues_LoadRotatedArray.c	ScriptValues_LoadRotatedArray	contrived	natural	6	
 src/objects/deck_cannons/BackgroundAnimation_Destroy.c	BackgroundAnimation_Destroy	contrived	natural	1	
 src/objects/deck_cannons/PaletteCycleBackground_Init.c	PaletteCycleBackground_Init	contrived	natural	3	
+src/objects/deck_cannons/PaletteCycleBackground_Create.c	PaletteCycleBackground_Create	minor	natural	1	
