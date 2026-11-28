@@ -9,12 +9,9 @@ u32 WindCannonManager_Destroy(struct FanCannonManager *p)
     s32 i;
     Sound_StopSong(0x519);
     cannon = p->slots;
-    i = 0;
-    do {
+    for (i = 0; i < 8; i++, cannon++) {
         if (p->occupiedSlots & (1 << i))
             WindCannonManager_DestroySlot(p, cannon, i);
-        i++;
-        cannon++;
-    } while (i <= 7);
+    }
     return gFanCannonManager = 0;
 }
