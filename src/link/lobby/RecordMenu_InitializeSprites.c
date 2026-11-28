@@ -12,14 +12,14 @@ void RecordMenu_InitializeSprites(struct RecordMenu *menu)
     ResourceHeader_Relocate(menu->rowResource, proc);
     for (i = 0; i < 8; i++) {
         AnimSprite_InitLinked(&menu->sprites[i], menu->rowResource, menu->spriteIds[i], 16, 0, 0, 0,
-                          NULL);
+                              NULL);
         menu->states[i] = -1;
     }
     proc = ScriptProc_Start(0xcb05, 0x530d);
     menu->cursorProc = proc;
     ResourceHeader_Relocate(menu->resource, proc);
     AnimSprite_InitLinked(&menu->sprites[8], menu->resource, menu->spriteIds[i], 17, 0, 0, 0, NULL);
-    menu->states[i] |= -1;
+    menu->states[i] = -1;
     CpuCopy32(menu->sprites[8].tiles, menu->palette, sizeof(menu->palette));
     menu->sprites[8].flags = 0xa000;
     menu->sprites[8].tiles = menu->palette;
