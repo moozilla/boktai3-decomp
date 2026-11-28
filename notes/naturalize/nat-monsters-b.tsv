@@ -175,3 +175,4 @@ src/monsters/poison_hand/PoisonHand_Update.c	PoisonHand_Update	contrived	minor	4
 src/monsters/poison_hand/PoisonHand_InitializeFromScript.c	PoisonHand_InitializeFromScript	minor	natural	5	
 src/monsters/poison_hand/PoisonHand_RecordDefeat.c	PoisonHand_RecordDefeat	contrived	natural	1	file-local IncrementCounter replaces H/W/INC macros
 src/monsters/poison_hand/PoisonHand_InitCollider.c	PoisonHand_InitCollider	contrived	minor	2	(u16) casts on the s16 flag fields
+src/monsters/poison_hand/PoisonHand_ApplyHitReaction.c	PoisonHand_ApplyHitReaction	contrived	minor	3	spark loop keeps frame struct, pointers, parked limit/mask/zero (same as MuspellHead_ApplyHitReaction); (u16) on sparkMask
