@@ -403,3 +403,4 @@ src/scene/actor/placement/SceneActorTerrain_GetNeighborCell.c	SceneActorTerrain_
 src/scene/actor/placement/SceneActorTerrain_ReadScriptParameters.c	SceneActorTerrain_ReadScriptParameters	contrived	natural	3	-
 src/scene/actor/placement/SceneActorRegistry_SetObjectContext.c	SceneActorRegistry_SetObjectContext	natural	natural	0	-
 src/scene/actor/placement/SceneActorTerrain_CheckHeightTransition.c	SceneActorTerrain_CheckHeightTransition	contrived	minor	8	mask local in the cell height helper: attributes & 15 reorders the shift
+src/scene/actor/placement/SceneActorTerrain_IsFacingPosition.c	SceneActorTerrain_IsFacingPosition	contrived	contrived	5	failed/success gotos: early returns merge the two exits differently

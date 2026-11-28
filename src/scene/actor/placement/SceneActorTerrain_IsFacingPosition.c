@@ -15,7 +15,7 @@ u32 SceneActorTerrain_IsFacingPosition(struct SceneActorTerrainView *actor,
         angle -= 256;
     else if (angle < -128)
         angle += 256;
-    if ((angle < 0 ? -angle : angle) <= 48)
+    if (abs(angle) <= 48)
         goto success;
 failed:
     return 0;
