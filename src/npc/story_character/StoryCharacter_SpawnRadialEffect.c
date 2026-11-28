@@ -3,13 +3,10 @@
 #include "engine/heap.h"
 #include "npc/story_character/state_actor.h"
 #include "engine/engine.h"
+#include "engine/math/math_shift.h"
 extern const s16 gUnk_086149C4[];
 void *SpriteEffectController_Create(void *, void *, u32, u32, u32, u32, u32, u32, u32, u32, u32,
                                     u32, u32, u32, u32, u32, s32, s32);
-static inline s32 Scale(s32 value)
-{
-    return value >= 0 ? value >> 12 : -(-value >> 12);
-}
 // confidence=low: emits a radial effect around the actor tag's position.
 void StoryCharacter_SpawnRadialEffect(struct StateActor *actor)
 {
@@ -27,11 +24,14 @@ void StoryCharacter_SpawnRadialEffect(struct StateActor *actor)
     v = &velocity;
     speed = bits + 32;
     sampleOrigin = randomOrigin;
-    v->x = Scale(gUnk_086149C4[(heading + 64) & 255] * speed);
+    v->x = Math_ShiftTowardZero(gUnk_086149C4[(heading + 64) & 255] * speed, 12);
     v->y = 0;
-    v->z = Scale(gUnk_086149C4[heading] * speed);
-    frames = (s32)ParticleRandom_ReadRelativeSample(sampleOrigin, (const u16 *)RANDOM_TABLE_ADDR);
-    frames = ((frames >> 4) & 15) + 7;
+    v->z = Math_ShiftTowardZero(gUnk_086149C4[heading] * speed, 12);
+    frames =
+        (((s32)ParticleRandom_ReadRelativeSample(sampleOrigin, (const u16 *)RANDOM_TABLE_ADDR) >>
+          4) &
+         15) +
+        7;
     SpriteEffectController_Create(&tag->state, &velocity, 0x1C1E, 0xD43F, 0, 0, 17, 0, 2, 6, 0,
                                   frames, 0, 0, 0, 0, -4, -4);
 }
