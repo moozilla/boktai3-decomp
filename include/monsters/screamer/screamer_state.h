@@ -3,32 +3,15 @@
 
 #include "engine/video/display_animation.h"
 #include "engine/task.h"
-struct ActorPosition {
-    s16 x, y, z, pad;
-};
-struct ScreamerSprite {
-    u32 flags;
-    u8 unknown4[0xc];
-    u16 frame;
-    u8 unknown12[0xa];
-    struct ActorPosition position;
-    u8 unknown24[8];
-};
+#include "scene/collision/contact_swarm.h"
 /* Private state begins before the end of the canonical actor record. */
 struct ScreamerState {
     struct Task task;
     u32 age;
-    struct ActorPosition initialPosition;
-    struct ScreamerSprite sprite;
-    u8 graphics[0x1c];
-    u8 attackCollider[0x54];
-    u8 bodyCollider[6];
-    u16 colliderFlags;
-    u8 unknownC8[0x104 - 0xC8];
-    u16 blinkTimer;
-    u8 unknown106[0x11A - 0x106];
-    u16 contactFlags;
-    u8 unknown11C[76];
+    struct ContactPosition initialPosition;
+    struct ContactSwarmSprite sprite;
+    struct ContactSwarmGraphics graphics;
+    struct ContactCollider attackCollider, bodyCollider, frontCollider;
     u8 body[0x48];
     void *update;
     struct DisplaySequenceState sequence;

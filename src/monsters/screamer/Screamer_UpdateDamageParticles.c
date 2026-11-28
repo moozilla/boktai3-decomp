@@ -23,14 +23,14 @@ static inline u32 TestFlags(s16 mask, u32 *flags)
 {
     return *flags & mask;
 }
-static inline void Screamer_CopyPosition(struct ActorPosition *out, const struct ActorPosition *in)
+static inline void Screamer_CopyPosition(struct ContactPosition *out, const struct ContactPosition *in)
 {
     *out = *in;
 }
 s32 Screamer_UpdateDamageParticles(struct ScreamerState *p)
 {
     struct EnemyParticleParams parameters;
-    struct ActorPosition position;
+    struct ContactPosition position;
     s32 emitted;
     void *dataOwner;
     u16 *blink;
@@ -42,7 +42,7 @@ s32 Screamer_UpdateDamageParticles(struct ScreamerState *p)
         p->f200 = p->f204;
         Sound_PlaySong(0x13e);
         if (p->f1DC > 0) {
-            struct ContactCollider *body = (void *)p->bodyCollider;
+            struct ContactCollider *body = (void *)(void *)&p->bodyCollider;
             DamageNumberDisplay_Show(body, p->f1DC, 0, &body->position, &body->offset, 1);
             SceneHud_SetTimedState(p->f1F8, p->f1E4, p->f1E6, p->f1EC, body->costFlags == 4,
                                    p->f1F4);
@@ -50,7 +50,7 @@ s32 Screamer_UpdateDamageParticles(struct ScreamerState *p)
         if (p->f1E4 <= 0) {
             const u16 *randomTable;
             p->f1E0 = 1;
-            p->blinkTimer = 0;
+            p->bodyCollider.responseValue = 0;
 
             for (emitted = 0; emitted < 8; emitted++) {
                 dataOwner = gUnk_0203B000;
@@ -92,13 +92,13 @@ s32 Screamer_UpdateDamageParticles(struct ScreamerState *p)
         p->f1DC = 0;
     }
     if (p->f1DE > 0) {
-        AnimData_SelectPaletteBank(p->graphics, 0x192);
+        AnimData_SelectPaletteBank((void *)&p->graphics, 0x192);
 
         p->f1DE--;
     } else {
-        AnimData_SelectPaletteBank(p->graphics, 0x1C4);
+        AnimData_SelectPaletteBank((void *)&p->graphics, 0x1C4);
     }
-    blink = &p->blinkTimer;
+    blink = &p->bodyCollider.responseValue;
     if ((*blink) && (!p->f1E0)) {
         (*blink)--;
         if (((*blink) >> 2) & 1)

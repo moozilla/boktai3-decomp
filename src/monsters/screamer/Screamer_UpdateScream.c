@@ -27,9 +27,9 @@ s32 Screamer_UpdateScream(struct ScreamerState *p)
                 p->f1D6 = 1;
                 Sound_PlaySong(0x51A);
             }
-            p->colliderFlags &= ~4;
-            Collider_SetPosition(p->bodyCollider, &p->sprite.position, 0);
-            p->contactFlags |= 4;
+            p->bodyCollider.flags &= ~4;
+            Collider_SetPosition((void *)&p->bodyCollider, &p->sprite.position, 0);
+            p->frontCollider.flags |= 4;
             break;
         case 1:
             if (Screamer_StepScreamLoop(p, phase)) {
@@ -46,10 +46,10 @@ s32 Screamer_UpdateScream(struct ScreamerState *p)
                     }
                 }
             }
-            Collider_SetPosition(p->attackCollider, &p->sprite.position, 0);
-            Collider_Refresh(p->attackCollider);
-            p->colliderFlags &= ~4;
-            p->contactFlags |= 4;
+            Collider_SetPosition((void *)&p->attackCollider, &p->sprite.position, 0);
+            Collider_Refresh((void *)&p->attackCollider);
+            p->bodyCollider.flags &= ~4;
+            p->frontCollider.flags |= 4;
             break;
         case 2: {
             u32 playbackLimit;
@@ -66,9 +66,9 @@ s32 Screamer_UpdateScream(struct ScreamerState *p)
                 *timer = 0;
                 p->f1D2 = 0;
             }
-            p->colliderFlags &= ~4;
-            Collider_SetPosition(p->bodyCollider, &p->sprite.position, 0);
-            p->contactFlags |= 4;
+            p->bodyCollider.flags &= ~4;
+            Collider_SetPosition((void *)&p->bodyCollider, &p->sprite.position, 0);
+            p->frontCollider.flags |= 4;
             break;
         }
     }

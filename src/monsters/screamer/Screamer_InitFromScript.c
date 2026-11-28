@@ -9,7 +9,7 @@ void SceneBody_SetSprite(void *, void *);
 void TerrainOverlay_QueueAddActor(void *);
 s32 Screamer_InitFromScript(struct ScreamerState *p, void *resource)
 {
-    struct ActorPosition position;
+    struct ContactPosition position;
     void *graphics;
     void *sequences;
     s32 value;
@@ -96,12 +96,12 @@ s32 Screamer_InitFromScript(struct ScreamerState *p, void *resource)
     } else
         p->f1F4 = 0;
     p->f1F8 = resource;
-    graphics = p->graphics;
+    graphics = (void *)&p->graphics;
     AnimData_Load(graphics, 0x7E7D);
     Sprite_Init(&p->sprite, graphics, 1);
     p->sprite.position = p->initialPosition;
     AnimData_SelectPaletteBank(graphics, 0x1C4);
-    *(((u8 *)(&p->sprite)) + 7) = 3;
+    p->sprite.priority = 3;
     sequences = ScriptProc_Start(0x922E, 0x5184);
     p->f218 = sequences;
     if (!p->f1F6) {
@@ -120,7 +120,7 @@ s32 Screamer_InitFromScript(struct ScreamerState *p, void *resource)
     else
         p->sprite.position.z -= 16;
     if (p->f1EE) {
-        struct ActorPosition *offsetPosition;
+        struct ContactPosition *offsetPosition;
         offsetPosition = &position;
         *offsetPosition = p->sprite.position;
         if (!p->f1D8)

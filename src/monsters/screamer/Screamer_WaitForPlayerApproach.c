@@ -1,11 +1,11 @@
 #include "monsters/screamer/screamer_playback.h"
 s32 Screamer_UpdateScream(struct ScreamerState *);
-struct ActorPosition *Player_GetEffectivePosition(u32);
+struct ContactPosition *Player_GetEffectivePosition(u32);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 s32 Screamer_WaitForPlayerApproach(struct ScreamerState *p)
 {
-    struct ActorPosition *player;
-    struct ActorPosition *position;
+    struct ContactPosition *player;
+    struct ContactPosition *position;
     s32 dx, dz;
     p->sprite.flags &= ~1;
     player = Player_GetEffectivePosition(0);
@@ -18,9 +18,9 @@ s32 Screamer_WaitForPlayerApproach(struct ScreamerState *p)
         p->age = 0;
         p->f1D6 = 0;
     }
-    p->colliderFlags &= ~4;
-    Collider_SetPosition(p->bodyCollider, position, 0);
-    p->contactFlags |= 4;
+    p->bodyCollider.flags &= ~4;
+    Collider_SetPosition((void *)&p->bodyCollider, position, 0);
+    p->frontCollider.flags |= 4;
     Screamer_StepAnimation(p);
     return 0;
 }
