@@ -615,3 +615,4 @@ src/system/inventory/GameState_SortConsumableSlots.c	GameState_SortConsumableSlo
 src/system/inventory/sub_0822DF68.c	sub_0822DF68	natural	natural	0	
 src/system/inventory/sub_0822DFA0.c	sub_0822DFA0	natural	natural	0	
 src/system/inventory/Inventory_CanAssignEquipment.c	Inventory_CanAssignEquipment	natural	natural	0	
+src/system/save/Palette_GetStateBlendIndices.c	Palette_GetStateBlendIndices	contrived	natural	1	
