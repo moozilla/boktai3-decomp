@@ -1,4 +1,5 @@
 #include "ui/title/mode_menu.h"
+#include "gba/io_reg.h"
 #include "engine/video/palette_pulse.h"
 #include "system/game_state/game_state.h"
 #include "link/session/session_save.h"
@@ -230,12 +231,6 @@ void ModeMenu_Destroy(struct ModeMenu *p)
 
 s32 ModeMenu_Initialize(struct ModeMenu *p)
 {
-    struct AnimSpriteResource *res;
-    struct AnimSprite *w1;
-    struct AnimSprite *w2;
-    u32 *flags;
-    u16 **pal;
-    u16 *x3A;
     s32 i;
     s32 opt;
     void *gfx;
@@ -253,28 +248,22 @@ s32 ModeMenu_Initialize(struct ModeMenu *p)
         p->choiceCount = 2;
     if (p->selection > p->choiceCount)
         p->selection = p->choiceCount;
-    p->unlockKeys[0] = 0x200;
-    p->unlockKeys[1] = 0x200;
-    p->unlockKeys[2] = 0x200;
-    p->unlockKeys[3] = 0x200;
-    p->unlockKeys[4] = 0x200;
-    p->unlockKeys[5] = 0x100;
-    p->unlockKeys[6] = 0x100;
-    p->unlockKeys[7] = 0x100;
-    p->unlockKeys[8] = 0x100;
-    p->unlockKeys[9] = 0x100;
-    p->unlockKeys[10] = 0x200;
-    p->unlockKeys[11] = 0x100;
-    p->unlockKeys[12] = 0x200;
-    p->unlockKeys[13] = 0x100;
-    p->unlockKeys[14] = 4;
-    p->unlockKeys[15] = 8;
-    res = &p->resource;
-    w1 = &p->background;
-    w2 = &p->cursor;
-    flags = &p->cursor.flags;
-    pal = &p->cursor.palette;
-    x3A = &p->cursor.paletteBank;
+    p->unlockKeys[0] = L_BUTTON;
+    p->unlockKeys[1] = L_BUTTON;
+    p->unlockKeys[2] = L_BUTTON;
+    p->unlockKeys[3] = L_BUTTON;
+    p->unlockKeys[4] = L_BUTTON;
+    p->unlockKeys[5] = R_BUTTON;
+    p->unlockKeys[6] = R_BUTTON;
+    p->unlockKeys[7] = R_BUTTON;
+    p->unlockKeys[8] = R_BUTTON;
+    p->unlockKeys[9] = R_BUTTON;
+    p->unlockKeys[10] = L_BUTTON;
+    p->unlockKeys[11] = R_BUTTON;
+    p->unlockKeys[12] = L_BUTTON;
+    p->unlockKeys[13] = R_BUTTON;
+    p->unlockKeys[14] = SELECT_BUTTON;
+    p->unlockKeys[15] = START_BUTTON;
     for (i = 0; i < 16; i++) {
         p->keyHistory[i] = 0;
         p->keyFrames[i] = 0;
@@ -303,19 +292,17 @@ s32 ModeMenu_Initialize(struct ModeMenu *p)
     BgGfx_LoadTilemapSimple(3, 0, 0, 0, 0);
     CpuSet(((struct ModeMenuPalette *)ScriptProc_Start(0x92B3, 0x81B))->colors, gBgPaletteBuffer,
            0x100);
-    ResourceHeader_Relocate(res, ScriptProc_Start(0xCB05, 0x530D));
+    ResourceHeader_Relocate(&p->resource, ScriptProc_Start(0xCB05, 0x530D));
     if (gScreenTextParameters.mode)
-        AnimSprite_InitLinked(w1, res, 0xD9, 0x10, 0, 0, 0, 0);
+        AnimSprite_InitLinked(&p->background, &p->resource, 0xD9, 0x10, 0, 0, 0, 0);
     else
-        AnimSprite_InitLinked(w1, res, 0xD1, 0x10, 0, 0, 0, 0);
-    AnimSprite_InitLinked(w2, res, 0x47, 0x10, 0, 0, 0, 0);
-    *flags |= 1;
-    CpuSet(p->savedPalette = *pal, p->palette, 0x10);
-    *pal = p->palette;
-    {
-        u16 v = 0xE010;
-        *x3A = v;
-    }
+        AnimSprite_InitLinked(&p->background, &p->resource, 0xD1, 0x10, 0, 0, 0, 0);
+    AnimSprite_InitLinked(&p->cursor, &p->resource, 0x47, 0x10, 0, 0, 0, 0);
+    p->cursor.flags |= 1;
+    p->savedPalette = p->cursor.palette;
+    CpuSet(p->savedPalette, p->palette, 0x10);
+    p->cursor.palette = p->palette;
+    p->cursor.paletteBank = 0xE010;
     if (p->saveIndex >= 0) {
         Menu_EraseRect(1, 4, 0x1C, 9);
         if (gScreenTextParameters.mode != 0) {
