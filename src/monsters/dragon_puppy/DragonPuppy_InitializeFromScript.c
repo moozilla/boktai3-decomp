@@ -58,12 +58,10 @@ s32 DragonPuppy_InitializeFromScript(struct DragonPuppy *p, void *parent)
     else
         p->attackInterval = 60;
     if (Script_SeekToKeyword('h')) {
-        s32 v = Script_GetValue();
-        u8 *b = &p->deathVariant;
-        *b = v;
-        *b = ((s8)*b - 1) / 2;
-        if (*b > 3)
-            *b = 1;
+        p->deathVariant = Script_GetValue();
+        p->deathVariant = ((s8)p->deathVariant - 1) / 2;
+        if (p->deathVariant > 3)
+            p->deathVariant = 1;
     } else
         p->deathVariant = 1;
     if (Script_SeekToKeyword('r'))
@@ -120,14 +118,13 @@ s32 DragonPuppy_InitializeFromScript(struct DragonPuppy *p, void *parent)
     if (!p->initialDead)
         DragonPuppy_InitCollider(p);
     if (p->terrainEnabled && !p->initialDead) {
-        s32 cell = DragonPuppy_CellIndex(&p->sprite.position);
-        TerrainModifiers_RegisterCell(p->terrain, cell, 0, p->sprite.position.y >> 8, 0, 1);
+        TerrainModifiers_RegisterCell(p->terrain, (DragonPuppy_CellIndex(&p->sprite.position)), 0,
+                                      p->sprite.position.y >> 8, 0, 1);
     }
     if (p->showTerrainBody) {
-        u8 *body = p->terrainBody;
-        SceneBody_Init(body, p->context, &p->sprite.position, 0, 4, p);
-        SceneBody_SetSprite(body, &p->sprite);
-        TerrainOverlay_QueueAddActor(body);
+        SceneBody_Init(p->terrainBody, p->context, &p->sprite.position, 0, 4, p);
+        SceneBody_SetSprite(p->terrainBody, &p->sprite);
+        TerrainOverlay_QueueAddActor(p->terrainBody);
     }
     if (p->attackSchedule)
         DragonPuppy_ReadAttackSchedule(p);
