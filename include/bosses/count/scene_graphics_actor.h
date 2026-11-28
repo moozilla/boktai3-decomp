@@ -95,7 +95,10 @@ struct SceneGraphicsActor {
     u8 unk96[0xBC - 0x96];
     u32 hitStatRewardFlags; /* 0xBC: copied from the collider that last hit the actor. */
     u32 hitReactionFlags;   /* 0xC0 */
-    u8 unkC4[0xE2 - 0xC4];
+    u8 unkC4[0xC8 - 0xC4];
+    s32 playerDistances[1]; /* 0xC8: squared distance to each player, from playerPositions. */
+    u8 playerBearings[1];   /* 0xCC */
+    u8 unkCD[0xE2 - 0xCD];
     u8 contactHundredths; /* 0xE2 */
     u8 unkE3[0x10C - 0xE3];
     /* 0x10C: setup stores each player and then its position one slot later, so only

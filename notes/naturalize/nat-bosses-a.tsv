@@ -123,3 +123,4 @@ src/bosses/count/SceneActors_UpdateBlinkReaction.c	SceneActors_UpdateBlinkReacti
 src/bosses/count/SceneActors_RunUnpausedState.c	SceneActors_RunUnpausedState	natural	natural	0	
 src/bosses/count/SceneActors_TryApplyRequestedState.c	SceneActors_TryApplyRequestedState	contrived	natural	1	
 src/bosses/count/SceneActors_SpawnDestructionParticles.c	SceneActors_SpawnDestructionParticles	contrived	natural	1	
+src/bosses/count/Count_UpdateFrame.c	Count_UpdateFrame	contrived	minor	40	typed fields; kept two views (actor and owner) of the same object: the target scan reads through the second view
