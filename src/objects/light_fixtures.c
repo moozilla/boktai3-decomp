@@ -174,25 +174,26 @@ void LightFixture_Activate(struct PooledInteractableManager *manager,
 #undef POSITION
 
 /* Motion 1: steps along the route and moves the position by the step. */
-void LightFixture_UpdateRouteMotion(struct PooledInteractable *s)
+void LightFixture_UpdateRouteMotion(struct PooledInteractable *slot)
 {
-    void *q = &s->route;
-    if (s->delay != 0) {
-        s->delay--;
+    void *route = &slot->route;
+    if (slot->delay != 0) {
+        slot->delay--;
     } else {
-        struct ContactPosition *r = &s->drawable.position;
-        struct SceneExtent *op;
+        struct ContactPosition *position = &slot->drawable.position;
+        struct SceneExtent *step;
         struct {
-            u32 w;
-            struct SceneExtent o;
-        } m;
-        op = &m.o;
-        if ((u8)Route_GetMovementTowardCurrentPoint(q, r, op, &m.w, s->range, s->range, s->speed)) {
-            Route_AdvancePoint(q);
-            s->delay = Route_GetCurrentPointNodeId(q);
+            u32 distance;
+            struct SceneExtent step;
+        } movement;
+        step = &movement.step;
+        if ((u8)Route_GetMovementTowardCurrentPoint(route, position, step, &movement.distance,
+                                                    slot->range, slot->range, slot->speed)) {
+            Route_AdvancePoint(route);
+            slot->delay = Route_GetCurrentPointNodeId(route);
         }
-        r->x += op->x;
-        s->drawable.position.z += op->z;
+        position->x += step->x;
+        slot->drawable.position.z += step->z;
     }
 }
 
