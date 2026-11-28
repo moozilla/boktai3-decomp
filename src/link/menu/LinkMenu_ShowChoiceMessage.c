@@ -1,9 +1,6 @@
-#define LinkMenu_ConsumeStateEntry LinkSession_ConsumeStateEntry
-#define LinkMenu_SetState          LinkSession_SetState
-#define LinkMenu_CheckSession      LinkSession_CheckSessionReady
-#define LinkMenu_ResetSelection    LinkSession_BeginShutdown
 #include "global.h"
 #include "scene/areas/area_effect_link.h"
+#include "link/selection/link_selection_mode.h"
 u8 LinkSession_ConsumeStateEntry(void *);
 s32 LinkSession_CheckSessionReady(void *);
 void LinkSession_BeginShutdown(void *, void (*)(void));
@@ -24,48 +21,32 @@ static inline u16 SelectionAt(struct AreaEffectLinkState *p, s32 index)
         return 0xffff;
     return p->selection[index];
 }
-static inline u8 IsChoiceMode(u32 value, u32 mask)
-{
-    value &= mask;
-    if (value == 0x1000)
-        return 1;
-    return 0;
-}
 s32 LinkMenu_ShowChoiceMessage(struct AreaEffectLinkState *p)
 {
     u8 *session = p->sessionData;
-    s32 count, i, limit;
-    u32 mask;
+    s32 count, i;
+
     if (LinkSession_ConsumeStateEntry(p)) {
-        u8 *values;
-        s32 *window;
         Hud_RefreshSpriteFromScript();
         Hud_SetMode(5);
-        values = p->incomingChoices;
-        SlotText_CopySelectedString(values, session);
+        SlotText_CopySelectedString(p->incomingChoices, session);
         p->menuTextWindow = TextWindow_Create(1, 6, 28, 6);
-        window = &p->menuTextWindow;
-        TextWindow_SetScript(*window, p->choiceMessageScript);
-        TextWindow_Refresh(*window, 0);
-        TextWindow_SetString(*window, 1, values);
-        TextWindow_StartPlayback(*window);
+        TextWindow_SetScript(p->menuTextWindow, p->choiceMessageScript);
+        TextWindow_Refresh(p->menuTextWindow, 0);
+        TextWindow_SetString(p->menuTextWindow, 1, p->incomingChoices);
+        TextWindow_StartPlayback(p->menuTextWindow);
     }
     if (LinkSession_CheckSessionReady(p) < 0) {
         LinkSession_BeginShutdown(p, ScriptPanel_OpenTextWindow);
         return -1;
     }
     count = 0;
-    i = 0;
-    limit = p->participantCount;
-    if (i < limit) {
-        mask = 0x3c00;
-        do {
-            u16 value = SelectionAt(p, i);
-            if (IsChoiceMode(value, mask) && (value & 0xff) == 0x8b)
-                count++;
-        } while (++i < limit);
+    for (i = 0; i < p->participantCount; i++) {
+        u16 value = SelectionAt(p, i);
+        if (LinkSelection_IsReady(value, 0x3c00) && (value & 0xff) == 0x8b)
+            count++;
     }
-    if (count == limit)
+    if (count == p->participantCount)
         LinkSession_SetState(p, 11, SessionMenu_RunEventScript);
     else if (p->menuElapsed > 120)
         p->requestedMode = 0x108b;
