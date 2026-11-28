@@ -211,3 +211,4 @@ src/ui/dialogue/text_sequence.c	TextSequence_ReturnZero	natural	natural	0
 src/ui/dialogue/text_sequence.c	TextSequence_CreateFromScript	natural	natural	0	
 src/ui/dialogue/script_option_menu.c	OptionMenu_Update	contrived	natural	1	
 src/ui/dialogue/screen_message.c	ScreenMessage_Update	minor	natural	1	
+src/ui/dialogue/screen_message.c	ScreenMessage_Initialize	contrived	natural	3	
