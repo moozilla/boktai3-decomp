@@ -685,3 +685,4 @@ src/minigames/result_game/ResultMenu_CreateGraphics.c	ResultMenu_CreateGraphics	
 src/minigames/result_game/ResultMenu_SendCommand.c	ResultMenu_SendCommand	contrived	minor	16	counted do/while copy with src and count locals: a for loop adds a second count test
 src/minigames/result_game/ResultMenu_EnqueueMarker.c	ResultMenu_EnqueueMarker	contrived	natural	2	
 src/minigames/result_game/ResultGame_ShowPressMarker.c	ResultGame_ShowPressMarker	contrived	natural	3	
+src/minigames/result_game/ResultGame_HidePressMarker.c	ResultGame_HidePressMarker	contrived	natural	3	
