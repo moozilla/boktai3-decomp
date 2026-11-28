@@ -128,11 +128,6 @@ void Anim_RestartSequence(struct DisplaySequenceState *, void *, u32, u32, u32);
 
 s32 Div(s32, s32);
 
-static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceState *st)
-{
-    PlayerCue_StepSequence(sp, st);
-}
-
 // confidence=low: health-derived animation and recovery; actor identity remains tentative.
 
 void IceBoulder_UpdateDamageAnimation(struct RegionActor *p)
@@ -213,13 +208,6 @@ void IceBoulder_UpdateBehaviorAnimation(struct RegionActor *p)
     }
 }
 
-static inline u8 IceBoulder_TestFlagWord(u32 *flags, u32 bit)
-{
-    if (*flags & bit)
-        return 1;
-    return 0;
-}
-
 // confidence=low: updates animation, enters the death state on depleted health, otherwise restores ten health.
 
 void IceBoulder_UpdateHealthAnimation(struct RegionActor *p)
@@ -265,13 +253,6 @@ void IceBoulder_UnregisterTerrain(struct RegionActor *p)
         }
     }
 }
-
-union SparkPosition {
-    struct ContactPosition position;
-    struct {
-        u32 x : 16, y : 16, z : 16, pad : 16;
-    } packed;
-};
 
 // confidence=low: emits periodic sparkles around the origin while the transition animation plays.
 

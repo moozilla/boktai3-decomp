@@ -366,3 +366,13 @@ src/objects/ice_boulders.c	IceBoulder_CreateFromScript	contrived	minor	25	open-c
 src/objects/ice_boulders.c	IceBoulder_ApplyContactDamage	contrived	minor	8	Mask() word tests keep constant-first operand order; clamp ternary keeps the halfword store shape
 src/objects/ice_boulders.c	IceBoulder_UnregisterTerrain	contrived	contrived	12	mask, pointer and value locals through TestV: plain flag test/clear reloads the flag word in another order
 src/objects/ice_boulders.c	IceBoulder_UpdateBehaviorAnimation	minor	natural	2	
+src/objects/ice_boulders.c	IceBoulderPool_UpdateActors	contrived	contrived	20	cursor/callback/used pointer locals and slot helpers: struct loop reorders two loop-invariant loads (1 insn)
+src/objects/ice_boulders.c	IceBoulderPool_DestroyActors	contrived	contrived	8	mask/pointer locals for the terrain flag: plain test/clear reloads in another order
+src/objects/ice_boulders.c	IceBoulderPool_Allocate	minor	minor	3	Tst slot helper keeps the 0/1 test value
+src/objects/ice_boulders.c	IceBoulder_InitializeCollider	natural	natural	0	
+src/objects/ice_boulders.c	IceBoulderPool_OnStateNoOp	natural	natural	0	
+src/objects/ice_boulders.c	IceBoulder_UpdateHealthAnimation	natural	natural	0	
+src/objects/ice_boulders.c	IceBoulder_AnimateRemoval	natural	natural	0	
+src/objects/ice_boulders.c	IceBoulderPool_InitManager	natural	natural	0	
+src/objects/ice_boulders.c	IceBoulderPool_Create	natural	natural	0	
+src/objects/ice_boulders.c	IceBoulderPool_ResetInstance	natural	natural	0	
