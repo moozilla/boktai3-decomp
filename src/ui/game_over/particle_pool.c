@@ -67,16 +67,8 @@ void SpiralParticles_UpdateParticle(struct ParticlePool *pool, struct PoolPartic
 
 void ParticlePool_UpdateLinearParticle(struct ParticlePool *pool, struct PoolParticle *particle)
 {
-    {
-        u16 x = particle->tail.control.velocityX;
-        u16 y = particle->tail.position.axis.x;
-        particle->tail.position.axis.x = x + y;
-    }
-    {
-        u16 x = particle->tail.control.velocityZ;
-        u16 y = particle->tail.position.axis.z;
-        particle->tail.position.axis.z = x + y;
-    }
+    particle->tail.position.axis.x += particle->tail.control.velocityX;
+    particle->tail.position.axis.z += particle->tail.control.velocityZ;
     particle->tail.control.animationPhase++;
     if (particle->tail.control.animationPhase == 5) {
         switch (particle->tail.control.kind) {
