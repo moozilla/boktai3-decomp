@@ -1,11 +1,12 @@
 #include "global.h"
-extern u8 *gGameState;
+#include "system/game_state/game_state.h"
 s32 GameState_GetChallengeBestScore(u32 i)
 {
-    s32 r;
+    s32 result;
+
     if (i <= 11)
-        r = *(s32 *)(i * 4 + gGameState + 0x7c8);
+        result = *(i + gGameState->unk7C8);
     else
-        r = -1;
-    return r;
+        result = -1;
+    return result;
 }
