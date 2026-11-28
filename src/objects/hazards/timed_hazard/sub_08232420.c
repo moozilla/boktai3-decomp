@@ -1,54 +1,21 @@
 #include "engine/engine.h"
 #include "engine/ram.h"
+#include "objects/hazards/timed_hazard.h"
 #include "scene/collision/packed_contact_vector.h"
-#include "effects/particles/particle_emission_vector_layout.h"
-struct HazardSprite {
-    u32 flags;
-    u8 pad4[3], priority;
-    u8 pad8[0x2C - 8];
-};
-struct TimedHazard {
-    u8 id, entered, state, flags;
-    u8 pad4, unknown5;
-    u16 timer, delay;
-    u8 padA[2];
-    struct ParticleEmissionVector position;
-    u16 ground;
-    u16 health;
-    void *collider, *attack;
-    u8 resource[0x1C];
-    struct HazardSprite sprite;
-    u8 anim[0x10];
-    void *previous, *next;
-};
-struct TimedHazardPool {
-    u8 task[0x18];
-    void *animation;
-};
+#include "scene/motion/scene_actor_terrain.h"
+
 void *ColliderSpritePool_Create(u32, u32);
 void TimedHazard_OnDamageContact();
 void TimedHazard_OnAttackContact();
 void Collider_SetAttackPowerAndForce(void *, u32, u32);
-u32 TimedHazard_LinkInstance(struct TimedHazardPool *, struct TimedHazard *);
-u8 *TerrainModifiers_FindCellOverride(s32, s32);
-struct Cell {
-    u8 height, tile;
-    u16 flags;
-};
-static inline struct Cell *getCell(s32 index)
-{
-    u8 *dynamic = TerrainModifiers_FindCellOverride(index, 1);
-    if (dynamic)
-        return (struct Cell *)(dynamic + 4);
-    return (struct Cell *)(gTerrainMap->cells + 12 + index * 4);
-}
-s32 sub_08232420(s32 id, s32 flags, s32 delay, s32 health, struct ParticleEmissionVector *position)
+
+s32 sub_08232420(s32 id, s32 flags, s32 delay, s32 health, struct ContactPosition *position)
 {
     struct PackedContactVector size, offset;
     struct TimedHazard *p;
-    struct ParticleEmissionVector *pos;
+    struct ContactPosition *ground;
     void *resource;
-    if (!((struct TimedHazardPool *)gColliderSpritePool) && !ColliderSpritePool_Create(0xC0DB, 0))
+    if (!gColliderSpritePool && !ColliderSpritePool_Create(0xC0DB, 0))
         return -1;
     p = Heap_Alloc(sizeof(*p));
     if (!p)
@@ -58,36 +25,14 @@ s32 sub_08232420(s32 id, s32 flags, s32 delay, s32 health, struct ParticleEmissi
     p->flags = flags;
     p->delay = delay;
     p->position = *position;
-    {
-        struct ParticleEmissionVector *groundPos = &p->position;
-        s32 x = p->position.x >> 8, z = groundPos->z >> 8, index;
-        struct Cell *cell;
-        u32 slope;
-        s32 height;
-        pos = groundPos;
-        if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-            index = 0;
-        else
-            index = gTerrainMap->rows[z] + x;
-        cell = getCell(index);
-        slope = cell->height >> 4;
-        height = (cell->height & 15) << 8;
-        switch (slope) {
-            case 1:
-                height -= (u8)groundPos->z;
-                break;
-            case 2:
-                height -= (u8)groundPos->x;
-                break;
-        }
-        p->ground = height;
-    }
+    ground = &p->position;
+    p->ground = SceneActorTerrain_GetHeight(SceneActorTerrain_GetCellIndex(ground), ground);
     p->health = health;
     if (p->flags & 1) {
-        p->collider = Heap_Alloc(84);
+        p->collider = Heap_Alloc(sizeof(struct ContactCollider));
         if (!p->collider)
             return -1;
-        Memory_Clear(p->collider, 84);
+        Memory_Clear(p->collider, sizeof(struct ContactCollider));
         size.x = 90;
         size.y = 128;
         size.z = 90;
@@ -97,25 +42,25 @@ s32 sub_08232420(s32 id, s32 flags, s32 delay, s32 health, struct ParticleEmissi
         Collider_Init(p->collider, 0, 0x4001, 0, 16, &size, &offset);
         Collider_SetCallback(p->collider, TimedHazard_OnDamageContact, p);
         Collider_Refresh(p->collider);
-        Collider_SetPosition(p->collider, pos, 0);
+        Collider_SetPosition(p->collider, &p->position, 0);
     } else
         p->collider = 0;
     if (p->flags & 1) {
-        p->attack = Heap_Alloc(84);
+        p->attack = Heap_Alloc(sizeof(struct ContactCollider));
         if (!p->attack)
             return -1;
-        Memory_Clear(p->attack, 84);
-        ((struct ParticleEmissionVector *)&size)->x = 100;
-        ((struct ParticleEmissionVector *)&size)->y = 120;
-        ((struct ParticleEmissionVector *)&size)->z = 100;
-        ((struct ParticleEmissionVector *)&offset)->x = 0;
-        ((struct ParticleEmissionVector *)&offset)->y = 0;
-        ((struct ParticleEmissionVector *)&offset)->z = 0;
+        Memory_Clear(p->attack, sizeof(struct ContactCollider));
+        size.x = 100;
+        size.y = 120;
+        size.z = 100;
+        offset.x = 0;
+        offset.y = 0;
+        offset.z = 0;
         Collider_Init(p->attack, 0, 0x2001, 0, 16, &size, &offset);
         Collider_SetCallback(p->attack, TimedHazard_OnAttackContact, p);
         Collider_SetAttackPowerAndForce(p->attack, 50, 20);
         Collider_Refresh(p->attack);
-        Collider_SetPosition(p->attack, pos, 0);
+        Collider_SetPosition(p->attack, &p->position, 0);
     } else
         p->attack = 0;
     resource = p->resource;
@@ -123,7 +68,7 @@ s32 sub_08232420(s32 id, s32 flags, s32 delay, s32 health, struct ParticleEmissi
         return -1;
     Sprite_Init(&p->sprite, resource, 1);
     p->sprite.priority = 2;
-    Anim_SetSequence(p->anim, ((struct TimedHazardPool *)gColliderSpritePool)->animation, 1, 0, 0);
+    Anim_SetSequence(&p->anim, ((struct TimedHazardPool *)gColliderSpritePool)->animation, 1, 0, 0);
     AnimData_SelectPaletteBank(resource, p->id + 0x153);
     if (p->delay == 0) {
         p->state = 1;
@@ -134,14 +79,11 @@ s32 sub_08232420(s32 id, s32 flags, s32 delay, s32 health, struct ParticleEmissi
         p->timer = 0;
         p->entered = 1;
     }
-    p->unknown5 = 0;
+    p->remove = 0;
     p->previous = 0;
     p->next = 0;
-    return TimedHazard_LinkInstance(((struct TimedHazardPool *)gColliderSpritePool), p);
+    return TimedHazard_LinkInstance((struct TimedHazardPool *)gColliderSpritePool, p);
 }
-int Script_GetKeywordValue(int, int);
-int Script_SeekToKeyword(int);
-int Script_GetValue(void);
 /* Script command handler that follows sub_08232420 inside its ROM symbol (no label of its own). */
 // Provisional name: TimedHazard_CreateFromScript (hidden function, confidence low)
 s32 sub_0823269C(void)
@@ -161,5 +103,5 @@ s32 sub_0823269C(void)
         position.y = 0;
         position.z = 0;
     }
-    return sub_08232420(id, flags, delay, health, (struct ParticleEmissionVector *)&position);
+    return sub_08232420(id, flags, delay, health, (struct ContactPosition *)&position);
 }
