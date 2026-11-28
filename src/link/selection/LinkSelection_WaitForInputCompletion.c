@@ -1,4 +1,5 @@
 #include "global.h"
+#include "gba/io_reg.h"
 #include "scene/areas/area_effect_link.h"
 #include "engine/ram.h"
 u8 LinkSession_ConsumeStateEntry(void *);
@@ -20,33 +21,21 @@ static inline u16 Slot(struct AreaEffectLinkState *p, s32 i)
         return -1;
     return p->selection[i];
 }
-static inline u8 ModeLeave(u32 input, u32 mask)
+static inline u8 ModeLeave(u32 value)
 {
-    u32 value = input;
-    u32 maskCopy;
-    maskCopy = mask;
-    value &= maskCopy;
-    if (value == 0x3400)
+    if ((value & 0x3c00) == 0x3400)
         return 1;
     return 0;
 }
-static inline u8 ModeInput(u32 input, u32 mask)
+static inline u8 ModeInput(u32 value)
 {
-    u32 value = input;
-    u32 maskCopy;
-    maskCopy = mask;
-    value &= maskCopy;
-    if (value == 0xc00)
+    if ((value & 0x3c00) == 0xc00)
         return 1;
     return 0;
 }
-static inline u8 ModeCancel(u32 input, u32 mask)
+static inline u8 ModeCancel(u32 value)
 {
-    u32 value = input;
-    u32 maskCopy;
-    maskCopy = mask;
-    value &= maskCopy;
-    if (value == 0x2800)
+    if ((value & 0x3c00) == 0x2800)
         return 1;
     return 0;
 }
@@ -67,42 +56,33 @@ s32 LinkSelection_WaitForInputCompletion(struct AreaEffectLinkState *p)
         StageIconDisplay_Create(1, 0, 0, p);
     }
     if (LinkSession_CheckSessionReady(p) < 0) {
-        goto shutdown;
+        LinkSession_BeginShutdown(p, ScriptPanel_OpenTextWindow);
+        return -1;
     }
-    keys = *(vu16 *)0x04000130;
+    keys = REG_KEYINPUT;
     keys &= 0xfff3;
     ready = 0;
-    flags = ready;
-    i = 0;
-    if (ready < p->participantCount) {
-        do {
-            u16 value = Slot(p, i);
-            if (ModeLeave(value, 0x3c00)) {
-                LinkSelection_RecordSlotState(p, value, i, &flags, 0);
-                ready++;
-            } else if (ModeInput(value, 0x3c00) || ModeCancel(value, 0x3c00)) {
-                LinkSelection_RecordSlotState(p, value, i, &flags, 0);
-                p->menuElapsed = 0;
-            } else if (value == 0xffff) {
-                goto shutdown;
-            }
-        } while (++i < p->participantCount);
+    flags = 0;
+    for (i = 0; i < p->participantCount; ++i) {
+        u16 value = Slot(p, i);
+        if (ModeLeave(value)) {
+            LinkSelection_RecordSlotState(p, value, i, &flags, 0);
+            ready++;
+        } else if (ModeInput(value) || ModeCancel(value)) {
+            LinkSelection_RecordSlotState(p, value, i, &flags, 0);
+            p->menuElapsed = 0;
+        } else if (value == 0xffff) {
+            LinkSession_BeginShutdown(p, ScriptPanel_OpenTextWindow);
+            return -1;
+        }
     }
     if (p->menuElapsed > 60 && ready >= p->participantCount) {
         LinkSession_SetState(p, 19, LinkSelection_WaitForReadyParticipants);
-        goto end;
+    } else {
+        if (!p->menuElapsed)
+            LinkSelection_AdvanceBitExchange(p, flags, &keys);
+        p->requestedMode = PackKeys(keys, 0x3400);
+        c->frames++;
     }
-    goto waiting;
-shutdown:
-    LinkSession_BeginShutdown(p, ScriptPanel_OpenTextWindow);
-    return -1;
-waiting:
-    if (!p->menuElapsed) {
-        LinkSelection_AdvanceBitExchange(p, flags, &keys);
-    }
-
-    p->requestedMode = PackKeys(keys, 0x3400);
-    c->frames++;
-end:
     return 0;
 }
