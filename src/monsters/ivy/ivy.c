@@ -69,7 +69,6 @@ void Ivy_OnSecondaryContact(void)
 
 void SceneActorAnimation_SelectDirectionalFlags(struct RoomActor *, s32);
 
-// scope: put Ivy_UpdateActiveState begin
 void Ivy_UpdateActiveState(struct ChaseActor *actor)
 {
     if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
@@ -80,13 +79,11 @@ void Ivy_UpdateActiveState(struct ChaseActor *actor)
     }
     SceneActorAnimation_SelectDirectionalFlags(&actor->base, 0xE);
 }
-// scope: put Ivy_UpdateActiveState end
 
 /* Tentative name based on the observed state transition or initialization. */
 
 void Sound_PlaySong(u32);
 
-// scope: put SceneActorReaction_PlayHiddenCue begin
 void SceneActorReaction_PlayHiddenCue(struct ChaseActor *actor)
 {
     if (SceneActorReaction_TakePrepared(actor)) {
@@ -99,7 +96,6 @@ void SceneActorReaction_PlayHiddenCue(struct ChaseActor *actor)
     if (actor->base.restart)
         actor->base.stepDone = 1;
 }
-// scope: put SceneActorReaction_PlayHiddenCue end
 
 /* Ivy_UpdateInactiveState: Empty Ivy state handler; inactive role is tentative */
 
@@ -109,7 +105,6 @@ void Ivy_UpdateInactiveState(void)
 
 /* Ivy_EnterDisabledState: Consumes the entry flag and switches drawable and collision flags to directional animation 20; disabled role tentative */
 
-// scope: put Ivy_EnterDisabledState begin
 void Ivy_EnterDisabledState(struct ChaseActor *actor)
 {
     if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
@@ -120,7 +115,6 @@ void Ivy_EnterDisabledState(struct ChaseActor *actor)
         SceneActorAnimation_SelectDirectionalFlags(&actor->base, 20);
     }
 }
-// scope: put Ivy_EnterDisabledState end
 
 struct Player;
 
@@ -246,7 +240,6 @@ void Ivy_UpdateGrabAttack(struct ChaseActor *actor)
 
 void Ivy_UpdateActiveState(struct ChaseActor *actor);
 
-// scope: put SceneActorReaction_FinishAnimation17 begin
 void SceneActorReaction_FinishAnimation17(struct ChaseActor *actor)
 {
     if (SceneActorReaction_TakePrepared(actor)) {
@@ -260,7 +253,6 @@ void SceneActorReaction_FinishAnimation17(struct ChaseActor *actor)
         SceneActorChase_SetBehavior(actor, 2);
     }
 }
-// scope: put SceneActorReaction_FinishAnimation17 end
 
 s32 Div(s32, s32);
 
@@ -365,7 +357,6 @@ static inline void ReportDrain(struct ChaseActor *victim)
  * actor's cell once its hold time runs out or it stops struggling, otherwise kept in place.
  */
 
-// scope: put Ivy_UpdateHold begin
 /* How far the player's byte counter at 0x4F4 has moved since the hold began. */
 static inline s32 Ivy_TicksHeld(struct Ivy *context)
 {
@@ -463,13 +454,11 @@ void Ivy_UpdateHold(struct ChaseActor *actor, s32 frame)
     if (frame > 0xB4)
         actor->base.stepDone = 1;
 }
-// scope: put Ivy_UpdateHold end
 
 /* Ivy release start (tentative): on entry disables the main collider, plays directional
  * animation 0x15 and puts a held player back on the centre of the actor's terrain cell; then
  * clears context flag 2. */
 
-// scope: put Ivy_BeginRelease begin
 void Ivy_BeginRelease(struct ChaseActor *actor)
 {
     struct Ivy *context = actor->base.context;
@@ -494,7 +483,6 @@ void Ivy_BeginRelease(struct ChaseActor *actor)
     if (actor->base.restart)
         actor->base.stepDone = 1;
 }
-// scope: put Ivy_BeginRelease end
 
 struct IvyTransitionActor {
     u8 unknown0[0x59];
@@ -579,7 +567,6 @@ static inline void Ivy_ClearHalf(u8 *p, u32 offset, u32 bits)
     field->value &= mask;
 }
 
-// scope: put SceneActorControl_UpdateAnimationTransition begin
 void SceneActorControl_UpdateAnimationTransition(struct ChaseActor *actor, s32 frame)
 {
     struct DisplaySequenceState *animation =
@@ -606,7 +593,6 @@ void SceneActorControl_UpdateAnimationTransition(struct ChaseActor *actor, s32 f
         actor->base.body.direction = actor->base.tracking.heading;
     }
 }
-// scope: put SceneActorControl_UpdateAnimationTransition end
 
 void Ivy_UpdateRestartFlags(struct ChaseActor *actor)
 {
@@ -1042,7 +1028,6 @@ void SceneActorControl_WaitForTarget(struct ChaseActor *actor)
 
 #define SceneActorControl_UpdateDirectionalIdle Ivy_UpdateActiveState
 
-// scope: put SceneActorControl_UpdateTargetApproachPhase begin
 void SceneActorControl_UpdateTargetApproachPhase(struct ChaseActor *actor)
 {
     struct Ivy *state = actor->base.context;
@@ -1060,7 +1045,6 @@ void SceneActorControl_UpdateTargetApproachPhase(struct ChaseActor *actor)
     }
     actor->base.counter2AC++;
 }
-// scope: put SceneActorControl_UpdateTargetApproachPhase end
 
 /* Arm the vine's hold: Ivy_UpdateHold takes over with state 0x25. The
    arguments, the early address and the local constants give the ROM's
@@ -1174,7 +1158,6 @@ void Ivy_InitControlPresets(struct ChaseActor *actor)
 
 void SceneActorControl_UpdateAnimationTransition(struct ChaseActor *actor, s32 frame);
 
-// scope: put SceneActorControl_BeginSoundTransition begin
 s32 SceneActorControl_BeginSoundTransition(struct ChaseActor *actor)
 {
     s32 started;
@@ -1193,13 +1176,11 @@ s32 SceneActorControl_BeginSoundTransition(struct ChaseActor *actor)
     }
     return started;
 }
-// scope: put SceneActorControl_BeginSoundTransition end
 
 /* Ivy release (tentative): once per capture (context flag 1), and when context flag 2 says the
  * player is held, puts the player back on the centre of the actor's terrain cell facing the
  * actor's quadrant (cue 0xE6); then returns the actor to idle with both colliders disabled. */
 
-// scope: put Ivy_ReleaseCapturedPlayer begin
 void Ivy_ReleaseCapturedPlayer(struct ChaseActor *actor)
 {
     if (Ivy_TestCaptureFlags(actor->base.context, IVY_CAPTURE_RELEASED))
@@ -1226,7 +1207,6 @@ void Ivy_ReleaseCapturedPlayer(struct ChaseActor *actor)
     ((struct Ivy *)actor->base.context)->captureFlags |= IVY_CAPTURE_RELEASED;
     actor->base.health = 0;
 }
-// scope: put Ivy_ReleaseCapturedPlayer end
 
 void SceneActorRegistry_SendToCategory(s32, s16 *);
 
@@ -1294,13 +1274,11 @@ void Ivy_InitializeContactColliders(struct ChaseActor *actor)
                                    actor);
 }
 
-// scope: put SceneActor_BeginReaction22 begin
 void SceneActor_BeginReaction22(struct ChaseActor *actor)
 {
     SceneActorTerrain_EnterState(actor, 0, 0, 0);
     SceneActorChase_SetControl(actor, Ivy_UpdateActiveState, 0x22);
 }
-// scope: put SceneActor_BeginReaction22 end
 
 void *SceneActor_FindNearbyPlayerTarget(struct ChaseActor *actor)
 {
@@ -1502,7 +1480,6 @@ void Collider_Remove(void *);
 
 void SceneActorRegistry_UnlinkActor(void *);
 
-// scope: put Ivy_Destroy begin
 u32 Ivy_Destroy(struct ChaseActor *actor)
 {
     u8 *drawable = actor->base.drawable;
@@ -1524,7 +1501,6 @@ u32 Ivy_Destroy(struct ChaseActor *actor)
     SceneActorRegistry_UnlinkActor(actor);
     return 0;
 }
-// scope: put Ivy_Destroy end
 
 void Ivy_InitProfileId(struct ChaseActor *actor);
 
