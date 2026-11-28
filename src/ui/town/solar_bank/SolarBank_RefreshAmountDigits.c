@@ -8,11 +8,11 @@ void SolarBank_RefreshAmountDigits(struct SolarBankPanel *panel)
     s32 digits[4];
     s32 value, remaining, i;
     s32 *digit;
-    struct SolarBankDigit *anim;
+    struct AnimSprite *anim;
     void *data;
     value = panel->transferAmount;
     if (value == 0) {
-        data = panel->animData;
+        data = &panel->animData;
         for (i = 0; i < 4; i++)
             digits[i] = 0;
     } else {
@@ -22,7 +22,7 @@ void SolarBank_RefreshAmountDigits(struct SolarBankPanel *panel)
         value -= digits[1] * 100;
         digits[2] = Div(value, 10);
         digits[3] = value - digits[2] * 10;
-        data = panel->animData;
+        data = &panel->animData;
     }
     digit = digits;
     anim = panel->transferDigits;

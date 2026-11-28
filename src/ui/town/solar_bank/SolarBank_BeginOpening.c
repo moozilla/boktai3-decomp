@@ -14,7 +14,7 @@ void SolarBank_BeginOpening(struct SolarBankPanel *panel)
     BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0);
     SpriteMenu_HideAll(panel);
     panel->label.flags &= ~1;
-    Anim_SetKeyframes(&panel->label, panel->labelData, 0, 2, 0);
+    Anim_SetKeyframes(&panel->label, &panel->labelData, 0, 2, 0);
     panel->controls[0].flags &= ~1;
     panel->controls[1].flags &= ~1;
     MessageWindow_ShowMessage(0);

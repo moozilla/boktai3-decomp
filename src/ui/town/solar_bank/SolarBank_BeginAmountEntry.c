@@ -21,9 +21,9 @@ void SolarBank_BeginAmountEntry(struct SolarBankPanel *panel)
     BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0);
     SpriteMenu_HideAll(panel);
     panel->label.flags &= ~1;
-    Anim_SetKeyframes(&panel->label, panel->labelData, 1, 1, 0);
+    Anim_SetKeyframes(&panel->label, &panel->labelData, 1, 1, 0);
     FIELD(u32, 0x1E0) &= ~1;
-    Anim_LoadKeyframe(panel->unk1D8, panel->labelData, 0x12, 1);
+    Anim_LoadKeyframe(&panel->percentSign, &panel->labelData, 0x12, 1);
     panel->balance = *(u32 *)(gGameState + 0x77C);
     panel->transferAmount = *(s16 *)(gGameState + 0x7B0);
     b = &panel->transferDigits[0].flags;
@@ -35,7 +35,7 @@ void SolarBank_BeginAmountEntry(struct SolarBankPanel *panel)
         a += 24;
     }
     SolarBank_RefreshAmountDigits(panel);
-    FIELD(struct SolarBankDigit, 0x538).flags &= ~1;
+    FIELD(struct AnimSprite, 0x538).flags &= ~1;
     a = &FIELD(u32, 0x658);
     for (i = 1; i >= 0; i--) {
         *a &= ~1;
@@ -44,8 +44,8 @@ void SolarBank_BeginAmountEntry(struct SolarBankPanel *panel)
     zero = 0;
     AnimData_SelectPaletteBank(panel->indicators, 0x1AE);
     AnimData_SelectPaletteBank(&panel->indicators[1], 0x1B1);
-    FIELD(struct SolarBankDigit, 0x598).flags &= ~1;
-    FIELD(struct SolarBankDigit, 0x5F8).flags &= ~1;
+    FIELD(struct AnimSprite, 0x598).flags &= ~1;
+    FIELD(struct AnimSprite, 0x5F8).flags &= ~1;
     MessageWindow_ShowMessage(2);
     FIELD(u16, 0x702) = zero;
     FIELD(u16, 0x704) = zero;

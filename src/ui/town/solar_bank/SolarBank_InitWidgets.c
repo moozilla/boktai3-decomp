@@ -1,28 +1,7 @@
+#include "ui/town/solar_bank_panel.h"
 #include "ui/widgets/scene_input.h"
 #include "system/clock/sun_clock.h"
 #include "bosses/vanargand/vanargand_parts.h"
-
-struct BankAnim {
-    u8 b[0x1C];
-};
-struct SolarBankDisplay {
-    u8 pad0[0x18];
-    struct AnimSpriteResource bankResource;
-    struct AnimSpriteResource commonResource;
-    struct AnimSprite label;
-    struct AnimSprite prompt;
-    struct AnimSprite rateDigits[2];
-    struct AnimSprite percentSign;
-    struct AnimSprite balanceDigits[4];
-    struct AnimSprite transferDigits[4];
-    struct AnimSprite transferLabel;
-    struct AnimSprite firstMarker;
-    struct AnimSprite secondMarker;
-    struct DisplaySequenceSprite sprites[2];
-    struct BankAnim anims[2];
-    u8 unknown6E8[0x28];
-    u16 promptPalette[16];
-};
 
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
@@ -32,7 +11,7 @@ static inline void SolarBank_SetRate(s16 *rate, s32 level)
     *rate = 0x41 + level;
 }
 
-void SolarBank_InitWidgets(struct SolarBankDisplay *p)
+void SolarBank_InitWidgets(struct SolarBankPanel *p)
 {
     struct AnimSpritePlayback labelPlayback;
     u8 labelPriority;
@@ -44,19 +23,19 @@ void SolarBank_InitWidgets(struct SolarBankDisplay *p)
     s32 tens;
     s32 i;
     source = ScriptProc_Start(0xCB05, 0x32BA);
-    p->bankResource = *source;
-    ResourceHeader_Relocate(&p->bankResource, source);
+    p->labelData = *source;
+    ResourceHeader_Relocate(&p->labelData, source);
     source = ScriptProc_Start(0xCB05, 0x530D);
-    p->commonResource = *source;
-    ResourceHeader_Relocate(&p->commonResource, source);
+    p->animData = *source;
+    ResourceHeader_Relocate(&p->animData, source);
     labelPlayback.priority = 0;
     labelPlayback.mode = 0;
     pos.x = 0;
     pos.y = 0;
     pos.z = 0;
     labelPriority = labelPlayback.priority;
-    AnimSprite_InitLinked(&p->label, &p->bankResource, 0, 0x30, labelPriority, labelPlayback.mode, 60,
-                      &pos);
+    AnimSprite_InitLinked(&p->label, &p->labelData, 0, 0x30, labelPriority, labelPlayback.mode, 60,
+                          &pos);
     if (Script_SeekToKeyword('R')) {
         s32 rate = Script_GetValue();
         if (rate < 0)
@@ -71,24 +50,23 @@ void SolarBank_InitWidgets(struct SolarBankDisplay *p)
     percent = ((100 * gGameState->solarBankRate) >> 6) - 100;
     tens = Div(percent, 10);
     percent -= tens * 10;
-    AnimSprite_InitLinked(&p->rateDigits[0], &p->bankResource, (u16)(tens + 8), 0x30, 0, 0, 0x3C, &pos);
+    AnimSprite_InitLinked(&p->controls[0], &p->labelData, (u16)(tens + 8), 0x30, 0, 0, 0x3C, &pos);
     pos.x += 8;
-    AnimSprite_InitLinked(&p->rateDigits[1], &p->bankResource, (u16)(percent + 8), 0x30, 0, 0, 0x3C,
-                      &pos);
+    AnimSprite_InitLinked(&p->controls[1], &p->labelData, (u16)(percent + 8), 0x30, 0, 0, 0x3C,
+                          &pos);
     pos.x = 0;
-    AnimSprite_InitLinked(&p->percentSign, &p->bankResource, 0x12, 0x30, 0, 0, 0x3C, &pos);
+    AnimSprite_InitLinked(&p->percentSign, &p->labelData, 0x12, 0x30, 0, 0, 0x3C, &pos);
     pos.x = -8;
     pos.y = -8;
-    AnimSprite_InitLinked(&p->prompt, &p->commonResource, 0x4B, 0x10, 0, 0, 0x3C, &pos);
+    AnimSprite_InitLinked(&p->prompt, &p->animData, 0x4B, 0x10, 0, 0, 0x3C, &pos);
     p->prompt.palette = p->promptPalette;
     pos.x = 0x28;
     pos.y = 0x28;
-    bankResource = &p->bankResource;
-    commonResource = &p->commonResource;
+    bankResource = &p->labelData;
+    commonResource = &p->animData;
     for (i = 0; i < 4; i++) {
         struct ContactPosition *position = &pos;
-        struct AnimSprite *animSprite = &p->balanceDigits[i];
-        AnimSprite_InitLinked(animSprite, commonResource, 0, 0x30, 0, 0, 0x3C, position);
+        AnimSprite_InitLinked(&p->balanceDigits[i], commonResource, 0, 0x30, 0, 0, 0x3C, position);
         pos.x += 8;
     }
 
@@ -96,20 +74,19 @@ void SolarBank_InitWidgets(struct SolarBankDisplay *p)
     pos.y = 0x28;
     for (i = 0; i < 4; i++) {
         struct ContactPosition *position = &pos;
-        struct AnimSprite *animSprite = &p->transferDigits[i];
-        AnimSprite_InitLinked(animSprite, commonResource, 0, 0x30, 0, 0, 0x3C, position);
+        AnimSprite_InitLinked(&p->transferDigits[i], commonResource, 0, 0x30, 0, 0, 0x3C, position);
         pos.x += 8;
     }
 
     for (i = 0; i < 2; i++) {
-        AnimData_Load(&p->anims[i], 0xA47C);
-        Sprite_Init(&p->sprites[i], &p->anims[i], 0);
+        AnimData_Load(&p->indicators[i], 0xA47C);
+        Sprite_Init(&p->sprites[i], &p->indicators[i], 0);
         p->sprites[i].priority = 0;
         p->sprites[i].flags = 0x30;
         if (i == 0)
             p->sprites[0].flags |= 4;
         if (i == 1)
-            AnimData_SelectPaletteBank(&p->anims[1], 0x1B1);
+            AnimData_SelectPaletteBank(&p->indicators[1], 0x1B1);
         p->sprites[i].position.x = 0x38 + (i * 0x60);
         p->sprites[i].position.y = 0x58;
         p->sprites[i].position.z = 0;

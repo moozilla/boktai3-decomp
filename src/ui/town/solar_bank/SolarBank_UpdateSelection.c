@@ -26,11 +26,11 @@ void SolarBank_UpdateSelection(struct SolarBankPanel *panel)
             Sound_PlaySong(0xdc);
             panel->selection = 1 - panel->selection;
             if (panel->selection) {
-                Anim_LoadKeyframe(&panel->prompt, panel->animData, 0x4b, 1);
+                Anim_LoadKeyframe(&panel->prompt, &panel->animData, 0x4b, 1);
             } else {
-                Anim_LoadKeyframe(&panel->prompt, panel->animData, 0x4c, 1);
+                Anim_LoadKeyframe(&panel->prompt, &panel->animData, 0x4c, 1);
             }
         }
     }
-    Anim_Step(&panel->label, panel->labelData);
+    Anim_Step(&panel->label, &panel->labelData);
 }

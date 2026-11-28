@@ -17,7 +17,7 @@ void SolarBank_BeginSelection(struct SolarBankPanel *panel)
     panel->controls[1].flags &= ~1;
     panel->selection = 1;
     panel->prompt.flags &= ~1;
-    Anim_LoadKeyframe(&panel->prompt, panel->animData, 0x4b, 1);
+    Anim_LoadKeyframe(&panel->prompt, &panel->animData, 0x4b, 1);
     MessageWindow_ShowMessage(1);
     SolarBank_SetState(panel, SolarBank_UpdateSelection);
 }

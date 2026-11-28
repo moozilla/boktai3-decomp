@@ -185,7 +185,7 @@ blink:
     if (panel->blinkPhase == 0) {
         AnimData_SelectPaletteBank(&panel->indicators[0], 0x1AE);
         AnimData_SelectPaletteBank(&panel->indicators[1], 0x1B1);
-        Anim_LoadKeyframe(panel->unk1D8, panel->labelData, 0x12, 1);
+        Anim_LoadKeyframe(&panel->percentSign, &panel->labelData, 0x12, 1);
     } else {
         switch ((panel->blinkPhase & 0x1f) >> 3) {
             case 1:
@@ -201,9 +201,9 @@ blink:
         }
         AnimData_SelectPaletteBank(&panel->indicators[0], 0x1AE + v);
         AnimData_SelectPaletteBank(&panel->indicators[1], 0x1B1 + v);
-        Anim_LoadKeyframe(panel->unk1D8, panel->labelData, panel->transferDirection * 3 + 0x13 + v,
-                          1);
+        Anim_LoadKeyframe(&panel->percentSign, &panel->labelData,
+                          panel->transferDirection * 3 + 0x13 + v, 1);
     }
 step:
-    Anim_Step(&panel->label, panel->labelData);
+    Anim_Step(&panel->label, &panel->labelData);
 }
