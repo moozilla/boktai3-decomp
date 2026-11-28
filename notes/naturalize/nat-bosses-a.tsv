@@ -148,3 +148,4 @@ src/bosses/count/ContactActor_UpdateTracking.c	ContactActor_UpdateTracking	contr
 src/bosses/count/ContactActor_UpdateRoaming.c	ContactActor_UpdateRoaming	contrived	minor	70	keeps local vector helpers; the random draws need three different shared/local accessors to keep register choice (table r2 vs r4)
 src/bosses/count/ContactActor_UpdateRandomWalk.c	ContactActor_UpdateRandomWalk	contrived	minor	25	keeps delta write/read pointer blocks: direct field writes differ (stack address caching)
 src/bosses/count/ContactActor_UpdateBurst.c	ContactActor_UpdateBurst	contrived	minor	22	keeps delta write pointer, position/origin pointers and one position alias in the heading call
+src/bosses/count/ContactActor_UpdateReaction.c	ContactActor_UpdateReaction	contrived	contrived	30	speed/direction/write temporaries and k2 palette constant stay: shared charge offset narrows direction and inline forms differ
