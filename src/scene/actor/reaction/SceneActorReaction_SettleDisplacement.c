@@ -106,7 +106,8 @@ void SceneActorReaction_SettleDisplacement(struct ChaseActor *actor)
         SceneActorReaction_ResetRouteControl(actor, &group->common.control);
     }
     if (!actor->base.drawableKind) {
-        struct DisplaySequenceState *status = &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence;
+        struct DisplaySequenceState *status =
+            &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence;
         if (((status->index == 2) && (status->elapsed == (status->duration != 0))) &&
             (status->duration != 1))
             status->elapsed = 0;
@@ -138,7 +139,8 @@ void SceneActorReaction_SettleDisplacement(struct ChaseActor *actor)
     if (Reaction_MotionStopped(x, z) && (counter <= 0)) {
         struct ContactCollider *collider;
         actor->base.attachmentTimer = 0;
-        actor->base.reactionDirection = (DamageNumber_ProjectScale(actor->base.body.direction) + 7) & 7;
+        actor->base.reactionDirection =
+            (DamageNumber_ProjectScale(actor->base.body.direction) + 7) & 7;
         SceneActorChase_SetState(actor, 3, 1, 0);
         SceneActorChase_SetControl(actor, group->animationEndControl, 8);
         SceneActorChase_ClearWordFlags(&actor->base.statusFlags, 2);
@@ -147,9 +149,9 @@ void SceneActorReaction_SettleDisplacement(struct ChaseActor *actor)
         actor->base.body.direction = ((actor->base.body.direction + 32) >> 6) << 6;
         collider = &actor->base.colliderA;
         if (Recovery_ActorCollisionFlags(actor, 0x40)) {
-            collider->flags &= 0xFEFF;
+            collider->flags &= ~0x100;
         } else if (SceneActorChase_QueryMotionFlagComponent(actor, 0x2016)) {
-            collider->flags &= 0xFEFF;
+            collider->flags &= ~0x100;
         } else {
             collider->flags |= 0x100;
         }
