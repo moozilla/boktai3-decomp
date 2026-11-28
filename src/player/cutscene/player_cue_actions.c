@@ -2064,10 +2064,7 @@ void PlayerCue_UpdateSideRecoil(struct Player *player)
     PlayerCue_StepSequence((struct ContactSwarmSprite *)&player->secondaryDrawFlags,
                            &player->cueCollider.sequence);
     if (player->recoilSpeed) {
-        u8 *direction;
-        u32 angle;
-        direction = &player->facing;
-        angle = ((*direction + 5) & 7) << 5;
+        u32 angle = ((player->facing + 5) & 7) << 5;
         player->velocityX = -TruncateQ12(gUnk_086149C4[(angle + 64) & 255] * player->recoilSpeed);
         player->velocityZ = -TruncateQ12(gUnk_086149C4[angle] * player->recoilSpeed);
         player->recoilSpeed = (player->recoilSpeed * 3) >> 2;
