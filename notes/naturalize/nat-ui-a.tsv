@@ -115,3 +115,4 @@ src/ui/books/forging_book/sub_08211860.c	sub_08211860	contrived	natural	1
 src/ui/books/forging_book/ForgingBook_IsWeaponDiscovered.c	ForgingBook_IsWeaponDiscovered	contrived	natural	1	
 src/ui/books/forging_book/ForgingBook_IsItemDiscoveryRecorded.c	ForgingBook_IsItemDiscoveryRecorded	contrived	natural	1	
 src/ui/books/forging_book/ForgingBook_IsItemDiscovered.c	ForgingBook_IsItemDiscovered	minor	natural	1	
+src/ui/books/forging_book/ForgingBook_RecordWeaponDiscoveryFromScript.c	ForgingBook_RecordWeaponDiscoveryFromScript	contrived	natural	1	
