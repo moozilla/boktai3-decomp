@@ -127,47 +127,37 @@ void ScriptPrompt_Destroy(struct ScriptPromptScreen *p)
 
 s32 ScriptPrompt_Initialize(struct ScriptPromptScreen *s)
 {
-    u32 layer;
+    u32 size;
     void *background;
-    void *palette;
     void *resource;
-    u16 *sourcePalette;
-    struct AnimSpriteResource *frameResource;
-    struct AnimSpriteResource *acceptResource;
-    struct AnimSpriteResource *cancelResource;
-    u16 **widgetPalette;
-    u16 **savedPalette;
-    u16 *colors;
+    struct AnimSpriteResource *frameGraphics, *acceptGraphics, *cancelGraphics;
+
     Bg_ClearTilemap(0);
     BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0);
     Bg_ClearTilemap(2);
     BgGfx_LoadTilemapSimple(2, 0, 0, 0, 0);
     Bg_ClearTilemap(3);
     background = ScriptProc_Start(0xC091, 0x3536);
-    layer = 5;
-    Bg_SetupLayers(2, 0, background, 0, 0, 1, &layer);
+    size = 5;
+    Bg_SetupLayers(2, 0, background, 0, 0, 1, &size);
     BgGfx_LoadTilemapSimple(3, 0, 0, 0, 0);
-    palette = ((struct ScriptPromptPalette *)ScriptProc_Start(0x92B3, 0x204))->colors;
-    CpuSet(palette, gBgPaletteBuffer, 0x100);
+    CpuSet(((struct ScriptPromptPalette *)ScriptProc_Start(0x92B3, 0x204))->colors,
+           gBgPaletteBuffer, 0x100);
     resource = ScriptProc_Start(0xCB05, 0xE2AB);
-    frameResource = &s->widgets[0].resource;
-    ResourceHeader_Relocate(frameResource, resource);
-    AnimSprite_InitLinked(&s->widgets[0], frameResource, 0x37, 0x10, 0, 0, 0, 0);
+    frameGraphics = &s->widgets[0].resource;
+    ResourceHeader_Relocate(frameGraphics, resource);
+    AnimSprite_InitLinked(&s->widgets[0], frameGraphics, 0x37, 0x10, 0, 0, 0, 0);
     resource = ScriptProc_Start(0xCB05, 0x530D);
-    acceptResource = &s->widgets[1].resource;
-    ResourceHeader_Relocate(acceptResource, resource);
-    AnimSprite_InitLinked(&s->widgets[1], acceptResource, 0x4B, 0x10, 0, 0, 0, 0);
-    cancelResource = &s->widgets[2].resource;
-    ResourceHeader_Relocate(cancelResource, resource);
-    AnimSprite_InitLinked(&s->widgets[2], cancelResource, 0x4C, 0x10, 0, 0, 0, 0);
-    savedPalette = &s->savedPalette;
-    widgetPalette = &s->widgets[1].sprite.palette;
-    sourcePalette = *widgetPalette;
-    *savedPalette = sourcePalette;
-    colors = s->colors;
-    CpuSet(sourcePalette, colors, 0x10);
-    *widgetPalette = colors;
-    s->widgets[2].sprite.palette = colors;
+    acceptGraphics = &s->widgets[1].resource;
+    ResourceHeader_Relocate(acceptGraphics, resource);
+    AnimSprite_InitLinked(&s->widgets[1], acceptGraphics, 0x4B, 0x10, 0, 0, 0, 0);
+    cancelGraphics = &s->widgets[2].resource;
+    ResourceHeader_Relocate(cancelGraphics, resource);
+    AnimSprite_InitLinked(&s->widgets[2], cancelGraphics, 0x4C, 0x10, 0, 0, 0, 0);
+    s->savedPalette = s->widgets[1].sprite.palette;
+    CpuSet(s->savedPalette, s->colors, 0x10);
+    s->widgets[1].sprite.palette = s->colors;
+    s->widgets[2].sprite.palette = s->colors;
     s->fadeSpeed = 0;
     Menu_StartFadeIn(0);
     ScriptPrompt_ResetDisplay(s);
