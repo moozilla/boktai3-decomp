@@ -604,3 +604,4 @@ src/ui/town/storage/Storage_CompleteCategoryRemoval.c	Storage_CompleteCategoryRe
 src/ui/town/storage/Storage_RefreshCategoryWidgets.c	Storage_RefreshCategoryWidgets	contrived	minor	5	function-pointer cast on the state word
 src/ui/town/storage/Storage_RebuildGrid.c	Storage_RebuildGrid	contrived	natural	6	
 src/ui/town/storage/Storage_SetGridFlags.c	Storage_SetGridFlags	contrived	natural	1	
+src/ui/town/storage/Storage_InitSelectionGrid.c	Storage_InitSelectionGrid	contrived	minor	2	repeat zero local

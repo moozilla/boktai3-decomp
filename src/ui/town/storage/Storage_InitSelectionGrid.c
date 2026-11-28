@@ -1,13 +1,13 @@
 #include "global.h"
-void Storage_SetGridFlags(u8 *, u32);
-u8 SceneInput_GetGridSelection(u8 *);
-void Storage_InitSelectionGrid(u8 *p, u32 a, u32 b, u32 c, u32 d)
+#include "ui/widgets/scene_input_navigation.h"
+void Storage_SetGridFlags(struct SceneInputGridView *, u32);
+void Storage_InitSelectionGrid(struct SceneInputGridView *grid, u32 kind, u32 x, u32 y, u32 flags)
 {
-    u32 z = 0;
-    p[0] = a;
-    Storage_SetGridFlags(p, d);
-    p[1] = b;
-    p[2] = c;
-    p[3] = SceneInput_GetGridSelection(p);
-    p[8] = z;
+    u32 repeat = 0;
+    grid->kind = kind;
+    Storage_SetGridFlags(grid, flags);
+    grid->cursorX = x;
+    grid->cursorY = y;
+    grid->selection = SceneInput_GetGridSelection(grid);
+    grid->repeat = repeat;
 }
