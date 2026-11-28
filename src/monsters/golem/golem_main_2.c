@@ -1102,18 +1102,15 @@ s32 Golem_Init(void *object)
     Golem_InitActionHandlers(actor);
     Golem_InitSpecialActionHandlers(actor);
 
-    {
-        struct Golem *instance = arg0;
-        instance->field68D = 0;
-        instance->routeDelay = 0x78;
-        instance->counter686 = 0;
-        instance->field684 = 2;
-        instance->pushSpeed = 0;
-        instance->routeDelay = 0xA0;
-        instance->field68A = 0;
-        instance->responseCount = 0;
-        instance->field693 = 0;
-    }
+    arg0->field68D = 0;
+    arg0->routeDelay = 0x78;
+    arg0->counter686 = 0;
+    arg0->field684 = 2;
+    arg0->pushSpeed = 0;
+    arg0->routeDelay = 0xA0;
+    arg0->field68A = 0;
+    arg0->responseCount = 0;
+    arg0->field693 = 0;
 
     MonsterInit_SaveControl(MonsterInit_SavedControlOf(&actor->chase), &actor->chase);
     GolemInit_InstallCompletionCallbacks(actor);
