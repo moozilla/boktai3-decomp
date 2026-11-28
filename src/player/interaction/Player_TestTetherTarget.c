@@ -28,11 +28,8 @@ static inline u8 *properties(struct ContactPosition *position)
     p = TerrainModifiers_FindCellOverride(cell, 1);
     if (p)
         p += 4;
-    else {
-        struct Map *map = gTerrainMap;
-        u32 offset = cell * 4 + 12;
-        p = map->cells + offset;
-    }
+    else
+        p = gTerrainMap->cells + 12 + cell * 4;
     return p;
 }
 static inline s32 absolute(s32 v)

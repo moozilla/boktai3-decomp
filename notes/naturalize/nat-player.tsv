@@ -616,3 +616,4 @@ src/player/interaction/Player_UpdateHeldInteraction.c	Player_UpdateHeldInteracti
 src/player/interaction/Player_UpdateHeldEnergyBurst.c	Player_UpdateHeldEnergyBurst	minor	natural	1	-
 src/player/interaction/Player_CalculateMovementSpeed.c	Player_CalculateMovementSpeed	contrived	minor	2	IsFixedSpeed link-mode helper fixes the double test
 src/player/interaction/Player_ConstrainTetherTarget.c	Player_ConstrainTetherTarget	contrived	minor	5	u16 cast on the final angle
+src/player/interaction/Player_TestTetherTarget.c	Player_TestTetherTarget	minor	natural	1	-
