@@ -240,3 +240,7 @@ src/ui/title/sound_test.c	SoundTest_SelectNext	natural	natural	0	-
 src/ui/title/sound_test.c	SoundTest_UpdatePlaybackIndicators	natural	natural	0	-
 src/ui/title/sound_test.c	SoundTest_ConfigureFromScript	natural	natural	0	-
 src/ui/title/sound_test.c	SoundTest_Create	natural	natural	0	-
+src/ui/title/tutorial_otenko.c	TutorialOtenkoPalette_BeginFade	natural	natural	0	
+src/ui/title/tutorial_otenko.c	TutorialOtenkoPalette_UpdateFade	natural	natural	0	
+src/ui/title/tutorial_otenko.c	TutorialOtenkoPalette_UpdateFadeAndNotify	natural	natural	0	
+src/ui/title/tutorial_otenko.c	TutorialOtenkoPalette_BeginReverseFade	contrived	natural	2	

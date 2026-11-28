@@ -132,20 +132,15 @@ void TutorialOtenkoPalette_UpdateReverseFade(struct ActorAnimController *);
 void TutorialOtenkoPalette_BeginReverseFade(struct ActorAnimController *p)
 {
     const u16 *src;
-    u16 *dst;
     s32 i;
-    void *effect;
     p->step = 50;
     p->duration = 50;
-    effect = p->effect;
-    AnimData_SelectPaletteBank(effect, 343);
+    AnimData_SelectPaletteBank(p->effect, 343);
     p->savedPalette = p->palette;
-    AnimData_SelectPaletteBank(effect, 344);
+    AnimData_SelectPaletteBank(p->effect, 344);
     src = p->palette;
-    dst = p->output;
-    for (i = 15; i >= 0; i--) {
-        *dst++ = *src++;
-    }
+    for (i = 0; i < 16; i++)
+        p->output[i] = src[i];
     p->palette = p->output;
     p->previous = TutorialOtenkoPalette_UpdateReverseFade;
 }
@@ -237,7 +232,8 @@ void TutorialOtenko_SetInteractionControlFlag(u8 *);
 
 void TutorialOtenko_BeginInteractionSoundSequence(u8 *);
 
-void TutorialOtenko_OnInteractionChildRelease(struct ActorAnimController *, struct ActorChildSlot *);
+void TutorialOtenko_OnInteractionChildRelease(struct ActorAnimController *,
+                                              struct ActorChildSlot *);
 
 void TutorialOtenko_OnInteractionChildDelay(struct ActorAnimController *, struct ActorChildSlot *);
 
@@ -507,7 +503,8 @@ void TutorialOtenko_UpdateScaleGrowth(struct ActorAnimController *p)
 
 void TutorialOtenko_ArmRestIdleTransition(struct ActorAnimController *p)
 {
-    if (p->obj.position.x == 25 && p->obj.position.z == 0 && absolute(p->obj.position.y - 102) <= 9) {
+    if (p->obj.position.x == 25 && p->obj.position.z == 0 &&
+        absolute(p->obj.position.y - 102) <= 9) {
         p->timer = 0;
         p->fn = TutorialOtenko_UpdateIdleWait;
         if (gSunClock[14] == 5 || gSunClock[14] == 0 || gSunClock[14] == 4)
@@ -754,7 +751,6 @@ void TutorialOtenko_BeginScriptedAnimationPhaseNine(void)
 
 /* TutorialOtenko_SetAnimationPhase: Requests and saves the supplied phase with special cases for playing sound and clearing control */
 
-
 struct G {
     u8 f0[0xE2C];
     u16 e2c;
@@ -800,7 +796,6 @@ void TutorialOtenko_SetAnimationPhase(u32 phase)
 
 /* TutorialOtenko_BeginAnimationPhaseTen: Ensures the controller exists and requests mode three phase ten with playback preservation */
 
-
 void TutorialOtenko_BeginAnimationPhaseTen(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
@@ -814,7 +809,6 @@ void TutorialOtenko_BeginAnimationPhaseTen(void)
 
 /* TutorialOtenko_BeginAnimationPhaseEleven: Ensures the controller exists and requests mode three phase eleven with playback preservation */
 
-
 void TutorialOtenko_BeginAnimationPhaseEleven(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
@@ -827,7 +821,6 @@ void TutorialOtenko_BeginAnimationPhaseEleven(void)
 }
 
 /* TutorialOtenko_BeginCompletionAnimation: Selects mode 3 phase 13 whose handler plays sequence 18 and invokes the completion script */
-
 
 void TutorialOtenko_BeginCompletionAnimation(void)
 {
@@ -1085,7 +1078,8 @@ static inline u8 child_take(struct ActorChildSlot *c)
     return 0;
 }
 
-void TutorialOtenko_OnInteractionChildUpdate(struct ActorAnimController *input, struct ActorChildSlot *child)
+void TutorialOtenko_OnInteractionChildUpdate(struct ActorAnimController *input,
+                                             struct ActorChildSlot *child)
 {
     struct ActorChildSlot *c = child;
     struct ActorAnimController *p = input;
@@ -1096,7 +1090,8 @@ void TutorialOtenko_OnInteractionChildUpdate(struct ActorAnimController *input, 
 
 /* Tentative role: Wait through a child-triggered delay, then enter mode 2 / phase 4. */
 
-void TutorialOtenko_OnInteractionChildDelay(struct ActorAnimController *input, struct ActorChildSlot *child)
+void TutorialOtenko_OnInteractionChildDelay(struct ActorAnimController *input,
+                                            struct ActorChildSlot *child)
 {
     struct ActorChildSlot *c = child;
     struct ActorAnimController *p = input;
@@ -1119,7 +1114,7 @@ void TutorialOtenko_OnInteractionChildDelay(struct ActorAnimController *input, s
 /* Tentative role: Release the owner effect and reset this child callback. */
 
 void TutorialOtenko_OnInteractionChildRelease(struct ActorAnimController *input,
-                                     struct ActorChildSlot *child)
+                                              struct ActorChildSlot *child)
 {
     struct ActorChildSlot *c = child;
     struct ActorAnimController *p = input;
@@ -1143,7 +1138,8 @@ void TutorialOtenko_OnInteractionChildRelease(struct ActorAnimController *input,
 
 /* Tentative role: Select a child sprite effect and clear its hidden flag. */
 
-void TutorialOtenko_OnEffectChildPaletteInit(struct ActorAnimController *p, struct ActorChildSlot *c)
+void TutorialOtenko_OnEffectChildPaletteInit(struct ActorAnimController *p,
+                                             struct ActorChildSlot *c)
 {
     if (child_take(c)) {
         AnimData_SelectPaletteBank(c->sprite, c->effect + 2);
@@ -2397,22 +2393,22 @@ void TutorialOtenko_UpdateBlinkBurstDisappearance(struct ActorAnimController *p)
             ImpactBurst_EmitBurst(&p->obj.position.x, 1, 512, 48, 8, 8, 8, 4);
             ImpactBurst_EmitBurst(&p->obj.position.x, 1, 512, 48, 8, 8, 8, 4);
             ImpactBurst_EmitBurst(&p->obj.position.x, 1, 512, 48, 8, 8, 8, 4);
-            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.position.x, 32, 60, duration, 3, duration, 5, 60,
-                                            duration);
-            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.position.x, 64, 60, duration, 3, duration, 5, 60,
-                                            duration);
-            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.position.x, 96, 60, duration, 3, duration, 5, 60,
-                                            duration);
-            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.position.x, 128, 60, duration, 3, duration, 5, 60,
-                                            duration);
-            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.position.x, 160, 60, duration, 3, duration, 5, 60,
-                                            duration);
-            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.position.x, 192, 60, duration, 3, duration, 5, 60,
-                                            duration);
-            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.position.x, 224, 60, duration, 3, duration, 5, 60,
-                                            duration);
-            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.position.x, 256, 60, duration, 3, duration, 5, 60,
-                                            duration);
+            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.position.x, 32, 60, duration, 3, duration,
+                                            5, 60, duration);
+            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.position.x, 64, 60, duration, 3, duration,
+                                            5, 60, duration);
+            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.position.x, 96, 60, duration, 3, duration,
+                                            5, 60, duration);
+            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.position.x, 128, 60, duration, 3,
+                                            duration, 5, 60, duration);
+            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.position.x, 160, 60, duration, 3,
+                                            duration, 5, 60, duration);
+            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.position.x, 192, 60, duration, 3,
+                                            duration, 5, 60, duration);
+            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.position.x, 224, 60, duration, 3,
+                                            duration, 5, 60, duration);
+            ImpactParticleGroup_SpawnRadial(1, 3, &p->obj.position.x, 256, 60, duration, 3,
+                                            duration, 5, 60, duration);
             ActorShadow_Disable(p->p2);
             p->obj.flags |= 1;
             TutorialOtenko_SetState(p, 1, 2);
@@ -2439,7 +2435,6 @@ void TutorialOtenko_UpdateBlinkBurstDisappearance(struct ActorAnimController *p)
 }
 
 /* TutorialOtenko_OnAnimationNoOp: Empty function in the animation state block; tentative no-op animation callback */
-
 
 void TutorialOtenko_OnAnimationNoOp(void)
 {
@@ -2871,7 +2866,6 @@ void sub_081E99EC(struct ActorAnimController *p)
 }
 
 /* TutorialOtenko_UpdateInactiveAnimation: Empty handler provisionally interpreted as an inactive animation callback */
-
 
 void TutorialOtenko_UpdateInactiveAnimation(void)
 {
@@ -3378,7 +3372,8 @@ void Sprite_Init(void *, void *, u32);
 void Sprite_SetOriginStub(void *, s32, s32);
 void Shadow_Initialize(void *, void *, s32);
 
-static inline void ActorInit_InitMainSprite(struct ActorInitController *p, struct DisplaySequenceSprite *obj)
+static inline void ActorInit_InitMainSprite(struct ActorInitController *p,
+                                            struct DisplaySequenceSprite *obj)
 {
     void *effect;
     p->animationResource = ScriptProc_Start(0x922e, 0xc6a0);
