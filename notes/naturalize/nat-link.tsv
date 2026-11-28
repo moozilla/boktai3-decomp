@@ -336,3 +336,4 @@ src/link/records/PanelText_DrawDecimal.c	PanelText_DrawDecimal	contrived	contriv
 src/link/records/RecordPanel_RefreshEntryLabels.c	RecordPanel_RefreshEntryLabels	minor	natural	2	
 src/link/records/RecordPanel_ShowName.c	RecordPanel_ShowName	contrived	natural	1	
 src/link/records/sub_0810D760.c	sub_0810D760	contrived	contrived	10	q = p copy stays: Refresh reads windows through the second pointer (separate induction register)
+src/link/score_panel/LinkScorePanel_LoadBackground.c	LinkScorePanel_LoadBackground	contrived	natural	1	

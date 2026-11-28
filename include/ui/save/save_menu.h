@@ -22,7 +22,8 @@ struct SaveMenu {
     const u8 *statusScript;
     u32 flags;
     s32 localPlayer;
-    u8 state, unknown1001[7];
+    u8 state, unknown1001[3];
+    s32 nameWindow; /* 0x1004 */
     s32 windows[7];
     u8 entering, unknown1025;
     u16 timer, unknown1028, exitScript, unknown102C, skip, remaining, step;
