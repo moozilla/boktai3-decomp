@@ -1,12 +1,8 @@
 #include "global.h"
-#include "engine/runtime.h"
-struct G {
-    u8 a[0x10];
-    u32 w10;
-};
+#include "link/session/session_save.h"
 u32 SaveData_IsHeaderValid(void)
 {
-    if (((struct G *)gSessionState)->w10 == 0x369F)
+    if (((struct SessionSave *)gSessionState)->magic == 0x369F)
         return 1;
     return 0;
 }
