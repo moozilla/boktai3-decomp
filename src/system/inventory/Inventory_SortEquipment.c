@@ -3,29 +3,23 @@ s32 Inventory_GetEquipmentId(s32);
 void Inventory_SwapEquipmentEntries(s32, s32);
 void Inventory_SortEquipment(s32 base)
 {
-    s32 n = 0;
+    s32 count = 0;
     s32 gaps = 0;
-    s32 i;
-    s32 j;
-    s32 a;
-    for (i = 0; i <= 15; i++) {
-        s32 idx = base + i;
-        if (Inventory_GetEquipmentId(idx) == 0xFF) {
+    s32 i, j;
+
+    for (i = 0; i < 16; i++) {
+        if (Inventory_GetEquipmentId(base + i) == 0xFF) {
             gaps++;
         } else {
-            n++;
+            count++;
             if (gaps > 0)
-                Inventory_SwapEquipmentEntries(idx, idx - gaps);
+                Inventory_SwapEquipmentEntries(base + i, base + i - gaps);
         }
     }
-    if (n > 1) {
-        s32 m;
-        i = 0;
-        m = n - 1;
-        for (; i < m; i++) {
-            for (j = i; j < n; j++) {
-                a = Inventory_GetEquipmentId(base + i);
-                if (a > Inventory_GetEquipmentId(base + j))
+    if (count > 1) {
+        for (i = 0; i < count - 1; i++) {
+            for (j = i; j < count; j++) {
+                if (Inventory_GetEquipmentId(base + i) > Inventory_GetEquipmentId(base + j))
                     Inventory_SwapEquipmentEntries(base + i, base + j);
             }
         }
