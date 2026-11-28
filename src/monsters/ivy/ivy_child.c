@@ -147,7 +147,6 @@ static inline struct SwordMotion *Sword_ChildMotion(struct IvyBurstPrefix *actor
 
 void Ivy_UpdateDefeatBurst(struct IvyBurstPrefix *actor)
 {
-    s32 remainder;
     if (Ivy_TakeBurstStart(actor)) {
         s32 i = 0;
         struct IvyBurstPart *parts = actor->parts;
@@ -181,8 +180,7 @@ void Ivy_UpdateDefeatBurst(struct IvyBurstPrefix *actor)
     }
     if (actor->callback)
         Callback_InvokeActor(actor, actor->callback);
-    remainder = Mod(actor->counter, 2);
-    if (remainder == 0) {
+    if (Mod(actor->counter, 2) == 0) {
         struct PackedContactVector range;
         struct PackedContactVector position;
         struct SceneVec offset;
@@ -196,28 +194,28 @@ void Ivy_UpdateDefeatBurst(struct IvyBurstPrefix *actor)
         ZeroFill8(&offset);
         switch (actor->burstIndex) {
             case 0:
-                offset.z = (offset.x = -120);
+                offset.z = offset.x = -120;
                 actor->burstIndex++;
                 Sound_PlaySong(366);
                 break;
 
             case 1:
-                offset.z = (offset.x = -75);
+                offset.z = offset.x = -75;
                 actor->burstIndex++;
                 break;
 
             case 2:
-                offset.z = (offset.x = -30);
+                offset.z = offset.x = -30;
                 actor->burstIndex++;
                 break;
 
             case 3:
-                offset.z = (offset.x = 15);
+                offset.z = offset.x = 15;
                 actor->burstIndex++;
                 break;
 
             case 4:
-                offset.z = (offset.x = 60);
+                offset.z = offset.x = 60;
                 actor->burstIndex = 0;
                 break;
         }
@@ -234,7 +232,7 @@ void Ivy_UpdateDefeatBurst(struct IvyBurstPrefix *actor)
             actor->control.state = 0;
             actor->control.phase = 0;
             Ivy_SetFlags(&actor->control, 1);
-            if ((actor->scene->mode != 4) && (actor->script)) {
+            if (actor->scene->mode != 4 && actor->script) {
                 s32 values[8];
                 struct ScriptUtilityArguments arguments;
                 values[0] = actor->position.x;
@@ -255,7 +253,7 @@ void Ivy_UpdateDefeatBurst(struct IvyBurstPrefix *actor)
         actor->effectFlags &= ~1;
         actor->flash++;
     }
-    (actor->counter)++;
+    actor->counter++;
 }
 
 /* Ivy_OnUpdateIdle: Empty callback at the end of the main Ivy state handlers; idle role tentative */

@@ -102,3 +102,4 @@ src/monsters/ivy/child_group.c	ChildGroup_UpdateTransitionJitter	minor	minor	0	r
 src/monsters/ivy/child_group.c	ChildGroup_UpdateAlternatingCallbacks	minor	minor	0	random-table step written out with pointer locals / bare block
 src/monsters/ivy/ivy_child.c	Ivy_UpdateActions	minor	natural	2	
 src/monsters/ivy/ivy_child.c	Ivy_UpdateChildBobbing	minor	natural	1	
+src/monsters/ivy/ivy_child.c	Ivy_UpdateDefeatBurst	contrived	contrived	16	partial: Ivy_TakeBurstStart/Sword_*/Ivy_ScaleOffset helpers and the parts pointer stay: strength reduction and mask load order; position write spelled with temps order
