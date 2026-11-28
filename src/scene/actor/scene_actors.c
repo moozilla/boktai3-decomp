@@ -433,15 +433,7 @@ void SceneActors_SpawnAmbientParticle(struct StateActor *actor)
     cursor = (cursor + 1) & 0x3ff;
     gRandomIndex = cursor;
     heightSample = HitSpark_Sample((u32)table, cursor);
-    {
-        u16 *y = (u16 *)&actor->target.y;
-        heightSample &= 0x1f;
-        {
-            int height = *y;
-            heightSample += height;
-        }
-        position.y = heightSample;
-    }
+    position.y = actor->target.y + (heightSample & 0x1f);
     {
         u16 *z = (u16 *)&actor->target.z;
         horizontalSample -= 0x7f;

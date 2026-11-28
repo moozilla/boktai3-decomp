@@ -362,3 +362,4 @@ src/scene/actor/scene_actors.c	SceneActors_SetHealthLimits	contrived	minor	3	gGa
 src/scene/actor/scene_actors.c	SceneActors_StartDirectionalAnimation	contrived	natural	6	-
 src/scene/actor/scene_actors.c	SceneActors_StartEightDirectionAnimation	contrived	natural	4	-
 src/scene/actor/scene_actors.c	SceneActors_UpdateAnimation	minor	natural	1	-
+src/scene/actor/scene_actors.c	SceneActors_SpawnAmbientParticle	contrived	minor	5	z coordinate through a u16 pointer: a direct member read changes one instruction
