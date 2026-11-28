@@ -121,3 +121,4 @@ src/objects/coffin/tether_actor.c	TetherActor_InitStateParameters	natural	natura
 src/objects/coffin/tether_actor.c	TetherActor_UpdateInteractionCooldown	natural	natural	0	
 src/objects/coffin/tether_actor.c	TetherActor_UpdateSecondaryColliderValues	minor	natural	3	
 src/objects/coffin/tether_actor.c	TetherActor_OnChargeContact	contrived	minor	18	mask and responseMask locals and the actor input copy stay: each fixes the order of one mask load or the parameter move
+src/objects/coffin/tether_actor.c	TetherActor_UpdateSampledPosition	contrived	natural	4	

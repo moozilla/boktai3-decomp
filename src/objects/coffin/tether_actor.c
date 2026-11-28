@@ -1909,24 +1909,11 @@ extern const s16 gUnk_086149C4[];
 
 void TetherActor_UpdateSampledPosition(struct TetherActor *p)
 {
-    u32 i;
-    s32 x;
-    s32 y;
-    s32 t;
+    u32 angle;
     p->sampledPosition = p->position;
-    i = ((p->heading + 1) & 7) << 5;
-    t = gUnk_086149C4[(i + 0x40) & 0xFF] << 7;
-    if (t >= 0)
-        x = t >> 12;
-    else
-        x = -(-t >> 12);
-    p->sampledPosition.x += x;
-    t = gUnk_086149C4[i] << 7;
-    if (t >= 0)
-        y = t >> 12;
-    else
-        y = -(-t >> 12);
-    p->sampledPosition.z += y;
+    angle = ((p->heading + 1) & 7) << 5;
+    p->sampledPosition.x += scaleOffset(gUnk_086149C4[(angle + 64) & 255] << 7);
+    p->sampledPosition.z += scaleOffset(gUnk_086149C4[angle] << 7);
 }
 
 void TetherActor_HandleFlaggedCell(struct TetherActor *actor)
