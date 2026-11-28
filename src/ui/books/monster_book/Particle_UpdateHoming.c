@@ -2,6 +2,12 @@
 #include "engine/engine.h"
 #include "ui/books/bestiary_homing_sprite.h"
 
+struct HomingEmitter {
+    u8 pad0[0x24];
+    s16 x;
+    u8 pad26[2];
+    s16 z;
+};
 struct HomingTarget {
     u8 pad0[2];
     s16 y;
@@ -23,26 +29,24 @@ struct HomingParticle {
 extern const s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
 
-void Particle_UpdateHoming(u8 *actor, struct HomingParticle *p)
+void Particle_UpdateHoming(struct HomingEmitter *emitter, struct HomingParticle *p)
 {
     struct HomingTarget *target = p->target;
     struct BestiaryHomingSprite *sprite = &p->sprite_at20;
-    s32 dx = *(s16 *)(actor + 0x24) - sprite->x;
-    s32 dz = *(s16 *)(actor + 0x28) - sprite->z;
-    s32 vx;
+    s32 dx = emitter->x - sprite->x;
+    s32 dz = emitter->z - sprite->z;
 
     p->angle = Math_Atan2(dx, dz);
-    vx = (gUnk_086149C4[(p->angle + 0x40) & 0xFF] * p->speed) >> 12;
-    p->vx = vx;
+    p->vx = (gUnk_086149C4[(p->angle + 0x40) & 0xFF] * p->speed) >> 12;
     p->vz = (gUnk_086149C4[p->angle] * p->speed) >> 12;
     if (dx * dx + dz * dz <= 99) {
         p->state = 1;
         p->speed = 0;
         gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-        p->angle = ((const u16 *)0x0203B400)[gRandomIndex];
+        p->angle = ((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
     } else {
         s32 height;
-        sprite->x += vx;
+        sprite->x += p->vx;
         height = target->y - sprite->y;
         if (height > 8)
             sprite->y += 8;
