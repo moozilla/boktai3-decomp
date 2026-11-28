@@ -40,13 +40,10 @@ int Text_CopyWithoutTags(u8 *dst, u8 *src, int limit)
 
 s32 GlyphTable_FindPair(u8 *p, u32 a, u32 b)
 {
-    s32 i = 0;
-    while (i <= 0x3F) {
-        if (p[0] == a && p[1] == b) {
+    s32 i;
+    for (i = 0; i < 64; i++, p += 2) {
+        if (p[0] == a && p[1] == b)
             return i;
-        }
-        i++;
-        p += 2;
     }
     return -1;
 }

@@ -151,3 +151,4 @@ src/ui/status_screen/numeric_overlay.c	NumericOverlay_Update	natural	natural	0	-
 src/ui/status_screen/numeric_overlay.c	NumericOverlay_Destroy	natural	natural	0	-
 src/ui/status_screen/numeric_overlay.c	NumericOverlay_Create	natural	natural	0	-
 src/ui/title/password.c	Text_CopyWithoutTags	contrived	minor	10	signed-byte test for the lead byte and the separate *dst = c; dst++ stay
+src/ui/title/password.c	GlyphTable_FindPair	minor	natural	1	-
