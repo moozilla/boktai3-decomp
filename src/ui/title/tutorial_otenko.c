@@ -658,14 +658,6 @@ void TutorialOtenko_BeginAnimationPhaseEight(void)
 
 /* Script command: configure the singleton animation controller. */
 
-#define H(o) (*(u16 *)((u8 *)g + (o)))
-
-#define B(o) (*(u8 *)((u8 *)g + (o)))
-
-#define W(o) (*(u32 *)((u8 *)g + (o)))
-
-#define OWNER(o) (*(u16 *)(*(u8 **)((u8 *)g + 0x18) + (o)))
-
 s32 Script_SeekToKeyword(s32);
 
 s32 Script_GetValue(void);
@@ -684,23 +676,6 @@ void TutorialOtenko_BeginScriptedAnimationPhaseNine(void)
 }
 
 /* TutorialOtenko_SetAnimationPhase: Requests and saves the supplied phase with special cases for playing sound and clearing control */
-
-struct G {
-    u8 f0[0xE2C];
-    u16 e2c;
-    u8 f1[3];
-    u16 e32;
-    u8 f2[0xF5A - 0xE34];
-    u8 xa : 4;
-    u8 xb : 4;
-    u8 y;
-    u16 b;
-    u8 f3[0xF64 - 0xF5E];
-    u8 c;
-    u8 f4[0xF86 - 0xF65];
-    u8 d;
-    u8 e;
-};
 
 void ScriptUtility_ClearControlFlag(void);
 
@@ -2695,10 +2670,6 @@ void TimeDisplay_SetSelectionKeyframe(struct Display *p)
 }
 
 /* Show the paired foreground objects and their associated objects. */
-
-struct Obj {
-    u32 a, b, flags;
-};
 
 void TutorialOtenko_HideAuxiliarySprites(struct Display *p)
 {

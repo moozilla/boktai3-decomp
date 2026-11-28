@@ -338,3 +338,4 @@ src/ui/title/tutorial_otenko.c	TimeDisplay_GetCurrentMonth	natural	natural	0
 src/ui/title/tutorial_otenko.c	TutorialOtenko_RequestControllerRemoval	natural	natural	0	
 src/ui/title/tutorial_otenko.c	TutorialOtenko_EnsureController	natural	natural	0	
 src/ui/title/tutorial_otenko.c	TutorialOtenko_InitializeController	contrived	minor	8	countdown palette copies with a mask local; view of the effect buffer for its palette pointer; sprite/shadow locals
+src/ui/title/tutorial_otenko.c	TutorialOtenko_ConfigureInteractionChildFromScript	contrived	contrived	1	strength-reduced pointer walk over the children, empty countdown loop and do-while store macro; a plain indexed rewrite is 150+ instructions off
