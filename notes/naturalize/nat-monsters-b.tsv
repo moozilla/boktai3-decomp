@@ -84,3 +84,4 @@ src/monsters/ivy/sub_080F2F24.c	sub_080F2F24	natural	natural	0
 src/monsters/ivy/PhaseObject_ConvergeEntries.c	PhaseObject_ConvergeEntries	natural	natural	0	
 src/monsters/ivy/PhaseObject_TickEntryReset.c	PhaseObject_TickEntryReset	natural	natural	0	
 src/monsters/ivy/child_group.c	ChildGroup_AdvanceLaunchCycle	minor	natural	1	(u8) on the callback result
+src/monsters/ivy/child_group.c	ChildGroup_WaitForInactiveMembers	contrived	natural	1	

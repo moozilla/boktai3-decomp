@@ -112,19 +112,11 @@ void ChildGroup_BeginInactiveState(struct PhaseObject *);
 void ChildGroup_WaitForInactiveMembers(struct SwordGroup *p)
 {
     s32 active = 0;
-    s32 n;
-    u8 *memberActive;
-    if (active < p->count) {
-        memberActive = (u8 *)p + ((u8 *)&p->children[0].mode.active - (u8 *)p);
-        {
-            u32 stride = sizeof(struct SwordChild);
-            n = p->count;
-            do {
-                if (*memberActive)
-                    active++;
-                memberActive += stride;
-            } while (--n != 0);
-        }
+    s32 i;
+
+    for (i = 0; i < p->count; i++) {
+        if (p->children[i].mode.active)
+            active++;
     }
     if (active == 0) {
         PhaseObject_EnterMode((struct PhaseObject *)p, 1, 1);
