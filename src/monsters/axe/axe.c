@@ -2848,7 +2848,7 @@ void Axe_UpdateBodyColliders(struct ChaseActor *actor)
     for (index = 0; index < 3; index++) {
         if (WordFlags_Has(0x40, &context->flagsE4C) ||
             SceneActorChase_HasPlacementFlags(actor, 0x800)) {
-            ContactCollider_SetFlags(attack, 4);
+            attack->flags |= 4;
             ContactCollider_SetFlags(&actor->base.colliderA, 4);
             for (i = 0; i < 2; i++) {
                 ContactCollider_SetFlags(&context->extraBody[i], 4);
