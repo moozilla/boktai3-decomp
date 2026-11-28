@@ -9,20 +9,18 @@ s32 ActorVariant_GetTableValue(u32, s32);
 void Player_SetAnimationIndex(struct Player *, s32, s32);
 void Player_UpdateStumble(struct Player *p)
 {
-    u16 *frame;
     if (p->tetherMode != 2) {
         Player_SetTetherMode(p, 2, 0);
         Player_PlayLocalSong(p->slot, 0x344);
     }
     Player_SetSecondaryActionFlags(p, 8);
-    frame = &p->tetherFrame;
-    (*frame)++;
-    if (*frame > 0xF) {
+    p->tetherFrame++;
+    if (p->tetherFrame > 0xF) {
         Player_SetTetherMode(p, 0, 0);
         return;
     }
     Player_SetSecondaryActionFlags(p, 2);
-    if ((u16)(*frame - 5) <= 7)
+    if (p->tetherFrame >= 5 && p->tetherFrame <= 12)
         Player_SetSecondaryActionFlags(p, 1);
     Player_SetSecondaryActionFlags(p, 4);
     p->actionEighteenParameter = 0x174;
