@@ -1,18 +1,15 @@
 #include "global.h"
-#include "npc/story_character/state_actor.h"
+#include "npc/manager/scene_actor_lifecycle.h"
 
-void Actor_PlayAnimationEntry(void *, u32, u32, u32, u32);
-s32 DisplayAnimation_TestFinished(void *);
-
-void StoryCharacter_StartKind9Animation6Then5(u32 ctx, struct StateActor *p)
+void StoryCharacter_StartKind9Animation6Then5(u32 ctx, struct SceneActor *p)
 {
     u32 r;
     s32 phase;
 
-    if (p->enter != 0) {
-        p->enter = 0;
-        p->done = 0;
-        switch (p->kind) {
+    if (p->animationEntered != 0) {
+        p->animationEntered = 0;
+        p->finished = 0;
+        switch (p->variant) {
             case 4:
                 r = 0;
                 break;
@@ -96,19 +93,19 @@ void StoryCharacter_StartKind9Animation6Then5(u32 ctx, struct StateActor *p)
                 break;
         }
         Actor_PlayAnimationEntry(p, r, 2, 1, 4);
-        p->phase = 0;
+        p->animationPhase = 0;
     }
 
-    phase = p->phase;
+    phase = p->animationPhase;
     if (phase == 1)
         goto phase1;
     if (phase > 1)
         goto end;
     if (phase != 0)
         goto end;
-    if (!DisplayAnimation_TestFinished(&p->targetPosition.z))
+    if (!DisplayAnimation_TestFinished(&p->drawable.common))
         goto end;
-    switch (p->kind) {
+    switch (p->variant) {
         case 4:
             r = 0;
             break;
@@ -192,13 +189,13 @@ void StoryCharacter_StartKind9Animation6Then5(u32 ctx, struct StateActor *p)
             break;
     }
     Actor_PlayAnimationEntry(p, r, 1, 1, 4);
-    p->phase = 1;
+    p->animationPhase = 1;
     goto end;
 phase1:
-    if (!DisplayAnimation_TestFinished(&p->targetPosition.z))
+    if (!DisplayAnimation_TestFinished(&p->drawable.common))
         goto end;
-    p->done = phase;
-    p->phase = 2;
+    p->finished = phase;
+    p->animationPhase = 2;
 end:
     return;
 }
