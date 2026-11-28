@@ -20,9 +20,6 @@ struct ContactImpactEffect {
     void (*update)(struct ContactImpactEffect *);
     s32 timer;
 };
-struct ContactImpactPackedPosition {
-    u32 x : 16, y : 16, z : 16, pad : 16;
-};
 u32 PopInSprite_GetStateResult(struct ContactImpactEffect *);
 void ContactImpactEffect_BeginMotion(void *object, struct ContactPosition *,
                                      struct ContactPosition *, u32, u32, u32, s32, u32);
