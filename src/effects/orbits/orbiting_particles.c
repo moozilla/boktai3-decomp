@@ -98,123 +98,84 @@ u32 OrbitingParticles_Destroy(struct OrbitingParticles *particles)
     return 0;
 }
 
-static inline u8 *cell(int i)
+int OrbitingParticles_Initialize(struct OrbitingParticles *particles, struct SceneVec *source,
+                                 int radius, int duration, int count, int type)
 {
-    u8 *p = TerrainModifiers_FindCellOverride(i, 1);
-    if (p)
-        return p + 4;
-    return gTerrainMap->cells + 12 + i * 4;
-}
+    s32 i, height;
+    struct OrbitingParticle *orb;
 
-static inline int randomAngle(void)
-{
-    u32 offset, value;
-    u16 *table;
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    offset = gRandomIndex * 2;
-    table = ((u16 *)RANDOM_TABLE_ADDR);
-    value = *(u16 *)(offset + (u32)table);
-    return (value & 127) - 32;
-}
-
-int OrbitingParticles_Initialize(struct OrbitingParticles *m, struct SceneVec *source, int radius,
-                                 int duration, int count, int type)
-{
-    int i, index, height, slope;
-    struct SceneVec *pos;
-    u8 *c;
-    struct OrbitingParticle *p;
     switch (type) {
         case 1:
-            m->resource = AnimData_FindEntry(0x1c1e);
-            m->frame = 0;
+            particles->resource = AnimData_FindEntry(0x1C1E);
+            particles->frame = 0;
             break;
         case 3:
-            m->resource = AnimData_FindEntry(0x1c1e);
-            m->frame = 4;
+            particles->resource = AnimData_FindEntry(0x1C1E);
+            particles->frame = 4;
             break;
         case 4:
-            m->resource = AnimData_FindEntry(0x1c1e);
-            m->frame = 6;
+            particles->resource = AnimData_FindEntry(0x1C1E);
+            particles->frame = 6;
             break;
         case 5:
-            m->resource = AnimData_FindEntry(0x1c1e);
-            m->frame = 8;
+            particles->resource = AnimData_FindEntry(0x1C1E);
+            particles->frame = 8;
             break;
         case 6:
-            m->resource = AnimData_FindEntry(0x1c1e);
-            m->frame = 10;
+            particles->resource = AnimData_FindEntry(0x1C1E);
+            particles->frame = 10;
             break;
         case 7:
-            m->resource = AnimData_FindEntry(0x1c1e);
-            m->frame = 12;
+            particles->resource = AnimData_FindEntry(0x1C1E);
+            particles->frame = 12;
             break;
         case 8:
-            m->resource = AnimData_FindEntry(0x1c1e);
-            m->frame = 14;
+            particles->resource = AnimData_FindEntry(0x1C1E);
+            particles->frame = 14;
             break;
         case 0:
         case 2:
         default:
-            m->resource = AnimData_FindEntry(0x1c1e);
-            m->frame = 2;
+            particles->resource = AnimData_FindEntry(0x1C1E);
+            particles->frame = 2;
             break;
     }
-    m->position = *source;
-    pos = &m->position;
-    {
-        int x = pos->x >> 8, z = pos->z >> 8;
-        if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-            index = 0;
-        else
-            index = gTerrainMap->rows[z] + x;
-    }
-    c = cell(index);
-    slope = *c >> 4;
-    height = (*c & 15) << 8;
-    switch (slope) {
-        case 1:
-            height -= (u8)pos->z;
-            break;
-        case 2:
-            height -= (u8)pos->x;
-            break;
-    }
-    if (m->position.y < height)
-        m->position.y = height;
-    m->time = 0;
-    m->duration = duration;
-    m->speed = 20;
-    m->limit = 400;
+    particles->position = *source;
+    height = Terrain_SampleHeight((struct ContactPosition *)&particles->position);
+    if (particles->position.y < height)
+        particles->position.y = height;
+    particles->time = 0;
+    particles->duration = duration;
+    particles->speed = 20;
+    particles->limit = 400;
     if (count > 7)
         count = 8;
-    m->count = count;
-    p = m->orbs;
-    for (i = 0; i <= 7; p++) {
-        struct OrbitingParticleSprite *s = &p->sprite;
-        int angle, r;
-        p->state = 0;
-        p->angle = randomAngle();
-        p->rise = 0;
-        p->radius = radius;
-        p->timer = i * 4;
-        ParticleSprite_Initialize(s, m->resource, 1);
-        Effect_SetOrigin(s, -4, -4);
-        SpriteDrawable_SelectTileFrame(s, m->resource, m->frame);
-        Effect_SetPalette(s, 1);
-        angle = p->angle;
-        r = p->radius;
-        p->sprite.position.x = scale(gUnk_086149C4[(angle + 64) & 255] * r);
-        p->sprite.position.y = 0;
-        p->sprite.position.z = scale(gUnk_086149C4[angle] * r);
-        p->sprite.position.y += p->rise;
-        p->sprite.position.x += m->position.x;
-        p->sprite.position.y += m->position.y;
-        p->sprite.position.z += m->position.z;
-        {
-            s->priority = 1;
-            i += 1;
-        }
+    particles->count = count;
+    orb = particles->orbs;
+    for (i = 0; i < 8; i++, orb++) {
+        struct OrbitingParticleSprite *sprite = &orb->sprite;
+        s32 angle, orbRadius;
+
+        orb->state = 0;
+        orb->angle = (ParticleRandom_ReadDirectSample(gRandomTable) & 127) - 32;
+        orb->rise = 0;
+        orb->radius = radius;
+        orb->timer = i * 4;
+        ParticleSprite_Initialize(sprite, particles->resource, 1);
+        Effect_SetOrigin(sprite, -4, -4);
+        SpriteDrawable_SelectTileFrame(sprite, particles->resource, particles->frame);
+        Effect_SetPalette(sprite, 1);
+        angle = orb->angle;
+        orbRadius = orb->radius;
+        orb->sprite.position.x =
+            Math_ShiftTowardZero(gUnk_086149C4[(angle + 64) & 255] * orbRadius, 12);
+        orb->sprite.position.y = 0;
+        orb->sprite.position.z = Math_ShiftTowardZero(gUnk_086149C4[angle] * orbRadius, 12);
+        orb->sprite.position.y += orb->rise;
+        orb->sprite.position.x += particles->position.x;
+        orb->sprite.position.y += particles->position.y;
+        orb->sprite.position.z += particles->position.z;
+        sprite->priority = 1;
     }
     return 0;
 }
