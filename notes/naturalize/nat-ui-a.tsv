@@ -564,3 +564,4 @@ src/ui/hud/display/Hud_HideAuxiliaryElements.c	Hud_HideAuxiliaryElements	natural
 src/ui/hud/display/sub_08177D88.c	sub_08177D88	fudged	natural	6	
 src/ui/hud/display/Hud_RefreshSpriteFromScript.c	Hud_RefreshSpriteFromScript	fudged	natural	1	
 src/ui/hud/display/Hud_SaveMode.c	Hud_SaveMode	fudged	natural	1	
+src/ui/hud/display/Hud_RestoreMode.c	Hud_RestoreMode	fudged	natural	1	
