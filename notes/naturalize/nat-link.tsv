@@ -162,3 +162,5 @@ src/link/player/sub_0823A2E4.c	sub_0823A2E4	contrived	minor	3	callback is read t
 src/link/player/sub_0823A060.c	sub_0823A060	contrived	minor	40	status flag accessor stays: a plain |= differs by two instructions
 src/link/player/LinkPlayer_RemoveAuxiliaryResources.c	LinkPlayer_RemoveAuxiliaryResources	contrived	natural	1	
 src/link/player/LinkPlayer_InitializeActor.c	LinkPlayer_InitializeActor	minor	minor	2	effect position is copied through a ContactPosition cast
+src/link/player/LinkPlayer_BlendPalette.c	LinkPlayer_BlendPalette	contrived	contrived	9	hoisted palette and brightness pointers stay: indexed loops compile very differently
+src/link/player/sub_0823A518.c	sub_0823A518	contrived	natural	1	

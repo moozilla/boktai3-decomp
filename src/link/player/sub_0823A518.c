@@ -1,13 +1,12 @@
 #include "global.h"
+#include "player/player.h"
 #include "scene/areas/area_effect_link.h"
-struct L {
-    u8 pad[0x5c];
-    u8 arr[1];
-};
-u8 sub_0823A518(u8 *p)
+
+u8 sub_0823A518(struct Player *p)
 {
-    s32 index = *(s32 *)(p + 0x18);
-    if (gLinkSession == NULL || index < 0)
+    s32 slot = p->slot;
+
+    if (gLinkSession == NULL || slot < 0)
         return 0;
-    return ((struct L *)gLinkSession)->arr[index];
+    return gLinkSession->playerValues[slot];
 }
