@@ -541,3 +541,4 @@ src/ui/town/shop/Shop_CreateAccessoryShop.c	Shop_CreateAccessoryShop	minor	minor
 src/ui/town/shop/Shop_CreateTravelingMerchant.c	Shop_CreateTravelingMerchant	minor	minor	0	task callback casts
 src/ui/town/shop/Shop_CreateGariGariKunStall.c	Shop_CreateGariGariKunStall	minor	minor	0	task callback casts
 src/ui/town/solar_bank/SolarBank_InitWidgets.c	SolarBank_InitWidgets	contrived	minor	8	position pointer and resource locals in the digit loops; labelPlayback copy for the first priority
+src/ui/town/solar_bank/SolarBank_RefreshAmountDigits.c	SolarBank_RefreshAmountDigits	contrived	natural	2	

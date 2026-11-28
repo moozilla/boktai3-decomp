@@ -6,13 +6,9 @@ s32 Div(s32, s32);
 void SolarBank_RefreshAmountDigits(struct SolarBankPanel *panel)
 {
     s32 digits[4];
-    s32 value, remaining, i;
-    s32 *digit;
-    struct AnimSprite *anim;
-    void *data;
+    s32 value, i;
     value = panel->transferAmount;
     if (value == 0) {
-        data = &panel->animData;
         for (i = 0; i < 4; i++)
             digits[i] = 0;
     } else {
@@ -22,16 +18,9 @@ void SolarBank_RefreshAmountDigits(struct SolarBankPanel *panel)
         value -= digits[1] * 100;
         digits[2] = Div(value, 10);
         digits[3] = value - digits[2] * 10;
-        data = &panel->animData;
     }
-    digit = digits;
-    anim = panel->transferDigits;
-    remaining = 3;
-    do {
-        Anim_LoadKeyframe(anim, data, (u16)*digit++, 1);
-        anim++;
-        remaining--;
-    } while (remaining >= 0);
+    for (i = 0; i < 4; i++)
+        Anim_LoadKeyframe(&panel->transferDigits[i], &panel->animData, (u16)digits[i], 1);
     value = panel->balance;
     if (value == 0) {
         for (i = 0; i < 4; i++)
@@ -44,12 +33,6 @@ void SolarBank_RefreshAmountDigits(struct SolarBankPanel *panel)
         digits[2] = Div(value, 10);
         digits[3] = value - digits[2] * 10;
     }
-    digit = digits;
-    anim = panel->balanceDigits;
-    remaining = 3;
-    do {
-        Anim_LoadKeyframe(anim, data, (u16)*digit++, 1);
-        anim++;
-        remaining--;
-    } while (remaining >= 0);
+    for (i = 0; i < 4; i++)
+        Anim_LoadKeyframe(&panel->balanceDigits[i], &panel->animData, (u16)digits[i], 1);
 }
