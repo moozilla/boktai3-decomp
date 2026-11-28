@@ -276,3 +276,4 @@ src/link/player/PlayerCue_UpdateFacingPose.c	PlayerCue_UpdateFacingPose	contrive
 src/link/player/PlayerCue_UpdatePoseRecovery.c	PlayerCue_UpdatePoseRecovery	contrived	minor	4	secondary sprite viewed through its draw-flags field
 src/link/player/PlayerCue_UpdateTerrainSlide.c	PlayerCue_UpdateTerrainSlide	contrived	minor	4	secondary sprite viewed through its draw-flags field
 src/link/player/PlayerCue_UpdateSpiralPose.c	PlayerCue_UpdateSpiralPose	contrived	minor	2	secondary sprite viewed through its draw-flags field
+src/link/player/sub_082420D4.c	sub_082420D4	minor	natural	2	separate turned local for the saved-option offset
