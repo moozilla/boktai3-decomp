@@ -775,24 +775,12 @@ void TutorialOtenko_BeginCurveToPosition(void)
     g->resource = Script_GetValue();
     if (Script_SeekToKeyword(0x74)) {
         g->targetX = Script_GetValue();
-        {
-            u32 value = Script_GetValue() + 160;
-            g->targetY = value;
-        }
+        g->targetY = Script_GetValue() + 160;
         g->targetZ = Script_GetValue();
     } else {
-        {
-            u32 value = (u16)g->owner->position.x;
-            g->targetX = value;
-        }
-        {
-            u32 value = (u16)g->owner->position.y + 160;
-            g->targetY = value;
-        }
-        {
-            u32 value = (u16)g->owner->position.z;
-            g->targetZ = value;
-        }
+        g->targetX = g->owner->position.x;
+        g->targetY = g->owner->position.y + 160;
+        g->targetZ = g->owner->position.z;
     }
     g->targetFacing = Script_GetKeywordValue(0x64, -1);
     g->handle = (void *)Script_GetKeywordValue(0x70, 0);
