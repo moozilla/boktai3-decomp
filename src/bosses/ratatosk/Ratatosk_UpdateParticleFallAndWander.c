@@ -26,8 +26,8 @@ s32 Ratatosk_UpdateParticleFallAndWander(struct RatatoskParticle *particle, s32 
                 u32 sample = gUnk_086141BC[gEffectRandomTableIndex];
                 params->speed = sample & 3;
             }
-            params->angle =
-                gUnk_086141BC[gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 0x3FF];
+            gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 0x3FF;
+            params->angle = gUnk_086141BC[gEffectRandomTableIndex];
         }
     }
     return 0;
