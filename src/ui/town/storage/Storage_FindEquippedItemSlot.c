@@ -1,27 +1,13 @@
 #include "global.h"
-extern u8 *gGameState;
-s32 Storage_FindEquippedItemSlot(u32 a, s32 v)
+#include "system/game_state/game_state.h"
+s32 Storage_FindEquippedItemSlot(u32 unused, s32 slot)
 {
     s32 i;
-    s16 *q;
-    s32 r;
-    if (v <= 0xf)
-        goto setup;
-    goto none;
-found:
-    r = i;
-    goto end;
-setup:
-    i = 0;
-    q = (s16 *)(gGameState + 0x68);
-    do {
-        if (*q == v)
-            goto found;
-        q++;
-        i++;
-    } while (i <= 7);
-none:
-    r = -1;
-end:
-    return r;
+    if (slot > 0xf)
+        return -1;
+    for (i = 0; i < 8; i++) {
+        if (gGameState->inventory[i] == slot)
+            return i;
+    }
+    return -1;
 }

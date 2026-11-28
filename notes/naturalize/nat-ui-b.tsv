@@ -577,3 +577,4 @@ src/ui/town/storage/Storage_SetUpdateCallback.c	Storage_SetUpdateCallback	contri
 src/ui/town/storage/Storage_SetInteractionMode.c	Storage_SetInteractionMode	contrived	natural	1	
 src/ui/town/storage/Storage_SetState.c	Storage_SetState	contrived	natural	3	
 src/ui/town/storage/Storage_InitSlotMapping.c	Storage_InitSlotMapping	contrived	natural	1	
+src/ui/town/storage/Storage_FindEquippedItemSlot.c	Storage_FindEquippedItemSlot	contrived	natural	6	
