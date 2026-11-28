@@ -2733,10 +2733,6 @@ u8 SceneActor_TryTrackNearbyPlayer(struct ChaseActor *actor, struct ContactPosit
 {
     struct SceneActorChaseGroup *group = &actor->group;
     struct ContactPosition delta;
-    struct ContactPosition *deltaPointer;
-    struct ContactPosition *position;
-    u32 distance;
-    struct SceneActorChaseTracking *tracking;
     if (playerId != gTrackedPlayerId[0])
         goto fail;
     {
@@ -2745,15 +2741,9 @@ u8 SceneActor_TryTrackNearbyPlayer(struct ChaseActor *actor, struct ContactPosit
         if (!(player->statusFlags & mask))
             goto fail;
     }
-    deltaPointer = &delta;
-    Vanargand_Difference(deltaPointer, input, &actor->base.body.position);
-    distance = delta.x * delta.x + deltaPointer->z * deltaPointer->z;
-    {
-        u32 range = group->common.control.radiusSquared;
-        position = &actor->base.body.position;
-        if (distance >= range)
-            goto fail;
-    }
+    Vanargand_Difference(&delta, input, &actor->base.body.position);
+    if ((delta.x * delta.x + delta.z * delta.z) >= group->common.control.radiusSquared)
+        goto fail;
     if (!(u8)SceneActorPath_FaceAndCheckStraightPath(actor))
         goto fail;
     SceneActorChase_ClearActorFlags(actor, 0x80);
@@ -2761,28 +2751,24 @@ u8 SceneActor_TryTrackNearbyPlayer(struct ChaseActor *actor, struct ContactPosit
         struct Mummy *parent = actor->base.context;
         u32 mask = 0x800;
         u16 *flags = &parent->flags6F2;
-        u32 value = *flags;
-        mask |= value;
+        mask |= *flags;
         *flags = mask;
     }
-    tracking = &actor->base.tracking;
-    tracking->target = &((struct SceneActorChasePlayer *)gPlayers[0])->target;
+    actor->base.tracking.target = &((struct SceneActorChasePlayer *)gPlayers[0])->target;
     if (IsPlayerTracked(actor))
-        tracking->target = &((struct SceneActorChasePlayer *)gPlayers[0])->target;
-    else if (!tracking->target)
+        actor->base.tracking.target = &((struct SceneActorChasePlayer *)gPlayers[0])->target;
+    else if (!actor->base.tracking.target)
         goto ready;
     {
-        struct SceneActorChaseTarget *target = tracking->target;
-        s32 dx = target->position.x - position->x;
-        s32 dz = target->position.z - actor->base.body.position.z;
+        s32 dx = actor->base.tracking.target->position.x - actor->base.body.position.x;
+        s32 dz = actor->base.tracking.target->position.z - actor->base.body.position.z;
         actor->base.tracking.heading = Math_Atan2(dx, dz);
         actor->base.tracking.distance = dx * dx + dz * dz;
     }
 ready: {
     u32 mask = 0x80;
     u16 *flags = &actor->base.reactionFlags;
-    u32 value = *flags;
-    mask |= value;
+    mask |= *flags;
     *flags = mask;
 }
     return 1;
