@@ -543,3 +543,4 @@ src/system/inventory/Inventory_GetItemOverrideFlag.c	Inventory_GetItemOverrideFl
 src/system/inventory/Inventory_GetItemId.c	Inventory_GetItemId	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
 src/system/inventory/Inventory_GetKeyItemId.c	Inventory_GetKeyItemId	contrived	minor	1	u16 field read as signed through a cast
 src/system/inventory/Inventory_SetItemId.c	Inventory_SetItemId	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
+src/system/inventory/Inventory_SetKeyItemId.c	Inventory_SetKeyItemId	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
