@@ -4,41 +4,17 @@
 #include "player/cutscene/player_cue_sequence.h"
 #include "bosses/vanargand/vanargand_projectiles.h"
 
-struct P {
-    u8 pad0[0x30];
-    struct SceneVec position;
-    u8 pad38[0x14C - 0x38];
-    struct ContactSwarmSprite sprite;
-    u8 pad1[0x3A2 - 0x14C - sizeof(struct ContactSwarmSprite)];
-    u8 facing, flip, dir;
-    u8 pad2[0x3FC - 0x3A5];
-    struct DisplaySequenceState seq;
-    u32 unknown40C;
-    const void *resource;
-    const void *resource2;
-    u8 pad3[0x458 - 0x418];
-    u8 phase;
-    u8 pad4;
-    u16 timer;
-    u8 pad5[0x4E8 - 0x45C];
-    u16 scale;
-    u8 pad6[0x58C - 0x4EA];
-    void (*fn)(struct P *);
-};
-void Player_SetTetherMode(struct P *, s32, s32);
+void Player_SetTetherMode(struct Player *, s32, s32);
 void Player_PlayLocalSong(s32, u32);
 void Camera_RequestShake(u32);
 void RecoilPuff_Spawn(void *);
-void Player_UpdateActionFacingSide(struct P *);
+void Player_UpdateActionFacingSide(struct Player *);
 extern const s16 gUnk_086149C4[];
 struct PackedVec {
     u32 x : 16;
     s32 y : 16;
     u32 z : 16, pad : 16;
 };
-#define B(o) (*(u8 *)((u8 *)p + (o)))
-#define H(o) (*(u16 *)((u8 *)p + (o)))
-#define W(o) (*(u32 *)((u8 *)p + (o)))
 // confidence=low: a landing cue that slides toward a terrain target, then returns to idle
 static inline s32 Scale3(s32 v)
 {
@@ -46,62 +22,55 @@ static inline s32 Scale3(s32 v)
         return v >> 3;
     return -(-v >> 3);
 }
-void PlayerCue_UpdateTerrainSlide(struct P *p)
+void PlayerCue_UpdateTerrainSlide(struct Player *p)
 {
-    if (B(0x457) != 0x1d) {
-        if (p->dir > 4) {
-            p->facing = (8 - p->dir) >> 1;
-            p->flip = 1;
+    if (p->tetherMode != 0x1d) {
+        if (p->facing > 4) {
+            p->heading = (8 - p->facing) >> 1;
+            p->side = 1;
         } else {
-            p->facing = p->dir >> 1;
-            p->flip = 0;
+            p->heading = p->facing >> 1;
+            p->side = 0;
         }
-        if (H(0x4C2) != 0) {
-            Player_PlayLocalSong(W(0x18), H(0x4C2));
-            H(0x4C2) = 0;
+        if (p->contactActionTag != 0) {
+            Player_PlayLocalSong(p->slot, p->contactActionTag);
+            p->contactActionTag = 0;
         }
         Player_SetTetherMode(p, 0x1d, 0);
     }
-    Anim_SetSequence(&p->seq, p->resource, 2, p->facing, p->flip);
-    PlayerCue_StepSequence(&p->sprite, &p->seq);
-    {
-        struct Player *player = (struct Player *)p;
-        if (player->directionFrame != 0) {
-            if (player->terrainClampBlocked) {
-                s32 dx = player->terrainTarget->x - p->position.x;
-                s32 dz = player->terrainTarget->z - p->position.z;
-                H(0x38) = Scale3(dx);
-                H(0x3C) = Scale3(dz);
-                {
-                    u16 *t = &H(0x45A);
-                    if (*t <= 5) {
-                        if ((*t & 1) == 0) {
-                            Player_PlayLocalSong(W(0x18), 0x191);
-                            RecoilPuff_Spawn(&p->position);
-                        }
-                        (*t)++;
-                    }
+    Anim_SetSequence(&p->cueCollider.sequence, p->cueCollider.sideResource, 2, p->heading, p->side);
+    PlayerCue_StepSequence((struct ContactSwarmSprite *)&p->secondaryDrawFlags,
+                           &p->cueCollider.sequence);
+    if (p->directionFrame != 0) {
+        if (p->terrainClampBlocked) {
+            s32 dx = p->terrainTarget->x - p->position.x;
+            s32 dz = p->terrainTarget->z - p->position.z;
+            p->velocityX = Scale3(dx);
+            p->velocityZ = Scale3(dz);
+            if (p->tetherFrame <= 5) {
+                if ((p->tetherFrame & 1) == 0) {
+                    Player_PlayLocalSong(p->slot, 0x191);
+                    RecoilPuff_Spawn(&p->position);
                 }
-            } else {
-                u32 ang = ((p->dir + 5) & 7) << 5;
-                H(0x38) = -VanargandProjectile_Scale(gUnk_086149C4[(ang + 0x40) & 0xff] * H(0x270));
-                H(0x3C) = -VanargandProjectile_Scale(gUnk_086149C4[ang] * H(0x270));
-            }
-            {
-                u16 *q = &H(0x270);
-                Camera_RequestShake(*q);
-                *q = (*q * 3) >> 2;
+                p->tetherFrame++;
             }
         } else {
-            H(0x270) = 0;
-            B(0x479) = 0;
-            B(0x4BA) = 0;
-            if (B(0x5B9) == 3 && B(0x5BB) != 0) {
-                Player_SetTetherMode(p, 0x16, 0);
-            } else {
-                Player_UpdateActionFacingSide(p);
-                Player_SetTetherMode(p, 0, 0);
-            }
+            u32 ang = ((p->facing + 5) & 7) << 5;
+            p->velocityX =
+                -VanargandProjectile_Scale(gUnk_086149C4[(ang + 0x40) & 0xff] * p->directionFrame);
+            p->velocityZ = -VanargandProjectile_Scale(gUnk_086149C4[ang] * p->directionFrame);
+        }
+        Camera_RequestShake(p->directionFrame);
+        p->directionFrame = (p->directionFrame * 3) >> 2;
+    } else {
+        p->directionFrame = 0;
+        p->terrainClampBlocked = 0;
+        p->contactSpecial = 0;
+        if (p->movementModifierKind == 3 && p->movementModifierActive != 0) {
+            Player_SetTetherMode(p, 0x16, 0);
+        } else {
+            Player_UpdateActionFacingSide(p);
+            Player_SetTetherMode(p, 0, 0);
         }
     }
 }
