@@ -1,27 +1,28 @@
 #include "global.h"
-struct VecB278 {
-    u32 x : 16, y : 16, z : 16;
-};
-void Collider_Init(u8 *, s32, s32, s32, s32, struct VecB278 *, struct VecB278 *);
-void Collider_SetAttackProperties(u8 *, s32, s32, s32, s32, s32);
-void Collider_SetCallback(u8 *, void *, u8 *);
-void Collider_SetPosition(u8 *, u8 *, s32);
+#include "player/player.h"
+
+void Collider_Init(void *, s32, s32, s32, s32, struct SceneVec *, struct SceneVec *);
+void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
+void Collider_SetCallback(void *, void *, void *);
+void Collider_SetPosition(void *, void *, s32);
 void Player_ApplyGatedContact(void);
-s32 Collider_Refresh(u8 *);
-void Player_InitBodyCollider(u8 *p)
+s32 Collider_Refresh(void *);
+
+void Player_InitBodyCollider(struct Player *p)
 {
-    struct VecB278 scale;
-    struct VecB278 position;
-    u8 *q = p + 0x230;
-    scale.x = 50;
-    scale.y = 127;
-    scale.z = 50;
-    position.x = 0;
-    position.y = 127;
-    position.z = 0;
-    Collider_Init(q, *(u16 *)(p + 0x24), 0x4001, 0, (u16)(1U << *(u32 *)(p + 0x18)), &scale,
-                  &position);
-    Collider_SetCallback(q, Player_ApplyGatedContact, p);
-    Collider_SetPosition(q, p + 0x168, 0);
-    Collider_Refresh(q);
+    struct SceneVec size;
+    struct SceneVec offset;
+    struct PlayerCollider *collider = &p->collider;
+
+    size.x = 50;
+    size.y = 127;
+    size.z = 50;
+    offset.x = 0;
+    offset.y = 127;
+    offset.z = 0;
+    Collider_Init(collider, p->positionalEffectGroup, 0x4001, 0, (u16)(1 << p->slot), &size,
+                  &offset);
+    Collider_SetCallback(collider, Player_ApplyGatedContact, p);
+    Collider_SetPosition(collider, &p->colliderPosition, 0);
+    Collider_Refresh(collider);
 }
