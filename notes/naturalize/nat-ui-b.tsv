@@ -199,3 +199,5 @@ src/ui/title/password_menu.c	PasswordMenu_MoveCursorUp	minor	natural	1	-
 src/ui/title/password_menu.c	PasswordMenu_MoveCursorDown	minor	natural	1	-
 src/ui/title/password_menu.c	PasswordMenu_MoveCursorLeft	minor	natural	1	-
 src/ui/title/password_menu.c	PasswordMenu_MoveCursorRight	minor	natural	1	-
+src/ui/title/password_menu.c	PasswordMenu_UpdateKeyboardCursor	natural	natural	0	-
+src/ui/title/password_menu.c	PasswordMenu_RedrawSelection	contrived	natural	1	-

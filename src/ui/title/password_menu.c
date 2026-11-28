@@ -383,12 +383,8 @@ void PasswordMenu_RedrawSelection(struct PasswordMenu *p, s32 n)
     d = Div(n, 6);
     x = (n - d * 6) * 2 + tbl[d][0];
     y = tbl[d][1];
-    {
-        u32 base = Script_ParseStringRef(gSelectionMenuParameters.pBlock);
-        s32 off = n * 4;
-        u8 *a = (u8 *)p->selections;
-        text = Text_LookupString(base + *(u32 *)(a + off));
-    }
+    text = Text_LookupString(Script_ParseStringRef(gSelectionMenuParameters.pBlock) +
+                             p->selections[n]);
     Menu_EraseRect(x, y, 2, 2);
     Menu_DrawText(x, y, text);
 }
