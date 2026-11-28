@@ -1,15 +1,9 @@
 #include "global.h"
+#include "ui/books/bestiary_display.h"
 
-struct S {
-    u8 pad[0x9ec];
-    u16 h9ec;
-    u16 h9ee;
-    u16 h9f0;
-};
-
-void BestiaryDisplay_SetPosition(struct S *p, u16 a, u16 b)
+void BestiaryDisplay_SetPosition(struct BestiaryDisplay *p, u16 x, u16 y)
 {
-    p->h9ec = a;
-    p->h9ee = b;
-    p->h9f0 = 0;
+    p->origin[0] = x;
+    p->origin[1] = y;
+    p->origin[2] = 0;
 }
