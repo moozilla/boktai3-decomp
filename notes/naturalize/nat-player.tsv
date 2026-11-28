@@ -212,3 +212,4 @@ src/player/core/player_core.c	ScreenMote_ResetManager	natural	natural	0
 src/player/core/player_core.c	Player_UpdateFacingSide	natural	natural	0	
 src/player/core/player_core.c	Player_SetAnimation	contrived	contrived	3	unchanged so far: plain member forms differ by 1+ insns (alias, anim pointer and sum block fix register order); retry
 src/player/core/player_core.c	PlayerAnimation_SelectSecondaryKeyframes	contrived	contrived	2	unchanged so far: plain forms change register use; retry
+src/player/core/player_core.c	Player_SetAnimation	contrived	natural	16	

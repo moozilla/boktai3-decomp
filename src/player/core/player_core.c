@@ -20,29 +20,22 @@ void Player_UpdateFacingSide(struct Player *player)
     }
 }
 
-s32 Player_SetAnimation(void *player, u32 index, u32 rate, u32 mode)
+s32 Player_SetAnimation(struct Player *player, u32 index, u32 rate, u32 mode)
 {
-    struct Player *actor;
     struct AnimSprite *anim;
-    void *data;
     u32 flags = 4;
-    actor = player;
-    if (actor->animationIndex == index)
+    if (player->animationIndex == index)
         flags = 5;
-    actor->animationIndex = index;
-    anim = &actor->animation;
-    data = actor->animationData;
-    {
-        u32 sum = index;
-        sum += actor->heading;
-        Anim_SetKeyframes(&actor->animation, data, (u16)sum, (u16)mode, flags);
-    }
-    if (actor->side)
+    player->animationIndex = index;
+    anim = &player->animation;
+    Anim_SetKeyframes(&player->animation, player->animationData,
+                      (u16)(player->animationIndex + player->heading), (u16)mode, flags);
+    if (player->side)
         anim->flags |= 4;
     else
-        (&actor->animation)->flags &= ~4;
-    Anim_SetFrameDurationScale(&actor->animation, (u16)rate);
-    return Anim_Step(&actor->animation, actor->animationData);
+        anim->flags &= ~4;
+    Anim_SetFrameDurationScale(&player->animation, (u16)rate);
+    return Anim_Step(&player->animation, player->animationData);
 }
 
 s32 PlayerAnimation_SelectSecondaryKeyframes(struct Player *player, s32 index, s32 rate)
