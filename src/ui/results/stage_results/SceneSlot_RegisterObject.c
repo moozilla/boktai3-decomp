@@ -1,36 +1,24 @@
-#define SceneSlot_GetOrCreateRegistry ActorMarkerPool_EnsureSingleton
-#define gSceneSlotRegistry            gPanelSpritePool
 #include "global.h"
-#include "engine/ram.h"
-struct SceneSlot {
-    u32 flags;
-    u8 unknown4[0x38];
-    void *object;
-    u32 occupied;
-    u8 unknown44[0x1C];
-};
-struct SceneSlotRegistry {
-    u8 unknown0[0x34];
-    struct SceneSlot slots[8];
-};
-struct SceneSlotRegistry *ActorMarkerPool_EnsureSingleton(void);
-s32 SceneSlot_RegisterObject(void *object)
+#include "ui/results/actor_marker_pool.h"
+
+u8 *ActorMarkerPool_EnsureSingleton(void);
+
+s32 SceneSlot_RegisterObject(const struct FixedPosition *anchor)
 {
-    struct SceneSlotRegistry *existing = gSceneSlotRegistry;
-    struct SceneSlotRegistry *registry;
+    struct MarkerPool *pool;
     s32 i;
-    if (!existing) {
-        registry = SceneSlot_GetOrCreateRegistry();
-        if (!registry)
-            return -1;
+    if (gPanelSpritePool) {
+        pool = (struct MarkerPool *)gPanelSpritePool;
     } else {
-        registry = existing;
+        pool = (struct MarkerPool *)ActorMarkerPool_EnsureSingleton();
+        if (!pool)
+            return -1;
     }
     for (i = 0; i < 8; i++) {
-        if (!registry->slots[i].occupied) {
-            registry->slots[i].object = object;
-            registry->slots[i].flags &= ~1;
-            registry->slots[i].occupied = 1;
+        if (!pool->slots[i].active) {
+            pool->slots[i].anchor = anchor;
+            pool->slots[i].sprite.flags &= ~1;
+            pool->slots[i].active = 1;
             return i;
         }
     }
