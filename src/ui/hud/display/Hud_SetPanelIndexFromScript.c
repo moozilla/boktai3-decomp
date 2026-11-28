@@ -1,12 +1,12 @@
 #include "global.h"
+#include "engine/engine.h"
 #include "engine/ram.h"
-s32 Script_SeekToKeyword(s32);
-s32 Script_GetValue(void);
+#include "ui/pause/scene_hud_display.h"
 void Hud_SetPanelIndexFromScript(void)
 {
-    u8 *p = gFieldHud;
-    if (p) {
-        if (Script_SeekToKeyword(0x69))
-            p[0x4864] = Script_GetValue();
+    struct SceneHudState *hud = (struct SceneHudState *)gFieldHud;
+    if (hud) {
+        if (Script_SeekToKeyword('i'))
+            hud->scriptPanelIndex = Script_GetValue();
     }
 }

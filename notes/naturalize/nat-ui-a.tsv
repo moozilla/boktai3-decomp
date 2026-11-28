@@ -580,3 +580,6 @@ src/ui/hud/display/Hud_RegisterTimer.c	Hud_RegisterTimer	fudged	natural	1
 src/ui/hud/display/Hud_ClearTimer.c	Hud_ClearTimer	fudged	natural	1	
 src/ui/hud/display/sub_08178474.c	sub_08178474	fudged	natural	1	
 src/ui/hud/display/SceneHud_RefreshControls.c	SceneHud_RefreshControls	fudged	partial	2	owner local before storing the action owner; gFieldHud u8* casts
+src/ui/hud/display/SceneHud_SetTimedState.c	SceneHud_SetTimedState	natural	natural	0	
+src/ui/hud/display/sub_0817845C.c	sub_0817845C	natural	natural	0	
+src/ui/hud/display/Hud_SetPanelIndexFromScript.c	Hud_SetPanelIndexFromScript	fudged	natural	1	

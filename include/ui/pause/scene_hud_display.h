@@ -122,7 +122,7 @@ struct SceneHudState {
     u16 meterPulseFrame;       /* 0xA64: 60-frame HUD meter pulse */
     u16 fieldValueMode;    /* 0xA66 */
     u16 *fieldValueSource; /* 0xA68 */
-    u8 playerValueEnabled, unknownA6D;
+    u8 playerValueEnabled, messageDisplayTimer;
     u16 timedStateParameter;                            /* 0xA6E: sixth argument to 081781B4 */
     u16 timedStateStart;                                /* 0xA70: negative input clamps to zero */
     u16 timedStateValue;                                /* 0xA72 */
@@ -248,7 +248,8 @@ struct SceneHudState {
     u8 actionTransferBonus; /* 0x4861: bonus animation/palette selection (tentative) */
     u8 selectedStat,
         appliedStatIncrease; /* 0x4862: base-stat bonus selection and clamped increase */
-    u8 unknown4864[2];
+    u8 scriptPanelIndex; /* 0x4864: script -i (tentative) */
+    u8 unknown4865;
     s16 appliedStatB; /* 0x4866: nonnegative stat B change */
     u8 unknown4868[2];
     u16 savedStatA; /* 0x486A: restored after a previewed item effect */
