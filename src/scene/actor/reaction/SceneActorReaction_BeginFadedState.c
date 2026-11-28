@@ -1,3 +1,4 @@
+#include "scene/motion/scene_actor_terrain_reaction.h"
 #include "scene/actor/scene_actor_reaction.h"
 void SceneActorReaction_BeginFadedState(struct ChaseActor *actor)
 {
@@ -19,8 +20,6 @@ void SceneActorReaction_BeginFadedState(struct ChaseActor *actor)
         }
         {
             struct ContactCollider *collider = &actor->base.colliderA;
-            u32 old;
-            old = collider->flags;
             collider->flags = 4 | collider->flags;
             actor->base.colliderA.responseValue = 0;
         }
@@ -47,9 +46,11 @@ void SceneActorReaction_BeginFadedState(struct ChaseActor *actor)
         }
         actor->base.attachmentTimer = 0;
         if (actor->base.drawableKind == 0)
-            ((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sprite.priority = state;
+            ((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sprite.priority =
+                state;
         else
-            ((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile.attribute1A = state;
+            ((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile.attribute1A =
+                state;
         {
             u32 mask = 0x80000;
             u32 *field;
