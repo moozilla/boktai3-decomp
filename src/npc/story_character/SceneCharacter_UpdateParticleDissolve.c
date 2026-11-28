@@ -1,37 +1,33 @@
-#include "global.h"
+#include "npc/story_character/scene_character.h"
+#include "scene/collision/contact_position.h"
+
 s32 Mod(s32, s32);
-struct Pair081CBC44 {
-    u32 a, b;
-};
-struct Pair081CBC44 *SunOrb_GetPosition(s32);
+struct ContactPosition *SunOrb_GetPosition(s32);
 void sub_081FED40(s32);
 void Sound_PlaySong(u32);
-void StoryCharacter_SpawnRadialEffect(u8 *);
-void SceneCharacter_UpdateParticleDissolve(u8 *a, u8 *b, s32 frame)
+void StoryCharacter_SpawnRadialEffect(struct SceneNpc *);
+
+void SceneCharacter_UpdateParticleDissolve(void *context, struct SceneNpc *actor, s32 frame)
 {
-    u8 *pos = b + 0x20;
-    if (b[9]) {
-        u32 zero = 0;
-        b[9] = zero;
-        b[7] = zero;
-        *(struct Pair081CBC44 *)(pos + 8) = *SunOrb_GetPosition(*(s16 *)(pos + 4));
-        sub_081FED40(*(s16 *)(pos + 4));
+    struct SceneCharacterEffects *effects = &actor->effects;
+    s32 i;
+    if (actor->animationEntered) {
+        actor->animationEntered = 0;
+        actor->done = 0;
+        *(struct ContactPosition *)effects->unknown8 = *SunOrb_GetPosition((s16)effects->orbId);
+        sub_081FED40((s16)effects->orbId);
         Sound_PlaySong(0x5ca);
-        b[0x18] = zero;
-        *(u32 *)(b + 0x10) = zero;
+        actor->animationPhase = 0;
+        actor->stateFrame = 0;
     }
     if (frame <= 30) {
         if (frame <= 19 || Mod(frame, 2) == 0) {
-            StoryCharacter_SpawnRadialEffect(b);
-            if (frame <= 9) {
-                s32 i = 1;
-                do {
-                    StoryCharacter_SpawnRadialEffect(b);
-                    i--;
-                } while (i >= 0);
-            }
+            StoryCharacter_SpawnRadialEffect(actor);
+            if (frame <= 9)
+                for (i = 0; i < 2; i++)
+                    StoryCharacter_SpawnRadialEffect(actor);
         }
     }
     if (frame > 30)
-        b[7] = 1;
+        actor->done = 1;
 }

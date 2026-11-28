@@ -219,3 +219,6 @@ src/npc/story_character/SceneCharacter_UpdateSlowingBlink.c	SceneCharacter_Updat
 src/npc/story_character/SceneCharacter_UpdateAcceleratingBlink.c	SceneCharacter_UpdateAcceleratingBlink	natural	natural	1	
 src/npc/story_character/SceneCharacter_UpdateContinuousBlink.c	SceneCharacter_UpdateContinuousBlink	natural	natural	1	
 src/npc/story_character/StoryCharacter_StartAnimStep.c	StoryCharacter_StartAnimStep	natural	natural	2	
+src/npc/story_character/SceneCharacter_UpdateAnimationTen.c	SceneCharacter_UpdateAnimationTen	natural	natural	0	
+src/npc/story_character/SceneCharacter_FaceSceneTarget.c	SceneCharacter_FaceSceneTarget	natural	natural	0	
+src/npc/story_character/SceneCharacter_UpdateParticleDissolve.c	SceneCharacter_UpdateParticleDissolve	contrived	minor	1	the copied orb position is a ContactPosition view of effects.unknown8
