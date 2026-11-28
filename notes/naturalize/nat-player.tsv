@@ -60,3 +60,5 @@ src/player/appearance/player_visuals.c	Player_QueueStatusEffect	natural	natural	
 src/player/appearance/player_visuals.c	Player_GetEffectTickDelta	natural	natural	0	-
 src/player/appearance/player_visuals.c	SceneActor_SelectEffectDisplayMode	natural	natural	0	-
 src/player/appearance/player_visuals.c	sub_0813D834	contrived	contrived	30	do/while(0) with goto and byte offset: break or a plain block changes the movs offset order and register allocation
+src/player/appearance/player_visuals.c	Player_ClearStateTimer	natural	natural	0	-
+src/player/appearance/player_visuals.c	Player_SelectTimedVisualMode	contrived	contrived	8	resource address via casts: counters628[slot] computes the base first; VisualBonusFlag accessor: plain test differs

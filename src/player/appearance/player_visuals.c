@@ -639,7 +639,7 @@ s32 Player_SelectTimedVisualMode(struct Player *p, s32 mode)
 {
     s32 *resource;
     s32 i;
-    if ((u8)(p->actionMode - 1) <= 1 || VisualBonusFlag(p, 0x20000000))
+    if (p->actionMode == 1 || p->actionMode == 2 || VisualBonusFlag(p, 0x20000000))
         *(s32 *)(p->timedEventSlot * 4 + (u8 *)gGameState + 0x628) = 0;
     {
         u32 slot = p->timedEventSlot;
@@ -656,17 +656,16 @@ s32 Player_SelectTimedVisualMode(struct Player *p, s32 mode)
         mode = 6;
         p->contactFlashTimer = 64;
     } else {
-        u16 *timer = &p->contactFlashTimer;
-        if (*timer) {
-            if ((*timer >> 2) & 1)
+        if (p->contactFlashTimer) {
+            if ((p->contactFlashTimer >> 2) & 1)
                 mode = 6;
-            --*timer;
+            --p->contactFlashTimer;
         }
     }
     for (i = 0; i <= 1; i++) {
         switch (i) {
             case 0:
-                if ((u8)(p->actionMode - 1) <= 1) {
+                if (p->actionMode == 1 || p->actionMode == 2) {
                     p->scriptStatus[0] = 0;
                     p->scriptFlashTimer = 0;
                 } else if (p->scriptStatus[0]) {
@@ -679,16 +678,15 @@ s32 Player_SelectTimedVisualMode(struct Player *p, s32 mode)
                     mode = 2;
                     p->scriptFlashTimer = 64;
                 } else {
-                    u16 *timer = &p->scriptFlashTimer;
-                    if (*timer) {
-                        if ((*timer >> 2) & 1)
+                    if (p->scriptFlashTimer) {
+                        if ((p->scriptFlashTimer >> 2) & 1)
                             mode = 2;
-                        --*timer;
+                        --p->scriptFlashTimer;
                     }
                 }
                 break;
             case 1:
-                if ((u8)(p->actionMode - 1) <= 1 || VisualBonusFlag(p, 0x20000000)) {
+                if (p->actionMode == 1 || p->actionMode == 2 || VisualBonusFlag(p, 0x20000000)) {
                     if (p->scriptStatus[i]) {
                         Player_NotifyActionCategories(p);
                         p->catalogSavedOption = gGameState->values08[4];
