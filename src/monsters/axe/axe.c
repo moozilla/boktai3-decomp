@@ -488,18 +488,18 @@ void Axe_UpdateTargetLunge(struct ChaseActor *a, s32 frame)
 
 void SceneActorControl_ResetRotation(struct ChaseActor *actor)
 {
-    u8 *state = actor->base.context;
+    struct Axe *axe = actor->base.context;
     struct RotatingDrawable *drawable = actor->base.drawable;
     s32 angle;
     u8 *timer;
     if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
         drawable->flags |= 2;
-        state[0xEAF] = 30;
+        axe->unknownEAF = 30;
     }
     angle = NormalizeAngle(drawable->angle);
     if (angle > 0) {
         s32 step;
-        timer = &state[0xEAF];
+        timer = &axe->unknownEAF;
         step = Div(angle, *timer);
         drawable->angle -= step;
     } else {
@@ -507,13 +507,13 @@ void SceneActorControl_ResetRotation(struct ChaseActor *actor)
         s32 step;
         if (magnitude < 0)
             magnitude = -magnitude;
-        timer = &state[0xEAF];
+        timer = &axe->unknownEAF;
         step = Div(magnitude, *timer);
         drawable->angle += step;
     }
     --*timer;
-    if (state[0xEAF] == 0) {
-        Axe_SetAuxiliarySpriteRenderState(actor, state + 0x888, 0x13C);
+    if (axe->unknownEAF == 0) {
+        Axe_SetAuxiliarySpriteRenderState(actor, axe->blackPalette, 0x13C);
         actor->base.stepDone = 1;
     }
 }
