@@ -208,8 +208,7 @@ void NidhoggrDuelMinion_UpdateDying(struct ContactSequenceOwner *parent,
         TransientSpriteEffects_Spawn(0, 0x1004, scatterPosition, 0, 256, 256);
         ImpactParticleGroup_SpawnRadial(4, 14, position, 64, 256, 12, 8, 8, 8, 30, 30);
         {
-            s32 health = actor->health;
-            if ((health <= 0) && parent->script) {
+            if ((actor->health <= 0) && parent->script) {
                 coordinates[0] = actor->position.x;
                 coordinates[1] = actor->position.y;
                 coordinates[2] = actor->position.z;
