@@ -414,3 +414,8 @@ src/scene/actor/placement/SceneActorPlacement_ConsumeShakeFlags.c	SceneActorPlac
 src/scene/actor/placement/SceneActorPlacement_PlayVariantEventSound.c	SceneActorPlacement_PlayVariantEventSound	minor	minor	0	unsigned long long flag test: a plain & 4 drops the widened test
 src/scene/actor/placement/SceneActorPlacement_PlayCategoryEventSound.c	SceneActorPlacement_PlayCategoryEventSound	minor	minor	0	parked mask and flag pointer: a plain test loads the field before the mask
 src/scene/actor/placement/SceneActorEffects_AdvanceSteps.c	SceneActorEffects_AdvanceSteps	contrived	minor	2	countdown do-while: a for loop counting up compiles differently
+src/scene/actor/placement/SceneActorTerrain_RequestRetreatRoute.c	SceneActorTerrain_RequestRetreatRoute	minor	minor	0	untyped parameter copy: a typed ChaseActor parameter changes register allocation
+src/scene/actor/placement/SceneActorEffects_EmitRandomOffsets.c	SceneActorEffects_EmitRandomOffsets	minor	minor	0	random table view union: direct indexing loads the table address differently
+src/scene/actor/placement/SceneActorPlacement_EmitTimedParticles.c	SceneActorPlacement_EmitTimedParticles	contrived	contrived	0	byte-assembled table address and raw emission view: a plain table pointer is constant folded
+src/scene/actor/placement/SceneActorPlacement_PlayCategoryResponseSound.c	SceneActorPlacement_PlayCategoryResponseSound	minor	minor	0	unsigned long long flag test and parked mask: plain tests drop the widened compare
+src/scene/actor/placement/SceneActorEffects_ReleaseResources.c	SceneActorEffects_ReleaseResources	contrived	contrived	4	parked flag masks, predicate and identity pointer: plain tests load the field before the mask and drop the saved pointers

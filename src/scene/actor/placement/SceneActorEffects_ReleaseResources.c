@@ -34,12 +34,8 @@ void SceneActorEffects_ReleaseResources(struct ChaseActor *actor)
         if (TestValue(value))
             SceneMessages_UnregisterReceiver(actor->base.receiver);
     }
-    {
-        u8 *shadow;
-        shadow = actor->base.shadow;
-        if (*shadow)
-            Shadow_Destroy(shadow);
-    }
+    if (actor->base.shadow[0])
+        Shadow_Destroy(actor->base.shadow);
     if (*(u8 *)group->effectConfig)
         SceneActorEffects_DestroyGroup(group->effectConfig);
     {
