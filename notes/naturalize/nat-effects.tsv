@@ -195,3 +195,4 @@ src/effects/bursts/spiral_burst/SpiralBurst_SetState.c	SpiralBurst_SetState	cont
 src/effects/bursts/spiral_burst/SpiralBurst_OnTaskUpdate.c	SpiralBurst_OnTaskUpdate	contrived	natural	2	-
 src/effects/bursts/spiral_burst/SpiralBurst_OnTaskDestroy.c	SpiralBurst_OnTaskDestroy	contrived	natural	1	-
 src/effects/bursts/spiral_burst/SpiralBurst_InitCollider.c	SpiralBurst_InitCollider	minor	natural	3	-
+src/effects/bursts/spiral_burst/SpiralBurst_Init.c	SpiralBurst_Init	contrived	natural	1	-
