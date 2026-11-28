@@ -38,7 +38,6 @@ void SceneActorAnimation_UpdateEightDirectionCallback(void);
 void SceneActors_UpdateStationaryReaction(void);
 void sub_08022B18(void);
 
-
 struct CountResourceHeader {
     u32 words[8];
 };
@@ -131,10 +130,6 @@ struct CountInitGameState {
     s16 x, y, z;
 };
 
-static inline void CountInit_SetHeight(struct CountInit *p, s16 height)
-{
-    p->base.initialHeight = height;
-}
 static inline void CountInit_ConfigureAnimation(struct CountInitBase *p, u8 mode, u8 entry)
 {
     p->animationMode = mode;
@@ -162,8 +157,7 @@ static inline void CountInit_SetRequestedStateHandler(struct CountInitBase *p, v
     p->requestedStateCallback = callback;
 }
 
-static inline void CountInit_SetCameraOrbit(struct CountInitCamera *camera, u32 angle,
-                                              u32 distance)
+static inline void CountInit_SetCameraOrbit(struct CountInitCamera *camera, u32 angle, u32 distance)
 {
     camera->angle = angle;
     camera->distance = distance;
@@ -188,22 +182,21 @@ int sub_08028F78(struct CountInit *s, u32 id)
     u32 health;
     u32 facing;
 
-    actorType = Script_GetKeywordValue(0x74, 0);
+    actorType = Script_GetKeywordValue('t', 0);
     if (actorType)
         return -1;
     SceneActors_Register(base, 0);
-    base->kind = Script_GetKeywordValue(0x42, 0);
-    base->ambientMode = Script_GetKeywordValue(0x69, 0);
-    n = Script_GetKeywordValue(0x50, 1);
+    base->kind = Script_GetKeywordValue('B', 0);
+    base->ambientMode = Script_GetKeywordValue('i', 0);
+    n = Script_GetKeywordValue('P', 1);
     base->targetCount = n;
     i = 0;
     if (i < n) {
         u8 *count = &base->targetCount;
         void **dst = base->targetWords;
-        struct Player **src = gPlayers;
         /* Each entry advances one word; its position pointer shares the next slot. */
         do {
-            struct Player *q = *src;
+            struct Player *q = gPlayers[i];
             if (q) {
                 dst[0] = q;
                 dst[1] = &q->position;
@@ -212,7 +205,6 @@ int sub_08028F78(struct CountInit *s, u32 id)
                 dst[1] = 0;
             }
             dst++;
-            src++;
             i++;
         } while (i < *count);
     }
@@ -223,7 +215,7 @@ int sub_08028F78(struct CountInit *s, u32 id)
     s->base.resource = *resource;
     ResourceHeader_Relocate(&s->base.resource, resource);
 
-    if (Script_SeekToKeyword(0x70)) {
+    if (Script_SeekToKeyword('p')) {
         pos.x = Script_GetValue();
         pos.y = Script_GetValue();
         pos.z = Script_GetValue();
@@ -235,9 +227,9 @@ int sub_08028F78(struct CountInit *s, u32 id)
         pos.z = (u16)cfg->z;
         facing = 0x40;
     }
-    CountInit_SetHeight(s, pos.y);
+    s->base.initialHeight = pos.y;
 
-    if (Script_SeekToKeyword(0x72)) {
+    if (Script_SeekToKeyword('r')) {
         pos2.x = Script_GetValue();
         pos2.y = Script_GetValue();
         pos2.z = Script_GetValue();
@@ -249,7 +241,7 @@ int sub_08028F78(struct CountInit *s, u32 id)
     pos2.y = s->base.initialHeight;
     Math_SetMotionPosition(s->base.motion, &pos2);
 
-    if (Script_SeekToKeyword(0x73)) {
+    if (Script_SeekToKeyword('s')) {
         health = Script_GetValue();
         s->base.colliderExtra = Script_GetValue();
         s->reactionLength = Script_GetValue();
@@ -261,7 +253,7 @@ int sub_08028F78(struct CountInit *s, u32 id)
         s->hitThreshold = 5;
     }
 
-    if (Script_SeekToKeyword(0x61)) {
+    if (Script_SeekToKeyword('a')) {
         s->tuning[0] = Script_GetValue();
         s->tuning[1] = Script_GetValue();
         s->tuning[2] = Script_GetValue();
@@ -296,23 +288,20 @@ int sub_08028F78(struct CountInit *s, u32 id)
     SceneActors_StartUnmirroredAnimation(base, s->base.animation, &s->base.resource, 5, 1, 0);
 
     if (base->ambientMode) {
-        mode = Script_GetKeywordValue(0x44, 0);
+        mode = Script_GetKeywordValue('D', 0);
         switch (mode) {
             case 0:
                 CountInit_ConfigureAnimation(base, 2, 1);
-                CountInit_SetState(base, (void *)SceneActorAnimation_UpdateDirectionalCallback,
-                                     1);
+                CountInit_SetState(base, (void *)SceneActorAnimation_UpdateDirectionalCallback, 1);
                 break;
             case 1:
                 CountInit_ConfigureAnimation(base, 2, 2);
                 CountInit_SetState(base, (void *)SceneActorAnimation_UpdateEightDirectionCallback,
-                                     2);
+                                   2);
                 break;
             case 2:
                 CountInit_ConfigureAnimation(base, 2, 0);
                 CountInit_SetState(base, (void *)SceneActors_UpdateStationaryReaction, 26);
-                break;
-            default:
                 break;
         }
     } else {
@@ -326,7 +315,7 @@ int sub_08028F78(struct CountInit *s, u32 id)
     SceneActorGraphics_InitializeBody(s);
     SceneActorGraphics_InitializeOverlay(s, s->base.colliderExtra);
 
-    if (Script_SeekToKeyword(0x63)) {
+    if (Script_SeekToKeyword('c')) {
         u32 a = Script_GetValue();
         u32 b = Script_GetValue();
         SceneActors_SetEventScripts(base, a, b);
@@ -336,13 +325,13 @@ int sub_08028F78(struct CountInit *s, u32 id)
         s->eventMode = 0;
     }
 
-    if (Script_SeekToKeyword(0x41)) {
+    if (Script_SeekToKeyword('A')) {
         for (i = 0; i <= 3 && Script_GetPc(); i++) {
             base->scriptValues[i] = Script_GetValue();
         }
     }
 
-    if (Script_SeekToKeyword(0x43)) {
+    if (Script_SeekToKeyword('C')) {
         s->flashPeriod = Script_GetValue();
         s->flashOn = Script_GetValue();
         s->flashOff = Script_GetValue();
@@ -354,7 +343,7 @@ int sub_08028F78(struct CountInit *s, u32 id)
     s->flashFrames = 0;
     s->flashState = 0;
 
-    if (Script_SeekToKeyword(0x66)) {
+    if (Script_SeekToKeyword('f')) {
         s->fadeOn = Script_GetValue();
         s->fadeOff = Script_GetValue();
     } else {
@@ -362,19 +351,19 @@ int sub_08028F78(struct CountInit *s, u32 id)
         s->fadeOff = 0x1E;
     }
 
-    s->effectId = Script_GetKeywordValue(0x53, 0);
+    s->effectId = Script_GetKeywordValue('S', 0);
     s->damageFlags = 0;
     {
-        u8 initialDamageFlag = Script_GetKeywordValue(0x4D, 1) != 0;
+        u8 initialDamageFlag = Script_GetKeywordValue('M', 1) != 0;
         u32 enabledFlags;
         s->damageFlags = initialDamageFlag;
         enabledFlags = CountInit_ForcedDamageFlag(s->damageFlags);
-        s->damageFlags = Script_GetKeywordValue(0x54, 1) ? (2 | enabledFlags) : initialDamageFlag;
+        s->damageFlags = Script_GetKeywordValue('T', 1) ? (2 | enabledFlags) : initialDamageFlag;
     }
     {
         u32 *flags = &s->damageFlags;
         u32 v = *flags;
-        *flags = Script_GetKeywordValue(0x48, 0) ? (4 | v) : v;
+        *flags = Script_GetKeywordValue('H', 0) ? (4 | v) : v;
     }
 
     ScaledShadow_Initialize(s->base.shadow, &s->base.position, 0x40, 0x40, 0x40, 0x40, 0x1900, 1, 6,
@@ -394,23 +383,17 @@ int sub_08028F78(struct CountInit *s, u32 id)
             off += 0x20;
         } while ((s32)--i >= 0);
     }
-    {
-        palette = gPaletteBankData + 0x6720;
-        dst = (u32 *)(s->paletteNormal);
-        i = 15;
-        do {
-            CpuSet(palette, dst, 0x04000008);
-            dst += 8;
-        } while ((s32)--i >= 0);
+    palette = gPaletteBankData + 0x6720;
+    dst = (u32 *)s->paletteNormal;
+    for (i = 0; i < 16; i++) {
+        CpuSet(palette, dst, 0x04000008);
+        dst += 8;
     }
-    {
-        palette = gPaletteBankData + 0x6700;
-        dst = (u32 *)(s->paletteSpecial);
-        i = 15;
-        do {
-            CpuSet(palette, dst, 0x04000008);
-            dst += 8;
-        } while ((s32)--i >= 0);
+    palette = gPaletteBankData + 0x6700;
+    dst = (u32 *)s->paletteSpecial;
+    for (i = 0; i < 16; i++) {
+        CpuSet(palette, dst, 0x04000008);
+        dst += 8;
     }
 
     s->base.palette = s->paletteDefault;

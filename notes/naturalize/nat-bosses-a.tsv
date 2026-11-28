@@ -133,3 +133,4 @@ src/bosses/count/Count_Init.c	Count_Init	natural	natural	0
 src/bosses/count/Count_Destroy.c	Count_Destroy	contrived	natural	1	
 src/bosses/count/Count_Create.c	Count_Create	natural	natural	0	
 src/bosses/count/Count_UpdatePresentation.c	Count_UpdatePresentation	contrived	minor	18	removed the blend read helper; kept flag/camera accessors (plain flag ops reallocate), base/p aliases, zero local in the pulse reset and the duplicated shadow-enable arms
+src/bosses/count/sub_08028F78.c	sub_08028F78	contrived	contrived	25	partial: keyword characters, plain palette copy loops, direct player read; kept private CountInit view and its setter helpers (plain stores change allocation), first palette loop, flag accumulation blocks
