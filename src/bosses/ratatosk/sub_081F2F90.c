@@ -52,26 +52,25 @@ s32 sub_081F2FE8(struct Ratatosk *self)
     return selected;
 }
 
-struct RatatoskPoint *sub_081F3018(u8 *p, s16 *pos)
+struct ContactPosition *sub_081F3018(struct Ratatosk *self, struct ContactPosition *position)
 {
-    s32 idx = -1;
-    u32 best = 0xFFFFFFFF;
+    s32 selected = -1;
+    u32 minimum = -1;
     s32 i = 0;
-    s32 px = pos[0];
-    s32 pz = pos[2];
-    struct RatatoskPoint *q = (struct RatatoskPoint *)(p + 0xCCC);
-    do {
-        s32 dx = q->x - px;
-        s32 dz = q->z - pz;
-        u32 d = dx * dx + dz * dz;
-        if (d <= best) {
-            idx = i;
-            best = d;
+    s32 x = position->x;
+    s32 z = position->z;
+
+    for (; i < 9; i++) {
+        s32 dx = self->points[i].x - x;
+        s32 dz = self->points[i].z - z;
+        u32 distance = dx * dx + dz * dz;
+
+        if (distance <= minimum) {
+            selected = i;
+            minimum = distance;
         }
-        q++;
-        i++;
-    } while (i <= 8);
-    if (idx == -1)
+    }
+    if (selected == -1)
         return NULL;
-    return (struct RatatoskPoint *)(p + 0xCCC) + idx;
+    return &self->points[selected];
 }
