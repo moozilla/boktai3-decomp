@@ -285,3 +285,4 @@ src/effects/orbits/orbiting_particles.c	OrbitingParticles_Advance	natural	natura
 src/effects/orbits/orbiting_particles.c	OrbitingParticles_Update	contrived	contrived	0	unchanged: natural indexed loops leave the pointer induction order (call argument, field pointer copy and position pointer); about 400 spellings
 src/effects/orbits/orbiting_particles.c	OrbitingParticles_Destroy	contrived	natural	1	
 src/effects/orbits/orbiting_particles.c	OrbitingParticles_Initialize	contrived	natural	150	
+src/effects/orbits/orbiting_particles.c	OrbitingParticles_Create	minor	natural	1	

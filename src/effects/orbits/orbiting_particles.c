@@ -183,7 +183,7 @@ int OrbitingParticles_Initialize(struct OrbitingParticles *particles, struct Sce
 struct OrbitingParticles *OrbitingParticles_Create(struct SceneVec *pos, int radius, int duration,
                                                    int count, int type)
 {
-    struct OrbitingParticles *p = Task_Create(11, 436);
+    struct OrbitingParticles *p = Task_Create(11, sizeof(*p));
     if (p) {
         Task_SetCallbacks(p, (void (*)(void *))OrbitingParticles_Update,
                           (void (*)(void *))OrbitingParticles_Destroy);
