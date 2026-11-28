@@ -139,3 +139,4 @@ src/bosses/count/contact_actor_display.c	ContactActor_InitializeSlot	contrived	m
 src/bosses/count/contact_actor_display.c	ContactActor_HideSlot	minor	natural	6	
 src/bosses/count/contact_actor_display.c	ContactActorPool_HideSlots	minor	natural	6	
 src/bosses/count/contact_actor_display.c	ContactActor_UpdateDisplay	minor	natural	6	
+src/bosses/count/contact_actor_display.c	ContactActor_UpdateAdvance	contrived	minor	6	keeps delta write pointer and entry pointer: SetChargeOffset narrows direction
