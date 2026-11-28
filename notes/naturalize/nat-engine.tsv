@@ -687,3 +687,4 @@ src/system/save/sub_0822BD58.c	sub_0822BD58	contrived	natural	1
 src/system/save/Save_LoadSelectedSlot.c	Save_LoadSelectedSlot	minor	natural	1	
 src/system/save/Save_LoadAlternateSlot.c	Save_LoadAlternateSlot	minor	natural	1	
 src/system/save/Save_ToggleSelectedSlot.c	Save_ToggleSelectedSlot	minor	natural	1	
+src/system/save/Save_CopySelectedStateToAlternateSlot.c	Save_CopySelectedStateToAlternateSlot	minor	natural	1	
