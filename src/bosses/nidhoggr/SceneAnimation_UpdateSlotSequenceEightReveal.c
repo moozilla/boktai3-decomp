@@ -1,51 +1,23 @@
-#include "global.h"
-void AnimSprite_SelectGlyph(void *, void *, int);
-struct Flags {
-    u8 pad[0x71dc];
-    u8 flags[52];
-    u8 done[52];
-};
-struct Entry {
-    u32 flags;
-    u8 pad[0x5c];
-};
-struct Entries {
-    u8 pad[0x5444];
-    struct Entry items[52];
-};
-struct Visual {
-    u8 pad[6];
-    u16 flags;
-};
-struct Sprite {
-    u32 pad;
-    u32 flags;
-};
-void Anim_SetKeyframes(void *, void *, s32, s32, s32);
-s32 Anim_Step(void *, void *);
-void Sound_PlaySongChecked(s32);
-void SceneAnimation_UpdateSlotSequenceEightReveal(u8 *p, int i)
+#include "bosses/nidhoggr/nidhoggr_animation.h"
+
+void SceneAnimation_UpdateSlotSequenceEightReveal(struct Nidhoggr *boss, int i)
 {
-    u8 *q;
-    u32 old;
-    u8 *base = p + 0x71dc;
-    u8 **base_pointer = &base;
-    q = *base_pointer + i;
-    old = *q;
-    if (!old) {
-        ((struct Entries *)p)->items[i].flags &= ~1;
-        Anim_SetKeyframes(p + (i * 0x60 + 0x543c), p + 0x541c, 8, 2, 4);
-        (*q)++;
-        ((struct Flags *)p)->done[i] = old;
+    if (!boss->rowInitFlag[i]) {
+        boss->rows[i].flags &= ~1;
+        Anim_SetKeyframes(&boss->rows[i], &boss->animHdr, 8, 2, 4);
+        boss->rowInitFlag[i]++;
+        boss->rowDoneFlag[i] = 0;
         {
-            struct Visual *v = (struct Visual *)(i * 0x54 + (u32)p + 0x66d8);
+            struct ContactCollider *collider =
+                (struct ContactCollider *)(i * sizeof(struct ContactCollider) + (u32)boss + 0x66d8);
             u32 mask = ~4;
-            v->flags = mask & v->flags;
+
+            collider->flags &= mask;
         }
         Sound_PlaySongChecked(0x3fe);
     }
-    if (Anim_Step(p + (i * 0x60 + 0x543c), p + 0x541c)) {
-        *q = 0xff;
-        ((struct Flags *)p)->done[i] = 1;
+    if (Anim_Step(&boss->rows[i], &boss->animHdr)) {
+        boss->rowInitFlag[i] = 0xff;
+        boss->rowDoneFlag[i] = 1;
     }
 }
