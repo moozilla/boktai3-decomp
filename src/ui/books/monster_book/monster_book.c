@@ -165,10 +165,10 @@ static inline u8 MonsterBook_CurrentEntry(struct MonsterBook *owner)
 
 void MonsterBook_ClearWindows(struct MonsterBook *book)
 {
-    u32 *handle = book->windows;
     s32 i;
-    for (i = 7; i >= 0; i--)
-        TextWindow_Clear(*handle++);
+
+    for (i = 0; i < 8; i++)
+        TextWindow_Clear(book->windows[i]);
     book->transitionFlags |= 1;
     Bg_ClearTilemap(0);
 }
