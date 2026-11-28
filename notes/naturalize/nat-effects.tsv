@@ -87,3 +87,4 @@ src/effects/bursts/large_fragment_effect.c	LargeFragmentEffect_StopAll	contrived
 src/effects/bursts/large_fragment_effect.c	LargeFragmentEffect_InitCollider	contrived	natural	1	-
 src/effects/bursts/large_fragment_effect.c	LargeFragmentEffect_UpdateCollider	contrived	natural	1	-
 src/effects/bursts/large_fragment_effect.c	SceneSlot_Allocate	minor	natural	4	-
+src/effects/bursts/large_fragment_effect.c	SceneSlot_EmitPulse	contrived	minor	12	recovered random bank origin, its late copy and the planar velocity pointer: needed for the dead origin load and the velocity base register
