@@ -281,3 +281,4 @@ src/ui/dialogue/text_interpreter/TextState_PushStream.c	TextState_PushStream	min
 src/ui/dialogue/text_interpreter/TextState_PopStream.c	TextState_PopStream	minor	natural	1	
 src/ui/dialogue/text_interpreter/TextState_AdvanceLine.c	TextState_AdvanceLine	contrived	natural	3	
 src/ui/dialogue/text_interpreter/TextState_PlayGlyphSound.c	TextState_PlayGlyphSound	contrived	minor	14	goto into the toggle-clear arm: jump2 only shares that block this way
+src/ui/dialogue/text_interpreter/Text_ExtractDecimalDigit.c	Text_ExtractDecimalDigit	contrived	natural	3	
