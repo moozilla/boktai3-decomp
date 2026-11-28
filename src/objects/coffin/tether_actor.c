@@ -1861,46 +1861,39 @@ void TetherActor_UpdateSecondaryColliderValues(struct TetherActor *p)
 void TetherActor_OnChargeContact(struct ContactCollider *collider, void *other,
                                  struct TetherActor *inputActor)
 {
-    struct TetherActor *owner = inputActor;
     struct TetherActor *actor;
-    u32 allowed;
-    u32 responseMask;
-    u32 flags;
-    u32 mask = 0x800;
     u32 amount, cooldown;
+    u32 responseMask;
+    u32 mask = 0x800;
+    u32 allowed;
     if (collider->flags & mask)
-        goto done;
-    actor = owner;
+        return;
+    actor = inputActor;
     if (actor->unknown1B == 1)
-        goto done;
-    allowed = 0;
+        return;
+    allowed = FALSE;
     if (!actor->kindValue) {
-        if (collider->contactFlags & 1)
-            goto charge;
-        if (!(collider->statRewardFlags & 512))
-            goto allowGate;
-        goto charge;
-    } else
-        allowed = 1;
-allowGate:
+        if ((collider->contactFlags & 1) || (collider->statRewardFlags & 512))
+            allowed = TRUE;
+    } else {
+        allowed = TRUE;
+    }
     if (!allowed)
-        goto done;
-charge:
+        return;
     if (actor->contactCooldown || !collider->unknown3C)
-        goto done;
+        return;
     responseMask = 1;
-    flags = collider->statRewardFlags;
-    responseMask &= flags;
+    responseMask &= collider->statRewardFlags;
     if (responseMask) {
         amount = 200;
         cooldown = 8;
-    } else if (flags & 2) {
+    } else if (collider->statRewardFlags & 2) {
         amount = 300;
         cooldown = 12;
-    } else if (flags & 4) {
+    } else if (collider->statRewardFlags & 4) {
         amount = 500;
         cooldown = 8;
-    } else if ((flags &= 16) != 0) {
+    } else if (collider->statRewardFlags & 16) {
         amount = 500;
         cooldown = 8;
     } else {
@@ -1910,7 +1903,6 @@ charge:
     TetherActor_AccumulateCharge(actor, amount);
     actor->paletteOverrideTimer = 4;
     actor->contactCooldown = cooldown;
-done:;
 }
 
 extern const s16 gUnk_086149C4[];
