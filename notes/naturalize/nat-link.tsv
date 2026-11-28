@@ -228,3 +228,5 @@ src/link/player/Player_IsUnflaggedBelowResourceLimit.c	Player_IsUnflaggedBelowRe
 src/link/player/Player_UpdateFacingFromInputHistory.c	Player_UpdateFacingFromInputHistory	minor	natural	1	
 src/link/player/Player_UpdateChargeAction.c	Player_UpdateChargeAction	minor	natural	3	
 src/link/player/Player_UpdateConvergingChargeAction.c	Player_UpdateConvergingChargeAction	minor	natural	3	
+src/link/player/Player_SaveActionIndex.c	Player_SaveActionIndex	natural	natural	0	
+src/link/player/sub_0823D750.c	sub_0823D750	contrived	natural	25	unnamed statModifierContext halfword read through unknownCE
