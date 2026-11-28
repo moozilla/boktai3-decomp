@@ -278,3 +278,4 @@ src/player/core/Player_RecordInputTicks.c	Player_RecordInputTicks	contrived	natu
 src/player/core/Player_ApplyLatchedActionMode.c	Player_ApplyLatchedActionMode	natural	natural	0	
 src/player/core/PlayerContact_UpdateThresholdEvent.c	PlayerContact_UpdateThresholdEvent	contrived	natural	3	
 src/player/core/Player_Update.c	Player_Update	minor	minor	2	positive reset value block local; void-pointer prototypes
+src/player/core/Player_InitializeFromScript.c	Player_InitializeFromScript	contrived	minor	5	data/sprite/state pointer locals

@@ -22,29 +22,22 @@ void Player_SaveStateSnapshot(struct Player *);
 void SceneHud_RefreshControls(void);
 void *PileTrap_Create(s32, s32);
 void PlayerAttackEffect_Create(void *, void *, void *);
-static inline void StepPlayback(struct ContactSwarmSprite *sprite,
-                                struct DisplaySequenceState *state)
-{
-    PlayerCue_StepSequence(sprite, state);
-}
 s32 Player_InitializeFromScript(struct Player *p, s32 slot)
 {
     u8 *data;
-    void **resource;
     struct ContactSwarmSprite *sprite;
     struct DisplaySequenceState *state;
     p->statModifierContext.statBOverrideEnabled = 255;
     TimedEffect_GetOrCreateManager(12);
     p->actionDisplay = ActorDebris_Create(&p->animation, &p->heading, &p->side);
-    data = (u8 *)p + 0x1FC;
+    data = p->auxiliarySprite[0].unknown2C;
     AnimData_Load(data, 0x97D3);
-    *(void **)((u8 *)p + 0x22C) = ScriptProc_Start(0x922E, 0xC6A0);
-    resource = (void **)((u8 *)p + 0x22C);
+    p->auxiliaryResource = ScriptProc_Start(0x922E, 0xC6A0);
     sprite = (struct ContactSwarmSprite *)p->auxiliarySprite;
     Sprite_Init(sprite, data, 1);
     state = &p->auxiliarySequence;
-    Anim_SetSequence(state, *resource, 1, 0, 0);
-    StepPlayback(sprite, state);
+    Anim_SetSequence(state, p->auxiliaryResource, 1, 0, 0);
+    PlayerCue_StepSequence(sprite, state);
     Player_InitSlotFromScript(p);
     Player_InitActionMode(p);
     Player_InitBodyFromScript(p, slot);
@@ -65,6 +58,6 @@ s32 Player_InitializeFromScript(struct Player *p, s32 slot)
     }
     p->actionRequestEffect = PileTrap_Create(slot + 1, 0);
     PlayerAttackEffect_Create(&p->animation, &p->facing, &p->side);
-    *(u32 *)p->unkA88 = 0;
+    p->unkA88[0] = 0;
     return 0;
 }
