@@ -1,12 +1,14 @@
-#include "global.h"
-void TransformMarker_CopyVector(u8 *p, u8 *q)
+#include "ui/town/shop_item_values.h"
+
+void TransformMarker_CopyVector(struct SceneValueEquipment *entry,
+                                const struct SceneValueEquipmentDefinition *definition)
 {
-    p[4] = q[0xc];
-    p[5] = q[0xd];
-    p[6] = q[0xe];
-    p[7] = q[0xf];
-    p[8] = q[0x10];
-    p[9] = q[0x11];
-    p[10] = q[0x12];
-    p[11] = q[0x13];
+    entry->modifierA = definition->modifierTextA;
+    entry->unknown5[0] = definition->unknownD[0];
+    entry->unknown5[1] = definition->unknownD[1];
+    entry->unknown5[2] = definition->unknownD[2];
+    entry->modifierB = definition->modifierTextB;
+    entry->unknown9[0] = definition->unknown11[0];
+    entry->unknown9[1] = definition->unknown11[1];
+    entry->unknown9[2] = definition->unknown11[2];
 }
