@@ -19,7 +19,7 @@ void Collider_SetAttackProperties(void *, int, int, int, int, int);
 void Collider_SetBodyProperties(void *, int, int, int);
 
 void NidhoggrDuel_OnDamageCollision(struct ContactCollider *, struct ContactCollider *,
-                                       struct GridAttackActor *);
+                                    struct GridAttackActor *);
 
 void NidhoggrDuelMinionPool_SpawnActor(void *, void *, int);
 
@@ -31,8 +31,7 @@ void SparkParticle_Spawn(void *, int, void *, int, int, int, int, int);
 
 void NidhoggrDuelOrb_BeginExpansion(void *);
 
-void NidhoggrDuel_SpawnTargetedProjectile(struct GridAttackActor *, struct ContactPosition *,
-                                             int);
+void NidhoggrDuel_SpawnTargetedProjectile(struct GridAttackActor *, struct ContactPosition *, int);
 
 void NidhoggrDuelMinionPool_BeginAllDeaths(void *);
 
@@ -75,8 +74,8 @@ void NidhoggrDuel_SetAnimation(struct GridAttackActor *p, int sequence, int star
 void Collision_CalculateDamageResponse(void *, void *);
 void PlayerStats_AddContactHundredths(struct ContactCollider *, struct ContactCollider *, s32);
 
-void NidhoggrDuel_OnDamageCollision(struct ContactCollider *source,
-                                       struct ContactCollider *other, struct GridAttackActor *p)
+void NidhoggrDuel_OnDamageCollision(struct ContactCollider *source, struct ContactCollider *other,
+                                    struct GridAttackActor *p)
 {
     struct GridAttackActor *base = p;
     Collision_CalculateDamageResponse(source, other);
@@ -167,22 +166,16 @@ void NidhoggrDuel_SpawnGridPattern(struct GridAttackActor *p)
         NidhoggrDuel_SpawnGridContact(p, 0, 1);
         NidhoggrDuel_SpawnGridContact(p, 1, 1);
         NidhoggrDuel_SpawnGridContact(p, 2, 1);
-        {
-            u16 *table = gRandomTable;
-            NidhoggrDuel_SpawnGridContact(p, NidhoggrDuel_RandomColumn(table), 2);
-            NidhoggrDuel_SpawnGridContact(p, NidhoggrDuel_RandomColumn(table), 3);
-            NidhoggrDuel_SpawnGridContact(p, NidhoggrDuel_RandomColumn(table), 4);
-        }
+        NidhoggrDuel_SpawnGridContact(p, NidhoggrDuel_RandomColumn(gRandomTable), 2);
+        NidhoggrDuel_SpawnGridContact(p, NidhoggrDuel_RandomColumn(gRandomTable), 3);
+        NidhoggrDuel_SpawnGridContact(p, NidhoggrDuel_RandomColumn(gRandomTable), 4);
     } else {
         NidhoggrDuel_SpawnGridContact(p, 0, 1);
         NidhoggrDuel_SpawnGridContact(p, 1, 1);
         NidhoggrDuel_SpawnGridContact(p, 2, 1);
-        {
-            u16 *table = gRandomTable;
-            NidhoggrDuel_SpawnGridContact(p, NidhoggrDuel_RandomColumn(table), 2);
-            NidhoggrDuel_SpawnGridContact(p, NidhoggrDuel_RandomColumn(table), 3);
-            NidhoggrDuel_SpawnGridContact(p, NidhoggrDuel_RandomColumn(table), 4);
-        }
+        NidhoggrDuel_SpawnGridContact(p, NidhoggrDuel_RandomColumn(gRandomTable), 2);
+        NidhoggrDuel_SpawnGridContact(p, NidhoggrDuel_RandomColumn(gRandomTable), 3);
+        NidhoggrDuel_SpawnGridContact(p, NidhoggrDuel_RandomColumn(gRandomTable), 4);
     }
 }
 
@@ -196,7 +189,8 @@ static inline void NidhoggrDuel_SetState(struct GridAttackActor *p, void (*fn)(v
     p->pending = 0;
 }
 
-static inline void NidhoggrDuel_StartActionMode(struct GridAttackActor *p, int mode, int zero, int id)
+static inline void NidhoggrDuel_StartActionMode(struct GridAttackActor *p, int mode, int zero,
+                                                int id)
 {
     p->active = mode;
     p->actionReset = zero;
@@ -221,7 +215,7 @@ static inline void NidhoggrDuel_OffsetCoordinate(volatile s16 *coordinate, u32 r
     *coordinate = (rounded + ((random & 63) + center)) - 32;
 }
 void NidhoggrDuel_SpawnTargetedProjectile(struct GridAttackActor *actor,
-                                             struct ContactPosition *point, int kind)
+                                          struct ContactPosition *point, int kind)
 {
     struct ContactPosition velocity;
     struct SceneVec position;
@@ -254,8 +248,8 @@ int NidhoggrDuel_OnDamage(struct GridAttackActor *p, int kind, int damage)
                 size.x = 32;
                 size.y = 0;
                 size.z = 32;
-                DamageNumberDisplay_Show(&p->damageCollider, damage, 0, &position->position,
-                                         &size, 1);
+                DamageNumberDisplay_Show(&p->damageCollider, damage, 0, &position->position, &size,
+                                         1);
             }
             NidhoggrDuel_StartActionMode(p, 1, 0, 0);
             NidhoggrDuel_SetState(p, NidhoggrDuel_UpdateDamageHold, 5);
@@ -532,8 +526,8 @@ void NidhoggrDuel_UpdateTargetedAttack(struct GridAttackActor *p, int tick)
     if (p->reset(p))
         return;
     if (tick == 8)
-        NidhoggrDuel_SpawnTargetedProjectile(
-            base, (struct ContactPosition *)p->targetPositions[0], base->targetAttackParameter);
+        NidhoggrDuel_SpawnTargetedProjectile(base, (struct ContactPosition *)p->targetPositions[0],
+                                             base->targetAttackParameter);
     if (p->animationEnded)
         p->finished = 1;
 }
@@ -582,7 +576,7 @@ void NidhoggrDuel_UpdateStaggerState(struct GridAttackActor *p)
 }
 
 static inline void NidhoggrDuel_SetDeathEffect(struct GridAttackActor *p, int mode, int id,
-                                             int duration)
+                                               int duration)
 {
     p->effectId = id;
     p->effectMode = mode;
@@ -1008,7 +1002,8 @@ void NidhoggrDuel_ProcessMessages(struct GridAttackActor *p)
                     NidhoggrDuel_SetMessageY(p, ((u16 *)command)[5]);
                     NidhoggrDuel_SetMessageZ(p, ((u16 *)command)[6]);
                     NidhoggrDuel_SetDrawableX(base, NidhoggrDuel_GetMessageX(p));
-                    NidhoggrDuel_SetDrawableY(base, (u16)base->height + NidhoggrDuel_GetMessageY(p));
+                    NidhoggrDuel_SetDrawableY(base,
+                                              (u16)base->height + NidhoggrDuel_GetMessageY(p));
                     NidhoggrDuel_SetDrawableZ(base, NidhoggrDuel_GetMessageZ(p));
                     Trigger_ConsumePending(&p->receiver, 1);
                     break;
@@ -1354,7 +1349,7 @@ void NidhoggrDuel_UpdateAnimationAndTargets(struct GridAttackActor *p)
         gRandomIndex = (gRandomIndex + 1) & 1023;
         angle = *(u16 *)((gRandomIndex << 1) + (u32)gRandomTable);
         actor->drawable.position.x += NidhoggrDuel_Truncate12(gUnk_086149C4[(angle + 64) & 255] *
-                                                            (actor->reactionCooldown << 2));
+                                                              (actor->reactionCooldown << 2));
         actor->drawable.position.z +=
             NidhoggrDuel_Truncate12(gUnk_086149C4[angle & 255] * (actor->reactionCooldown << 2));
         actor->reactionCooldown--;
@@ -1766,8 +1761,8 @@ s32 NidhoggrDuel_Initialize(struct GridAttackActor *p, u32 ctx)
     else
         p->projectedDisplay = 0;
 
-    p->contactPool =
-        NidhoggrDuelMinionPool_Create(poolHealth, poolValue, poolResource, ctx, (s16)p->contactReward);
+    p->contactPool = NidhoggrDuelMinionPool_Create(poolHealth, poolValue, poolResource, ctx,
+                                                   (s16)p->contactReward);
     p->orbitContact = NidhoggrDuelOrb_Create(position, orbitValue);
     p->contactBurst = NidhoggrDuelBurst_Create(&p->drawable.position);
     p->linkedActorId = Script_GetKeywordValue(0x54, 0);
