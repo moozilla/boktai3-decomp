@@ -1,11 +1,7 @@
-#include "global.h"
-struct S {
-    u8 p[0x202];
-    u16 h;
-    u32 a;
-};
-void SpiralBurst_SetState(struct S *s, u32 v)
+#include "effects/bursts/spiral_burst.h"
+
+void SpiralBurst_SetState(struct SpiralBurst *burst, void (*state)(struct SpiralBurst *))
 {
-    s->a = v;
-    s->h = 0;
+    burst->state = state;
+    burst->timer = 0;
 }

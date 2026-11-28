@@ -27,13 +27,15 @@ struct SpiralParticle {
 };
 
 struct SpiralBurst {
-    u8 unknown0[0x1c];
+    u8 task[0x18];
+    void *source;
     struct ContactPosition origin;
     u8 collider[0x54];
     struct SpiralParticle particles[8];
     const struct SpriteEffectTileResource *resource;
-    u8 unknown1fc[6];
+    u16 unk_1FC, duration, soundBase;
     u16 timer;
+    void (*state)(struct SpiralBurst *);
 };
 static inline s32 SpiralBurst_ScaleOffset(s32 product)
 {
