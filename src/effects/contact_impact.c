@@ -352,10 +352,10 @@ void SpriteController_AnimateGrowing(struct ContactImpactEffect *p)
 void SpriteController_AnimateShrinking(struct ContactImpactEffect *p)
 {
     s32 duration = 8;
-    s32 value = Fixed8_Interpolate(0x40, 0x26, 8, p->timer);
+    s32 scale = Fixed8_Interpolate(64, 38, duration, p->timer);
 
-    p->sprite.scaleX = value;
-    p->sprite.scaleY = value;
+    p->sprite.scaleX = scale;
+    p->sprite.scaleY = scale;
     if (p->timer >= duration)
         PopInSprite_SetHidden(p);
     else

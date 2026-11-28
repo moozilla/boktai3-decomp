@@ -62,3 +62,4 @@ src/effects/contact_impact.c	PopInSprite_StartAppearing	contrived	natural	1	-
 src/effects/contact_impact.c	PopInSprite_StartDisappearing	contrived	natural	1	-
 src/effects/contact_impact.c	PopInSprite_SetHidden	contrived	natural	1	-
 src/effects/contact_impact.c	SpriteController_AnimateGrowing	minor	natural	3	-
+src/effects/contact_impact.c	SpriteController_AnimateShrinking	minor	natural	2	-
