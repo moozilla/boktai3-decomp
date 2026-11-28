@@ -1,15 +1,10 @@
 #include "scene/collision/contact_actor.h"
+#include "scene/motion/scene_actor_charge_offset.h"
 #include "engine/math/monster_particle_random.h"
 #include "scene/terrain/terrain_sampling.h"
 #include "scene/actor/scene_actor_part_burst.h"
 void ContactActor_SetDirectionalSequence(struct ContactActorPool *, struct ContactActor *, u32);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
-static inline s32 truncateShift12(s32 value)
-{
-    if (value >= 0)
-        return value >> 12;
-    return -((-value) >> 12);
-}
 static inline u32 nextRandomFrom(const u16 *table, u32 *cursor)
 {
     u32 index;
@@ -48,10 +43,7 @@ void ContactActor_UpdateRetreat(struct ContactActorPool *pool, struct ContactAct
         s32 jitter;
         struct ContactPosition *write;
         slot->enter = 0;
-        {
-            struct ContactCollider *collider = &slot->healthCollider;
-            collider->flags |= 4;
-        }
+        ContactCollider_SetFlags(&slot->healthCollider, 4);
         center = &pool->retreatCenter;
         pool->retreatCenter.y = Terrain_SampleHeight(center);
         PARTICLE_RANDOM_CAPTURE_ORIGIN(origin);
@@ -70,10 +62,10 @@ void ContactActor_UpdateRetreat(struct ContactActorPool *pool, struct ContactAct
         {
             s32 product = gUnk_086149C4[(angle + 64) & random.mask] * radius;
             random.cursor = &gRandomIndex;
-            write->x = truncateShift12(product) | (origin & 3);
+            write->x = SceneActor_ChargeComponent(product) | (origin & 3);
         }
         write->y = 0;
-        write->z = truncateShift12(gUnk_086149C4[angle] * radius);
+        write->z = SceneActor_ChargeComponent(gUnk_086149C4[angle] * radius);
         entryDestination = &slot->destination;
         addPosition(entryDestination, &delta, &pool->retreatCenter);
         table = gRandomTable;
@@ -107,14 +99,13 @@ void ContactActor_UpdateRetreat(struct ContactActorPool *pool, struct ContactAct
         struct ContactPosition *write = &delta;
         u32 direction = slot->direction;
         u32 speed = slot->speed;
-        write->x = truncateShift12(gUnk_086149C4[(direction + 64) & 255] * speed);
+        write->x = SceneActor_ChargeComponent(gUnk_086149C4[(direction + 64) & 255] * speed);
         write->y = 0;
-        write->z = truncateShift12(gUnk_086149C4[direction] * speed);
+        write->z = SceneActor_ChargeComponent(gUnk_086149C4[direction] * speed);
     }
     {
         const struct ContactPosition *read = &delta;
-        const struct ContactPosition *first = &delta;
-        slot->position.x += first->x;
+        slot->position.x += read->x;
         position->y += read->y;
         position->z += read->z;
     }
@@ -123,9 +114,7 @@ void ContactActor_UpdateRetreat(struct ContactActorPool *pool, struct ContactAct
         s32 dx = slot->destination.x - slot->position.x;
         s32 dz = destination->z - position->z;
         if (((dx * dx) + (dz * dz)) <= 16383) {
-            slot->state = 7;
-            slot->enter = 1;
-            slot->stateFrame = 0;
+            ContactActor_EnterState(slot, 7);
         } else
             slot->stateFrame++;
     }
