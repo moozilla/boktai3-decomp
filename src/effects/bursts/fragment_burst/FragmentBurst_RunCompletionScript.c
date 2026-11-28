@@ -1,7 +1,7 @@
-#include "global.h"
-void Script_Call(u32, u32);
-void FragmentBurst_RunCompletionScript(u8 *p)
+#include "effects/bursts/fragment_burst.h"
+
+void FragmentBurst_RunCompletionScript(struct FragmentBurst *burst)
 {
-    if (*(u32 *)(p + 0x158))
-        Script_Call(*(u32 *)(p + 0x158), 0);
+    if (burst->completionScript)
+        Script_Call(burst->completionScript, 0);
 }
