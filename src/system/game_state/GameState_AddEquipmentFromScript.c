@@ -1,9 +1,8 @@
 #include "global.h"
-s32 Script_SeekToKeyword(s32);
-s32 Script_GetValue(void);
+#include "engine/engine.h"
 void GameState_AddEquipment(s32);
 void GameState_AddEquipmentFromScript(void)
 {
-    if (Script_SeekToKeyword(0x6D))
+    if (Script_SeekToKeyword('m'))
         GameState_AddEquipment(Script_GetValue());
 }
