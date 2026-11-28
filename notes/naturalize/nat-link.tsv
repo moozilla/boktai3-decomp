@@ -25,3 +25,4 @@ src/link/lobby/LinkLobbyPanel_LoadBackground.c	LinkLobbyPanel_LoadBackground	con
 src/link/lobby/TimerDisplay_DrawRecord.c	TimerDisplay_DrawRecord	contrived	natural	1	
 src/link/lobby/TimerDisplay_DrawRecord.c	RecordMenu_DrawRecords	contrived	minor	22	clamped scores stored through u16 lvalues: a field store lets the compiler keep the gGameState pointer, the ROM reloads it
 src/link/lobby/LinkLobbyPanel_DrawActorValues.c	LinkLobbyPanel_DrawActorValues	contrived	natural	2	
+src/link/lobby/LinkLobbyPanel_RefreshPlayerNames.c	LinkLobbyPanel_RefreshPlayerNames	contrived	natural	2	

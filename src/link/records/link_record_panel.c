@@ -55,16 +55,6 @@ static inline s32 clampIndex(s32 index, s32 low, s32 high)
     return result;
 }
 
-static inline struct LinkTimeRecord *getPeer(s32 index)
-{
-    struct AreaEffectLinkState *session = gLinkSession;
-    struct LinkRecordPayload *payload;
-    if (!session || session->unavailable != 1)
-        return NULL;
-    payload = (struct LinkRecordPayload *)session->sessionData;
-    return &payload->peers[index];
-}
-
 static inline u8 validSelection(s32 index)
 {
     if (index < 0)
@@ -222,8 +212,8 @@ void LinkRecordPanel_InitializeWidgets(struct LinkRecordPanel *owner)
     owner->widgetScript = script;
     ResourceHeader_Relocate(&owner->widgetResource, script);
     for (i = 0; i < 7; i++) {
-        AnimSprite_InitLinked(&owner->widgets[i], &owner->widgetResource, owner->entryValues[i], 0x10, 0, 0,
-                          0, 0);
+        AnimSprite_InitLinked(&owner->widgets[i], &owner->widgetResource, owner->entryValues[i],
+                              0x10, 0, 0, 0, 0);
         owner->previousValues[i] = 0xFFFF;
     }
 }

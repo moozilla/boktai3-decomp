@@ -33,11 +33,13 @@ struct RecordMenu {
     u32 titleScript, choiceScript, recordScript;
     u8 pad14e8[4];
     u8 leaving, selection;
-    u8 pad14ee[14];
+    u8 choice, pulsePhase;
+    s32 nameWindows[2]; /* one per player; the first also shows the selection prompt */
+    s32 titleWindow;
     u8 redraw;
     u8 pad14fd;
     u16 inputDelay;
-    u8 pad1500[2];
+    u16 finishScript;
     u16 exitScript;
 };
 

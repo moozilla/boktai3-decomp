@@ -2,6 +2,7 @@
 #define GUARD_LINK_RECORD_PANEL_H
 #include "player/appearance/character_preview_actor.h"
 #include "ui/widgets/scene_input.h"
+#include "scene/areas/area_effect_link.h"
 /* Two received records are a phase of the session's payload storage. */
 struct LinkTimeRecord {
     u8 sourceName[16], displayName[16];
@@ -24,6 +25,17 @@ struct LinkRecordPaletteCycle {
     u16 colors[16], frame;
     u8 unknown22[2];
 };
+/* A peer's record, once the session payload holds them. */
+static inline struct LinkTimeRecord *getPeer(s32 index)
+{
+    struct AreaEffectLinkState *session = gLinkSession;
+    struct LinkRecordPayload *payload;
+
+    if (!session || session->unavailable != 1)
+        return NULL;
+    payload = (struct LinkRecordPayload *)session->sessionData;
+    return &payload->peers[index];
+}
 struct LinkRecordPanel {
     struct Task task;
     void *backgroundResource, *paletteResource;
