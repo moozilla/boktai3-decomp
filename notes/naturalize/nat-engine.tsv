@@ -245,3 +245,4 @@ src/engine/video/background_layers.c	Bg_SetPriority	natural	natural
 src/engine/video/background_layers.c	Bg_SetCharacterBase	minor	minor	1	u16 temp per case: storing the expression directly drops the ROM's halfword narrowing
 src/engine/video/background_layers.c	Bg_SetAffineTransform	contrived	minor	6	the reciprocal inline keeps a two-step divide (the one-line form changes the argument conversion)
 src/engine/video/background_layers.c	Bg_FillTilemapRectangle	minor	natural	3	
+src/engine/video/background_layers.c	Bg_CopyTilemapRectangle	minor	natural	3	

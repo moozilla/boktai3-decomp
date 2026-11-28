@@ -329,7 +329,6 @@ void Bg_SetTilemapEntry(u32 n, s32 x, s32 y, u32 a, u32 b, u32 c)
 void Bg_CopyTilemapRectangle(s32 layer, s32 x, s32 y, s32 w, s32 h, s32 *src, s32 palette,
                              s32 priority)
 {
-    //BODY
     struct BackgroundLayer *l = &gBgRecords[layer];
     s32 stride;
     u16 *map;
