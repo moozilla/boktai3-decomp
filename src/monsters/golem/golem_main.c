@@ -465,7 +465,7 @@ void Golem_UpdateAttackProperties(struct ChaseActor *a)
             u16 value = a->base.attacks.parameter[2];
             Collider_SetAttackProperties(c, power, response, 0, reaction, value);
         }
-        goto active;
+        SceneActorChase_SetReactionFlags(a, 0x4000);
     } else if (SceneActorChase_QueryMotionFlags(a, 0x100)) {
         s32 speed = state->charge.speed;
         s32 scale;
@@ -494,7 +494,6 @@ void Golem_UpdateAttackProperties(struct ChaseActor *a)
             Collider_SetAttackProperties(c, power, response, 0x400, reaction, value);
         }
         Golem_MarkContactPlacement(&group->placement, 1);
-    active:
         SceneActorChase_SetReactionFlags(a, 0x4000);
     } else {
         struct ContactCollider *c = &a->base.colliderB;
