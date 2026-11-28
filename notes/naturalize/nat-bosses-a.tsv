@@ -159,3 +159,5 @@ src/bosses/count/ContactActorPool_Create.c	ContactActorPool_Create	natural	natur
 src/bosses/count/ContactActorPool_RequestClear.c	ContactActorPool_RequestClear	natural	natural	0	
 src/bosses/count/ContactActorPool_Start.c	ContactActorPool_Start	contrived	contrived	14	unchanged core: random-table halves union with BeginRandomSamples, draw-view of the health collider and pointer temps; plain table reads differ
 src/bosses/count/CountBats_ApplyHealthContact.c	CountBats_ApplyHealthContact	contrived	minor	18	mask and state locals stay: only an enter-state helper or these locals give the register order
+src/bosses/count/CountBats_IgnoreResourceContact.c	CountBats_IgnoreResourceContact	natural	natural	0	
+src/bosses/count/CountBats_InitializeSlot.c	CountBats_InitializeSlot	contrived	minor	6	palette helper stays
