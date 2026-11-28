@@ -203,3 +203,4 @@ src/effects/directional_effect/DirectionalEffect_Update.c	DirectionalEffect_Upda
 src/effects/directional_effect/Player_OnDirectionalEffectAnimationEvent.c	Player_OnDirectionalEffectAnimationEvent	contrived	natural	1	-
 src/effects/directional_effect/DirectionalEffect_DecodeAnimationMode.c	DirectionalEffect_DecodeAnimationMode	natural	natural	0	-
 src/effects/directional_effect/Player_ShowDirectionalEffect.c	Player_ShowDirectionalEffect	contrived	natural	2	-
+src/effects/directional_effect/Player_StartDirectionalEffect.c	Player_StartDirectionalEffect	contrived	natural	2	-

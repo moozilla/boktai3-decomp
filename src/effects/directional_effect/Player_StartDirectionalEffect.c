@@ -1,47 +1,28 @@
-#include "global.h"
-#include "effects/directional_effect/point_layout.h"
-/* Tentative role: place and launch a directional effect. */
-typedef struct Point Point;
-typedef struct Sprite {
-    u8 pad0[0x1c];
-    Point pos;
-} Sprite;
-typedef struct State {
-    u8 pad0[0x3a4];
-    u8 facing;
-    u8 pad3a5[0x457];
-    Sprite sprite;
-    u8 pad820[0x20];
-    u32 pad840;
-    u8 animation[0x10];
-    void *resource;
-    s16 dx;
-    u8 pad85a[2];
-    s16 dy;
-} State;
-extern const s16 gUnk_086149C4[];
+#include "player/player.h"
+#include "engine/engine.h"
+#include "effects/bursts/spiral_burst.h"
+
 void DirectionalEffect_DecodeAnimationMode(u32, u32 *, u32 *);
-void Anim_SetSequence(void *, void *, s32, u8, u8);
-void Player_ShowDirectionalEffect(State *);
-static inline s32 scale(s32 v)
+void Player_ShowDirectionalEffect(struct Player *);
+
+/* Tentative role: place and launch a directional effect. */
+void Player_StartDirectionalEffect(struct Player *player, u32 mode,
+                                   union DirectionalSpritePosition *position)
 {
-    if (v >= 0)
-        return v >> 12;
-    return -((-v) >> 12);
-}
-void Player_StartDirectionalEffect(State *s, u32 mode, Point *pos)
-{
-    Sprite *sprite = &s->sprite;
-    s32 angle;
-    u32 a, b;
-    angle = ((s->facing + 5) & 7) << 5;
-    sprite->pos = *pos;
-    sprite->pos.z += 190;
-    sprite->pos.x += scale(240 * gUnk_086149C4[(angle + 64) & 255]);
-    sprite->pos.y += scale(240 * gUnk_086149C4[angle & 255]);
-    s->dx = scale(10 * gUnk_086149C4[(angle + 64) & 255]);
-    s->dy = scale(10 * gUnk_086149C4[angle & 255]);
-    DirectionalEffect_DecodeAnimationMode(mode, &a, &b);
-    Anim_SetSequence(s->animation, s->resource, 0, a, b);
-    Player_ShowDirectionalEffect(s);
+    struct DirectionalSprite *sprite = &player->directionalEffect[0].sprite;
+    s32 angle = ((player->facing + 5) & 7) << 5;
+    u32 variant, group;
+
+    sprite->position = *position;
+    sprite->position.axis.height += 190;
+    sprite->position.axis.x += SpiralBurst_ScaleOffset(240 * gUnk_086149C4[(angle + 64) & 255]);
+    sprite->position.axis.depth += SpiralBurst_ScaleOffset(240 * gUnk_086149C4[angle & 255]);
+    player->directionalEffect[0].velocityX =
+        SpiralBurst_ScaleOffset(10 * gUnk_086149C4[(angle + 64) & 255]);
+    player->directionalEffect[0].velocityY =
+        SpiralBurst_ScaleOffset(10 * gUnk_086149C4[angle & 255]);
+    DirectionalEffect_DecodeAnimationMode(mode, &variant, &group);
+    Anim_SetSequence(&player->directionalEffect[0].animation,
+                     player->directionalEffect[0].sequenceResource, 0, (u8)variant, (u8)group);
+    Player_ShowDirectionalEffect(player);
 }
