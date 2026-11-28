@@ -264,3 +264,4 @@ src/monsters/axe/axe.c	ActorPhase_SelectDistantWaypoint	contrived	contrived	2	re
 src/monsters/axe/axe.c	Axe_UpdateScreenShake	contrived	minor	5	remaining: constlocal
 src/monsters/axe/axe.c	Axe_InitAttackTrail	minor	minor	16	remaining: block
 src/monsters/axe/axe.c	Axe_UpdateAttackColliderPositions	minor	minor	1	remaining: constlocal
+src/monsters/axe/axe.c	ActorCollision_InitThreeAuxiliaryAttacks	minor	minor	1	remaining: maskhelper

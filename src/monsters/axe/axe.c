@@ -2746,14 +2746,15 @@ void ActorCollision_InitThreeAuxiliaryAttacks(struct ChaseActor *actor)
     offset.y = 0;
     offset.z = 0;
     for (i = 0; i < 3; i++) {
-        struct ContactCollider *collider = &group->auxiliaryAttack[i];
-        Collider_Init(collider, actor->base.body.id, 0x2401, 0, 16, &size, &offset);
-        Collider_SetAttackProperties(collider, SceneActorCollision_ReadAttackField3C(actor, 3),
+        Collider_Init(&group->auxiliaryAttack[i], actor->base.body.id, 0x2401, 0, 16, &size,
+                      &offset);
+        Collider_SetAttackProperties(&group->auxiliaryAttack[i],
+                                     SceneActorCollision_ReadAttackField3C(actor, 3),
                                      SceneActorCollision_ReadAttackField40(actor, 3), 0,
                                      SceneActorCollision_ReadAttackReactionFlags(actor, 3),
                                      SceneActorCollision_ReadAttackField44(actor, 3));
-        Collider_SetPosition(collider, &actor->base.body.position, 0);
-        Collider_SetCallback(collider, Axe_OnAttackColliderContact, actor);
+        Collider_SetPosition(&group->auxiliaryAttack[i], &actor->base.body.position, 0);
+        Collider_SetCallback(&group->auxiliaryAttack[i], Axe_OnAttackColliderContact, actor);
     }
 }
 
