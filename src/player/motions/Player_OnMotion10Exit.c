@@ -1,12 +1,12 @@
 #include "global.h"
 #include "engine/engine.h"
+#include "player/player.h"
 
-void PlayerAction_RefreshModifiers(u8 *);
+void PlayerAction_RefreshModifiers(void *);
 
-void Player_OnMotion10Exit(u8 *p)
+void Player_OnMotion10Exit(struct Player *p)
 {
-    if (!(gEngineFlags & 0x1000)) {
+    if (!(gEngineFlags & 0x1000))
         PlayerAction_RefreshModifiers(p);
-    }
-    *(u8 *)(p + 0xAC8) = 0xFF;
+    p->baseActionVariant = 0xFF;
 }

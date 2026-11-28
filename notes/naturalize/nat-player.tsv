@@ -648,3 +648,4 @@ src/player/motions/Player_UpdateEnergyBurst.c	Player_UpdateEnergyBurst	natural	n
 src/player/motions/Player_UpdateAttachmentCue.c	Player_UpdateAttachmentCue	contrived	minor	8	facing mask held in a local initialized to 7: a direct and ties the other operand register (README fact 33)
 src/player/motions/Player_OnMotion11Exit.c	Player_OnMotion11Exit	contrived	natural	1	-
 src/player/motions/Player_UpdateAlternateFormCue.c	Player_UpdateAlternateFormCue	contrived	natural	4	-
+src/player/motions/Player_OnMotion10Exit.c	Player_OnMotion10Exit	contrived	natural	1	-
