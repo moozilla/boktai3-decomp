@@ -271,11 +271,6 @@ static inline u8 testFlag(u32 mask, u32 *flags)
 }
 
 
-static inline s32 TimedEventValue(u32 slot)
-{
-    return ((struct GameState *)(slot * sizeof(s32) + (u32)gGameState))->counters628[0];
-}
-
 void Hud_DrawWarningMeter(struct SceneHudState *hud, s32 mode, u32 x, u32 y)
 {
     s32 blink;
@@ -287,26 +282,24 @@ void Hud_DrawWarningMeter(struct SceneHudState *hud, s32 mode, u32 x, u32 y)
     if (hud->actionOwner->tetherMode == 0x23 && hud->controlMode != 8)
         goto blank;
     if (gGameState->playerParticleRate > 0x9C3 && hud->controlMode != 8) {
-        u16 *timer = &hud->warningBlinkTimer;
-        u32 bit = (*timer >> 4) & 1;
+        u32 bit = (hud->warningBlinkTimer >> 4) & 1;
         blink = 1;
         if (bit)
             blink = 0;
-        if ((*timer & 0x3F) == 2)
+        if ((hud->warningBlinkTimer & 0x3F) == 2)
             Sound_PlaySong(0x132);
-        (*timer)++;
+        hud->warningBlinkTimer++;
     } else if (gGameState->playerParticleRate > 0 && hud->controlMode != 8) {
-        u16 *timer = &hud->warningBlinkTimer;
-        u32 bit = (*timer >> 5) & 1;
+        u32 bit = (hud->warningBlinkTimer >> 5) & 1;
         blink = 1;
         if (bit)
             blink = 0;
-        if ((*timer & 0x3F) == 2)
+        if ((hud->warningBlinkTimer & 0x3F) == 2)
             Sound_PlaySong(0x131);
-        (*timer)++;
+        hud->warningBlinkTimer++;
     } else {
         blink = 0;
-        hud->warningBlinkTimer = blink;
+        hud->warningBlinkTimer = 0;
     }
     if (blink) {
     blank:
@@ -320,15 +313,14 @@ void Hud_DrawWarningMeter(struct SceneHudState *hud, s32 mode, u32 x, u32 y)
         else if (testFlag(0x80, &gGameState->flags868) || hud->controlMode == 8 ||
                  WordFlags_Test(&hud->actionOwner->statusFlags, 0x10)) {
             u32 frame = hud->meterPulseFrame;
-            pulse = 0x29F;
-            if (frame > 0x24) {
+            if (frame <= 0x24)
+                pulse = 0x29F;
+            else if (frame <= 0x2C)
                 pulse = 0x1FB;
-                if (frame <= 0x2C)
-                    goto pulse_ready;
-                if (frame <= 0x34)
-                    pulse = 0x177;
-            }
-        pulse_ready:
+            else if (frame <= 0x34)
+                pulse = 0x177;
+            else
+                pulse = 0x1FB;
             if (++hud->meterPulseFrame > 0x3B)
                 hud->meterPulseFrame = 0;
         } else {
@@ -348,8 +340,8 @@ void Hud_DrawWarningMeter(struct SceneHudState *hud, s32 mode, u32 x, u32 y)
             *tiles++ = 0xD05E;
         *tiles = 0xD05F;
     }
-    if ((u8)(hud->controlMode - 8) > 1) {
-        if (TimedEventValue(hud->actionOwner->timedEventSlot) > 0) {
+    if (hud->controlMode != 8 && hud->controlMode != 9) {
+        if (*(gGameState->counters628 + hud->actionOwner->timedEventSlot) > 0) {
             tiles = Hud_GetTilemapCell(0, 15, 17);
             for (i = 0; i < 5; i++)
                 *tiles++ = (i + 0x3B) | 0xD000u;

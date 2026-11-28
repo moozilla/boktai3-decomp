@@ -524,3 +524,4 @@ src/ui/hud/display/hud.c	Hud_DrawHealthLabel	natural	natural	0
 src/ui/hud/display/hud.c	Hud_DrawEnergyLabel	natural	natural	0	
 src/ui/hud/display/hud.c	Hud_DrawAlternateMeterLabel	natural	natural	0	
 src/ui/hud/display/hud.c	Hud_DrawPlayerGauge	fudged	natural	1	
+src/ui/hud/display/hud.c	Hud_DrawWarningMeter	fudged	partial	20	blink bit local, testFlag helper (0/1 flag), pointer-sum event counter read (address computed index-first), goto into the blank arm
