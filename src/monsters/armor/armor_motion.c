@@ -199,9 +199,12 @@ struct ArmorWalkController {
     u16 flagsB32; // 0xB32
     u8 padB34[5];
     u8 facing; // 0xB39
-    u8 padB3A[6];
+    u8 padB3A;
+    u8 moveAngle; // 0xB3B
+    u8 padB3C[4];
     u8 walkState;    // 0xB40
     u8 walkComplete; // 0xB41
+    u8 ticks;        // 0xB42
 };
 
 extern const u32 gArmorWalkAnimations[];
@@ -320,76 +323,58 @@ struct ActorMotionVector {
 
 extern u32 gUnk_0824EBA4[];
 
-void Armor_UpdateRunMotion(u8 *p, s32 speed, u32 timer)
+void Armor_UpdateRunMotion(struct ArmorWalkController *p, s32 speed, u32 duration)
 {
-    u8 *s = p + 0xB40;
-    s16 zero;
-    struct ActorMotionVector *v;
-
-    if (*s == 0) {
-        Armor_SetAnimationFromStart((u32)p, (u32)&gUnk_0824EBA4[((p[0xB39] + 0x60) >> 6) & 3]);
-        (*s)++;
-        p[0xB41] = 1;
-        *(u16 *)(p + 0xC4) = timer;
+    if (p->walkState == 0) {
+        Armor_SetAnimationFromStart((u32)p, (u32)&gUnk_0824EBA4[((p->facing + 0x60) >> 6) & 3]);
+        p->walkState++;
+        p->walkComplete = 1;
+        p->animationDuration = duration;
         SceneCombatActor_SelectFirstCollider((struct SceneCombatActor *)p);
-        ((struct ActorStateFlags *)(p + 0xB32))->flags |= 0x20;
+        p->flagsB32 |= 0x20;
     }
-    {
-        u8 *ap = p + 0xB39;
-        struct ActorMotionVector *w = v = (void *)(p + 0x50);
-        u8 a = *ap;
-        s32 t;
-        w->x = RoundMotion(gUnk_086149C4[(a + 64) & 255] * speed);
-        w->y = 0;
-        t = RoundMotion(gUnk_086149C4[a] * speed);
-        zero = 0;
-        w->z = t;
-    }
-    if (*(s16 *)(p + 0x50) == 0) {
-        s32 d = 0x80 - p[0x48];
+    SetMotion((struct ArmorMotionVector *)&p->motionX, p->facing, speed);
+    if (p->motionX == 0) {
+        s32 d = 0x80 - p->axisX;
         if (d > 16)
-            *(s16 *)(p + 0x50) = 3;
-        else if (d < -16) {
-            u32 n = 0xFFFD;
-            *(u16 *)(p + 0x50) = n;
-        }
-    } else if (*(s16 *)(p + 0x54) == 0) {
-        s32 d = 0x80 - p[0x4C];
+            p->motionX = 3;
+        else if (d < -16)
+            p->motionX = -3;
+    } else if (p->motionZ == 0) {
+        s32 d = 0x80 - p->axisZ;
         if (d > 16)
-            *(s16 *)(p + 0x54) = 3;
-        else if (d < -16) {
-            u32 n = 0xFFFD;
-            *(u16 *)(p + 0x54) = n;
-        }
+            p->motionZ = 3;
+        else if (d < -16)
+            p->motionZ = -3;
     }
-    switch (*(u16 *)(p + 0xC8)) {
+    switch (p->surfaceType) {
         case 2:
-            if (*(u16 *)(p + 0xC0) == zero)
+            if (p->stepSoundLock == 0)
                 Sound_PlaySongChecked(0xC2);
             break;
         case 5:
-            if (*(u16 *)(p + 0xC0) == zero)
+            if (p->stepSoundLock == 0)
                 Sound_PlaySongChecked(0xC3);
             break;
     }
 }
 
-void Armor_UpdateRun(u32 a)
+void Armor_UpdateRun(struct ArmorWalkController *p)
 {
-    Armor_UpdateRunMotion(a, 0x14, 0x20);
+    Armor_UpdateRunMotion(p, 0x14, 0x20);
 }
 
-void Armor_UpdateRunWithScatterEffect(u8 *p)
+void Armor_UpdateRunWithScatterEffect(struct ArmorWalkController *p)
 {
     Armor_UpdateRunMotion(p, 20, 0x20);
-    if ((p[0xB42] & 0x7) == 0)
+    if ((p->ticks & 0x7) == 0)
         Armor_SpawnScatterEffect(p);
 }
 
-void Armor_UpdateRunWithTrailEffect(u8 *p)
+void Armor_UpdateRunWithTrailEffect(struct ArmorWalkController *p)
 {
     Armor_UpdateRunMotion(p, 20, 0x20);
-    if ((p[0xB42] & 0x7) == 0)
+    if ((p->ticks & 0x7) == 0)
         SceneActor_SpawnSpriteEffect(p);
 }
 

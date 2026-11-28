@@ -18,3 +18,27 @@ src/monsters/armor/actor_marker.c	Armor_SpawnRandomDirectionalParticle	contrived
 src/monsters/armor/actor_marker.c	Armor_SpawnDirectionalParticleFan	contrived	natural	1	
 src/monsters/armor/actor_marker.c	ActorMarker_LaunchFragments	contrived	contrived	0	tried row-pointer indexing and plain random draw: position pointers/rowStart arithmetic decide hoist order and induction
 src/monsters/armor/actor_palette.c	Armor_UpdatePaletteRestoreDelay	contrived	natural	2	
+src/monsters/armor/actor_palette.c	ArmorPalette_CopyKindBanks	minor	minor	0	per-bank source/destination temps fix argument evaluation order
+src/monsters/armor/actor_palette.c	ActorPalette_LoadScriptBanks	minor	minor	0	per-bank source/destination temps fix argument evaluation order
+src/monsters/armor/actor_palette.c	ActorPalette_RestoreSelectedBanks	natural	natural	0	
+src/monsters/armor/actor_palette.c	Armor_BindPaletteBanks	natural	natural	0	
+src/monsters/armor/actor_palette.c	Armor_InitPaletteController	natural	natural	0	
+src/monsters/armor/actor_palette.c	ActorPalette_Reset	natural	natural	0	
+src/monsters/armor/actor_palette.c	Armor_StartFastWhiteFade	natural	natural	0	
+src/monsters/armor/actor_palette.c	Armor_StartSlowWhiteFade	natural	natural	0	
+src/monsters/armor/actor_palette.c	ActorPalette_BeginTransition	natural	natural	0	
+src/monsters/armor/actor_palette.c	Palette_UpdatePulseFade	natural	natural	0	
+src/monsters/armor/actor_palette.c	Armor_StartAccentPaletteFade	natural	natural	0	
+src/monsters/armor/actor_palette.c	Armor_CopyScenePalette	natural	natural	0	
+src/monsters/armor/actor_palette.c	Armor_StartFullPaletteRestoreDelay	natural	natural	0	
+src/monsters/armor/actor_palette.c	Armor_StartPaletteRestoreDelay	natural	natural	0	
+src/monsters/armor/actor_palette.c	ActorPalette_ReturnImmediately	natural	natural	0	
+src/monsters/armor/actor_palette.c	ActorPalette_DisableCallbacks	natural	natural	0	
+src/monsters/armor/actor_palette.c	ActorPalette_FadeWhiteFast	minor	minor	0	per-bank source temps fix argument evaluation order
+src/monsters/armor/actor_palette.c	ActorPalette_FadeWhite	minor	minor	0	per-bank source temps fix argument evaluation order
+src/monsters/armor/actor_palette.c	ActorPalette_BlendSavedBanks	minor	minor	0	per-bank source temps fix argument evaluation order
+src/monsters/armor/actor_palette.c	ActorPalette_BlendSavedBanksSlow	minor	minor	0	per-bank source temps fix argument evaluation order
+src/monsters/armor/actor_palette.c	Armor_StartPaletteTransition	contrived	contrived	0	tried direct arguments and BeginEffect helper: callback locals and bank temps fix load order
+src/monsters/armor/actor_palette.c	Armor_InitPaletteBanks	contrived	contrived	0	tried direct arguments and BeginEffect helper: callback locals and bank temps fix load order
+src/monsters/armor/actor_palette.c	ActorPalette_PulseBlendSaved	contrived	contrived	0	direct copy arguments tried: bank-offset and source temps fix address computation order
+src/monsters/armor/armor_motion.c	Armor_UpdateRunMotion	contrived	natural	1	
