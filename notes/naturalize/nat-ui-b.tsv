@@ -588,3 +588,4 @@ src/ui/town/storage/Storage_BeginCategoryBrowse.c	Storage_BeginCategoryBrowse	mi
 src/ui/town/storage/Storage_UpdateItemTransition.c	Storage_UpdateItemTransition	contrived	natural	1	
 src/ui/town/storage/Storage_UpdateBrowseIntro.c	Storage_UpdateBrowseIntro	minor	natural	1	
 src/ui/town/storage/MenuPanel_IsEntryAvailable.c	MenuPanel_IsEntryAvailable	minor	natural	1	
+src/ui/town/storage/MenuPanel_IsEntryEmpty.c	MenuPanel_IsEntryEmpty	contrived	minor	2	index-first pointer sum into table160
