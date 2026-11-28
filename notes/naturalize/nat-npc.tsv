@@ -678,3 +678,4 @@ src/minigames/result_game/sub_0801B700.c	sub_0801B700	contrived	natural	2
 src/minigames/result_game/ResultMenu_ConfigureLayers.c	ResultMenu_ConfigureLayers	minor	minor	0	
 src/minigames/result_game/ResultMenu_InitializeLayer.c	ResultMenu_InitializeLayer	natural	natural	0	
 src/minigames/result_game/Transformation_ReportResult.c	Transformation_ReportResult	contrived	natural	1	
+src/minigames/result_game/Transformation_Finish.c	Transformation_Finish	contrived	natural	1	

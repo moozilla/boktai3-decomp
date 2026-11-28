@@ -1,15 +1,15 @@
+#include "minigames/result_game/result_tutorial.h"
 #include "global.h"
 void ScreenTransition_SendCommand(int, int, int, int, int, int, int);
-void Transformation_ReportResult(void *);
-void Task_Kill(void *);
-void Transformation_Finish(u8 *p)
+void Transformation_ReportResult(struct ResultMenu *menu);
+void Transformation_Finish(struct ResultMenu *menu)
 {
-    if (*(u32 *)(p + 0x3c) == 60)
+    if (menu->phaseFrame == 60)
         ScreenTransition_SendCommand(1, 5, 4, 4, 4, 0xffff, 0);
-    if (*(u32 *)(p + 0x3c) > 91) {
-        if (*(u16 *)(p + 0x7a0))
-            Transformation_ReportResult(p);
-        Task_Kill(p);
+    if (menu->phaseFrame > 91) {
+        if (menu->completionScript)
+            Transformation_ReportResult(menu);
+        Task_Kill(menu);
     } else
-        (*(u32 *)(p + 0x3c))++;
+        menu->phaseFrame++;
 }
