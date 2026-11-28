@@ -1812,17 +1812,13 @@ void TetherActor_AccumulateCharge(struct TetherActor *p, u32 a)
 
 void TetherActor_UpdateChargeDecay(struct TetherActor *p)
 {
-    u16 *q = &p->charge;
-    u32 z;
-    if (*q != 0) {
-        u32 v = *q - 1;
-        z = 0;
-        *q = v;
-        if ((u16)v == 1) {
-            p->chargeReady = z;
-            *q = z;
+    if (p->charge != 0) {
+        p->charge--;
+        if (p->charge == 1) {
+            p->chargeReady = 0;
+            p->charge = 0;
             p->pendingEffectHandle = ActorAttachment_UpdateFromDescriptor(
-                p->pendingEffectHandle, &p->bodyConfig, 0x7F, z, z, z, 0xFA, 0x122);
+                p->pendingEffectHandle, &p->bodyConfig, 0x7F, 0, 0, 0, 0xFA, 0x122);
         }
     }
 }
