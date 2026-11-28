@@ -177,3 +177,4 @@ src/effects/bursts/linked_effect/ActorEffect_Spawn.c	ActorEffect_Spawn	minor	nat
 src/effects/bursts/linked_effect/LinkedEffect_SetVariant.c	LinkedEffect_SetVariant	contrived	contrived	40	random-draw unions, sine/mask locals and index arithmetic: register allocation of the table, mask and sine address
 src/effects/bursts/linked_effect/LinkedEffect_BeginRisingTravel.c	LinkedEffect_BeginRisingTravel	contrived	minor	20	random value read through the table's constant address
 src/effects/bursts/linked_effect/LinkedEffect_FollowTarget.c	LinkedEffect_FollowTarget	contrived	minor	20	sprite and sequence locals, target-delta wrapper and constant-address random reads (register allocation)
+src/effects/bursts/radial_burst/sub_08235E20.c	sub_08235E20	contrived	natural	1	-
