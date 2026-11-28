@@ -1,21 +1,20 @@
-#include "global.h"
+#include "npc/otenko/scene_npc_transition.h"
+#include "engine/task.h"
 
-u32 Task_Create(u32, u32);
-void Task_SetCallbacks(u32, void (*)(void), void (*)(void));
-s32 SceneEffect_InitParticleRing(u32, u32);
-void Task_Kill(u32);
-void Otenko_UpdateTransitionEffect(void);
-void Otenko_OnTransitionEffectDestroy(void);
+s32 SceneEffect_InitParticleRing(struct TransitionEffect *, const struct ContactPosition *);
+s32 Otenko_UpdateTransitionEffect(struct TransitionEffect *);
+s32 Otenko_OnTransitionEffectDestroy(struct TransitionEffect *);
 
-u32 Otenko_CreateTransitionEffect(u32 a)
+struct TransitionEffect *Otenko_CreateTransitionEffect(const struct ContactPosition *origin)
 {
-    u32 r = Task_Create(0xb, 0x1fc);
-    if (r != 0) {
-        Task_SetCallbacks(r, Otenko_UpdateTransitionEffect, Otenko_OnTransitionEffectDestroy);
-        if (SceneEffect_InitParticleRing(r, a) < 0) {
-            Task_Kill(r);
+    struct TransitionEffect *effect = (struct TransitionEffect *)Task_Create(0xB, sizeof(*effect));
+    if (effect) {
+        Task_SetCallbacks(&effect->task, (void *)Otenko_UpdateTransitionEffect,
+                          (void *)Otenko_OnTransitionEffectDestroy);
+        if (SceneEffect_InitParticleRing(effect, origin) < 0) {
+            Task_Kill(&effect->task);
             return 0;
         }
     }
-    return r;
+    return effect;
 }
