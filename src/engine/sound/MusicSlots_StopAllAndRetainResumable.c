@@ -1,30 +1,21 @@
-#define gMusicSlotPlayerTable gUnk_082643EC
 #include "global.h"
 #include "gba/m4a_internal.h"
 #include "engine/ram.h"
 
-extern const struct MusicPlayer gMusicSlotPlayerTable[];
 void m4aMPlayAllStop(void);
 
 /* Tentative: preserve songs in resumable slots while stopping every player. */
 void MusicSlots_StopAllAndRetainResumable(void)
 {
-    s32 i = 0;
-    const struct MusicPlayer *players = gMusicSlotPlayerTable;
-    u16 *slot = gMusicSlotSongs;
-    u16 *songs = slot;
-    u32 mask = 0xFFFF;
-    u16 zero = i;
-    do {
+    s32 i;
+
+    for (i = 0; i < 32; i++) {
         if (i == 10) {
-            u32 active = players[10].info->status & mask;
-            if (active == 0)
-                songs[10] = active;
+            if ((gMPlayTable[10].info->status & 0xffff) == 0)
+                gMusicSlotSongs[10] = 0;
         } else if (i != 12 && i != 29 && i != 30) {
-            *slot = zero;
+            gMusicSlotSongs[i] = 0;
         }
-        slot++;
-        i++;
-    } while (i <= 31);
+    }
     m4aMPlayAllStop();
 }

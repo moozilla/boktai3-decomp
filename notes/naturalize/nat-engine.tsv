@@ -103,3 +103,4 @@ src/engine/sound/Sound_StopPlayer30Song.c	Sound_StopPlayer30Song	minor	natural	1
 src/engine/sound/Sound_FadeOutChannel10.c	Sound_FadeOutChannel10	minor	natural	1	
 src/engine/sound/Sound_PauseChannel10.c	Sound_PauseChannel10	minor	natural	1	
 src/engine/sound/Sound_StopTrackedSong.c	Sound_StopTrackedSong	contrived	minor	1	slots pointer: loads the table address before the player number
+src/engine/sound/MusicSlots_StopAllAndRetainResumable.c	MusicSlots_StopAllAndRetainResumable	contrived	natural	1	
