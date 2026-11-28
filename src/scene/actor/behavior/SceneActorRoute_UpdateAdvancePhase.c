@@ -13,7 +13,6 @@ void SceneActorRoute_UpdateAdvancePhase(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
     s32 speed, event;
-    void **routeField;
     u16 *scale;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1))
         SceneActorTerrain_InstallControl(actor, actor->base.onAlternateEntry, 1);
@@ -39,17 +38,14 @@ void SceneActorRoute_UpdateAdvancePhase(struct ChaseActor *actor)
     else
         Anim_SetFrameDurationScale((u8 *)actor->base.drawable + 0x20, *scale);
 
-    routeField = &group->route;
-    event = NavMesh_ConsumeProbeEvent(*routeField);
+    event = NavMesh_ConsumeProbeEvent(group->route);
     if (!event) {
-        void *descriptor = *routeField;
-        if (SceneActorBehavior_AccelerateTowardDescriptor(actor, descriptor, 32, 32, speed)) {
+        if (SceneActorBehavior_AccelerateTowardDescriptor(actor, group->route, 32, 32, speed)) {
             SceneActorTerrain_EnterState(actor, 0, 0, 0);
             return;
         }
     } else {
-        void *descriptor = *routeField;
-        if (SceneActorBehavior_RequestDescriptorTurn(actor, descriptor, 32, 32, speed))
+        if (SceneActorBehavior_RequestDescriptorTurn(actor, group->route, 32, 32, speed))
             SceneActorTerrain_EnterState(actor, 0, 0, 6);
     }
     actor->base.counter2AC++;

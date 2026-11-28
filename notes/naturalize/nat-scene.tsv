@@ -260,3 +260,4 @@ src/scene/actor/behavior/SceneActor_RunControlAndFallback.c	SceneActor_RunContro
 src/scene/actor/behavior/SceneActor_DispatchActivePhase.c	SceneActor_DispatchActivePhase	natural	natural	0	-
 src/scene/actor/behavior/SceneActorRoute_UpdateTimedPhase.c	SceneActorRoute_UpdateTimedPhase	natural	natural	0	-
 src/scene/actor/behavior/SceneActorRoute_UpdateWaitPhase.c	SceneActorRoute_UpdateWaitPhase	contrived	minor	3	parked status clear mask (plain &= loads the field first)
+src/scene/actor/behavior/SceneActorRoute_UpdateAdvancePhase.c	SceneActorRoute_UpdateAdvancePhase	contrived	minor	4	duration scale pointer assigned in both branches
