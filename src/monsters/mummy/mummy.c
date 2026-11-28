@@ -34,7 +34,6 @@ void Mummy_OnAttackCollision(u8 *unused, struct ContactCollider *obj, u8 *input)
 {
     struct ChaseActor *base = (void *)input;
     struct Mummy *state = base->base.context;
-    u16 responseCost;
     u16 contactFlags;
     u32 rawKind;
     u32 kindIndex;
@@ -45,7 +44,7 @@ void Mummy_OnAttackCollision(u8 *unused, struct ContactCollider *obj, u8 *input)
     contactFlags = rawKind;
     if (kindIndex <= 7) {
         u16 *flags;
-        if ((!Mummy_LoadContactLatch(state, &flags, 0x800)) &&
+        if (!Mummy_LoadContactLatch(state, &flags, 0x800) &&
             SceneActorChase_Bits32(&((struct Player *)obj->owner)->statusFlags, 8))
             return;
         {
@@ -53,12 +52,12 @@ void Mummy_OnAttackCollision(u8 *unused, struct ContactCollider *obj, u8 *input)
             *flags &= mask;
         }
         if ((!SceneActor_ActionsBlocked((struct ChaseActor *)input)) &&
-            ((obj->contactFlags) & 15)) {
+            (obj->contactFlags & 15)) {
             ((struct ChaseActor *)input)->base.counter304 = obj->collisionId;
             SceneActorChase_ClearWordFlags(&((struct ChaseActor *)input)->base.statusFlags,
                                            ROOM_ACTOR_STATUS_INTERACTING);
         }
-        base->base.tracking.target = SceneActorContacts_FindObjectById((u16)base->base.counter304);
+        base->base.tracking.target = SceneActorContacts_FindObjectById(base->base.counter304);
         obj->responseFlags |= 1;
         if ((!(*((u16 *)Mummy_ResponseAddress(
                 (u32) & ((struct ChaseActor *)0)->base.colliderA.responseValue, base)))) &&
@@ -70,8 +69,7 @@ void Mummy_OnAttackCollision(u8 *unused, struct ContactCollider *obj, u8 *input)
                 struct ContactCollider *collider = &base->base.colliderA;
                 collider->cost = 1;
             }
-            responseCost = base->base.colliderA.cost;
-            base->base.reactionSoundVariant = responseCost;
+            base->base.reactionSoundVariant = base->base.colliderA.cost;
             base->base.colliderA.responseParameter = 1;
             base->base.colliderA.responseValue = 30;
             base->base.field2E6 = 4;
