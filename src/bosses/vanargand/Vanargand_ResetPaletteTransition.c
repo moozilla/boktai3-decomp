@@ -1,17 +1,11 @@
 #include "global.h"
+#include "bosses/vanargand/vanargand_pair_attack.h"
 
-struct A {
-    u8 f[0xf18];
-    u32 a;
-    u32 b;
-    u16 h;
-};
-
-void Vanargand_ResetPaletteTransition(struct A *p)
+void Vanargand_ResetPaletteTransition(struct VanargandPairAttack *boss)
 {
-    if (p->h != 0) {
-        p->a = 0;
-        p->h = 0;
-        p->b = 0x6f;
+    if (boss->paletteMode != 0) {
+        boss->paletteFrame = 0;
+        boss->paletteMode = 0;
+        boss->paletteSelector = 0x6F;
     }
 }

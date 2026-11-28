@@ -97,7 +97,11 @@ struct VanargandPairAttack {
     u16 palettes[16][16];
     u8 fadeA[0xB18 - 0x918];
     u8 fadeB[0xD18 - 0xB18];
-    u8 fadeC[0xF24 - 0xD18];
+    u8 fadeC[0xF18 - 0xD18];
+    s32 paletteFrame;    /* 0xF18 */
+    u32 paletteSelector; /* 0xF1C */
+    u16 paletteMode;     /* 0xF20 */
+    u16 paletteShift;    /* 0xF22 */
     u32 variant;
     u32 stageQueued
         [3]; /* 0xF28: per stage (indexed by transition), tested by the queued action state. */
