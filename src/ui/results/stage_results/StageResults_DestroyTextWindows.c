@@ -1,10 +1,15 @@
 #include "global.h"
+
+struct StageResults {
+    u8 pad0[0x11CC];
+    u32 textWindows[3];
+};
+
 void TextWindow_Clear(u32);
-void StageResults_DestroyTextWindows(u8 *p)
+
+void StageResults_DestroyTextWindows(struct StageResults *results)
 {
-    u32 *q = (u32 *)(p + 0x11CC);
-    s32 i = 2;
-    do {
-        TextWindow_Clear(*q++);
-    } while (--i >= 0);
+    s32 i;
+    for (i = 0; i < 3; i++)
+        TextWindow_Clear(results->textWindows[i]);
 }
