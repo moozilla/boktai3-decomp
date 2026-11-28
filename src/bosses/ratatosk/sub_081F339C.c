@@ -1,16 +1,17 @@
 #include "global.h"
+#include "bosses/ratatosk/ratatosk.h"
 
-s32 sub_081F339C(u8 *p)
+s32 sub_081F339C(struct Ratatosk *self)
 {
-    s32 best = -1;
-    u32 max = 0;
+    s32 selected = -1;
+    u32 maximum = 0;
     s32 i;
-    for (i = 0; i <= 3; i++) {
-        u8 *e = p + 0xdf0 + i * 24;
-        if (*(u32 *)e == 1 && *(u32 *)(e + 0xc) >= max) {
-            max = *(u32 *)(e + 0xc);
-            best = i;
+
+    for (i = 0; i < 4; i++) {
+        if (self->targets[i].active == 1 && self->targets[i].anchorDistance >= maximum) {
+            maximum = self->targets[i].anchorDistance;
+            selected = i;
         }
     }
-    return best;
+    return selected;
 }

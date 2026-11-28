@@ -8,3 +8,4 @@ src/bosses/ratatosk/sub_081F2F90.c	sub_081F3018	contrived	natural	3
 src/bosses/ratatosk/Ratatosk_FindActiveTargetNearestPlayer.c	Ratatosk_FindActiveTargetNearestPlayer	contrived	natural	1	
 src/bosses/ratatosk/Ratatosk_FindActiveTargetNearestReference.c	Ratatosk_FindActiveTargetNearestReference	contrived	natural	1	
 src/bosses/ratatosk/sub_081F336C.c	sub_081F336C	contrived	natural	1	
+src/bosses/ratatosk/sub_081F339C.c	sub_081F339C	contrived	natural	1	
