@@ -3,6 +3,7 @@
 #include "engine/engine.h"
 #include "engine/input.h"
 #include "engine/ram.h"
+#include "link/wireless/random.h"
 // Tentative family name: actor animation/state handlers; specific actor identity unknown.
 s32 Mod(s32, s32);
 void AnimationActor_ProcessKeys(struct Ratatosk *p)
@@ -16,11 +17,7 @@ void AnimationActor_ProcessKeys(struct Ratatosk *p)
     }
     if (gPadState[1] & 0x200) {
         q->duration = 128;
-        gRandomIndex = (gRandomIndex + 1) & 1023;
-        q->destination =
-            *(struct ContactPosition
-                  *)((Mod(*(const u16 *)(gRandomIndex * 2 + (u32)gRandomTable), 9) * 8 + (u32)q) +
-                     0xccc);
+        q->destination = *(Mod(RANDOM_NEXT(), 9) + q->points);
         Ratatosk_EnterPhase(p, 2);
     }
     if (p->actionFinished == 1 && q->actionState != 3)

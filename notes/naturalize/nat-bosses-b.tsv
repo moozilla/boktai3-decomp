@@ -92,3 +92,6 @@ src/bosses/ratatosk/Ratatosk_BeginInterruptState.c	Ratatosk_BeginInterruptState	
 src/bosses/ratatosk/Ratatosk_UpdatePointEffectAnimation.c	Ratatosk_UpdatePointEffectAnimation	minor	minor	4	one mask-parameter flag accessor stays: mask loaded before the field
 src/bosses/ratatosk/Ratatosk_UpdateShrinkingAnimation.c	Ratatosk_UpdateShrinkingAnimation	minor	minor	4	two mask-parameter flag accessors and a local animation view stay: mask loaded before the field
 src/bosses/ratatosk/SceneActor_UpdateState1Command.c	SceneActor_UpdateState1Command	contrived	natural	3	== TRUE kept: the compiler compares the entry result with 1
+src/bosses/ratatosk/SceneActor_UpdateState24AndConditionalReturnCommand.c	SceneActor_UpdateState24AndConditionalReturnCommand	natural	natural	0	
+src/bosses/ratatosk/Ratatosk_UpdateScriptedState.c	Ratatosk_UpdateScriptedState	natural	natural	0	
+src/bosses/ratatosk/AnimationActor_ProcessKeys.c	AnimationActor_ProcessKeys	contrived	minor	7	second actor alias stays: ROM keeps a second copy of the pointer; index-first pointer add
