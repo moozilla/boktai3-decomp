@@ -1,4 +1,5 @@
 #include "global.h"
+#include "gba/io_reg.h"
 struct Bytes {
     u8 b0, b1, b2, b3, b4, b5, b6, b7;
 };
@@ -14,27 +15,20 @@ u32 Clock_ReadValidatedRtcDateTime(void)
     u32 status = 0;
     s32 i;
 
-    vu16 *ime, *ie;
-    u32 zero;
     Solar_PauseMeasurement();
-    i = 0;
-    ime = (vu16 *)0x04000208;
-    zero = 0;
-    ie = (vu16 *)0x04000200;
-    while (i <= 4) {
+    for (i = 0; i < 5; i++) {
         u16 old;
-        *ime = zero;
-        old = *ie;
-        *ie = zero;
+        REG_IME = 0;
+        old = REG_IE;
+        REG_IE = 0;
         Clock_BeginRtcAccess();
         status = (u8)Rtc_ReadDateTime(&gRtcDateTime);
         Clock_EndRtcAccess();
-        *ie = old;
-        *ime = 1;
+        REG_IE = old;
+        REG_IME = 1;
         if (status == 1)
             break;
         Clock_WaitCycles(200);
-        i++;
     }
     Solar_ResumeMeasurement();
     if (status == 1) {

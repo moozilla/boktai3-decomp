@@ -448,3 +448,4 @@ src/system/clock/SunClock_GetMoonPhaseIndex.c	SunClock_GetMoonPhaseIndex	minor	n
 src/system/clock/Clock_CheckRtcDate.c	Clock_CheckRtcDate	contrived	natural	1	
 src/system/clock/Clock_IsEarlyMorning.c	Clock_IsEarlyMorning	minor	natural	1	
 src/system/clock/sub_08229180.c	sub_08229180	minor	natural	1	
+src/system/clock/Clock_ReadValidatedRtcDateTime.c	Clock_ReadValidatedRtcDateTime	contrived	natural	1	
