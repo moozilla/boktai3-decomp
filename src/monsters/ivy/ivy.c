@@ -293,32 +293,6 @@ static inline void CellCenter(struct SceneVec *out, u32 cell)
     out->z = (z << 8) + 0x80;
 }
 
-static inline void ResetState(struct ChaseActor *actor, u32 s)
-{
-    actor->base.state2A8 = s;
-    actor->base.phase2A9 = 0;
-    actor->base.behavior2AA = 0;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
-}
-
-static inline void Facing(struct ChaseActor *actor, u8 *quadrant, u8 *flip)
-{
-    s32 side = ((actor->base.body.direction + 0x60) >> 6) & 3;
-    if (side > 1) {
-        *flip = 1;
-        *quadrant = 3 - side;
-    } else {
-        *flip = 0;
-        *quadrant = side;
-    }
-}
-
-static inline s32 WrapCounter(s32 n)
-{
-    return n - 256;
-}
-
 static inline void FacingAngle(struct ChaseActor *actor, u8 *angle)
 {
     s32 turn = (actor->base.body.direction + 0x20) & 0xFF;
@@ -396,47 +370,53 @@ static inline void ReportDrain(struct ChaseActor *victim)
  * drained after 140 frames (HUD update, damage number) and handed back with its control
  * callback at group+0x22C; a held player (kind <= 3) is released onto the centre of the
  * actor's cell once its hold time runs out or it stops struggling, otherwise kept in place.
- * Notes for matching: the report is an inline function (its zero temporary lives in the
- * inline's frame, addressed through r8), the drawable mode byte is a bitfield (its store
- * leaves the zero the ROM reuses), and the wrapped tick difference goes through an inline
- * so combine does not refold it. */
+ */
+
+// scope: put Ivy_UpdateHold begin
+/* How far the player's byte counter at 0x4F4 has moved since the hold began. */
+static inline s32 Ivy_TicksHeld(struct Ivy *context)
+{
+    s32 start = context->startTick;
+    s32 now = gPlayers[0]->facingChangeEffects;
+
+    if (now < start) {
+        s32 wrapped = start - 256;
+        return now - wrapped;
+    }
+    return now - start;
+}
 
 void Ivy_UpdateHold(struct ChaseActor *actor, s32 frame)
 {
     struct Ivy *context = actor->base.context;
-    void *group = &actor->group;
-    struct DisplaySequenceState *sequence = (void *)((u8 *)actor->base.drawable + 0x48);
+    struct SceneActorChaseGroup *group = &actor->group;
+    struct DisplaySequenceState *sequence =
+        &((struct SceneActorControlMotionDrawable *)actor->base.drawable)->sequence;
     struct SceneActorBody *target;
     u8 quadrant, flip;
     struct ContactPosition position;
     s32 index;
+
     if (SceneActorReaction_TakePrepared(actor)) {
-        context->startTick = (*(u8 **)gPlayers)[0x4F4];
-        {
-            u16 *destination = &actor->base.colliderA.flags;
-            u32 flags = *destination;
-            u32 mask = 4;
-            mask |= flags;
-            mask &= 0xFFF7;
-            *destination = mask;
-        }
-        {
-            u32 mask = 0x800;
-            mask |= actor->base.placementFlags;
-            actor->base.placementFlags = mask;
-        }
+        context->startTick = gPlayers[0]->facingChangeEffects;
+        actor->base.colliderA.flags |= 4;
+        actor->base.colliderA.flags &= ~8;
+        MonsterInit_SetMotionFlags(actor, 0x800);
     }
     target = (void *)actor->base.tracking.target;
-    Facing(actor, &quadrant, &flip);
+    Ivy_Facing(actor, &quadrant, &flip);
     if (target->mode <= 3) {
+        /* A held player is placed for the frame about to be shown. */
         if (sequence->elapsed + 1 >= sequence->duration) {
             index = sequence->index + 1;
             if (index >= sequence->frameCount)
                 index = 0;
-        } else
+        } else {
             index = sequence->index;
-    } else
+        }
+    } else {
         index = sequence->index;
+    }
     position.x = actor->base.body.position.x + gUnk_08606384[flip][index].x;
     position.y = actor->base.body.position.y + gUnk_08606384[flip][index].y;
     position.z = actor->base.body.position.z + gUnk_08606384[flip][index].z;
@@ -445,68 +425,52 @@ void Ivy_UpdateHold(struct ChaseActor *actor, s32 frame)
         ((struct IvyDrawable *)actor->base.drawable)->mode = 2;
         victim = target->owner;
         SceneActorReaction_ApplyHitResponse(victim, 0, &position, 0, flip, 0);
-        if (frame <= 0x8C)
-            goto animate;
-        {
+        if (frame > 0x8C) {
             s32 health = victim->base.health;
             victim->base.colliderA.cost = health;
             victim->base.reactionSoundVariant = health;
             victim->base.health = 0;
+            ReportDrain(victim);
+            SceneActorTerrain_EnterState(victim, 3, 0, 0);
+            SceneActorChase_SetControl(victim, group->defeatBurstControl, 0x1E);
+            ClearHeld(context);
+            actor->base.stepDone = 1;
+            return;
         }
-        ReportDrain(victim);
-        ResetState(victim, 3);
-        SceneActorChase_SetControl(victim, *(void **)((u8 *)group + 0x22C), 0x1E);
-        ClearHeld(context);
-        actor->base.stepDone = 1;
-        return;
-    }
-    if (target->mode > 3)
-        goto animate;
-    {
+    } else if (target->mode <= 3) {
         struct Player *player;
         ((struct IvyDrawable *)actor->base.drawable)->mode = 1;
         player = target->owner;
         if (Mod(frame, context->interval) == 0) {
-            s32 start, cur, elapsed;
-            if (IsIdle(player))
-                goto release;
-            start = context->startTick;
-            cur = (*(u8 **)gPlayers)[0x4F4];
-            if (cur < start) {
-                s32 wrapped = WrapCounter(start);
-                elapsed = cur - wrapped;
-            } else
-                elapsed = cur - start;
-            if (elapsed > context->holdTicks) {
-            release:
+            u32 status, power, flags;
+
+            if (IsIdle(player) || Ivy_TicksHeld(context) > context->holdTicks) {
                 FacingAngle(actor, &quadrant);
                 CellCenter((struct SceneVec *)&position, actor->base.terrainCell);
                 Player_ApplyPositionRequest(player, (struct SceneVec *)&position, 0x40, quadrant,
                                             0x3C, 0, 0, 0);
                 ClearHeld(context);
-                MonsterInit_SetState(actor, 0, 0, 2);
+                SceneActorChase_SetBehavior(actor, 2);
                 SceneActorChase_SetControl(actor, (void *)Ivy_UpdateActiveState, 0x22);
                 return;
             }
-            {
-                u32 status = Ivy_GetAnimationStatus(actor);
-                u32 request = actor->base.attacks.first[1];
-                u32 option = actor->base.attacks.flags[1];
-                Player_BeginPositionRequest(player, (struct SceneVec *)&position, 0, status, flip,
-                                            0, 0, request, option);
-            }
+            status = Ivy_GetAnimationStatus(actor);
+            power = actor->base.attacks.first[1];
+            flags = actor->base.attacks.flags[1];
+            Player_BeginPositionRequest(player, (struct SceneVec *)&position, 0, status, flip, 0,
+                                        0, power, flags);
         } else {
             Player_BeginPositionRequest(player, (struct SceneVec *)&position, 0,
                                         Ivy_GetAnimationStatus(actor), flip, 0, 0, 0, 0);
         }
     }
-animate:
     SceneActorAnimation_SelectDirectionalFlags((void *)actor, 0x12);
     if (sequence->index == 0 && sequence->elapsed == 0)
         Sound_PlaySong(0x1DE);
     if (frame > 0xB4)
         actor->base.stepDone = 1;
 }
+// scope: put Ivy_UpdateHold end
 
 /* Ivy release start (tentative): on entry disables the main collider, plays directional
  * animation 0x15 and puts a held player back on the centre of the actor's terrain cell; then
