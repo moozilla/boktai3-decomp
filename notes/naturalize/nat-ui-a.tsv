@@ -152,3 +152,4 @@ src/ui/books/forging_book/CollectionBook_UpdateSelectionCursor.c	CollectionBook_
 src/ui/books/forging_book/CollectionBook_UpdateTrackedEntryMarker.c	CollectionBook_UpdateTrackedEntryMarker	contrived	natural	1	
 src/ui/books/forging_book/ForgingBook_UpdateCursorPulse.c	ForgingBook_UpdateCursorPulse	contrived	natural	1	
 src/ui/books/forging_book/ForgingBook_RefreshEntryDescription.c	ForgingBook_RefreshEntryDescription	contrived	natural	1	
+src/ui/books/forging_book/ForgingBook_SetupPageBackground.c	ForgingBook_SetupPageBackground	contrived	minor	1	initial size 16 stored twice
