@@ -37,11 +37,6 @@ static inline void InvalidatePreviousAnimation(struct Player *p)
     s16 missing = -1;
     *field = missing;
 }
-static inline void ClearContactTimer(struct Player *p)
-{
-    u16 *timer = &p->statModifierContext.contactTimer;
-    *timer = 0;
-}
 void Player_UpdateWeaponCueCombo(struct Player *p)
 {
     struct PlayerActionCueInfo info;
@@ -53,14 +48,13 @@ void Player_UpdateWeaponCueCombo(struct Player *p)
     Player_AddControlFlags(p, 0x100);
     switch (p->tetherPhase) {
         case 0: {
-            u16 *timer = &p->tetherFrame;
-            if (!(*timer))
+            if (!p->tetherFrame)
                 Player_SelectActionVariant(p);
             if (Player_SetAnimation(p, Player_SelectActionCue(p), record->speed, 2)) {
                 p->actionResetCounter = 0;
                 Player_SetActionPhase(p, 1);
             }
-            ++(*timer);
+            p->tetherFrame++;
             FrameDisplay_UpdateSprite(p->actionDisplay);
             break;
         }
@@ -68,46 +62,45 @@ void Player_UpdateWeaponCueCombo(struct Player *p)
         case 1:
             Player_UpdateAttackFacing(p);
             Player_SetAnimation(p, Player_SelectActionCue(p), record->speed, 2);
-            if (!((*(p->inputKeys)) & 2)) {
+            if (!(p->inputKeys[0] & 2)) {
                 Player_InitializeActionContact(p);
                 Player_SetActionPhase(p, 2);
             } else
-                ++(p->tetherFrame);
+                p->tetherFrame++;
             break;
 
-        case 2: {
+        case 2:
             phase = &record->phases[p->actionResetCounter];
             Player_SetAnimation(p, Player_SelectActionCue(p), record->speed, 2);
-            if ((++(p->tetherFrame)) > (phase->delay)) {
+            if (++p->tetherFrame > phase->delay) {
                 InvalidatePreviousAnimation(p);
                 Player_SetActionPhase(p, 3);
             }
-            if ((p->inputKeys)[1] & 2)
+            if (p->inputKeys[1] & 2)
                 p->statModifierContext.bufferedAttack = 1;
-            ClearContactTimer(p);
+            p->statModifierContext.contactTimer = 0;
             break;
-        }
 
         case 3: {
             phase = &record->phases[p->actionResetCounter];
-            if (!(p->tetherFrame)) {
+            if (!p->tetherFrame) {
                 s32 cost = Player_UpdateStatThreshold(p);
-                if ((p->currentStatB) <= cost)
+                if (p->currentStatB <= cost)
                     p->currentStatB = 0;
                 else
                     p->currentStatB -= cost;
             }
-            ++(p->tetherFrame);
+            p->tetherFrame++;
             p->statModifierContext.contactParameter = 10;
-            if ((p->inputKeys)[1] & 2)
+            if (p->inputKeys[1] & 2)
                 p->statModifierContext.bufferedAttack = 1;
             if (phase->forced)
                 forced = 1;
             if (Player_SetAnimation(p, Player_SelectActionCue(p), phase->speed, 2) ||
                 Player_IsActionCueReady(p)) {
-                if ((p->statModifierContext.bufferedAttack) && Player_HasWeaponComboEntry(p)) {
+                if (p->statModifierContext.bufferedAttack && Player_HasWeaponComboEntry(p)) {
                     p->statModifierContext.bufferedAttack = 0;
-                    ++(p->actionResetCounter);
+                    p->actionResetCounter++;
                     Player_SetActionPhase(p, 2);
                 } else
                     Player_SetActionPhase(p, 4);
@@ -116,24 +109,22 @@ void Player_UpdateWeaponCueCombo(struct Player *p)
             break;
         }
 
-        case 4: {
+        case 4:
             phase = &record->phases[p->actionResetCounter];
-            ++(p->tetherFrame);
+            p->tetherFrame++;
             Player_SetAnimation(p, Player_SelectActionCue(p), phase->speed, 2);
-            if ((p->tetherFrame) > (phase->releaseDuration))
+            if (p->tetherFrame > phase->releaseDuration)
                 Player_SetActionPhase(p, 5);
             break;
-        }
 
-        case 5: {
+        case 5:
             p->statModifierContext.bufferedAttack = 0;
             if (Player_SetAnimation(p, Player_SelectActionCue(p), record->speed, 2) ||
-                ((p->tetherFrame) > 30)) {
+                p->tetherFrame > 30) {
                 ActorSequence_Begin(p, 0, 0);
                 p->actionResetCounter = 0;
             }
             break;
-        }
 
         default:
             ActorSequence_Begin(p, 0, 0);
