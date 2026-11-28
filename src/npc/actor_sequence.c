@@ -37,24 +37,22 @@ void SceneTarget_BeginMove(void *, void *, void *, int, int, int, int);
 
 void SceneActorSequence_UpdateFadeInHold(struct SceneActorSequence *);
 
+static inline void SceneActorSequence_SetPoint(struct SceneActorSequencePoint *point, int x, int y,
+                                               int z)
+{
+    point->x = x;
+    point->y = y;
+    point->z = z;
+}
+
 void SceneActorSequence_BeginDownwardMotion(struct SceneActorSequence *p)
 {
     struct SceneActorSequencePoint start, end;
-    s16 *q = (s16 *)&start;
-    int x = 120, y = 80, zero = 0;
-    start.x = x;
-    q[1] = y;
-    q[2] = zero;
-    {
-        s16 *r = (s16 *)&end;
-        int y2 = 144;
-        r[0] = x;
-        r[1] = y2;
-        r[2] = zero;
-    }
+    SceneActorSequence_SetPoint(&start, 120, 80, 0);
+    SceneActorSequence_SetPoint(&end, 120, 144, 0);
     SceneTarget_BeginMove(p->actor, &start, &end, 1, 64, 128, 60);
     p->updateState = SceneActorSequence_UpdateFadeInHold;
-    p->timer = zero;
+    p->timer = 0;
 }
 
 s32 PopInSprite_GetStateResult(void *);

@@ -108,3 +108,4 @@ src/npc/sabata_rider/script.c	SabataRider_ResetFromScript	contrived	minor	5	entr
 src/npc/actor_sequence.c	SceneActorSequence_UpdateBackgroundScroll	natural	natural	0	
 src/npc/actor_sequence.c	SceneActorSequence_BeginFadeIn	natural	natural	0	
 src/npc/actor_sequence.c	SceneActorSequence_UpdateFadeIn	minor	natural	1	
+src/npc/actor_sequence.c	SceneActorSequence_BeginDownwardMotion	contrived	natural	6	
