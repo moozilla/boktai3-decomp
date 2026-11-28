@@ -115,24 +115,19 @@ void MessageActor_RestoreIdleAfterState49(void *ctx, struct StateActor *p)
         p->nextState = 0x49;
     }
     if (p->done) {
-        u32 zero, one;
+        void (*next)(void);
         Trigger_ConsumePending(p->receiver, 1);
-        zero = 0;
-        p->state = zero;
-        p->timer = zero;
-        one = 1;
-        p->enterCommand = one;
-        {
-            void (*next)(void) = Actor_OnHiddenIdleUpdate;
-            p->prevState = one;
-            p->stateCallback = next;
-        }
-        p->stateFrame = zero;
-        p->enter = one;
-        p->phase = zero;
+        p->state = 0;
+        p->timer = 0;
+        p->enterCommand = 1;
+        next = Actor_OnHiddenIdleUpdate;
+        p->prevState = 1;
+        p->stateCallback = next;
+        p->stateFrame = 0;
+        p->enter = 1;
+        p->phase = 0;
     }
 }
-
 STATE_COMMAND_WAIT(MessageActor_WaitForState4A, 0x4a)
 STATE_COMMAND_GO(MessageActor_StartState4B, 0x4b)
 STATE_COMMAND_WAIT(MessageActor_WaitForState4C, 0x4c)
