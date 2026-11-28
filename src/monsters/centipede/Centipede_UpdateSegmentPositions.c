@@ -79,13 +79,7 @@ void Centipede_UpdateSegmentPositions(struct Actor *p, s32 divisor, s32 threshol
                     if (divisor < minimumDivisor)
                         divisor = 1;
                 }
-                {
-                    s32 quotient = Div(delta.x, divisor);
-                    u32 address = (u32)g;
-                    address += i * (s32)sizeof(struct Segment);
-                    *(s16 *)(address + FIELD_OFFSET(struct Group, segments[0].position)) +=
-                        quotient;
-                }
+                g->segments[i].position.x += Div(delta.x, divisor);
                 g->segments[i].position.y += Div(delta.y, divisor);
                 g->segments[i].position.z += Div(delta.z, divisor);
             }
