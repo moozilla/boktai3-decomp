@@ -111,3 +111,4 @@ src/monsters/ivy/ivy_child.c	Ivy_DispatchState	minor	minor	2	parked mask local m
 src/monsters/ivy/ivy_child.c	ActorPhase_ApproachNeutral	minor	minor	6	random-table read through offset local: ROM adds scaled index to base (base loaded after shift)
 src/monsters/ivy/ivy_child.c	Ivy_BeginChildRandomDelay	minor	minor	12	random-table read through byte-offset cast: same hoist order as ApproachNeutral
 src/monsters/ivy/ivy_child.c	Ivy_OnChildContact	contrived	contrived	0	unchanged: 12 interdependent helpers and private structs for a sword child view; not attempted
+src/monsters/mummy/mummy_entry.c	Mummy_UpdateRevival	minor	minor	3	flag peek helper stays
