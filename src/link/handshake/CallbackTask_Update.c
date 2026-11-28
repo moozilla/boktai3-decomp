@@ -2,7 +2,6 @@
 #include "engine/input.h"
 #include "gba/io_reg.h"
 #include "link/handshake/link_callback_task.h"
-u8 CallbackTask_Finish(struct LinkCallbackTask *);
 
 static inline void CallbackTask_Cancel(struct LinkCallbackTask *task)
 {

@@ -20,6 +20,8 @@ struct LinkCallbackTask {
     void *context;
 };
 
+u8 CallbackTask_Finish(struct LinkCallbackTask *task);
+
 typedef char LinkCallbackTaskSizeCheck[sizeof(struct LinkCallbackTask) == 0x84 ? 1 : -1];
 
 #endif

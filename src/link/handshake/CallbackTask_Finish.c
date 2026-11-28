@@ -1,25 +1,12 @@
 #include "global.h"
-/* Provisional names and field interpretations; confidence low. */
-struct CallbackTask {
-    u8 pad0[0x20];
-    s32 arg2;
-    s32 arg1;
-    u32 result;
-    void *pending;
-    u32 acknowledged;
-    u8 pad34[0x6F - 0x34];
-    u8 arg3;
-    u32 flags;
-    void (*success)(void *, s32, s32, u32);
-    void (*failure)(void *, s32, s32, u32);
-    u32 unk7C;
-    void *context;
-};
+#include "engine/engine.h"
+#include "link/handshake/link_callback_task.h"
+
 void Serial_StopCommunication(void);
-void Task_Kill(void *);
-u8 CallbackTask_Finish(struct CallbackTask *task)
+
+u8 CallbackTask_Finish(struct LinkCallbackTask *task)
 {
-    if (task->pending) {
+    if (task->completed) {
         Serial_StopCommunication();
         task->acknowledged = 1;
         if (task->result) {
@@ -30,7 +17,7 @@ u8 CallbackTask_Finish(struct CallbackTask *task)
                 task->failure(task->context, task->arg1, task->arg2, task->arg3);
         }
         Task_Kill(task);
-        return 1;
+        return TRUE;
     }
-    return 0;
+    return FALSE;
 }
