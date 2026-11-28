@@ -1,25 +1,19 @@
 #include "global.h"
+#include "ui/town/storage_screen.h"
 void Inventory_SortConsumables(u32);
 void Inventory_SortEquipment(u32);
 void GameState_SortConsumableSlots(u32);
-struct StorageCategoryMenu {
-    u8 unknown0[0x1754];
-    u8 selectedCategory;
-    u8 unknown1755[3];
-    u8 categories[0x48];
-    u8 sortMode;
-};
-void Storage_SortSelectedCategory(struct StorageCategoryMenu *p)
+void Storage_SortSelectedCategory(struct StorageScreen *screen)
 {
-    switch (p->categories[p->selectedCategory] >> 1) {
+    switch (screen->categoryKinds[screen->category] >> 1) {
         case 0:
-            Inventory_SortConsumables(p->sortMode);
+            Inventory_SortConsumables(screen->slots[16]);
             break;
         case 1:
-            Inventory_SortEquipment(p->sortMode);
+            Inventory_SortEquipment(screen->slots[16]);
             break;
         case 2:
-            GameState_SortConsumableSlots(p->sortMode);
+            GameState_SortConsumableSlots(screen->slots[16]);
             break;
     }
 }
