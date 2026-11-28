@@ -10,7 +10,6 @@
 void ScriptPrompt_ResetDisplay(struct ScriptPromptScreen *p)
 {
     u8 text[32];
-    u32 zero;
     u8 *src, *dst;
     Menu_EraseRect(4, 5, 5, 2);
     Menu_DrawText(4, 5,
@@ -21,8 +20,7 @@ void ScriptPrompt_ResetDisplay(struct ScriptPromptScreen *p)
         Menu_EraseRect(3, 8, 24, 4);
         Menu_DrawText(4, 8,
                       Text_LookupString(Script_ParseStringRef(gScriptPromptSettings.message) + 7));
-        zero = 0;
-        CpuSet(&zero, text, 0x05000008);
+        CpuFill32(0, text, sizeof(text));
         src = Text_LookupString(Script_ParseStringRef(gScriptPromptSettings.title));
         dst = text;
         dst[0] = 0x80;

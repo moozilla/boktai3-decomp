@@ -221,3 +221,4 @@ src/ui/dialogue/screen_message.c	ScreenMessage_Destroy	natural	natural	0
 src/ui/dialogue/screen_message.c	ScreenMessage_SetParametersFromScript	natural	natural	0	
 src/ui/dialogue/screen_message.c	ScreenMessage_Create	natural	natural	0	
 src/ui/dialogue/script_prompt.c	ScriptPrompt_Initialize	contrived	natural	5	
+src/ui/dialogue/script_prompt.c	ScriptPrompt_ResetDisplay	minor	natural	1	
