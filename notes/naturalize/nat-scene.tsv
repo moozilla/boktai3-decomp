@@ -177,3 +177,9 @@ src/scene/actor/attachment/ActorAttachment_TickDetachedParts.c	ActorAttachment_T
 src/scene/actor/attachment/ActorAttachment_BeginPartJitter.c	ActorAttachment_BeginPartJitter	natural	natural	0	-
 src/scene/actor/attachment/ActorAttachment_TickManager.c	ActorAttachment_TickManager	contrived	natural	4	-
 src/scene/actor/attachment/ActorAttachment_DestroyManager.c	ActorAttachment_DestroyManager	contrived	natural	1	-
+src/scene/actor/attachment/ActorAttachment_LoadManagerResources.c	ActorAttachment_LoadManagerResources	natural	natural	0	-
+src/scene/actor/attachment/ActorAttachment_InitManager.c	ActorAttachment_InitManager	natural	natural	0	-
+src/scene/actor/attachment/ActorAttachment_CreateManager.c	ActorAttachment_CreateManager	natural	natural	0	-
+src/scene/actor/attachment/ActorAttachment_ClearManagerPointer.c	ActorAttachment_ClearManagerPointer	natural	natural	0	-
+src/scene/actor/attachment/ActorAttachment_IsUnavailable.c	ActorAttachment_IsUnavailable	natural	natural	0	-
+src/scene/actor/attachment/ActorAttachment_ReleaseAll.c	ActorAttachment_ReleaseAll	minor	natural	1	occupied predicate kept

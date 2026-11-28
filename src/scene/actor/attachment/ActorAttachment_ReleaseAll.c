@@ -22,11 +22,10 @@ void ActorAttachment_ReleaseAll(void)
             struct ActorAttachmentPartSprite *parts = slot->parts;
             struct ContactSwarmSprite *sprite = &slot->sprite;
             if (slot->slotId >= 0) {
+                s8 id = slot->slotId;
                 u32 kind;
-                {
-                    s8 id = slot->slotId;
-                    manager->occupiedMask &= ~(1 << id);
-                }
+
+                manager->occupiedMask &= ~(1 << id);
                 kind = slot->resourceKind;
                 if (kind <= 1 || kind == 4 || kind == 5 || kind == 6) {
                     if (slot->active48) {
