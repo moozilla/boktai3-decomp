@@ -267,3 +267,21 @@ src/objects/hazards/animated_hazard.c	AnimatedHazard_AnimateHold	contrived	natur
 src/objects/hazards/animated_hazard.c	AnimatedHazard_AnimateRetraction	contrived	natural	1	
 src/objects/hazards/animated_hazard.c	AnimatedHazard_CreateProximity	contrived	contrived	1	open-coded ground height: see next row
 src/objects/hazards/animated_hazard.c	AnimatedHazard_Create	contrived	natural	4	
+src/objects/hazards/animated_hazard.c	AnimatedHazard_CreateProximity	contrived	minor	30	keeps open-coded ground height: with the shared terrain helpers delay is spilled instead of hold (global allocation priority) or the store order of hold/duration flips
+src/objects/hazards/animated_hazard.c	AnimatedHazard_ConsumeEntered	minor	minor	1	result local: early returns let jump2 reorder the flag clear
+src/objects/hazards/animated_hazard.c	AnimatedHazard_CreateProximity	contrived	minor	30	keeps open-coded ground height: with the shared terrain helpers delay is spilled instead of hold (global allocation priority) or the hold/duration store order flips
+src/objects/hazards/animated_hazard.c	AnimatedHazard_GetManager	natural	natural	0	
+src/objects/hazards/animated_hazard.c	AnimatedHazard_SetState	natural	natural	0	
+src/objects/hazards/animated_hazard.c	AnimatedHazard_Initialize	natural	natural	0	
+src/objects/hazards/animated_hazard.c	AnimatedHazard_Deactivate	natural	natural	0	
+src/objects/hazards/animated_hazard.c	AnimatedHazard_Noop	natural	natural	0	
+src/objects/hazards/animated_hazard.c	AnimatedHazard_WaitForPlayer	natural	natural	0	
+src/objects/hazards/animated_hazard.c	AnimatedHazard_EmitWarning	natural	natural	0	
+src/objects/hazards/animated_hazard.c	AnimatedHazard_Update	natural	natural	0	
+src/objects/hazards/animated_hazard.c	AnimatedHazard_RemoveSprite	natural	natural	0	
+src/objects/hazards/animated_hazard.c	AnimatedHazardManager_Update	natural	natural	0	
+src/objects/hazards/animated_hazard.c	AnimatedHazardManager_Destroy	natural	natural	0	
+src/objects/hazards/animated_hazard.c	AnimatedHazardManager_Initialize	natural	natural	0	
+src/objects/hazards/animated_hazard.c	AnimatedHazardManager_Create	natural	natural	0	
+src/objects/hazards/animated_hazard.c	AnimatedHazardManager_GetFreeSlot	natural	natural	0	
+src/objects/hazards/animated_hazard.c	AnimatedHazardManager_RetractAll	natural	natural	0	
