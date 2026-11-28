@@ -46,7 +46,7 @@ void SceneActors_UpdateSwarmAttack(struct StateActor *p, int tick)
         random = ((u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
         direction -= 8;
         direction += random & 15;
-        CountBats_SpawnCharge(*(struct ContactSwarm **)((u8 *)actor + 0x9d4), &spawn, direction, 20, 0, 0, 0);
+        CountBats_SpawnCharge(actor->graphics.batPool, &spawn, direction, 20, 0, 0, 0);
         Sound_PlaySongChecked(234);
     }
     if (actor->animation.status & 2) {
