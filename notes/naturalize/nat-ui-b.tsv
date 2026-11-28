@@ -514,3 +514,10 @@ src/ui/town/shop/Shop_TickSwapTransition.c	Shop_TickSwapTransition	minor	minor	0
 src/ui/town/shop/Shop_TickPurchaseConfirmation.c	Shop_TickPurchaseConfirmation	natural	natural	0	
 src/ui/town/shop/Shop_TickSaleFeedback.c	Shop_TickSaleFeedback	minor	minor	1	lifecycle view cast for the frame counter
 src/ui/town/shop/Shop_TickDiscardFeedback.c	Shop_TickDiscardFeedback	minor	minor	1	lifecycle view cast for the frame counter
+src/ui/town/shop/Shop_TickSaleConfirmation.c	Shop_TickSaleConfirmation	natural	natural	0	
+src/ui/town/shop/Shop_TickSaleTransition.c	Shop_TickSaleTransition	minor	minor	25	per-case funds pointer: plain += changes the gGameState reloads; a shared pointer only swaps registers
+src/ui/town/shop/Shop_TickDiscardConfirmation.c	Shop_TickDiscardConfirmation	natural	natural	0	
+src/ui/town/shop/Shop_TickDiscardTransition.c	Shop_TickDiscardTransition	minor	minor	0	swap view cast
+src/ui/town/shop/Shop_RefreshCatalogDisplay.c	Shop_RefreshCatalogDisplay	minor	minor	0	page and panel view casts
+src/ui/town/shop/Shop_ClearDescription.c	Shop_ClearDescription	natural	natural	0	
+src/ui/town/shop/Shop_UpdateDisplay.c	Shop_UpdateDisplay	minor	minor	2	panel view casts

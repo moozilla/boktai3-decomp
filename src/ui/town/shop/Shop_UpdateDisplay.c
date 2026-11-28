@@ -19,12 +19,11 @@ void Shop_ShowConsumableDescription(struct ShopPanel *);
 void Shop_ClearDescription(struct ShopTail *);
 void Shop_UpdateDisplay(struct ShopTail *p)
 {
-    u32 bits = p->interactionFlags & 3;
-    if (bits == 1) {
+    if ((p->interactionFlags & 3) == 1) {
         ++p->blinkFrame;
         if ((p->blinkFrame >> 5) & 1) {
-            p->display.valueA.flags |= bits;
-            p->display.valueB.flags |= bits;
+            p->display.valueA.flags |= 1;
+            p->display.valueB.flags |= 1;
         } else {
             p->display.valueA.flags &= ~1;
             p->display.valueB.flags &= ~1;
@@ -87,7 +86,6 @@ void Shop_UpdateDisplay(struct ShopTail *p)
         }
     }
     p->interactionFlags &= 0x3F;
-    SceneInputPanel_SetMeterGlyph(&p->display, p->page,
-                                  ((struct ShopScriptCatalog *)p)->pageCount);
+    SceneInputPanel_SetMeterGlyph(&p->display, p->page, ((struct ShopScriptCatalog *)p)->pageCount);
     SceneInputPanel_TickHighlight(&p->highlight);
 }
