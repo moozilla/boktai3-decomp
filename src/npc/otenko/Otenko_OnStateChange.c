@@ -4,18 +4,17 @@ extern u32 gUnk_08612568[];
 
 s32 Otenko_OnStateChange(struct OtenkoActor *p)
 {
-    s32 r;
-    if ((u8)(p->nextState - 1) <= 0x21) {
-        void (*t)(void) = (void (*)(void))gUnk_08612568[p->nextState];
-        u8 v = p->nextState;
-        p->prevState = v;
-        p->stateCallback = t;
+    s32 result;
+    if (p->nextState >= 1 && p->nextState <= 0x22) {
+        void (*callback)(void) = (void (*)(void))gUnk_08612568[p->nextState];
+        p->prevState = p->nextState;
+        p->stateCallback = callback;
         p->stateFrame = 0;
         p->animationEntered = 1;
         p->animationPhase = 0;
-        r = 1;
+        result = 1;
     } else {
-        r = 0;
+        result = 0;
     }
-    return r;
+    return result;
 }
