@@ -190,3 +190,4 @@ src/npc/story_character/Actor_UpdateKindFifteenEntryTenTimed.c	Actor_UpdateKindF
 src/npc/story_character/SceneCharacter_UpdateAnimationFiveSixFive.c	SceneCharacter_UpdateAnimationFiveSixFive	contrived	natural	1	
 src/npc/story_character/SceneCharacter_StartSlowAnimationSeven.c	SceneCharacter_StartSlowAnimationSeven	contrived	natural	1	
 src/npc/story_character/SceneCharacter_StartAnimationSeven.c	SceneCharacter_StartAnimationSeven	contrived	natural	1	
+src/npc/story_character/SceneCharacter_UpdateAnimationSevenSixFive.c	SceneCharacter_UpdateAnimationSevenSixFive	contrived	natural	1	

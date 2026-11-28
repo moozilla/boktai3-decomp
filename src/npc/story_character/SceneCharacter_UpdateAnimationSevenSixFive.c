@@ -1,13 +1,12 @@
-#include "global.h"
-s32 DisplayAnimation_TestFinished(void *);
-void Actor_PlayAnimationEntry(void *, s32, s32, s32, s32);
-void SceneCharacter_UpdateAnimationSevenSixFive(void *unused, u8 *p)
+#include "npc/manager/scene_actor_lifecycle.h"
+s32 DisplayAnimation_TestFinished(struct DisplayAnimation *);
+void SceneCharacter_UpdateAnimationSevenSixFive(void *unused, struct SceneActor *p)
 {
-    if (p[9]) {
+    if (p->animationEntered) {
         s32 r;
-        p[9] = 0;
-        p[7] = 0;
-        switch (p[1]) {
+        p->animationEntered = 0;
+        p->finished = 0;
+        switch (p->variant) {
             case 4:
                 r = 0;
                 break;
@@ -91,13 +90,13 @@ void SceneCharacter_UpdateAnimationSevenSixFive(void *unused, u8 *p)
                 break;
         }
         Actor_PlayAnimationEntry(p, r, 2, 0, 4);
-        p[0x18] = 0;
+        p->animationPhase = 0;
     }
-    if (DisplayAnimation_TestFinished(p + 0xd4)) {
-        switch (p[0x18]) {
+    if (DisplayAnimation_TestFinished(&p->drawable.common)) {
+        switch (p->animationPhase) {
             case 0: {
                 s32 r;
-                switch (p[1]) {
+                switch (p->variant) {
                     case 4:
                         r = 0;
                         break;
@@ -181,12 +180,12 @@ void SceneCharacter_UpdateAnimationSevenSixFive(void *unused, u8 *p)
                         break;
                 }
                 Actor_PlayAnimationEntry(p, r, 2, 0, 4);
-                p[0x18]++;
+                p->animationPhase++;
                 break;
             }
             case 1: {
                 s32 r;
-                switch (p[1]) {
+                switch (p->variant) {
                     case 4:
                         r = 0;
                         break;
@@ -270,12 +269,12 @@ void SceneCharacter_UpdateAnimationSevenSixFive(void *unused, u8 *p)
                         break;
                 }
                 Actor_PlayAnimationEntry(p, r, 2, 0, 4);
-                p[0x18]++;
+                p->animationPhase++;
                 break;
             }
             case 2:
-                p[7] = 1;
-                p[0x18]++;
+                p->finished = 1;
+                p->animationPhase++;
                 break;
             default:
                 return;
