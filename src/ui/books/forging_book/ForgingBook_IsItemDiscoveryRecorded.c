@@ -1,21 +1,9 @@
 #include "global.h"
-struct G {
-    u8 pad[0x720];
-    u32 a720;
-    u32 a724;
-    u32 a728;
-    u32 a72c;
-    u32 a730;
-};
-extern struct G *gGameState;
-u32 ForgingBook_IsItemDiscoveryRecorded(s32 n)
+#include "ui/books/forging_book.h"
+
+u32 ForgingBook_IsItemDiscoveryRecorded(s32 index)
 {
-    u32 *p;
-    if (n > 0x1f) {
-        p = &gGameState->a724;
-        n -= 0x20;
-    } else {
-        p = &gGameState->a720;
-    }
-    return *p & (1 << n);
+    if (index <= 31)
+        return gGameState->flags720 & (1 << index);
+    return gGameState->flags724 & (1 << (index - 32));
 }
