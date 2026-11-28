@@ -346,3 +346,4 @@ src/objects/hazards/timed_hazard/TimedHazard_OnAttackContact.c	TimedHazard_OnAtt
 src/objects/hit_switch.c	HitSwitch_ReceiveCollision	contrived	minor	3	mask local keeps the constant loaded before the reaction flags and reused as the cooldown
 src/objects/hit_switch.c	HitSwitch_UpdateStatic	contrived	natural	1	
 src/objects/hit_switch.c	HitSwitch_UpdateBobbing	contrived	natural	1	
+src/objects/hit_switch.c	HitSwitch_AnimateBobbingCompletion	minor	natural	1	
