@@ -693,16 +693,15 @@ void PlayerCue_UpdateDeparture(struct Player *player)
 
 void Player_UpdateTimedDirectionAction(struct Player *player)
 {
-    u8 phase = player->tetherPhase;
-    switch (phase) {
+    switch (player->tetherPhase) {
         case 0:
             if (!player->tetherFrame) {
-                if ((u8)(s8)player->facing > 4) {
+                if (player->facing > 4) {
                     player->heading = (8 - player->facing) >> 1;
                     player->side = 1;
                 } else {
-                    player->heading = (u8)(s8)player->facing >> 1;
-                    player->side = phase;
+                    player->heading = player->facing >> 1;
+                    player->side = 0;
                 }
                 player->tetherFrame++;
             }
@@ -719,12 +718,11 @@ void Player_UpdateTimedDirectionAction(struct Player *player)
         case 1:
             if (Player_SetAnimation(player, ActorVariant_GetTableValue(player->actionMode, 0x13),
                                     0x40, 1)) {
-                u8 direction = player->facing;
-                if (direction > 4) {
-                    player->heading = 8 - direction;
-                    player->side = phase;
+                if (player->facing > 4) {
+                    player->heading = 8 - player->facing;
+                    player->side = 1;
                 } else {
-                    player->heading = direction;
+                    player->heading = player->facing;
                     player->side = 0;
                 }
                 PlayerCue_EnterStandUpdate(player);
