@@ -816,18 +816,14 @@ void Axe_UpdateDamageSpin(struct ChaseActor *actor, s32 frame)
         SceneActorTerrain_EnterState(actor, 3, 0, 0);
         actor->base.attachmentTimer = 0;
         if (HasAuxiliary(state)) {
-            u32 *flags = &state->auxiliarySprite.flags;
-            *flags |= 2;
+            state->auxiliarySprite.flags |= 2;
             state->flagsCAB = 0;
             state->trailHeading = 0;
             state->trailPosition = state->auxiliarySprite.position;
-            {
-                u32 angle = state->trailStartAngle;
-                state->trailAngle = angle;
-            }
+            state->trailAngle = state->trailStartAngle;
             state->trailSpinRate = 4;
             ActorShadow_Disable(state->auxiliaryShadow);
-            *flags = 1;
+            state->auxiliarySprite.flags = 1;
         }
         state->damageSpinStarted = 1;
         state->reactionHoldTimer = 0;
@@ -842,7 +838,7 @@ void Axe_UpdateDamageSpin(struct ChaseActor *actor, s32 frame)
         context->trailAngle = next;
         if ((s32)previous < next)
             Sound_PlaySong(361);
-        if ((frame & 1) && context->trailSpinRate <= 19)
+        if (frame & 1 && context->trailSpinRate <= 19)
             context->trailSpinRate++;
         ActorPhase_EmitTrailSprite(actor, &context->trailPosition, context->trailAngle);
         Axe_UpdateTrailColliders(actor);
