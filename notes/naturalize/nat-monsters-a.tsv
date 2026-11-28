@@ -435,3 +435,14 @@ src/monsters/armor/Armor_DampPartMovement.c	Armor_DampPartMovement	minor	minor	0
 src/monsters/armor/SpinningApproach_DampReturnMovement.c	SpinningApproach_DampReturnMovement	minor	minor	0	open-coded halve-toward-zero blocks and a byte view of the parent
 src/monsters/armor/Armor_InitParts.c	Armor_InitParts	contrived	contrived	4	zero/active locals, per-case palette temps and chained stores kept: each removal changes constant sharing between the stores
 src/monsters/armor/Armor_QueueFallingParts.c	Armor_QueueFallingParts	contrived	contrived	3	three parallel part pointers in a do-while: a for loop or literal active flag changes the induction variables
+src/monsters/axe/axe.c	SceneActorControl_SettleRotation	contrived	natural	1	
+src/monsters/axe/actor_phase.c	ActorPhase_UpdateReverseFlicker	contrived	natural	1	
+src/monsters/axe/axe.c	SceneActorControl_TiltRotation	contrived	minor	5	saved temp for the heading byte
+src/monsters/axe/axe.c	SceneActorControl_ResetRotation	contrived	minor	2	timer pointer to the countdown byte: member reads move the Div argument load
+src/monsters/axe/axe_contact.c	Axe_LatchColliderContact	contrived	contrived	0	each collider flag write has its own block-scoped pointer: direct member writes change address materialization
+src/monsters/axe/actor_phase.c	ActorPhase_WaitBeforeRelocation	contrived	contrived	0	each collider flag write has its own block-scoped pointer: direct member writes change address materialization
+src/monsters/axe/axe_contact.c	Axe_OnBodyContact	contrived	contrived	1	do-while over attack/body banks with a VLA-typedef stride: a for loop over the arrays strength-reduces differently
+src/monsters/axe/axe_contact.c	Axe_UpdateOrbitAttack	contrived	contrived	3	do-while over attack/body banks with a VLA-typedef stride: a for loop over the arrays strength-reduces differently
+src/monsters/axe/axe.c	Axe_UpdateTargetLunge	contrived	contrived	4	flags pointer, mask blocks and entered temp: direct member updates change constant load order
+src/monsters/axe/axe.c	Axe_UpdateTrailFadeIn	minor	minor	0	block-scoped sprite view casts
+src/monsters/axe/axe.c	Axe_UpdateTargetWindup	minor	minor	0	block-scoped sprite view casts
