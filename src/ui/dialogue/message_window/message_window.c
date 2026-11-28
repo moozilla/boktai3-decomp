@@ -395,11 +395,9 @@ int MessageWindow_OpenFromScript(void)
         return -1;
     state = &window->state;
     if (Script_SeekToKeyword('s')) {
-        void *script = Script_GetTextSourcePc();
-        window->messageTable = script;
-        if (!script)
+        if (!(window->messageTable = Script_GetTextSourcePc()))
             return -1;
-        MessageWindow_SetMessageTable(script);
+        MessageWindow_SetMessageTable(window->messageTable);
     }
     if (Script_SeekToKeyword('r')) {
         int x = Script_GetValue();
@@ -408,11 +406,8 @@ int MessageWindow_OpenFromScript(void)
         int height = Script_GetValue();
         MessageWindow_SetBounds(x, y, width, height);
     }
-    {
-        s32 palette = Script_GetKeywordValue('c', window->palette);
-        if (MessageWindow_LoadPalette(window, palette) < 0)
-            return -1;
-    }
+    if (MessageWindow_LoadPalette(window, Script_GetKeywordValue('c', window->palette)) < 0)
+        return -1;
     MessageWindow_ApplyPalette(window);
     window->messageIndex = Script_GetKeywordValue('i', window->messageIndex);
     state->spacing = Script_GetKeywordValue('m', state->spacing);
