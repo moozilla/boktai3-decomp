@@ -1,10 +1,5 @@
 #include "effects/bursts/explosion.h"
 
-static inline void UpdateFrame(struct Explosion *explosion)
-{
-    explosion->sprite.frame = explosion->age >> 2;
-}
-
 s32 Explosion_Update(struct Explosion *explosion)
 {
     if (explosion->delay) {
@@ -29,12 +24,6 @@ u32 Explosion_Destroy(struct Explosion *explosion)
 {
     Sprite_Remove(&explosion->sprite);
     return 0;
-}
-
-static inline void SetSpriteHidden(struct ContactSwarmSprite *sprite, u32 bit)
-{
-    sprite->priority = bit;
-    sprite->flags |= bit;
 }
 
 void Explosion_InitSprite(struct ContactSwarmSprite *sprite, struct ContactSwarmGraphics *resource,
@@ -86,12 +75,6 @@ void Explosion_InitColliderWithFlags(struct Explosion *explosion, struct Contact
     Collider_SetCallback(collider, 0, explosion);
     if (power == 0 && force == 0)
         explosion->collisionDisabled = 1;
-}
-
-static inline void InitializeDelay(u16 *dest, u32 zero, u32 value)
-{
-    *dest++ = value;
-    *dest = zero;
 }
 
 s32 Explosion_Init(struct Explosion *explosion, struct ContactPosition *position, u32 contactFlags,
