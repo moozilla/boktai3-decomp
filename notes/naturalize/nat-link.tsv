@@ -351,3 +351,5 @@ src/link/score_panel/LinkMenu_DrawRandomizedFourDigitNumber.c	LinkMenu_DrawRando
 src/link/score_panel/LinkScorePanel_UpdateRollingNumber.c	LinkScorePanel_UpdateRollingNumber	minor	natural	2	
 src/link/score_panel/LinkScorePanel_UpdateNumberReveal.c	LinkScorePanel_UpdateNumberReveal	contrived	natural	2	
 src/link/score_panel/LinkScorePanel_UpdateDisplayedScore.c	LinkScorePanel_UpdateDisplayedScore	contrived	contrived	10	gotos stay: structured forms move the unavailable block
+src/link/score_panel/sub_08110128.c	sub_08110128	natural	natural	0	
+src/link/score_panel/sub_08110164.c	sub_08110164	contrived	natural	3	
