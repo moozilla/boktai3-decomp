@@ -12,7 +12,6 @@ void Player_StartDirectionalEffect(struct Player *, u32, void *);
 
 void Player_UpdateThrowAction(struct Player *p)
 {
-
     switch (p->tetherPhase) {
         case 0:
             Player_SaveActionIndex(p);
@@ -34,10 +33,8 @@ void Player_UpdateThrowAction(struct Player *p)
             if (p->inputKeys[1] & 2)
                 p->statModifierContext.bufferedAttack = 1;
             Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 0x17), 0x40);
-            {
-                if (p->actionMode == 1 && p->animation.frameIndex == 2 && p->animation.elapsed == 0)
-                    Player_StartDirectionalEffect(p, p->facing, &p->position);
-            }
+            if (p->actionMode == 1 && p->animation.frameIndex == 2 && p->animation.elapsed == 0)
+                Player_StartDirectionalEffect(p, p->facing, &p->position);
             if (Player_UpdateSweepAction(p))
                 Player_SetTetherMode(p, 3, 6);
             break;
