@@ -10,25 +10,21 @@ void Shop_RefreshEquipmentValue(struct ShopActionView *panel)
                 kind = Inventory_GetEquipmentId(panel->selection);
                 value = SceneItemValue_CalculateEquipment(panel->selection);
                 label = 1;
-                goto ready;
+                break;
             } else if (panel->selection <= 23) {
-                s32 index = (panel->page << 3) - 16;
-                index += panel->selection;
-                kind = panel->catalog[index];
+                kind = panel->catalog[panel->page * 8 + (panel->selection - 16)];
                 if (kind >= 0) {
                     value = Equipment_GetDefinition(kind)->baseValue;
                     label = 0;
-                    goto ready;
+                    break;
                 }
             }
-            break;
         default:
+            kind = 255;
+            value = 0;
+            label = 0;
             break;
     }
-    kind = 255;
-    value = 0;
-    label = 0;
-ready:
     if (kind != 255 && value > 0) {
         SceneInput_GetGridPosition(&position, panel->selection);
         SceneHud_ShowFourDigits((void *)panel, (void *)&position, value, label);
