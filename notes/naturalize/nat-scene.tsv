@@ -397,3 +397,4 @@ src/scene/actor/placement/SceneActorCollision_InitExternalAttackWithField34.c	Sc
 src/scene/actor/placement/SceneActorMovement_UpdateAirborne.c	SceneActorMovement_UpdateAirborne	contrived	contrived	20	goto into the shared cell setup and flag pointer blocks: structured if/else moves the airborne branch layout
 src/scene/actor/placement/SceneActorMovement_UpdateAnimationAndTerrain.c	SceneActorMovement_UpdateAnimationAndTerrain	contrived	contrived	18	enabled-bit local, flag marker helpers and cell pointer: plain stores and |= load the field before the mask and reload the terrain cell
 src/scene/actor/placement/SceneActorMovement_ProjectProbe.c	SceneActorMovement_ProjectProbe	contrived	natural	4	-
+src/scene/actor/placement/SceneActorMovement_UpdateStatus.c	SceneActorMovement_UpdateStatus	minor	minor	2	status helper calls: plain flag operators load the field before the mask

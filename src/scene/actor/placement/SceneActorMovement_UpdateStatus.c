@@ -45,9 +45,8 @@ static inline void SceneActorMovement_ApplyReactionFlags(struct ChaseActor *acto
     }
 }
 
-s32 SceneActorMovement_UpdateStatus(struct ChaseActor *object)
+s32 SceneActorMovement_UpdateStatus(struct ChaseActor *actor)
 {
-    struct ChaseActor *actor = (void *)object;
     ActorStatus_Palette(actor);
     SceneActorMovement_Wake(actor);
     ActorStatus_Blink(actor);
@@ -55,7 +54,7 @@ s32 SceneActorMovement_UpdateStatus(struct ChaseActor *object)
     ActorStatus_Particles(actor);
     if (!ActorStatus_IsDown(actor))
         ActorStatus_FaceTarget(actor);
-    ActorStatus_StoreByte(&actor->base.colliderB.direction, actor->base.body.direction);
-    ActorStatus_StoreByte(&actor->base.colliderA.direction, actor->base.body.direction);
+    actor->base.colliderB.direction = actor->base.body.direction;
+    actor->base.colliderA.direction = actor->base.body.direction;
     return 1;
 }
