@@ -428,3 +428,4 @@ src/npc/kuro/Kuro_UpdateArcMove.c	Kuro_UpdateArcMove	contrived	minor	8	landing t
 src/npc/kuro/Kuro_OscillatePaletteBlend.c	Kuro_OscillatePaletteBlend	natural	natural	0	
 src/npc/kuro/Kuro_TickStateAndPalette.c	Kuro_TickStateAndPalette	natural	natural	0	
 src/npc/kuro/Kuro_EnterRequestedState.c	Kuro_EnterRequestedState	minor	natural	1	
+src/npc/kuro/Kuro_UpdateTargetFacing.c	Kuro_UpdateTargetFacing	minor	minor	3	parked 0x1000 mask and near flag: the plain forms change load order and branch layout; local actor/context layouts

@@ -83,10 +83,7 @@ void Kuro_UpdateTargetFacing(struct Context *ctx, struct Npc *p)
         p->done = 0;
         Kuro_PlayTaggedAnimation(p, 0, 1, 0, 4);
         p->animationStarted = 1;
-        {
-            u8 angle = p->angle;
-            p->savedAngle = angle;
-        }
+        p->savedAngle = p->angle;
         if (((ctx->targetActor && !AllowsFacing(ctx->targetActor)) && (!(gEngineFlags & 0x200))) &&
             (p->attachmentEnabled)) {
             Actor_SetAttachmentEffect(p, 3, 0, 0);
