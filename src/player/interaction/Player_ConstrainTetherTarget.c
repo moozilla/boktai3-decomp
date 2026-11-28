@@ -20,11 +20,8 @@ static inline u8 *properties(struct SceneVec *position)
     p = TerrainModifiers_FindCellOverride(cell, 1);
     if (p)
         p += 4;
-    else {
-        struct EngineMap *map = gTerrainMap;
-        u32 offset = cell * 4 + 12;
-        p = map->cells + offset;
-    }
+    else
+        p = gTerrainMap->cells + 12 + cell * 4;
     return p;
 }
 struct PackedVec {
@@ -69,51 +66,41 @@ void Player_ConstrainTetherTarget(struct Player *actor, s32 dx, s32 dz, s32 radi
     s32 ox = scale(70 * dx);
     s32 oz = scale(70 * dz);
     struct SceneVec *target = TetherActor_GetPosition();
-    s32 x = (target->x - actor->position.x) - ox;
-    s32 z = (target->z - actor->position.z) - oz;
-    if (((x * x) + (z * z)) > (radius * radius)) {
+    s32 x = target->x - actor->position.x - ox;
+    s32 z = target->z - actor->position.z - oz;
+    if (x * x + z * z > radius * radius) {
         s32 angle = Math_Atan2(x, z);
         struct PackedVec candidate;
-        candidate.x = (actor->position.x + scale(gUnk_086149C4[(angle + 64) & 255] * radius)) + ox;
-        candidate.z = (actor->position.z + scale(gUnk_086149C4[angle & 255] * radius)) + oz;
-        candidate.x = ((target->x * 3) + candidate.x) >> 2;
-        candidate.z = ((target->z * 3) + candidate.z) >> 2;
+        candidate.x = actor->position.x + scale(gUnk_086149C4[(angle + 64) & 255] * radius) + ox;
+        candidate.z = actor->position.z + scale(gUnk_086149C4[angle & 255] * radius) + oz;
+        candidate.x = (target->x * 3 + candidate.x) >> 2;
+        candidate.z = (target->z * 3 + candidate.z) >> 2;
         if (!Player_TestTetherTarget(actor, &candidate)) {
-            u16 rawX = actor->position.x;
-            s32 cellx = ((s16)rawX) >> 8;
-            struct SceneVec *position = &actor->position;
-            s32 cellz = position->z >> 8;
-            s32 current;
+            s32 current = indexAt(&actor->position);
             s32 next;
-            u16 ax = rawX;
-            if ((((cellx < 0) || (cellz < 0)) || (((u32)cellx) >= gTerrainWidth)) ||
-                (((u32)cellz) >= gTerrainHeight))
-                current = 0;
-            else
-                current = gTerrainMap->rows[cellz] + cellx;
-            next = indexAt((void *)(&candidate));
-            if (current == (next + 1))
-                candidate.x = ((((s16)ax) >> 8) << 8) + 2;
-            else if (current == (next - 1))
-                candidate.x = (((((s16)ax) >> 8) + 1) << 8) - 2;
+            next = indexAt((struct SceneVec *)&candidate);
+            if (current == next + 1)
+                candidate.x = ((actor->position.x >> 8) << 8) + 2;
+            else if (current == next - 1)
+                candidate.x = (((actor->position.x >> 8) + 1) << 8) - 2;
             else {
                 s32 width = SceneGrid_Width();
-                if (current == (next + width))
+                if (current == next + width)
                     candidate.z = ((actor->position.z >> 8) << 8) + 2;
-                else if (current == (next - width))
+                else if (current == next - width)
                     candidate.z = (((actor->position.z >> 8) + 1) << 8) - 2;
                 else {
-                    candidate.x = ax;
+                    candidate.x = actor->position.x;
                     candidate.z = actor->position.z;
                 }
             }
             if (!TetherActor_GetStatusFlags())
-                candidate.y = heightAt((void *)(&candidate));
+                candidate.y = heightAt((struct SceneVec *)&candidate);
         } else if (!TetherActor_GetStatusFlags())
-            candidate.y = heightAt((void *)(&candidate));
+            candidate.y = heightAt((struct SceneVec *)&candidate);
         x = actor->position.x - candidate.x;
         z = actor->position.z - candidate.z;
         angle = (u16)Math_Atan2(x, z);
-        TetherActor_SetInteractionTarget(&candidate, ((((u16)angle) + 0x70) >> 5) & 7);
+        TetherActor_SetInteractionTarget(&candidate, (((u16)angle + 0x70) >> 5) & 7);
     }
 }
