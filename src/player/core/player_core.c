@@ -512,7 +512,7 @@ void SceneActor_SpawnModeParticles(struct Player *player)
 {
     struct SceneExtent extent;
     struct SceneVec position;
-    if ((u8)(player->actionMode - 3) <= 1) {
+    if (player->actionMode == 3 || player->actionMode == 4) {
         position = player->colliderPosition;
         extent.x = 32;
         extent.y = 32;

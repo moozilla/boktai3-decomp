@@ -232,3 +232,11 @@ src/player/core/player_core.c	ActorResponse_Apply	minor	minor	3	half-flag helper
 src/player/core/player_core.c	ActorFlags_SelectResponse	natural	natural	0	
 src/player/core/player_core.c	Player_RecalculateDerivedStats	contrived	contrived	9	unchanged: second loop's state cursor advances two bytes per stat; indexed forms are strength-reduced differently
 src/player/core/player_core.c	Player_GetMaxLife	contrived	minor	8	equipment block view over actionFlagState with signed bonus read
+src/player/core/player_core.c	Player_GetMaxEnergy	contrived	minor	8	landed with Player_GetMaxLife; equipment block view over actionFlagState
+src/player/core/player_core.c	Player_ClampStatsAndSyncStatus	natural	natural	0	
+src/player/core/player_core.c	Player_InitializeStatsFromScript	natural	natural	0	
+src/player/core/player_core.c	Player_RefreshBodyCollision	minor	minor	2	scene-8 helper; documented unused defense value
+src/player/core/player_core.c	Player_InitVitalsAndCollisionFromScript	natural	natural	0	
+src/player/core/player_core.c	Player_RefreshVitalsAndCollision	natural	natural	0	
+src/player/core/player_core.c	Player_RefreshStatsAndVitals	natural	natural	0	
+src/player/core/player_core.c	SceneActor_SpawnModeParticles	minor	natural	1	
