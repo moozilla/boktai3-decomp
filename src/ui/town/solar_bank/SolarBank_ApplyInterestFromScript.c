@@ -1,7 +1,7 @@
 #include "global.h"
 #include "engine/engine.h"
 #include "system/game_state/game_state.h"
-#define STATE_S16(offset) (*(s16 *)((u8 *)gGameState + (offset)))
+#include "ui/town/solar_bank_panel.h"
 u32 SunClock_GetSecond(void);
 s32 Mod(s32, s32);
 /* Script (registry 61A0): over -d days (at most 10), grows the balance at game
@@ -21,16 +21,16 @@ void SolarBank_ApplyInterestFromScript(void)
         days = 0;
     if (days <= 0)
         return;
-    value = STATE_S16(0x7B0);
+    value = gGameState->unk7B0;
     if ((u32)(value - 1) <= 9997) {
         for (i = 0; i < days; i++) {
-            value = ((STATE_S16(0x598) * value) >> 6) + 1;
+            value = ((gGameState->solarBankRate * value) >> 6) + 1;
             if (value > 9998) {
                 value = 9999;
                 break;
             }
         }
-        STATE_S16(0x7B0) = value;
+        gGameState->unk7B0 = value;
     }
     if (Script_SeekToKeyword('R')) {
         s32 rate = Script_GetValue();
@@ -38,7 +38,8 @@ void SolarBank_ApplyInterestFromScript(void)
             rate = 0;
         if (rate > 13)
             rate = 13;
-        STATE_S16(0x598) = rate + 0x41;
+        SolarBank_SetRate(&gGameState->solarBankRate, rate);
     } else
-        STATE_S16(0x598) = Mod((u32)gGameState->unk614 ^ SunClock_GetSecond(), 13) + 0x41;
+        SolarBank_SetRate(&gGameState->solarBankRate,
+                          Mod((u32)gGameState->unk614 ^ SunClock_GetSecond(), 13));
 }

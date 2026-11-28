@@ -37,4 +37,9 @@ struct SolarBankPanel {
     u16 promptPalette[16]; /* 0x710: also the saved copy of the palette bank */
     void (*state)(void);
 };
+
+static inline void SolarBank_SetRate(s16 *rate, s32 level)
+{
+    *rate = 0x41 + level;
+}
 #endif

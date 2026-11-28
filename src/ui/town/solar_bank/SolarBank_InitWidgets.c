@@ -6,11 +6,6 @@
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
 
-static inline void SolarBank_SetRate(s16 *rate, s32 level)
-{
-    *rate = 0x41 + level;
-}
-
 void SolarBank_InitWidgets(struct SolarBankPanel *p)
 {
     struct AnimSpritePlayback labelPlayback;
