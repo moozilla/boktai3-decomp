@@ -40,7 +40,8 @@ struct Ratatosk {
     u8 vulnerable; /* 0x9A */
     u8 unknown9B;
     u32 flags; /* 0x9C: StateActor actionFlags. */
-    u8 unknownA0[2];
+    u8 unknownA0;
+    u8 behaviorFlag; /* 0xA1: cleared before each Ratatosk_UpdateBehavior dispatch. */
     u8 reactionPhase; /* 0xA2 */
     u8 animationCompletions;
     u32 reactionTimer; /* 0xA4 */
