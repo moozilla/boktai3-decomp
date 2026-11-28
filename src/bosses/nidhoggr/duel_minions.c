@@ -497,13 +497,10 @@ s32 NidhoggrDuelMinionPool_BeginAllDeaths(struct ContactSequenceOwner *owner)
     if (!owner)
         return -1;
     actor = owner->actors;
-    remaining = 7;
-    do {
+    for (remaining = 0; remaining < 8; remaining++, actor++) {
         if (actor->active && actor->state <= 2)
             NidhoggrDuelMinion_SetState(actor, 3);
-        --remaining;
-        ++actor;
-    } while (remaining >= 0);
+    }
     return 0;
 }
 
