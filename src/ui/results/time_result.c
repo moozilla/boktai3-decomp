@@ -7,8 +7,7 @@ void TimeResult_SetState(struct ChallengeTimeResult *result,
     result->timer = 0;
 }
 
-void TimeResult_LoadDigit(struct AnimSprite *digit, struct AnimSpriteResource *graphics,
-                          u32 value)
+void TimeResult_LoadDigit(struct AnimSprite *digit, struct AnimSpriteResource *graphics, u32 value)
 {
     if (value <= 9)
         Anim_LoadKeyframe(digit, graphics, (u16)value, 0);
@@ -38,16 +37,16 @@ void TimeResult_BeginDigitReveal(struct ChallengeTimeResult *result)
 
 s32 TimeResult_HandleInput(struct ChallengeTimeResult *result)
 {
-    u16 *k = gPadState;
-    if (k[0] & 0x20)
-        (result->horizontalOffset)--;
-    else if (k[0] & 0x10)
-        (result->horizontalOffset)++;
-    if (k[0] & 0x40)
-        (result->verticalOffset)--;
-    else if (k[0] & 0x80)
-        (result->verticalOffset)++;
-    if (k[1] & 1)
+    u16 *keys = gPadState;
+    if (keys[0] & 0x20)
+        result->horizontalOffset--;
+    else if (keys[0] & 0x10)
+        result->horizontalOffset++;
+    if (keys[0] & 0x40)
+        result->verticalOffset--;
+    else if (keys[0] & 0x80)
+        result->verticalOffset++;
+    if (keys[1] & 1)
         TimeResult_BeginFadeOut(result);
 }
 
