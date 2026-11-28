@@ -353,3 +353,4 @@ src/link/score_panel/LinkScorePanel_UpdateNumberReveal.c	LinkScorePanel_UpdateNu
 src/link/score_panel/LinkScorePanel_UpdateDisplayedScore.c	LinkScorePanel_UpdateDisplayedScore	contrived	contrived	10	gotos stay: structured forms move the unavailable block
 src/link/score_panel/sub_08110128.c	sub_08110128	natural	natural	0	
 src/link/score_panel/sub_08110164.c	sub_08110164	contrived	natural	3	
+src/link/score_panel/LinkScorePanel_OnWaitSessionReady.c	LinkScorePanel_OnWaitSessionReady	contrived	minor	5	SetUpdate inline copied from save_menu.c; state -1 local as in the session state getter
