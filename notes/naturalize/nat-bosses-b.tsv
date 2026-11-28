@@ -349,3 +349,12 @@ src/bosses/vanargand/ActorSoundPhase_UpdateConditionalStop.c	ActorSoundPhase_Upd
 src/bosses/vanargand/Vanargand_UpdateQueuedActionTransition.c	Vanargand_UpdateQueuedActionTransition	near-natural	near-natural	3	second boss alias kept
 src/bosses/vanargand/Vanargand_UpdateTimedAlternateTransition.c	Vanargand_UpdateTimedAlternateTransition	near-natural	near-natural	2	object cast kept: variant read from the incoming pointer
 src/bosses/vanargand/Vanargand_UpdateTargetFlagTransition.c	Vanargand_UpdateTargetFlagTransition	near-natural	near-natural	3	mask local and flag result kept
+src/bosses/vanargand/Vanargand_UpdateTimedMode10.c	Vanargand_UpdateTimedMode10	near-natural	near-natural	1	second boss alias keeps a register copy
+src/bosses/vanargand/Vanargand_UpdateVariantEntry.c	Vanargand_UpdateVariantEntry	near-natural	near-natural	1	second boss alias keeps a register copy
+src/bosses/vanargand/Vanargand_UpdateTimedMode13.c	Vanargand_UpdateTimedMode13	near-natural	near-natural	1	second boss alias keeps a register copy
+src/bosses/vanargand/ActorSoundPhase_UpdateStop.c	ActorSoundPhase_UpdateStop	near-natural	near-natural	1	second boss alias keeps a register copy
+src/bosses/vanargand/VanargandPair_ResetPairMode.c	VanargandPair_ResetPairMode	near-natural	near-natural	1	second boss alias keeps a register copy
+src/bosses/vanargand/VanargandPair_UpdateActivePairState.c	VanargandPair_UpdateActivePairState	natural	natural	0	
+src/bosses/vanargand/Vanargand_UpdateEntryTransition.c	Vanargand_UpdateEntryTransition	natural	natural	0	
+src/bosses/vanargand/Vanargand_UpdateMode9Transition.c	Vanargand_UpdateMode9Transition	near-natural	near-natural	1	object cast kept: variant read from the incoming pointer
+src/bosses/vanargand/Vanargand_UpdateMode3Transition.c	Vanargand_UpdateMode3Transition	near-natural	near-natural	2	object casts kept: reads from the incoming pointer
