@@ -151,7 +151,7 @@ void StatusScreen_RefreshDirtyDisplays(struct StatusScreen *s)
 
 int StatusScreen_CheckConfirm(struct StatusScreen *p)
 {
-    if ((gPadState[1] & 8) || (gPadState[1] & 1)) {
+    if ((gPadState[1] & START_BUTTON) || (gPadState[1] & A_BUTTON)) {
         ScreenTransition_SendCommand(3, 4, 4, 4, 4, 65535, 0);
         StatusScreen_SetState(p, StatusScreen_FadeAndExit);
         return 1;
