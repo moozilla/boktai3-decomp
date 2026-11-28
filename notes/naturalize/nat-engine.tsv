@@ -545,3 +545,4 @@ src/system/inventory/Inventory_GetKeyItemId.c	Inventory_GetKeyItemId	contrived	m
 src/system/inventory/Inventory_SetItemId.c	Inventory_SetItemId	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
 src/system/inventory/Inventory_SetKeyItemId.c	Inventory_SetKeyItemId	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
 src/system/inventory/Inventory_AddItemWithState.c	Inventory_AddItemWithState	contrived	natural	1	
+src/system/inventory/Inventory_AddItemFromScript.c	Inventory_AddItemFromScript	minor	natural	1	
