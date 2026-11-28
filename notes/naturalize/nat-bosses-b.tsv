@@ -306,3 +306,4 @@ src/bosses/vanargand/Vanargand_OnPartContact.c	Vanargand_OnPartContact	natural	n
 src/bosses/vanargand/Camera_BlendOffset.c	Camera_BlendOffset	natural	natural	0	
 src/bosses/vanargand/Vanargand_TestProjectedHorizontalRange.c	Vanargand_TestProjectedHorizontalRange	near-natural	near-natural	6	destination slot pointer kept: ROM forms &boss->destination before &target
 src/bosses/vanargand/Vanargand_GetTargetLateralDistance.c	Vanargand_GetTargetLateralDistance	near-natural	near-natural	3	destination slot pointer and SetVector helper kept: load order and store merging
+src/bosses/vanargand/Vanargand_SetPendingCue.c	Vanargand_SetPendingCue	near-natural	unchanged	2	mask local kept: plain |= mismatches; passing the constant to the flag setter only moves it into a helper argument
