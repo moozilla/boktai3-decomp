@@ -222,3 +222,4 @@ src/bosses/hresvelgr/Hresvelgr_ApproachArraySixteenth.c	Hresvelgr_ApproachArrayS
 src/bosses/hresvelgr/ScalarApproach_ApplyAngleProfileArray.c	ScalarApproach_ApplyAngleProfileArray	contrived	minor	3	index pointer copies stay
 src/bosses/hresvelgr/Hresvelgr_GetEnvironmentalLevel.c	Hresvelgr_GetEnvironmentalLevel	contrived	natural	1	
 src/bosses/hresvelgr/Hresvelgr_SetAnimation.c	Hresvelgr_SetAnimation	minor	natural	1	
+src/bosses/hresvelgr/Hresvelgr_HasCellOverride.c	Hresvelgr_HasCellOverride	minor	natural	1	
