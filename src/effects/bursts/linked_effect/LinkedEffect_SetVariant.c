@@ -1,35 +1,27 @@
-#include "scene/collision/contact_position.h"
+#include "effects/bursts/spiral_burst.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
 #include "engine/math/monster_particle_random.h"
 
 u32 DebrisMote_Create(struct ContactPosition *, struct ContactPosition *, s32, s32);
 
-static inline s32 ScaleComponent(s32 x)
-{
-    if (x >= 0)
-        return x >> 12;
-    return -((-x) >> 12);
-}
-
 void LinkedEffect_SetVariant(struct ContactPosition *position, u8 variant)
 {
-    s32 count;
+    s32 i;
     const u16 *table;
     u32 mask;
     struct ContactPosition velocity;
-    struct ContactPosition *v;
+    struct ContactPosition *planar;
     s32 angle;
     u32 *cursor;
 
     table = gRandomTable;
-    v = &velocity;
+    planar = &velocity;
     angle = variant + 214;
     cursor = &gRandomIndex;
     mask = 1023;
-    count = 5;
 
-    do {
+    for (i = 0; i < 6; i++) {
         u32 sample;
         union {
             u32 mask, index, offset;
@@ -51,14 +43,14 @@ void LinkedEffect_SetVariant(struct ContactPosition *position, u8 variant)
         speed = (sample & read.mask) + 4;
 
         projection.sine = gUnk_086149C4;
-        v->x = ScaleComponent(projection.sine[(heading + 64) & 255] * speed);
-        v->y = 0;
-        v->z = ScaleComponent(projection.sine[heading] * speed);
+        planar->x = SpiralBurst_ScaleOffset(projection.sine[(heading + 64) & 255] * speed);
+        planar->y = 0;
+        planar->z = SpiralBurst_ScaleOffset(projection.sine[heading] * speed);
 
         index = (*cursor + 1) & mask;
         PARTICLE_RANDOM_READ_SAMPLE(height, table, index);
         projection.heightMask = 15;
-        v->y = height & projection.heightMask;
+        planar->y = height & projection.heightMask;
 
         read.index = (index + 1) & mask;
         *cursor = read.index;
@@ -68,5 +60,5 @@ void LinkedEffect_SetVariant(struct ContactPosition *position, u8 variant)
         sample = 15;
         DebrisMote_Create(position, &velocity, (lifeSample & sample) + 30, 5);
         angle += 14;
-    } while (--count >= 0);
+    }
 }

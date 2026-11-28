@@ -174,3 +174,4 @@ src/effects/bursts/linked_effect/FragmentProjectilePool_ResetSingleton.c	Fragmen
 src/effects/bursts/linked_effect/ActorEffect_OrientFromPositions.c	ActorEffect_OrientFromPositions	contrived	minor	10	random byte read through the table's constant address (literal load order)
 src/effects/bursts/linked_effect/ActorEffect_InitColliders.c	ActorEffect_InitColliders	contrived	natural	4	-
 src/effects/bursts/linked_effect/ActorEffect_Spawn.c	ActorEffect_Spawn	minor	natural	2	-
+src/effects/bursts/linked_effect/LinkedEffect_SetVariant.c	LinkedEffect_SetVariant	contrived	contrived	40	random-draw unions, sine/mask locals and index arithmetic: register allocation of the table, mask and sine address
