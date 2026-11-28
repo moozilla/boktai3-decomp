@@ -1,11 +1,8 @@
 #include "global.h"
 #include "script/script_utility.h"
-typedef struct {
-    u8 id, pad;
-    u16 level;
-    u8 data[12];
-} Entry;
-Entry *Inventory_GetEquipmentEntry(int);
+#include "minigames/result_game/result_tutorial.h"
+#include "ui/town/shop_item_values.h"
+
 static inline int clamp(int x)
 {
     if (x > 999)
@@ -14,19 +11,19 @@ static inline int clamp(int x)
         x = 0;
     return x;
 }
-void Transformation_ReportResult(u8 *p)
+void Transformation_ReportResult(struct ResultMenu *menu)
 {
     int values[7];
     struct ScriptUtilityArguments args;
-    Entry *entry = Inventory_GetEquipmentEntry(p[0xba]);
-    values[0] = clamp(*(int *)(p + 0xd8));
-    values[1] = clamp(*(int *)(p + 0xdc));
-    values[2] = clamp(*(int *)(p + 0xe0));
-    values[3] = *(s16 *)(p + 0xc8);
-    values[4] = p[0xc6];
-    values[5] = p[0xc5];
-    values[6] = entry->level;
+    struct SceneValueEquipment *entry = Inventory_GetEquipmentEntry(menu->equipmentSlot);
+    values[0] = clamp(menu->preciseCount);
+    values[1] = clamp(menu->closeCount);
+    values[2] = clamp(menu->missedCount);
+    values[3] = menu->rankChange;
+    values[4] = menu->gradeRaised;
+    values[5] = menu->transformationOutcome;
+    values[6] = entry->condition;
     args.count = 7;
     args.values = values;
-    Script_Call(*(u16 *)(p + 0x7a0), &args);
+    Script_Call(menu->completionScript, &args);
 }

@@ -675,3 +675,6 @@ src/minigames/result_game/TransformMarker_ClearVector.c	TransformMarker_ClearVec
 src/minigames/result_game/TransformMarker_CopyVector.c	TransformMarker_CopyVector	contrived	natural	1	
 src/minigames/result_game/sub_0801B600.c	sub_0801B600	contrived	natural	8	
 src/minigames/result_game/sub_0801B700.c	sub_0801B700	contrived	natural	2	
+src/minigames/result_game/ResultMenu_ConfigureLayers.c	ResultMenu_ConfigureLayers	minor	minor	0	
+src/minigames/result_game/ResultMenu_InitializeLayer.c	ResultMenu_InitializeLayer	natural	natural	0	
+src/minigames/result_game/Transformation_ReportResult.c	Transformation_ReportResult	contrived	natural	1	
