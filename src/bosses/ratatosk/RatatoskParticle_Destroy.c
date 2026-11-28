@@ -1,24 +1,17 @@
 #include "global.h"
+#include "bosses/ratatosk/ratatosk_small_particle.h"
 #include "engine/ram.h"
-struct E {
-    u8 p[0x74];
-};
-struct A {
-    u8 p0[0x18];
-    u32 w18;
-    u8 p1[0x38 - 0x1c];
-    struct E e[24];
-};
-void RatatoskParticle_Remove(struct A *, struct E *, s32);
-u32 RatatoskParticle_Destroy(struct A *a)
+
+void RatatoskParticle_Remove(struct ParticlePool *, struct Particle *, s32);
+
+u32 RatatoskParticle_Destroy(struct ParticlePool *pool)
 {
-    struct E *e = a->e;
-    s32 i = 0;
-    do {
-        if (a->w18 & (1 << i))
-            RatatoskParticle_Remove(a, e, i);
-        i++;
-        e++;
-    } while (i <= 0x17);
-    return gParticlePool = 0;
+    struct Particle *e = pool->particles;
+    s32 i;
+    for (i = 0; i < 24; i++, e++) {
+        if (pool->mask & (1 << i))
+            RatatoskParticle_Remove(pool, e, i);
+    }
+    gParticlePool = 0;
+    return 0;
 }

@@ -139,3 +139,4 @@ src/bosses/ratatosk/Ratatosk_RemoveAnimation.c	Ratatosk_RemoveAnimation	contrive
 src/bosses/ratatosk/SceneResource_InitializeHiddenSprite.c	SceneResource_InitializeHiddenSprite	minor	minor	0	local view of the sprite flags; falls off the end of a u32 function as the ROM does
 src/bosses/ratatosk/Ratatosk_UpdateCollidersAndPalette.c	Ratatosk_UpdateCollidersAndPalette	contrived	minor	35	actor alias, flag accessors with mask arguments, polar/scale helpers and the front-collider vector add stay (plain operators change mask load order/registers)
 src/bosses/ratatosk/RatatoskParticle_Remove.c	RatatoskParticle_Remove	contrived	natural	2	
+src/bosses/ratatosk/RatatoskParticle_Destroy.c	RatatoskParticle_Destroy	contrived	natural	2	
