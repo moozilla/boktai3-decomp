@@ -1,5 +1,5 @@
 #include "objects/hazards/animated_hazard.h"
-#include "engine/video/display_sequence_inline.h"
+#include "engine/video/display_sequence_step.h"
 #include "scene/terrain/terrain_collision.h"
 /* AnimatedHazard_Noop: Empty function with no callers or taken address; placeholder/no-op in the animated-hazard unit. */
 
@@ -103,75 +103,12 @@ static inline u32 frame_factor(u16 v)
 
 void AnimatedHazard_AnimateAttack(struct AnimatedHazardManager *m, struct AnimatedHazard *p)
 {
-    struct DisplaySequenceSprite *o;
-    struct DisplaySequenceState *a;
-    const u16 *entry;
-    int done;
     if (AnimatedHazard_ConsumeEntered(m, p)) {
         p->sprite.flags &= ~1;
         Anim_SetSequence(&p->anim, m->script, 0, 0, 0);
         Sound_PlaySongChecked(0x34D);
     }
-    o = &p->sprite;
-    a = &p->anim;
-    entry = a->commands + a->index;
-    o->frame = *entry >> 6;
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = a->flags;
-        bit = 1;
-        first = (u8)(control.raw & bit);
-        if (first != (((*entry & 0x30) >> 4) & bit))
-            p->sprite.flags |= 4;
-        else
-            p->sprite.flags &= ~4;
-    }
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = a->flags;
-        bit = 2;
-        first = (u8)(control.raw & bit);
-        if (first != (((*entry & 0x30) >> 4) & bit))
-            o->flags |= 8;
-        else
-            o->flags &= ~8;
-    }
-    if (++a->elapsed >= a->duration) {
-        a->elapsed = 0;
-        if (a->flags & 4) {
-            if (a->index == 0) {
-                if (a->flags & 8) {
-                    a->elapsed = a->duration;
-                } else {
-                    a->index = a->frameCount - 1;
-                }
-                done = 1;
-            } else {
-                a->index--;
-                done = 0;
-            }
-        } else {
-            if (++a->index >= a->frameCount) {
-                if ((u8)(a->flags & 8)) {
-                    a->elapsed = a->duration;
-                    a->index = a->frameCount - 1;
-                } else {
-                    a->index = 0;
-                }
-                done = 1;
-            } else
-                done = 0;
-        }
-        entry = a->commands + a->index;
-        a->frameWeight = frame_factor(*entry);
-        a->duration = (a->frameWeight * a->speed) >> 6;
-        if (!a->duration)
-            a->duration = 1;
-    } else
-        done = 0;
-    if (done)
+    if (DisplaySequence_StepSprite(&p->sprite, &p->anim))
         AnimatedHazard_SetState(m, p, 4);
     Collider_Refresh(&p->collider);
 }
