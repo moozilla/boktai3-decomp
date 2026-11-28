@@ -32,3 +32,4 @@ src/bosses/ratatosk/sub_081F33CC.c	sub_081F33CC	natural	natural	0
 src/bosses/ratatosk/SceneDistance_ClearLinkedEntry.c	SceneDistance_ClearLinkedEntry	natural	natural	0	
 src/bosses/ratatosk/Ratatosk_GetPosition.c	Ratatosk_GetPosition	natural	natural	0	
 src/bosses/ratatosk/SceneActorAnimation_UpdateSwoopMotion.c	SceneActorAnimation_UpdateSwoopMotion	minor	minor	4	second actor alias (allocation) and mask-parameter flag accessor stay
+src/bosses/ratatosk/SceneActorAnimation_UpdateSwoopApproach.c	SceneActorAnimation_UpdateSwoopApproach	contrived	contrived	17	second actor alias, body pointer, two flag accessors stay: register allocation and mask-before-field order

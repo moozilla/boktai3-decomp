@@ -19,28 +19,24 @@ void SceneActorAnimation_UpdateSwoopApproach(struct Ratatosk *p, int tick)
         p->actionChanged = 0;
         SceneActors_StartEightDirectionAnimation(p, p->animationData, p->animation, 2, 1, 1, 4);
         PolarInterpolation_SetCurrentFromPoint(&p->motionPath, &p->body.position);
-        {
-            sub_082222BC(&p->motionPath, &p->destination, p->duration);
-            if (p->duration <= 64)
-                Sound_PlaySong(0x567);
-            else
-                Sound_PlaySong(0x56c);
-        }
+        sub_082222BC(&p->motionPath, &p->destination, p->duration);
+        if (p->duration <= 64)
+            Sound_PlaySong(0x567);
+        else
+            Sound_PlaySong(0x56c);
     } else {
         SceneActors_StartEightDirectionAnimation(p, p->animationData, p->animation, 2, 1, 1, 1);
     }
     if (!(u8)Callback_InvokeActor(p, p->actionTryUpdate)) {
         if (!(tick & 3)) {
             int id = ActorResource_GetFixedId(p2);
-            {
-                u8 *data = gPaletteBankData + id * 32;
-                TemporaryAnimationPool_CreateEntry(p2->animationData, 8, 0x200, 0xe011, data);
-            }
+            u8 *data = gPaletteBankData + id * 32;
+            TemporaryAnimationPool_CreateEntry(p2->animationData, 8, 0x200, 0xe011, data);
         }
         if (p2->duration <= 0x20) {
             Ratatosk_SetFlags(p, 0x40000);
-            Ratatosk_SetFlags(p, 8);
-            Ratatosk_SetFlags(p, 4);
+            p->flags |= 8;
+            p->flags |= 4;
         }
         if (p2->duration > 0x3f && p->actionPhase != 8 && p->actionPhase != 4) {
             Ratatosk_SetFlags(p, 0x40);
