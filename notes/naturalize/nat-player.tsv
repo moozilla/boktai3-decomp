@@ -656,3 +656,6 @@ src/player/motions/sub_081481E4.c	sub_081481E4	minor	natural	1	-
 src/player/motions/Player_UpdateWaveringMovement.c	Player_UpdateWaveringMovement	minor	minor	4	timer pointer and random table origin locals: removing either moves the pointer and literal loads
 src/player/motions/Player_UpdateDirectionRecovery.c	Player_UpdateDirectionRecovery	minor	minor	3	facing pointer local: ROM forms the member address before the new value
 src/player/motions/Player_UpdateTimedMovementRecovery.c	Player_UpdateTimedMovementRecovery	minor	natural	1	-
+src/player/motions/Player_UpdateDecayingRecoil.c	Player_UpdateDecayingRecoil	natural	natural	0	-
+src/player/motions/Player_UpdateSpiralDisorientation.c	Player_UpdateSpiralDisorientation	natural	natural	0	-
+src/player/motions/sub_08148E4C.c	sub_08148E4C	minor	natural	1	-
