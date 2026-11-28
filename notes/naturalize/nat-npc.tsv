@@ -81,3 +81,5 @@ src/npc/manager/MessageWindow_ResetInstance.c	MessageWindow_ResetInstance	natura
 src/npc/sabata_rider/collision.c	Actor_ApplyKnockback	minor	minor	6	boolean predicate helpers and mask-first flag setter: ROM materializes the booleans and the mask; grouped position struct keeps one stack base
 src/npc/sabata_rider/collision.c	ActorMotion_SetKnockback	natural	natural	0	
 src/npc/sabata_rider/collision.c	ActorCollision_InitBounds	contrived	natural	5	
+src/npc/sabata_rider/collision.c	ActorMotion_ApplyInput	minor	minor	3	inline ApplyBoost keeps an owner alias of actor: ROM holds a second copy of the pointer (r7) for the later boost-frame accesses
+src/npc/sabata_rider/ActorScript_ParseParams.c	ActorScript_ParseParams	contrived	minor	18	local ScriptPosition/MotionState views of the player stay; offset pointer in Actor_SetScreenPosition: ROM keeps the field address in a register
