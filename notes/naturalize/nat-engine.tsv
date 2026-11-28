@@ -381,3 +381,6 @@ src/engine/video/palette/sub_08217BBC.c	sub_08217BBC	contrived	natural	1
 src/engine/video/palette/sub_08217C7C.c	sub_08217C7C	minor	minor	1	gray summed with += to keep the loop shape; palette rows viewed as 16-entry arrays
 src/engine/video/palette/Palette_ApplyBackgroundFade.c	Palette_ApplyBackgroundFade	minor	minor	20	productOrBank holds the fade product then the bank counter (register choice); u16 casts pick the multiply operand form
 src/engine/video/palette/sub_08217430.c	sub_08217430	contrived	contrived	32	unreachable call keeps the bank pointer in r3 (4th-argument preference); do/while(0) keeps the black-fade loop register order; IsKey32E helper shapes the flag test
+src/engine/video/sprite_component/SpriteComponent_Suspend.c	SpriteComponent_Suspend	minor	natural	1	
+src/engine/video/sprite_component/SpriteComponent_Resume.c	SpriteComponent_Resume	natural	natural	1	
+src/engine/video/sprite_component/SpriteComponent_SetFramePosition.c	SpriteComponent_SetFramePosition	minor	natural	1	
