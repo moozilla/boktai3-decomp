@@ -281,3 +281,7 @@ src/player/core/Player_Update.c	Player_Update	minor	minor	2	positive reset value
 src/player/core/Player_InitializeFromScript.c	Player_InitializeFromScript	contrived	minor	5	data/sprite/state pointer locals
 src/player/core/Player_Destroy.c	Player_Destroy	minor	natural	1	
 src/player/core/Player_GetEffectivePosition.c	Player_GetEffectivePosition	contrived	natural	1	
+src/player/core/Player_Create.c	Player_Create	natural	natural	0	
+src/player/core/Player_GetBasePosition.c	Player_GetBasePosition	natural	natural	0	
+src/player/core/sub_0815F588.c	sub_0815F588	natural	natural	0	
+src/player/core/sub_0815F5A0.c	sub_0815F5A0	natural	natural	0	
