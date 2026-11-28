@@ -176,3 +176,4 @@ src/scene/actor/attachment/ActorAttachment_TickAscendingSprite.c	ActorAttachment
 src/scene/actor/attachment/ActorAttachment_TickDetachedParts.c	ActorAttachment_TickDetachedParts	minor	natural	3	id local: the plain expression computes the mask address first
 src/scene/actor/attachment/ActorAttachment_BeginPartJitter.c	ActorAttachment_BeginPartJitter	natural	natural	0	-
 src/scene/actor/attachment/ActorAttachment_TickManager.c	ActorAttachment_TickManager	contrived	natural	4	-
+src/scene/actor/attachment/ActorAttachment_DestroyManager.c	ActorAttachment_DestroyManager	contrived	natural	1	-
