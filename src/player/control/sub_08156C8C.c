@@ -1,8 +1,10 @@
 #include "global.h"
-void Player_RestoreCameraFollow(u8 *);
+#include "player/player.h"
 
-void sub_08156C8C(u8 *player)
+void Player_RestoreCameraFollow(struct Player *);
+
+void sub_08156C8C(struct Player *p)
 {
-    if (*(s16 *)(player + 0x4b6) != 0)
-        Player_RestoreCameraFollow(player);
+    if (p->cameraOffsetActive != 0)
+        Player_RestoreCameraFollow(p);
 }
