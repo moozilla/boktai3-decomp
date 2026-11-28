@@ -194,3 +194,4 @@ src/monsters/popbud/Combat_ApplyHitReaction.c	Combat_ApplyHitReaction	contrived	
 src/monsters/popbud/ProjectileEmitter_UpdateAttack.c	ProjectileEmitter_UpdateAttack	minor	natural	2	pos/origin pointer locals
 src/monsters/popbud/ProjectileEmitter_WaitForPlayerApproach.c	ProjectileEmitter_WaitForPlayerApproach	minor	natural	2	pos/origin pointer locals
 src/monsters/popbud/ProjectileEmitter_EmitAttackFrame.c	ProjectileEmitter_EmitAttackFrame	minor	minor	3	u32 sample holds the table address and then the first random draw
+src/monsters/popbud/Combat_SpawnDirectionalProjectile.c	Combat_SpawnDirectionalProjectile	minor	natural	1	polar/add inline helpers
