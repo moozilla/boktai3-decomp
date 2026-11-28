@@ -291,3 +291,5 @@ src/player/cutscene/player_cue_actions.c	ScriptActor_CallCompletionScript	minor	
 src/player/cutscene/player_cue_actions.c	PlayerCue_BeginAcknowledgement	natural	natural	0	
 src/player/cutscene/player_cue_actions.c	PlayerCue_AcknowledgePendingTrigger	minor	natural	1	
 src/player/cutscene/player_cue_actions.c	PlayerCue_CompleteAction	minor	natural	1	
+src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateHidden	natural	natural	0	
+src/player/cutscene/player_cue_actions.c	PlayerCue_UpdatePeriodicParticles	minor	natural	1	

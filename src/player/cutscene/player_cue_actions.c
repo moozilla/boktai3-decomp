@@ -75,15 +75,10 @@ void PlayerCue_UpdateHidden(struct Player *player)
 
 void PlayerCue_UpdatePeriodicParticles(struct Player *player)
 {
-    u8 *frame;
-    s32 next;
     if (player->cueParticlesEnabled != 0) {
-        frame = &player->cueParticleFrame;
-        next = *frame + 1;
-        *frame = next;
-        if ((u8)next > 7) {
+        if (++player->cueParticleFrame > 7) {
             SceneActor_SpawnModeParticles(player);
-            *frame = 0;
+            player->cueParticleFrame = 0;
         }
     }
 }
