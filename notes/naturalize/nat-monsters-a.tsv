@@ -15,3 +15,4 @@ src/monsters/armor/actor_marker.c	ActorMarker_InitMovingSprite	natural	natural	0
 src/monsters/armor/actor_marker.c	ActorMarker_EmitRingEffects	contrived	minor	20	offset address stays sizeof-scaled integer arithmetic (index*8 + table operand order); index set before the position pointer
 src/monsters/armor/actor_marker.c	ActorMarker_EmitIndexedEffect	contrived	contrived	0	tried gUnk_0824E778[row][index] and sum forms: table local loaded before the shifts decides operand order
 src/monsters/armor/actor_marker.c	Armor_SpawnRandomDirectionalParticle	contrived	minor	6	*(table + index): plain subscript swaps the add operands
+src/monsters/armor/actor_marker.c	Armor_SpawnDirectionalParticleFan	contrived	natural	1	

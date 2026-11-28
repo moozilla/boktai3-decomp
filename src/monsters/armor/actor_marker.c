@@ -156,11 +156,9 @@ void Armor_SpawnRandomDirectionalParticle(struct SceneCombatActor *actor)
 
 void Armor_SpawnDirectionalParticleFan(struct SceneCombatActor *actor)
 {
-    s32 index = 0;
-    do {
-        ActorMarker_EmitIndexedEffect(actor, index);
-        index++;
-    } while (index <= 8);
+    s32 i;
+    for (i = 0; i < 9; i++)
+        ActorMarker_EmitIndexedEffect(actor, i);
 }
 
 static inline u16 NextFragmentLift(const u16 *table, u32 *index)
