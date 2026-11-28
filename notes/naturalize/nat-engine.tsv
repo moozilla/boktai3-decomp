@@ -74,3 +74,4 @@ src/engine/math/sub_08221CC8.c	sub_08221CC8	contrived	natural	8
 src/engine/math/sub_08221F54.c	sub_08221F54	contrived	natural	3	
 src/engine/math/ScalarApproach_DivideAngleStep.c	ScalarApproach_DivideAngleStep	contrived	natural	3	
 src/engine/math/ScalarApproach_ApplyWrappedProfileArray.c	ScalarApproach_ApplyWrappedProfileArray	minor	natural	3	
+src/engine/math/ScalarApproach_ApplyClampedProfileArray.c	ScalarApproach_ApplyClampedProfileArray	contrived	minor	12	do/while(0) around ++values stays: without it count outranks values in global alloc

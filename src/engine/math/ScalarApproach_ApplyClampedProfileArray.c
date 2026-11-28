@@ -1,13 +1,12 @@
 #include "engine/math/scalar_approach.h"
 /* ScalarApproach_ApplyClampedProfileArray: Applies one indexed scalar coefficient profile to each value and target pair */
 void ScalarApproach_ApplyClampedProfileArray(s16 *values, const s16 *targets, s32 profile,
-                                               s32 count)
+                                             s32 count)
 {
-    if (profile > 15) {
+    if (profile > 15)
         profile = 15;
-    }
     profile = ScalarApproach_ProfileCoefficient(profile);
-    while ((count = (s32)((u32)count - 1)) >= 0) {
+    while (--count >= 0) {
         *values = ScalarApproach_Profile(*values, *targets, profile);
         do {
             ++values;
