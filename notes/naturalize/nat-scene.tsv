@@ -94,3 +94,5 @@ src/scene/actor/actor_pool/pooled_actor_controller.c	Actor_CreateControllerFromS
 src/scene/actor/actor_pool/pooled_motion.c	MotionPool_InitializeSlot	contrived	natural	5	
 src/scene/actor/actor_pool/pooled_motion.c	MotionPool_Destroy	minor	natural	1	
 src/scene/actor/actor_pool/pooled_motion.c	MotionPool_Initialize	minor	natural	1	
+src/scene/actor/actor_pool/pooled_motion.c	MotionPool_Update	contrived	contrived	0	unchanged: dropping moving, output or flag temporaries each shifts load order in the 16-slot loop
+src/scene/actor/actor_pool/pooled_motion.c	MotionPool_AdjustHeading	contrived	minor	20	two-step (s8) delta, step local, and a flag local for the |= (ROM loads the mask before flags)

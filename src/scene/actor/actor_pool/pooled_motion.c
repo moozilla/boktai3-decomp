@@ -283,31 +283,21 @@ void MotionPool_AdjustHeading(struct MotionPoolSlot *slot)
         const struct ContactPosition *target = slot->target;
         if (target) {
             struct ContactPosition *position = &slot->sprite.position;
-            u32 byte = (u8)Math_Atan2(target->x - position->x, target->z - position->z);
-            u32 desired;
-            u32 current;
-            s32 delta;
+            u8 desired = Math_Atan2(target->x - position->x, target->z - position->z);
+            u32 current = (u8)params->direction;
+            s32 delta = (s8)desired;
             u32 step;
-            s32 limit;
-            u32 flags;
-            desired = byte;
-            current = (u8)params->direction;
-            delta = (s8)desired;
             delta = (s8)(delta - current);
             step = params->turnSpeed;
-            limit = (s8)params->turnSpeed;
-            if (delta > limit) {
-                delta = current + step;
-                params->direction = delta;
-            } else if (delta < limit) {
-                delta = current - step;
-                params->direction = delta;
-            } else
+            if (delta > (s8)params->turnSpeed)
+                params->direction = current + step;
+            else if (delta < (s8)params->turnSpeed)
+                params->direction = current - step;
+            else
                 params->direction = desired;
             {
                 u32 flag = 1;
-                flags = slot->flags;
-                slot->flags = flags | flag;
+                slot->flags |= flag;
             }
         }
     }
