@@ -198,7 +198,7 @@ s32 TetherActor_InitRequestIndicator(struct TetherRequestIndicator *indicator)
 
 void *TetherActor_CreateRequestIndicator(void)
 {
-    void *indicator = Task_Create(9, 0xac);
+    struct TetherRequestIndicator *indicator = Task_Create(9, sizeof(*indicator));
     if (indicator != 0) {
         Task_SetCallbacks(indicator, TetherActor_UpdateRequestIndicator,
                           TetherActor_DestroyRequestIndicator);
