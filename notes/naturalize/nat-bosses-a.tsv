@@ -172,3 +172,4 @@ src/bosses/count/CountBats_UpdateReaction.c	CountBats_UpdateReaction	contrived	c
 src/bosses/count/CountBats_Update.c	CountBats_Update	contrived	minor	12	fade-out keeps value/zero locals
 src/bosses/count/CountBats_Destroy.c	CountBats_Destroy	minor	natural	3	
 src/bosses/count/CountBats_Initialize.c	CountBats_Initialize	minor	natural	3	
+src/bosses/count/CountBats_Create.c	CountBats_Create	minor	natural	3	

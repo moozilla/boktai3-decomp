@@ -8,11 +8,10 @@ struct ContactSwarm *CountBats_Create(void)
     if (pool) {
         Task_SetCallbacks(pool, (void (*)(void *))CountBats_Update,
                           (void (*)(void *))CountBats_Destroy);
-        if (CountBats_Initialize(pool) >= 0)
-            goto done;
-        Task_Kill(pool);
-        return 0;
+        if (CountBats_Initialize(pool) < 0) {
+            Task_Kill(pool);
+            return 0;
+        }
     }
-done:
     return pool;
 }
