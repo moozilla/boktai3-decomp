@@ -21,7 +21,7 @@ void SceneActorPlacement_ShowActor(struct RoomActor *s)
             if (s->shadow[0])
                 ActorShadow_Enable(s->shadow);
             ClearCollider(&s->colliderA);
-            s->colliderA.responseValue = zero;
+            s->colliderA.responseValue = 0;
             ActorStatus_ClearDrawableFlags((void *)s, 1);
         }
     }

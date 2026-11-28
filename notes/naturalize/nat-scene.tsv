@@ -425,3 +425,4 @@ src/scene/actor/placement/SceneActorMovement_ResolveRoutePosition.c	SceneActorMo
 src/scene/actor/placement/SceneActorScript_ApplyRouteStartCommand.c	SceneActorScript_ApplyRouteStartCommand	contrived	minor	2	argument locals fix the load order of the three command words
 src/scene/actor/placement/SceneActorPlacement_PlayResponseAndResetState.c	SceneActorPlacement_PlayResponseAndResetState	contrived	contrived	3	flag mask helpers and fallback goto into a case: plain &= and & tests reorder the load
 src/scene/actor/placement/SceneActorPlacement_ResumeResetControl.c	SceneActorPlacement_ResumeResetControl	minor	minor	3	parked bit mask and collider helper: plain & and &= load the field before the mask
+src/scene/actor/placement/SceneActorPlacement_ShowActor.c	SceneActorPlacement_ShowActor	contrived	contrived	4	masked-zero local and flags pointer: a combined flag test loses the single load
