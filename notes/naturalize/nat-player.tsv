@@ -138,3 +138,4 @@ src/player/attack/ActorFlags_GetResponseBits.c	ActorFlags_GetResponseBits	minor	
 src/player/attack/Player_UpdateSelectedSpinAttack.c	Player_UpdateSelectedSpinAttack	contrived	minor	3	SceneVec/ContactPosition view casts
 src/player/attack/Player_SetFacingFromAngle.c	Player_SetFacingFromAngle	contrived	natural	1	-
 src/player/attack/sub_0814B02C.c	sub_0814B02C	minor	natural	5	-
+src/player/attack/Player_SelectNearestMotionTarget.c	Player_SelectNearestMotionTarget	contrived	minor	12	ProjectPosition keeps its sum copy; TargetPosition view casts
