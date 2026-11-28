@@ -223,37 +223,29 @@ int Actor_PlayAnimationEntry(void *object, int id, int a, int b, int c)
 
 /* Actor_PlayFootstepSound: plays a step sound when the animation hits one of two marked frames */
 
-struct StepSounds {
-    u16 a, b;
-};
-
-extern const struct StepSounds gUnk_086055D4[];
+/* Two step sounds per surface, indexed by the resource entry's sound. */
+extern const u16 gUnk_086055D4[][2];
 
 void Actor_PlayFootstepSound(struct SceneActor *actor, u32 mode)
 {
     u32 frame;
-    u32 idx;
+    u32 foot;
     if (!actor->soundEnabled)
         return;
     if (mode == 1)
-        idx = 0;
+        foot = 0;
     else if (mode == 3)
-        idx = 2;
+        foot = 2;
     else
         return;
     if (DisplayAnimation_GetFrameBoundary(&actor->drawable.common, &frame)) {
         const struct SceneActorResourceEntry *info = actor->resourceEntry;
-        const s8 *fr = info->payload.footstepFrames;
-        const s8 *f = fr + idx;
-        s32 f0 = f[0];
-        if (f0 == frame)
-            Sound_PlaySong(gUnk_086055D4[info->sound].a);
-        else if (f[1] == frame) {
-            const u16 *sounds = (const u16 *)gUnk_086055D4;
-            u32 index = info->sound * sizeof(struct StepSounds);
-            sounds += 1;
-            Sound_PlaySong(*(const u16 *)((const u8 *)sounds + index));
-        }
+        const s8 *table = info->payload.footstepFrames;
+        const s8 *frames = table + foot;
+        if (frames[0] == frame)
+            Sound_PlaySong(gUnk_086055D4[info->sound][0]);
+        else if (frames[1] == frame)
+            Sound_PlaySong(gUnk_086055D4[info->sound][1]);
     }
 }
 
