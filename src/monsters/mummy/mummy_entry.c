@@ -1469,9 +1469,9 @@ void Mummy_ResumeDelayedRoute(struct ChaseActor *actor)
     if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
         return;
     if ((s32)actor->base.counter2AC > 60) {
-        SceneActorChase_ClearFlagComponent((void *)&group->common.gate.flags, 6);
+        SceneActorChase_ClearFlagComponent(&group->common.gate.flags, 6);
         SceneActorChase_SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
-        SceneActorDelay_Prepare((void *)&group->saved, group->common.gate.control, 12, 30);
+        SceneActorDelay_Prepare(&group->saved, group->common.gate.control, 12, 30);
         SceneActorChase_SetState(actor, 3, 1, 0);
         if (body->pursuitDelay &&
             actor->base.terrainCell ==
