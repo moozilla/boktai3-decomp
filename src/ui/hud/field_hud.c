@@ -58,13 +58,12 @@ void FieldHud_RefreshGaugeIndex(struct FieldHudWidgets *widgets)
 
 void FieldHud_UpdateTimeDigits(struct FieldHudWidgets *widgets)
 {
-    s32 **source = &widgets->timeSource;
     s32 minutes, fraction, digit;
-    if (!*source)
+    if (!widgets->timeSource)
         return;
-    minutes = Div(**source, 60);
-    fraction = Div((**source - minutes * 60) * 169, 10);
-    if (**source > 59999) {
+    minutes = Div(*widgets->timeSource, 60);
+    fraction = Div((*widgets->timeSource - minutes * 60) * 169, 10);
+    if (*widgets->timeSource > 59999) {
         AnimSprite_SelectGlyph(&widgets->timeDigits[0], widgets->timeResource, 50);
         AnimSprite_SelectGlyph(&widgets->timeDigits[1], widgets->timeResource, 50);
         AnimSprite_SelectGlyph(&widgets->timeDigits[2], widgets->timeResource, 50);
