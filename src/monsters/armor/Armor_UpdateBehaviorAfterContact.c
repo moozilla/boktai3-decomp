@@ -90,9 +90,7 @@ void Armor_UpdateBehaviorAfterContact(struct Obj *p, s32 delta, u32 flags, s32 f
             if (flag) {
                 p->state = 1;
                 p->timer = 0x5A;
-                {
-                    *q = k2;
-                }
+                *q = k2;
             } else if (p->keys & 1) {
                 if ((s16)sum > 400) {
                     p->state = 2;

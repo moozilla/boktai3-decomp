@@ -98,3 +98,4 @@ src/monsters/armor/Armor_UpdatePartBobbing.c	Armor_UpdatePartBobbing	contrived	n
 src/monsters/armor/armor_behavior.c	DirectionalActor_UpdateVisibilityDelay	contrived	minor	1	display flags read through a view cast
 src/monsters/armor/armor_behavior.c	Armor_DispatchBehaviorUpdate	contrived	natural	1	
 src/monsters/armor/Armor_UpdateModeAttackDecision.c	Armor_UpdateModeAttackDecision	contrived	minor	5	
+src/monsters/armor/Armor_UpdateBehaviorAfterContact.c	Armor_UpdateBehaviorAfterContact	contrived	minor	3	
