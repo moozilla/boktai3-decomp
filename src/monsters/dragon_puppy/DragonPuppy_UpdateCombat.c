@@ -53,7 +53,6 @@ s32 DragonPuppy_UpdateCombat(struct DragonPuppy *p)
                                    p->collider.costFlags == 4, p->hudValue148);
         }
         if (p->health <= 0) {
-            const u16 *table;
             s32 count;
             p->defeated = 1;
             Sound_PlaySong(0x530);
@@ -63,13 +62,12 @@ s32 DragonPuppy_UpdateCombat(struct DragonPuppy *p)
                 v->y += 200;
             }
             velocity.x = -4;
-            table = gRandomTable;
-            velocity.y = ParticleRandom_ReadDirectSample(table) & 3;
+            velocity.y = ParticleRandom_ReadDirectSample(gRandomTable) & 3;
             velocity.z = -4;
             size.x = 24;
-            size.y = (ParticleRandom_ReadDirectSample(table) & 3) + 1;
+            size.y = (ParticleRandom_ReadDirectSample(gRandomTable) & 3) + 1;
             size.z = 24;
-            count = (ParticleRandom_ReadDirectSample(table) & 3) + 4;
+            count = (ParticleRandom_ReadDirectSample(gRandomTable) & 3) + 4;
             ImpactParticleGroup_SpawnBouncing(count, 0x16, &position, &velocity, &size, 15, 15);
             Anim_RestartSequence(&p->animation, p->deathAnimation, 5, p->deathVariant, 0);
             AnimData_SelectPaletteBank(p->palette, 0x1b9);
