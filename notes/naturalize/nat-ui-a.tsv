@@ -108,3 +108,4 @@ src/ui/books/forging_book/ForgingBook_GetCategoryEntryCount.c	ForgingBook_GetCat
 src/ui/books/forging_book/ForgingBook_GetEntryAnimation.c	ForgingBook_GetEntryAnimation	contrived	natural	1	
 src/ui/books/forging_book/ForgingBook_GetCategoryEntryOffset.c	ForgingBook_GetCategoryEntryOffset	natural	natural	1	
 src/ui/books/forging_book/ForgingBook_CountDiscoveredCategoryEntries.c	ForgingBook_CountDiscoveredCategoryEntries	minor	natural	1	
+src/ui/books/forging_book/ForgingBook_IsCategoryComplete.c	ForgingBook_IsCategoryComplete	minor	natural	2	

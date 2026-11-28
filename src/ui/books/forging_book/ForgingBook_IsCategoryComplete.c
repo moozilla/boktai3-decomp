@@ -1,12 +1,8 @@
 #include "global.h"
-s32 ForgingBook_CountDiscoveredCategoryEntries(u32, u32);
-s32 ForgingBook_GetCategoryEntryCount(u32);
-u32 ForgingBook_IsCategoryComplete(u32 a, u32 b)
+#include "ui/books/forging_book.h"
+
+u32 ForgingBook_IsCategoryComplete(struct ForgingBook *book, s32 category)
 {
-    s32 x = ForgingBook_CountDiscoveredCategoryEntries(a, b);
-    s32 y = ForgingBook_GetCategoryEntryCount(b);
-    u32 r = 0;
-    if (x >= y)
-        r = 1;
-    return r;
+    return ForgingBook_CountDiscoveredCategoryEntries(book, category) >=
+           ForgingBook_GetCategoryEntryCount(category);
 }
