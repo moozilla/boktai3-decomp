@@ -707,3 +707,4 @@ src/system/save/Region_OnDestroy.c	Region_OnDestroy	natural	natural	0
 src/system/save/Save_AlignSizeToEightBytes.c	Save_AlignSizeToEightBytes	natural	natural	0	
 src/system/save/sub_0822F174.c	sub_0822F174	natural	natural	0	
 src/system/save/Save_WriteBlock.c	Save_WriteBlock	minor	minor	2	failure paths share one goto label: separate returns are not merged the same way
+src/system/solar/solar_calibration_menu.c	SolarCalibration_Initialize	contrived	minor	1	returns the assignment of zero to fadeSpeed, as the ROM does
