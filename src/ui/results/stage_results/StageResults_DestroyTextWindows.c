@@ -1,11 +1,7 @@
 #include "global.h"
+#include "ui/results/stage_results.h"
 
-struct StageResults {
-    u8 pad0[0x11CC];
-    u32 textWindows[3];
-};
-
-void TextWindow_Clear(u32);
+void TextWindow_Clear(s32);
 
 void StageResults_DestroyTextWindows(struct StageResults *results)
 {
