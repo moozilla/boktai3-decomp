@@ -232,3 +232,11 @@ src/bosses/hresvelgr/Collider_IgnoreCallback.c	Collider_IgnoreCallback	natural	n
 src/bosses/hresvelgr/Hresvelgr_InitializeCollider.c	Hresvelgr_InitializeCollider	minor	natural	1	
 src/bosses/hresvelgr/Hresvelgr_OnBodyContact.c	Hresvelgr_OnBodyContact	contrived	minor	30	saved actor alias and a mask local stay (the ROM masks the 0x20 register)
 src/bosses/hresvelgr/Hresvelgr_OnSecondaryContact.c	Hresvelgr_OnSecondaryContact	contrived	minor	30	saved actor alias and a mask local stay (the ROM masks the 0x20 register)
+src/bosses/hresvelgr/Hresvelgr_BeginDamageReaction.c	Hresvelgr_BeginDamageReaction	natural	natural	0	
+src/bosses/hresvelgr/ColliderActor_InitBodyCollider.c	ColliderActor_InitBodyCollider	minor	minor	1	SetVector helper stays
+src/bosses/hresvelgr/ColliderActor_InitLowerBodyCollider.c	ColliderActor_InitLowerBodyCollider	natural	natural	0	
+src/bosses/hresvelgr/ColliderActor_UpdateCameraOffset.c	ColliderActor_UpdateCameraOffset	contrived	contrived	6	unchanged: camera, position and delta pointer temps; each removal reorders registers
+src/bosses/hresvelgr/Hresvelgr_GetTravelTarget.c	Hresvelgr_GetTravelTarget	minor	minor	2	actor copy and angle mask statement stay
+src/bosses/hresvelgr/Hresvelgr_SetRandomTravelTarget.c	Hresvelgr_SetRandomTravelTarget	contrived	contrived	5	unchanged: one variable holds the table address and then the angle (register priority, see source comment)
+src/bosses/hresvelgr/SceneMover_SetSideTarget.c	SceneMover_SetSideTarget	contrived	contrived	3	unchanged: second anchor alias selects the register of the x load
+src/bosses/hresvelgr/SceneMover_IsNearTarget.c	SceneMover_IsNearTarget	contrived	minor	6	square temporaries stay
