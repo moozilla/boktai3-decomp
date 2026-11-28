@@ -4,12 +4,6 @@
 void Sprite_Remove(void *);
 void Collider_Remove(void *);
 void ScaledShadow_Destroy(void *);
-static inline u8 LootDepositCallbackPool_IsActive(u32 *mask, s32 i)
-{
-    if (*mask & (1 << i))
-        return TRUE;
-    return FALSE;
-}
 s32 LootDepositCallbackPool_DestroyEntries(struct CallbackPool *pool)
 {
     s32 i;

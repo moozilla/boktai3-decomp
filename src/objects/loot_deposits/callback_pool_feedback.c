@@ -261,7 +261,7 @@ void LootDepositFeedback_CheckPlayerRange(struct CallbackPoolEntry *actor)
     }
 }
 
-s32 LootDepositFeedback_IsPlayerInsideOriginRange(struct CallbackPoolEntry *actor)
+u8 LootDepositFeedback_IsPlayerInsideOriginRange(struct CallbackPoolEntry *actor)
 {
     struct ContactPosition delta;
     LootDepositCallbackPool_Subtract(&delta, &actor->savedPosition, &gPlayers[0]->position);

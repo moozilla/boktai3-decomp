@@ -6,12 +6,6 @@
 
 extern void *gUnk_086064E8[];
 s32 sub_08249240(void *, void *, void *);
-static inline u8 LootDepositCallbackPool_IsActive(u32 *mask, s32 i)
-{
-    if (*mask & (1 << i))
-        return TRUE;
-    return FALSE;
-}
 s32 LootDepositCallbackPool_UpdateEntries(struct CallbackPool *pool)
 {
     struct CallbackPoolEntry *start = pool->entries;
