@@ -412,8 +412,8 @@ s32 ScenePool_ApplyMotionInput(struct ScenePoolActor *actor, u32 input)
         if (!(actor->inputFlags & 0x400))
             Sound_PlaySong(0x8F);
         braking = 1;
-        actor->forwardSpeed = (s32)(actor->lateralSpeed << 3) >> 4;
-        actor->lateralSpeed = (s32)(actor->lateralSpeed << 3) >> 4;
+        actor->forwardSpeed = (actor->lateralSpeed << 3) >> 4;
+        actor->lateralSpeed = (actor->lateralSpeed << 3) >> 4;
     } else {
         braking = 0;
     }
