@@ -132,11 +132,10 @@ u8 Sprite_BlinkUntilExpired(void *, u32, s32, s32);
 
 void AnimatedTile_TickFadeOut(struct AnimatedTileManager *manager, struct AnimatedTile *tile)
 {
-    s32 value;
-    struct ScriptUtilityArguments args;
     if (tile->entered) {
-        value = tile->name;
-        args.values = &value;
+        struct ScriptUtilityArguments args;
+        s32 name = tile->name;
+        args.values = &name;
         args.count = 1;
         Script_Call(tile->script, &args);
         tile->timer = 0;
@@ -144,12 +143,12 @@ void AnimatedTile_TickFadeOut(struct AnimatedTileManager *manager, struct Animat
     }
     if (Sprite_BlinkUntilExpired(tile, tile->timer, 45, 90)) {
         s32 slot = tile->slot;
-        u32 *used = &manager->used;
-        *used &= ~(1 << slot);
+        manager->used &= ~(1 << slot);
         Sprite_Remove(tile);
         tile->state = 0;
-    } else
+    } else {
         tile->timer++;
+    }
 }
 
 /* AnimatedTile_OnStateComplete: Empty entry following animation state code; provisionally a completion hook */
