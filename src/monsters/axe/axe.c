@@ -1075,7 +1075,8 @@ void Axe_UpdatePursuit(struct ChaseActor *actor)
     else
         actor->base.body.direction -= step;
     Polar(&velocity, actor->base.body.direction, 32);
-    *((u8 *)actor->base.drawable + 6) = 159 - actor->base.body.direction;
+    ((struct DisplaySequenceSprite *)actor->base.drawable)->attribute =
+        159 - actor->base.body.direction;
     actor->base.body.motion = velocity;
     actor->base.counter2AC++;
 }
