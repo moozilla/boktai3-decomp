@@ -42,7 +42,8 @@ struct AreaEffectLinkState {
     u16 value;
     u8 unknown64[0x18];
     u16 receivedByteCounts[4]; /* +0x7C: per-participant assembly cursors, 08138300. */
-    u8 unknown84[8];
+    s16 actorValues[2];        /* 0x84: drawn on the link lobby panel; confidence=low */
+    u8 unknown88[4];
     s16 menuResults[2]; /* 0x8C: selected local result in 081100A0 */
     u8 unknown90[0x24];
     void (*menuCallback)(void); /* 0xB4 */

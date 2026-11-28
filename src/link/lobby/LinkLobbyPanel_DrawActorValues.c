@@ -1,19 +1,17 @@
 #include "global.h"
 #include "scene/areas/area_effect_link.h"
-struct S {
-    u8 filler[0x84];
-    s16 a;
-    s16 b;
-};
+
 void PanelText_DrawDigits(s32, s32, s32, s32, s32);
+
 void LinkLobbyPanel_DrawActorValues(void)
 {
-    struct S *s = gLinkSession;
-    if (s == 0) {
-        PanelText_DrawDigits(0, 0x64, 0, 0x12, (s32)s);
-        PanelText_DrawDigits(0, 0x64, 0x12, 0x12, (s32)s);
+    struct AreaEffectLinkState *session = gLinkSession;
+
+    if (!session) {
+        PanelText_DrawDigits(0, 100, 0, 18, 0);
+        PanelText_DrawDigits(0, 100, 18, 18, 0);
     } else {
-        PanelText_DrawDigits(s->a, 0x64, 0, 0x12, 0);
-        PanelText_DrawDigits(s->b, 0x64, 0x12, 0x12, 0);
+        PanelText_DrawDigits(session->actorValues[0], 100, 0, 18, 0);
+        PanelText_DrawDigits(session->actorValues[1], 100, 18, 18, 0);
     }
 }
