@@ -1,15 +1,15 @@
 #include "global.h"
 #include "npc/manager/scene_actor_lifecycle.h"
-s32 Actor_UpdateAcceleratingBlink(u8 *, u32, u32);
-void SceneCharacter_UpdateAcceleratingBlink(u8 *a, struct SceneActor *b, u32 c)
+s32 Actor_UpdateAcceleratingBlink(struct SceneActor *, u32, u32);
+void SceneCharacter_UpdateAcceleratingBlink(void *context, struct SceneActor *actor, u32 tick)
 {
-    if (b->animationEntered) {
-        b->animationEntered = 0;
-        b->finished = 0;
-        b->ticks = 0x10;
+    if (actor->animationEntered) {
+        actor->animationEntered = 0;
+        actor->finished = 0;
+        actor->ticks = 0x10;
     }
-    if (Actor_UpdateAcceleratingBlink(b, c, 0x10)) {
-        SceneActor_SetFlags(b, 0x100);
-        b->finished = 1;
+    if (Actor_UpdateAcceleratingBlink(actor, tick, 0x10)) {
+        SceneActor_SetFlags(actor, 0x100);
+        actor->finished = 1;
     }
 }
