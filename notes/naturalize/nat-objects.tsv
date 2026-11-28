@@ -481,3 +481,4 @@ src/objects/loot_deposits/LootDeposit_CreateFromScript.c	LootDeposit_CreateFromS
 src/objects/loot_deposits/sub_08104748.c	sub_08104748	contrived	minor	9	self alias: without it the hit timer address is built from the argument register
 src/objects/loot_deposits/sub_081047B4.c	sub_081047B4	minor	natural	1	
 src/objects/loot_deposits/LootDeposit_UpdateMemberProximity.c	LootDeposit_UpdateMemberProximity	contrived	minor	4	local clear, scale and flag helpers kept
+src/objects/loot_deposits/LootDeposit_UpdateMemberSway.c	LootDeposit_UpdateMemberSway	contrived	minor	1	local scale helpers kept

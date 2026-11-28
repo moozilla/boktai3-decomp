@@ -1,18 +1,8 @@
 #include "global.h"
-struct ActorGroupMember {
-    u32 flags;
-    u8 pad4[2];
-    u8 angle;
-    u8 pad7[0x15];
-    s16 x, y, z, pad22;
-    u8 pad24[0xF4];
-    s16 originX, originY, originZ, pad11E;
-    s16 turnStep;
-    u8 pad122[6];
-    s16 radiusX;
-    u8 pad12A[2];
-    s16 radiusZ;
-};
+#include "engine/engine.h"
+#include "engine/ram.h"
+#include "objects/loot_deposits/callback_pool.h"
+
 extern const s16 gUnk_086149C4[];
 static inline s32 Scale(s32 x)
 {
@@ -44,34 +34,34 @@ static inline s32 WrapAngle(s32 x)
     return x;
 }
 // confidence=low: rotates the member's offset about its origin and damps its turn step.
-void LootDeposit_UpdateMemberSway(struct ActorGroupMember *p)
+void LootDeposit_UpdateMemberSway(struct CallbackPoolEntry *entry)
 {
-    s32 angle = WrapAngle(p->angle);
+    s32 angle = WrapAngle(entry->sprite.attribute);
     s32 x;
     s32 z;
 
-    if (angle == 0 && p->turnStep == 0)
+    if (angle == 0 && entry->motion.x == 0)
         return;
-    x = ScaleR(p->radiusX * gUnk_086149C4[(p->angle + 64) & 255]) +
-        Scale(p->radiusZ * gUnk_086149C4[p->angle]);
-    z = ScaleR(-(p->radiusX * gUnk_086149C4[p->angle])) +
-        Scale(p->radiusZ * gUnk_086149C4[(p->angle + 64) & 255]);
-    p->x = p->originX + x;
-    p->z = z + p->originZ;
-    if (p->turnStep == 0) {
+    x = ScaleR(entry->swayRadius.x * gUnk_086149C4[(entry->sprite.attribute + 64) & 255]) +
+        Scale(entry->swayRadius.z * gUnk_086149C4[entry->sprite.attribute]);
+    z = ScaleR(-(entry->swayRadius.x * gUnk_086149C4[entry->sprite.attribute])) +
+        Scale(entry->swayRadius.z * gUnk_086149C4[(entry->sprite.attribute + 64) & 255]);
+    entry->sprite.position.x = entry->savedPosition.x + x;
+    entry->sprite.position.z = z + entry->savedPosition.z;
+    if (entry->motion.x == 0) {
         if (angle > 0)
-            p->angle--;
+            entry->sprite.attribute--;
         else
-            p->angle++;
+            entry->sprite.attribute++;
     } else {
-        p->angle += p->turnStep;
-        if (p->turnStep > 0) {
-            if (angle > p->turnStep)
-                p->turnStep *= -1;
+        entry->sprite.attribute += entry->motion.x;
+        if (entry->motion.x > 0) {
+            if (angle > entry->motion.x)
+                entry->motion.x *= -1;
         } else {
-            if (angle < p->turnStep) {
-                p->turnStep *= -1;
-                p->turnStep = Half(p->turnStep);
+            if (angle < entry->motion.x) {
+                entry->motion.x *= -1;
+                entry->motion.x = Half(entry->motion.x);
             }
         }
     }
