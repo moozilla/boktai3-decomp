@@ -19,11 +19,8 @@ void SceneActors_InitConvergingParticles(struct SabataActorState *actor)
 void SceneActors_RemoveConvergingParticles(struct SabataActorState *actor)
 {
     s32 index;
-    struct ConvergingParticle *particle = actor->convergingParticles.particles;
-    for (index = 3; index >= 0; index--) {
-        Effect_Remove(particle);
-        particle++;
-    }
+    for (index = 0; index < 4; index++)
+        Effect_Remove(&actor->convergingParticles.particles[index]);
 }
 
 static inline s32 magnitude(s32 v)
@@ -60,7 +57,8 @@ void SceneActors_UpdateConvergingParticles(struct SabataActorState *actor)
                 draw->position.x = (u16)actor->offsetPoint.x + (u16)particle->dx;
                 draw->position.y = (u16)actor->offsetPoint.z + (u16)particle->dy;
                 if (++particle->ticks == 4)
-                    SpriteDrawable_SelectTileFrame(draw, actor->convergingParticles.graphics, particle->kind + 1);
+                    SpriteDrawable_SelectTileFrame(draw, actor->convergingParticles.graphics,
+                                                   particle->kind + 1);
                 count++;
             }
         }
@@ -75,11 +73,12 @@ static inline s32 random_value(void)
     return *(u16 *)((u8 *)gRandomTable + (gRandomIndex << 1));
 }
 
-
-void SceneActors_SpawnConvergingParticle(struct SabataActorState *actor, struct ConvergingParticlePoint *pos)
+void SceneActors_SpawnConvergingParticle(struct SabataActorState *actor,
+                                         struct ConvergingParticlePoint *pos)
 {
     if ((++actor->convergingParticles.ticks & 3) == 0) {
-        struct ConvergingParticle *particle = &actor->convergingParticles.particles[actor->convergingParticles.next];
+        struct ConvergingParticle *particle =
+            &actor->convergingParticles.particles[actor->convergingParticles.next];
         struct ConvergingParticle *draw = particle;
         s32 angle;
         s32 radius;
