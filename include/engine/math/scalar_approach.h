@@ -31,20 +31,19 @@ static inline s32 ScalarApproach_ApplyDelta(s32 current, s32 target, s32 delta, 
 {
     s32 step;
     u32 threshold = (1u << shift) - 1;
-    if (delta != 0) {
-        if (delta + threshold <= 2 * threshold) {
-            s32 minimum = -(1 << shift);
-            if (delta > 0)
-                minimum = 1 << shift;
-            delta = minimum;
-        }
-        if (delta >= 0)
-            step = delta >> shift;
-        else
-            step = -(-delta >> shift);
-        target = current + step;
+    if (!delta)
+        return target;
+    if (delta + threshold <= 2 * threshold) {
+        s32 minimum = -(1 << shift);
+        if (delta > 0)
+            minimum = 1 << shift;
+        delta = minimum;
     }
-    return target;
+    if (delta >= 0)
+        step = delta >> shift;
+    else
+        step = -(-delta >> shift);
+    return current + step;
 }
 static inline s32 ScalarApproach_Shift2(s32 current, s32 target)
 {
