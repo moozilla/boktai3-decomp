@@ -224,3 +224,4 @@ src/effects/feathers/FeatherEffectPool_DestroyTask.c	FeatherEffectPool_DestroyTa
 src/effects/feathers/FeatherEffectPool_Init.c	FeatherEffectPool_Init	minor	natural	2	-
 src/effects/feathers/FeatherEffectPool_GetOrCreate.c	FeatherEffectPool_GetOrCreate	minor	natural	1	-
 src/effects/feathers/FeatherEffectPool_ResetSingleton.c	FeatherEffectPool_ResetSingleton	natural	natural	0	-
+src/effects/healing/FlickerParticle_UpdateMotion.c	FlickerParticle_UpdateMotion	minor	natural	3	
