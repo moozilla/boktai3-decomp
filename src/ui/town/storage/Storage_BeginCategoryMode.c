@@ -27,39 +27,30 @@ void Storage_InitSelectionGrid(struct SceneInputGridView *, u32, u32, u32, u32);
 void Storage_UpdateCursorPosition(struct SceneInputGridView *, void *);
 void Storage_BeginCategoryBrowse(struct StorageCategoryMenu *);
 void Sound_PlaySong(u32);
-void MenuPanel_ShowDescription(struct StorageCategoryMenu *, s32, const void *, void *);
+void MenuPanel_ShowDescription(struct StorageCategoryMenu *, s32, const void *, s32);
 void Storage_ResetCategoryPalette(struct StorageCategoryMenu *, u16 *);
-void Storage_SetState(struct StorageCategoryMenu *,
-                             void (*)(struct StorageCategoryMenu *), u32);
+void Storage_SetState(struct StorageCategoryMenu *, void (*)(struct StorageCategoryMenu *), u32);
 void Storage_UpdateSortConfirmation(struct StorageCategoryMenu *);
 void Storage_BeginCategoryMode(struct StorageCategoryMenu *p, u32 mode)
 {
-    int new_var;
+    u32 modeIndex;
+    s32 none;
     Storage_InitSlotMapping(p, (p->categoryKinds[p->category] & 1) << 4);
     Storage_RefreshCategoryWidgets(p);
     Storage_RefreshSelectedItemDetails(p);
-    {
-        u32 modeIndex = mode - 1;
-        p->mode = mode;
-        new_var = -1;
-        if (modeIndex <= 1) {
-            Storage_InitSelectionGrid(&p->grid, 0, 4, 0, 16);
-            Storage_UpdateCursorPosition(&p->grid, p->cursor);
-            Storage_BeginCategoryBrowse(p);
-        } else {
-            Sound_PlaySong(0xDD);
-            {
-                s32 none;
-                void *description = p->description;
-                void *panel = p;
-
-                none = new_var;
-                MenuPanel_ShowDescription(panel, 4, description, (void *)none);
-            }
-            SceneInput_BeginChoice(&p->prompt, p->choiceResource, &p->choiceState, 1, 0);
-            Storage_ResetCategoryPalette(p, p->colors);
-            Storage_SetState(p, Storage_UpdateSortConfirmation, 0);
-            Storage_RefreshCategoryWidgets(p);
-        }
+    modeIndex = mode - 1;
+    p->mode = mode;
+    none = -1;
+    if (modeIndex <= 1) {
+        Storage_InitSelectionGrid(&p->grid, 0, 4, 0, 16);
+        Storage_UpdateCursorPosition(&p->grid, p->cursor);
+        Storage_BeginCategoryBrowse(p);
+    } else {
+        Sound_PlaySong(0xDD);
+        MenuPanel_ShowDescription(p, 4, p->description, none);
+        SceneInput_BeginChoice(&p->prompt, p->choiceResource, &p->choiceState, 1, 0);
+        Storage_ResetCategoryPalette(p, p->colors);
+        Storage_SetState(p, Storage_UpdateSortConfirmation, 0);
+        Storage_RefreshCategoryWidgets(p);
     }
 }

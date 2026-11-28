@@ -599,3 +599,4 @@ src/ui/town/storage/Storage_UpdateCloseDelay.c	Storage_UpdateCloseDelay	contrive
 src/ui/town/storage/Storage_Update.c	Storage_Update	contrived	natural	2	
 src/ui/town/storage/Storage_Destroy.c	Storage_Destroy	contrived	minor	2	sprite-array view starting at the first control
 src/ui/town/storage/Storage_Init.c	Storage_Init	contrived	natural	2	
+src/ui/town/storage/Storage_BeginCategoryMode.c	Storage_BeginCategoryMode	contrived	minor	18	mode-1 and -1 locals order the mode store and the message argument
