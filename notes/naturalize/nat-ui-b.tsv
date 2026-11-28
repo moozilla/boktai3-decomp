@@ -573,3 +573,4 @@ src/ui/town/storage/Storage_BeginEquipmentSpecialMove.c	Storage_BeginEquipmentSp
 src/ui/town/storage/sub_081BE730.c	sub_081BE730	contrived	minor	12	widget-run view for the flag write; index-first pointer sum into table160
 src/ui/town/storage/sub_081BEBE0.c	sub_081BEBE0	contrived	minor	3	storage text view cast: the item text pointer overlaps the glyph pair
 src/ui/town/storage/Storage_HideItemDetails.c	Storage_HideItemDetails	contrived	natural	2	
+src/ui/town/storage/Storage_SetUpdateCallback.c	Storage_SetUpdateCallback	contrived	natural	1	

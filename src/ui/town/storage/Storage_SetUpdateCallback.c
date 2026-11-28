@@ -1,6 +1,7 @@
 #include "global.h"
-void Storage_SetUpdateCallback(u8 *p, u32 v)
+#include "ui/town/storage_screen.h"
+void Storage_SetUpdateCallback(struct StorageScreen *screen, u32 callback)
 {
-    *(u32 *)(p + 0x17F0) = v;
-    *(u16 *)(p + 0x174E) = 0;
+    screen->updateCallback = callback;
+    screen->timer = 0;
 }
