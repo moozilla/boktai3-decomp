@@ -282,3 +282,4 @@ src/ui/title/tutorial_otenko.c	TutorialOtenko_BeginPositionedEffect	contrived	na
 src/ui/title/tutorial_otenko.c	TutorialOtenko_BeginRadialBurst	contrived	contrived	3	expanded state change with the mode parked before the null check (the shared helper keeps the phase constant in another register); u8 one flag
 src/ui/title/tutorial_otenko.c	TutorialOtenko_GetFacingDirection	contrived	natural	1	
 src/ui/title/tutorial_otenko.c	TutorialOtenko_SetSpritePriorityFromScript	contrived	natural	1	
+src/ui/title/tutorial_otenko.c	TutorialOtenko_SetPreviousAnimationStateFromScript	contrived	natural	1	

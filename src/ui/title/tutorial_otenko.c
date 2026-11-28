@@ -959,13 +959,13 @@ void TutorialOtenko_SetSpritePriorityFromScript(void)
 
 void TutorialOtenko_SetPreviousAnimationStateFromScript(void)
 {
-    u8 *p = gScriptedActorController;
-    if (p == 0) {
-        p = TutorialOtenko_EnsureController(0xBB34, 0);
-        if (p == 0)
+    struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
+    if (g == 0) {
+        g = (struct ActorAnimController *)TutorialOtenko_EnsureController(0xBB34, 0);
+        if (g == 0)
             return;
     }
-    p[0xF6C] = Script_GetKeywordValue(0x72, 0);
+    g->last = Script_GetKeywordValue(0x72, 0);
 }
 
 void TutorialOtenko_OnControllerIdle(void *controller, void *child)
