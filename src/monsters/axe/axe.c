@@ -308,11 +308,8 @@ void SceneActorControl_RecoverRotation(struct ChaseActor *actor, s32 elapsed)
     angle = NormalizeAngle(32 - state->savedAngle);
     if (angle < 0) {
         u32 step = state->acceleration;
-        {
-            u32 cur = drawable->angle;
-            step = step + cur;
-            drawable->angle = step;
-        }
+        step = step + drawable->angle;
+        drawable->angle = step;
     } else
         drawable->angle -= state->acceleration;
     if (Mod(elapsed, 4) == 0)
@@ -2168,36 +2165,30 @@ void Axe_EmitMotionTrail(struct ChaseActor *actor)
     sprite = (void *)((u8 *)sprite + 0x708);
     PlayerCue_StepSequence((void *)sprite, &trail->trail[trail->nextTrail].sequence);
     {
-        u32 offset =
-            ((struct Axe *)context)->nextTrail * sizeof(struct AxeTrailSlot);
+        u32 offset = ((struct Axe *)context)->nextTrail * sizeof(struct AxeTrailSlot);
         u8 *slot = context + offset;
         *((struct ContactPosition *)(slot + 0x724)) = actor->base.body.position;
     }
     {
-        u32 offset =
-            ((struct Axe *)context)->nextTrail * sizeof(struct AxeTrailSlot);
+        u32 offset = ((struct Axe *)context)->nextTrail * sizeof(struct AxeTrailSlot);
         u8 *slots = context + 0x708;
         *((u32 *)(slots + offset)) &= ~1;
         slots += ((struct Axe *)context)->nextTrail * sizeof(struct AxeTrailSlot);
         *((u32 *)slots) |= 2;
     }
     {
-        u32 offset =
-            ((struct Axe *)context)->nextTrail * sizeof(struct AxeTrailSlot);
+        u32 offset = ((struct Axe *)context)->nextTrail * sizeof(struct AxeTrailSlot);
         u8 *slot = context + offset;
         *((u16 *)(slot + 0x764)) = 8;
     }
     sourceDrawable = actor->base.drawable;
-    slotBase = context + ((((struct Axe *)context)->nextTrail) *
-                          sizeof(struct AxeTrailSlot));
+    slotBase = context + ((((struct Axe *)context)->nextTrail) * sizeof(struct AxeTrailSlot));
     CopyAngle(sourceDrawable, slotBase);
     scaleDrawable = actor->base.drawable;
-    scaleSlotBase = context + ((((struct Axe *)context)->nextTrail) *
-                               sizeof(struct AxeTrailSlot));
+    scaleSlotBase = context + ((((struct Axe *)context)->nextTrail) * sizeof(struct AxeTrailSlot));
     CopyScaleX(scaleDrawable, scaleSlotBase);
     sourceDrawable = actor->base.drawable;
-    slotBase = context + ((((struct Axe *)context)->nextTrail) *
-                          sizeof(struct AxeTrailSlot));
+    slotBase = context + ((((struct Axe *)context)->nextTrail) * sizeof(struct AxeTrailSlot));
     CopyScaleY(sourceDrawable, slotBase);
     if ((++(((struct Axe *)context)->nextTrail)) > 3)
         ((struct Axe *)context)->nextTrail = 0;
@@ -2836,11 +2827,13 @@ void Axe_UpdateTrailColliders(struct ChaseActor *actor)
                 offset.z = 60;
                 break;
         }
-        x = Scale_UpdateTrailColliders(offset.x * gUnk_086149C4[(entry->sprite.attribute + 64) & 255]);
+        x = Scale_UpdateTrailColliders(offset.x *
+                                       gUnk_086149C4[(entry->sprite.attribute + 64) & 255]);
         z = Scale_UpdateTrailColliders(offset.z * gUnk_086149C4[entry->sprite.attribute]);
         position.x = x + z + position.x;
         x = Scale_UpdateTrailColliders(-(offset.x * gUnk_086149C4[entry->sprite.attribute]));
-        z = Scale_UpdateTrailColliders(offset.z * gUnk_086149C4[(entry->sprite.attribute + 64) & 255]);
+        z = Scale_UpdateTrailColliders(offset.z *
+                                       gUnk_086149C4[(entry->sprite.attribute + 64) & 255]);
         position.z = x + z + position.z;
         Collider_SetPosition(&ctx->auxiliaryAttack[i], &position, 0);
         Collider_Refresh(&ctx->auxiliaryAttack[i]);
