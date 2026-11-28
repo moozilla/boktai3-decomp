@@ -70,14 +70,11 @@ void NidhoggrEffect_UpdatePool(struct PanelEffectPool *pool)
     struct PanelMotion *motion;
     struct SceneVec *position;
     u32 stride = sizeof(*large);
-    do {
+    for (; remaining > 0; remaining--, small++, mask <<= 1) {
         NidhoggrEffect_InvokeCallback(small, small->update);
         if (!small->update)
             pool->smallMask &= ~mask;
-        remaining--;
-        small++;
-        mask <<= 1;
-    } while (remaining > 0);
+    }
     large = pool->large;
     remaining = 48;
     index = 0;
