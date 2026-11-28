@@ -2,6 +2,7 @@
 #include "system/clock/sun_clock.h"
 #include "system/game_state/game_state.h"
 #include "scene/actor/scene_actor_style.h"
+#include "scene/areas/area_effect_link.h"
 
 struct ClockPanelSnapshot {
     u8 nameBytes[32];
@@ -11,19 +12,13 @@ struct ClockPanelSnapshot {
     u8 unk38[0x88];
     struct SceneActorStyle style;
 };
-struct ClockPanel {
-    u8 unk0[0x1D];
-    u8 mode;
-    u8 unk1E[0xC2];
-    struct ClockPanelSnapshot snapshot;
-};
 s32 GameState_GetChallengeBestScore(u32);
 u32 GameState_HasEquippedConsumable(s32);
 void SceneActorStyle_InitializeFromGameState(struct SceneActorStyle *);
-void ClockPanel_CaptureSnapshot(struct ClockPanel *p)
+void ClockPanel_CaptureSnapshot(struct AreaEffectLinkState *p)
 {
-    u8 *record;
-    struct ClockPanelSnapshot *s = &p->snapshot;
+    u8 *style;
+    struct ClockPanelSnapshot *s = (struct ClockPanelSnapshot *)p->sessionData;
     u8 *dest;
     s32 *values;
     u8 *src;
@@ -31,20 +26,20 @@ void ClockPanel_CaptureSnapshot(struct ClockPanel *p)
     s32 party;
     unsigned int bikeNameOffset;
     bikeNameOffset = 16;
-    record = (u8 *)s;
+    style = (u8 *)s;
     src = gGameState->playerName;
     for (i = 0; i < 16; i++)
         s->nameBytes[i] = src[i];
     src = gGameState->playerName + 16;
     i = 0;
     values = s->values;
-    record += (u8 *)&s->style - (u8 *)s;
+    style += (u8 *)&s->style - (u8 *)s;
     dest = s->nameBytes + bikeNameOffset;
     for (; i < 16; i++)
         dest[i] = src[i];
     for (i = 0; i < 5; i++)
         *values++ = GameState_GetChallengeBestScore(i + 6);
-    if (!p->mode)
+    if (!p->exchangeBusy)
         s->time = gSunClock.extra6 * 15 + gSunClock.extra7;
     else
         s->time = 0;
@@ -74,5 +69,5 @@ void ClockPanel_CaptureSnapshot(struct ClockPanel *p)
         }
         s->party = value;
     }
-    SceneActorStyle_InitializeFromGameState((struct SceneActorStyle *)record);
+    SceneActorStyle_InitializeFromGameState((struct SceneActorStyle *)style);
 }
