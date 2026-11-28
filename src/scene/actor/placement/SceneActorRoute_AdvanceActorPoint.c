@@ -9,7 +9,7 @@ void SceneActorRoute_AdvanceActorPoint(struct ChaseActor *actor,
 {
     struct SceneActorRouteCursor *embedded = (void *)&actor->group.homeRoute;
     u16 script = (u16)actor->base.scriptId;
-    u32 mode, near;
+    u32 mode;
     if (script) {
         s32 values[3];
         struct ScriptUtilityArguments args;
@@ -23,8 +23,7 @@ void SceneActorRoute_AdvanceActorPoint(struct ChaseActor *actor,
     }
     Route_AdvancePoint(cursor);
     mode = cursor->point->attributes >> 4;
-    near = (u8)SceneActorRoute_IsOutsidePointBounds(cursor, &actor->base.body.position, 32, 32);
-    if (near) {
+    if ((u8)SceneActorRoute_IsOutsidePointBounds(cursor, &actor->base.body.position, 32, 32)) {
         SceneActorMovement_ResolveRoutePosition(actor);
         SceneActorTerrain_EnterState(actor, 0, 0, 2);
         actor->base.field2C2 = 64;
