@@ -495,3 +495,4 @@ src/player/cutscene/player_cue_dispatch.c	Player_OnStateOneEvent	natural	natural
 src/player/cutscene/player_cue_dispatch.c	Player_ScaleLevelValue	minor	natural	11	-
 src/player/cutscene/player_cue_dispatch.c	PlayerCue_InitAttackCollider	minor	minor	1	unchanged: sum reused for the facing octant (register choice)
 src/player/cutscene/player_cue_dispatch.c	Player_UpdateColliderRefreshCountdown	minor	natural	1	-
+src/player/cutscene/player_cue_dispatch.c	PlayerCue_ApplyColliderScale	minor	minor	0	unchanged: flag accessor helpers (mask loaded before the flag word)
