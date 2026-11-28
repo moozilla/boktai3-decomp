@@ -532,3 +532,4 @@ src/monsters/centipede/CentipedeBody_ResetDirectionalAnimations.c	CentipedeBody_
 src/monsters/centipede/CentipedeBody_RestartSegmentAnimations.c	CentipedeBody_RestartSegmentAnimations	contrived	contrived	2	local sequence step duplicates the shared one except the command table pointer, which the ROM reads through the state
 src/monsters/centipede/Centipede_ReactToContact.c	Centipede_ReactToContact	contrived	minor	6	second segment pointer and random table local remain
 src/monsters/centipede/Centipede_HasVisitedRoute.c	Centipede_HasVisitedRoute	contrived	natural	1	
+src/monsters/centipede/ActorTrail_ResetAtSavedPosition.c	ActorTrail_ResetAtSavedPosition	contrived	minor	6	random index block and drawable position casts stay
