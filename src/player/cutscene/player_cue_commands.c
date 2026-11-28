@@ -879,22 +879,12 @@ void PlayerCue_Refresh(struct Player *player)
 
 // confidence=low: selects player attachment descriptors and associated sound effects.
 
-static inline void Attachment_SetValue(u16 *dest, s32 value)
-{
-    *dest = value;
-}
-
-static inline void Attachment_SetMode(u8 *dest, s32 value)
-{
-    *dest = value;
-}
-
 void Player_ConfigureAttachmentEffect(struct Player *player, u32 action, s32 value, s32 arg)
 {
     switch (action) {
         case 0:
-            Attachment_SetMode(&player->kindTwoAttachmentDescriptor, 0);
-            Attachment_SetValue(&player->kindTwoAttachmentCounter, 0);
+            player->kindTwoAttachmentDescriptor = 0;
+            player->kindTwoAttachmentCounter = 0;
             player->kindTwoAttachment = ActorAttachment_UpdateFromDescriptor(
                 player->kindTwoAttachment, &player->positionalEffectGroup,
                 player->kindTwoAttachmentDescriptor, 1, 0, 0, 0, 80);
@@ -902,8 +892,8 @@ void Player_ConfigureAttachmentEffect(struct Player *player, u32 action, s32 val
             break;
 
         case 1:
-            Attachment_SetMode(&player->kindTwoAttachmentDescriptor, 0);
-            Attachment_SetValue(&player->kindTwoAttachmentCounter, 0);
+            player->kindTwoAttachmentDescriptor = 0;
+            player->kindTwoAttachmentCounter = 0;
             player->kindTwoAttachment = ActorAttachment_UpdateFromDescriptor(
                 player->kindTwoAttachment, &player->positionalEffectGroup,
                 player->kindTwoAttachmentDescriptor, 3, 0, 0, 0, 80);
@@ -911,8 +901,8 @@ void Player_ConfigureAttachmentEffect(struct Player *player, u32 action, s32 val
             break;
 
         case 2:
-            Attachment_SetMode(&player->kindTwoAttachmentDescriptor, 0);
-            Attachment_SetValue(&player->kindTwoAttachmentCounter, 0);
+            player->kindTwoAttachmentDescriptor = 0;
+            player->kindTwoAttachmentCounter = 0;
             player->kindTwoAttachment = ActorAttachment_UpdateFromDescriptor(
                 player->kindTwoAttachment, &player->positionalEffectGroup,
                 player->kindTwoAttachmentDescriptor, 0, 0, 0, 0, 80);
@@ -920,8 +910,8 @@ void Player_ConfigureAttachmentEffect(struct Player *player, u32 action, s32 val
             break;
 
         case 3:
-            Attachment_SetMode(&player->kindTwoAttachmentDescriptor, 0);
-            Attachment_SetValue(&player->kindTwoAttachmentCounter, 0);
+            player->kindTwoAttachmentDescriptor = 0;
+            player->kindTwoAttachmentCounter = 0;
             player->kindTwoAttachment = ActorAttachment_UpdateFromDescriptor(
                 player->kindTwoAttachment, &player->positionalEffectGroup,
                 player->kindTwoAttachmentDescriptor, 2, 0, 0, 0, 80);
@@ -929,8 +919,8 @@ void Player_ConfigureAttachmentEffect(struct Player *player, u32 action, s32 val
             break;
 
         case 4:
-            Attachment_SetMode(&player->kindTwoAttachmentDescriptor, 1);
-            Attachment_SetValue(&player->kindTwoAttachmentCounter, value);
+            player->kindTwoAttachmentDescriptor = 1;
+            player->kindTwoAttachmentCounter = value;
             player->kindTwoAttachment = ActorAttachment_UpdateFromDescriptor(
                 player->kindTwoAttachment, &player->positionalEffectGroup,
                 player->kindTwoAttachmentDescriptor, 0, &player->kindTwoAttachmentCounter, (s16)arg,
@@ -938,8 +928,8 @@ void Player_ConfigureAttachmentEffect(struct Player *player, u32 action, s32 val
             break;
 
         case 5:
-            Attachment_SetMode(&player->kindTwoAttachmentDescriptor, 3);
-            Attachment_SetValue(&player->kindTwoAttachmentCounter, value);
+            player->kindTwoAttachmentDescriptor = 3;
+            player->kindTwoAttachmentCounter = value;
             player->kindTwoAttachment = ActorAttachment_UpdateFromDescriptor(
                 player->kindTwoAttachment, &player->positionalEffectGroup,
                 player->kindTwoAttachmentDescriptor, 0, &player->kindTwoAttachmentCounter, (s16)arg,
@@ -948,7 +938,7 @@ void Player_ConfigureAttachmentEffect(struct Player *player, u32 action, s32 val
 
         case 6:
             player->kindTwoAttachmentDescriptor = 5;
-            Attachment_SetValue(&player->kindTwoAttachmentCounter, 0);
+            player->kindTwoAttachmentCounter = 0;
             player->kindTwoAttachment = ActorAttachment_UpdateFromDescriptor(
                 player->kindTwoAttachment, &player->positionalEffectGroup,
                 player->kindTwoAttachmentDescriptor, 0, 0, 0, 150, 230);
@@ -956,14 +946,14 @@ void Player_ConfigureAttachmentEffect(struct Player *player, u32 action, s32 val
 
         case 7:
             player->kindTwoAttachmentDescriptor = 4;
-            Attachment_SetValue(&player->kindTwoAttachmentCounter, 0);
+            player->kindTwoAttachmentCounter = 0;
             player->kindTwoAttachment = ActorAttachment_UpdateFromDescriptor(
                 player->kindTwoAttachment, &player->positionalEffectGroup,
                 player->kindTwoAttachmentDescriptor, 0, 0, 0, 150, 230);
             break;
 
         case 8:
-            Attachment_SetValue(&player->kindTwoAttachmentCounter, 0);
+            player->kindTwoAttachmentCounter = 0;
             player->kindTwoAttachment = ActorAttachment_UpdateFromDescriptor(
                 player->kindTwoAttachment, &player->positionalEffectGroup,
                 player->kindTwoAttachmentDescriptor, 127, 0, 0, 0, 80);

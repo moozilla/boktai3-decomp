@@ -436,3 +436,5 @@ src/player/cutscene/player_cue_commands.c	PlayerCue_FormMotion	natural	natural	0
 src/player/cutscene/player_cue_commands.c	PlayerCue_Motion38To	natural	natural	0	-
 src/player/cutscene/player_cue_commands.c	PlayerCue_StateMotion	natural	natural	0	-
 src/player/cutscene/player_cue_commands.c	PlayerCue_ShakeEffect	minor	natural	1	-
+src/player/cutscene/player_cue_commands.c	PlayerCue_Refresh	natural	natural	0	-
+src/player/cutscene/player_cue_commands.c	Player_ConfigureAttachmentEffect	contrived	natural	1	-
