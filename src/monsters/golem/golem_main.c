@@ -72,7 +72,7 @@ s32 Golem_AlignChargeTarget(void *context)
         struct Unk080C47DCObject **goalTarget;
         if (Cell((*target)->position.x >> 8, (*target)->position.z >> 8) !=
             Cell(body->position.x >> 8, body->position.z >> 8)) {
-            if ((dx < 0 ? (-dx) : (dx)) < (dz < 0 ? (-dz) : (dz)))
+            if ((dx < 0 ? -dx : dx) < (dz < 0 ? -dz : dz))
                 link->target->position.x = (body->position.x & (~0xFF)) + 0x80;
             else {
                 struct ContactPosition *position = &body->position;

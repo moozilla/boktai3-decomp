@@ -105,7 +105,7 @@ void CentipedeBody_ReturnToCellCenter(struct ChaseActor *actor)
         actor->base.body.motion.z += Div(target.z, 10);
     }
     Centipede_UpdateSegmentPositions(actor, 12, 0xA410);
-    if ((difference < 0 ? (-difference) : (difference)) <= 7) {
+    if ((difference < 0 ? -difference : difference) <= 7) {
         if (body->returnCell == index)
             Tentacle_BeginForwardState(actor);
     } else if (difference > 0) {

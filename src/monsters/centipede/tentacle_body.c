@@ -17,16 +17,11 @@ void CentipedeBody_OnAttackCollision(u8 *unused, struct ContactCollider *collide
     }
 }
 
-static inline u8 CentipedeBody_IsUnavailable(struct ChaseActor *actor)
-{
-    return SceneActorPlacement_IsUnavailable(&actor->base);
-}
-
 void CentipedeBody_OnBodyContact(struct SceneActorBehaviorContactView *source,
                                  struct SceneActorBehaviorContactView *destination,
                                  struct ChaseActor *actor)
 {
-    if ((SceneActorPlacement_IsUnavailable(&actor->base)))
+    if (SceneActorPlacement_IsUnavailable(&actor->base))
         return;
     SceneActorBehavior_ApplyContactReaction(source, destination, (void *)actor);
     Centipede_EnterHitReaction(actor);

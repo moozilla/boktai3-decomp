@@ -230,14 +230,14 @@ void Golem_UpdateChargePursuit(struct ChaseActor *actor)
         index = SceneActorChase_PlayerSlot(partner);
         if (index < 0)
             goto route;
-        if ((SceneActorChase_Bits32(&gPlayers[index]->statusFlags, 0x20000))) {
+        if (IsDazzled(gPlayers[index])) {
             u8 held = Golem_HasRouteFlag(body, 0x80000);
             if (!held) {
                 Golem_Recover(body);
                 return;
             }
         }
-    } else if ((SceneActorChase_Bits32(&gPlayers[0]->statusFlags, 0x20000))) {
+    } else if (IsDazzled(gPlayers[0])) {
         u8 held = Golem_HasRouteFlag(body, 0x80000);
         if (!held) {
             Golem_Recover(body);
@@ -246,7 +246,7 @@ void Golem_UpdateChargePursuit(struct ChaseActor *actor)
     }
 route:
     route = group->route;
-    if ((*(u16 *)route & 4)) {
+    if (*(u16 *)route & 4) {
         if (Actor_StepTowardTargetAxis(actor, route, 24, 24, body->pushSpeed, 0)) {
             s32 distance;
             s32 d;
@@ -294,11 +294,11 @@ route:
                     index = SceneActorChase_PlayerSlot(partner);
                     if (index < 0)
                         goto recover;
-                    if ((SceneActorChase_Bits32(&gPlayers[index]->statusFlags, 0x20000)))
+                    if (IsDazzled(gPlayers[index]))
                         goto recover;
                     body->charge688 = 400;
                 } else {
-                    if ((SceneActorChase_Bits32(&gPlayers[0]->statusFlags, 0x20000)))
+                    if (IsDazzled(gPlayers[0]))
                         goto recover;
                     body->charge688 = 400;
                 }
@@ -610,7 +610,7 @@ void Golem_ChargeOrReturnHome(struct ChaseActor *actor)
                 goto check;
             {
                 struct Player *player = gPlayers[index];
-                if (!(SceneActorChase_Bits32(&player->statusFlags, 0x20000)))
+                if (!IsDazzled(player))
                     goto check;
             }
             SceneActorChase_SetTypedControl(actor, Golem_UpdateChargeStop, 0x27);
@@ -618,7 +618,7 @@ void Golem_ChargeOrReturnHome(struct ChaseActor *actor)
             return;
         } else {
             struct Player *player = gPlayers[0];
-            if (!(SceneActorChase_Bits32(&player->statusFlags, 0x20000)))
+            if (!IsDazzled(player))
                 goto check;
             SceneActorChase_SetTypedControl(actor, Golem_UpdateChargeStop, 0x27);
             SceneActorChase_SetPhase(actor, 2, 3);

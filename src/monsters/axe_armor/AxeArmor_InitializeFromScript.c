@@ -30,10 +30,6 @@ static inline s32 AxeArmor_CellIndex(struct SceneVec *v)
         return 0;
     return gTerrainMap->rows[z] + x;
 }
-static inline void AxeArmor_GetFlags(u32 **out, struct DisplaySequenceSprite *sprite)
-{
-    *out = &sprite->flags;
-}
 static inline u32 AxeArmor_StepSequence(u32 *flipFlags, struct AxeArmor *actor,
                                         struct DisplaySequenceSprite *owner,
                                         struct DisplaySequenceState *state)

@@ -3530,7 +3530,7 @@ s32 SceneActorControl_AdvanceReactionCount(struct ChaseActor *actor)
     if (context->reactionCount <= 2)
         ++context->reactionCount;
     if (!SceneActorTurn_Flags(flags, 0x8100)) {
-        if (!(WordFlags_Has(4, &context->flagsE4C)) && context->reactionCount > 2) {
+        if (!WordFlags_Has(4, &context->flagsE4C) && context->reactionCount > 2) {
             Chase_SetState(actor, 0, 2, 6);
             context->reactionCount = 0;
             return 1;
