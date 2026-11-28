@@ -10,6 +10,7 @@ void ActorAttachment_TickRisingPart(struct ActorAttachmentSlotView *slot)
         struct ActorAttachmentPartSprite *sprite = slot->parts;
         struct DisplaySequenceState *sequence = slot->sequences;
         const struct ActorAttachmentPartResource *resource;
+        s32 sample;
         switch (slot->kind) {
             case 2:
                 resource = manager->partResource;
@@ -24,12 +25,9 @@ void ActorAttachment_TickRisingPart(struct ActorAttachmentSlotView *slot)
         ActorAttachment_StepRisingPart(sprite, sequence, resource);
         slot->jitter[0].x = ((slot->counters[0] >> 1) * gUnk_086149C4[slot->phase[0]]) >> 12;
         slot->jitter[0].y += 2;
-        {
-            s32 sample;
-            gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-            sample = *(u16 *)(RANDOM_TABLE_ADDR + gRandomIndex * 2);
-            slot->phase[0] += (sample >> 4) & 7;
-        }
+        gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+        sample = ((u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
+        slot->phase[0] += (sample >> 4) & 7;
         sprite->position.x = slot->anchor->x + slot->jitter[0].x;
         sprite->position.y = slot->anchor->y + slot->jitter[0].y + slot->position.z;
         sprite->position.z = slot->anchor->z - slot->jitter[0].x;
@@ -42,11 +40,10 @@ void ActorAttachment_TickRisingPart(struct ActorAttachmentSlotView *slot)
             sequence->index = 2;
         if (slot->jitter[0].y > 210) {
             s32 i;
+            s32 id;
             slot->flags31 = 0;
-            {
-                s32 id = slot->slotId;
-                manager->occupiedMask &= ~(1 << id);
-            }
+            id = slot->slotId;
+            manager->occupiedMask &= ~(1 << id);
             sprite->flags |= 1;
             for (i = 0; i <= 2; i++) {
                 slot->status[i] = 0;

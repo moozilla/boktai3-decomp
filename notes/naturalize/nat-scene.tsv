@@ -168,3 +168,6 @@ src/scene/actor/attachment/ActorAttachment_AllocateSlotHeader.c	ActorAttachment_
 src/scene/actor/attachment/ActorAttachment_UpdateFollowingOffset.c	ActorAttachment_UpdateFollowingOffset	contrived	natural	1	-
 src/scene/actor/attachment/ActorAttachment_ReleaseResource.c	ActorAttachment_ReleaseResource	minor	natural	2	id local: the plain expression computes the mask address first
 src/scene/actor/attachment/ActorAttachment_ReleasePartsResource.c	ActorAttachment_ReleasePartsResource	minor	natural	2	id local: the plain expression computes the mask address first
+src/scene/actor/attachment/ActorAttachment_AllocateSlot.c	ActorAttachment_AllocateSlot	natural	natural	0	occupied predicate kept: plain test loses the materialized 0/1
+src/scene/actor/attachment/ActorAttachment_TickLandingBounce.c	ActorAttachment_TickLandingBounce	natural	natural	0	-
+src/scene/actor/attachment/ActorAttachment_TickRisingPart.c	ActorAttachment_TickRisingPart	minor	natural	3	id local: the plain expression computes the mask address first
