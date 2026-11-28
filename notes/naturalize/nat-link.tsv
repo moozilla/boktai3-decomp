@@ -252,3 +252,5 @@ src/link/player/sub_0823E704.c	sub_0823E704	natural	natural	0
 src/link/player/Player_EmitScatterEffect.c	Player_EmitScatterEffect	minor	natural	3	
 src/link/player/Player_UpdateThrowArc.c	Player_UpdateThrowArc	minor	natural	5	attack collider position set through p-> chain, not the context pointer
 src/link/player/Player_UpdateTetherThrow.c	Player_UpdateTetherThrow	contrived	natural	1	
+src/link/player/sub_0823EDDC.c	sub_0823EDDC	natural	natural	0	
+src/link/player/sub_0823EE80.c	sub_0823EE80	contrived	natural	34	collider calls spelled through p->statModifierContext: via the context pointer gcse copies the sine table base
