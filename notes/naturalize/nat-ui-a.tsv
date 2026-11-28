@@ -235,3 +235,4 @@ src/ui/dialogue/message_window/message_window.c	MessageWindow_SetDisplayMode	con
 src/ui/dialogue/message_window/message_window.c	MessageWindow_Clear	contrived	natural	4	
 src/ui/dialogue/message_window/message_window.c	MessageWindow_SetMessageTableFromScript	natural	natural	1	
 src/ui/dialogue/message_window/message_window.c	MessageWindow_ShowMessage	contrived	minor	8	message table local so the state address is computed between its load and test
+src/ui/dialogue/message_window/message_window.c	MessageWindow_SetBounds	contrived	minor	8	existing TextState_SetBounds return cast kept

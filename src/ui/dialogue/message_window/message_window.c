@@ -243,23 +243,18 @@ s32 MessageWindow_SetTextCursor(u32 value)
 int MessageWindow_SetBounds(int x, int y, int width, int height)
 {
     struct MessageWindow *window = (void *)gMessageWindow;
-    int result;
-    if (window)
-        goto run;
-    result = 0;
-    goto done;
-run: {
-    TextWindow_BlankRect(window->x, window->y, window->width, window->height);
-    window->x = x;
-    window->y = y;
-    window->width = width;
-    window->height = height;
-    /* This caller forwards the callee's r0; engine.h currently declares void. */
-    result = ((s32(*)(void *, u32, u32, u32, u32))TextState_SetBounds)(
-        &window->state, window->x, window->y, window->width, window->height);
-}
-done:
-    return result;
+
+    if (window) {
+        TextWindow_BlankRect(window->x, window->y, window->width, window->height);
+        window->x = x;
+        window->y = y;
+        window->width = width;
+        window->height = height;
+        /* This caller forwards the callee's r0; engine.h currently declares void. */
+        return ((s32(*)(void *, u32, u32, u32, u32))TextState_SetBounds)(
+            &window->state, window->x, window->y, window->width, window->height);
+    }
+    return 0;
 }
 
 int MessageWindow_SetBoundsFromScript(void)
