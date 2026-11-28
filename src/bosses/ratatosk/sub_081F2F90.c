@@ -1,25 +1,23 @@
 #include "global.h"
+#include "bosses/ratatosk/ratatosk.h"
 
 struct RatatoskPoint {
     s16 x, y, z, pad;
 };
 
-s32 sub_081F2F90(u8 *p)
+s32 sub_081F2F90(struct Ratatosk *self)
 {
-    s32 idx = -1;
-    u32 best = 0;
-    s32 i = 0;
-    u8 *q = p + 0xD28;
-    do {
-        u32 v = *(u32 *)q;
-        if (v >= best) {
-            best = v;
-            idx = i;
+    s32 selected = -1;
+    u32 maximum = 0;
+    s32 i;
+
+    for (i = 0; i < 9; i++) {
+        if (self->orbPoints[i].distance >= maximum) {
+            maximum = self->orbPoints[i].distance;
+            selected = i;
         }
-        q += 0x18;
-        i++;
-    } while (i <= 8);
-    return idx;
+    }
+    return selected;
 }
 
 s32 sub_081F2FBC(u8 *p)
