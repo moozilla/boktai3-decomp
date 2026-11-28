@@ -207,7 +207,7 @@ struct ScrollingDialogue *ScrollingDialogue_Create(void)
     struct ScrollingDialogue *dialogue;
     if (gScrollingDialogue != 0)
         return (void *)gScrollingDialogue;
-    dialogue = Task_Create(0x3, 0x19c);
+    dialogue = Task_Create(0x3, sizeof(struct ScrollingDialogue));
     if (dialogue != 0) {
         Task_SetCallbacks(dialogue, (void (*)(void *))ScrollingDialogue_OnTaskUpdate,
                           (void (*)(void *))ScrollingDialogue_OnTaskDestroy);

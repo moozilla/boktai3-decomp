@@ -316,3 +316,4 @@ src/ui/dialogue/scrolling_dialogue/scrolling_dialogue.c	ScrollingDialogue_Update
 src/ui/dialogue/scrolling_dialogue/scrolling_dialogue.c	ScrollingDialogue_Show	minor	natural	3	
 src/ui/dialogue/scrolling_dialogue/scrolling_dialogue.c	ScrollingDialogue_Hide	minor	natural	3	
 src/ui/dialogue/scrolling_dialogue/scrolling_dialogue.c	ScrollingDialogue_OnTaskDestroy	minor	natural	1	
+src/ui/dialogue/scrolling_dialogue/scrolling_dialogue.c	ScrollingDialogue_Create	minor	natural	1	
