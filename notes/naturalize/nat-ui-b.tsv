@@ -392,3 +392,5 @@ src/ui/town/dark_loan.c	DarkLoan_GetDefaultRate	natural	natural	0
 src/ui/town/dark_loan.c	DarkLoan_InitializeFromScript	natural	natural	0	
 src/ui/town/dark_loan.c	DarkLoan_Create	natural	natural	0	
 src/ui/town/dark_loan.c	DarkLoan_CreateHiddenDisplay	contrived	contrived	8	do-while(0) and rate field pointer: without the loop weight the panel pointer outranks the field address (r4/r5 swap)
+src/ui/town/dark_loan.c	DarkLoan_OpenDisplay	natural	natural	0	
+src/ui/town/ScriptPanel_IsCallbackActive.c	ScriptPanel_IsCallbackActive	natural	natural	0	
