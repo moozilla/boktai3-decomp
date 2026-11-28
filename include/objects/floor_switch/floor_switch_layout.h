@@ -2,6 +2,7 @@
 #define GUARD_INCLUDE_OBJECTS_FLOOR_SWITCH_FLOOR_SWITCH_LAYOUT_H
 
 #include "global.h"
+#include "engine/task.h"
 
 struct FloorSwitch {
     u32 flags;
@@ -22,8 +23,8 @@ struct FloorSwitch {
     u8 pad5C[0x8];
     s32 s[4];
     s32 w[4];
-    u8 pad84[0x2];
-    u16 field86; /* confidence=low */
+    u16 slot; /* confidence=low */
+    s16 field86; /* confidence=low: index of the update handler */
     u16 flags88;
     u8 field8A; /* confidence=low */
     u8 field8B; /* confidence=low */
@@ -32,5 +33,14 @@ struct FloorSwitch {
 };
 
 typedef char FloorSwitchSizeCheck[sizeof(struct FloorSwitch) == 0x90 ? 1 : -1];
+
+/* confidence=low */
+struct FloorSwitchManager {
+    struct Task task;
+    struct FloorSwitch switches[8];
+    u32 used; /* one bit per switch */
+};
+
+typedef char FloorSwitchManagerSizeCheck[sizeof(struct FloorSwitchManager) == 0x49c ? 1 : -1];
 
 #endif

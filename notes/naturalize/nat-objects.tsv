@@ -224,3 +224,4 @@ src/objects/dungeon_prop/scenery_motion.c	SceneryMotion_UpdateAbsoluteSines	natu
 src/objects/dungeon_prop/scenery_motion.c	SceneryMotion_InterpolatePosition	natural	natural	0	
 src/objects/dungeon_prop/scenery_motion.c	SceneryMotion_CalculateArcCenter	natural	natural	0	
 src/objects/dungeon_prop/scenery_motion.c	SceneryMotion_UpdateCrossedSines	minor	minor	1	destination x pointer in the projection helper keeps the store address order
+src/objects/floor_switch/FloorSwitch_AllocateSlot.c	FloorSwitch_AllocateSlot	contrived	natural	1	Tst() helper kept
