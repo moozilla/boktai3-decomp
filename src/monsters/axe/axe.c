@@ -2554,10 +2554,9 @@ void Axe_UpdateScreenShake(struct ChaseActor *actor)
     struct Axe *q = actor->base.context;
     u32 m = 0x40;
     if (!(actor->base.motionFlags & m)) {
-        u8 *p = &q->shakeFrames;
-        if (*p) {
+        if (q->shakeFrames) {
             Camera_RequestShake(q->parameterEB2);
-            *p = *p - 1;
+            q->shakeFrames--;
         }
     }
 }
