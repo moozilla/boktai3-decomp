@@ -4,31 +4,26 @@
 #include "engine/engine_globals.h"
 #include "engine/ram.h"
 
-static inline int choose(u32 mode, int normal, int alternate)
+static inline void ContactPosition_Add(struct ContactPosition *dst, const struct ContactPosition *src)
 {
-    int test = mode & 1;
-    int result;
-    result = normal;
-    if (test)
-        result = alternate;
-    return result;
+    dst->x += src->x;
+    dst->y += src->y;
+    dst->z += src->z;
 }
-static inline void add(struct ContactPosition *a, struct ContactPosition *b)
-{
-    a->x += b->x;
-    a->y += b->y;
-    a->z += b->z;
-}
+
 void SceneActors_UpdateSwarmAttack(struct StateActor *p, int tick)
 {
     struct SceneGraphicsActor *actor = (struct SceneGraphicsActor *)p;
-    struct StateActor *p2 = p;
-    u8 *position = (u8 *)&p->bodyId;
+    struct SceneActorBody *body = SceneActors_Body(p);
     struct ContactPosition spawn;
+
     if (p->actionChanged) {
         int sequence;
         p->actionChanged = 0;
-        sequence = choose(actor->graphics.animationFlags, 68, 30);
+        if (actor->graphics.animationFlags & 1)
+            sequence = 30;
+        else
+            sequence = 68;
         SceneActors_StartDirectionalAnimation(p, &actor->animation, (int)&actor->animationResource,
                                               sequence, 2, 1, 4);
         Sound_PlaySongChecked(860);
@@ -39,24 +34,22 @@ void SceneActors_UpdateSwarmAttack(struct StateActor *p, int tick)
         return;
     if (tick > 10 && (tick & 7) == 7) {
         int direction;
+        u32 random;
         if (p->animationFacing4 == 0 || p->animationFacing4 == 3)
-            SceneActor_SetChargeOffset((p->animationFacing4 * 64) - 64, &spawn, 180);
+            SceneActor_SetChargeOffset(p->animationFacing4 * 64 - 64, &spawn, 180);
         else
-            SceneActor_SetChargeOffset((p->animationFacing4 * 64) - 64, &spawn, 110);
-        add(&spawn, (struct ContactPosition *)(position + 12));
+            SceneActor_SetChargeOffset(p->animationFacing4 * 64 - 64, &spawn, 110);
+        ContactPosition_Add(&spawn, &body->position);
         spawn.y += 300;
-        direction = ((struct SceneGraphicsActor *)p2)->graphics.projectileDirection;
+        direction = actor->graphics.projectileDirection;
         gRandomIndex = (gRandomIndex + 1) & 1023;
-        {
-            u32 random = *(u16 *)(RANDOM_TABLE_ADDR + (gRandomIndex << 1));
-            direction -= 8;
-            random &= 15;
-            direction += random;
-        }
-        CountBats_SpawnCharge(*(void **)((u8 *)p2 + 0x9d4), &spawn, direction, 20, 0, 0, 0);
+        random = ((u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
+        direction -= 8;
+        direction += random & 15;
+        CountBats_SpawnCharge(*(struct ContactSwarm **)((u8 *)actor + 0x9d4), &spawn, direction, 20, 0, 0, 0);
         Sound_PlaySongChecked(234);
     }
-    if (((struct SceneGraphicsActor *)p2)->animation.status & 2) {
+    if (actor->animation.status & 2) {
         if (tick > 40)
             p->actionFinished = 1;
     }
