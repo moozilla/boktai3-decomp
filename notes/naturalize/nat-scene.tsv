@@ -387,3 +387,4 @@ src/scene/actor/scene_actors.c	SceneActors_UpdateEffects	minor	minor	0	flag help
 src/scene/actor/placement/sub_08136A9C.c	sub_08136A9C	minor	minor	0	flag helper calls: plain |= and &= load the field before the mask
 src/scene/actor/placement/SceneActorRegistry_RegisterCategoryReceiver.c	SceneActorRegistry_RegisterCategoryReceiver	minor	minor	0	pause predicate and flag setter: plain tests lose the materialized 0/1 and reorder the load
 src/scene/actor/placement/SceneActorRoute_AdvanceActorPoint.c	SceneActorRoute_AdvanceActorPoint	contrived	minor	3	status flag mask block: plain &= loads the field before the mask
+src/scene/actor/placement/SceneActorMovement_UpdateHeight.c	SceneActorMovement_UpdateHeight	contrived	minor	5	parked 0x4000 mask: a plain test loads the field first
