@@ -13,13 +13,11 @@ void Player_ApplyContactCosts(struct ContactCollider *source, struct ContactColl
     if (ContactCollider_TestContactFlags(target, 0x1F) != 0) {
         player = source->owner;
         Collision_CalculateElementalResponse(source, target);
-        i = 0;
-        do {
-            void *cb = player->contactCostCallbacks[i];
-            if (cb)
-                target->cost += sub_08249244(player, source, target, cb);
-            i++;
-        } while (i <= 2);
+        for (i = 0; i < 3; i++) {
+            if (player->contactCostCallbacks[i])
+                target->cost +=
+                    sub_08249244(player, source, target, player->contactCostCallbacks[i]);
+        }
         if (player->actionMode == 1 && player->statModifierContext.savedActionIndex == 1 &&
             PlayerLink_IsActionModeAllowed(player) != 0) {
             if (!(target->costFlags & 8)) {

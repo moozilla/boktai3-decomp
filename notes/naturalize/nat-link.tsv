@@ -232,3 +232,4 @@ src/link/player/Player_SaveActionIndex.c	Player_SaveActionIndex	natural	natural	
 src/link/player/sub_0823D750.c	sub_0823D750	contrived	natural	25	unnamed statModifierContext halfword read through unknownCE
 src/link/player/Player_GetConfiguredActionPower.c	Player_GetConfiguredActionPower	natural	natural	0	
 src/link/player/Player_CollectCallbackFlags.c	Player_CollectCallbackFlags	contrived	contrived	14	(*(&i))++ stays: loop.c otherwise reverses the counter or drops the pointer giv
+src/link/player/Player_ApplyContactCosts.c	Player_ApplyContactCosts	minor	natural	2	
