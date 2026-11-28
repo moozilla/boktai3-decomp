@@ -159,3 +159,4 @@ src/monsters/muspell_head/MuspellHead_UpdateProjectileAttack.c	MuspellHead_Updat
 src/monsters/muspell_head/MuspellHead_UpdateState.c	MuspellHead_UpdateState	contrived	natural	5	(s16) tests of u16 dead/flash; one collider pointer around the flag clear
 src/monsters/muspell_head/MuspellHead_UpdateState.c	MuspellHead_UpdateState	natural	natural	4	collider pointer in both flag branches; PlayerSlot_ReadStatus replaces the parked status mask
 src/monsters/muspell_head/MuspellHead_ApplyHitReaction.c	MuspellHead_ApplyHitReaction	contrived	minor	40	spark loop keeps frame struct, pos/vel/index pointers, limit/mask/zero locals and HitSpark_Sample table variable (loop.c hoisting and register allocation; every single removal changes registers)
+src/monsters/muspell_head/MuspellHead_TryProjectileAttack.c	MuspellHead_TryProjectileAttack	minor	natural	4	sample stays ContactSampleVector (packed s32 bitfield writes)
