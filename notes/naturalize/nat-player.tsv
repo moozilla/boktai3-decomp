@@ -325,3 +325,4 @@ src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateWalkTarget	minor	minor	
 src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateMotionFade	minor	natural	2	-
 src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateRecoilSlide	natural	natural	0	-
 src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateAlternateFormChange	contrived	natural	4	-
+src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateFormChange	minor	natural	4	-

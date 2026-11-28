@@ -1608,7 +1608,7 @@ void PlayerCue_UpdateFormChange(struct Player *player)
     Player_AddControlFlags(player, 8);
     switch (player->tetherPhase) {
         case 0:
-            if (((u8)(player->facing - 2)) <= 4) {
+            if (player->facing >= 2 && player->facing <= 6) {
                 player->facing = 4;
                 player->heading = 4;
                 player->side = 0;
@@ -1645,26 +1645,25 @@ void PlayerCue_UpdateFormChange(struct Player *player)
             break;
 
         case 2:
-            if ((player->tetherFrame & 7) < (7 - (player->tetherFrame >> 2)))
+            if ((player->tetherFrame & 7) < 7 - (player->tetherFrame >> 2))
                 Player_SetAnimation(player, ActorVariant_GetTableValue(player->actionMode, 10), 64,
                                     1);
             else if (player->actionMode != 1) {
-                Anim_SetKeyframes(&player->animation,
-                                  (struct DisplaySequenceState *)player->animationData, 0xE4, 0, 0);
-                Anim_Step(&player->animation, (struct DisplaySequenceState *)player->animationData);
+                Anim_SetKeyframes(&player->animation, player->animationData, 0xE4, 0, 0);
+                Anim_Step(&player->animation, player->animationData);
             } else
                 Player_SetAnimation(player, ActorVariant_GetTableValue(0, 10), 64, 1);
             if ((player->actionEighteenDuration += 3) > 32)
                 player->actionEighteenDuration = 32;
             player->resetValue6FC = 30;
-            if ((++player->tetherFrame) > 19) {
+            if (++player->tetherFrame > 19) {
                 if (player->actionMode != 1)
                     player->actionMode = 1;
                 else
                     player->actionMode = 0;
                 Player_InitVisualResources(player);
-                player->savedSpriteResource = 65535;
-                if ((player->unk536 != 21) && (player->unk536 != 49))
+                player->savedSpriteResource = 0xFFFF;
+                if (player->unk536 != 21 && player->unk536 != 49)
                     player->active = 0;
                 Player_SetActionPhase(player, 3);
             }
@@ -1686,11 +1685,9 @@ void PlayerCue_UpdateFormChange(struct Player *player)
                 }
             } else {
                 if (player->tetherFrame == 0)
-                    Anim_SetKeyframes(&player->animation,
-                                      (struct DisplaySequenceState *)player->animationData, 0xE4, 1,
-                                      0);
-                Anim_Step(&player->animation, (struct DisplaySequenceState *)player->animationData);
-                if ((++player->tetherFrame) > 29) {
+                    Anim_SetKeyframes(&player->animation, player->animationData, 0xE4, 1, 0);
+                Anim_Step(&player->animation, player->animationData);
+                if (++player->tetherFrame > 29) {
                     Player_UpdateFacingSide(player);
                     ActorSequence_Begin(player, 0, 0);
                     Player_UpdateFacingSide(player);
