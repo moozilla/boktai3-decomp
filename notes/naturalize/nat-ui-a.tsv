@@ -239,3 +239,4 @@ src/ui/dialogue/message_window/message_window.c	MessageWindow_SetBounds	contrive
 src/ui/dialogue/message_window/message_window.c	MessageWindow_SetNumberArgument	minor	natural	5	
 src/ui/dialogue/message_window/message_window.c	MessageWindow_SetStringArgument	minor	natural	4	
 src/ui/dialogue/message_window/message_window.c	MessageWindow_SetStringArgumentFromScript	minor	natural	5	
+src/ui/dialogue/message_window/message_window.c	MessageWindow_SetStringFromPc	minor	natural	5	

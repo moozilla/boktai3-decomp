@@ -316,15 +316,15 @@ int MessageWindow_SetStringFromPc(void)
 {
     int kind = Script_GetValue();
     void *ref = Script_GetPc();
-    int result;
-    if (ref) {
-        int offset = Script_GetKeywordValue(0x69, 0);
-        int id = Script_ParseStringRef(ref);
-        MessageWindow_SetStringArgument(kind, (u32)Text_LookupString(id + offset));
-        result = 0;
-    } else
-        result = -1;
-    return result;
+    int offset;
+    int id;
+
+    if (!ref)
+        return -1;
+    offset = Script_GetKeywordValue('i', 0);
+    id = Script_ParseStringRef(ref);
+    MessageWindow_SetStringArgument(kind, (u32)Text_LookupString(id + offset));
+    return 0;
 }
 
 s32 MessageWindow_SetArgumentFromScript(void)
