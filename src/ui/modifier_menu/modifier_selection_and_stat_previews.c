@@ -302,15 +302,16 @@ void ModifierMenu_SelectPendingSource(struct ModifierMenu *menu)
             s32 index = menu->choice.cursor.index;
             id = category * 6 + index;
             pending->selectedId = id;
-        }
             Modifier_LoadSecondSource(pending, &menu->current);
             break;
+        }
         case 2: {
             s32 category = menu->choice.cursor.category;
             s32 index = menu->choice.cursor.index;
             id = category * 6 + index;
             pending->secondaryId = id;
-        } break;
+            break;
+        }
     }
 }
 

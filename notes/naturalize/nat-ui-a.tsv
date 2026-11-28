@@ -616,3 +616,15 @@ src/ui/modifier_menu/modifier_selection_and_stat_previews.c	Modifier_ApplyAmount
 src/ui/modifier_menu/modifier_selection_and_stat_previews.c	Modifier_CollectSources	fudged	natural	2	
 src/ui/modifier_menu/modifier_selection_and_stat_previews.c	Modifier_ApplyToStat	fudged	partial	9	total copy of value, records pointer, unused frame prefix struct (stack layout)
 src/ui/modifier_menu/modifier_selection_and_stat_previews.c	Modifier_ApplyPositiveKindThree	fudged	natural	2	
+src/ui/modifier_menu/modifier_selection_and_stat_previews.c	Modifier_ApplyKindSix	natural	natural	0	
+src/ui/modifier_menu/modifier_selection_and_stat_previews.c	Modifier_ApplyKindZero	natural	natural	0	
+src/ui/modifier_menu/modifier_selection_and_stat_previews.c	Modifier_ApplyKindSeven	natural	natural	0	
+src/ui/modifier_menu/modifier_selection_and_stat_previews.c	Modifier_ApplyKindEight	natural	natural	0	
+src/ui/modifier_menu/modifier_selection_and_stat_previews.c	Modifier_ApplyKindNine	natural	natural	0	
+src/ui/modifier_menu/modifier_selection_and_stat_previews.c	Modifier_ApplyKindTen	natural	natural	0	
+src/ui/modifier_menu/modifier_selection_and_stat_previews.c	Modifier_ApplyKindTwelve	natural	natural	0	
+src/ui/modifier_menu/modifier_selection_and_stat_previews.c	Modifier_LoadFirstSource	natural	natural	0	
+src/ui/modifier_menu/modifier_selection_and_stat_previews.c	Modifier_LoadSecondSource	natural	natural	0	
+src/ui/modifier_menu/modifier_selection_and_stat_previews.c	Modifier_LoadThirdSource	natural	natural	0	
+src/ui/modifier_menu/modifier_selection_and_stat_previews.c	Modifier_LoadFourthSource	natural	natural	0	
+src/ui/modifier_menu/modifier_selection_and_stat_previews.c	ModifierMenu_SelectPendingSource	fudged	partial	13	shared id local across the three cases is required (dropping it changes register allocation)
