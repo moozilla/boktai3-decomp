@@ -126,3 +126,4 @@ src/bosses/ratatosk/Ratatosk_OnDamageCollision.c	Ratatosk_OnDamageCollision	cont
 src/bosses/ratatosk/Ratatosk_InitBodyCollider.c	Ratatosk_InitBodyCollider	contrived	natural	1	
 src/bosses/ratatosk/Ratatosk_InitOuterCollider.c	Ratatosk_InitOuterCollider	contrived	natural	1	
 src/bosses/ratatosk/Ratatosk_InitHurtCollider.c	Ratatosk_InitHurtCollider	contrived	natural	1	
+src/bosses/ratatosk/Ratatosk_InitWideBodyCollider.c	Ratatosk_InitWideBodyCollider	contrived	natural	1	
