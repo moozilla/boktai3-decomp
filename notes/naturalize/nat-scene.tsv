@@ -409,3 +409,4 @@ src/scene/actor/placement/SceneActorTerrain_DisableCollision.c	SceneActorTerrain
 src/scene/actor/placement/SceneActorTerrain_ResumeDrawable.c	SceneActorTerrain_ResumeDrawable	minor	minor	0	shared mask local for both flag clears: literal masks reload the constant
 src/scene/actor/placement/SceneActorPlacement_ResetActorState.c	SceneActorPlacement_ResetActorState	contrived	contrived	0	parked masks and motion-flag pointer: plain operators load the field before the mask
 src/scene/actor/placement/SceneActorPlacement_ResetToPathPoint.c	SceneActorPlacement_ResetToPathPoint	contrived	minor	4	flag mask helper and flags pointer: plain &= ~4 loads the field before the mask
+src/scene/actor/placement/SceneActorPlacement_ConsumeCallbackFlag.c	SceneActorPlacement_ConsumeCallbackFlag	minor	natural	2	-

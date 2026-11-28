@@ -1,15 +1,11 @@
 #include "scene/motion/scene_actor_availability.h"
 #include "scene/actor/scene_actor_placement.h"
 
-u32 SceneActorPlacement_ConsumeCallbackFlag(struct RoomActor *argument)
+u32 SceneActorPlacement_ConsumeCallbackFlag(struct RoomActor *actor)
 {
-    struct RoomActor *actor = argument;
-    u32 unavailable = SceneActor_ActionsBlocked((void *)actor);
-    if (!unavailable && actor->reactionFlags) {
-        u8 pending;
+    if (!SceneActor_ActionsBlocked((void *)actor) && actor->reactionFlags) {
         u16 *flags;
-        pending = SceneActor_TestPendingFlag((void *)actor, 0x80, &flags);
-        if (pending) {
+        if (SceneActor_TestPendingFlag((void *)actor, 0x80, &flags)) {
             void *callback = actor->reactionGate;
             if (callback)
                 Callback_InvokeActor(actor, callback);
