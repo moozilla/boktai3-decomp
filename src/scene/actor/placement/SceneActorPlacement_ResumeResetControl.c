@@ -20,9 +20,6 @@ void SceneActorPlacement_ResumeResetControl(struct RoomActor *actor)
         ClearCollider(&actor->colliderA);
         SceneActorRegistry_ResetRouteAndColliders((void *)actor);
         SceneActorTerrain_EnterState((struct ChaseActor *)actor, 3, 0, 0);
-        {
-            const void *control = actor->onHidden;
-            SceneActorTerrain_InstallControl((struct ChaseActor *)actor, control, 12);
-        }
+        SceneActorTerrain_InstallControl((struct ChaseActor *)actor, actor->onHidden, 12);
     }
 }
