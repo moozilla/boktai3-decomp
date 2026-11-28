@@ -1,3 +1,4 @@
+#include "scene/motion/scene_actor_terrain_reaction.h"
 #include "scene/motion/scene_actor_availability.h"
 #include "scene/actor/scene_actor_control_motion.h"
 #include "player/player.h"
@@ -39,13 +40,6 @@ void SceneActorControl_ConsumeLiftFlag(struct ChaseActor *actor)
             struct LiftHalfBits *f = (void *)&actor->base.motionFlags;
             f->bits = bit | f->bits;
         }
-        {
-            u8 behavior = 3;
-            actor->base.state2A8 = 0;
-            actor->base.phase2A9 = 0;
-            actor->base.behavior2AA = behavior;
-            actor->base.counter2AC = 0;
-            actor->base.field2B1 = 1;
-        }
+        SceneActorTerrain_EnterState(actor, 0, 0, 3);
     }
 }
