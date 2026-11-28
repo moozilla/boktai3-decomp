@@ -551,3 +551,16 @@ src/system/inventory/Inventory_HasItemFromScript.c	Inventory_HasItemFromScript	m
 src/system/inventory/Inventory_RemoveAllItemsOfKindFromScript.c	Inventory_RemoveAllItemsOfKindFromScript	contrived	natural	1	
 src/system/inventory/sub_0822D080.c	sub_0822D080	contrived	minor	1	array indexed as *(i + field) for the index-first address sum; one local carries the id and then the state
 src/system/inventory/Inventory_SortConsumables.c	Inventory_SortConsumables	contrived	natural	1	
+src/system/inventory/Inventory_ClearItemSlot.c	Inventory_ClearItemSlot	natural		0	natural
+src/system/inventory/Inventory_ClearKeyItemSlot.c	Inventory_ClearKeyItemSlot	natural		0	natural
+src/system/inventory/Inventory_AddKeyItem.c	Inventory_AddKeyItem	natural		0	natural
+src/system/inventory/Inventory_AddItem.c	Inventory_AddItem	natural		0	natural
+src/system/inventory/Inventory_RemoveConsumable.c	Inventory_RemoveConsumable	natural		0	natural
+src/system/inventory/Inventory_RemoveValuable.c	Inventory_RemoveValuable	natural		0	natural
+src/system/inventory/Inventory_RemoveItem.c	Inventory_RemoveItem	natural		0	natural
+src/system/inventory/Inventory_HasConsumable.c	Inventory_HasConsumable	natural		0	natural
+src/system/inventory/Inventory_HasValuable.c	Inventory_HasValuable	natural		0	natural
+src/system/inventory/Inventory_HasItem.c	Inventory_HasItem	natural		0	natural
+src/system/inventory/Inventory_SwapValuableSlots.c	Inventory_SwapValuableSlots	natural		0	natural
+src/system/inventory/Inventory_SortValuables.c	Inventory_SortValuables	natural		0	natural
+src/system/inventory/Inventory_IsKeyItemId.c	Inventory_IsKeyItemId	minor	3	u8-returning inline: the plain boolean forms compile branchless or without the byte normalization	minor
