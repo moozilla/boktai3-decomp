@@ -368,3 +368,5 @@ src/npc/otenko/Otenko_UpdateTurnInPlace.c	Otenko_UpdateTurnInPlace	contrived	nat
 src/npc/otenko/Otenko_UpdateProjectedVisible.c	Otenko_UpdateProjectedVisible	contrived	minor	1	u32 mask parked before the display flag OR
 src/npc/otenko/Otenko_UpdateProjectedIdle.c	Otenko_UpdateProjectedIdle	minor	natural	1	
 src/npc/otenko/Otenko_OnStateChange.c	Otenko_OnStateChange	contrived	minor	1	callback local loaded before the prevState store; result variable
+src/npc/otenko/sub_081CFCF8.c	sub_081CFCF8	minor	minor	1	local toward-zero shift writes its result variable; the shared helper allocates differently
+src/npc/otenko/Otenko_UpdateProjectedMove.c	Otenko_UpdateProjectedMove	contrived	natural	3	
