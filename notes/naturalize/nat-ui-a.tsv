@@ -602,3 +602,4 @@ src/ui/hud/display/SceneHud_InitGameplayResources.c	SceneHud_InitGameplayResourc
 src/ui/hud/display/SceneHud_InitializeOwner.c	SceneHud_InitializeOwner	fudged	partial	7	u8 index block before gPlayers load (truncation register)
 src/ui/hud/display/SceneHud_InitFromScript.c	SceneHud_InitFromScript	fudged	natural	2	player local before storing the action owner
 src/ui/hud/display/Hud_CreateStandardLayout.c	Hud_CreateStandardLayout	fudged	natural	1	
+src/ui/hud/display/Hud_CreateAlternateLayout.c	Hud_CreateAlternateLayout	fudged	natural	1	
