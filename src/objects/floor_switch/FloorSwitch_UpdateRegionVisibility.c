@@ -1,5 +1,8 @@
 #include "global.h"
-extern u8 *gGameState;
+#include "engine/engine.h"
+#include "engine/ram.h"
+#include "objects/floor_switch/floor_switch_layout.h"
+#include "system/game_state/game_state.h"
 
 static inline u8 Eq(u32 a, u32 b)
 {
@@ -8,13 +11,14 @@ static inline u8 Eq(u32 a, u32 b)
     return FALSE;
 }
 
-u32 FloorSwitch_UpdateRegionVisibility(u32 *p)
+u32 FloorSwitch_UpdateRegionVisibility(struct FloorSwitch *floorSwitch)
 {
-    u32 v = p[0x54 / 4];
-    if (Eq(*(u32 *)(gGameState + 0x5A0), v)) {
-        *p &= ~1;
+    u32 region = floorSwitch->region;
+
+    if (Eq(gGameState->region, region)) {
+        floorSwitch->flags &= ~1;
         return 1;
     }
-    *p |= 1;
+    floorSwitch->flags |= 1;
     return 0;
 }
