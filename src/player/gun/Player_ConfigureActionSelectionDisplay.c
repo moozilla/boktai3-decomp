@@ -12,31 +12,27 @@ void Projectile_SetVariant(u8 *, u16);
 void Player_ConfigureActionSelectionDisplay(struct Player *p)
 {
     u32 selection;
+    u8 heading;
+
     Player_GetSpecialAttackDescriptor(p->statModifierContext.actionKind);
     Projectile_InitializeParams(p->statModifierContext.actionSelectionDisplay);
-    if (!p->statModifierContext.statBOverrideEnabled) {
-        if (p->actionMode == 6)
-            goto mode6;
+    if (!p->statModifierContext.statBOverrideEnabled && p->actionMode != 6) {
         if (!p) {
             selection = 1;
         } else {
             u32 flags = Player_ReadStatusBits(&p->statBonusFlags, 0x10000000);
+
             selection = 7;
-            if (flags)
-                goto selected;
-            selection = 1;
+            if (!flags)
+                selection = 1;
         }
-    selected:
         Projectile_SetVariant(p->statModifierContext.actionSelectionDisplay, 1);
+    } else if (p->actionMode == 6) {
+        Projectile_SetVariant(p->statModifierContext.actionSelectionDisplay, 1);
+        selection = 1;
     } else {
-        if (p->actionMode == 6) {
-        mode6:
-            Projectile_SetVariant(p->statModifierContext.actionSelectionDisplay, 1);
-            selection = 1;
-        } else {
-            selection = p->statModifierContext.actionKind - 1;
-            Projectile_SetVariant(p->statModifierContext.actionSelectionDisplay, 0);
-        }
+        selection = p->statModifierContext.actionKind - 1;
+        Projectile_SetVariant(p->statModifierContext.actionSelectionDisplay, 0);
     }
     if (!p->statModifierContext.statBOverrideEnabled)
         Projectile_SetTypeAndElement(p->statModifierContext.actionSelectionDisplay, selection, 0);
@@ -44,9 +40,7 @@ void Player_ConfigureActionSelectionDisplay(struct Player *p)
         Projectile_SetTypeAndElement(
             p->statModifierContext.actionSelectionDisplay, selection,
             Player_GetAttackElementType(p->statModifierContext.statBOverrideMode));
-    {
-        u8 value = (u8)gPlayers[0]->unk2D;
-        Projectile_SetFlightParams(p->statModifierContext.actionSelectionDisplay, 0, 60, value, 24);
-    }
+    heading = gPlayers[0]->unk2D;
+    Projectile_SetFlightParams(p->statModifierContext.actionSelectionDisplay, 0, 60, heading, 24);
     Projectile_SetCollisionSize(p->statModifierContext.actionSelectionDisplay, 16, 100, 16);
 }

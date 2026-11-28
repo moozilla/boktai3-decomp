@@ -593,3 +593,4 @@ src/player/effects/spiral_trail/moving_glyph.c	MovingSprite_Initialize	contrived
 src/player/effects/spiral_trail/moving_glyph.c	MovingGlyph_InitializeFromScript	contrived	natural	1	-
 src/player/effects/spiral_trail/moving_glyph.c	MovingGlyph_Create	natural	natural	0	-
 src/player/effects/spiral_trail/moving_glyph.c	MovingGlyph_CreateFromScript	natural	natural	0	-
+src/player/gun/Player_ConfigureActionSelectionDisplay.c	Player_ConfigureActionSelectionDisplay	contrived	natural	14	-
