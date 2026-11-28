@@ -138,7 +138,7 @@ void LightFixture_React(struct PooledInteractableManager *manager, struct Pooled
 void LightFixture_Activate(struct PooledInteractableManager *manager,
                            struct PooledInteractable *slot)
 {
-    struct SceneExtent effect;
+    struct ContactPosition effect;
     if (LightFixture_ConsumeEnteredFlag(slot)) {
         void *drawable = &slot->drawable;
         Anim_SetKeyframes(drawable, slot->resource, gUnk_086049CE[slot->kind][0], 1, 0);
@@ -146,24 +146,24 @@ void LightFixture_Activate(struct PooledInteractableManager *manager,
         LightFixture_RunScript(slot);
         if (slot->kind != 2) {
             Anim_SelectPaletteBank(drawable, gUnk_086049DA[slot->kind] + 1);
-            effect = POSITION;
-            effect.x = POSITION.x;
-            effect.y = POSITION.y + 400;
-            effect.z = POSITION.z;
+            effect = slot->drawable.position;
+            effect.x = slot->drawable.position.x;
+            effect.y = slot->drawable.position.y + 400;
+            effect.z = slot->drawable.position.z;
             ImpactBurst_EmitDirectional(1, 2, 0x2001, 64, 0, 0, 0, 0, 4, 2, &effect);
-            effect.x = POSITION.x - 64;
-            effect.y = POSITION.y + 192;
-            effect.z = POSITION.z + 64;
+            effect.x = slot->drawable.position.x - 64;
+            effect.y = slot->drawable.position.y + 192;
+            effect.z = slot->drawable.position.z + 64;
             ImpactBurst_EmitDirectional(1, 2, 0x2001, 64, 0, 0, 0, 0, 4, 2, &effect);
-            effect.x = POSITION.x + 64;
-            effect.y = POSITION.y + 192;
-            effect.z = POSITION.z - 64;
+            effect.x = slot->drawable.position.x + 64;
+            effect.y = slot->drawable.position.y + 192;
+            effect.z = slot->drawable.position.z - 64;
             ImpactBurst_EmitDirectional(1, 2, 0x2001, 64, 0, 0, 0, 0, 4, 2, &effect);
         } else {
-            effect = POSITION;
-            effect.x = POSITION.x;
-            effect.y = POSITION.y + 200;
-            effect.z = POSITION.z;
+            effect = slot->drawable.position;
+            effect.x = slot->drawable.position.x;
+            effect.y = slot->drawable.position.y + 200;
+            effect.z = slot->drawable.position.z;
             ImpactBurst_EmitDirectional(1, 2, 0x2001, 64, 0, 0, 0, 0, 4, 2, &effect);
         }
     }
