@@ -93,3 +93,6 @@ src/link/panel/LinkSelection_UpdateParticipantScores.c	LinkSelection_UpdateParti
 src/link/panel/sub_0810BD34.c	sub_0810BD34	minor	natural	3	
 src/link/panel/SlotState_ResetInactiveMode.c	SlotState_ResetInactiveMode	contrived	minor	3	one-element loop with an i == 0 test stays
 src/link/panel/LinkPanel_SetTimeFromScript.c	LinkPanel_SetTimeFromScript	minor	natural	1	slot 2 writes past recordTicks[2] in the session struct
+src/link/panel/SlotText_CopySelectedString.c	SlotText_CopySelectedString	natural	natural	5	
+src/link/panel/LinkPanel_GetValueFromScript.c	LinkPanel_GetValueFromScript	contrived	contrived	9	goto session-data getter stays: if/return forms branch differently
+src/link/panel/LinkPanelSlots_InitBackgroundResources.c	LinkPanelSlots_InitBackgroundResources	contrived	natural	1	

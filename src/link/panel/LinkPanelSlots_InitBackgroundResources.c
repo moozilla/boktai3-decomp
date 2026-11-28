@@ -1,17 +1,20 @@
 #include "global.h"
 #include "engine/video/render.h"
-void *ScriptProc_Start(u32, u32);
+#include "engine/video/palette_resource.h"
+#include "gba/syscall.h"
+#include "link/panel/link_panel.h"
 void Bg_SetupLayers(u32, u32, void *, u32, u32, u32, u32 *);
-void LinkPanelSlots_InitBackgroundResources(u8 *s)
+void LinkPanelSlots_InitBackgroundResources(struct LinkPanel *panel)
 {
-    u32 value;
-    void *p;
-    void *q;
-    p = ScriptProc_Start(0xC091, 0xCE15);
-    *(void **)(s + 0x18) = p;
-    value = 2;
-    Bg_SetupLayers(2, 0, p, 0, 0, 1, &value);
-    q = (u8 *)ScriptProc_Start(0x92B3, 0xA2F6) + 0x14;
-    *(void **)(s + 0x1C) = q;
-    CpuSet(q, gBgPaletteBuffer, 0x100);
+    u32 maps[1];
+    void *resource;
+    u16 *palette;
+
+    resource = ScriptProc_Start(0xC091, 0xCE15);
+    panel->backgroundResource = resource;
+    maps[0] = 2;
+    Bg_SetupLayers(2, 0, resource, 0, 0, 1, maps);
+    palette = ((struct PaletteResource *)ScriptProc_Start(0x92B3, 0xA2F6))->banks;
+    panel->paletteResource = palette;
+    CpuCopy16(palette, gBgPaletteBuffer, 0x200);
 }
