@@ -147,16 +147,15 @@ void TaskSystem_KillBelowPersistenceLevel(s32 level)
 struct RuntimeTask *Task_FindById(u16 id)
 {
     struct TaskList *list = gTaskLists;
-    s32 i = 0;
-    do {
-        struct RuntimeTask *task = list->head;
-        for (; task != 0; task = task->next) {
+    s32 i;
+
+    for (i = 0; i <= 13; i++, list++) {
+        struct RuntimeTask *task;
+        for (task = list->head; task != 0; task = task->next) {
             if (task->id == id)
                 return task;
         }
-        i++;
-        list++;
-    } while (i <= 13);
+    }
     return 0;
 }
 
