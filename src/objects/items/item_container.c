@@ -501,12 +501,10 @@ void Trigger_UpdateLockedRecovery(struct TriggerManager *manager, struct Trigger
         p->timer++;
 }
 
-s32 TriggerManager_Update(struct TriggerManager *input)
+s32 TriggerManager_Update(struct TriggerManager *p)
 {
-    struct TriggerManager *p = input;
     s32 i;
     struct Trigger *trigger, *next;
-    u8 *delay;
     for (i = 0; i < 4; i++) {
         struct Player *actor;
         actor = gPlayers[i];
@@ -528,9 +526,7 @@ s32 TriggerManager_Update(struct TriggerManager *input)
             out->z = horizontal + height;
         }
     }
-    trigger = p->head;
-    delay = &p->soundDelay;
-    for (; trigger; trigger = next) {
+    for (trigger = p->head; trigger; trigger = next) {
         next = trigger->next;
         if (trigger->flags & 1)
             Trigger_Destroy(trigger);
@@ -539,40 +535,30 @@ s32 TriggerManager_Update(struct TriggerManager *input)
                 if (trigger->sprite)
                     trigger->sprite->flags &= ~1;
                 {
-                    struct TriggerObject *object;
-                    struct TriggerObject *candidate = trigger->object;
-                    object = candidate;
-                    if (candidate) {
-                        if (!trigger->started)
-                            goto showObject;
-                        else if (gWeatherCollisionTimer > 0) {
-                            candidate->flags &= ~1;
-                            trigger->flash = 0;
-                            trigger->tick = 0;
-                            trigger->visible = 1;
-                        } else {
-                            s32 available;
-                            if (gEngineFlags & 2048)
-                                available = stateMode();
-                            else {
-                                if (gPlayers[0]) {
-                                    if (Player_ReadStatusBits(&gPlayers[0]->actionFlags, 16))
-                                        goto available;
-                                }
-                                available = globalMode();
-                            }
-                            if (available) {
-                            available:
-                                if (trigger->visible)
-                                    trigger->flash = 31;
-                                {
-                                    u32 ticks = trigger->flash;
-                                    u8 saved = ticks;
-                                    if (saved) {
-                                        ticks--;
-                                        trigger->flash = ticks;
-                                        ticks &= 15;
-                                        if (ticks > 7)
+                    struct TriggerObject *shown = trigger->object;
+                    struct TriggerObject *object = shown;
+                    if (shown) {
+                        if (trigger->started) {
+                            if (gWeatherCollisionTimer > 0) {
+                                shown->flags &= ~1;
+                                trigger->flash = 0;
+                                trigger->tick = 0;
+                                trigger->visible = 1;
+                            } else {
+                                s32 available;
+                                if (gEngineFlags & 2048)
+                                    available = stateMode();
+                                else if (gPlayers[0] &&
+                                         Player_ReadStatusBits(&gPlayers[0]->actionFlags, 16))
+                                    available = 1;
+                                else
+                                    available = globalMode();
+                                if (available) {
+                                    if (trigger->visible)
+                                        trigger->flash = 31;
+                                    if (trigger->flash) {
+                                        trigger->flash--;
+                                        if ((trigger->flash & 15) > 7)
                                             object->flags &= ~1;
                                         else
                                             object->flags |= 1;
@@ -582,35 +568,28 @@ s32 TriggerManager_Update(struct TriggerManager *input)
                                         else if (trigger->tick <= 71)
                                             object->flags |= 1;
                                         else
-                                            trigger->tick = saved;
+                                            trigger->tick = 0;
                                         trigger->tick++;
                                     }
-                                }
-                                trigger->visible = 0;
-                            } else {
-                                if (!trigger->visible)
-                                    trigger->flash = 47;
-                                {
-                                    u32 ticks = trigger->flash;
-                                    if (ticks) {
-                                        ticks--;
-                                        trigger->flash = ticks;
-                                        if ((ticks & 15) > 7)
+                                    trigger->visible = 0;
+                                } else {
+                                    if (!trigger->visible)
+                                        trigger->flash = 47;
+                                    if (trigger->flash) {
+                                        trigger->flash--;
+                                        if ((trigger->flash & 15) > 7)
                                             object->flags |= 1;
                                         else
                                             object->flags &= ~1;
                                         trigger->tick = 0;
                                     } else
                                         object->flags |= 1;
+                                    trigger->visible = 1;
                                 }
-                                trigger->visible = 1;
                             }
-                        }
+                        } else
+                            shown->flags &= ~1;
                     }
-                    goto updatedVisibility;
-                showObject:
-                    candidate->flags &= ~1;
-                updatedVisibility:;
                 }
             } else {
                 if (trigger->sprite)
@@ -621,12 +600,8 @@ s32 TriggerManager_Update(struct TriggerManager *input)
             sub_08249240(p, trigger, trigger->update);
         }
     }
-    {
-        u8 *timer = delay;
-        u32 ticks = *timer;
-        if (ticks)
-            *timer = ticks - 1;
-    }
+    if (p->soundDelay)
+        p->soundDelay--;
     return 0;
 }
 
