@@ -28,99 +28,90 @@ void EnemyAttackParticle_EnableShadow(void *);
 void EnemyAttackParticle_AddFlags(void *, u32);
 void EnemyAttackParticle_Emit(void *, void *);
 
-s32 PoisonHand_Update(struct PoisonHand *p)
+s32 PoisonHand_Update(struct PoisonHand *hand)
 {
-    struct ContactCollider *collider;
-    /* The loop bank and final age update share the current data owner. */
+    u16 amount;
+    /* The random bank and the final age update share one pointer. */
     void *dataOwner;
     if (Engine_PauseBits(0x400) || Flags_MaskedWord(4, &gPlayerSlotStatus[0]))
         return 0;
-    Callback_InvokeActor(p, p->update);
-    p->sprite.flags &= ~1;
-    if (p->defeated == 0) {
-        struct ContactCollider *c = &p->collider;
-        c->flags &= ~4;
-        Collider_SetPosition(c, &p->sprite.position, 0);
-        collider = c;
+    Callback_InvokeActor(hand, hand->update);
+    hand->sprite.flags &= ~1;
+    if (hand->defeated == 0) {
+        struct ContactCollider *collider = &hand->collider;
+
+        collider->flags &= ~4;
+        Collider_SetPosition(collider, &hand->sprite.position, 0);
     } else {
-        struct ContactCollider *c = &p->collider;
-        c->flags |= 4;
-        collider = c;
+        struct ContactCollider *collider = &hand->collider;
+
+        collider->flags |= 4;
     }
-    {
-        s16 *damage = &p->damage;
-        u16 amount = *damage;
-        if (*damage > 0 && p->defeated == 0) {
-            s16 *health = &p->health;
-            *health -= amount;
-            p->reaction = p->pendingReaction;
-            Sound_PlaySong(0x13e);
-            if (*damage > 0) {
-                DamageNumberDisplay_Show(collider, *damage, 0, &p->collider.position,
-                                         &p->collider.offset, 1);
-                SceneHud_SetTimedState(p->hud, *health, p->maxHealth, p->hudState,
-                                       p->collider.costFlags == 4, p->hudTimer);
-            }
-            if (p->health <= 0) {
-                struct EnemyParticleParams parameters;
-                const u16 *randomTable;
-                s32 i;
-                p->defeated = 1;
-                p->collider.responseValue = 0;
-                for (i = 0; i < 8; i++) {
-                    dataOwner = gUnk_0203B000;
-                    randomTable = (const u16 *)dataOwner + 512;
-                    {
-                        s32 frame = Mod(ParticleRandom_ReadSample(randomTable), 2) + 0x1d;
-                        u8 direction;
-                        EnemyAttackParticle_InitParameters(&parameters);
-                        direction = ParticleRandom_ReadSample(randomTable);
-                        EnemyAttackParticle_SetGraphicsParameters(&parameters, 0x7e7c, frame,
-                                                                  0x1c5);
-                        EnemyAttackParticle_SetMotionParameters(&parameters, 0, 60, direction,
-                                                          ParticleRandom_ReadSample(randomTable) &
-                                                              15);
-                        EnemyAttackParticle_SetVerticalMotion(&parameters, 0x2000, 0x18000);
-                        EnemyAttackParticle_EnableShadow(&parameters);
-                        if (i & 1)
-                            EnemyAttackParticle_AddFlags(&parameters, 0x200);
-                        else
-                            EnemyAttackParticle_AddFlags(&parameters, 0x400);
-                        {
-                            const u16 *lateBank = (const u16 *)dataOwner;
-                            if (ParticleRandom_ReadBankSample(lateBank) & 1)
-                                EnemyAttackParticle_AddFlags(&parameters, 4);
-                            if (ParticleRandom_ReadBankSample(lateBank) & 1)
-                                EnemyAttackParticle_AddFlags(&parameters, 8);
-                        }
-                        EnemyAttackParticle_Emit(&parameters, &p->sprite.position);
-                    }
-                }
-                Anim_RestartSequence(&p->sequence, p->animationResource, 0x19, 0, 0);
-                AnimData_SelectPaletteBank(p->graphics, 0x1c5);
-                p->flashTimer = 0;
-                p->update = PoisonHand_UpdateDefeatBurst;
-                p->age = 0;
-                Sound_PlaySong(0x52f);
-            }
-            p->flashTimer = 8;
-            p->hitReaction = 1;
-            p->damage = 0;
+    amount = hand->damage;
+    if (hand->damage > 0 && hand->defeated == 0) {
+        hand->health -= amount;
+        hand->reaction = hand->pendingReaction;
+        Sound_PlaySong(0x13e);
+        if (hand->damage > 0) {
+            DamageNumberDisplay_Show(&hand->collider, hand->damage, 0, &hand->collider.position,
+                                     &hand->collider.offset, 1);
+            SceneHud_SetTimedState(hand->hud, hand->health, hand->maxHealth, hand->hudState,
+                                   hand->collider.costFlags == 4, hand->hudTimer);
         }
+        if (hand->health <= 0) {
+            struct EnemyParticleParams parameters;
+            const u16 *randomTable;
+            s32 i;
+            hand->defeated = 1;
+            hand->collider.responseValue = 0;
+            for (i = 0; i < 8; i++) {
+                dataOwner = gUnk_0203B000;
+                randomTable = (const u16 *)dataOwner + 512;
+                {
+                    s32 frame = Mod(ParticleRandom_ReadSample(randomTable), 2) + 0x1d;
+                    u8 direction;
+                    EnemyAttackParticle_InitParameters(&parameters);
+                    direction = ParticleRandom_ReadSample(randomTable);
+                    EnemyAttackParticle_SetGraphicsParameters(&parameters, 0x7e7c, frame, 0x1c5);
+                    EnemyAttackParticle_SetMotionParameters(
+                        &parameters, 0, 60, direction, ParticleRandom_ReadSample(randomTable) & 15);
+                    EnemyAttackParticle_SetVerticalMotion(&parameters, 0x2000, 0x18000);
+                    EnemyAttackParticle_EnableShadow(&parameters);
+                    if (i & 1)
+                        EnemyAttackParticle_AddFlags(&parameters, 0x200);
+                    else
+                        EnemyAttackParticle_AddFlags(&parameters, 0x400);
+                    if (ParticleRandom_ReadBankSample((const u16 *)dataOwner) & 1)
+                        EnemyAttackParticle_AddFlags(&parameters, 4);
+                    if (ParticleRandom_ReadBankSample((const u16 *)dataOwner) & 1)
+                        EnemyAttackParticle_AddFlags(&parameters, 8);
+                    EnemyAttackParticle_Emit(&parameters, &hand->sprite.position);
+                }
+            }
+            Anim_RestartSequence(&hand->sequence, hand->animationResource, 0x19, 0, 0);
+            AnimData_SelectPaletteBank(&hand->graphics, 0x1c5);
+            hand->flashTimer = 0;
+            hand->update = PoisonHand_UpdateDefeatBurst;
+            hand->age = 0;
+            Sound_PlaySong(0x52f);
+        }
+        hand->flashTimer = 8;
+        hand->hitReaction = 1;
+        hand->damage = 0;
     }
-    if (p->flashTimer > 0) {
-        AnimData_SelectPaletteBank(p->graphics, 0x192);
-        p->flashTimer--;
+    if (hand->flashTimer > 0) {
+        AnimData_SelectPaletteBank(&hand->graphics, 0x192);
+        hand->flashTimer--;
     } else
-        AnimData_SelectPaletteBank(p->graphics, 0x1c5);
-    if (p->collider.responseValue) {
-        p->collider.responseValue--;
-        if ((p->collider.responseValue >> 2) & 1)
-            p->sprite.flags |= 1;
+        AnimData_SelectPaletteBank(&hand->graphics, 0x1c5);
+    if (hand->collider.responseValue) {
+        hand->collider.responseValue--;
+        if ((hand->collider.responseValue >> 2) & 1)
+            hand->sprite.flags |= 1;
         else
-            p->sprite.flags &= ~1;
+            hand->sprite.flags &= ~1;
     }
-    PlayerCue_StepSequenceEnded((void *)&p->sprite, &p->sequence);
-    dataOwner = p;
+    PlayerCue_StepSequenceEnded(&hand->sprite, &hand->sequence);
+    dataOwner = hand;
     ((struct PoisonHand *)dataOwner)->age++;
 }

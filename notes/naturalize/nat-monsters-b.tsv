@@ -164,3 +164,11 @@ src/monsters/muspell_head/MuspellHead_InitializeFromScript.c	MuspellHead_Initial
 src/monsters/ooze/Ooze_BeginAttack.c	Ooze_BeginAttack	minor	natural	4	collider pointer in case 1
 src/monsters/ooze/Ooze_InitializeFromScript.c	Ooze_InitializeFromScript	contrived	minor	12	heading is folded to a quadrant through a u32 copy and a redundant range test before the switch
 src/monsters/ooze/Ooze_ReadScriptValueList.c	Ooze_ReadScriptValueList	minor	natural	3	
+src/monsters/ooze/Ooze_Create.c	Ooze_Create	natural	natural	0	
+src/monsters/ooze/Ooze_InitAttackCollider.c	Ooze_InitAttackCollider	natural	natural	0	
+src/monsters/ooze/Ooze_OnCollision.c	Ooze_OnCollision	natural	natural	0	
+src/monsters/ooze/Ooze_UpdateAttackDelay.c	Ooze_UpdateAttackDelay	natural	natural	0	
+src/monsters/ooze/Ooze_UpdateIdle.c	Ooze_UpdateIdle	natural	natural	0	
+src/monsters/ooze/Ooze_Destroy.c	Ooze_Destroy	minor	minor	0	raw +0x20: s32 tail return needs Sprite_Remove declared s32, conflicts with the void prototype behind monsters/ooze.h
+src/monsters/ooze/SceneTask_DispatchUnlessPaused.c	SceneTask_DispatchUnlessPaused	natural	natural	0	
+src/monsters/poison_hand/PoisonHand_Update.c	PoisonHand_Update	contrived	minor	40	u16 amount copy of damage; dataOwner reused for the random bank and the final age++ (any plain form changes allocation across the particle loop)

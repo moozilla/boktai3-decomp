@@ -88,10 +88,10 @@ s32 PoisonHand_InitializeFromScript(struct PoisonHand *p, void *parent)
     } else
         p->hudTimer = 0;
     p->hud = parent;
-    AnimData_Load(p->graphics, 0x7e7d);
-    Sprite_Init(&p->sprite, p->graphics, 1);
+    AnimData_Load(&p->graphics, 0x7e7d);
+    Sprite_Init(&p->sprite, &p->graphics, 1);
     *(struct SceneVec *)&p->sprite.position = p->initialPosition;
-    AnimData_SelectPaletteBank(p->graphics, 0x1c5);
+    AnimData_SelectPaletteBank(&p->graphics, 0x1c5);
     resource = ScriptProc_Start(0x922e, 0x5184);
     p->animationResource = resource;
     if (!p->initialDead) {

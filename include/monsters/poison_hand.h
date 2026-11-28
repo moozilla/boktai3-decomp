@@ -5,13 +5,14 @@
 #include "engine/task.h"
 #include "engine/video/display_animation.h"
 #include "scene/collision/contact_collider.h"
+#include "scene/collision/contact_swarm.h"
 
 struct PoisonHand {
     struct Task task;
     s32 age;
     struct SceneVec initialPosition;
-    struct DisplaySequenceSprite sprite;
-    u8 graphics[0x1c];
+    struct ContactSwarmSprite sprite;
+    struct ContactSwarmGraphics graphics;
     struct ContactCollider collider;
     u8 terrainBody[0x48];
     void *update;
