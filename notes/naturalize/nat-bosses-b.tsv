@@ -12,3 +12,4 @@ src/bosses/ratatosk/sub_081F339C.c	sub_081F339C	contrived	natural	1
 src/bosses/ratatosk/Ratatosk_UpdatePointDistancesToPlayer.c	Ratatosk_UpdatePointDistancesToPlayer	contrived	natural	2	
 src/bosses/ratatosk/Ratatosk_FindNearestPointExcept.c	Ratatosk_FindNearestPointExcept	contrived	natural	1	
 src/bosses/ratatosk/Ratatosk_FindPointNearestReferenceExcept.c	Ratatosk_FindPointNearestReferenceExcept	contrived	natural	1	
+src/bosses/ratatosk/Ratatosk_GetSelectedPointIndex.c	Ratatosk_GetSelectedPointIndex	minor	natural	1	
