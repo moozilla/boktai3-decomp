@@ -227,3 +227,16 @@ src/ui/title/game_start.c	GameStart_Create	natural	natural	0	-
 src/ui/title/sound_test.c	SoundTest_Update	minor	natural	1	-
 src/ui/title/sound_test.c	SoundTest_Destroy	contrived	minor	1	literal mask 3 passed to Bg_DisableDisplay
 src/ui/title/sound_test.c	SoundTest_Initialize	minor	minor	2	ClearPosition helper kept: CpuFill32 computes the position address after the zero (2 insns)
+src/ui/title/sound_test.c	SoundTest_CountEntries	natural	natural	0	-
+src/ui/title/sound_test.c	SoundTest_ShowCategory	natural	natural	0	-
+src/ui/title/sound_test.c	SoundTest_MoveCategoryCursor	natural	natural	0	-
+src/ui/title/sound_test.c	SoundTest_DrawTrackName	natural	natural	0	-
+src/ui/title/sound_test.c	SoundTest_DrawSecondCategoryIndex	natural	natural	0	-
+src/ui/title/sound_test.c	SoundTest_DrawThirdCategoryIndex	natural	natural	0	-
+src/ui/title/sound_test.c	SoundTest_PlaySelection	natural	natural	0	-
+src/ui/title/sound_test.c	SoundTest_StopSelection	natural	natural	0	-
+src/ui/title/sound_test.c	SoundTest_SelectPrevious	natural	natural	0	-
+src/ui/title/sound_test.c	SoundTest_SelectNext	natural	natural	0	-
+src/ui/title/sound_test.c	SoundTest_UpdatePlaybackIndicators	natural	natural	0	-
+src/ui/title/sound_test.c	SoundTest_ConfigureFromScript	natural	natural	0	-
+src/ui/title/sound_test.c	SoundTest_Create	natural	natural	0	-
