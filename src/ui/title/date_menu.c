@@ -1,4 +1,5 @@
 #include "global.h"
+#include "gba/io_reg.h"
 #include "engine/video/palette_pulse.h"
 #include "ui/title/date_menu.h"
 #include "engine/input.h"
@@ -173,11 +174,6 @@ void Sound_PlaySong(u32);
 
 void DateMenu_UpdateDigits(struct DateMenu *);
 
-struct AnimPanelKeys {
-    u16 held;
-    u16 pressed;
-};
-
 /* Tentative clock-setting layout of the AnimPanel task. */
 
 enum { CLOCK_DIR_NONE, CLOCK_DIR_UP, CLOCK_DIR_DOWN };
@@ -187,19 +183,19 @@ void DateMenu_HandleClockInput(struct DateMenu *p)
     s32 dir = CLOCK_DIR_NONE;
     s32 days;
 
-    if ((*(struct AnimPanelKeys *)gPadState).pressed & 0x40) {
+    if (gPadState[1] & DPAD_UP) {
         dir = CLOCK_DIR_UP;
-    } else if ((*(struct AnimPanelKeys *)gPadState).pressed & 0x80) {
+    } else if (gPadState[1] & DPAD_DOWN) {
         dir = CLOCK_DIR_DOWN;
-    } else if ((*(struct AnimPanelKeys *)gPadState).held & 0xC0) {
+    } else if (gPadState[0] & (DPAD_UP | DPAD_DOWN)) {
         if (++p->repeatTimer > 14 && Mod(p->repeatTimer, 5) == 0) {
-            if ((*(struct AnimPanelKeys *)gPadState).held & 0x40)
+            if (gPadState[0] & DPAD_UP)
                 dir = CLOCK_DIR_UP;
             else
                 dir = CLOCK_DIR_DOWN;
         }
     } else {
-        p->repeatTimer = dir;
+        p->repeatTimer = 0;
     }
 
     switch (p->selection) {
