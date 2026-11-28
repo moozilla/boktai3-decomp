@@ -1,118 +1,87 @@
-#include "engine/engine.h"
+#include "global.h"
+#include "ui/books/forging_book.h"
 #include "engine/video/render.h"
-#include "engine/video/anim_sprite.h"
-
-struct IbHalfword {
-    u16 value;
-};
-struct IbSprite {
-    u8 pad0[7];
-    u8 visible;
-    u8 scaleX, scaleY;
-    u8 padA[6];
-    u16 style;
-    u8 pad12[10];
-    struct ContactPosition position;
-};
-s32 AnimSprite_InitLinked(u8 *, void *, u16, u32, u8, u8, u8, const struct ContactPosition *);
-s32 ForgingBook_IsCategoryComplete(void *, s32);
+void AnimSprite_InitLinked(void *, void *, u32, u32, u32, u32, u32, const void *);
 s32 Mod(s32, s32);
 void *ActorDebris_Create(void *, void *, void *);
 void *PlayerAttackEffect_Create(void *, void *, void *);
-u32 ForgingBook_InitSprites(u8 *p)
+
+u32 ForgingBook_InitSprites(struct ForgingBook *book)
 {
-    struct AnimSpriteResource *res;
-    struct ContactPosition pos;
+    struct AnimSpriteResource *resource, *previewResource;
+    struct ContactPosition position;
+    struct DisplaySequenceSprite *sprite;
     s32 i;
-    struct IbSprite *sprite;
-    void *animation;
-    u16 coordinate;
 
-    res = ScriptProc_Start(0xcb05, 0xe2ab);
-    *((struct AnimSpriteResource *)(p + 0x24)) = *res;
-    ResourceHeader_Relocate(p + 0x24, res);
-    AnimSprite_InitLinked(p + 0x64, p + 0x24, 0x49, 0x10, 0, 0, 0, 0);
-    AnimSprite_InitLinked(p + 0x124, p + 0x24, 0x3e, 0x10, 0, 0, 0, 0);
-    if (!ForgingBook_IsCategoryComplete(p, *((s16 *)(p + 0xb60))))
-        *((u32 *)(p + 0x12c)) |= 1;
-    pos.x = 0xb8;
-    pos.y = 0x68;
-    pos.z = 0;
+    resource = ScriptProc_Start(0xcb05, 0xe2ab);
+    book->resource = *resource;
+    ResourceHeader_Relocate(&book->resource, resource);
+    AnimSprite_InitLinked(&book->background, &book->resource, 0x49, 0x10, 0, 0, 0, 0);
+    AnimSprite_InitLinked(&book->completionBadge, &book->resource, 0x3e, 0x10, 0, 0, 0, 0);
+    if (!ForgingBook_IsCategoryComplete(book, book->category))
+        book->completionBadge.flags |= 1;
+    position.x = 0xb8;
+    position.y = 0x68;
+    position.z = 0;
     for (i = 0; i < 4; i++) {
-        AnimSprite_InitLinked((u8 *)((struct AnimSprite *)(p + 0x1e4) + i), p + 0x24, 0, 0x10, 0,
-                          0, 0, &pos);
-        pos.x += 8;
+        AnimSprite_InitLinked(&book->countDigits[i], &book->resource, 0, 0x10, 0, 0, 0, &position);
+        position.x += 8;
         if (i == 1)
-            pos.x += 8;
+            position.x += 8;
     }
-
-    AnimSprite_InitLinked(p + 0x184, p + 0x24, 0x4c, 0x10, 0, 0, 0, 0);
-    res = ScriptProc_Start(0xcb05, 0x530d);
-    *((struct AnimSpriteResource *)(p + 0x44)) = *res;
-    ResourceHeader_Relocate(p + 0x44, res);
-    pos.x = 0x58;
-    pos.y = 0x18;
-    pos.z = 0;
-    AnimSprite_InitLinked(p + 0xc4, p + 0x44, 0x4d, 0x10, 0, 0, 0, &pos);
-    res = ScriptProc_Start(0xcb05, 0x5d04);
-    *((struct AnimSpriteResource *)(p + 0x388)) = *res;
-    ResourceHeader_Relocate(p + 0x388, res);
-    pos.x = 0x58;
-    pos.y = 0x18;
-    {
-        struct AnimSprite *cells = (void *)(p + 0x3a8);
-        for (i = 0; i < 18; i++) {
-            struct ContactPosition *cellPosition = &cells[i].position;
-            AnimSprite_InitLinked((u8 *)&cells[i], p + 0x388, (u16)(0xf0 + i), 0x10, 0, 0, 0, 0);
-            cellPosition->x = pos.x;
-            cellPosition->y = pos.y;
-            cellPosition->z = 0;
-            if (Mod(i, 6) == 5) {
-                pos.x = 0x58;
-                pos.y += 0x18;
-            } else {
-                pos.x += 0x18;
-            }
+    AnimSprite_InitLinked(&book->categoryHeading, &book->resource, 0x4c, 0x10, 0, 0, 0, 0);
+    resource = ScriptProc_Start(0xcb05, 0x530d);
+    book->cursorResource = *resource;
+    ResourceHeader_Relocate(&book->cursorResource, resource);
+    position.x = 0x58;
+    position.y = 0x18;
+    position.z = 0;
+    AnimSprite_InitLinked(&book->cursor, &book->cursorResource, 0x4d, 0x10, 0, 0, 0, &position);
+    resource = ScriptProc_Start(0xcb05, 0x5d04);
+    book->cellResource = *resource;
+    ResourceHeader_Relocate(&book->cellResource, resource);
+    position.x = 0x58;
+    position.y = 0x18;
+    for (i = 0; i < 18; i++) {
+        AnimSprite_InitLinked(&book->cells[i], &book->cellResource, (u16)(0xf0 + i), 0x10, 0, 0, 0,
+                              0);
+        book->cells[i].position.x = position.x;
+        book->cells[i].position.y = position.y;
+        book->cells[i].position.z = 0;
+        if (Mod(i, 6) == 5) {
+            position.x = 0x58;
+            position.y += 0x18;
+        } else {
+            position.x += 0x18;
         }
     }
-    {
-        u32 *r5 = (u32 *)(p + 0x10c);
-        CpuSet((void *)(*r5), p + 0x364, 0x10);
-        *r5 = (u32)(p + 0x364);
-        ((struct IbHalfword *)(p + 0xfe))->value = 0xe010;
-    }
-    {
-        struct AnimSpriteResource *objectRes = ScriptProc_Start(0xcb05, 0xde23);
-        ResourceHeader_Relocate(p + 0xa68, objectRes);
-    }
-    AnimSprite_InitLinked(p + 0xa88, p + 0xa68, 0, 0, 0, 1, 0, 0);
-    *((u32 *)(p + 0xa90)) &= ~1;
-    *((u8 *)(p + 0xaa2)) = 2;
-    {
-        u32 *r5 = (u32 *)(p + 0xad0);
-        CpuSet((void *)(*r5), p + 0xaec, 0x10);
-        *r5 = (u32)(p + 0xaec);
-    }
-    coordinate = ((u16)gCamera.position.x) - 456;
-    *((u16 *)(p + 0xaa8)) = coordinate;
-    coordinate = ((u16)gCamera.position.y);
-    *((u16 *)(p + 0xaaa)) = coordinate;
-    coordinate = ((u16)gCamera.position.z) + 336;
-    *((u16 *)(p + 0xaac)) = coordinate;
-    *((u8 *)(p + 0xae8)) = 3;
-    *((u8 *)(p + 0xae9)) = 1;
-    *((void **)(p + 0xb58)) = ActorDebris_Create(p + 0xa88, p + 0xae8, p + 0xae9);
-    *((void **)(p + 0xb5c)) = PlayerAttackEffect_Create(p + 0xa88, p + 0xbe6, p + 0xae9);
-    animation = p + 0xb3c;
-    AnimData_Load(animation, 0x1c1b);
-    animation = p + 0xb3c;
-    sprite = (void *)(p + 0xb10);
-    Sprite_Init(sprite, animation, 0x212);
-    sprite->style = 5;
-    *((u8 *)(p + 0xb17)) = 1;
-    *((u16 *)(p + 0xb2c)) = 0x2e;
-    *((u16 *)(p + 0xb2e)) = 0x48;
-    *((u16 *)(p + 0xb30)) = 0;
-    *((u8 *)(p + 0xb18)) = 0x40;
-    *((u8 *)(p + 0xb19)) = 0x40;
+    CpuSet(book->cursor.palette, book->cursorColors, 0x10);
+    book->cursor.palette = book->cursorColors;
+    book->cursor.paletteBank = 0xe010;
+    previewResource = ScriptProc_Start(0xcb05, 0xde23);
+    ResourceHeader_Relocate(&book->previewResource, previewResource);
+    AnimSprite_InitLinked(&book->preview, &book->previewResource, 0, 0, 0, 1, 0, 0);
+    book->preview.flags &= ~1;
+    book->preview.attribute1A = 2;
+    CpuSet(book->preview.palette, book->previewColors, 0x10);
+    book->preview.palette = book->previewColors;
+    book->preview.position.x = gCamera.position.x - 456;
+    book->preview.position.y = gCamera.position.y;
+    book->preview.position.z = gCamera.position.z + 336;
+    book->animationBase = 3;
+    book->animationFlag = 1;
+    book->debrisTask =
+        ActorDebris_Create(&book->preview, &book->animationBase, &book->animationFlag);
+    book->attackEffectTask =
+        PlayerAttackEffect_Create(&book->preview, &book->unknownBE6, &book->animationFlag);
+    AnimData_Load(&book->spriteGraphics, 0x1c1b);
+    sprite = &book->sprite;
+    Sprite_Init(sprite, &book->spriteGraphics, 0x212);
+    sprite->frame = 5;
+    book->sprite.priority = 1;
+    book->sprite.position.x = 0x2e;
+    book->sprite.position.y = 0x48;
+    book->sprite.position.z = 0;
+    book->sprite.palette = 0x40;
+    book->sprite.paletteVariant = 0x40;
 }
