@@ -18,16 +18,10 @@ void MessageWindow_Clear(void);
 void ScrollingDialogue_ClearScript(void);
 s32 Shop_DestroyController(struct ShopCleanupView *owner)
 {
-    struct AnimSprite *animSprite;
     s32 i;
     Sprite_Remove(&owner->sprite);
-    animSprite = owner->widgets;
-    i = 68;
-    do {
-        Anim_Remove(animSprite);
-        animSprite++;
-        i--;
-    } while (i >= 0);
+    for (i = 0; i < 69; i++)
+        Anim_Remove(&owner->widgets[i]);
     SceneInput_DestroyMarkerPair(&owner->transition);
     SceneInput_DestroyGlyphPair(&owner->prompt);
     MessageWindow_Clear();

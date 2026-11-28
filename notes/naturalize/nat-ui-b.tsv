@@ -528,3 +528,4 @@ src/ui/town/shop/Shop_InitCatalogBackground.c	Shop_InitCatalogBackground	minor	m
 src/ui/town/shop/Shop_InitMessageBox.c	Shop_InitMessageBox	natural	natural	0	
 src/ui/town/shop/Shop_ReadScriptCatalog.c	Shop_ReadScriptCatalog	minor	minor	3	pointer-sum subscripts: p->catalog[n] changes the address order and strength reduction
 src/ui/town/shop/Shop_TickController.c	Shop_TickController	minor	natural	1	
+src/ui/town/shop/Shop_DestroyController.c	Shop_DestroyController	contrived	minor	1	cleanup view over the panel
