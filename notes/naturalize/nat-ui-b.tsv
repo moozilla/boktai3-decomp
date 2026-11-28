@@ -484,3 +484,9 @@ src/ui/town/shop/Shop_SelectActionDestination.c	Shop_SelectActionDestination	min
 src/ui/town/shop/Shop_BeginActionSelection.c	Shop_BeginActionSelection	natural	natural	0	
 src/ui/town/shop/Shop_BeginPurchaseConfirmation.c	Shop_BeginPurchaseConfirmation	contrived	minor	4	catalog view cast
 src/ui/town/shop/Shop_BeginSaleConfirmation.c	Shop_BeginSaleConfirmation	contrived	minor	2	index-first pointer sum into table160
+src/ui/town/shop/Shop_BeginBrowse.c	Shop_BeginBrowse	natural	natural	0	
+src/ui/town/shop/Shop_BeginMoveSelection.c	Shop_BeginMoveSelection	natural	natural	0	
+src/ui/town/shop/Shop_BeginItemSelection.c	Shop_BeginItemSelection	natural	natural	0	
+src/ui/town/shop/Shop_BeginConsumableSelection.c	Shop_BeginConsumableSelection	natural	natural	0	
+src/ui/town/shop/Shop_BeginReposition.c	Shop_BeginReposition	natural	natural	0	
+src/ui/town/shop/Shop_UpdateMixedCatalogCategory.c	Shop_UpdateMixedCatalogCategory	minor	minor	2	u32 return type with no return value: void differs in register use
