@@ -1,8 +1,7 @@
-#include "global.h"
+#include "npc/otenko/scene_npc_transition.h"
+#include "engine/task.h"
 
-void Task_Kill(u32);
-
-void Otenko_DestroyTransitionEffect(u32 a)
+void Otenko_DestroyTransitionEffect(struct TransitionEffect *effect)
 {
-    Task_Kill(a);
+    Task_Kill(&effect->task);
 }
