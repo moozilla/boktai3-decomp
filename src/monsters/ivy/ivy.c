@@ -1826,7 +1826,7 @@ s32 Ivy_WaitForColorRelease(struct PhaseObject *s);
 
 s32 Ivy_UpdateRedBrightening(struct PhaseObject *p)
 {
-    p->red = Div((u32)p->pulseTimer * 7, p->pulseDuration) + 24;
+    p->red = Div(p->pulseTimer * 7, p->pulseDuration) + 24;
     if (p->pulseTimer++ == p->pulseDuration) {
         if (p->pulseMode == 0)
             p->phaseUpdate = (void *)SceneActor_LowerColorRedPeak;
@@ -1834,7 +1834,7 @@ s32 Ivy_UpdateRedBrightening(struct PhaseObject *p)
             p->phaseUpdate = (void *)Ivy_WaitForColorRelease;
         p->pulseTimer = p->pulseDuration;
     }
-    p->color = color(p);
+    p->color = (p->blue << 10) | (p->green << 5) | p->red;
     return 0;
 }
 
