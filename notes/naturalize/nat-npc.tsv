@@ -400,3 +400,4 @@ src/npc/otenko/Otenko_DestroyTransitionEffect.c	Otenko_DestroyTransitionEffect	n
 src/npc/kuro/Kuro_UpdateMode21.c	Kuro_UpdateMode21	contrived	natural	1	
 src/npc/kuro/Kuro_UpdateMode26.c	Kuro_UpdateMode26	contrived	natural	1	
 src/npc/kuro/Kuro_UpdateMode18.c	Kuro_UpdateMode18	contrived	natural	1	
+src/npc/kuro/Kuro_UpdateMode19.c	Kuro_UpdateMode19	contrived	natural	1	
