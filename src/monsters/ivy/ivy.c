@@ -69,17 +69,18 @@ void Ivy_OnSecondaryContact(void)
 
 void SceneActorAnimation_SelectDirectionalFlags(struct RoomActor *, s32);
 
+// scope: put Ivy_UpdateActiveState begin
 void Ivy_UpdateActiveState(struct ChaseActor *actor)
 {
     if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
-        u16 *q;
-        ((u8 *)actor->base.drawable)[7] = 2;
-        q = &actor->base.colliderA.flags;
-        *q = (*q & 0xFFFB) | 8;
+        ((struct IvyDrawable *)actor->base.drawable)->mode = 2;
+        actor->base.colliderA.flags &= ~4;
+        actor->base.colliderA.flags |= 8;
         HalfwordFlags_Clear(&actor->base.placementFlags, 0x800);
     }
     SceneActorAnimation_SelectDirectionalFlags(&actor->base, 0xE);
 }
+// scope: put Ivy_UpdateActiveState end
 
 /* Tentative name based on the observed state transition or initialization. */
 
