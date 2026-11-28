@@ -236,3 +236,4 @@ src/monsters/golem/golem_main.c	Golem_RestoreRoute	contrived	minor	3	remaining: 
 src/monsters/golem/golem_main.c	SceneActorRoute_CommitReachableDestination	minor	natural	4	
 src/monsters/golem/golem_main.c	SceneActorRoute_SetReachableDestination	minor	minor	7	remaining: maskhelper
 src/monsters/golem/golem_main.c	Golem_OnAttackCollision	contrived	contrived	4	remaining: structcast,maskhelper
+src/monsters/golem/golem_main.c	Golem_UpdateRevival	contrived	minor	1	remaining: maskhelper
