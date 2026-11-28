@@ -227,3 +227,4 @@ src/objects/dungeon_prop/scenery_motion.c	SceneryMotion_UpdateCrossedSines	minor
 src/objects/floor_switch/FloorSwitch_AllocateSlot.c	FloorSwitch_AllocateSlot	contrived	natural	1	Tst() helper kept
 src/objects/floor_switch/FloorSwitch_UpdateRegionVisibility.c	FloorSwitch_UpdateRegionVisibility	contrived	natural	8	u8 Eq() helper and region local keep the compare order
 src/objects/floor_switch/FloorSwitch_Release.c	FloorSwitch_Release	contrived	natural	1	
+src/objects/floor_switch/SpriteSlots_UpdateActive.c	SpriteSlots_UpdateActive	contrived	natural	8	switches base local
