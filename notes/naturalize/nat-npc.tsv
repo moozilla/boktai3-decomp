@@ -403,3 +403,4 @@ src/npc/kuro/Kuro_UpdateMode18.c	Kuro_UpdateMode18	contrived	natural	1
 src/npc/kuro/Kuro_UpdateMode19.c	Kuro_UpdateMode19	contrived	natural	1	
 src/npc/kuro/Kuro_UpdateMode16.c	Kuro_UpdateMode16	contrived	natural	1	
 src/npc/kuro/Kuro_UpdateMode20.c	Kuro_UpdateMode20	minor	natural	1	
+src/npc/kuro/Kuro_UpdateMode22.c	Kuro_UpdateMode22	contrived	natural	1	
