@@ -20,15 +20,19 @@ struct AreaEffectLinkState {
     u8 unknown22;
     u8 menuEvent;  /* 0x23; session menu callbacks */
     s8 menuChoice; /* 0x24 */
-    u8 unknown25[7];
+    u8 unknown25[3];
+    u8 startQueued; /* 0x28: confidence=low */
+    u8 unknown29[3];
     u8 menuInputLocked; /* 0x2C: link panel disables exit input when set */
-    u8 unknown2D[3];
-    u32 menuElapsed;   /* 0x30 */
-    u16 menuSelection; /* 0x34 */
+    u8 startCountdown;  /* 0x2D: confidence=low */
+    u16 stateTimer;     /* 0x2E: confidence=low */
+    u32 menuElapsed;    /* 0x30 */
+    u16 menuSelection;  /* 0x34 */
     u8 unknown36[8];
     u16 requestedMode; /* 0x3E */
     u16 *selection;    /* 0x40; packed mode in bits 10-13 */
-    u8 unknown44[8];
+    u8 unknown44[4];
+    s32 playerSlot;   /* 0x48: negative while there is no packet for us */
     u8 selectionPage; /* 0x4C */
     u8 previousSelectionPage;
     u8 sendBit;     /* 0x4E */
@@ -40,7 +44,12 @@ struct AreaEffectLinkState {
     u8 playerValues[4];
     u16 playerValueSum; /* +0x60: sum of selection bytes multiplied by four, 081381CC. */
     u16 value;
-    u8 unknown64[0x18];
+    u8 peerStates[2]; /* 0x64: confidence=low */
+    u8 unknown66[0xA];
+    u8 readyFrames[2]; /* 0x70: confidence=low */
+    u8 unknown72[2];
+    u8 missedFrames[2]; /* 0x74: confidence=low */
+    u8 unknown76[6];
     u16 receivedByteCounts[4]; /* +0x7C: per-participant assembly cursors, 08138300. */
     s16 actorValues[2];        /* 0x84: drawn on the link lobby panel; confidence=low */
     u8 unknown88[4];

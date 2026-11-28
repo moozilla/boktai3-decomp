@@ -32,7 +32,7 @@ static inline s32 peerStatus(s32 index)
 {
     if (!gLinkSession)
         return 0;
-    return gLinkSession->unknown64[index];
+    return gLinkSession->peerStates[index];
 }
 
 static inline u8 delayMessage(struct LinkPanel *panel)

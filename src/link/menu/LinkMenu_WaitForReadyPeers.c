@@ -3,36 +3,6 @@
 #include "engine/input.h"
 #include "scene/areas/area_effect_link.h"
 
-struct LinkReadySessionFlags {
-    u8 pad0[0x2c];
-    u8 startRequested;
-};
-
-struct LinkReadyState {
-    u8 pad0[0x18];
-    s16 localPlayer;
-    u16 count;
-    u8 pad1c;
-    u8 busy;
-    u8 pad1e[5];
-    u8 event;
-    u8 pad24[4];
-    u8 requested;
-    u8 pad29[4];
-    u8 countdown;
-    u16 timer;
-    u8 pad30[0xe];
-    u16 mode;
-    u16 *selection;
-    u8 pad44[4];
-    s32 status;
-    u8 pad4c[0x18];
-    u8 presence[2];
-    u8 pad66[0xa];
-    u8 ready[2];
-    u8 pad72[2];
-    u8 missed[2];
-};
 s32 Serial_ReadLatestPacket(u16 *);
 u8 LinkSession_ConsumeStateEntry(void *);
 u8 LinkSession_HasParticipantCount(void *, s32);
@@ -44,190 +14,180 @@ void Sound_PlaySong(u32);
 void ScriptPanel_PollSelection(void);
 void sub_0810A304(void);
 void ScriptPanel_ConfirmSelection(void);
-static inline u16 LinkReady_GetSelection(struct LinkReadyState *p, s32 i)
+static inline u16 SelectionAt(struct AreaEffectLinkState *p, s32 index)
 {
-    if (i < 0)
+    if (index < 0)
         return -1;
-    return p->selection[i];
+    return p->selection[index];
 }
 static inline u8 LinkReady_HasMode(u32 value, u32 mask, u32 expected)
 {
-    value &= mask;
-    if (value == expected)
+    if ((value & mask) == expected)
         return 1;
     return 0;
 }
-
-static inline void LinkReady_ClearReady(struct LinkReadyState *p)
-{
-    s32 i = 1;
-    u8 *base;
-    do {
-        base = p->ready;
-        base[i] = 0;
-        --i;
-    } while ((s32)(base + i) >= (s32)base);
-}
-static inline u16 LinkReady_AdvanceTimer(u16 *timer)
-{
-    ++*timer;
-    return *timer;
-}
-s32 LinkMenu_WaitForReadyPeers(struct LinkReadyState *p)
+s32 LinkMenu_WaitForReadyPeers(struct AreaEffectLinkState *p)
 {
     u16 packets[4];
     s32 i;
-    u8 *event;
+
     Serial_ReadLatestPacket(packets);
     if (LinkSession_ConsumeStateEntry(p)) {
-        p->timer = 0;
-        p->requested = 0;
+        p->stateTimer = 0;
+        p->startQueued = 0;
+        /* Storing through a pointer to a copy keeps gcse from sharing this field address
+         * with the later countdown accesses. */
         {
-            struct LinkReadyState *state = p;
-            struct LinkReadyState **initial = &state;
-            (*initial)->countdown = 40;
+            struct AreaEffectLinkState *state = p;
+            struct AreaEffectLinkState **session = &state;
+
+            (*session)->startCountdown = 40;
         }
         if (gLinkSession)
-            ((struct LinkReadySessionFlags *)gLinkSession)->startRequested = 0;
-        LinkReady_ClearReady(p);
+            gLinkSession->menuInputLocked = 0;
+        for (i = 0; i < 2; i++)
+            p->readyFrames[i] = 0;
     }
     if (!LinkSession_HasParticipantCount(p, 2)) {
-        p->requested = 0;
+        p->startQueued = 0;
         if (gLinkSession)
-            ((struct LinkReadySessionFlags *)gLinkSession)->startRequested = 0;
-        for (i = 0; i <= 1; i++) {
-            p->presence[i] = 0;
-            p->ready[i] = 0;
+            gLinkSession->menuInputLocked = 0;
+        for (i = 0; i < 2; i++) {
+            p->peerStates[i] = 0;
+            p->readyFrames[i] = 0;
         }
-
-        if ((++p->timer) > 119) {
+        if (++p->stateTimer > 119) {
             LinkSession_SetState(p, 2, ScriptPanel_PollSelection);
             Serial_StopCommunication();
         }
         return 0;
     }
-    if (p->status < 0) {
-        if (LinkReady_AdvanceTimer(&p->timer) > 59) {
+    if (p->playerSlot < 0) {
+        p->stateTimer++;
+        if (p->stateTimer > 59) {
             LinkSession_SetState(p, 2, ScriptPanel_PollSelection);
             Serial_StopCommunication();
             return 0;
         }
-        if (p->status != -3) {
-            LinkReady_ClearReady(p);
-            for (i = 0; i <= 1; i++) {
+        if (p->playerSlot != -3) {
+            for (i = 0; i < 2; i++)
+                p->readyFrames[i] = 0;
+            for (i = 0; i < 2; i++) {
                 if (packets[i] == 0xffff) {
-                    if (p->missed[i] < 255)
-                        p->missed[i]++;
-                    if (p->missed[i] > 119)
-                        p->presence[i] = 0;
+                    if (p->missedFrames[i] < 255)
+                        p->missedFrames[i]++;
+                    if (p->missedFrames[i] > 119)
+                        p->peerStates[i] = 0;
                 } else {
-                    p->missed[i] = 0;
-                    p->presence[i] = 1;
+                    p->missedFrames[i] = 0;
+                    p->peerStates[i] = 1;
                 }
             }
-        } else if (!p->busy && (gPadState[1] & 8))
-            p->requested = 1;
+        } else if (!p->exchangeBusy && (gPadState[1] & 8)) {
+            p->startQueued = 1;
+        }
     } else {
         s32 readyCount;
         s32 allReady;
         s32 other;
-        for (i = 0; i <= 1; i++) {
+
+        for (i = 0; i < 2; i++) {
             if (packets[i] == 0xffff) {
-                if (p->missed[i] < 255)
-                    p->missed[i]++;
-                if (p->missed[i] > 119)
-                    p->presence[i] = 0;
+                if (p->missedFrames[i] < 255)
+                    p->missedFrames[i]++;
+                if (p->missedFrames[i] > 119)
+                    p->peerStates[i] = 0;
             } else {
-                p->missed[i] = 0;
-                p->presence[i] = 1;
+                p->missedFrames[i] = 0;
+                p->peerStates[i] = 1;
             }
         }
-
-        p->timer = 0;
-        if (packets[p->status] == 0xffff) {
+        p->stateTimer = 0;
+        if (packets[p->playerSlot] == 0xffff) {
             LinkSession_SetState(p, 2, ScriptPanel_PollSelection);
             Serial_StopCommunication();
             return 0;
         }
-        p->localPlayer = p->status;
-        p->count = 0;
+        p->localPlayer = p->playerSlot;
+        p->participantCount = 0;
         readyCount = 0;
         allReady = 1;
         other = 0;
-        for (i = 0; i <= 1; i++) {
-            u16 value = LinkReady_GetSelection(p, i);
-            if ((value != 0xffff) &&
-                ((LinkReady_HasMode(value, 0x3c00, 0x400) && ((value & 255) == 0x9c)) ||
+        for (i = 0; i < 2; i++) {
+            u16 value = SelectionAt(p, i);
+            if (value != 0xffff &&
+                ((LinkReady_HasMode(value, 0x3c00, 0x400) && (value & 0xff) == 0x9c) ||
                  LinkReady_HasMode(value, 0x3c00, 0x1400))) {
                 readyCount++;
-                if (p->ready[i] < 255)
-                    p->ready[i]++;
-                if (p->ready[i] > 89) {
-                    p->presence[i] = 2;
+                if (p->readyFrames[i] < 255)
+                    p->readyFrames[i]++;
+                if (p->readyFrames[i] > 89) {
+                    p->peerStates[i] = 2;
                     if (allReady)
-                        p->count++;
+                        p->participantCount++;
                 } else {
                     allReady = 0;
-                    p->presence[i] = 1;
+                    p->peerStates[i] = 1;
                 }
             } else {
-                if (value == 0xffff)
-                    p->presence[i] = 0;
-                else {
+                if (value == 0xffff) {
+                    p->peerStates[i] = 0;
+                } else {
                     other = 1;
-                    p->presence[i] = 1;
+                    p->peerStates[i] = 1;
                 }
                 allReady = 0;
-                p->ready[i] = 0;
+                p->readyFrames[i] = 0;
                 if (gLinkSession)
-                    ((struct LinkReadySessionFlags *)gLinkSession)->startRequested = 0;
+                    gLinkSession->menuInputLocked = 0;
             }
         }
-
-        if (other)
-            for (i = 0; i <= 1; i++) {
+        if (other) {
+            for (i = 0; i < 2; i++) {
                 if (packets[i] != 0xffff)
-                    p->presence[i] = 1;
-                p->ready[i] = 0;
+                    p->peerStates[i] = 1;
+                p->readyFrames[i] = 0;
             }
-
+        }
         if (LinkSelection_IsStart(*p->selection, 0x3c00)) {
             if (gLinkSession)
-                ((struct LinkReadySessionFlags *)gLinkSession)->startRequested = 1;
-            if (p->countdown) {
-                p->countdown--;
-                if (p->count != 2 || p->count != readyCount || other)
-                    goto waiting;
-                if (!p->busy)
-                    p->presence[0] = 3;
-            } else if (p->count == 2 && p->count == readyCount && !other) {
+                gLinkSession->menuInputLocked = 1;
+            if (p->startCountdown) {
+                p->startCountdown--;
+                if (p->participantCount == 2 && p->participantCount == readyCount && !other) {
+                    if (!p->exchangeBusy)
+                        p->peerStates[0] = 3;
+                } else {
+                    p->requestedMode = 0x49c;
+                }
+            } else if (p->participantCount == 2 && p->participantCount == readyCount && !other) {
                 LinkSession_SetState(p, 5, sub_0810A304);
                 LinkSession_ClearParticipantCounters(p);
                 Sound_PlaySong(0xdd);
                 return 0;
-            } else
-                goto waiting;
-        } else {
-            p->countdown = 40;
-            if (!p->busy && p->count == 2 && p->count == readyCount && !other) {
-                if ((gPadState[1] & 8) || p->requested) {
-                    u16 requestedMode = 0x1400;
-                    p->mode = requestedMode;
-                    p->requested = 0;
-                    if (gLinkSession)
-                        ((struct LinkReadySessionFlags *)gLinkSession)->startRequested = 1;
-                }
-                p->presence[0] = 3;
             } else {
-            waiting:
-                p->mode = 0x49c;
+                p->requestedMode = 0x49c;
+            }
+        } else {
+            p->startCountdown = 40;
+            if (!p->exchangeBusy && p->participantCount == 2 && p->participantCount == readyCount &&
+                !other) {
+                if ((gPadState[1] & 8) || p->startQueued) {
+                    u16 mode = 0x1400;
+                    p->requestedMode = mode;
+                    p->startQueued = 0;
+                    if (gLinkSession)
+                        gLinkSession->menuInputLocked = 1;
+                }
+                p->peerStates[0] = 3;
+            } else {
+                p->requestedMode = 0x49c;
             }
         }
     }
-    event = &p->event;
-    if (*event != 2)
-        return 0;
-    SerialLink_InitMultiplayer();
-    LinkSession_SetState(p, 1, ScriptPanel_ConfirmSelection);
+    if (p->menuEvent == 2) {
+        SerialLink_InitMultiplayer();
+        LinkSession_SetState(p, 1, ScriptPanel_ConfirmSelection);
+    }
     return 0;
 }
