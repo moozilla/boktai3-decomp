@@ -359,19 +359,6 @@ static inline void ActorController_SetDamageCallback(struct PooledActor *actor, 
     actor->handleDamage = fn;
 }
 
-static inline void ActorController_InitHitSensor(struct PooledActor *actor, struct SceneVec *size,
-                                                 void *fn, struct SceneVec *offset)
-{
-    Actor_InitHitSensor(actor, size, offset, fn);
-}
-
-static inline void ActorController_InitBodyCollider(struct PooledActor *actor,
-                                                    struct SceneVec *size, void *fn,
-                                                    struct SceneVec *offset)
-{
-    Actor_InitBodyCollider(actor, size, offset, fn);
-}
-
 int Actor_InitializeControllerFromScript(struct PooledActor *actor)
 {
     struct SceneVec size, offset, size2, offset2;
@@ -386,14 +373,14 @@ int Actor_InitializeControllerFromScript(struct PooledActor *actor)
     offset.x = 0;
     offset.y = 128;
     offset.z = 0;
-    ActorController_InitHitSensor(actor, &size, Actor_OnColliderContact, &offset);
+    Actor_InitHitSensor(actor, &size, &offset, Actor_OnColliderContact);
     size2.x = 32;
     size2.y = 128;
     size2.z = 32;
     offset2.x = 0;
     offset2.y = 128;
     offset2.z = 0;
-    ActorController_InitBodyCollider(actor, &size2, Actor_OnHitboxContact, &offset2);
+    Actor_InitBodyCollider(actor, &size2, &offset2, Actor_OnHitboxContact);
     ActorController_SetSelectionCallback(actor, Actor_TryStartPendingAction);
     ActorController_SetDamageCallback(actor, Actor_OnDamage);
     actor->state = 0;
