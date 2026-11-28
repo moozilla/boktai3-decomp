@@ -46,3 +46,5 @@ src/player/appearance/character_model.c	SceneActorStyle_Initialize	natural	natur
 src/player/appearance/actor_stat_config.c	ActorStats_SetChoices	natural	natural	0	-
 src/player/appearance/actor_stat_config.c	ActorStats_ConfigureScaledParameters	natural	natural	0	-
 src/player/appearance/PaletteFade_ApplyBrightenedPalette.c	PaletteFade_ApplyBrightenedPalette	contrived	minor	40	(u16)color shifts and a second *src read: other color types change the extraction shifts or register choice
+src/player/appearance/player_visuals.c	Player_GetVisualEffectFlags	natural	natural	0	-
+src/player/appearance/player_visuals.c	Player_LoadVisualParameters	contrived	natural	6	index loaded then reduced in two statements (one expression adds a register copy)

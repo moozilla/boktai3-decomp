@@ -24,20 +24,20 @@ s32 Player_GetVisualEffectFlags(struct Player *s)
 
 void Player_LoadVisualParameters(struct Player *p)
 {
-    u16 *t;
-    s32 i;
+    const u16 *colors;
+    s32 index;
     if (p->baseActionVariant <= 9) {
-        t = (u16 *)(gPaletteBankData + 0x6A0);
-        i = p->baseActionVariant;
+        colors = (const u16 *)(gPaletteBankData + 0x6A0);
+        index = p->baseActionVariant;
     } else {
-        t = (u16 *)(gPaletteBankData + 0x2F60);
-        i = p->baseActionVariant;
-        i -= 10;
+        colors = (const u16 *)(gPaletteBankData + 0x2F60);
+        index = p->baseActionVariant;
+        index -= 10;
     }
-    t += i * 3;
-    p->basePalette[5] = *t++;
-    p->basePalette[6] = *t;
-    p->basePalette[13] = t[1];
+    colors += index * 3;
+    p->basePalette[5] = *colors++;
+    p->basePalette[6] = *colors++;
+    p->basePalette[13] = *colors;
 }
 
 static inline u16 Player_BlendColor(const u16 *source, const u16 *base, const u8 *brightnessPtr,
@@ -919,7 +919,6 @@ void Player_DestroyEffects(struct Player *p)
 }
 
 /* Player_GetEffectIntensity: Returns the global signed value also used to pace inward particle emission; intensity interpretation tentative */
-
 
 /* Tentative names for the per-channel effect reset state. */
 struct PlayerEffectResetState {
