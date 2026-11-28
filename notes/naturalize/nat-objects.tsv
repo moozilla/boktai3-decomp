@@ -440,3 +440,4 @@ src/objects/items/collectible/Collectible_CreateManager.c	Collectible_CreateMana
 src/objects/items/collectible/Collectible_ApplyPickupReward.c	Collectible_ApplyPickupReward	contrived	natural	1	
 src/objects/items/collectible/Collectible_OnPickup.c	Collectible_OnPickup	contrived	minor	6	body pointer and mask locals fix the constant-before-load order
 src/objects/items/collectible/Collectible_OnContact.c	Collectible_OnContact	contrived	minor	4	mask local: constant loaded before the flag word
+src/objects/items/collectible/sub_08115AC8.c	sub_08115AC8	contrived	minor	6	(u8) casts on the sequence arguments
