@@ -551,3 +551,7 @@ src/monsters/dragon_puppy/DragonPuppy_UpdateCombat.c	DragonPuppy_UpdateCombat	co
 src/monsters/dragon_puppy/DragonPuppy_HandleDefeat.c	DragonPuppy_HandleDefeat	minor	minor	0	H() halfword view for the unnamed game-state counters
 src/monsters/garmr_statue/GarmrStatue_UpdateCombat.c	GarmrStatue_UpdateCombat	contrived	contrived	2	pause gotos and collider alias block: early returns and per-branch assignment change the layout
 src/monsters/golem/golem_main.c	Golem_InitColliders	contrived	natural	1	
+src/monsters/golem/golem_main.c	Golem_ResetCombatState	minor	minor	1	drawable block for the sequence step
+src/monsters/golem/golem_main.c	Golem_UpdateAttackProperties	contrived	minor	2	attack parameter locals and collider alias per branch
+src/monsters/golem/golem_main.c	Skeleton_TryTriggerAction	minor	minor	3	mask local reused: literal masks load before each field
+src/monsters/golem/golem_main.c	Skeleton_ClearPendingFlag	minor	minor	1	word view of the state bytes; context block stays
