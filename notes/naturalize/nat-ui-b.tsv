@@ -457,3 +457,6 @@ src/ui/town/shop/Shop_PopulateConsumableGrid.c	Shop_PopulateConsumableGrid	contr
 src/ui/town/shop/Shop_BeginEquipmentSpecialMove.c	Shop_BeginEquipmentSpecialMove	contrived	minor	1	widget-run view over the panel for the flag writes
 src/ui/town/shop/Shop_BeginEquipmentRemoveMove.c	Shop_BeginEquipmentRemoveMove	contrived	minor	1	widget-run view over the panel for the flag writes
 src/ui/town/shop/Shop_BeginEquipmentCatalogMove.c	Shop_BeginEquipmentCatalogMove	contrived	natural	8	
+src/ui/town/shop/Shop_ClassifyEquipmentMove.c	Shop_ClassifyEquipmentMove	minor	minor	0	private cursor view of the controller
+src/ui/town/shop/Shop_FindEmptyEquipmentSlot.c	Shop_FindEmptyEquipmentSlot	natural	natural	0	
+src/ui/town/shop/Shop_FindEmptyConsumableSlot.c	Shop_FindEmptyConsumableSlot	contrived	natural	1	
