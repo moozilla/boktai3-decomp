@@ -291,3 +291,4 @@ src/ui/title/tutorial_otenko.c	TutorialOtenko_OnEffectChildPaletteInit	natural	n
 src/ui/title/tutorial_otenko.c	TutorialOtenko_UpdateRotatingAnimation	minor	minor	0	take/rotate helpers
 src/ui/title/tutorial_otenko.c	TutorialOtenko_UpdateAppearanceAnimation	contrived	minor	5	u8 one for the state flag
 src/ui/title/tutorial_otenko.c	TutorialOtenko_UpdateCompactEntryAnimation	contrived	natural	3	
+src/ui/title/tutorial_otenko.c	TutorialOtenko_UpdateProjectedEntryAnimation	contrived	minor	3	u8 one for the state flag
