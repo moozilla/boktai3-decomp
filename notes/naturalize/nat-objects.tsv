@@ -194,3 +194,7 @@ src/objects/deck_cannons/DeckCannon_ReadOptions.c	DeckCannon_ReadOptions	contriv
 src/objects/deck_cannons/DeckCannon_Create.c	DeckCannon_Create	contrived	natural	2	
 src/objects/deck_cannons/sub_0819A414.c	sub_0819A414	contrived	contrived	6	offset arithmetic: the ROM adds the battery base before the 0x28/0xD68 member offset, which every typed array form folds the other way
 src/objects/deck_cannons/DeckCannon_Update.c	DeckCannon_Update	contrived	natural	6	RunCallback() helper stops jump threading past the reload of update
+src/objects/deck_cannons/CallbackSlot_BeginPaletteTransition.c	CallbackSlot_BeginPaletteTransition	minor	minor	1	constant state local materializes the value before the field address
+src/objects/deck_cannons/sub_08199BD8.c	sub_08199BD8	minor	minor	1	constant state local materializes the value before the field address
+src/objects/deck_cannons/DeckCannon_InitCannon.c	DeckCannon_InitCannon	minor	minor	1	local update/destroy pair loads both addresses before either store
+src/objects/deck_cannons/ScriptValues_LoadRotatedArray.c	ScriptValues_LoadRotatedArray	contrived	natural	6	

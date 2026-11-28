@@ -11,14 +11,11 @@ void ScriptValues_LoadRotatedArray(struct ScriptValueRotation *rotation)
     struct ScriptValueSource *source = ScriptProc_Start(0x92b3, 0x26bb);
     u16 *destination = gBgPaletteBank2;
     s32 index = rotation->startIndex;
-    u16 *value = source->values;
-    s32 remaining = 6;
-    do {
+    s32 i;
+
+    for (i = 0; i < 7; i++, index++) {
         if (index > 7)
             index -= 7;
-        destination[index] = *value;
-        value++;
-        remaining--;
-        index++;
-    } while (remaining >= 0);
+        destination[index] = source->values[i];
+    }
 }
