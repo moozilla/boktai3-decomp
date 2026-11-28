@@ -641,3 +641,4 @@ src/system/save/sub_08227E5C.c	sub_08227E5C	contrived	contrived	16	address built
 src/system/save/SaveData_RequestSave.c	SaveData_RequestSave	minor	minor	2	set_flag inline: a direct store loads the pointer and the constant in the other order
 src/system/save/Settings_LoadOrInitializeDefaults.c	Settings_LoadOrInitializeDefaults	contrived	contrived	8	parked constants: direct field stores load the constants after the addresses
 src/system/save/GameState_UpdateCounterBalanceRank.c	GameState_UpdateCounterBalanceRank	contrived	natural	1	
+src/system/save/GameStats_SelectLeadingCounter.c	GameStats_SelectLeadingCounter	contrived	minor	1	array indexed as *(i + field) for the index-first address sum

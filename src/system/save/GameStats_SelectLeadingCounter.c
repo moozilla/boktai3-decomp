@@ -10,9 +10,8 @@ s32 GameStats_SelectLeadingCounter(void)
     s32 maximum;
     s32 selected;
 
-    /* Apply the element displacement before the field offset, as in the ROM. */
     for (i = 0; i <= 4; i++)
-        values[i] = Div(((struct GameState *)((u8 *)gGameState + i * 4))->counters640[0], 54000);
+        values[i] = Div(*(i + gGameState->counters640), 54000);
     maximum = 0;
     selected = 5;
     for (i = 0; i <= 4; i++) {
