@@ -586,3 +586,4 @@ src/ui/hud/display/Hud_SetPanelIndexFromScript.c	Hud_SetPanelIndexFromScript	fud
 src/ui/hud/display/Hud_SetValueSource.c	Hud_SetValueSource	fudged	natural	1	
 src/ui/hud/display/Hud_SetGaugeDisplayFlagFromScript.c	Hud_SetGaugeDisplayFlagFromScript	fudged	natural	1	
 src/ui/hud/display/Hud_StartMessageDisplayTimer.c	Hud_StartMessageDisplayTimer	fudged	natural	1	
+src/ui/hud/display/Hud_CloseMessageFromScript.c	Hud_CloseMessageFromScript	fudged	natural	1	

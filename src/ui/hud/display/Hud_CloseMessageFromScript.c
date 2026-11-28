@@ -1,12 +1,13 @@
 #include "global.h"
 #include "engine/ram.h"
+#include "ui/pause/scene_hud_display.h"
 void Hud_SetMode(u32);
-/* Script: clears HUD byte +0xA6D and sets HUD mode 7 (used when the message
-   window closes). */
+/* Script: stops the message display timer and sets HUD mode seven (used when
+   the message window closes). */
 void Hud_CloseMessageFromScript(void)
 {
     if (gFieldHud) {
-        gFieldHud[0xA6D] = 0;
+        ((struct SceneHudState *)gFieldHud)->messageDisplayTimer = 0;
         Hud_SetMode(7);
     }
 }
