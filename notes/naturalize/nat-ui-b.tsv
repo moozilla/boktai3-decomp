@@ -177,3 +177,4 @@ src/ui/title/name_entry.c	NameEntry_ToggleCharacterPage	natural	natural	0	-
 src/ui/title/name_entry.c	NameEntry_EraseCharacter	minor	minor	3	goto draw stays: nested forms are 5-7 insns off
 src/ui/title/name_entry.c	NameEntry_Destroy	contrived	minor	3	literal mask 3 passed to Bg_DisableDisplay
 src/ui/title/name_entry.c	NameEntry_Update	contrived	minor	3	session reset keeps the v value and slot pointer: member stores skip the gGameState reloads (14 insns)
+src/ui/title/name_entry.c	NameEntry_Initialize	minor	natural	1	-

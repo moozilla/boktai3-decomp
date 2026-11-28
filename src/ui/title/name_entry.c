@@ -684,9 +684,9 @@ s32 NameEntry_Initialize(struct NameEntryTask *screen)
 {
     s32 count;
     u8 *name;
-    u8 *str;
+    u8 *blank;
     s32 i;
-    u32 value;
+    u32 layerParam;
     void *res;
     void *bg;
 
@@ -711,9 +711,11 @@ s32 NameEntry_Initialize(struct NameEntryTask *screen)
         CpuSet(gGameState->playerName + 16, screen->name, 8);
     }
     name = screen->name;
-    str = Text_LookupString(Script_ParseStringRef((const void *)gNamePlaceholderScript[0]) + 0x54);
+    blank =
+        Text_LookupString(Script_ParseStringRef((const void *)gNamePlaceholderScript[0]) + 0x54);
     for (i = 8; i >= 0; i -= 2) {
-        if ((name[i] == 0 && name[i + 1] == 0) || (name[i] == str[0] && name[i + 1] == str[1])) {
+        if ((name[i] == 0 && name[i + 1] == 0) ||
+            (name[i] == blank[0] && name[i + 1] == blank[1])) {
             count++;
             continue;
         }
@@ -743,8 +745,8 @@ s32 NameEntry_Initialize(struct NameEntryTask *screen)
     BgGfx_LoadTilemapSimple(3, 0, 0, 0, 0);
     bg = ScriptProc_Start(0xC091, 0x3536);
     screen->bg = bg;
-    value = 0;
-    Bg_SetupLayers(2, 0, bg, 0, 0, 1, &value);
+    layerParam = 0;
+    Bg_SetupLayers(2, 0, bg, 0, 0, 1, &layerParam);
     BgGfx_LoadTilemapSimple(3, 0, 0, 0, 0);
     CpuSet((u8 *)ScriptProc_Start(0x92B3, 0x204) + 0x14, gBgPaletteBuffer, 0x100);
     res = ScriptProc_Start(0xCB05, 0xE2AB);
