@@ -91,3 +91,13 @@ src/monsters/ivy/child_group.c	Ivy_SetSegmentFlags	contrived	natural	1	u8* param
 src/monsters/ivy/child_group.c	Ivy_SetSegmentProperties	contrived	natural	1	u8* parameter kept for callers
 src/monsters/ivy/child_group.c	ChildGroup_LaunchNextInactiveMember	contrived	contrived	1	stride, address and callback offset locals: strength reduction and the order of the activation stores
 src/monsters/ivy/child_group.c	ChildGroup_UpdateOrbitingMembers	contrived	contrived	16	radius/cos/sin/angle pointers in a do-while: loop.c hoist order and register choice
+src/monsters/ivy/child_group.c	ChildGroup_ShowDamageNumber	natural	natural	0	
+src/monsters/ivy/child_group.c	Ivy_InitPaletteBuffers	natural	natural	0	
+src/monsters/ivy/child_group.c	ChildGroup_ReadScriptParameters	natural	natural	0	
+src/monsters/ivy/child_group.c	ChildGroup_ProcessEvent	natural	natural	0	
+src/monsters/ivy/child_group.c	ChildGroup_UpdateTimedOscillation	natural	natural	0	
+src/monsters/ivy/child_group.c	ChildGroup_BeginInactiveState	natural	natural	0	
+src/monsters/ivy/child_group.c	ChildGroup_WaitForTrailingMembers	natural	natural	0	
+src/monsters/ivy/child_group.c	ChildGroup_UpdateTransitionJitter	minor	minor	0	random-table step written out with pointer locals / bare block
+src/monsters/ivy/child_group.c	ChildGroup_UpdateAlternatingCallbacks	minor	minor	0	random-table step written out with pointer locals / bare block
+src/monsters/ivy/ivy_child.c	Ivy_UpdateActions	minor	natural	2	

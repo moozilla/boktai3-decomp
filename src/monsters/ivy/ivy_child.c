@@ -7,6 +7,7 @@
 #include "engine/ram.h"
 #include "engine/engine_globals.h"
 #include "scene/collision/packed_contact_vector.h"
+#include "monsters/ivy/phase_object.h"
 
 struct IvyBurstScene {
     u8 unknown0[0x1C];
@@ -263,23 +264,16 @@ void Ivy_OnUpdateIdle(void)
 {
 }
 
-struct P {
-    u8 f[0xcc8];
-    void *a;
-    u8 g[0xcd0 - 0xccc];
-    void *b;
-};
-
 s32 Callback_InvokeActor(void *, void *);
 
 void Ivy_UpdateGroundHeight(void *);
 
-void Ivy_UpdateActions(struct P *p)
+void Ivy_UpdateActions(struct PhaseObject *p)
 {
-    if (p->a != 0) {
-        Callback_InvokeActor(p, p->a);
-        if (p->b != 0)
-            Callback_InvokeActor(p, p->b);
+    if (p->update) {
+        Callback_InvokeActor(p, p->update);
+        if (p->secondaryUpdate)
+            Callback_InvokeActor(p, p->secondaryUpdate);
         Ivy_UpdateGroundHeight(p);
     }
 }

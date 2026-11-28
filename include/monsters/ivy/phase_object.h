@@ -88,7 +88,8 @@ struct PhaseObject {
     s8 red, green, blue; /* the color pulse's current offsets */
     u8 unknownCC7;
     void (*update)(struct PhaseObject *);
-    u8 unknownCCC[8];
+    u8 unknownCCC[4];
+    void (*secondaryUpdate)(struct PhaseObject *);
     void (*retarget)(struct PhaseObject *);
     void (*transition)(struct PhaseObject *);
     void (*secondaryTransition)(struct PhaseObject *);
