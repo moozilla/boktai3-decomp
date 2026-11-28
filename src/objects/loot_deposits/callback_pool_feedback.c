@@ -4,6 +4,7 @@
 #include "engine/ram.h"
 #include "objects/scene_object.h"
 #include "engine/engine.h"
+#include "engine/math/monster_particle_random.h"
 
 s32 Mod(s32, s32);
 
@@ -20,9 +21,9 @@ void LootDepositCallbackPool_UpdateShake(struct CallbackPoolEntry *entry)
         entry->sprite.position = entry->savedPosition;
     } else {
         entry->sprite.position.x =
-            entry->savedPosition.x + Mod(LootDepositCallbackPool_NextRandom(), 20) - 10;
+            entry->savedPosition.x + Mod(ParticleRandom_ReadDirectSample(gRandomTable), 20) - 10;
         entry->sprite.position.z =
-            entry->savedPosition.z + Mod(LootDepositCallbackPool_NextRandom(), 20) - 10;
+            entry->savedPosition.z + Mod(ParticleRandom_ReadDirectSample(gRandomTable), 20) - 10;
         entry->shakeTimer--;
     }
 }
@@ -108,7 +109,7 @@ void LootDepositCallbackPool_SpawnHitParticles(struct CallbackPoolEntry *entry)
 }
 
 void LootDepositCallbackPool_ApplyDamage(struct ContactCollider *, struct ContactCollider *,
-                              struct CallbackPoolEntry *);
+                                         struct CallbackPoolEntry *);
 
 /* Initialize the collider and its occupancy state for the constructor. */
 
