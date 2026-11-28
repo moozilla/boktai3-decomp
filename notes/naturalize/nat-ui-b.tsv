@@ -513,3 +513,4 @@ src/ui/town/shop/Shop_TickResetConfirmation.c	Shop_TickResetConfirmation	natural
 src/ui/town/shop/Shop_TickSwapTransition.c	Shop_TickSwapTransition	minor	minor	0	swap view cast
 src/ui/town/shop/Shop_TickPurchaseConfirmation.c	Shop_TickPurchaseConfirmation	natural	natural	0	
 src/ui/town/shop/Shop_TickSaleFeedback.c	Shop_TickSaleFeedback	minor	minor	1	lifecycle view cast for the frame counter
+src/ui/town/shop/Shop_TickDiscardFeedback.c	Shop_TickDiscardFeedback	minor	minor	1	lifecycle view cast for the frame counter
