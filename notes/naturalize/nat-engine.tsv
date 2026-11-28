@@ -505,3 +505,4 @@ src/system/game_state/Equipment_AssignUniqueSlot.c	Equipment_AssignUniqueSlot	co
 src/system/game_state/Inventory_AssignUniqueSecondarySlot.c	Inventory_AssignUniqueSecondarySlot	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
 src/system/game_state/sub_0822E86C.c	sub_0822E86C	contrived	natural	1	
 src/system/game_state/SolarFruit_SortInventorySlots.c	SolarFruit_SortInventorySlots	contrived	natural	1	
+src/system/game_state/GameState_CountCollectedConsumableTypes.c	GameState_CountCollectedConsumableTypes	contrived	natural	1	
