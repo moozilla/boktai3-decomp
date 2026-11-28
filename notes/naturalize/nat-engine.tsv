@@ -519,3 +519,4 @@ src/system/game_state/GameState_AddListEntryFromScript.c	GameState_AddListEntryF
 src/system/game_state/GameState_HasEquipmentFromScript.c	GameState_HasEquipmentFromScript	natural	natural	0	no return value without -m, as in the ROM
 src/system/game_state/GameState_HasUnlockFromScript.c	GameState_HasUnlockFromScript	natural	natural	0	
 src/system/game_state/GameState_HasUnlockedInventoryEntry.c	GameState_HasUnlockedInventoryEntry	minor	minor	6	upper inventory half addressed as (&inventory[8])[i] for the address order
+src/system/inventory/inventory.c	Inventory_SetUsePermissionFlagsFromScript	minor	natural	1	

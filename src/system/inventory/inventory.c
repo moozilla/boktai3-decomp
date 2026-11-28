@@ -14,8 +14,8 @@ void Inventory_SetUsePermissionFlagsFromScript(void)
 {
     s32 i;
     gInventoryUseFlags = 0;
-    if (Script_SeekToKeyword(0x66)) {
-        for (i = 0; i <= 3; i++) {
+    if (Script_SeekToKeyword('f')) {
+        for (i = 0; i < 4; i++) {
             if (Script_GetValue())
                 gInventoryUseFlags |= 1 << i;
         }
@@ -58,7 +58,6 @@ void Inventory_InitializeSelectionGrid(struct SceneInputGrid *grid, s32 identity
 }
 
 /* Inventory_GetItemCategory: Extracts the low category nibble from an item definition; category meaning tentative */
-
 
 extern const u16 gUnk_08E61280[];
 
