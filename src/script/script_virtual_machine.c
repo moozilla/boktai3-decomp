@@ -1030,21 +1030,22 @@ s32 Script_ReadReferenceValue(struct ScriptUtilityReference *ref, s32 index)
 u8 *Script_BackupVariableOperand(u8 *p)
 {
     struct ScriptUtilityReference ref;
-    u8 *r = (u8 *)&ref;
+    u8 *bytes = (u8 *)&ref;
     u8 *end, *base;
     s32 index = 0;
     s32 value;
     u32 descriptor;
     end = Script_DecodeVariableReference(p, &ref);
     value = Script_ReadReferenceValue(&ref, 0);
-    descriptor = (r[0] << 24) | (r[1] << 16) | (r[2] << 8) | r[3];
+    descriptor = (ref.descriptor[0] << 24) | (ref.descriptor[1] << 16) | (ref.descriptor[2] << 8) |
+                 ref.descriptor[3];
     if ((descriptor & 0xF00000) == 0x800000)
         base = gBackupGameState;
     else
         base = gBackupGameVariables;
     base += descriptor & 0xFFFF;
     if (((descriptor >> 24) & 0xF0) == 0x20)
-        index += *(u16 *)(r + 6);
+        index += *(u16 *)(bytes + 6);
     Script_WriteTypedVariable(base, descriptor, index, value);
     return end;
 }
