@@ -1477,7 +1477,6 @@ void Player_UpdateSelectedAttackCharge(void);
 void Player_BeginIndexedAction(struct Player *p, s32 action)
 {
     s32 index = action - 1;
-    const struct PlayerIndexedAction *table = gUnk_08E60F4C;
     const struct PlayerIndexedAction *descriptor;
     s32 i;
     if (p) {
@@ -1485,9 +1484,9 @@ void Player_BeginIndexedAction(struct Player *p, s32 action)
             ClearFlag(p, i);
     }
     if (p->actionMode != 6)
-        descriptor = &table[index];
+        descriptor = &gUnk_08E60F4C[index];
     else
-        descriptor = &table[index];
+        descriptor = &gUnk_08E60F4C[index];
     p->statModifierContext.actionKind = action;
     p->statModifierContext.actionDuration = descriptor->duration;
     p->statModifierContext.statBOverrideEnabled = 4;
