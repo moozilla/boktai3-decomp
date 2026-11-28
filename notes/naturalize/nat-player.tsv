@@ -102,3 +102,6 @@ src/player/appearance/player_visuals.c	Player_ConfigureActionCollider	minor	natu
 src/player/appearance/player_visuals.c	Player_BeginIndexedAction	minor	minor	8	identical mode branches stay: one plain assignment drops the ROM's branch
 src/player/appearance/player_visuals.c	Player_SetWeaponMode	natural	natural	0	-
 src/player/appearance/player_visuals.c	Player_ConsumeActionCharge	contrived	minor	9	two collider pointer locals: ROM forms the collider base before the 0x3E access, plain member access folds 0xBCA
+src/player/appearance/player_visuals.c	Player_SetWeaponInstance	minor	natural	3	retyped in the Player_ConsumeActionCharge commit
+src/player/appearance/player_visuals.c	Player_BeginDescriptorAction	minor	minor	3	retyped in the Player_ConsumeActionCharge commit; record cast to SceneInputItemDescriptor stays (two views of one record)
+src/player/appearance/player_visuals.c	PlayerAction_RefreshFlagState	contrived	minor	22	effect slot read stays an if/else over effects[0]/[1]: effects[effect] changes 40 instructions

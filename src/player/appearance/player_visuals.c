@@ -1564,17 +1564,6 @@ void Player_AddResistance(struct Player *, s32, s32);
 void Player_SubtractResistance(struct Player *, s32, s32);
 void Player_InitVisualResources(void *);
 void Collider_SetContactMode(void *, u32);
-static inline void ClearEquipmentFlag(struct Player *p, u32 index)
-{
-    if (!p)
-        return;
-    if (index > 63)
-        p->actionStateFlags &= ~(1 << (index - 64));
-    else if (index > 31)
-        p->actionFlags &= ~(1 << (index - 32));
-    else
-        p->statBonusFlags &= ~(1 << index);
-}
 static inline void SetEquipmentFlag(struct Player *p, u32 index)
 {
     if (!p)
@@ -1604,17 +1593,15 @@ void PlayerAction_RefreshFlagState(struct Player *p, struct EquipmentFlagState *
     if (p) {
         s32 bit;
         for (bit = 7; bit <= 67; bit++)
-            ClearEquipmentFlag(p, bit);
+            ClearFlag(p, bit);
     }
-    if (p) {
-        if (p->actionMode == 6 || p->slot) {
-            Player_InitVisualResources(p);
-            p->savedSpriteResource = -1;
-            return;
-        }
+    if (p && (p->actionMode == 6 || p->slot)) {
+        Player_InitVisualResources(p);
+        p->savedSpriteResource = -1;
+        return;
     }
     if (alternate < 0)
-        override = 0;
+        override = NULL;
     else
         override = GameState_GetConsumableDescriptor(alternate);
     for (i = 0; i <= 3; i++) {
@@ -1623,12 +1610,10 @@ void PlayerAction_RefreshFlagState(struct Player *p, struct EquipmentFlagState *
         if (override && i == override->slot)
             item = override;
         else {
-            struct GameState *save = gGameState;
-            const s16 *registered = ((struct GameState *)(i * 2 + (u32)save))->party;
-
-            if (*registered < 0)
+            if (*(gGameState->party + i) < 0)
                 continue;
-            item = GameState_GetConsumableDescriptor(Inventory_GetConsumableId(*registered));
+            item = GameState_GetConsumableDescriptor(
+                Inventory_GetConsumableId(*(gGameState->party + i)));
         }
         for (effect = 0; effect <= 1; effect++) {
             u32 kind, amount;
@@ -1908,15 +1893,15 @@ void PlayerAction_RefreshFlagState(struct Player *p, struct EquipmentFlagState *
         SetEquipmentFlag(p, 48);
     if (GameState_HasEquippedConsumable(9) && GameState_HasEquippedConsumable(25) &&
         GameState_HasEquippedConsumable(36) && GameState_HasEquippedConsumable(46)) {
-        ClearEquipmentFlag(p, 16);
+        ClearFlag(p, 16);
         SetEquipmentFlag(p, 15);
         ReverseResistance(p, 5);
         ReverseResistance(p, 3);
         ReverseResistance(p, 4);
         ReverseResistance(p, 2);
-        ClearEquipmentFlag(p, 43);
+        ClearFlag(p, 43);
         SetEquipmentFlag(p, 44);
-        ClearEquipmentFlag(p, 42);
+        ClearFlag(p, 42);
         SetEquipmentFlag(p, 41);
         SetEquipmentFlag(p, 47);
     }
@@ -2090,7 +2075,7 @@ void Player_SetActionRequest(struct Player *p, s32 kind)
             p->actionVariant = 0;
         }
         request->kind = kind;
-        ClearEquipmentFlag(p, 68);
+        ClearFlag(p, 68);
         if (kind == 3)
             SetEquipmentFlag(p, 68);
         else if (PileTrap_IsActive(p->actionRequestEffect))
@@ -2134,7 +2119,7 @@ void Player_InitActionRequest(struct Player *p)
         request->kind = 0xFF;
     else
         request->kind = Player_GetSelectedAbility(p);
-    ClearEquipmentFlag(p, 68);
+    ClearFlag(p, 68);
     if (request->kind == 3)
         SetEquipmentFlag(p, 68);
     if (request->kind < 0) {
