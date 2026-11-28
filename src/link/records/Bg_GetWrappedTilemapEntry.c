@@ -1,9 +1,12 @@
 #include "global.h"
+#include "engine/video/render.h"
 
-u8 *Bg_GetWrappedTilemapEntry(u32 i, u32 x, u32 y)
+u16 *Bg_GetWrappedTilemapEntry(u32 layer, u32 x, u32 y)
 {
-    u8 *tbl = (u8 *)0x03004C30 + ((i * 3) << 4);
-    u8 *base = *(u8 **)(tbl + 0x2C);
+    struct BackgroundLayer *record = &gBgRecords[layer];
+    u16 *map = record->map;
 
-    return base + ((x & 0x1F) << 1) + ((y & 0x1F) << 6);
+    map += x & 0x1F;
+    map += (y & 0x1F) * 32;
+    return map;
 }
