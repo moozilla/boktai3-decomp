@@ -1,5 +1,6 @@
 #include "engine/engine_pause.h"
 #include "global.h"
+#include "gba/io_reg.h"
 #include "scene/areas/area_effect_link.h"
 #include "system/game_state/game_state.h"
 #include "engine/engine.h"
@@ -80,19 +81,19 @@ s32 LinkSelection_ExchangeParticipantInput(struct AreaEffectLinkState *p)
     if (Engine_PauseBits(0x800)) {
         s32 best = 0, bestIndex = -1, j;
         for (j = 0; j <= 1; j++) {
-            if (((u8 **)gParticipantActors)[j]) {
-                ((u8 **)gParticipantActors)[j][0x8f9] = 0;
-                if (best < *(s32 *)(((u8 **)gParticipantActors)[j] + 0x28)) {
-                    best = *(s32 *)(((u8 **)gParticipantActors)[j] + 0x28);
+            if (gParticipantActors[j]) {
+                gParticipantActors[j]->leading = 0;
+                if (best < gParticipantActors[j]->position[0]) {
+                    best = gParticipantActors[j]->position[0];
                     bestIndex = j;
                 }
             }
         }
         if (bestIndex >= 0)
-            ((u8 **)gParticipantActors)[bestIndex][0x8f9] = 1;
+            gParticipantActors[bestIndex]->leading = 1;
     }
     c->frames++;
-    keys = *(vu16 *)0x04000130;
+    keys = REG_KEYINPUT;
     keys &= 0xfff3;
     flags = 0;
     for (i = 0; i < p->participantCount; i++) {

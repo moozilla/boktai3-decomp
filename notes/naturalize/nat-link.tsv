@@ -362,3 +362,4 @@ src/link/selection/LinkSession_OnStageIconComplete.c	LinkSession_OnStageIconComp
 src/link/selection/SessionMenu_CreateStageIconDisplay.c	SessionMenu_CreateStageIconDisplay	contrived	natural	1	
 src/link/selection/LinkSelection_RecordSlotState.c	LinkSelection_RecordSlotState	natural	natural	0	
 src/link/selection/LinkSelection_AdvanceBitExchange.c	LinkSelection_AdvanceBitExchange	minor	natural	1	
+src/link/selection/LinkSelection_ExchangeParticipantInput.c	LinkSelection_ExchangeParticipantInput	contrived	minor	4	ExchangeCounters view of sessionData stays: it keeps the base register
