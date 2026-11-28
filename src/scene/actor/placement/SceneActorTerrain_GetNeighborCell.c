@@ -113,9 +113,9 @@ s32 SceneActorTerrain_GetNeighborCell(struct SceneActorTerrainView *actor, s32 d
             return -1;
     }
     if ((currentKind == 2 && nextKind == 2) || (currentKind == 1 && nextKind == 1)) {
-        if ((difference < 0 ? -difference : difference) > 256)
+        if (abs(difference) > 256)
             return -1;
-    } else if ((difference < 0 ? -difference : difference) > 255)
+    } else if (abs(difference) > 255)
         return -1;
     return nextCell;
 }
