@@ -1996,10 +1996,9 @@ s32 Player_GetUsableEnchantment(struct Player *p)
 
 s32 Player_HasRequiredEnergy(struct Player *p, s32 v)
 {
-    if ((s32)p->currentStatB < v) {
-        return 0;
-    }
-    return 1;
+    if (p->currentStatB < v)
+        return FALSE;
+    return TRUE;
 }
 
 s32 Player_CanSpendSharedResource(struct Player *p, s32 v)

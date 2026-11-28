@@ -112,3 +112,6 @@ src/player/appearance/player_visuals.c	ActorParameter_GetModeValue	natural	natur
 src/player/appearance/player_visuals.c	Player_GetEnchantmentEnergyCost	minor	minor	2	status flag accessor stays: plain & loads the field before the mask
 src/player/appearance/player_visuals.c	Player_CanAffordEnchantment	contrived	natural	3	-
 src/player/appearance/player_visuals.c	Player_SpendEnchantmentEnergy	minor	natural	1	-
+src/player/appearance/player_visuals.c	Player_IsEnchantmentAvailable	natural	natural	0	-
+src/player/appearance/player_visuals.c	Player_GetUsableEnchantment	natural	natural	0	-
+src/player/appearance/player_visuals.c	Player_HasRequiredEnergy	minor	natural	1	-
