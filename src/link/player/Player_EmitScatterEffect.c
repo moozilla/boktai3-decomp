@@ -2,6 +2,7 @@
 #include "engine/math/scene_vec.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
+#include "engine/math/monster_particle_random.h"
 #include "link/player/directional_particle_vector.h"
 
 extern const s16 gUnk_086149C4[];
@@ -12,22 +13,14 @@ static inline s32 scale(s32 product)
     return product >= 0 ? product >> 12 : -((-product) >> 12);
 }
 
-static inline u32 randomValue(const u16 *table)
-{
-    u32 offset;
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    offset = gRandomIndex * 2;
-    return *(const u16 *)(offset + (u32)table);
-}
-
 void Player_EmitScatterEffect(void *task, struct SceneVec *center, u32 yaw, u32 pitch, void *arg)
 {
     struct DirectionalParticleVector pos, vel;
     s32 r, v;
-    pos.x = (randomValue(gRandomTable) & 0x1F) + center->x - 15;
-    pos.y = (randomValue(gRandomTable) & 0x1F) + center->y - 15;
-    pos.z = (randomValue(gRandomTable) & 0x1F) + center->z - 15;
-    r = (randomValue(gRandomTable) & 3) + 5;
+    pos.x = (ParticleRandom_ReadDirectSample(gRandomTable) & 0x1F) + center->x - 15;
+    pos.y = (ParticleRandom_ReadDirectSample(gRandomTable) & 0x1F) + center->y - 15;
+    pos.z = (ParticleRandom_ReadDirectSample(gRandomTable) & 0x1F) + center->z - 15;
+    r = (ParticleRandom_ReadDirectSample(gRandomTable) & 3) + 5;
     vel.y = scale(gUnk_086149C4[(yaw + 64) & 255] * r);
     v = -scale(gUnk_086149C4[yaw & 255] * r);
     vel.x = scale(gUnk_086149C4[(pitch + 64) & 255] * v);

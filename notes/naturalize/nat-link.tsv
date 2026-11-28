@@ -248,3 +248,5 @@ src/link/player/Player_BeginSlashAction.c	Player_BeginSlashAction	contrived	natu
 src/link/player/Player_EmitRandomSpark.c	Player_EmitRandomSpark	minor	natural	4	
 src/link/player/Player_UpdateSpinAction.c	Player_UpdateSpinAction	contrived	natural	2	
 src/link/player/Player_UpdateSlashAction.c	Player_UpdateSlashAction	contrived	minor	2	speed local for the animation rate stays: literals change allocation
+src/link/player/sub_0823E704.c	sub_0823E704	natural	natural	0	
+src/link/player/Player_EmitScatterEffect.c	Player_EmitScatterEffect	minor	natural	3	
