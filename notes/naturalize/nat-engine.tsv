@@ -701,3 +701,4 @@ src/system/save/Save_ResumeRuntimeAfterTransfer.c	Save_ResumeRuntimeAfterTransfe
 src/system/save/Save_VerifyBlock.c	Save_VerifyBlock	contrived	natural	1	
 src/system/save/Save_ReadBlock.c	Save_ReadBlock	contrived	natural	1	
 src/system/save/Save_WriteBlockWithRetries.c	Save_WriteBlockWithRetries	minor	natural	1	
+src/system/save/Save_ReadBlockWithRetries.c	Save_ReadBlockWithRetries	minor	natural	1	
