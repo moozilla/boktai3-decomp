@@ -477,3 +477,4 @@ src/system/game_state/sub_0811D600.c	sub_0811D600	contrived	minor	1	array indexe
 src/system/game_state/GameState_IsConsumableSlotEquipped.c	GameState_IsConsumableSlotEquipped	contrived	natural	1	
 src/system/game_state/GameState_HasEquippedConsumable.c	GameState_HasEquippedConsumable	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
 src/system/game_state/GameState_UnequipConsumableSlot.c	GameState_UnequipConsumableSlot	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
+src/system/game_state/GameState_ResetListsFromScript.c	GameState_ResetListsFromScript	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
