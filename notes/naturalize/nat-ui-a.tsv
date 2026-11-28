@@ -137,3 +137,4 @@ src/ui/books/forging_book/ForgingBook_OnTaskDestroy.c	ForgingBook_OnTaskDestroy	
 src/ui/books/forging_book/ForgingBook_ReturnIdleStatus.c	ForgingBook_ReturnIdleStatus	natural	natural	0	old_agbcc unit
 src/ui/books/forging_book/ForgingBook_RefreshCategory.c	ForgingBook_RefreshCategory	minor	minor	2	unused local accounts for the stack frame
 src/ui/books/forging_book/ForgingBook_InitSprites.c	ForgingBook_InitSprites	contrived	natural	4	u32 return with no value; sprite pointer local
+src/ui/books/forging_book/ForgingBook_RefreshCategoryPreview.c	ForgingBook_RefreshCategoryPreview	contrived	natural	1	

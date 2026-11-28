@@ -43,7 +43,7 @@ struct ForgingBook {
     s32 textWindow;
     const void *nameScript, *helpScript, *itemNameScript;
     u8 entries[0x61];
-    u8 emissionMode;
+    u8 animationMode;
     u8 unknownBE6, unknownBE7;
     u32 exitScript;
     u8 emptyString[4];
