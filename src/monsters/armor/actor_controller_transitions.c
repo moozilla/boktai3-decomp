@@ -333,13 +333,11 @@ extern const u32 gUnk_0824ED54[];
 
 void ActorController_UpdateFixedAnimationTransition(struct SceneCombatActor *actor)
 {
-    u8 *phase = &actor->actionPhase;
-    u8 initialPhase = *phase;
-    switch (initialPhase) {
-        case 0: {
+    switch (actor->actionPhase) {
+        case 0:
             Armor_SetAnimationFromStart(actor, gUnk_0824ED54);
-            (*phase)++;
-            actor->actionReady = initialPhase;
+            actor->actionPhase++;
+            actor->actionReady = 0;
             ActorController_SelectPairedColliders(actor);
             {
                 struct ActorControllerMotion *render = &actor->colliderGroup.motion;
@@ -348,11 +346,10 @@ void ActorController_UpdateFixedAnimationTransition(struct SceneCombatActor *act
             }
             actor->flags &= ~0x20;
             break;
-        }
         case 1:
             if (actor->animationComplete) {
-                *phase = 0xff;
-                actor->actionReady = initialPhase;
+                actor->actionPhase = 0xff;
+                actor->actionReady = 1;
                 actor->heading = 0x40;
             }
             break;
