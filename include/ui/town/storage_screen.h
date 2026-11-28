@@ -23,9 +23,17 @@ struct StorageScreen {
     u8 gridKind, cursorX, cursorY, selection, savedX, savedY, savedSelection;
     u8 unknown1767[0x29];
     u8 slots[32];
-    u8 unknown17B0[0x40];
+    u8 unknown17B0[0x18];
+    u16 cursorPalette[16];
+    u8 unknown17E8[8];
     u32 updateCallback;
     u32 state;
+};
+
+/* The message tables overlap the end of the glyph pair. */
+struct StorageTextView {
+    u8 unknown0[0x1734];
+    const void *itemText, *equipmentText, *consumableText;
 };
 
 #endif
