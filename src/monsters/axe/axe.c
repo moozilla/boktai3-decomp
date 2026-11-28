@@ -2135,12 +2135,9 @@ void Axe_EmitMotionTrail(struct ChaseActor *actor)
             struct SceneActorControlMotionDrawable *drawable = actor->base.drawable;
             struct DisplaySequenceState *source = &drawable->sequence;
             u16 sequence = source->sequenceId;
-            {
-                struct DisplaySequenceState *state = &trail->trail[trail->nextTrail].sequence;
-                const void *commands = trail->trail[trail->nextTrail].resource;
-                u8 speed = trail->variant;
-                Anim_SetSequence(state, (void *)commands, sequence, speed, zero);
-            }
+            Anim_SetSequence(&trail->trail[trail->nextTrail].sequence,
+                             (void *)trail->trail[trail->nextTrail].resource, sequence,
+                             trail->variant, zero);
         }
     }
     sprite = (void *)((trail->nextTrail * sizeof(struct AxeTrailSlot)) + (u32)context);

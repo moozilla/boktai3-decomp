@@ -258,3 +258,4 @@ src/monsters/axe/axe.c	SceneActorControl_CanAdvanceHover	contrived	contrived	6	r
 src/monsters/axe/axe.c	Axe_UpdateAttackFlashFade	contrived	contrived	25	remaining: block,constlocal,ptrtemp
 src/monsters/axe/axe.c	Axe_UpdatePaletteFade	contrived	contrived	8	remaining: u8cast,ptrtemp
 src/monsters/axe/axe.c	Axe_BeginPaletteTransition	contrived	contrived	14	remaining: u8cast,block,constlocal,mask,ptrtemp
+src/monsters/axe/axe.c	Axe_EmitMotionTrail	contrived	contrived	15	remaining: u8cast,bytep,zeroone,block,structcast
