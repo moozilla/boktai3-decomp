@@ -1,4 +1,5 @@
 #include "objects/hazards/directional_force.h"
+#include "objects/hazards/falling_objects.h"
 #include "engine/math/monster_particle_random.h"
 
 /* Smoothed angles use four fractional bits over an eight-bit turn. */
@@ -7,22 +8,6 @@ enum {
     DIRECTIONAL_FORCE_HALF_TURN = DIRECTIONAL_FORCE_FULL_TURN / 2,
     DIRECTIONAL_FORCE_ANGLE_MASK = DIRECTIONAL_FORCE_FULL_TURN - 1,
 };
-
-static inline u32 Random_Next(void)
-{
-    u32 offset;
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    offset = gRandomIndex * 2;
-    return *(const u16 *)(offset + (u32)gRandomTable);
-}
-
-static inline u32 Random_NextByteFrom(const u16 *table)
-{
-    u32 offset;
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    offset = gRandomIndex * 2;
-    return *(const u8 *)(offset + (u32)table);
-}
 
 /* Draw a sample, leaving the table it was read from in *table. */
 static inline u32 Random_NextKeepTable(const u16 **table)
@@ -69,9 +54,10 @@ s32 DirectionalForce_Tick(struct DirectionalForce *force)
                     force->targetMagnitude = force->baseMagnitude << 4;
                 else
                     force->targetMagnitude =
-                        (force->baseMagnitude + Mod(Random_Next(), force->magnitudeRange)) << 4;
+                        (force->baseMagnitude + Mod(FallingObject_Random(), force->magnitudeRange))
+                        << 4;
                 table = gRandomTable;
-                force->targetAngle = Random_NextByteFrom(table);
+                force->targetAngle = (u8)ParticleRandom_ReadSample(table);
                 if (force->delayRange == 0)
                     force->delay = force->baseDelay;
                 else
@@ -92,7 +78,8 @@ s32 DirectionalForce_Tick(struct DirectionalForce *force)
                 if (force->delayRange == 0)
                     force->delay = force->baseDelay;
                 else
-                    force->delay = force->baseDelay + Mod(Random_Next(), force->delayRange);
+                    force->delay =
+                        force->baseDelay + Mod(FallingObject_Random(), force->delayRange);
             } else
                 force->delay--;
             break;

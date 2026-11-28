@@ -287,3 +287,7 @@ src/objects/hazards/animated_hazard.c	AnimatedHazardManager_GetFreeSlot	natural	
 src/objects/hazards/animated_hazard.c	AnimatedHazardManager_RetractAll	natural	natural	0	
 src/objects/hazards/damage_controller.c	DamageController_Initialize	minor	natural	1	
 src/objects/hazards/damage_controller.c	DamageController_Create	minor	natural	1	
+src/objects/hazards/damage_controller.c	DamageController_AccumulateHit	natural	natural	0	
+src/objects/hazards/damage_controller.c	DamageController_Update	natural	natural	0	
+src/objects/hazards/damage_controller.c	DamageController_Destroy	natural	natural	0	
+src/objects/hazards/directional_force/DirectionalForce_Tick.c	DirectionalForce_Tick	contrived	minor	3200	one local draw helper that also returns the table remains: the second-mode magnitude draw needs the table loaded after the cursor into r3
