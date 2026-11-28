@@ -208,3 +208,4 @@ src/effects/directional_effect/sub_08238CE0.c	sub_08238CE0	contrived	natural	2	-
 src/effects/directional_effect/DirectionalEffect_Spawn.c	DirectionalEffect_Spawn	contrived	natural	2	-
 src/effects/directional_effect/DirectionalEffect_PlaceSprite.c	DirectionalEffect_PlaceSprite	contrived	natural	2	-
 src/effects/directional_effect/Player_DestroyDirectionalEffect.c	Player_DestroyDirectionalEffect	contrived	natural	1	-
+src/effects/directional_effect/DirectionalEffect_Init.c	DirectionalEffect_Init	contrived	natural	8	-
