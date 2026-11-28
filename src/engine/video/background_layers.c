@@ -76,7 +76,6 @@ void Bg_ClearTilemap(u32);
 
 void Bg_ResetDisplay(void)
 {
-    u32 zero;
     s32 i;
     gDispCntShadow = 0;
     Bg_ClearTilemap(0);
@@ -90,17 +89,11 @@ void Bg_ResetDisplay(void)
     REG_BLDCNT = 0;
     REG_BLDALPHA = 0;
     REG_BLDY = 0;
-    i = 0;
-    zero = 0;
-    for (; i <= 3; i++) {
-        struct VideoDmaRegisters *dma = (struct VideoDmaRegisters *)0x040000d4;
-        gBgTileUploadSrc[i] = zero;
-        gBgTileUploadParamA[i] = zero;
-        gBgTileUploadParamB[i] = zero;
-        dma->source = (u32)gUnk_086140CC;
-        dma->destination = 0x06000000 + i * 0x4000;
-        dma->control = 0x84000008;
-        dma->control;
+    for (i = 0; i < 4; i++) {
+        gBgTileUploadSrc[i] = 0;
+        gBgTileUploadParamA[i] = 0;
+        gBgTileUploadParamB[i] = 0;
+        DmaCopy32(3, gUnk_086140CC, BG_CHAR_ADDR(i), 32);
     }
 }
 
