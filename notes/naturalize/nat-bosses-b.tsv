@@ -35,3 +35,4 @@ src/bosses/ratatosk/SceneActorAnimation_UpdateSwoopMotion.c	SceneActorAnimation_
 src/bosses/ratatosk/SceneActorAnimation_UpdateSwoopApproach.c	SceneActorAnimation_UpdateSwoopApproach	contrived	contrived	17	second actor alias, body pointer, two flag accessors stay: register allocation and mask-before-field order
 src/bosses/ratatosk/SceneActorAnimation_UpdateDiveApproach.c	SceneActorAnimation_UpdateDiveApproach	contrived	minor	14	second actor alias, body pointer and flag accessors stay: allocation and mask-before-field order
 src/bosses/ratatosk/ActorMotion_UpdateTimedPaletteAnimation.c	ActorMotion_UpdateTimedPaletteAnimation	contrived	contrived	17	goto into the flag block and zero-argument palette helper stay: ROM keeps the zero in r8 and the draft without goto lays the tail out differently
+src/bosses/ratatosk/Ratatosk_UpdateTimedAttack.c	Ratatosk_UpdateTimedAttack	minor	minor	1	one mask-parameter flag accessor stays: mask is loaded before the field
