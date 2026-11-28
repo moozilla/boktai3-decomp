@@ -58,6 +58,15 @@ function stageData(file, generator, args, fallback) {
 }
 const STAGES = stageData('build/assets/stages.json', 'tools/assets/stages.py', ['json'], []);
 const LOCKS = stageData('build/autopilot/locks.json', 'tools/autopilot/locks.py', [], {});
+const STORY = (() => {
+  const file = path.join(ROOT, 'build/autopilot/story.json'), script = path.join(ROOT, 'tools/assets/story.py');
+  if (goal === 'story' && (!fs.existsSync(file) || fs.statSync(file).mtimeMs < fs.statSync(script).mtimeMs)) {
+    const result = spawnSync(python, [script, '--json'], { cwd: ROOT, encoding: 'utf8', maxBuffer: 1 << 28 });
+    if (result.error || result.status !== 0) throw new Error(`Could not generate ${file}: ${result.error || result.stderr}`);
+    fs.writeFileSync(file, result.stdout);
+  }
+  return fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')).sort((a, b) => a.value - b.value) : [];
+})();
 const PLATE_PUZZLES = stageData('build/autopilot/plate-puzzles.json', 'tools/autopilot/plate-puzzles.py', [], {});
 const ESCORT_TARGETS = stageData('build/autopilot/escort-targets.json', 'tools/autopilot/escort-targets.py', [], {});
 // What carries which reaction flag (tools/autopilot/breakers.py: LightFixture_OnHit, the gun's
@@ -153,15 +162,30 @@ const GOALS = {
       else if (!(yield* GOALS.m1(g, L))) return false;
     }
     const visited = VISITED, limit = +(opt('--scenes', 96));
-    const destination = +opt('--until-scene', -1), routeGoal = +opt('--goal', destination);
+    const destination = +opt('--until-scene', -1), fixedGoal = +opt('--goal', destination);
     const storyGoal = +opt('--until-story', -1), endpoint = destination >= 0 || storyGoal >= 0;
-    const reachedScene = () => destination >= 0 && L.where().scene === destination;
-    const reached = () => reachedScene() || (storyGoal >= 0 && L.story() >= storyGoal);
-    const arrivalForGoal = () => routeGoal >= 0 && storyGoal > L.story() ?
-      storyEntrances(stageOf(routeGoal), storyGoal, L.conditionsAllow) : undefined;
-    if (from?.landingDetour?.goal === routeGoal) landingDetour = from.landingDetour;
+    // Without --goal, exploration chooses the doors. When it has gone 24 rooms
+    // without a story beat (the San Miguel tour at story 30 takes 19), route to
+    // the room whose script raises the story to its next value instead.
+    // Three arrivals there without the beat hand the choice back.
+    let routeGoal = fixedGoal, milestone = storyGoal, storyAt = L.story(), sinceBeat = 0;
+    const beatArrivals = new Map();
+    const updateGoal = () => {
+      if (fixedGoal >= 0) return;
+      if (L.story() !== storyAt) { storyAt = L.story(); sinceBeat = 0; }
+      const beat = ++sinceBeat > 24 ? nextBeat(L.story()) : undefined, here = L.where().scene;
+      const key = beat && `${beat.value}:${beat.scene}`;
+      if (beat && here === beat.scene) beatArrivals.set(key, (beatArrivals.get(key) || 0) + 1);
+      const use = beat && (beatArrivals.get(key) || 0) < 3;
+      if ((use ? beat.scene : -1) !== routeGoal) event({ skill: 'story-goal', story: L.story(), rooms: sinceBeat, ...(use ? beat : { scene: -1 }) });
+      routeGoal = use ? beat.scene : -1;
+      milestone = use ? beat.value : -1;
+    };
+    const arrivalForGoal = () => routeGoal >= 0 && milestone > L.story() ?
+      storyEntrances(stageOf(routeGoal), milestone, L.conditionsAllow) : undefined;
+    if (from?.landingDetour?.goal === fixedGoal) landingDetour = from.landingDetour;
     let prev, keyGoal;
-    const failedKeyRooms = new Set();
+    const failedKeyRooms = new Set(), bossRetries = new Map();
     const bossActive = () => L.fightTargets().some((target) => target.boss || target.barrier);
     for (let rooms = 0; rooms < limit; rooms++) {
       const doorsHere = (resolve = true) => {
@@ -179,6 +203,7 @@ const GOALS = {
         !L.message().open && !L.activeMenu() && !g.fn.ScriptUtility_IsControlFlagSet() && bossActive();
       if (!resumeBattle && !(yield* untilControl(g, L, ready, 120, 30000))) { event({ skill: 'stop', why: 'no control with a door or enemy in 30000 frames', ...L.where() }); return !endpoint && rooms > 0; }
       event({ skill: 'entry', ...L.where(), story: L.story() });
+      updateGoal();
       if (reached()) {
         event({ skill: 'goal', reached: reachedScene() ? `scene ${destination}` : `story ${storyGoal}`, ...L.where(), story: L.story() });
         return true;
@@ -187,6 +212,9 @@ const GOALS = {
       // defer patrols until a door is blocked or the player takes damage.
       const targets = L.fightTargets();
       if (targets.some((t) => t.boss || t.barrier) || (targets.length && !doorsHere(false).length)) {
+        // A boss can take most of the life bar in one exchange: enter it
+        // near full when the item bag has something that restores life.
+        if (targets.some((t) => t.boss || t.barrier)) yield* heal(g, L, 3 / 4, 3);
         const f = yield* L.fight({ trace: (e) => event({ skill: 'fight', ...e }) });
         event({ skill: 'fought', ...f, scene: L.where().scene });
         if (!(yield* untilControl(g, L, ready, 60, 30000))) { event({ skill: 'stop', why: 'no control after the fight', ...L.where() }); return !endpoint && rooms > 0; }
@@ -223,18 +251,7 @@ const GOALS = {
       }
       // healing: below a third of the life bar with something in the item bag, find the
       // use of an item in the pause menu that raises life (menuSearch; once per room)
-      {
-        const p = $player(g) && g.$.gPlayers[0], life = () => g.$.gPlayers[0] ? g.$.gPlayers[0].currentStatA : 0;
-        if (p && p.maximumStatA && p.currentStatA * 3 < p.maximumStatA && L.bags().items.length) {
-          const life0 = p.currentStatA;
-          // Judge the actual life gain so the search keeps solar fruit and
-          // passes over items with unrelated effects.
-          const r = yield* L.menuSearch(() => life() > life0,
-            { max: 300, page: 1, keys: ['down', 'right', 'up', 'left', 'a', 'b'], settle: 90 });
-          if (r.done) yield g.press(0, 120);
-          event({ skill: 'heal', from: life0, to: life(), ...r });
-        }
-      }
+      yield* heal(g, L, 1 / 3, 1);
       // Both HP traps and live pressure plates can run scripts on contact.
       let prioritizeExit = Boolean(landingDetour) || L.coffinAvailable() || L.movingFloors().length > 0;
       const arrivals = arrivalForGoal();
@@ -418,6 +435,9 @@ const GOALS = {
       // a room can still be playing its arrival event (a dialogue that starts late, the
       // map changing under the player): let it run and try the doors again
       for (let round = 0; round < 4 && !moved; round++) {
+        // After Game Over and Continue, the boss registers only once its intro
+        // script has run. Fight it rather than waiting by a closed arena.
+        if (bossActive()) break;
         if (round) {
           event({ skill: 'wait', why: 'no door worked yet', round, ...L.where() });
           yield* untilControl(g, L, () => true, 240, 6000);
@@ -445,6 +465,11 @@ const GOALS = {
             event({ skill: 'landing', ...alternate });
           }
         }
+      }
+      if (!moved && bossActive() && (bossRetries.get(here) || 0) < 3) {
+        bossRetries.set(here, (bossRetries.get(here) || 0) + 1);
+        event({ skill: 'retry', why: 'boss active', attempt: bossRetries.get(here), ...L.where() });
+        continue;
       }
       if (!moved) { event({ skill: 'stop', why: 'no door worked', ...L.where() }); return !endpoint && rooms > 0; }
     }
@@ -491,6 +516,14 @@ const GOALS = {
     return true;
   },
 };
+
+// The next story value and the scene whose script sets it (tools/assets/story.py),
+// when that value has a setter in a known room.
+function nextBeat(story) {
+  const beat = STORY.find((entry) => entry.value > story);
+  const setter = beat?.setters.find((entry) => entry.scene !== null && stageIndex.has(entry.scene));
+  return setter ? { value: beat.value, scene: setter.scene } : undefined;
+}
 
 // Exploration distances: breadth first from HERE over stages.json doors (skipping doors a
 // run found unreachable from their side) to the nearest unvisited scene; each door's
@@ -578,6 +611,24 @@ function* throughDoor(g, L, box, { stopIf, alternateLanding } = {}) {
     event({ skill: 'interact', item: item.name, x: item.x, z: item.z, ...i });
   }
   return false;
+}
+
+// Healing: below FRACTION of the life bar with something in the item bag, find the
+// use of an item in the pause menu that raises life (menuSearch), at most USES times.
+function* heal(g, L, fraction, uses) {
+  const life = () => g.$.gPlayers[0] ? g.$.gPlayers[0].currentStatA : 0;
+  for (let i = 0; i < uses; i++) {
+    const p = $player(g) && g.$.gPlayers[0];
+    if (!p || !p.maximumStatA || p.currentStatA >= fraction * p.maximumStatA || !L.bags().items.length) return;
+    const life0 = p.currentStatA;
+    // Judge the actual life gain so the search keeps solar fruit and
+    // passes over items with unrelated effects.
+    const r = yield* L.menuSearch(() => life() > life0,
+      { max: 300, page: 1, keys: ['down', 'right', 'up', 'left', 'a', 'b'], settle: 90 });
+    if (r.done) yield g.press(0, 120);
+    event({ skill: 'heal', from: life0, to: life(), max: p.maximumStatA, ...r });
+    if (!r.done) return;
+  }
 }
 
 // End a run after 30 still frames (at most 600), including elevation and scene

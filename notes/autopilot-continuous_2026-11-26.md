@@ -73,7 +73,14 @@ The movies, function coverage, mGBA checkpoints and demo live under
 `build/autopilot/` in the worker checkout. The terrain overlay repair is
 in the source under `UBFIX`, so the port build needs no extra patch.
 
+The port takes its code addresses from `build/boktai3.elf`. A worktree
+without a built base clones the main checkout's ELF, which can predate the
+function renames. Every renamed function then drops out of the port's code
+table, and the first VBlank traps in `invoke` ("interrupt handler at unknown
+address 0x8213fd9"). Build the ROM in the worktree before the port.
+
 ```sh
+make disasm && python3 tools/build.py
 build/venv/bin/python port/build_game.py -j2
 build/venv/bin/python port/agent/gametypes.py --jobs 2
 make -f tools/emu/Makefile build/emu/harness
@@ -81,4 +88,21 @@ node tools/autopilot/autopilot.mjs story --until-story 51 --verify --coverage
 ```
 
 The default room budget is 96. `--scenes 8` reproduces the earlier smoke
-budget.
+budget. The story-51 run uses 91 rooms, so longer runs from a blank save
+need `--scenes 400`.
+
+## Past story 51 (2026-11-28, unverified)
+
+Continuing from the story-51 movie, the planner reached story 54 in the
+Count's arena (scene 3247). It entered with 37 of 100 life, and the Count
+killed the player with 197 HP left. After Continue, the Count registers
+only after its intro script runs. The room loop then saw no targets and no
+doors, so it waited while the player took damage. Two general fixes
+followed. Before a boss or curtain fight, the planner now heals to three
+quarters of max life, using up to three items. When a boss is live in a
+room where no door works, it fights again, up to three times per room. That run healed from 37 to 100 and beat the
+Count with 29 life left. It reached story 57 in 3219 at frame 244,134 (port only, not yet
+verified on the ROM). Story 58 is set in scene 3124 in the same dungeon. Exploration instead
+left for the overworld and looped between the hubs 2569 and 2553.
+A story-goal fallback (story.py: the scene that sets the next value) now
+takes over after 24 rooms without a beat. It is still being tested.
