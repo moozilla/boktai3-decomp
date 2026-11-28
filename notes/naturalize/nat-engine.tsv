@@ -356,3 +356,4 @@ src/engine/video/palette/sub_08217090.c	sub_08217090	minor	natural	1
 src/engine/video/palette/sub_082170D4.c	sub_082170D4	minor	natural	1	
 src/engine/video/palette/sub_082170FC.c	sub_082170FC	minor	natural	1	
 src/engine/video/palette/sub_0821710C.c	sub_0821710C	minor	natural	1	
+src/engine/video/palette/ResourceSlots_Reset.c	ResourceSlots_Reset	minor	natural	1	

@@ -1,5 +1,3 @@
-#define gResourceSlotCount gPaletteBanksInUse
-#define gResourceSlotIds   gObjPaletteKeys
 #include "global.h"
 #include "engine/video/render.h"
 void ResourceSlots_Reset(void)
