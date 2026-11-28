@@ -207,7 +207,6 @@ s32 Time_LoadRegionList(struct RegionMenu *menu)
 {
     s32 n, k, count, group;
     u8 *pc;
-    u32 zero;
     void *res;
     void *tiles;
     u32 value;
@@ -218,16 +217,16 @@ s32 Time_LoadRegionList(struct RegionMenu *menu)
         menu->selected = ((struct TimeState *)gSessionState)->region;
     if (menu->selected == 0)
         menu->selected = 1;
-    menu->fadeSpeed = zero = 0;
+    menu->fadeSpeed = 0;
     Bg_ClearTilemap(0);
-    BgGfx_LoadTilemapSimple(0, 0, 0, 0, zero);
+    BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0);
     Bg_ClearTilemap(2);
-    BgGfx_LoadTilemapSimple(2, 0, 0, 0, zero);
+    BgGfx_LoadTilemapSimple(2, 0, 0, 0, 0);
     Bg_ClearTilemap(3);
     tiles = ScriptProc_Start(0xC091, 0x3536);
     value = 3;
-    Bg_SetupLayers(2, 0, tiles, 0, zero, 1, &value);
-    BgGfx_LoadTilemapSimple(3, 0, 0, 0, zero);
+    Bg_SetupLayers(2, 0, tiles, 0, 0, 1, &value);
+    BgGfx_LoadTilemapSimple(3, 0, 0, 0, 0);
     CpuSet((u8 *)ScriptProc_Start(0x92B3, 0x204) + 0x14, gBgPaletteBuffer, 0x100);
     Script_SetPc((u8 *)gRegionMenuParameters.table);
     n = 0;
@@ -260,15 +259,9 @@ s32 Time_LoadRegionList(struct RegionMenu *menu)
     AnimSprite_InitLinked(&menu->anims[3], menu->anims[3].resource, 0x48, 0x10, 0, 0, 0, 0);
     menu->anims[3].flags |= 1;
     Time_ShowRegionMenu(menu);
-    {
-        void **saved = &menu->savedPalette;
-        void **pal = &menu->anims[3].palette;
-        u16 *copy;
-        *saved = *pal;
-        copy = menu->highlightPalette;
-        CpuSet(*saved, copy, 0x10);
-        *pal = copy;
-    }
+    menu->savedPalette = menu->anims[3].palette;
+    CpuSet(menu->savedPalette, menu->highlightPalette, 0x10);
+    menu->anims[3].palette = menu->highlightPalette;
     Time_ShowRegionMenu(menu);
     rect.x = 0;
     rect.y = (menu->selected - menu->skipped) * 16 + 0x38;
