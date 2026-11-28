@@ -191,3 +191,4 @@ src/bosses/hresvelgr/sub_0819AEE0.c	sub_0819AEE0	natural	natural	0
 src/bosses/hresvelgr/Math_ApproachEighth.c	Math_ApproachEighth	contrived	natural	3	
 src/bosses/hresvelgr/Math_ApproachSixteenth.c	Math_ApproachSixteenth	natural	natural	0	
 src/bosses/hresvelgr/Math_UnwrapAngleNearReference.c	Math_UnwrapAngleNearReference	minor	natural	1	
+src/bosses/hresvelgr/Math_ClampAroundCenter.c	Math_ClampAroundCenter	contrived	minor	3	keeps limit assigned in the condition

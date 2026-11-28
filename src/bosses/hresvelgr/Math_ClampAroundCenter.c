@@ -3,12 +3,8 @@
 
 s32 Math_ClampAroundCenter(s32 v, s32 center, s32 range)
 {
-    s32 limit = center - range;
-    if (v < limit)
-        goto clamp;
-    limit = center + range;
-    if (v > limit)
-    clamp:
+    s32 limit;
+    if (v < (limit = center - range) || v > (limit = center + range))
         v = limit;
     return v;
 }
