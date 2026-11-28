@@ -681,3 +681,4 @@ src/system/save/Script_TeleportToCell.c	Script_TeleportToCell	contrived	contrive
 src/system/save/SavedVariables_CaptureVariableValues.c	SavedVariables_CaptureVariableValues	contrived	natural	1	
 src/system/save/SavedVariables_RestoreVariableValues.c	SavedVariables_RestoreVariableValues	contrived	natural	1	
 src/system/save/SavedVariables_RunFromScript.c	SavedVariables_RunFromScript	contrived	natural	1	
+src/system/save/Save_WriteContinuation.c	Save_WriteContinuation	contrived	natural	1	
