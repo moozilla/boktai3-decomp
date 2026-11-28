@@ -1,75 +1,45 @@
 #include "scene/actor/actor_attachment_state.h"
-void ActorAttachment_UpdateValueFrame(struct ActorAttachmentSlotView *input)
+void ActorAttachment_UpdateValueFrame(struct ActorAttachmentSlotView *slot)
 {
-    struct ActorAttachmentSlotView *slot = input;
-    u32 four = 4;
-    u32 test = ActorAttachment_TestByteFlags(&slot->status[0], four);
-    u32 finished;
-    finished = test;
-    if (!finished) {
-        struct ActorAttachmentSlotView *view = slot;
-        s16 *value;
-        s16 sampledValue;
-        s32 current;
-        s16 *sample;
-        value = view->value;
-        sampledValue = *value;
-        current = sampledValue;
-        sample = value;
+    u32 depletedBit = 4;
+    u32 depleted = ActorAttachment_TestByteFlags(&slot->status[0], depletedBit);
+
+    if (!depleted) {
+        s16 *value = slot->value;
+        s16 sampled = *value;
+        s32 current = sampled;
+        s16 *sample = value;
+
         if (current <= 0) {
-            s16 *timer = &slot->timer;
-            u8 *status;
-            *timer = 20;
-            status = slot->status;
-            {
-                u32 input = *status;
-                u32 mask;
-                mask = 5;
-                mask |= input;
-                *status = mask;
-            }
+            slot->timer = 20;
+            slot->status[0] |= 5;
             slot->frame = 4;
         } else {
             s32 level = 4;
             s32 currentValue = *sample;
-            s16 *threshold;
-            s32 boundary;
-            s16 *cutoff;
-            u8 *status;
-            s16 *timer;
-            u8 *flags;
-            threshold = slot->thresholds;
-            boundary = *threshold * 4;
-            status = slot->status;
-            timer = &slot->timer;
-            cutoff = threshold;
-            flags = &slot->flags;
-            if (currentValue >= boundary)
-                slot->frame = finished;
-            else {
+            s16 *threshold = slot->thresholds;
+            s32 boundary = *threshold * 4;
+            u8 *status = slot->status;
+            s16 *timer = &slot->timer;
+            s16 *cutoff = threshold;
+            u8 *flags = &slot->flags;
+
+            if (currentValue >= boundary) {
+                slot->frame = 0;
+            } else {
                 do {
-                    level--;
-                    if (level <= 0)
+                    if (--level <= 0)
                         goto reset;
                 } while (*sample < *cutoff * level);
                 slot->frame = 4 - level;
             }
         reset: {
-            s32 zero = 0;
-            s16 *timerView;
-            timerView = timer;
-            *timerView = zero;
-            zero -= 6;
-            zero &= *status;
-            *status = zero;
+            s32 bits = 0;
+            *timer = bits;
+            bits -= 6;
+            *status &= bits;
         }
-            {
-                u32 input = *flags;
-                u32 value;
-                value = 0xFE;
-                value &= input;
-                *flags = value;
-            }
+            *flags &= ~1;
         }
     }
 }
