@@ -615,3 +615,4 @@ src/ui/modifier_menu/modifier_selection_and_stat_previews.c	Modifier_ReadPackedV
 src/ui/modifier_menu/modifier_selection_and_stat_previews.c	Modifier_ApplyAmount	natural	natural	0	
 src/ui/modifier_menu/modifier_selection_and_stat_previews.c	Modifier_CollectSources	fudged	natural	2	
 src/ui/modifier_menu/modifier_selection_and_stat_previews.c	Modifier_ApplyToStat	fudged	partial	9	total copy of value, records pointer, unused frame prefix struct (stack layout)
+src/ui/modifier_menu/modifier_selection_and_stat_previews.c	Modifier_ApplyPositiveKindThree	fudged	natural	2	

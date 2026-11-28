@@ -186,16 +186,12 @@ s32 Modifier_ApplyKindSeven(struct ModifierSelection *a, struct ModifierSelectio
 s32 Modifier_ApplyPositiveKindThree(struct ModifierSelection *a, struct ModifierSelection *b, s32 c,
                                     u32 d)
 {
-    s32 r;
-    if (c <= 0) {
-        r = 0;
-    } else {
-        c = Modifier_ApplyToStat(a, b, c, d, 3);
-        if (c > 999)
-            c = 999;
-        r = c;
-    }
-    return r;
+    if (c <= 0)
+        return 0;
+    c = Modifier_ApplyToStat(a, b, c, d, 3);
+    if (c > 999)
+        c = 999;
+    return c;
 }
 
 s32 Modifier_ApplyKindEight(struct ModifierSelection *a, struct ModifierSelection *b, s32 c, u32 d)
