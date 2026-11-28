@@ -608,16 +608,15 @@ void Golem_ChargeOrReturnHome(struct ChaseActor *actor)
         body->routeDelay -= 0x1E;
         coop = Test(gEngineFlags, 0x4800);
         if (coop) {
-            struct SceneActorChaseTarget *partner = actor->base.tracking.target;
             s32 index;
-            if (!partner)
+            if (!actor->base.tracking.target)
                 goto check;
-            index = SceneActorChase_PlayerSlot(partner);
+            index = SceneActorChase_PlayerSlot(actor->base.tracking.target);
             if (index < 0)
                 goto check;
             {
                 struct Player *player = gPlayers[index];
-                if (!IsDazzled(player))
+                if (!(SceneActorChase_Bits32(&player->statusFlags, 0x20000)))
                     goto check;
             }
             SceneActorChase_SetTypedControl(actor, Golem_UpdateChargeStop, 0x27);
@@ -625,7 +624,7 @@ void Golem_ChargeOrReturnHome(struct ChaseActor *actor)
             return;
         } else {
             struct Player *player = gPlayers[0];
-            if (!IsDazzled(player))
+            if (!(SceneActorChase_Bits32(&player->statusFlags, 0x20000)))
                 goto check;
             SceneActorChase_SetTypedControl(actor, Golem_UpdateChargeStop, 0x27);
             SceneActorChase_SetPhase(actor, 2, 3);
