@@ -51,12 +51,9 @@ s32 ScriptRecord_FindModifier(struct ScriptTargetEntry *out, s32 id)
 
 s32 ScriptRecord_GetTargetOption(void)
 {
-    s32 count;
-    if (gScriptRecordTable)
-        count = ((struct ScriptOptions *)gScriptRecordTable)->targetOption;
-    else
-        count = 0;
-    return count;
+    if (!gScriptRecordTable)
+        return 0;
+    return ((struct ScriptOptions *)gScriptRecordTable)->targetOption;
 }
 
 s32 ScriptRecord_FindExtendedModifier(struct ScriptWideEntry *out, s32 id)

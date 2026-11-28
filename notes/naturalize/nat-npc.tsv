@@ -528,3 +528,4 @@ src/script/script_record.c	ModifierStats_ApplyKind3	contrived	natural	1
 src/script/script_record.c	CallbackList_RunMatchingState	contrived	natural	1	
 src/script/script_record.c	Actor_RecomputeScriptedValue	minor	natural	1	
 src/script/script_record.c	CallbackList_ResetDispatch	minor	natural	3	
+src/script/script_record.c	ScriptRecord_GetTargetOption	minor	natural	1	
