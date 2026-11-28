@@ -1,27 +1,13 @@
 #include "scene/actor/scene_actor_state.h"
 #include "global.h"
+#include "scene/actor/scene_actor_placement.h"
 #include "scene/collision/scene_actor_collision.h"
 
 void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
 
-static inline u32 ActorFlag(struct ChaseActor *actor, u32 input, u32 offset)
-{
-    u32 mask = input;
-    return offset == 0x2D4 ? *(u16 *)((u8 *)actor + offset) & mask
-                           : *(u32 *)((u8 *)actor + offset) & mask;
-}
-
-static inline u8 IsUnavailable(struct ChaseActor *actor)
-{
-    if (actor && (ActorFlag(actor, 0x40, 0x2D4) || ActorFlag(actor, 0x20000, 0x2D0) ||
-                  actor->base.health <= 0))
-        return 1;
-    return 0;
-}
-
 void Tentacle_FireSecondaryAttack(struct ChaseActor *actor)
 {
-    if (IsUnavailable(actor))
+    if (SceneActorPlacement_IsUnavailable(&actor->base))
         return;
     {
         u32 busy = 0xA027;

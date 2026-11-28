@@ -540,3 +540,4 @@ src/monsters/centipede/Centipede_SpawnSparkBurst.c	Centipede_SpawnSparkBurst	con
 src/monsters/centipede/SceneActor_ResetQueuedState.c	SceneActor_ResetQueuedState	contrived	natural	6	
 src/monsters/centipede/Centipede_UpdateComponents.c	Centipede_UpdateComponents	contrived	natural	1	
 src/monsters/centipede/Centipede_RecoverFromSegmentLoss.c	Centipede_RecoverFromSegmentLoss	contrived	minor	3	mask helpers and halfword value blocks remain
+src/monsters/centipede/Tentacle_FireSecondaryAttack.c	Tentacle_FireSecondaryAttack	contrived	natural	2	
