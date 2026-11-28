@@ -1,10 +1,12 @@
 #include "global.h"
+#include "bosses/ratatosk/particle_config_layout.h"
 
-void Ratatosk_ConfigureParticle(u8 *p, u16 a, u32 b, u8 c, u32 d, u32 e)
+void Ratatosk_ConfigureParticle(struct ParticleConfig *config, u16 duration, u32 speed, u8 angle,
+                                u32 kind, u32 acceleration)
 {
-    *(u16 *)(p + 2) = a;
-    *(u32 *)(p + 8) = b;
-    *(u8 *)(p + 6) = c;
-    *(u32 *)(p + 0x14) = d;
-    *(u32 *)(p + 0xC) = e;
+    config->duration = duration;
+    config->mode = speed;
+    config->angle = angle;
+    config->kind = kind;
+    config->scale = acceleration;
 }
