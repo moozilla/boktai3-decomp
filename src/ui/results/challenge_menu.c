@@ -38,21 +38,16 @@ void ChallengeMenu_DrawOptions(struct ChallengeMenu *menu)
 {
     s32 base;
     s32 i;
-    s32 y;
     base = Script_ParseStringRef(menu->optionText);
     Menu_EraseRect(3, 6, 0x13, 2);
     Menu_DrawText(3, 6, Text_LookupString(base + 0xF));
-    i = 0;
-    y = 9;
-    do {
-        Menu_EraseRect(3, y, 0x13, 2);
+    for (i = 0; i < 3; i++) {
+        Menu_EraseRect(3, 9 + i * 2, 0x13, 2);
         if ((menu->enabledChoices >> i) & 1)
-            Menu_DrawText(3, y, Text_LookupString(base + i + menu->group * 3));
+            Menu_DrawText(3, 9 + i * 2, Text_LookupString(base + i + menu->group * 3));
         else
-            Menu_DrawText(3, y, Text_LookupString(base + 0x10));
-        y += 2;
-        i++;
-    } while (i <= 2);
+            Menu_DrawText(3, 9 + i * 2, Text_LookupString(base + 0x10));
+    }
 }
 
 void ChallengeMenu_UpdateDescription(struct ChallengeMenu *menu)
