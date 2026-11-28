@@ -716,13 +716,12 @@ static inline void Player_SetVisualStatusBits(u32 *flags, u32 mask)
     u32 m = mask;
     *flags |= m;
 }
-static inline void Player_DecayVisualSlowdown(struct Player *p, u32 zero)
+static inline void Player_DecayVisualSlowdown(struct Player *p)
 {
     if (p->visualSlowdownTimer != 0) {
-        u8 *chime = &p->unk4E1[0];
-        if (*chime != 0) {
+        if (p->unk4E1[0] != 0) {
             Sound_PlaySong(0x336);
-            *chime = zero;
+            p->unk4E1[0] = 0;
         }
         p->visualSlowdownTimer -= 1;
         if (p->visualSlowdownTimer == 0) {
@@ -743,16 +742,14 @@ static inline void Player_DecayVisualSlowdown(struct Player *p, u32 zero)
 void Player_UpdateStatusVisuals(void *actor)
 {
     struct Player *p = actor;
-    u32 remaining = p->active;
-    if (remaining) {
+    if (p->active) {
         if (p->sceneMode == 5) {
-            u16 *timer = &p->visualSlowdownTimer;
-            if (*timer < 64) {
-                if (*timer == 0) {
+            if (p->visualSlowdownTimer < 64) {
+                if (p->visualSlowdownTimer == 0) {
                     Sound_PlaySong(0x1EE);
                     p->unk4E1[0] = 1;
                 }
-                ++*timer;
+                ++p->visualSlowdownTimer;
             }
             p->animation.flags |= 2;
             {
@@ -762,7 +759,7 @@ void Player_UpdateStatusVisuals(void *actor)
             }
             Player_SetVisualStatusBits(&p->statusFlags, 0x50000);
         } else {
-            Player_DecayVisualSlowdown(p, 0);
+            Player_DecayVisualSlowdown(p);
         }
         if (p->sceneMode == 6 || VisualActionFlag(p, 8)) {
             p->animation.flags |= 0x200;
@@ -773,7 +770,7 @@ void Player_UpdateStatusVisuals(void *actor)
         if (p->kind & 1)
             --p->active;
     } else {
-        Player_DecayVisualSlowdown(p, remaining);
+        Player_DecayVisualSlowdown(p);
         if (VisualActionFlag(p, 8)) {
             p->animation.flags |= 0x200;
             Player_SetVisualStatusBits(&p->statusFlags, 0x20000);
