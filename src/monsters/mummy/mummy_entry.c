@@ -2046,7 +2046,7 @@ u8 Mummy_TryEngageTarget(struct ChaseActor *actor)
     target = Mummy_BeginContactTracking(&actor->base.tracking, 2);
     if (!actor->base.tracking.limit)
         goto restore;
-    contact = SceneActorContacts_SelectForActor((void *)actor, 2);
+    contact = SceneActorContacts_SelectForActor(actor, 2);
     if (!contact)
         goto restore;
     (*target) = contact->object;
@@ -2066,14 +2066,14 @@ u8 Mummy_TryEngageTarget(struct ChaseActor *actor)
         if (!((u8)Mummy_CanPassMovementThreshold(actor))) {
             if (Mummy_TestContext(context, 0x1400))
                 return 0;
-            Mummy_Arrive_path(actor, (void *)target);
+            Mummy_Arrive_path(actor, target);
             return 0;
         }
 
         if (!Mummy_TryDirectPursuit(actor))
             return 0;
-        if (SceneActorChase_TrackingFlags((void *)target, 8)) {
-            if ((actor->base.savedTargetCell) != cell) {
+        if (SceneActorChase_TrackingFlags(target, 8)) {
+            if (actor->base.savedTargetCell != cell) {
                 SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,
                                          &((*target))->position);
                 actor->base.savedTargetCell = cell;
@@ -2081,7 +2081,7 @@ u8 Mummy_TryEngageTarget(struct ChaseActor *actor)
         } else
             SceneActorTarget_ResetContactResponse(actor);
         SceneActorChase_SetReactionFlags(actor, 0x80);
-        Mummy_SetTrackingFlags((void *)target, 0x10);
+        Mummy_SetTrackingFlags(target, 0x10);
         return 1;
     }
     if (SceneActorTurn_ActorFlags(actor, 0x80) && (!SceneActorContact_MotionFlags(actor, 0x400)))

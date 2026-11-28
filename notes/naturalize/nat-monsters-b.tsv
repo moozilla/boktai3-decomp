@@ -137,3 +137,4 @@ src/monsters/mummy/mummy_entry.c	Mummy_FireAcceleratingVolley	contrived	contrive
 src/monsters/mummy/mummy_entry.c	SceneActorPath_FaceAndCheckStraightPath	contrived	contrived	13	coordinate temps fix load order
 src/monsters/mummy/mummy_entry.c	Mummy_RequestStraightRoute	minor	natural	10	
 src/monsters/mummy/mummy_entry.c	SceneActor_EnterMotionPhase	contrived	contrived	36	parked masks and flag accessors fix load order
+src/monsters/mummy/mummy_entry.c	Mummy_TryEngageTarget	contrived	contrived	39	gotos and many flag accessors remain
