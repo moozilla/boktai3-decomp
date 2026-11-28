@@ -1,20 +1,18 @@
 #include "global.h"
+#include "engine/engine.h"
+#include "link/lobby/record_menu.h"
+
 s32 LinkSession_GetSessionState(void *);
 void ScrollingDialogue_HideImmediately(void);
-void Task_Kill(void *);
-void Callback_InvokeActor(void *, u32);
-struct S {
-    u8 filler[0x14D8];
-    u32 f;
-};
-s32 LinkLobbyPanel_OnTaskUpdate(struct S *s)
+
+s32 LinkLobbyPanel_OnTaskUpdate(struct RecordMenu *menu)
 {
-    if (LinkSession_GetSessionState(s) == 0) {
+    if (LinkSession_GetSessionState(menu) == 0) {
         ScrollingDialogue_HideImmediately();
-        Task_Kill(s);
+        Task_Kill(menu);
         return -1;
     }
-    if (s->f != 0)
-        Callback_InvokeActor(s, s->f);
+    if (menu->update)
+        menu->update(menu);
     return 1;
 }
