@@ -27,11 +27,10 @@ void ActorAttachment_TickDescendingSprite(struct ActorAttachmentSlotView *slot)
             sequence->elapsed = 0;
         }
         if (ended) {
+            s32 id;
             slot->flags31 = 0;
-            {
-                s32 id = slot->slotId;
-                manager->occupiedMask &= ~(1 << id);
-            }
+            id = slot->slotId;
+            manager->occupiedMask &= ~(1 << id);
             sprite->flags |= 1;
             slot->status[0] = 0;
             slot->update = NULL;

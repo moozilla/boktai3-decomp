@@ -171,3 +171,4 @@ src/scene/actor/attachment/ActorAttachment_ReleasePartsResource.c	ActorAttachmen
 src/scene/actor/attachment/ActorAttachment_AllocateSlot.c	ActorAttachment_AllocateSlot	natural	natural	0	occupied predicate kept: plain test loses the materialized 0/1
 src/scene/actor/attachment/ActorAttachment_TickLandingBounce.c	ActorAttachment_TickLandingBounce	natural	natural	0	-
 src/scene/actor/attachment/ActorAttachment_TickRisingPart.c	ActorAttachment_TickRisingPart	minor	natural	3	id local: the plain expression computes the mask address first
+src/scene/actor/attachment/ActorAttachment_TickDescendingSprite.c	ActorAttachment_TickDescendingSprite	minor	natural	3	id local: the plain expression computes the mask address first
