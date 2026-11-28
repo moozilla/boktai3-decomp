@@ -1,6 +1,7 @@
 #include "global.h"
+#include "gba/io_reg.h"
 
-void Video_SetBlendBrightness(u32 v)
+void Video_SetBlendBrightness(u32 level)
 {
-    *(volatile u16 *)0x04000054 = v;
+    REG_BLDY = level;
 }
