@@ -360,28 +360,15 @@ static inline u8 Tst(u32 *m, s32 i)
     return FALSE;
 }
 
-struct E {
-    u8 a[0xA0];
-};
-
-struct FragmentDestroyManager {
-    u8 pad[0x38];
-    u32 mask;
-    struct E e[8];
-};
-
-u32 FragmentSpritePool_DestroyTask(struct FragmentDestroyManager *b)
+u32 FragmentSpritePool_DestroyTask(struct LargeFragmentSlotPool *pool)
 {
-    s32 i = 0;
-    struct E *e = b->e;
-    for (; i < 8; e++, i++) {
-        if (Tst(&b->mask, i))
-            Sprite_Remove(e);
+    s32 i;
+
+    for (i = 0; i < 8; i++) {
+        if (Tst(&pool->occupied, i))
+            Sprite_Remove(&pool->slots[i]);
     }
-    {
-        u32 z = 0;
-        gScriptedColliderManager = z;
-    }
+    gScriptedColliderManager = 0;
     return 0;
 }
 
