@@ -377,16 +377,9 @@ void DateMenu_UpdateDigits(struct DateMenu *);
 
 void Menu_StartFadeIn(u32);
 
-static inline void RelocateDateCursor(struct DateMenu *menu, void *source, u8 **graphics)
-{
-    *graphics = menu->widgets[3].resource;
-    ResourceHeader_Relocate(*graphics, source);
-}
-
 s32 DateMenu_Initialize(struct DateMenu *menu)
 {
     void *resource;
-    u8 *cursorGraphics;
     u32 layer;
     void *bg;
     menu->state = 0;
@@ -423,8 +416,9 @@ s32 DateMenu_Initialize(struct DateMenu *menu)
     menu->widgets[1].paletteBank = 0xE000;
     menu->widgets[2].paletteBank = 0xE001;
     resource = ScriptProc_Start(0xCB05, 0x530D);
-    RelocateDateCursor(menu, resource, &cursorGraphics);
-    AnimSprite_InitLinked((u8 *)&menu->widgets[3], cursorGraphics, 0x80, 0x10, 0, 0, 0, NULL);
+    ResourceHeader_Relocate(menu->widgets[3].resource, resource);
+    AnimSprite_InitLinked((u8 *)&menu->widgets[3], menu->widgets[3].resource, 0x80, 0x10, 0, 0, 0,
+                          NULL);
     DateMenu_InitializeDigitWidgets(menu);
     DateMenu_LoadCurrentDate(menu);
     DateMenu_UpdateDigits(menu);
