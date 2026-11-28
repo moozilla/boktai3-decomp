@@ -2,7 +2,6 @@
 #include "link/selection/link_selection_mode.h"
 #include "scene/areas/area_effect_link.h"
 
-// foundry draft (worker best 96.4%); what differs is mostly register allocation and instruction order
 u8 LinkSession_ConsumeStateEntry(struct AreaEffectLinkState *);
 s32 LinkSession_CheckSessionReady(struct AreaEffectLinkState *);
 void LinkSession_BeginShutdown(struct AreaEffectLinkState *, void (*)(void));
@@ -48,11 +47,9 @@ s32 LinkSelection_WaitForParticipantChoices(struct AreaEffectLinkState *p)
         else
             LinkSession_SetState(p, 23, SessionMenu_ShowTimedMessage);
     } else if (p->menuChoice >= 0) {
-        u32 choice = p->menuChoice;
-        u32 shifted = choice << 16;
-        u32 k = 0x2c000000;
-        k |= shifted;
-        p->requestedMode = k << 2 >> 18;
+        u16 value = p->menuChoice;
+        value |= 0x2c00;
+        p->requestedMode = value & 0x3fff;
     }
     return 0;
 }

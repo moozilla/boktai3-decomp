@@ -365,3 +365,4 @@ src/link/selection/LinkSelection_AdvanceBitExchange.c	LinkSelection_AdvanceBitEx
 src/link/selection/LinkSelection_ExchangeParticipantInput.c	LinkSelection_ExchangeParticipantInput	contrived	minor	4	ExchangeCounters view of sessionData stays: it keeps the base register
 src/link/selection/LinkSelection_WaitForInputCompletion.c	LinkSelection_WaitForInputCompletion	contrived	minor	11	ExchangeCounters view stays
 src/link/selection/LinkSelection_WaitForReadyParticipants.c	LinkSelection_WaitForReadyParticipants	contrived	contrived	3	session copy and counter pointer stay; falls off the end with the validity result
+src/link/selection/LinkSelection_WaitForParticipantChoices.c	LinkSelection_WaitForParticipantChoices	contrived	natural	7	
