@@ -256,18 +256,12 @@ int NidhoggrDuel_OnDamage(struct GridAttackActor *p, int kind, int damage)
         case 2:
             NidhoggrDuel_StartActionMode(p, 1, 0, 1);
             NidhoggrDuel_SetState(p, NidhoggrDuel_UpdateDamageRecovery, 6);
-            {
-                int angle = position->direction;
-                p->damageAngle = angle;
-            }
+            p->damageAngle = position->direction;
             break;
         case 1: {
-            int angle = (u8)p->players[0]->unk2D;
-            u8 *dst = &p->damageAngle;
-            int zero = 0;
-            *dst = angle;
+            p->damageAngle = p->players[0]->unk2D;
             NidhoggrDuel_AddFlags(p, 2);
-            NidhoggrDuel_StartActionMode(p, 1, zero, 3);
+            NidhoggrDuel_StartActionMode(p, 1, 0, 3);
             NidhoggrDuel_SetState(p, NidhoggrDuel_UpdateDeathState, 8);
         } break;
     }
