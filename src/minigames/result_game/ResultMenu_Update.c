@@ -1,13 +1,13 @@
 #include "global.h"
+#include "minigames/result_game/result_tutorial.h"
 int Solar_GetLevel(void);
-void Callback_InvokeActor(void *, void *);
 void sub_0801C24C(void *);
 void Camera_SetPosition(void *);
-int ResultMenu_Update(u8 *p)
+int ResultMenu_Update(struct ResultMenu *menu)
 {
-    *(int *)(p + 0x50) = Solar_GetLevel();
-    Callback_InvokeActor(p, *(void **)(p + 0x7a4));
-    sub_0801C24C(p);
-    Camera_SetPosition(p + 0x18);
+    menu->level = Solar_GetLevel();
+    Callback_InvokeActor(menu, menu->update);
+    sub_0801C24C(menu);
+    Camera_SetPosition(&menu->cameraPosition);
     return 0;
 }
