@@ -378,3 +378,13 @@ src/ui/town/dark_loan.c	DarkLoan_ConfirmPreview	natural	natural	0
 src/ui/town/dark_loan.c	DarkLoan_UpdateConfirmation	minor	natural	1	
 src/ui/town/dark_loan.c	DarkLoan_GetSelectionGroup	natural	natural	0	
 src/ui/town/dark_loan.c	DarkLoan_UpdateAdjustment	minor	minor	1	casts into unnamed or differently typed GameState fields (shared header not owned)
+src/ui/town/dark_loan.c	DarkLoan_WaitBeforeConfirmation	natural	natural	0	
+src/ui/town/dark_loan.c	DarkLoan_WaitAfterConfirm	natural	natural	0	
+src/ui/town/dark_loan.c	DarkLoan_WaitBeforeFade	natural	natural	0	
+src/ui/town/dark_loan.c	DarkLoan_CloseAfterDelay	natural	natural	0	
+src/ui/town/dark_loan.c	DarkLoan_UpdateClosing	natural	natural	0	
+src/ui/town/dark_loan.c	DarkLoan_OnUpdate	natural	natural	0	
+src/ui/town/dark_loan.c	DarkLoan_OnDestroy	natural	natural	0	
+src/ui/town/dark_loan.c	DarkLoan_StartDisplayScript	natural	natural	0	
+src/ui/town/dark_loan.c	DarkLoan_InitializeProcedure	natural	natural	0	
+src/ui/town/dark_loan.c	DarkLoan_BuildDisplay	contrived	minor	24	u8 priority copied from a playback struct field to put zero in a register; one secondary resource local for the first uses

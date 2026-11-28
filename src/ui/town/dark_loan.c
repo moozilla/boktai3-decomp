@@ -564,13 +564,10 @@ void DarkLoan_InitializeProcedure(struct DarkLoanScreen *panel)
 void DarkLoan_BuildDisplay(struct DarkLoanScreen *panel, s32 alternate)
 {
     struct DisplayResourceHeader *res;
-    struct DisplayResourceHeader *savedSecondary;
-    struct DisplayResourceHeader *primary;
-    struct DisplayResourceHeader *secondary;
     struct ContactPosition pos;
     s32 flags;
-    struct AnimSpritePlayback backgroundPlayback;
-    u8 backgroundDefault;
+    struct AnimSpritePlayback playback;
+    u8 priority;
     s32 i;
 
     res = ScriptProc_Start(0xCB05, 0x32BA);
@@ -578,18 +575,17 @@ void DarkLoan_BuildDisplay(struct DarkLoanScreen *panel, s32 alternate)
     ResourceHeader_Relocate(&panel->resource, res);
     res = ScriptProc_Start(0xCB05, 0x530D);
     panel->secondaryResource = *res;
-    savedSecondary = &panel->secondaryResource;
-    ResourceHeader_Relocate(savedSecondary, res);
-    backgroundPlayback.priority = 0;
+    ResourceHeader_Relocate(&panel->secondaryResource, res);
+    playback.priority = 0;
     pos.x = 0;
     pos.y = 0;
     pos.z = 0;
-    backgroundDefault = backgroundPlayback.priority;
+    priority = playback.priority;
     flags = 0x10;
     if (alternate)
         flags = 0x90;
     AnimSprite_InitLinked(&panel->widgets[DARK_LOAN_BACKGROUND], &panel->resource, 4, flags,
-                          backgroundDefault, backgroundDefault, 0x3C, &pos);
+                          priority, priority, 0x3C, &pos);
     AnimSprite_InitLinked(&panel->widgets[DARK_LOAN_RATE], &panel->resource, (u16)(panel->rate + 7),
                           flags, 0, 0, 0x3C, &pos);
     pos.x += 8;
@@ -599,8 +595,8 @@ void DarkLoan_BuildDisplay(struct DarkLoanScreen *panel, s32 alternate)
     AnimSprite_InitLinked(&panel->widgets[4], &panel->resource, 8, flags, 0, 0, 0x3C, &pos);
     pos.x = -8;
     pos.y = -8;
-    AnimSprite_InitLinked(&panel->widgets[DARK_LOAN_CURSOR], savedSecondary, 0x4B, flags, 0, 0,
-                          0x3C, &pos);
+    AnimSprite_InitLinked(&panel->widgets[DARK_LOAN_CURSOR], &panel->secondaryResource, 0x4B, flags,
+                          0, 0, 0x3C, &pos);
     panel->widgets[DARK_LOAN_CURSOR].palette = (u16 *)panel->snapshot;
     pos.x = 0x10;
     pos.y = -4;
@@ -608,37 +604,34 @@ void DarkLoan_BuildDisplay(struct DarkLoanScreen *panel, s32 alternate)
                           0x3C, &pos);
     pos.x = 0x90;
     pos.y = 0x28;
-    primary = &panel->resource;
-    secondary = savedSecondary;
     for (i = 0; i < 4; i++) {
-        struct ContactPosition *position = &pos;
-        struct AnimSprite *animSprite = &panel->widgets[DARK_LOAN_BALANCE_DIGITS + i];
-        AnimSprite_InitLinked(animSprite, secondary, 0x14, flags, 0, 0, 0x3C, position);
+        AnimSprite_InitLinked(&panel->widgets[DARK_LOAN_BALANCE_DIGITS + i],
+                              &panel->secondaryResource, 0x14, flags, 0, 0, 0x3C, &pos);
         pos.x += 8;
     }
     pos.x = -0x38;
     pos.y = 0x38;
     for (i = 0; i < 4; i++) {
-        struct ContactPosition *position = &pos;
-        struct AnimSprite *animSprite = &panel->widgets[DARK_LOAN_ADJUSTMENT_DIGITS + i];
-        AnimSprite_InitLinked(animSprite, primary, 8, flags, 0, 0, 0x3C, position);
+        AnimSprite_InitLinked(&panel->widgets[DARK_LOAN_ADJUSTMENT_DIGITS + i], &panel->resource, 8,
+                              flags, 0, 0, 0x3C, &pos);
         pos.x += 8;
     }
-    AnimSprite_InitLinked(&panel->widgets[DARK_LOAN_LABEL], primary, 0x22, flags, 0, 0, 0x3C, 0);
+    AnimSprite_InitLinked(&panel->widgets[DARK_LOAN_LABEL], &panel->resource, 0x22, flags, 0, 0,
+                          0x3C, 0);
     Vanargand_SetVector(&pos, -0x85, -0x18, 0);
-    AnimSprite_InitLinked(&panel->widgets[DARK_LOAN_DECORATIONS], secondary, 0x7E, flags, 0, 0,
-                          0x3C, &pos);
-    AnimSprite_InitLinked(&panel->widgets[21], secondary, 0x7F, flags, 0, 0, 0x3C, &pos);
+    AnimSprite_InitLinked(&panel->widgets[DARK_LOAN_DECORATIONS], &panel->secondaryResource, 0x7E,
+                          flags, 0, 0, 0x3C, &pos);
+    AnimSprite_InitLinked(&panel->widgets[21], &panel->secondaryResource, 0x7F, flags, 0, 0, 0x3C,
+                          &pos);
     pos.x = 0x58;
     pos.y = 0x38;
-    AnimSprite_InitLinked(&panel->widgets[DARK_LOAN_LOWER_RATE], primary, (u16)(panel->rate + 7),
-                          flags, 0, 0, 0x3C, &pos);
+    AnimSprite_InitLinked(&panel->widgets[DARK_LOAN_LOWER_RATE], &panel->resource,
+                          (u16)(panel->rate + 7), flags, 0, 0, 0x3C, &pos);
     pos.x = -0x30;
     pos.y = 0x48;
     for (i = 0; i < 4; i++) {
-        struct ContactPosition *position = &pos;
-        struct AnimSprite *animSprite = &panel->widgets[DARK_LOAN_AMOUNT_DIGITS + i];
-        AnimSprite_InitLinked(animSprite, primary, 8, flags, 0, 0, 0x3C, position);
+        AnimSprite_InitLinked(&panel->widgets[DARK_LOAN_AMOUNT_DIGITS + i], &panel->resource, 8,
+                              flags, 0, 0, 0x3C, &pos);
         pos.x += 8;
     }
     AnimData_Load(panel->animation, 0xA47C);
