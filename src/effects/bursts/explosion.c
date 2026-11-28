@@ -43,10 +43,10 @@ void Explosion_InitSprite(struct ContactSwarmSprite *sprite, struct ContactSwarm
     AnimData_Load(resource, 0x8639);
     Sprite_Init(sprite, resource, 0);
     sprite->frame = 0;
-    palette += 0x116;
-    AnimData_SelectPaletteBank(resource, palette);
+    AnimData_SelectPaletteBank(resource, palette + 0x116);
     sprite->position = *position;
-    SetSpriteHidden(sprite, 1);
+    sprite->priority = 1;
+    sprite->flags |= 1;
 }
 
 void Explosion_InitCollider(struct Explosion *explosion, struct ContactCollider *collider,
