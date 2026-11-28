@@ -1,22 +1,20 @@
 #include "global.h"
 #include "ui/books/palette_transition_banks.h"
 void Palette_CopyBank(u16 *, u16 *);
-void PaletteTransition_CopyBanks(struct PaletteTransitionBanks *p, u8 *data, u32 first, u32 extra)
+void PaletteTransition_CopyBanks(struct PaletteTransitionBanks *p, u16 *data, u32 first, u32 extra)
 {
     u16 *from;
     u16 *to;
-    u8 *index;
-    from = (u16 *)((u8 *)data + (first << 5));
-    index = &p->firstBank;
-    to = p->source[*index];
+    from = data + (first << 4);
+    to = p->source[p->firstBank];
     Palette_CopyBank(to, from);
-    from = (u16 *)((u8 *)data + ((first + 1) << 5));
-    to = p->source[*index + 1];
+    from = data + ((first + 1) << 4);
+    to = p->source[p->firstBank + 1];
     Palette_CopyBank(to, from);
-    from = (u16 *)((u8 *)data + ((first + 2) << 5));
-    to = p->source[*index + 2];
+    from = data + ((first + 2) << 4);
+    to = p->source[p->firstBank + 2];
     Palette_CopyBank(to, from);
-    from = (u16 *)((u8 *)data + (extra << 5));
+    from = data + (extra << 4);
     to = p->source[p->extraBank];
     Palette_CopyBank(to, from);
 }
