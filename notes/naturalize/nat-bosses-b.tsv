@@ -232,3 +232,13 @@ src/bosses/sabata/combat_commands.c	SabataState_BeginReverseAnimation	natural	na
 src/bosses/sabata/combat_commands.c	SabataState_UpdateRestartableAnimation	natural	natural	0	minor: single-use state/mask locals and goto-shared state store are needed to match
 src/bosses/sabata/combat_states.c	Sabata_UpdateTurningAttackChoice	machine-shaped	partial	45	kept actor/input pair and pulse-trigger inline (ROM re-derives the owner pointer)
 src/bosses/sabata/combat_states.c	Sabata_FollowHazardPath	machine-shaped	partial	4	kept path alias, state locals and random inline
+src/bosses/sabata/combat_states.c	Sabata_UpdateTimedAttackChoice	machine-shaped	machine-shaped	3	kept second actor alias and single-use state locals (removal changes allocation)
+src/bosses/sabata/combat_states.c	Sabata_WaitBeforeRestart	machine-shaped	machine-shaped	3	kept second actor alias and single-use state locals (removal changes allocation)
+src/bosses/sabata/combat_states.c	Sabata_WaitForAttackActivity	machine-shaped	machine-shaped	3	kept second actor alias and single-use state locals (removal changes allocation)
+src/bosses/sabata/combat_states.c	Sabata_WaitForPendingAttackEvent	machine-shaped	machine-shaped	3	kept second actor alias and single-use state locals (removal changes allocation)
+src/bosses/sabata/combat_states.c	Sabata_UpdateAttackThreshold	machine-shaped	machine-shaped	3	kept second actor alias and single-use state locals (removal changes allocation)
+src/bosses/sabata/combat_states.c	Sabata_WaitForVariantTrigger	machine-shaped	machine-shaped	3	kept second actor alias and single-use state locals (removal changes allocation)
+src/bosses/sabata/combat_states.c	SabataState_UpdateTrigger	machine-shaped	machine-shaped	3	kept second actor alias and single-use state locals (removal changes allocation)
+src/bosses/sabata/combat_states.c	SceneActorState_UpdateAnimationRequest	natural	natural	0	minor: state constant local
+src/bosses/sabata/combat_states.c	Sabata_ClearCombatEntryTrigger	natural	natural	0	minor: state constant local
+src/bosses/sabata/combat_states.c	SabataState_UpdateConditionalTrigger	natural	natural	0	minor: state constant local
