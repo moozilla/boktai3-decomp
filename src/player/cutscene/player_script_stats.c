@@ -10,16 +10,13 @@ s32 Script_GetActorIndex(void)
 
 s32 Script_ReadPositionOption(s16 *position)
 {
-    s32 result;
-    if (Script_SeekToKeyword(0x70) == 0) {
-        result = 0;
-    } else {
+    if (Script_SeekToKeyword('p')) {
         position[0] = Script_GetValue();
         position[1] = Script_GetValue();
         position[2] = Script_GetValue();
-        result = 1;
+        return 1;
     }
-    return result;
+    return 0;
 }
 
 void ScriptActor_SetPositionFromScript(void)
