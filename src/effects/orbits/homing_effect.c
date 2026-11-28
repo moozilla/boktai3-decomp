@@ -282,20 +282,14 @@ s32 EffectManager_SpawnParticles(s32 count, u32 type, u32 kind, struct EffectVec
                         (p->sprite.width >> 3) * (p->sprite.height >> 3) * factor + graphics->base;
                 }
             }
-            {
-                u32 left = 1 & a->flags;
-                if (left != DisplaySequence_MaskCommand((*entry & 0x30) >> 4, 1))
-                    p->sprite.flags |= 4;
-                else
-                    p->sprite.flags &= ~4;
-            }
-            {
-                u32 left = (u8)(2 & a->flags);
-                if (left != DisplaySequence_MaskCommand((*entry & 0x30) >> 4, 2))
-                    p->sprite.flags |= 8;
-                else
-                    p->sprite.flags &= ~8;
-            }
+            if ((u8)(a->flags & 1) != DisplaySequence_MaskCommand((*entry & 0x30) >> 4, 1))
+                p->sprite.flags |= 4;
+            else
+                p->sprite.flags &= ~4;
+            if ((u8)(a->flags & 2) != DisplaySequence_MaskCommand((*entry & 0x30) >> 4, 2))
+                p->sprite.flags |= 8;
+            else
+                p->sprite.flags &= ~8;
             if (++a->timer >= a->rate) {
                 a->timer = 0;
                 if (a->flags & 4) {
