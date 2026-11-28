@@ -281,3 +281,13 @@ src/scene/actor/behavior/SceneActorTarget_RunUnusedDestroyHook.c	SceneActorTarge
 src/scene/actor/behavior/SceneActorTarget_RunUnusedInitHook.c	SceneActorTarget_RunUnusedInitHook	natural	natural	0	-
 src/scene/actor/behavior/SceneActorTarget_RunUnusedUpdateHook.c	SceneActorTarget_RunUnusedUpdateHook	natural	natural	0	-
 src/scene/actor/behavior/SceneActorBehavior_UpdateColliders.c	SceneActorBehavior_UpdateColliders	contrived	contrived	30	goto chain, mask blocks and materialized flag predicates: plain forms share the disable tails differently; accessor forms only move the masks into arguments
+src/scene/actor/control/SceneActorControl_RequestDeparture.c	SceneActorControl_RequestDeparture	natural	natural	0	-
+src/scene/actor/control/SceneActorControl_RequestJitter.c	SceneActorControl_RequestJitter	natural	natural	0	-
+src/scene/actor/control/SceneActorControl_InitCollider.c	SceneActorControl_InitCollider	natural	natural	0	-
+src/scene/actor/control/SceneActorControl_AllocateSlot.c	SceneActorControl_AllocateSlot	natural	natural	0	-
+src/scene/actor/control/SceneActorControl_ClearUnusedParameters.c	SceneActorControl_ClearUnusedParameters	natural	natural	0	-
+src/scene/actor/control/SceneActorControl_NoOp.c	SceneActorControl_NoOp	natural	natural	0	-
+src/scene/actor/control/SceneActorControl_NoOp.c	SceneActorControl_OnContact	natural	natural	0	-
+src/scene/actor/control/SceneActorControl_IsEnabledForScene.c	SceneActorControl_IsEnabledForScene	minor	minor	0	MatchesScene predicate (materialized test)
+src/scene/actor/control/SceneActorControl_TickJitter.c	SceneActorControl_TickJitter	contrived	contrived	0	random-table union and sample blocks: the mask is loaded after the first seed read, only the explicit steps give that
+src/scene/actor/control/SceneActorControl_TryActivateNearby.c	SceneActorControl_TryActivateNearby	contrived	contrived	22	input aliases, SignedZ helper, packed delta pointer/zero-extension temporaries and the player location pointer

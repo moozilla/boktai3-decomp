@@ -32,17 +32,9 @@ static inline u8 TryPlayer(struct SceneActorControlSlot *input,
             s32 value = slot->index;
             *index = value;
         }
-        {
-            u16 *flags = &slot->flags;
-            *flags |= 0x10;
-            flags = &slot->collider.flags;
-            *flags |= 4;
-        }
-        {
-            struct SceneActorControlNearbyPlayer **read = location;
-            struct SceneActorControlNearbyPlayer *active = *read;
-            slot->parameter = active->counter;
-        }
+        slot->flags |= 0x10;
+        slot->collider.flags |= 4;
+        slot->parameter = (*location)->counter;
         args = 6;
         SceneActorRegistry_SendToCategoryPaletteOffset(2, 1, &args);
         Sound_PlaySong(0x115);
@@ -53,54 +45,43 @@ static inline u8 TryPlayer(struct SceneActorControlSlot *input,
 void SceneActorControl_TryActivateNearby(struct SceneActorControlSlot *input)
 {
     struct SceneActorControlSlot *slot = input;
-    struct SceneActorControlNearbyPlayer **location = &gPlayers[0];
+    struct SceneActorControlNearbyPlayer **location = gPlayers;
     struct SceneActorControlNearbyPlayer *player = *location;
     struct ContactPosition delta;
-    struct ContactPosition *q;
     const struct ContactPosition *position;
+    struct ContactPosition *q;
     if (player) {
         struct ContactPosition *initial = &delta;
         const struct ContactPosition *source = &slot->savedPosition;
         const struct ContactPosition *playerPosition = &player->position;
         s32 y;
-        u32 dx;
         u32 x;
         u32 z;
         s32 signedZ;
         x = (u16)player->position.x - (u16)source->x;
-        dx = x;
-        initial->x = dx;
+        initial->x = x;
         initial->y = playerPosition->y - source->y;
-        z = (u16)playerPosition->z;
-        z -= (u16)source->z;
+        z = (u16)playerPosition->z - (u16)source->z;
         initial->z = z;
         y = initial->y;
-        if ((y < 0 ? -y : y) <= 31 && (u16)(x + 64) <= 224 && (signedZ = SignedZ(z)) <= 160 &&
-            signedZ >= -58 && TryPlayer(slot, player, location))
+        if (abs(y) <= 31 && (u16)(x + 64) <= 224 && (signedZ = (s16)z) <= 160 && signedZ >= -58 &&
+            TryPlayer(slot, player, location))
             return;
         q = &delta;
         position = &slot->savedPosition;
         if (TetherActor_CopyPosition(q) && TetherActor_IsStateOne()) {
-            const struct ContactPosition *localSource;
-            u32 firstX = (u16)q->x;
             u32 z;
             s32 y;
             s32 signedZ;
-            localSource = position;
-            delta.x = firstX - (u16)localSource->x;
-            q->y -= localSource->y;
-            z = (u16)q->z;
-            z -= (u16)localSource->z;
+            delta.x = (u16)q->x - (u16)position->x;
+            q->y -= position->y;
+            z = (u16)q->z - (u16)position->z;
             q->z = z;
             y = q->y;
-            if ((y < 0 ? -y : y) <= 31 && (u16)((u16)q->x + 64) <= 224 &&
-                (signedZ = SignedZ(z)) <= 160 && signedZ >= -58 &&
-                TetherActor_GetParameter() < -1) {
+            if (abs(y) <= 31 && (u16)((u16)q->x + 64) <= 224 && (signedZ = SignedZ(z)) <= 160 &&
+                signedZ >= -58 && TetherActor_GetParameter() < -1) {
                 TetherActor_SetParameter(slot->index);
-                {
-                    u16 *flags = &slot->flags;
-                    *flags |= 0x40;
-                }
+                slot->flags |= 0x40;
                 Sound_PlaySong(0x115);
             }
         }
