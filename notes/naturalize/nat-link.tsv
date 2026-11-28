@@ -296,3 +296,4 @@ src/link/player/Player_TickDamageBlink.c	Player_TickDamageBlink	contrived	contri
 src/link/player/Script_GetOptionalIValue.c	Script_GetOptionalIValue	natural	natural	0	
 src/link/player/sub_08243704.c	sub_08243704	natural	natural	0	
 src/link/player/sub_0824372C.c	sub_0824372C	contrived	natural	4	slot local keeps the reread after the store
+src/link/player/Player_SetTimedEffect.c	Player_SetTimedEffect	contrived	natural	1	

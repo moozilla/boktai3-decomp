@@ -1,9 +1,10 @@
-// COMPILER: old_agbcc
 #include "global.h"
-/* Player_SetTimedEffect: Stores an effect value at offset 0xAD6 and starts a thirty-two-tick timer; effect interpretation tentative */
+#include "player/player.h"
+/* Player_SetTimedEffect: Stores an effect parameter and starts its thirty-two-tick timer; effect
+   interpretation tentative. */
 
-void Player_SetTimedEffect(u8 *p, u16 v)
+void Player_SetTimedEffect(struct Player *p, u16 parameter)
 {
-    *(u16 *)(p + 0xad6) = v;
-    *(u16 *)(p + 0xad8) = 32;
+    p->actionEighteenParameter = parameter;
+    p->actionEighteenDuration = 32;
 }
