@@ -651,3 +651,20 @@ src/script/runtime/Script_InitActorRegistry.c	Script_InitActorRegistry	contrived
 src/script/runtime/Script_SendMessage.c	Script_SendMessage	contrived	contrived	10	u16 increment written as a shift pair: count++ makes a separate add
 src/script/runtime/GameState_LoadSessionOrInitDefaults.c	GameState_LoadSessionOrInitDefaults	contrived	contrived	7	parked u32 value stores: plain literal stores reorder the constant and pointer loads
 src/script/key_trigger/KeyTrigger_Create.c	KeyTrigger_Create	contrived	natural	2	
+src/script/key_trigger/KeyTrigger_Init.c	KeyTrigger_Init	natural	natural	0	
+src/script/key_trigger/KeyTrigger_Update.c	KeyTrigger_Update	natural	natural	0	
+src/script/key_trigger/KeyTrigger_Destroy.c	KeyTrigger_Destroy	natural	natural	0	
+src/script/runtime/Script_SaveVariables.c	Script_SaveVariables	natural	natural	0	
+src/script/runtime/Script_GetSavedVariable.c	Script_GetSavedVariable	natural	natural	0	
+src/script/runtime/GameState_ResetSessionCounters.c	GameState_ResetSessionCounters	natural	natural	0	
+src/script/runtime/sub_08225504.c	sub_08225504	natural	natural	0	
+src/script/runtime/Script_InvokeRegistryCommand.c	Script_InvokeRegistryCommand	natural	natural	0	
+src/script/runtime/Script_HandleMapCommand.c	Script_HandleMapCommand	natural	natural	0	
+src/script/runtime/Script_InitEngineCommandHook.c	Script_InitEngineCommandHook	natural	natural	0	
+src/script/runtime/Script_RegisterEngineCommands.c	Script_RegisterEngineCommands	natural	natural	0	
+src/script/runtime/Script_ClearActorRegistry.c	Script_ClearActorRegistry	natural	natural	0	
+src/script/runtime/Script_ShutdownActorRegistryStub.c	Script_ShutdownActorRegistryStub	natural	natural	0	
+src/script/runtime/Script_SearchActorRegistry.c	Script_SearchActorRegistry	natural	natural	0	
+src/script/runtime/GameState_ClearSessionFlags.c	GameState_ClearSessionFlags	minor	minor	0	untyped gSessionState cast per store
+src/script/runtime/Script_GetActorFactory.c	Script_GetActorFactory	minor	minor	0	literal RAM address and u32 casts (no symbol or prototype header)
+src/script/runtime/sub_082254C8.c	sub_082254C8	minor	minor	1	id tested twice: if/else merges the branches differently; raw scene offset (no struct)
