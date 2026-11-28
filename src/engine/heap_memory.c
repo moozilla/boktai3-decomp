@@ -40,14 +40,12 @@ void *Heap_Alloc(s32 bytes)
 void *Heap_AllocFromEnd(s32 bytes)
 {
     struct HeapBlock *block = &gHeapHead;
-    bytes += 15;
-    bytes &= ~15;
+    struct HeapBlock *last;
+
+    bytes = (bytes + 15) & ~15;
     bytes += 16;
-    {
-        struct HeapBlock *next;
-        while ((next = block->next))
-            block = next;
-    }
+    while ((last = block->next) != NULL)
+        block = last;
     while (block) {
         u32 flags = block->size;
 
@@ -55,8 +53,7 @@ void *Heap_AllocFromEnd(s32 bytes)
             s32 size = flags & 0xFFFFF;
             u32 remainder = size - bytes;
             if (remainder > 16) {
-                struct HeapBlock *next = (struct HeapBlock *)((u32)block + size);
-                next = (struct HeapBlock *)((u32)next - bytes);
+                struct HeapBlock *next = (struct HeapBlock *)((u8 *)block + size - bytes);
                 next->size = bytes;
                 next->prev = block;
                 next->next = block->next;
@@ -68,7 +65,7 @@ void *Heap_AllocFromEnd(s32 bytes)
             } else
                 block->size = flags & 0x7FFFFFFF;
             block->unused = 0;
-            return (void *)(block + 1);
+            return block + 1;
         }
         block = block->prev;
     }
