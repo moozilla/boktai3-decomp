@@ -25,6 +25,7 @@ static inline u16 SelectionAt(struct AreaEffectLinkState *p, s32 index)
 s32 LinkMenu_ShowReadyMessage(struct AreaEffectLinkState *p)
 {
     s32 count, i;
+    u32 mask;
 
     if (LinkSession_ConsumeStateEntry(p)) {
         gBgFadeLevel = 0x40;
@@ -43,7 +44,8 @@ s32 LinkMenu_ShowReadyMessage(struct AreaEffectLinkState *p)
     count = 0;
     for (i = 0; i < p->participantCount; i++) {
         u16 value = SelectionAt(p, i);
-        if (LinkSelection_IsReady(value, 0x3c00) && (value & 0xff) == 0xd)
+        mask = 0x3c00;
+        if (LinkSelection_IsReady(value, mask) && (value & 0xff) == 0xd)
             count++;
     }
     if (count == p->participantCount)

@@ -25,6 +25,7 @@ s32 LinkMenu_ShowChoiceMessage(struct AreaEffectLinkState *p)
 {
     u8 *session = p->sessionData;
     s32 count, i;
+    u32 mask;
 
     if (LinkSession_ConsumeStateEntry(p)) {
         Hud_RefreshSpriteFromScript();
@@ -43,7 +44,8 @@ s32 LinkMenu_ShowChoiceMessage(struct AreaEffectLinkState *p)
     count = 0;
     for (i = 0; i < p->participantCount; i++) {
         u16 value = SelectionAt(p, i);
-        if (LinkSelection_IsReady(value, 0x3c00) && (value & 0xff) == 0x8b)
+        mask = 0x3c00;
+        if (LinkSelection_IsReady(value, mask) && (value & 0xff) == 0x8b)
             count++;
     }
     if (count == p->participantCount)

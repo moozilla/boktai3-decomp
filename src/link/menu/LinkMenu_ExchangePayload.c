@@ -1,6 +1,5 @@
 #include "global.h"
 #include "scene/areas/area_effect_link.h"
-#include "link/selection/link_selection_mode.h"
 u8 LinkSession_ConsumeStateEntry(void *);
 void LinkSession_ClearParticipantCounters(void *);
 s32 LinkSession_CheckSessionReady(void *);
@@ -18,6 +17,13 @@ struct LinkPayloadData {
     u8 outgoing[0x24]; /* payload and its CRC */
     u8 incoming[4][0x24];
 };
+static inline u8 IsPayloadMode(u16 value)
+{
+    value &= 0x3c00;
+    if (value == 0x1800)
+        return 1;
+    return 0;
+}
 s32 LinkMenu_ExchangePayload(struct AreaEffectLinkState *p)
 {
     struct LinkPayloadData *data = (struct LinkPayloadData *)p->sessionData;
@@ -32,7 +38,7 @@ s32 LinkMenu_ExchangePayload(struct AreaEffectLinkState *p)
         LinkSession_BeginShutdown(p, ScriptPanel_OpenTextWindow);
         return -1;
     }
-    if (LinkSelection_IsSelected(*p->selection, 0x3c00)) {
+    if (IsPayloadMode(*p->selection)) {
         LinkSession_SetState(p, 14, LinkSelection_WaitForEmptySlots);
         return 0;
     }
