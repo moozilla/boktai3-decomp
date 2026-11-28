@@ -36,3 +36,6 @@ src/objects/bouncing_bombs/BouncingBomb_DestroyPool.c	BouncingBomb_DestroyPool	c
 src/objects/bouncing_bombs/BouncingBomb_GetNearbyHeading.c	BouncingBomb_GetNearbyHeading	contrived	natural	15	
 src/objects/bouncing_bombs/BouncingBomb_ApplyContactImpulse.c	BouncingBomb_ApplyContactImpulse	contrived	minor	8	out/from pointer locals: ROM forms the output and subtrahend addresses first
 src/objects/bouncing_bombs/BouncingBomb_HandleTimerContact.c	BouncingBomb_HandleTimerContact	contrived	minor	14	self copy and WordFlags_Test kept: ROM copies the object and loads the mask first
+src/objects/bouncing_bombs/BouncingBomb_IsActive.c	BouncingBomb_IsActive	contrived	contrived	12	second object view kept: ROM copies the pointer before the null test
+src/objects/bouncing_bombs/BouncingBomb_InitializeColliders.c	BouncingBomb_InitializeColliders	natural	natural	0	
+src/objects/bouncing_bombs/BouncingBomb_Spawn.c	BouncingBomb_Spawn	contrived	minor	3	second object view for the sprite writes: ROM copies the pointer
