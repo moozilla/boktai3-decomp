@@ -1,4 +1,5 @@
 #include "ui/town/town_map.h"
+#include "gba/io_reg.h"
 
 void Palette_InterpolateBanks(void *, void *, void *, int, int);
 
@@ -94,7 +95,7 @@ void TownMap_UpdateAnimations(struct RegistryChoiceMenu *menu)
 
 void TownMap_ConfirmSelection(struct RegistryChoiceMenu *menu)
 {
-    if (gPadState[1] & 1) {
+    if (gPadState[1] & A_BUTTON) {
         if (TestFlags(menu->cursor, 2) && menu->selection >= 0) {
             if (menu->selection == 1 && menu->alternateScript) {
                 Script_Call(menu->alternateScript, 0);
