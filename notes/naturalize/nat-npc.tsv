@@ -127,3 +127,6 @@ src/npc/actor_sequence.c	SceneActorSequence_InitDisplayResources	contrived	contr
 src/npc/actor_sequence.c	SceneActorSequence_InitFromScript	natural	natural	0	
 src/npc/actor_sequence.c	SceneActorSequence_CreateFromScript	natural	natural	0	
 src/npc/actor_sequence.c	SceneActorSequence_InitDisplayResources	contrived	natural	1	
+src/npc/story_character/StoryCharacter_DispatchCommand.c	StoryCharacter_DispatchCommand	natural	natural	0	
+src/npc/story_character/StoryCharacter_OnCommand.c	StoryCharacter_OnCommand	natural	natural	0	
+src/npc/story_character/StoryCharacter_EnterPendingState.c	StoryCharacter_EnterPendingState	contrived	natural	7	
