@@ -204,3 +204,4 @@ src/effects/directional_effect/Player_OnDirectionalEffectAnimationEvent.c	Player
 src/effects/directional_effect/DirectionalEffect_DecodeAnimationMode.c	DirectionalEffect_DecodeAnimationMode	natural	natural	0	-
 src/effects/directional_effect/Player_ShowDirectionalEffect.c	Player_ShowDirectionalEffect	contrived	natural	2	-
 src/effects/directional_effect/Player_StartDirectionalEffect.c	Player_StartDirectionalEffect	contrived	natural	2	-
+src/effects/directional_effect/sub_08238CE0.c	sub_08238CE0	contrived	natural	2	-
