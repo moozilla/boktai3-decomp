@@ -133,14 +133,8 @@ int Actor_SetMirroredFourWayAnimation(struct SceneActor *actor, int a, int b, in
             flip = 0;
         }
     } else {
-        u32 facing = actor->facing4;
-        u8 range = facing - 1;
-        direction = 0;
-        if (range <= 1)
-            direction = stride;
-        flip = 0;
-        if (facing > 1)
-            flip = 1;
+        direction = actor->facing4 == 1 || actor->facing4 == 2 ? stride : 0;
+        flip = actor->facing4 > 1;
     }
     return DisplayAnimation_SetEntry(draw, a, direction, flip, b, c, d);
 }
