@@ -137,26 +137,27 @@ void GameOver_UpdateLetterTransforms(struct GameOver *panel)
 {
     s32 i;
     s32 spread;
+
     for (i = 0; i < 8; i++) {
         panel->sprites[i].scaleX = panel->extentX;
         panel->sprites[i].scaleY = panel->extentY;
     }
-    i = 3;
-    spread = 0;
-    for (; i >= 0; i--) {
-        if (panel->extentX > 0x40) {
+    for (i = 3, spread = 0; i >= 0; i--) {
+        if (panel->extentX > 64) {
             panel->sprites[i].position.x = panel->sprites[i].baseX - spread;
             spread = AddScaledLetterSpacing(spread - 16, panel);
-        } else
+        } else {
             panel->sprites[i].position.x = panel->sprites[i].baseX;
+        }
     }
     spread = 0;
     for (i = 4; i < 8; i++) {
-        if (panel->extentX > 0x40) {
+        if (panel->extentX > 64) {
             panel->sprites[i].position.x = panel->sprites[i].baseX + spread;
             spread = AddScaledLetterSpacing(spread - 16, panel);
-        } else
+        } else {
             panel->sprites[i].position.x = panel->sprites[i].baseX;
+        }
     }
 }
 
