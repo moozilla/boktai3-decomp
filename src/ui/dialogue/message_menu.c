@@ -73,11 +73,10 @@ int MessageMenu_Update(struct MessageMenu *m)
 
 int MessageMenu_Destroy(struct MessageMenu *m)
 {
-    int *handles = &m->mainText;
-    int i = 2;
-    do {
-        TextWindow_Destroy(*handles++);
-    } while (--i >= 0);
+    int i;
+
+    for (i = 0; i < 3; i++)
+        TextWindow_Destroy((&m->mainText)[i]);
     Anim_Remove(m->transition);
     return 0;
 }

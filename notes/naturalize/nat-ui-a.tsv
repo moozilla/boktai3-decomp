@@ -180,3 +180,4 @@ src/ui/dialogue/choice_menu.c	ChoiceMenu_PrintText	natural	natural	0
 src/ui/dialogue/choice_menu.c	ChoiceMenu_ParseTag	minor	minor	1	shared tag-argument macro; text = Find(); return text keeps the exits separate
 src/ui/dialogue/choice_menu.c	ChoiceMenu_Create	natural	natural	0	
 src/ui/dialogue/message_menu.c	MessageMenu_LoadBackground	minor	natural	1	
+src/ui/dialogue/message_menu.c	MessageMenu_Destroy	minor	natural	1	
