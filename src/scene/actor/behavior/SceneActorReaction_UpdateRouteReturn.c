@@ -82,10 +82,8 @@ static inline u8 SceneActorReaction_Arrive(void *obj)
         goto reroute;
     if (SceneActorChase_MotionFlags(actor, 0x400))
         return 0;
-    {
-        SceneActorChase_ClearFlagComponent(
-            (struct SceneActorChaseFlags16 *)&group->common.gate.flags, 4);
-    }
+    SceneActorChase_ClearFlagComponent((struct SceneActorChaseFlags16 *)&group->common.gate.flags,
+                                       4);
     if (SceneActorChase_MotionFlags(actor, 0x80)) {
         SceneActorChase_SetControl(actor, group->common.gate.control, 0x1A);
         SceneActorChase_SetBehavior(actor, 12);
@@ -97,18 +95,14 @@ static inline u8 SceneActorReaction_Arrive(void *obj)
             SceneActorReaction_CellAt(group->destination), group->destination);
         (group->destination)->pad = 0;
     }
-    {
-        u8 saved = actor->base.body.direction;
-        SceneActorReaction_BeginTurn(obj, saved, randomSamples);
-    }
+    SceneActorReaction_BeginTurn(obj, actor->base.body.direction, randomSamples);
     SceneActorTerrain_RequestRetreatRoute(obj);
     actor->base.field2C2 = 0x20;
     return 0;
-reroute: {
+reroute:
     SceneActorChase_CellCenter(cell, &target);
     if (SceneActorChase_TryRoute(obj, group->route, &actor->base.body.position, &target))
         goto success;
-}
     callback = &group->fallback;
 invoke:
     Callback_InvokeActor(actor, *callback);
@@ -130,16 +124,15 @@ void SceneActorReaction_UpdateRouteReturn(struct ChaseActor *actor)
         return;
     if ((u8)SceneActorReaction_BeginContactResponse(actor))
         return;
-    if ((s32)actor->base.counter2AC <= 60)
-        goto waiting;
-    SceneActorChase_ClearFlagComponent((struct SceneActorChaseFlags16 *)&group->common.gate.flags,
-                                       6);
-    SceneActorChase_SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
-    SceneActorDelay_Prepare((void *)&group->saved, group->common.gate.control, 12,
-                            group->common.gate.field41A);
-    SceneActorChase_SetState(actor, 3, 1, 0);
-    SceneActorReaction_Arrive(actor);
-    return;
-waiting:
+    if ((s32)actor->base.counter2AC > 60) {
+        SceneActorChase_ClearFlagComponent(
+            (struct SceneActorChaseFlags16 *)&group->common.gate.flags, 6);
+        SceneActorChase_SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
+        SceneActorDelay_Prepare((void *)&group->saved, group->common.gate.control, 12,
+                                group->common.gate.field41A);
+        SceneActorChase_SetState(actor, 3, 1, 0);
+        SceneActorReaction_Arrive(actor);
+        return;
+    }
     actor->base.counter2AC++;
 }
