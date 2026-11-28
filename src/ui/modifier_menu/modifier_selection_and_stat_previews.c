@@ -136,32 +136,27 @@ s32 Modifier_CollectSources(struct ModifierSelection *actor, struct ModifierSele
 }
 
 s32 Modifier_ApplyToStat(struct ModifierSelection *actor, struct ModifierSelection *selection,
-                         s32 value, u32 includeSelected, u32 kindArg)
+                         s32 value, u32 includeSelected, u32 kind)
 {
-    u32 kind = kindArg;
-    s32 acc = value;
     /* Original frame reserves an unused eight-byte prefix before the records. */
     struct {
         u8 unused[8];
         struct ModifierRecord records[8];
     } workspace;
-    struct ModifierRecord *record = workspace.records;
+    s32 total = value;
+    struct ModifierRecord *records = workspace.records;
     s32 i;
-    s32 result;
+    s32 count;
     for (i = 0; i < 8; i++)
-        record[i].order = -1;
-    result = Modifier_CollectSources(actor, selection, record, includeSelected);
-    if (result > 0) {
-        s32 count = result;
-        do {
-            if (record->kind == kind)
-                acc = Modifier_ApplyAmount(acc, kind, record->amount);
-            record++;
-        } while (--count != 0);
+        records[i].order = -1;
+    count = Modifier_CollectSources(actor, selection, records, includeSelected);
+    for (i = 0; i < count; i++) {
+        if (records[i].kind == kind)
+            total = Modifier_ApplyAmount(total, kind, records[i].amount);
     }
-    if (acc > 999)
-        acc = 999;
-    return acc;
+    if (total > 999)
+        total = 999;
+    return total;
 }
 
 s32 Modifier_ApplyKindSix(struct ModifierSelection *a, struct ModifierSelection *b, s32 c, u32 d)

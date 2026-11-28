@@ -614,3 +614,4 @@ src/ui/modifier_menu/modifier_selection_and_stat_previews.c	Modifier_TestSelecti
 src/ui/modifier_menu/modifier_selection_and_stat_previews.c	Modifier_ReadPackedValue	fudged	fudged	8	unchanged: 0x3f mask local (a literal changes register assignment in every case)
 src/ui/modifier_menu/modifier_selection_and_stat_previews.c	Modifier_ApplyAmount	natural	natural	0	
 src/ui/modifier_menu/modifier_selection_and_stat_previews.c	Modifier_CollectSources	fudged	natural	2	
+src/ui/modifier_menu/modifier_selection_and_stat_previews.c	Modifier_ApplyToStat	fudged	partial	9	total copy of value, records pointer, unused frame prefix struct (stack layout)
