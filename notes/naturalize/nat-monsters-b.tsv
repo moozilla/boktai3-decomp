@@ -198,3 +198,5 @@ src/monsters/popbud/Combat_SpawnDirectionalProjectile.c	Combat_SpawnDirectionalP
 src/monsters/popbud/Popbud_Create.c	Popbud_Create	natural	natural	0	
 src/monsters/popbud/Popbud_OnTaskDestroy.c	Popbud_OnTaskDestroy	minor	minor	0	raw +0x24: s32 tail return needs Sprite_Remove declared s32
 src/monsters/screamer/Screamer_HandleDefeat.c	Screamer_HandleDefeat	contrived	minor	2	counter casts for fields missing from game_state.h
+src/monsters/screamer/Screamer_OnColliderContact.c	Screamer_OnColliderContact	natural	natural	0	
+src/monsters/screamer/Screamer_ApplyHitReaction.c	Screamer_ApplyHitReaction	contrived	minor	2	spark loop frame struct and pointer temps: loop invariant allocation

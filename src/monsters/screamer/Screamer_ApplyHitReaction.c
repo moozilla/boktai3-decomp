@@ -2,48 +2,9 @@
 #include "engine/math/hit_spark_random.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
+#include "monsters/screamer/screamer_state.h"
 struct Vec {
     u16 x, y, z, pad;
-};
-struct Source {
-    u8 p0[0xa];
-    u16 type;
-    u8 pc[0x38 - 0xc];
-    u32 flags;
-    u8 p3c[8];
-    u16 reaction;
-};
-struct Hit {
-    u8 p0[0x3e];
-    u16 damage;
-    u8 p40[3];
-    u8 state;
-    u16 blocked;
-};
-struct Target {
-    u8 p0[0x40];
-    struct Vec position;
-    u8 p48[0xc0 - 0x48];
-    u8 collider[0xc];
-    struct Vec displayPosition;
-    u8 pd4[0x103 - 0xd4];
-    u8 direction;
-    u16 reaction;
-    u8 p106[0x1dc - 0x106];
-    s16 damage;
-    u16 flash;
-    u8 p1e0[4];
-    s16 health;
-    s16 hudA;
-    u16 pad;
-    u16 sparkMask;
-    s16 hudB;
-    u8 p1ee[6];
-    s16 hudTime;
-    u8 p1f6[2];
-    void *hud;
-    u8 p1fc[8];
-    u32 damageType;
 };
 extern const struct Vec gUnk_0824FE9C;
 void Collision_CalculateDamageResponse(void *, void *);
@@ -52,46 +13,36 @@ void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
 void SceneHud_SetTimedState(void *, s32, s32, s32, s32, s32);
 void PlayerStats_AddContactHundredths(void *, void *, s32);
 void SparkParticle_Spawn(void *, s32, void *, s32, s32, s32, s32, s32);
-void Screamer_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
-                               struct Target *targetInput)
+void Screamer_ApplyHitReaction(struct ContactCollider *source, struct ContactCollider *hit,
+                               struct ScreamerState *screamer)
 {
     struct {
         struct Vec position, velocity;
     } frame;
-    struct Source *source = sourceInput;
-    struct Hit *hit = input;
-    struct Target *target = targetInput;
+
     Collision_CalculateDamageResponse(source, hit);
-    if (hit->blocked) {
-        hit->damage = 0;
-        hit->state = 0;
+    if (hit->responseValue) {
+        hit->cost = 0;
+        hit->costFlags = 0;
     } else {
-        target->damage = hit->damage;
-        target->damageType = source->type;
-        target->reaction = source->reaction;
-        if (source->flags & 0x40) {
-            void *hud;
-            s32 health;
-            s32 a, b, direction;
-            target->reaction = 0x26;
-            target->flash = 8;
+        screamer->f1DC = hit->cost;
+        screamer->f204 = source->contactFlags;
+        screamer->bodyCollider.responseValue = source->responseValue;
+        if (source->reactionFlags & 0x40) {
+            screamer->bodyCollider.responseValue = 0x26;
+            screamer->f1DE = 8;
             Sound_PlaySong(0x211);
-            DamageNumberDisplay_Show(target->collider, target->damage, 0, &target->displayPosition,
-                                     target->pd4, 1);
-            hud = target->hud;
-            health = target->health;
-            a = target->hudA;
-            b = target->hudB;
-            direction = 0;
-            if (target->direction == 4)
-                direction = 1;
-            SceneHud_SetTimedState(hud, health, a, b, direction, target->hudTime);
-            if (source->flags & 0x40)
+            DamageNumberDisplay_Show(&screamer->bodyCollider, screamer->f1DC, 0,
+                                     &screamer->bodyCollider.position,
+                                     &screamer->bodyCollider.offset, 1);
+            SceneHud_SetTimedState(screamer->f1F8, screamer->f1E4, screamer->f1E6, screamer->f1EC,
+                                   screamer->bodyCollider.costFlags == 4, screamer->f1F4);
+            if (source->reactionFlags & 0x40)
                 goto sparks;
         }
         PlayerStats_AddContactHundredths(source, hit, 0);
     sparks:
-        if (source->flags & target->sparkMask) {
+        if (source->reactionFlags & (u16)screamer->f1EA) {
             s32 i;
             struct Vec *vel = &frame.velocity;
             struct Vec *pos = &frame.position;
@@ -104,7 +55,7 @@ void Screamer_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
                 u32 sample;
                 u32 x;
                 frame.velocity = gUnk_0824FE9C;
-                frame.position = target->position;
+                frame.position = *(struct Vec *)&screamer->sprite.position;
                 value = (u32)gRandomTable;
                 random = HitSpark_NextIndex(*index, limit);
                 sample = HitSpark_Sample(value, random);
@@ -116,13 +67,11 @@ void Screamer_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
                 pos->y += (u8)HitSpark_Sample(value, random);
                 random = HitSpark_NextIndex(random, limit);
                 *index = random;
-                {
-                    u32 last = HitSpark_Sample(value, random);
-                    x = pos->z - 0x40;
-                    last &= mask;
-                    x += last;
-                    pos->z = x;
-                }
+                sample = HitSpark_Sample(value, random);
+                x = pos->z - 0x40;
+                sample &= mask;
+                x += sample;
+                pos->z = x;
                 value = 0;
                 SparkParticle_Spawn(&frame.position, 1, vel, value, 3, 8, 2, 2);
             }
