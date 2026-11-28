@@ -264,12 +264,12 @@ s32 DamageNumberDisplay_Update(struct DamageNumberDisplay *display)
 
 u32 DamageNumberDisplay_Destroy(struct DamageNumberDisplay *display)
 {
-    s32 index = 0;
-    do {
-        DamageNumberDisplay_RemoveGroup(display, index);
-        ++index;
-    } while (index <= 3);
-    return (u32)(gDamageNumberDisplay = NULL);
+    s32 i;
+
+    for (i = 0; i < 4; i++)
+        DamageNumberDisplay_RemoveGroup(display, i);
+    gDamageNumberDisplay = NULL;
+    return 0;
 }
 
 void Effect_Initialize(void *, void *, u32);
