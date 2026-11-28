@@ -31,3 +31,5 @@ src/monsters/ivy/ivy.c	SceneActorControl_BeginSoundTransition	contrived	contrive
 src/monsters/ivy/ivy.c	Ivy_NotifyGroup	natural	natural	0	
 src/monsters/ivy/ivy.c	Ivy_InitProfileId	natural	natural	0	
 src/monsters/ivy/ivy.c	Ivy_TickDrawable	minor	natural	3	drawable+0x40 position of the tile drawable stays a raw offset (no type for that drawable)
+src/monsters/ivy/ivy.c	Ivy_InitializeContactColliders	minor	minor	0	packed position words written through u32 casts
+src/monsters/ivy/ivy.c	SceneActor_BeginReaction22	minor	natural	9	

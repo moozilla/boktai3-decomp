@@ -1294,15 +1294,13 @@ void Ivy_InitializeContactColliders(struct ChaseActor *actor)
                                    actor);
 }
 
+// scope: put SceneActor_BeginReaction22 begin
 void SceneActor_BeginReaction22(struct ChaseActor *actor)
 {
-    actor->base.state2A8 = 0;
-    actor->base.phase2A9 = 0;
-    actor->base.behavior2AA = 0;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
+    SceneActorTerrain_EnterState(actor, 0, 0, 0);
     SceneActorChase_SetControl(actor, Ivy_UpdateActiveState, 0x22);
 }
+// scope: put SceneActor_BeginReaction22 end
 
 void *SceneActor_FindNearbyPlayerTarget(struct ChaseActor *actor)
 {
