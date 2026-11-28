@@ -2429,63 +2429,23 @@ void TutorialOtenko_ConfigureFromScript(void)
     }
 }
 
-/* Initialization view names the body and counters absent from the shared layout. */
-struct ActorInitData {
-    u8 unk_00[12];
-    const u16 *palette;
-    u8 unk_10[0x1c];
-};
-struct ActorInitController {
-    u8 unk_00[0x18];
-    void *owner;
-    struct ActorChildSlot children[16];
-    struct DisplaySequenceSprite obj;
-    struct ActorInitData data[1];
-    u8 shadow[0x40];
-    void *animationResource;
-    u16 count;
-    u8 delta, unk_E7B;
-    u16 counter;
-    u8 unk_E7E[2];
-    struct SceneActorBody body;
-    s16 deltaX, deltaY, deltaZ;
-    u8 unk_ECE[2];
-    s16 targetX, targetY, targetZ;
-    u8 unk_ED6[2];
-    s16 startX, startY, startZ;
-    u8 unk_EDE[2];
-    struct ContactPosition savedPosition;
-    u16 alternate[16], fadeColors[32];
-    const u16 *savedPalette;
-    u8 unk_F4C[0x12];
-    u16 speed, heading;
-    u8 unk_F62[4];
-    u8 direction;
-    u8 unk_F67[4];
-    u8 flip;
-    u8 unk_F6C[0xe];
-    u16 savedY2;
-    u8 unk_F7C[0xe];
-    u16 resource;
-    u8 unk_F8C[8];
-    void (*scaleFn)(void *), (*otherFn)(void *);
-    s32 timer;
-    u32 variant;
-};
-
 s32 AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
 void Sprite_SetOriginStub(void *, s32, s32);
 void Shadow_Initialize(void *, void *, s32);
 
-static inline void ActorInit_InitMainSprite(struct ActorInitController *p,
+/* Initialization view of the main sprite's palette bank buffer. */
+struct ActorInitData {
+    u8 unk_00[12];
+    const u16 *palette;
+};
+
+static inline void ActorInit_InitMainSprite(struct ActorAnimController *p,
                                             struct DisplaySequenceSprite *obj)
 {
-    void *effect;
-    p->animationResource = ScriptProc_Start(0x922e, 0xc6a0);
-    effect = p->data;
-    AnimData_Load(effect, 0x97d3);
-    Sprite_Init(obj, effect, 0);
+    p->arg = (u32)ScriptProc_Start(0x922e, 0xc6a0);
+    AnimData_Load(p->effect, 0x97d3);
+    Sprite_Init(obj, p->effect, 0);
     Sprite_SetOriginStub(obj, -8, -19);
     obj->priority = 0;
     obj->flags = 3;
@@ -2502,7 +2462,7 @@ static inline void ActorInit_SetChildControl(void (*callback)(void *, void *),
 /* Initialize the singleton controller, its palette banks and child sprites. */
 s32 TutorialOtenko_InitializeController(void *arg0)
 {
-    struct ActorInitController *p = arg0;
+    struct ActorAnimController *p = arg0;
     struct DisplaySequenceSprite *obj;
     void *shadow;
     const u16 *palette, *src;
@@ -2513,21 +2473,21 @@ s32 TutorialOtenko_InitializeController(void *arg0)
     p->owner = gPlayers[0];
     obj = &p->obj;
     ActorInit_InitMainSprite(p, obj);
-    shadow = p->shadow;
+    shadow = p->p2;
     Shadow_Initialize(shadow, &p->obj.position.x, 0);
     ActorShadow_Disable(shadow);
     p->delta = 1;
     p->count = 0;
     p->counter = 0;
     {
-        struct ActorInitData *data = p->data;
+        struct ActorInitData *data = (struct ActorInitData *)p->effect;
         const u16 **saved = &p->savedPalette;
         *saved = data->palette;
     }
     palette = p->savedPalette;
     mask = 0xffff;
     src = palette;
-    dst = p->fadeColors;
+    dst = p->base;
     for (i = 15; i >= 0; i--) {
         dst[16] = *src;
         *dst = *src & mask;

@@ -333,3 +333,8 @@ src/ui/title/tutorial_otenko.c	TimeDisplay_RemoveAnimatedObjects	contrived	natur
 src/ui/title/tutorial_otenko.c	TimeDisplay_SetSelectionKeyframe	contrived	natural	3	
 src/ui/title/tutorial_otenko.c	TutorialOtenko_HideAuxiliarySprites	contrived	minor	5	two widget pointers (load offset form)
 src/ui/title/tutorial_otenko.c	TutorialOtenko_UpdatePairedSpriteAnimation	contrived	natural	1	
+src/ui/title/tutorial_otenko.c	TimeDisplay_GetLightPhaseGroup	natural	natural	0	
+src/ui/title/tutorial_otenko.c	TimeDisplay_GetCurrentMonth	natural	natural	0	
+src/ui/title/tutorial_otenko.c	TutorialOtenko_RequestControllerRemoval	natural	natural	0	
+src/ui/title/tutorial_otenko.c	TutorialOtenko_EnsureController	natural	natural	0	
+src/ui/title/tutorial_otenko.c	TutorialOtenko_InitializeController	contrived	minor	8	countdown palette copies with a mask local; view of the effect buffer for its palette pointer; sprite/shadow locals

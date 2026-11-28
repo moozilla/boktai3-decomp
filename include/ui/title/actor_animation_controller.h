@@ -61,18 +61,20 @@ struct Player;
 
 struct ActorAnimController {
     struct Task task;
-    struct Player *owner; /* 0x18: player linked to this controller */
+    struct Player *owner;               /* 0x18: player linked to this controller */
     struct ActorChildSlot children[16]; /* 0x1C, stride 0xDC */
-    struct DisplaySequenceSprite obj; /* 0xDDC */
+    struct DisplaySequenceSprite obj;   /* 0xDDC */
     u8 effect[12];      /* 0xE08: palette bank index buffer, see AnimData_SelectPaletteBank */
     const u16 *palette; /* 0xE14: active 16-color palette pointer */
     u8 unkE18[12];
     struct DisplaySequenceState anim; /* 0xE24 */
-    u8 p2[0x40];           /* 0xE34: motion-related state, not yet identified */
-    u32 arg;               /* 0xE74 */
-    u16 count;             /* 0xE78 */
-    s8 delta;              /* 0xE7A */
-    u8 unkE7B[5];
+    u8 p2[0x40];                      /* 0xE34: motion-related state, not yet identified */
+    u32 arg;                          /* 0xE74 */
+    u16 count;                        /* 0xE78 */
+    s8 delta;                         /* 0xE7A */
+    u8 unkE7B;
+    u16 counter; /* 0xE7C */
+    u8 unkE7E[2];
     struct SceneActorBody body; /* 0xE80 */
     s16 deltaX, deltaY, deltaZ; /* 0xEC8 */
     u8 unkECE[2];
@@ -81,23 +83,23 @@ struct ActorAnimController {
     s16 startX, startY, startZ; /* 0xED8 */
     u8 unkEDE[2];
     struct ContactPosition savedPosition; /* 0xEE0 */
-    u16 alternate[16];       /* 0xEE8: palette fade source colors */
-    u16 base[16];            /* 0xF08: palette fade target colors */
-    u16 output[16];          /* 0xF28: palette fade blended colors */
-    const u16 *savedPalette; /* 0xF48 */
-    s16 step;                /* 0xF4C */
-    u16 duration;            /* 0xF4E */
-    void *handle;            /* 0xF50 */
-    void *completionHandle;  /* 0xF54 */
-    u8 done, state;          /* 0xF58 */
-    u16 mode : 4;            /* 0xF5A */
+    u16 alternate[16];                    /* 0xEE8: palette fade source colors */
+    u16 base[16];                         /* 0xF08: palette fade target colors */
+    u16 output[16];                       /* 0xF28: palette fade blended colors */
+    const u16 *savedPalette;              /* 0xF48 */
+    s16 step;                             /* 0xF4C */
+    u16 duration;                         /* 0xF4E */
+    void *handle;                         /* 0xF50 */
+    void *completionHandle;               /* 0xF54 */
+    u8 done, state;                       /* 0xF58 */
+    u16 mode : 4;                         /* 0xF5A */
     u16 phase : 12;
-    u16 oldMode;        /* 0xF5C */
-    u16 speed, heading; /* 0xF5E */
+    u16 oldMode;            /* 0xF5C */
+    u16 speed, heading;     /* 0xF5E */
     s16 interactionHeading; /* 0xF62 */
-    u8 flags;       /* 0xF64: state-entry flag */
-    u8 phaseSelect; /* 0xF65: provisional, selects a (mode,phase) pair on setup */
-    u8 direction;   /* 0xF66 */
+    u8 flags;               /* 0xF64: state-entry flag */
+    u8 phaseSelect;         /* 0xF65: provisional, selects a (mode,phase) pair on setup */
+    u8 direction;           /* 0xF66 */
     s8 targetFacing;
     u8 facing;
     s8 bend;       /* 0xF69 */
@@ -108,14 +110,14 @@ struct ActorAnimController {
     u8 growFlag; /* 0xF6F: provisional, gates TutorialOtenko_UpdateScaleGrowth */
     u8 unkF70[6];
     u8 releaseControl; /* 0xF76: clear script control when the finishing animation ends */
-    u8 variant8; /* 0xF77: provisional, not the same slot as .variant below */
+    u8 variant8;       /* 0xF77: provisional, not the same slot as .variant below */
     u8 unkF78[2];
     u16 savedY2; /* 0xF7A: provisional idle-restore save, distinct from sprite.y */
     u8 heightSettled;
-    u8 interrupted; /* 0xF7D */
-    u16 savedPhase; /* 0xF7E */
-    u16 blinkTimer;   /* 0xF80 */
-    s16 blinkInterval; /* 0xF82: decreases as disappearance accelerates */
+    u8 interrupted;            /* 0xF7D */
+    u16 savedPhase;            /* 0xF7E */
+    u16 blinkTimer;            /* 0xF80 */
+    s16 blinkInterval;         /* 0xF82: decreases as disappearance accelerates */
     u16 delay;                 /* 0xF84 */
     u8 savedFrame, savedTimer; /* 0xF86 */
     u8 delayCounter;           /* 0xF88: provisional, distinct from the delay/timer fields above */
@@ -123,10 +125,10 @@ struct ActorAnimController {
     u16 resource;              /* 0xF8A */
     void (*previous)(void *);  /* 0xF8C */
     void (*fn)(void *);        /* 0xF90 */
-    void (*scaleFn)(struct ActorAnimController *);   /* 0xF94 */
-    void (*otherFn)(struct ActorAnimController *);   /* 0xF98 */
-    s32 timer;                 /* 0xF9C */
-    u32 variant;               /* 0xFA0 */
+    void (*scaleFn)(struct ActorAnimController *); /* 0xF94 */
+    void (*otherFn)(struct ActorAnimController *); /* 0xF98 */
+    s32 timer;                                     /* 0xF9C */
+    u32 variant;                                   /* 0xFA0 */
 };
 
 typedef char ActorAnimControllerSizeCheck[sizeof(struct ActorAnimController) == 0xFA4 ? 1 : -1];
