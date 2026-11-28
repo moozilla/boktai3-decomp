@@ -1,34 +1,20 @@
-#include "global.h"
-#include "engine/video/render.h"
-#include "scene/motion/scene_actor_chase_shared.h"
-struct Elem {
-    u32 flags;
-    u8 pad[40];
-};
-void HealthBurstEffect_StartBurst(u8 *);
-void HealthBurstEffect_UpdateBurstSprites(u8 *);
-void HealthBurstEffect_UpdateFadeOut(u8 *);
-#define H(o) (*(u16 *)(p + (o)))
-void HealthBurstEffect_UpdateBursts(u8 *p)
+#include "effects/healing/healing_effect.h"
+#include "engine/engine_pause_flags.h"
+
+void HealthBurstEffect_UpdateBursts(struct HealthBurstEffect *effect)
 {
-    u32 age = H(0x34e);
-    if (age == 0 || age == 18 || age == 36 || age == 54 || age == 72 || age == 90)
-        HealthBurstEffect_StartBurst(p);
-    HealthBurstEffect_UpdateBurstSprites(p);
-    H(0x34e)++;
-    if (H(0x34e) > 121) {
-        u32 *flags = &gEnginePauseFlags;
-        void (*next)(u8 *) = HealthBurstEffect_UpdateFadeOut;
-        u32 one = 1;
-        s32 addr = (s32)(p + 0xe8), end = (s32)(p + 0x114);
-        u32 zero;
-        do {
-            *(u32 *)addr |= one;
-            addr += 44;
-        } while (addr <= end);
-        zero = 0;
-        SceneActorChase_AndWordFlags(flags, ~4);
-        *(void (**)(u8 *))(p + 0x350) = next;
-        H(0x34e) = zero;
+    u32 timer = effect->timer;
+    s32 i;
+
+    if (timer == 0 || timer == 18 || timer == 36 || timer == 54 || timer == 72 || timer == 90)
+        HealthBurstEffect_StartBurst(effect);
+    HealthBurstEffect_UpdateBurstSprites(effect);
+    effect->timer++;
+    if (effect->timer > 121) {
+        for (i = 0; i < 2; i++)
+            effect->sprites[i].flags |= 1;
+        Engine_ClearPauseFlags(4);
+        effect->state = HealthBurstEffect_UpdateFadeOut;
+        effect->timer = 0;
     }
 }
