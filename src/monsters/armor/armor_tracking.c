@@ -47,7 +47,6 @@ void Armor_UpdateAlternateDeathSequence(struct S *p)
     }
 }
 
-
 void Armor_UpdateAction30(struct ArmorActionController *p)
 {
     switch (p->phase) {
@@ -77,15 +76,14 @@ s32 Math_Atan2(s32, s32);
 
 u32 ActorController_StartAlternateTurn(struct Armor *, u32);
 
-
 void Armor_UpdateFacingAction(struct Armor *p, s32 alternate)
 {
     switch (p->state) {
         case 0: {
-            u8 *target = gGameState;
-            s32 direction =
-                (Math_Atan2(*(s16 *)(target + 0x30) - p->x, *(s16 *)(target + 0x34) - p->z) + 32) &
-                0xc0;
+            s32 direction = (Math_Atan2(*(s16 *)(gGameState + 0x30) - p->x,
+                                        *(s16 *)(gGameState + 0x34) - p->z) +
+                             32) &
+                            0xc0;
             if (p->direction != direction) {
                 if (ActorController_StartAlternateTurn(p, direction))
                     p->state = 1;
@@ -109,18 +107,15 @@ void Armor_UpdateFacingAction(struct Armor *p, s32 alternate)
     }
 }
 
-
 void Armor_UpdateFacingAction25(u8 *p)
 {
     Armor_UpdateFacingAction(p, 0);
 }
 
-
 void Armor_UpdateFacingAction32(s32 a)
 {
     Armor_UpdateFacingAction(a, 1);
 }
-
 
 void Armor_UpdateTrackingAction31(s32 a)
 {
@@ -155,7 +150,6 @@ struct ArmorTrackingTarget {
     u8 pad[0x30];
     s16 x, y, z;
 };
-
 
 void ActorController_StartTurn(void *, u32);
 
@@ -288,8 +282,6 @@ struct E {
     u8 b;
 };
 
-
-
 void Armor_UpdateDelayedTrackingModeZero(struct E *p)
 {
     if (p->b != 0) {
@@ -329,7 +321,6 @@ void Armor_UpdateDelayedTrackingModeThree(struct E *p)
         Armor_UpdateOffsetTracking(p, 2, 0);
     }
 }
-
 
 void Armor_StopAndFinishBehavior(struct E *p)
 {

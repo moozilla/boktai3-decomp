@@ -267,3 +267,4 @@ src/monsters/axe/axe.c	Axe_UpdateAttackColliderPositions	minor	minor	1	remaining
 src/monsters/axe/axe.c	ActorCollision_InitThreeAuxiliaryAttacks	minor	minor	1	remaining: maskhelper
 src/monsters/axe/axe.c	Axe_UpdateBodyColliders	contrived	contrived	20	remaining: zeroone,constlocal,maskhelper
 src/monsters/axe/axe.c	SceneActorControl_AdvanceReactionCount	contrived	contrived	6	remaining: mask,maskhelper
+src/monsters/armor/armor_tracking.c	Armor_UpdateFacingAction	contrived	minor	2	remaining: rawoff
