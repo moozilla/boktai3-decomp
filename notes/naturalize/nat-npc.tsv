@@ -39,3 +39,6 @@ src/npc/manager/scene_actor_animation.c	Actor_EmitTowardNearbyActors	contrived	m
 src/npc/manager/scene_actor_animation.c	Actor_UpdateInteractionCue	contrived	minor	62	SceneActor_TestFlags twice (mask-first order in the loop)
 src/npc/manager/scene_actor_animation.c	Actor_BeginScriptControl	natural	natural	0	
 src/npc/manager/scene_actor_animation.c	Actor_InitBehaviorFromScript	minor	natural	1	
+src/npc/manager/scene_actor_animation.c	Actor_OnHiddenIdleUpdate	natural	natural	0	
+src/npc/manager/scene_actor_animation.c	Actor_OnIdleUpdate	natural	natural	0	
+src/npc/manager/scene_actor_animation.c	Actor_UpdateWalkToPosition	contrived	minor	12	distance/limit and from/to copies stay: the ROM copies pos/target to other registers at the range compare
