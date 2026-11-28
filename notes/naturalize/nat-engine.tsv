@@ -607,3 +607,4 @@ src/system/inventory/Inventory_ResetEquipmentAssignments.c	Inventory_ResetEquipm
 src/system/inventory/Inventory_GetConsumableObtainedFlag.c	Inventory_GetConsumableObtainedFlag	contrived	natural	1	
 src/system/inventory/Inventory_SetFlag.c	Inventory_SetFlag	contrived	natural	1	
 src/system/inventory/Inventory_GetConsumableCategory.c	Inventory_GetConsumableCategory	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
+src/system/inventory/Inventory_SetConsumableEntry.c	Inventory_SetConsumableEntry	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
