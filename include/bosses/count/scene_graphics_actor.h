@@ -39,7 +39,9 @@ struct SceneActorGraphics {
     s16 contactStatHundredths; /* 0x380 */
     u8 unk382;
     u8 trackedPlayerEscaped; /* 0x383: set after enough facing changes in the grab. */
-    u8 unk384[4];
+    u8 barrierCount; /* 0x384 */
+    u8 retreatFrames; /* 0x385: frames of the dying actor's slide back from blocked or low ground. */
+    u8 unk386[2];
     u32 reactionScript; /* 0x388: called after the special hit reaction. */
     u8 effectScale; /* 0x38C: SceneActorGraphics_SelectResource / SceneActors_DispatchCommands. */
     u8 unk38D;
@@ -107,7 +109,9 @@ struct SceneGraphicsActor {
     struct AnimSpriteResource animationResource; /* 0x220: keyframe resource. */
     struct AnimSprite animation; /* 0x240: body animation playback. */
     u8 unk2A0[0x30C - 0x2A0];
-    u8 approachMotion[0x33C - 0x30C]; /* 0x30C: polar interpolation state of the charge approach. */
+    u8 approachMotion[0x32C - 0x30C]; /* 0x30C: polar interpolation state of the charge approach. */
+    struct ContactPosition retreatTarget; /* 0x32C: the dying actor slides back toward this. */
+    u8 unk334[0x33C - 0x334];
     s32 pendingDamage;
     u8 damagePending;
     u8 specialReaction; /* 0x341: sound, sparks and script on reaction completion. */
