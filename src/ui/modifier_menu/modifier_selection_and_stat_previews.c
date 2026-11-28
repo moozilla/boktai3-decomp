@@ -315,16 +315,14 @@ void ModifierMenu_SelectPendingSource(struct ModifierMenu *menu)
     }
 }
 
-s32 ModifierMenu_CommitFirstSource(struct ModifierMenu *p)
+s32 ModifierMenu_CommitFirstSource(struct ModifierMenu *menu)
 {
-    struct ModifierSelection *s = &p->pending;
-    struct ModifierSelection *d = &p->current;
-    u16 v;
-    d->values0[0] = s->values0[0];
-    d->values0[1] = s->values0[1];
-    v = s->sourceIds[0];
-    d->sourceIds[0] = v;
-    gGameState->unk7A0[0] = v;
+    struct ModifierSelection *pending = &menu->pending;
+    struct ModifierSelection *current = &menu->current;
+    current->values0[0] = pending->values0[0];
+    current->values0[1] = pending->values0[1];
+    current->sourceIds[0] = pending->sourceIds[0];
+    gGameState->unk7A0[0] = current->sourceIds[0];
     return 0;
 }
 
