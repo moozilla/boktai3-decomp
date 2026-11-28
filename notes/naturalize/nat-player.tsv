@@ -383,3 +383,10 @@ src/player/cutscene/player_cue_commands.c	PlayerCue_OverlaySet	natural	natural	0
 src/player/cutscene/player_cue_commands.c	PlayerCue_OverlayOn	natural	natural	0	-
 src/player/cutscene/player_cue_commands.c	PlayerCue_OverlayOff	natural	natural	0	-
 src/player/cutscene/player_cue_commands.c	PlayerCue_SetPosition	minor	natural	1	-
+src/player/cutscene/player_cue_commands.c	PlayerCue_Hide	natural	natural	0	-
+src/player/cutscene/player_cue_commands.c	PlayerCue_Stand	natural	natural	0	-
+src/player/cutscene/player_cue_commands.c	PlayerCue_Face	natural	natural	0	-
+src/player/cutscene/player_cue_commands.c	PlayerCue_Idle	natural	natural	0	-
+src/player/cutscene/player_cue_commands.c	PlayerCue_StandVariant2	natural	natural	0	-
+src/player/cutscene/player_cue_commands.c	PlayerCue_StandVariant3	contrived	contrived	13	unchanged: heading/side pointer locals and the two quadrant helpers order the address and test
+src/player/cutscene/player_cue_commands.c	PlayerCue_WalkTo	minor	natural	1	-

@@ -171,7 +171,7 @@ void PlayerCue_StandVariant3(struct Player *player, s32 facing, u32 parameter)
 void PlayerCue_WalkTo(struct Player *player, const struct ContactPosition *destination,
                       u32 parameter, s32 targetFacing)
 {
-    (*(struct ContactPosition *)&player->cueDestination) = *destination;
+    *(struct ContactPosition *)&player->cueDestination = *destination;
     player->cueParameter = parameter;
     player->targetFacing = targetFacing;
     if (player->actionMode == 3) {
