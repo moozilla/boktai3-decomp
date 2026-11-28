@@ -12,35 +12,30 @@ void sub_08217BBC(void)
 {
     s32 i;
     s32 j;
-    s32 next;
     u16 *src;
     u16 *dst;
-    u16 tag;
 
     gBgPaletteSource = Palette_GetBackgroundBuffer();
-    for (i = 0; i <= 15; i = next) {
+    for (i = 0; i < 16; i++) {
         if (i < gPaletteBanksInUse)
-            src = (u16 *)((u8 *)gPaletteBankData + (gObjPaletteKeys[i] << 5));
+            src = gPaletteBankData + gObjPaletteKeys[i] * 16;
         else
             src = gObjPaletteBuffer[i];
         dst = gObjPaletteBuffer[i];
-        tag = gObjPaletteKeys[i];
-        next = i + 1;
-        if (tag != 0x3AA) {
-            j = 15;
-            do {
+        if (gObjPaletteKeys[i] != 0x3AA) {
+            for (j = 0; j < 16; j++) {
                 s32 color = *src;
-                s32 r = color & 0x1F, g = (color & 0x3E0) >> 5, b = (color & 0x7C00) >> 10;
-                s32 v = r + g + b;
-                v = (v >> 2) + (v >> 4) + (v >> 6);
-                {
-                    u16 o = v | (v << 5) | (v << 10);
-                    *dst = o;
-                }
+                s32 r = color & 0x1F;
+                s32 g = (color & 0x3E0) >> 5;
+                s32 b = (color & 0x7C00) >> 10;
+                s32 gray = r + g + b;
+                u16 result;
+                gray = (gray >> 2) + (gray >> 4) + (gray >> 6);
+                result = gray | (gray << 5) | (gray << 10);
+                *dst = result;
                 src++;
                 dst++;
-                j--;
-            } while (j >= 0);
+            }
         }
     }
 }
