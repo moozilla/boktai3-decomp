@@ -176,23 +176,20 @@ void ActorParticles_SpawnSideBurst(struct SideBurstActor *p)
 {
     struct ContactPackedVector a, b;
     u32 anim = p->field4B + 0x378;
+    u8 layer;
     a.x = (ActorParticles_NextRandom() & 31) - 7;
     a.y = -32;
     a.z = 0;
     b.x = -(ActorParticles_NextRandom() & 3) - 3;
     b.y = -(ActorParticles_NextRandom() & 7) - 3;
     b.z = (ActorParticles_NextRandom() & 7) - 3;
-    {
-        u8 layer = p->field4A;
-        ActorEffect_SpawnAtActorPos(p, &a, &b, 0x3d99, 0, layer, 1, 0, 0, anim, 0x30, 1, 0, 2, 6);
-    }
+    layer = p->field4A;
+    ActorEffect_SpawnAtActorPos(p, &a, &b, 0x3d99, 0, layer, 1, 0, 0, anim, 0x30, 1, 0, 2, 6);
     b.x = (ActorParticles_NextRandom() & 3) + 2;
     b.y = -(ActorParticles_NextRandom() & 7) - 2;
     b.z = (ActorParticles_NextRandom() & 7) - 3;
-    {
-        u8 layer = p->field4A;
-        ActorEffect_SpawnAtActorPos(p, &a, &b, 0x3d99, 0, layer, 1, 0, 0, anim, 0x30, 1, 0, 2, 6);
-    }
+    layer = p->field4A;
+    ActorEffect_SpawnAtActorPos(p, &a, &b, 0x3d99, 0, layer, 1, 0, 0, anim, 0x30, 1, 0, 2, 6);
 }
 
 struct ActorParticleEmitter {
