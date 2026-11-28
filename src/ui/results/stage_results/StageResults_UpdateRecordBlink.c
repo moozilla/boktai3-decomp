@@ -1,20 +1,19 @@
 #include "global.h"
+#include "ui/results/stage_results.h"
+
 s32 Mod(s32, s32);
-void StageResults_UpdateRecordBlink(u8 *s)
+
+void StageResults_UpdateRecordBlink(struct StageResults *results)
 {
-    u32 c = s[0x1208];
-    if (c == 1) {
-        if (Mod(s[0x1209], 0x14) == 0) {
-            u32 *w = (u32 *)(s + 0x2CC);
-            u32 v = *w;
-            if (v & c)
-                v &= ~1;
+    if (results->isRecord == 1) {
+        if (Mod(results->blinkTimer, 20) == 0) {
+            if (results->sprites[7].flags & 1)
+                results->sprites[7].flags &= ~1;
             else
-                v |= c;
-            *w = v;
+                results->sprites[7].flags |= 1;
         }
-        s[0x1209]++;
+        results->blinkTimer++;
     } else {
-        *(u32 *)(s + 0x2CC) |= 1;
+        results->sprites[7].flags |= 1;
     }
 }
