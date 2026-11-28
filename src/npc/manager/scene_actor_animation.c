@@ -771,7 +771,7 @@ void Actor_UpdateWalkToPosition(void *unused, struct SceneActor *actor)
     }
 }
 
-static inline void SceneActorAnimation_SetAngle(struct SceneActor *actor, s16 angle)
+static inline void SceneActorAnimation_SetAngle(struct SceneActor *actor, int angle)
 {
     actor->body.direction = angle;
     actor->facing8 = SceneFacing_EightWay(angle);
@@ -946,48 +946,46 @@ u32 Route_GetMovementTowardCurrentPoint(void *, void *, void *, void *, u32, u32
 
 void Actor_OnPathFollowUpdate(void *unused, struct SceneActor *actor)
 {
-    struct SceneActorBody *path = &actor->body;
-    struct SceneActorRouteCursor *ctx = &actor->route;
-    struct ContactPosition *pos = &actor->body.position;
-    union SceneActorDisplay *anim = &actor->drawable;
+    struct SceneActorBody *body = &actor->body;
+    struct SceneActorRouteCursor *route = &actor->route;
+    struct ContactPosition *position = &actor->body.position;
+    union SceneActorDisplay *drawable = &actor->drawable;
     if (actor->animationEntered) {
+        u16 *point;
         actor->animationEntered = 0;
         actor->finished = 0;
-        {
-            struct SceneActorRouteCursor *c3 = ctx;
-            u16 *t = (u16 *)c3->point;
-            int r = Math_Atan2(t[0] - pos->x, t[1] - pos->z);
-            actor->body.direction = r;
-            actor->facing8 = SceneFacing_EightWay(r);
-            actor->facing4 = SceneFacing_FourWay(r);
-        }
+        point = (u16 *)route->point;
+        SceneActorAnimation_SetAngle(actor,
+                                     Math_Atan2(point[0] - position->x, point[1] - position->z));
         Actor_PlayAnimationEntry(actor, 1, 1, 0, 4);
         actor->routeProgress = 0;
         actor->routeStepFinished = 0;
     }
-    SceneActor_SetFlags(actor, 4096);
+    SceneActor_SetFlags(actor, 0x1000);
     if ((u8)actor->query(actor) != 1) {
         if (actor->routeStepFinished == 0) {
-            if (anim->common.kind == 2) {
+            if (drawable->common.kind == 2) {
                 struct DisplayKeyframeState *keyframes = &actor->drawable.keyframe.keyframes;
                 if (keyframes->status & 4) {
-                    u32 v;
+                    u32 speed;
                     if (keyframes->frame & 1)
-                        v = (u16)actor->radiusA >> 1;
+                        speed = (u16)actor->radiusA >> 1;
                     else
-                        v = (u16)actor->radiusA;
-                    actor->routeStepFinished = Route_GetMovementTowardCurrentPoint(
-                        ctx, &path->position, &path->motion, &path->direction, v, v, v);
+                        speed = (u16)actor->radiusA;
+                    actor->routeStepFinished =
+                        Route_GetMovementTowardCurrentPoint(route, &body->position, &body->motion,
+                                                            &body->direction, speed, speed, speed);
                 }
             } else {
-                u32 v = (u16)actor->radiusA;
+                u32 speed = (u16)actor->radiusA;
                 actor->routeStepFinished = Route_GetMovementTowardCurrentPoint(
-                    ctx, pos, &actor->body.motion, &actor->body.direction, v, v, v);
+                    route, position, &actor->body.motion, &actor->body.direction, speed, speed,
+                    speed);
             }
         }
         if (actor->routeStepFinished) {
-            if (anim->common.kind == 2) {
-                struct DisplayKeyframeState *keyframes = &anim->keyframe.keyframes;
+            if (drawable->common.kind == 2) {
+                struct DisplayKeyframeState *keyframes = &drawable->keyframe.keyframes;
                 if (keyframes->status & 2)
                     actor->finished = 1;
             } else if (DisplayAnimation_TestFinished(&actor->drawable.common.kind))

@@ -45,3 +45,5 @@ src/npc/manager/scene_actor_animation.c	Actor_UpdateWalkToPosition	contrived	min
 src/npc/manager/scene_actor_animation.c	Actor_UpdateTurnToAngle	contrived	minor	2	SceneActor_SetFlags stays
 src/npc/manager/scene_actor_animation.c	Actor_OnDescendingFadeUpdate	contrived	minor	1	position cast of drawable.common.position stays (shared union type)
 src/npc/manager/scene_actor_animation.c	Actor_OnRisingFadeUpdate	contrived	minor	1	position cast of drawable.common.position stays
+src/npc/manager/scene_actor_animation.c	Actor_OnConfiguredAnimationUpdate	natural	natural	0	
+src/npc/manager/scene_actor_animation.c	Actor_OnPathFollowUpdate	contrived	minor	5	(u16*) route point cast: ROM reads x/z with ldrh; u16 casts of radiusA
