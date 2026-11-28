@@ -601,23 +601,14 @@ s32 sub_08022B18(struct StateActor *p, s32 kind, s32 damage)
 }
 void SceneActorState_StepTableByte(struct StateActor *p, const u8 *tbl)
 {
-    u16 *cur = &((struct SceneGraphicsActor *)p)->graphics.stepTableValue;
-    u16 old = *cur;
-    u8 *col;
-    u32 row;
-    ((struct SceneGraphicsActor *)p)->graphics.stepTableValuePrev = old;
-    row = ((struct SceneGraphicsActor *)p)->graphics.stepTableRow;
-    col = &((struct SceneGraphicsActor *)p)->graphics.stepTableCol;
-    {
-        u32 idx = row * 8 + (u32)tbl;
-        idx += *col;
-        *cur = *(u8 *)idx;
-    }
-    (*col)++;
-    if (*col > 7)
-        *col = 0;
+    struct SceneGraphicsActor *actor = (struct SceneGraphicsActor *)p;
+    actor->graphics.stepTableValuePrev = actor->graphics.stepTableValue;
+    actor->graphics.stepTableValue =
+        *(tbl + actor->graphics.stepTableRow * 8 + actor->graphics.stepTableCol);
+    actor->graphics.stepTableCol++;
+    if (actor->graphics.stepTableCol > 7)
+        actor->graphics.stepTableCol = 0;
 }
-
 extern const u8 gUnk_08604DC4[], gUnk_08604DE4[], gUnk_08604E04[], gUnk_08604E24[];
 
 void SceneActorState_StepTableByte(struct StateActor *p, const u8 *tbl);
