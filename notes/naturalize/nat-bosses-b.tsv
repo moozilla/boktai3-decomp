@@ -175,3 +175,4 @@ src/bosses/ratatosk/Ratatosk_InitializeFromScript.c	Ratatosk_InitializeFromScrip
 src/bosses/sabata/impact.c	CollisionReaction_RecordImpact	natural	natural	5	minor: distance/reward temporaries and mask accessor are needed
 src/bosses/sabata/impact.c	SabataImpact_CopyContact	machine-shaped	partial	12	kept boss alias, rewardMask/attributes temporaries, mask accessor and one-local (plain forms change allocation)
 src/bosses/sabata/impact.c	SabataImpact_InitCollider	machine-shaped	natural	2	
+src/bosses/sabata/impact.c	SabataImpact_TestForwardPoint	machine-shaped	partial	8	kept point/origin pointers and speed local; whole-function rewrite changes the point register

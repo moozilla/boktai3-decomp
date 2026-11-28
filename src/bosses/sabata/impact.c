@@ -190,26 +190,16 @@ u8 SabataImpact_TestForwardPoint(struct SabataActorImpact *actor)
     struct ContactPosition *components = &point;
     u32 angle = *anglePtr;
     s32 speed = 256;
-    {
-        s32 x = SabataImpact_TruncateFixed(gUnk_086149C4[(angle + 64) & 255] * 256);
-        components->x = x;
-        components->y = 0;
-    }
-    {
-        s32 sample = gUnk_086149C4[angle];
-        components->z = SabataImpact_TruncateFixed(sample * speed);
-    }
+    s32 x = SabataImpact_TruncateFixed(gUnk_086149C4[(angle + 64) & 255] * 256);
+    components->x = x;
+    components->y = 0;
+    components->z = SabataImpact_TruncateFixed(gUnk_086149C4[angle] * speed);
     {
         struct ContactPosition *destination = &point;
         struct ContactPosition *origin = &actor->body.position;
-        u8 result;
-        point.x = (u16)point.x + (u16)origin->x;
-        destination->y = (u16)destination->y + (u16)origin->y;
-        {
-            u32 z = (u16)origin->z;
-            u32 delta = (u16)destination->z;
-            destination->z = z + delta;
-        }
+        destination->x += origin->x;
+        destination->y += origin->y;
+        destination->z += origin->z;
         if ((u8)Terrain_IsSegmentBelowHeightLimit(origin, &point, 2, 256) != 0)
             return 1;
         return 0;
