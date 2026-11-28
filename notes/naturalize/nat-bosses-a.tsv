@@ -268,3 +268,4 @@ src/bosses/hresvelgr/Hresvelgr_UpdateActionThirtyRequest.c	Hresvelgr_UpdateActio
 src/bosses/hresvelgr/Hresvelgr_UpdateActionThirtyOneRequest.c	Hresvelgr_UpdateActionThirtyOneRequest	natural	natural	0	
 src/bosses/hresvelgr/ActorAction_WaitThenChangeBehavior.c	ActorAction_WaitThenChangeBehavior	natural	natural	0	
 src/bosses/hresvelgr/HresvelgrState_Hold37.c	HresvelgrState_Hold37	minor	minor	2	second actor pointer stays
+src/bosses/hresvelgr/ActorAction_FinishRecoveryAnimation.c	ActorAction_FinishRecoveryAnimation	minor	minor	3	second actor pointer stays
