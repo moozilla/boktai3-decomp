@@ -1017,24 +1017,22 @@ void TutorialOtenko_OnInteractionChildDelay(struct ActorAnimController *input,
 /* Tentative role: Release the owner effect and reset this child callback. */
 
 void TutorialOtenko_OnInteractionChildRelease(struct ActorAnimController *input,
-                                              struct ActorChildSlot *child)
+                                              struct ActorChildSlot *c)
 {
-    struct ActorChildSlot *c = child;
     struct ActorAnimController *p = input;
     if (child_take(c)) {
-        void **handle = &p->handle;
-        void *h = *handle;
-        if (h) {
-            *handle = 0;
-            Script_Call(h, 0);
+        if (p->handle) {
+            void *handle = p->handle;
+            p->handle = 0;
+            Script_Call(handle, 0);
         }
         {
             void (*fn)(void *, void *) = TutorialOtenko_OnInteractionChildUpdate;
-            s32 mask;
             c->fn = fn;
-            mask = 1;
-            mask |= c->control;
-            c->control = mask;
+        }
+        {
+            u8 one = 1;
+            c->control |= one;
         }
     }
 }
