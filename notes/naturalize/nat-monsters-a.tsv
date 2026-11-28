@@ -249,3 +249,4 @@ src/monsters/golem/golem_main_2.c	Golem_UpdateSettle	contrived	minor	5	remaining
 src/monsters/golem/golem_main_2.c	Golem_ChargeOrReturnHome	contrived	contrived	16	remaining: goto,block,maskhelper
 src/monsters/axe/actor_phase.c	ActorPhase_UpdateAcceleratingTrail	minor	minor	3	remaining: block
 src/monsters/axe/axe.c	SceneActorControl_RecoverRotation	contrived	contrived	6	remaining: block,maskhelper
+src/monsters/axe/axe.c	SceneActorControl_FinishRotation	contrived	contrived	5	remaining: bytep,constlocal,mask,maskhelper

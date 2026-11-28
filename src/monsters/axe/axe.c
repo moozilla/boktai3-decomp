@@ -348,9 +348,8 @@ void SceneActorControl_FinishRotation(struct ChaseActor *actor, s32 elapsed)
     }
     if (Mod(elapsed, 6) == 0) {
         u32 mask = 32;
-        u16 *flags = &actor->base.reactionFlags;
-        mask |= *flags;
-        *flags = mask;
+        mask |= actor->base.reactionFlags;
+        actor->base.reactionFlags = mask;
     }
     if (elapsed > 80)
         RotationPhase_Change(actor, SceneActorControl_ResetRotation, 52);
