@@ -1,50 +1,33 @@
 #include "scene/collision/contact_swarm.h"
 #include "player/cutscene/player_cue_sequence.h"
+#include "player/player.h"
 
-struct PRecover {
-    u8 pad000[0x18];
-    u32 song;
-    u8 pad00[0x20 - 0x1C];
-    u32 flags20;
-    u8 pad0[0x14C - 0x24];
-    struct ContactSwarmSprite sprite;
-    u8 pad1[0x3A2 - 0x14C - sizeof(struct ContactSwarmSprite)];
-    u8 facing, flip, dir;
-    u8 pad2[0x3FC - 0x3A5];
-    struct DisplaySequenceState seq;
-    u32 unknown40C;
-    const void *resource;
-    const void *resource2;
-    u8 pad3[0x457 - 0x418];
-    u8 tetherActive;
-    u8 pad4[0x46A - 0x458];
-    u8 stepSoundFlag;
-};
-s32 Player_GetLinkedSmoothedDirection(struct PRecover *);
-s32 Player_GetAdjustedMovementInterval(struct PRecover *);
-void LinkPlayer_SetScaledDirectionalVelocity(struct PRecover *, s32);
-void Player_UpdateActionFacingSide(struct PRecover *);
+s32 Player_GetLinkedSmoothedDirection(struct Player *);
+s32 Player_GetAdjustedMovementInterval(struct Player *);
+void LinkPlayer_SetScaledDirectionalVelocity(struct Player *, s32);
+void Player_UpdateActionFacingSide(struct Player *);
 void Player_PlayLocalSong(u32, s32);
-void Player_SetTetherMode(struct PRecover *, s32, s32);
-void Player_BeginWalk(struct PRecover *p)
+void Player_SetTetherMode(struct Player *, s32, s32);
+void Player_BeginWalk(struct Player *p)
 {
-    if (p->tetherActive != 1) {
-        p->stepSoundFlag = 0;
+    if (p->tetherMode != 1) {
+        p->footstepSide = 0;
         Player_SetTetherMode(p, 1, 0);
     }
-    p->flags20 &= ~1;
-    p->dir = Player_GetLinkedSmoothedDirection(p);
+    p->statusFlags &= ~1;
+    p->facing = Player_GetLinkedSmoothedDirection(p);
     LinkPlayer_SetScaledDirectionalVelocity(p, Player_GetAdjustedMovementInterval(p));
     Player_UpdateActionFacingSide(p);
-    Anim_SetSequence(&p->seq, p->resource, 1, p->facing, p->flip);
-    PlayerCue_StepSequence(&p->sprite, &p->seq);
-    if (p->seq.index == 2 && p->seq.elapsed == 0) {
-        if (p->stepSoundFlag) {
-            p->stepSoundFlag = 0;
-            Player_PlayLocalSong(p->song, 0xC7);
+    Anim_SetSequence(&p->cueCollider.sequence, p->cueCollider.sideResource, 1, p->heading, p->side);
+    PlayerCue_StepSequence((struct ContactSwarmSprite *)&p->secondaryDrawFlags,
+                           &p->cueCollider.sequence);
+    if (p->cueCollider.sequence.index == 2 && p->cueCollider.sequence.elapsed == 0) {
+        if (p->footstepSide) {
+            p->footstepSide = 0;
+            Player_PlayLocalSong(p->slot, 0xC7);
         } else {
-            p->stepSoundFlag = 1;
-            Player_PlayLocalSong(p->song, 0xC8);
+            p->footstepSide = 1;
+            Player_PlayLocalSong(p->slot, 0xC8);
         }
     }
 }
