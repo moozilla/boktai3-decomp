@@ -210,9 +210,10 @@ void *TetherActor_CreateRequestIndicator(void)
     return indicator;
 }
 
-void ScenePaletteFade_SetState(struct ScenePaletteFade *fade, void (*v)(struct ScenePaletteFade *))
+void ScenePaletteFade_SetState(struct ScenePaletteFade *fade,
+                               void (*update)(struct ScenePaletteFade *))
 {
-    fade->update = v;
+    fade->update = update;
     fade->timer = 0;
 }
 
