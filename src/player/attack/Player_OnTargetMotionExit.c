@@ -1,13 +1,8 @@
 #include "global.h"
+#include "player/player.h"
 
-void Player_OnTargetMotionExit(u8 *p)
+void Player_OnTargetMotionExit(struct Player *p)
 {
-    u8 *q = p + 0xAC;
-    u32 a = *(u32 *)(p + 0x30);
-    u32 b = *(u32 *)(p + 0x34);
-
-    *(u32 *)q = a;
-    *(u32 *)(q + 4) = b;
-    p += 0xEC;
-    *(u32 *)(p + 8) |= 1;
+    p->animation.position = *(struct ContactPosition *)&p->position;
+    AnimSprite_Hide(&p->secondaryAnimation);
 }
