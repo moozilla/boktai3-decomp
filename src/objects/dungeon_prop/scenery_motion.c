@@ -25,11 +25,7 @@ s32 SceneryMotion_SteerXZ(struct OrbitMotion *motion)
     s32 nextAngle;
     s32 delta;
     s32 oldAngle;
-    {
-        s32 deltaX = motion->base.x - destination->x;
-        s32 deltaOther = position->z - destination->z;
-        angle = Math_Atan2(deltaX, deltaOther);
-    }
+    angle = Math_Atan2(motion->base.x - destination->x, position->z - destination->z);
     {
         struct OrbitVector *currentDestination = motion->position;
         x = currentDestination->x - motion->base.x;
@@ -142,7 +138,8 @@ s32 SceneryMotion_SteerXY(struct OrbitMotion *motion)
 s32 SceneryMotion_UpdateAngle(struct OrbitMotion *motion)
 {
     struct OrbitVector delta;
-    motion->angle = interpolate(motion->endAngle, motion->duration, motion->startAngle, motion->timer);
+    motion->angle =
+        interpolate(motion->endAngle, motion->duration, motion->startAngle, motion->timer);
     polar(&delta, motion->angle, motion->radius);
     add(motion->position, &motion->center, &delta);
     if ((u32)++motion->timer > motion->duration) {
@@ -180,9 +177,8 @@ static inline s32 SceneryMotion_HalfTowardZero(s32 n)
     return -((-n) >> 1);
 }
 
-
-
-static inline void SceneryMotion_ProjectCrossedPair(struct OrbitVector *v, struct OrbitWavePair *motion)
+static inline void SceneryMotion_ProjectCrossedPair(struct OrbitVector *v,
+                                                    struct OrbitWavePair *motion)
 {
     s32 screenY;
     s32 screenX;
@@ -213,11 +209,12 @@ s32 SceneryMotion_UpdateCrossedSines(struct OrbitMotion *motion)
 
 void SceneryMotion_UpdateAbsoluteSines(struct OrbitMotion *motion)
 {
-    motion->offset.x = absolute(scale12(motion->radius * gUnk_086149C4[(motion->angle + motion->speed * motion->timer) & 255]));
-    motion->offset.y =
-        absolute(scale12(motion->radius2 * gUnk_086149C4[(motion->angle + motion->speed * motion->timer) & 255]));
-    motion->offset.z =
-        absolute(scale12(motion->radius3 * gUnk_086149C4[(motion->angle + motion->speed * motion->timer) & 255]));
+    motion->offset.x = absolute(scale12(
+        motion->radius * gUnk_086149C4[(motion->angle + motion->speed * motion->timer) & 255]));
+    motion->offset.y = absolute(scale12(
+        motion->radius2 * gUnk_086149C4[(motion->angle + motion->speed * motion->timer) & 255]));
+    motion->offset.z = absolute(scale12(
+        motion->radius3 * gUnk_086149C4[(motion->angle + motion->speed * motion->timer) & 255]));
 }
 
 s32 SceneryMotion_InterpolatePosition(struct OrbitMotion *motion)
@@ -261,7 +258,7 @@ static inline void normalize(struct OrbitVector *v, s32 scale)
 }
 
 s32 SceneryMotion_CalculateArcCenter(struct OrbitVector *out, struct OrbitVector *start,
-                                   struct OrbitVector *end, s32 sweep)
+                                     struct OrbitVector *end, s32 sweep)
 {
     struct OrbitVector delta;
     s32 distanceSquared;

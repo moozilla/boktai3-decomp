@@ -215,3 +215,4 @@ src/objects/dungeon_prop/scenery.c	DungeonScenery_UpdateFade	contrived	minor	39	
 src/objects/coffin/tether_presentation.c	ScenePaletteFade_InitFromScript	natural	natural	1	
 src/objects/dungeon_prop/scenery.c	DungeonScenery_Initialize	minor	minor	4	palette upload block keeps the CpuSet mode local so the constant is loaded before the bank address
 src/objects/dungeon_prop/scenery.c	DungeonScenery_ApplyHitFlash	contrived	minor	7	local copy of the object parameter and an unused 4-byte scratch array give the original frame and register choice
+src/objects/dungeon_prop/scenery_motion.c	SceneryMotion_SteerXZ	contrived	contrived	12	vector pointer temps, split distance/u16 locals and saved velocity pointer each pin an address register; only the atan2 delta block came out
