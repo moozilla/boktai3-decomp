@@ -823,10 +823,9 @@ void Hud_DrawSunClockTimeA(s32 x, s32 y)
 void Hud_DrawClockLabelB(u32 x, u32 y)
 {
     u16 *cell = Hud_GetTilemapCell(0, x, y);
-    *cell = 0xF07C;
-    cell++;
-    *cell = 0xF07D;
-    cell[1] = 0xF07F;
+    *cell++ = 0xF07C;
+    *cell++ = 0xF07D;
+    *cell = 0xF07F;
 }
 
 void Hud_DrawClockLabelA(u32 x, u32 y)

@@ -544,3 +544,4 @@ src/ui/hud/display/hud.c	Hud_DrawSunClockTimeB	natural	natural	0
 src/ui/hud/display/hud.c	Hud_DrawSunClockTimeA	natural	natural	0	
 src/ui/hud/display/hud.c	Hud_DrawStatusMetersAndCounts	natural	natural	0	
 src/ui/hud/display/hud.c	Hud_DrawSelectedCounter	fudged	natural	6	
+src/ui/hud/display/hud.c	Hud_DrawClockLabelB	fudged	natural	1	
