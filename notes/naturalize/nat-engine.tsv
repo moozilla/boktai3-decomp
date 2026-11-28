@@ -673,3 +673,8 @@ src/system/save/Scene_CanOpenMenu.c	Scene_CanOpenMenu	contrived	minor	1	tether m
 src/system/save/DelayedScript_Update.c	DelayedScript_Update	contrived	minor	1	goto into the repeat check
 src/system/save/DelayedScript_Create.c	DelayedScript_Create	contrived	natural	1	
 src/system/save/Script_CreateDeferredTaskFromScript.c	Script_CreateDeferredTaskFromScript	contrived	natural	1	
+src/system/save/Palette_ClearGrayscale.c	Palette_ClearGrayscale	natural	natural	0	
+src/system/save/Terrain_GetFloorHeightFromScript.c	Terrain_GetFloorHeightFromScript	minor	minor	0	point words written through a bitfield union
+src/system/save/Terrain_GetFloorKindFromScript.c	Terrain_GetFloorKindFromScript	contrived	contrived	7	coordinate words built with a mask variable and the cell pointer reused to hold x: bitfield and plain stores rotate registers
+src/system/save/Terrain_GetCellWordFromScript.c	Terrain_GetCellWordFromScript	contrived	contrived	7	same coordinate-word construction as the floor kind query
+src/system/save/Script_TeleportToCell.c	Script_TeleportToCell	contrived	contrived	2	pointer alias to the position for the slope adjustment; direct member reads change the load order
