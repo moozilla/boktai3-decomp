@@ -1226,7 +1226,7 @@ void Axe_SelectRandomRoutePoint(struct S080FA7D0 *s)
     u8 v;
 
     gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-    v = Mod(*(u16 *)(((u8 *)gRandomTable) + (gRandomIndex << 1)), *e->p);
+    v = Mod(*(gRandomTable + gRandomIndex), *e->p);
     if (v == e->a)
         v = Mod(v + 1, *e->p);
     e->a = v;
