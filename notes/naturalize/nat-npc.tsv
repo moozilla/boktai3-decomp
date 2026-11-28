@@ -686,3 +686,4 @@ src/minigames/result_game/ResultMenu_SendCommand.c	ResultMenu_SendCommand	contri
 src/minigames/result_game/ResultMenu_EnqueueMarker.c	ResultMenu_EnqueueMarker	contrived	natural	2	
 src/minigames/result_game/ResultGame_ShowPressMarker.c	ResultGame_ShowPressMarker	contrived	natural	3	
 src/minigames/result_game/ResultGame_HidePressMarker.c	ResultGame_HidePressMarker	contrived	natural	3	
+src/minigames/result_game/ResultGame_ShowTargetMarker.c	ResultGame_ShowTargetMarker	contrived	natural	3	
