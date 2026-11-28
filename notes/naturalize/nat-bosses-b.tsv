@@ -364,3 +364,4 @@ src/bosses/vanargand/Vanargand_UpdateMode24Transition.c	Vanargand_UpdateMode24Tr
 src/bosses/vanargand/Vanargand_UpdateMode25Transition.c	Vanargand_UpdateMode25Transition	near-natural	near-natural	1	second boss alias kept
 src/bosses/vanargand/ActorSoundPhase_EnterPhase21.c	ActorSoundPhase_EnterPhase21	near-natural	near-natural	1	second boss alias kept
 src/bosses/vanargand/Vanargand_DispatchSecondaryState.c	Vanargand_DispatchSecondaryState	contrived	natural	1	
+src/bosses/vanargand/Vanargand_RunSecondaryPhaseCallback.c	Vanargand_RunSecondaryPhaseCallback	contrived	natural	1	
