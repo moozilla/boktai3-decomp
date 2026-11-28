@@ -18,8 +18,7 @@ void SceneActorReaction_UpdateRouteRecovery(struct ChaseActor *actor)
         actor->base.field2B1 = 0;
     if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
         return;
-    result = SceneActorReaction_BeginContactResponse(actor);
-    if (result)
+    if (SceneActorReaction_BeginContactResponse(actor))
         return;
     if ((s32)actor->base.counter2AC > 60) {
         struct ContactPosition target;

@@ -240,3 +240,4 @@ src/scene/actor/behavior/SceneActorReaction_BeginContactResponse.c	SceneActorRea
 src/scene/actor/behavior/SceneActorReaction_UpdateContactRoute.c	SceneActorReaction_UpdateContactRoute	contrived	contrived	0	random-sample statement macro and heading helpers shared with other route code; same form fails to simplify in the detour
 src/scene/actor/behavior/SceneActorControl_UpdateEntryTransition.c	SceneActorControl_UpdateEntryTransition	minor	natural	2	-
 src/scene/actor/behavior/SceneActorReaction_UpdateRouteReturn.c	SceneActorReaction_UpdateRouteReturn	contrived	minor	4	goto reroute/invalid_target chain in the arrive inline; local copies of shared chase inlines
+src/scene/actor/behavior/SceneActorReaction_UpdateRouteRecovery.c	SceneActorReaction_UpdateRouteRecovery	contrived	contrived	5	parked flag clear blocks through the saved flags pointer, route-point block: plain &= loads the field first
