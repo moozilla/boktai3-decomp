@@ -207,3 +207,4 @@ src/npc/story_character/StoryCharacter_UpdateFacingAnimation.c	StoryCharacter_Up
 src/npc/story_character/sub_081CB5B0.c	sub_081CB5B0	contrived	minor	5	u32 mask parked before the displayFlags OR (mask-first); callback local before the prevState store
 src/npc/story_character/SceneCharacter_UpdatePalettePulse.c	SceneCharacter_UpdatePalettePulse	minor	natural	2	from/to locals (inline arguments reorder the address computations)
 src/npc/story_character/SceneCharacter_UpdateAlternatePalettePulse.c	SceneCharacter_UpdateAlternatePalettePulse	minor	natural	2	from/to locals (inline arguments reorder the address computations)
+src/npc/story_character/sub_081CBB1C.c	sub_081CBB1C	contrived	minor	22	pointer copies (facing, velocity, from, to) and the first velocity product: register allocation across Math_Atan2

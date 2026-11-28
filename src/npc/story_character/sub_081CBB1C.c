@@ -1,137 +1,53 @@
 #include "global.h"
+#include "engine/engine.h"
+#include "engine/math/math_shift.h"
 #include "scene/motion/scene_facing.h"
-#include "engine/engine_globals.h"
+#include "npc/manager/scene_actor_lifecycle.h"
 
-struct Vec {
-    s16 x, y, z, pad;
-};
-struct Actor {
-    u8 pad0[7];
-    u8 done;
-    u8 pad8[1];
-    u8 entered;
-    u8 pada[4];
-    u16 flags;
-    u8 pad10[8];
-    u8 phase;
-    u8 facing4;
-    u8 facing8;
-    u8 targetAngle;
-    u8 pad1c[56];
-    struct Vec target;
-    u8 body[9];
-    u8 angle;
-    u8 pad66[2];
-    struct Vec pos;
-    struct Vec velocity;
-    u8 pad78[92];
-    u32 drawable;
-    u8 padd8[80];
-    struct Vec *sourcePos;
-    u8 pad12c[52];
-    struct Vec *drawPos;
-    u8 pad164[164];
-    int speed;
-    u32 speedSquared;
-    u8 pad210[212];
-    int (*callback)(struct Actor *);
-};
-struct Map {
-    u32 pad;
-    u8 *cells;
-    u8 pad8[28];
-    u16 rows[1];
-};
-u8 *TerrainModifiers_FindCellOverride(int, int);
 extern const s16 gUnk_086149C4[];
-int Actor_PlayAnimationEntry(struct Actor *, int, int, int, int);
-void Actor_PlayFootstepSound(struct Actor *, int);
-void DisplayAnimation_SetFlags(void *, int);
-void DisplayAnimation_ClearFlags(void *, int);
-void DisplayAnimation_SetPalette(void *, int, int, int);
-void Sound_PlaySong(int);
+
 int Math_Atan2(int, int);
-static inline int scale(int v)
+
+// confidence=low: Actor_UpdateWalkToPosition without the entry animation, callback test or
+// footsteps; it moves by the new velocity itself.
+void sub_081CBB1C(void *unused, struct SceneActor *actor)
 {
-    if (v >= 0)
-        return v >> 12;
-    return -((-v) >> 12);
-}
-static inline u8 *cell(int i)
-{
-    u8 *p = TerrainModifiers_FindCellOverride(i, 1);
-    if (p)
-        return p + 4;
-    return ((struct Map *)gTerrainMap)->cells + 12 + i * 4;
-}
-static inline int height(struct Vec *pos)
-{
-    int x = pos->x >> 8, z = pos->z >> 8, index;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        index = 0;
-    else
-        index = ((struct Map *)gTerrainMap)->rows[z] + x;
-    return (*cell(index) & 15) << 8;
-}
-// confidence=low: Actor_UpdateWalkToPosition (Actor_UpdateWalkToPosition) without the entry animation,
-// callback test or footsteps; it moves by the new velocity itself.
-void sub_081CBB1C(void *unused, struct Actor *arg)
-{
-    struct Actor *p = arg;
-    if (p->entered) {
-        p->entered = 0;
-        p->done = 0;
+    if (actor->animationEntered) {
+        actor->animationEntered = 0;
+        actor->finished = 0;
     }
     {
-        struct Vec *pos = &p->pos;
-        struct Vec *target = &p->target;
+        struct ContactPosition *pos = &actor->body.position;
+        struct ContactPosition *target = &actor->target;
         int dx = target->x - pos->x;
         int dz = target->z - pos->z;
         u32 distance = dx * dx + dz * dz;
-        u32 limit = p->speedSquared;
-        struct Vec *savedPos = pos;
-        struct Vec *savedTarget = target;
-
+        u32 limit = actor->distanceSquared;
+        struct ContactPosition *from = pos;
+        struct ContactPosition *to = target;
         if (distance <= limit) {
-            p->pos = p->target;
-            p->done = 1;
+            actor->body.position = actor->target;
+            actor->finished = 1;
         } else {
-            u8 *ap = &p->angle;
-            struct Vec *vel = &p->velocity;
-            int angle = *ap;
-            int speed = p->speed;
-
+            u8 *facing = &actor->body.direction;
+            struct ContactPosition *velocity = &actor->body.motion;
+            int angle = *facing;
+            int speed = actor->distance;
             s32 product = speed * gUnk_086149C4[(angle + 64) & 255];
-            u8 *savedAngle = ap;
-            struct Vec *savedVel = vel;
-
-            vel->x = scale(product);
-            vel->y = 0;
-            vel->z = scale(speed * gUnk_086149C4[angle]);
+            u8 *savedFacing = facing;
+            struct ContactPosition *savedVelocity = velocity;
+            velocity->x = Math_ShiftTowardZero(product, 12);
+            velocity->y = 0;
+            velocity->z = Math_ShiftTowardZero(speed * gUnk_086149C4[angle], 12);
+            actor->direction = Math_Atan2(to->x - from->x, to->z - from->z);
             {
-                struct Vec *target = savedTarget;
-                s32 x;
-                struct Vec *pos;
-                s32 z;
-
-                x = target->x;
-                pos = savedPos;
-
-                x -= pos->x;
-
-                z = target->z - pos->z;
-                p->targetAngle = Math_Atan2(x, z);
+                int value = actor->direction;
+                *savedFacing = value;
+                actor->facing8 = SceneFacing_EightWay(value);
+                actor->facing4 = SceneFacing_FourWay(value);
             }
-            {
-                int value = p->targetAngle;
-                u8 *out = savedAngle;
-
-                *out = value;
-                p->facing8 = SceneFacing_EightWay(value);
-                p->facing4 = SceneFacing_FourWay(value);
-            }
-            savedPos->x += savedVel->x;
-            p->pos.z += p->velocity.z;
+            from->x += savedVelocity->x;
+            actor->body.position.z += actor->body.motion.z;
         }
     }
 }
