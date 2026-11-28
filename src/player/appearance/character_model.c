@@ -214,60 +214,56 @@ void ActorSprite_InitPartDrawings(struct ScenePoolActor *actor, struct Character
 {
     struct {
         s16 x, y, z;
-    } projected, *position;
+    } screen, *position;
     s32 dx, dy;
     s32 frames;
-    s32 partIndex;
-    s32 anim;
-    u8 animId;
+    s32 i;
     s32 z;
-    struct ModifierDisplayObject *part;
-    void *resource;
 
     model->data = ScriptProc_Start(0xCB05, (u16)id);
     ResourceHeader_Relocate(&model->resource, model->data);
     frames = 0;
-    for (partIndex = 0; partIndex < 5; partIndex++) {
+    for (i = 0; i < 5; i++) {
+        struct ModifierDisplayObject *part;
+        s32 animation;
         dx = 0;
         dy = 0;
-        switch (partIndex) {
+        switch (i) {
             case 0:
-                anim = actor->bodyAnimation;
+                animation = actor->bodyAnimation;
                 frames = 16;
                 break;
             case 3:
-                anim = actor->accessoryAnimation;
+                animation = actor->accessoryAnimation;
                 dx = 15;
                 dy = -2;
                 frames = 16;
                 break;
             case 4:
-                anim = actor->accessoryAnimation;
+                animation = actor->accessoryAnimation;
                 dx = -19;
                 dy = -2;
                 frames = 16;
                 break;
             case 1:
-                anim = actor->faceAnimation;
+                animation = actor->faceAnimation;
                 frames = 16;
                 break;
             case 2:
                 ScenePalette_RefreshOnFlags(actor, model);
-                anim = actor->paletteMode;
+                animation = actor->paletteMode;
                 frames = 16;
                 break;
             default:
-                anim = 0;
+                animation = 0;
                 break;
         }
-        part = &model->view.parts[partIndex];
-        resource = &model->resource;
-        animId = anim;
-        if (AnimSprite_InitLinked(part, resource, animId, frames, 0, 1, 0, 0) != 0)
+        part = &model->view.parts[i];
+        if (AnimSprite_InitLinked(part, &model->resource, (u8)animation, frames, 0, 1, 0, 0) != 0)
             return;
-        Anim_SetKeyframes(part, resource, animId, 1, 0);
-        Anim_Step(part, resource);
-        position = &projected;
+        Anim_SetKeyframes(part, &model->resource, (u8)animation, 1, 0);
+        Anim_Step(part, &model->resource);
+        position = &screen;
         position->x = (actor->position.x >> 12) - ((struct TilemapPanel *)gSceneCamera)->scroll.x;
         position->y =
             ((actor->position.z + (actor->position.y + actor->restrictionMetric)) >> 12) + 0x5A;
