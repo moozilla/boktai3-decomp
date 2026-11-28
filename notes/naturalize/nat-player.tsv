@@ -620,3 +620,8 @@ src/player/interaction/Player_TestTetherTarget.c	Player_TestTetherTarget	minor	n
 src/player/interaction/Player_InvokeStoredCallback.c	Player_InvokeStoredCallback	contrived	natural	1	-
 src/player/interaction/Player_UpdateTetherMovement.c	Player_UpdateTetherMovement	contrived	contrived	3	FlagMovement/PlayerRef and modeFive helpers plus goto to the animation tail fix the branch layout and tests
 src/player/motions/Player_ResetIdleMotion.c	Player_ResetIdleMotion	contrived	natural	1	-
+src/player/motions/Player_UpdateMovementFacing.c	Player_UpdateMovementFacing	natural	natural	0	-
+src/player/motions/Player_UpdateChargedBurst.c	Player_UpdateChargedBurst	natural	natural	0	-
+src/player/motions/Player_UpdateSpiralBurst.c	Player_UpdateSpiralBurst	natural	natural	0	-
+src/player/motions/Player_UpdateActionEighteen.c	Player_UpdateActionEighteen	natural	natural	0	-
+src/player/motions/PileTrap_UpdatePlacementAction.c	PileTrap_UpdatePlacementAction	minor	natural	1	-

@@ -1,4 +1,3 @@
-#define Player_ConsumePhaseEntry Player_ConsumeStateEntry
 #include "global.h"
 #include "player/player.h"
 u32 Player_ConsumeStateEntry(struct Player *);
