@@ -559,3 +559,4 @@ src/script/script_virtual_machine.c	Script_GetStackArgument	contrived	natural	4
 src/script/script_virtual_machine.c	Script_SetStackArgument	contrived	natural	4	
 src/script/script_virtual_machine.c	Script_ReadVector32	minor	natural	1	
 src/script/script_virtual_machine.c	Script_ReadVector16	minor	natural	1	
+src/script/script_virtual_machine.c	Text_LookupString	contrived	natural	2	

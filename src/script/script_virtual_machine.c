@@ -38,6 +38,7 @@ u8 *Script_LookupResource(u8 *base, u32 unused, u16 key, u16 context)
 u32 Script_LookupArchive(u32 key, struct ScriptArchiveEntry *tbl, s32 lo, s32 hi)
 {
     s32 mid;
+    struct ScriptArchiveEntry *e;
     while (lo < hi) {
         mid = (lo + hi) >> 1;
         if (tbl[mid].key < key)
@@ -45,8 +46,9 @@ u32 Script_LookupArchive(u32 key, struct ScriptArchiveEntry *tbl, s32 lo, s32 hi
         else
             hi = mid;
     }
-    if (tbl[lo].key == key)
-        return tbl[lo].value;
+    e = (struct ScriptArchiveEntry *)((lo << 3) + (u32)tbl);
+    if (e->key == key)
+        return e->value;
     return 0;
 }
 
@@ -287,12 +289,12 @@ u32 Script_GetCallArgument(s32 n)
 
 u32 Script_GetStackArgument(s32 n)
 {
-    return *(gScriptVm.argSp - (n + 1));
+    return *(u32 *)((u8 *)gScriptVm.argSp - (n * 4 + 4));
 }
 
 void Script_SetStackArgument(s32 n, u32 v)
 {
-    *(gScriptVm.argSp - (n + 1)) = v;
+    *(u32 *)((u8 *)gScriptVm.argSp - (n * 4 + 4)) = v;
 }
 
 void Script_ResetKeywordStack(void)
@@ -363,10 +365,12 @@ s32 Script_ReadValue(const void *p)
 s32 Script_ReadVector32(u8 *p, s32 *destination)
 {
     s32 type, value;
-    s32 i;
-    for (i = 0; i < 3; i++) {
+    s32 *vector;
+    s32 count;
+    vector = destination;
+    for (count = 0; count < 3; count++) {
         p = Script_DecodeOperand(p, &type, &value);
-        destination[i] = value;
+        vector[count] = value;
     }
     gScriptVm.pc = p;
     return 0;
@@ -375,10 +379,12 @@ s32 Script_ReadVector32(u8 *p, s32 *destination)
 s32 Script_ReadVector16(u8 *p, s16 *destination)
 {
     s32 type, value;
-    s32 i;
-    for (i = 0; i < 3; i++) {
+    s16 *vector;
+    s32 count;
+    vector = destination;
+    for (count = 0; count < 3; count++) {
         p = Script_DecodeOperand(p, &type, &value);
-        destination[i] = value;
+        vector[count] = value;
     }
     gScriptVm.pc = p;
     return 0;
@@ -623,17 +629,15 @@ void *sub_0821AD98(void *table, u32 key, s32 count)
     return 0;
 }
 
-u8 *Text_LookupString(s32 id)
-{
-    u8 **sections = gScriptSectionBases;
-    u8 *e = (u8 *)((id << 2) + (u32)sections[1]);
-    u32 v = (e[3] << 24) | (e[2] << 16) | (e[1] << 8) | e[0];
-    return sections[2] + (v & 0x7FFFFFFF);
-}
-
 static inline u32 read_word(u8 *p)
 {
     return (p[3] << 24) | (p[2] << 16) | (p[1] << 8) | p[0];
+}
+
+u8 *Text_LookupString(s32 id)
+{
+    u32 offset = read_word(gScriptSectionBases[1] + id * 4);
+    return gScriptSectionBases[2] + (offset & 0x7FFFFFFF);
 }
 
 s32 Script_LoadScript(u8 *p)
