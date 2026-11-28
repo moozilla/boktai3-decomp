@@ -50,13 +50,11 @@ void Centipede_ResolveBlockedMovement(struct ChaseActor *actor)
     }
     {
         u32 mask = 0x2000;
-        u32 *flags = &actor->base.behaviorFlags;
-        *flags = *flags | mask;
+        actor->base.behaviorFlags = actor->base.behaviorFlags | mask;
     }
     if (**(u8 **)((u8 *)actor + 0x6c) & 1) {
-        u8 *count = &trail->blockedFrameCount;
-        ++*count;
-        if (*count > 30) {
+        ++trail->blockedFrameCount;
+        if (trail->blockedFrameCount > 30) {
             s32 difference;
             trail->wanderDirection = (trail->wanderDirection + 1) & 3;
             Centipede_SelectWanderRoute(actor);
