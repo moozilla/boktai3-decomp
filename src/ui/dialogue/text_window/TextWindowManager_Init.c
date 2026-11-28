@@ -1,15 +1,14 @@
 #include "global.h"
 #include "engine/ram.h"
+#include "ui/dialogue/text_window.h"
+#include "ui/dialogue/text_window_manager.h"
 
-struct S {
-    u8 f[0x18];
-    u32 a;
-    u32 b;
-};
-u32 TextWindowManager_Init(struct S *p)
+
+
+int TextWindowManager_Init(struct WindowManager *manager)
 {
-    gWindowManager = p;
-    p->a = 0;
-    p->b = 0;
+    gWindowManager = (void *)manager;
+    manager->nextId = 0;
+    manager->head = 0;
     return 0;
 }
