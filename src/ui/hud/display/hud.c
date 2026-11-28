@@ -410,18 +410,15 @@ void Hud_DrawStoredEnergyGauge(struct SceneHudState *hud, s32 mode)
     s32 background, foreground, full, partial, n, amount;
     u16 *cell;
     int paletteChanged;
-    s32 stored;
-    struct GameState *g;
+    struct GameState *state;
     if (mode == 1) {
         background = 0x1f;
         if (hud->storedEnergy < gGameState->unk618) {
-            u16 *timer = &hud->storedEnergyTimer;
-            s32 bit;
-            ++*timer;
-            bit = (*timer >> 2) & 1;
-            foreground = 0x7fff;
-            if (bit)
+            hud->storedEnergyTimer++;
+            if ((hud->storedEnergyTimer >> 2) & 1)
                 foreground = 0x3e0;
+            else
+                foreground = 0x7fff;
         } else if (hud->storedEnergyFlash) {
             foreground = 0x7fff;
             --hud->storedEnergyFlash;
@@ -430,27 +427,24 @@ void Hud_DrawStoredEnergyGauge(struct SceneHudState *hud, s32 mode)
     } else {
         background = 0x39ce;
         if (hud->storedEnergyFlash) {
-            amount = 0x7fff;
-            foreground = amount;
+            foreground = 0x7fff;
             --hud->storedEnergyFlash;
         } else
             foreground = 0x1f;
     }
-    paletteChanged = gBgPaletteBank13Color14 != background;
-    if (paletteChanged)
+    if (gBgPaletteBank13Color14 != background)
         gBgPaletteBank13Color14 = background;
     if ((&gBgPaletteBank13Color14)[-1] != foreground)
         (&gBgPaletteBank13Color14)[-1] = foreground;
-    g = gGameState;
-    stored = g->unk618;
-    hud->storedEnergy = stored;
-    amount = g->unk618;
+    state = gGameState;
+    hud->storedEnergy = state->unk618;
+    amount = state->unk618;
     if (amount <= 0) {
         full = 0;
         partial = 0;
-    } else if (g->unk61C > 1) {
+    } else if (state->unk61C > 1) {
         s32 scale = 79;
-        partial = Div((amount - 1) * scale, g->unk61C - 1) + 1;
+        partial = Div((amount - 1) * scale, state->unk61C - 1) + 1;
         full = partial >> 3;
         partial -= full << 3;
     } else {
@@ -464,7 +458,7 @@ void Hud_DrawStoredEnergyGauge(struct SceneHudState *hud, s32 mode)
     for (n = 0; n < full; n++)
         *cell-- = 0xd089;
     if (partial) {
-        *cell-- = (partial + 0x81) | -0x3000;
+        *cell-- = (partial + 0x81) | 0xD000;
         n++;
     }
     for (; n < 10; n++)

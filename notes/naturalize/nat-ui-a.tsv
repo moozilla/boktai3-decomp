@@ -526,3 +526,5 @@ src/ui/hud/display/hud.c	Hud_DrawAlternateMeterLabel	natural	natural	0
 src/ui/hud/display/hud.c	Hud_DrawPlayerGauge	fudged	natural	1	
 src/ui/hud/display/hud.c	Hud_DrawWarningMeter	fudged	partial	20	blink bit local, testFlag helper (0/1 flag), pointer-sum event counter read (address computed index-first), goto into the blank arm
 src/ui/hud/display/hud.c	Hud_DrawTwoDigitCounter	fudged	natural	8	
+src/ui/hud/display/hud.c	Hud_ClearCounterTiles	natural	natural	0	
+src/ui/hud/display/hud.c	Hud_DrawStoredEnergyGauge	fudged	partial	22	state pointer, scale literal local, previous palette color via [-1] (register assignment of hud and background)
