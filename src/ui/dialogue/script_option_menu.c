@@ -2,18 +2,17 @@
 
 void OptionMenu_Update(struct OptionMenu *p)
 {
-    s32 zero = 0;
+    s32 value = 0;
     struct ScriptUtilityArguments args;
-    struct ScriptUtilityArguments *ap;
+
     args.count = 1;
-    args.values = &zero;
+    args.values = &value;
     if (gPadState[1] & 0x40) {
         Sound_PlaySong(0xDC);
         p->selection--;
         if (p->selection < 0)
             p->selection = 7;
     }
-    ap = &args;
     if (gPadState[1] & 0x80) {
         Sound_PlaySong(0xDC);
         p->selection++;
@@ -22,7 +21,7 @@ void OptionMenu_Update(struct OptionMenu *p)
     }
     if (gPadState[1] & 1) {
         if (p->selection == 1)
-            Script_Call(gOptionMenuParameters.callbacks.entries[1], ap);
+            Script_Call(gOptionMenuParameters.callbacks.entries[1], &args);
         else
             Script_Call(gOptionMenuParameters.callbacks.entries[p->selection], 0);
         Task_Kill(p);
