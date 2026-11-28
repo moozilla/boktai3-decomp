@@ -1,7 +1,7 @@
 #include "global.h"
+#include "engine/engine.h"
 #include "engine/ram.h"
-
-void Sprite_Remove(void *);
+#include "objects/floor_switch/floor_switch_layout.h"
 
 static inline u8 Tst(u32 *m, s32 i)
 {
@@ -10,28 +10,14 @@ static inline u8 Tst(u32 *m, s32 i)
     return FALSE;
 }
 
-struct E {
-    u8 a[0x90];
-};
-struct S {
-    u8 pad[0x18];
-    struct E e[8];
-    u8 pad2[0x498 - 0x18 - 0x90 * 8];
-    u32 mask;
-};
-
-u32 FloorSwitch_OnManagerDestroy(struct S *b)
+u32 FloorSwitch_OnManagerDestroy(struct FloorSwitchManager *manager)
 {
-    s32 i = 0;
-    u32 *m = &b->mask;
-    struct E *e = b->e;
-    for (; i < 8; e++, i++) {
-        if (Tst(m, i))
-            Sprite_Remove(e);
+    s32 i;
+
+    for (i = 0; i < 8; i++) {
+        if (Tst(&manager->used, i))
+            Sprite_Remove(&manager->switches[i]);
     }
-    {
-        u32 z = 0;
-        gFloorSwitchManager = z;
-    }
+    gFloorSwitchManager = 0;
     return 0;
 }

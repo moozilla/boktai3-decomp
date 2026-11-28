@@ -228,3 +228,4 @@ src/objects/floor_switch/FloorSwitch_AllocateSlot.c	FloorSwitch_AllocateSlot	con
 src/objects/floor_switch/FloorSwitch_UpdateRegionVisibility.c	FloorSwitch_UpdateRegionVisibility	contrived	natural	8	u8 Eq() helper and region local keep the compare order
 src/objects/floor_switch/FloorSwitch_Release.c	FloorSwitch_Release	contrived	natural	1	
 src/objects/floor_switch/SpriteSlots_UpdateActive.c	SpriteSlots_UpdateActive	contrived	natural	8	switches base local
+src/objects/floor_switch/FloorSwitch_OnManagerDestroy.c	FloorSwitch_OnManagerDestroy	contrived	natural	1	Tst() helper kept
