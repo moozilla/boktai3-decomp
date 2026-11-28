@@ -1524,7 +1524,7 @@ void SceneActor_WaitForControlCompletion(struct ChaseActor *actor)
     busy = Callback_InvokeActor(actor, actor->base.contactQuery.opaque);
     if (!busy) {
         if (actor->base.stepDone) {
-            SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
+            SceneActorAnimation_SelectDirectionalEntry(actor, 0);
             SceneActorChase_SetBehavior(actor, 0x10);
             SceneActorChase_SetControl(actor, Mummy_UpdatePlayerRoute, 0x27);
         } else
