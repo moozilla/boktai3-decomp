@@ -635,25 +635,15 @@ void ScriptActor_StartTimedChargeFromScript(void)
     s32 index = Script_GetActorIndex();
     struct Player *actor = gPlayers[index];
     if (actor != NULL) {
-        u16 *timer;
-        s32 value;
-        if (Script_SeekToKeyword('t')) {
-            value = Script_GetValue();
-            timer = &actor->cueRemaining;
-        } else {
-            timer = &actor->cueRemaining;
-            value = 600;
-        }
-        *timer = value;
+        if (Script_SeekToKeyword('t'))
+            actor->cueRemaining = Script_GetValue();
+        else
+            actor->cueRemaining = 600;
         Hud_RegisterTimer(&actor->cueRemaining);
-        if (Script_SeekToKeyword('c')) {
-            value = Script_GetValue();
-            timer = &actor->cueRequired;
-        } else {
-            timer = &actor->cueRequired;
-            value = 720;
-        }
-        *timer = value;
+        if (Script_SeekToKeyword('c'))
+            actor->cueRequired = Script_GetValue();
+        else
+            actor->cueRequired = 720;
         actor->cueElapsed = 0;
         actor->cueParameter = ScriptActor_GetCueOptionFromScript();
         actor->facing = 4;
