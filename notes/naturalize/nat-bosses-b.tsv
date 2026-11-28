@@ -177,3 +177,12 @@ src/bosses/sabata/impact.c	SabataImpact_CopyContact	machine-shaped	partial	12	ke
 src/bosses/sabata/impact.c	SabataImpact_InitCollider	machine-shaped	natural	2	
 src/bosses/sabata/impact.c	SabataImpact_TestForwardPoint	machine-shaped	partial	8	kept point/origin pointers and speed local; whole-function rewrite changes the point register
 src/bosses/sabata/impact.c	SabataImpact_FindNearbyPoint	machine-shaped	partial	12	kept body/center/components pointers, mask and speed locals (ROM keeps each in a register)
+src/bosses/sabata/impact.c	SabataImpact_NoOp	natural	natural	0	
+src/bosses/sabata/impact.c	SabataImpact_InitAttackCollider	natural	natural	0	
+src/bosses/sabata/impact.c	SabataImpact_InitBodyCollider	natural	natural	0	
+src/bosses/sabata/impact.c	ActorExtension_ResetState	natural	natural	0	
+src/bosses/sabata/impact.c	ActorResource_IsBelowSelectedLimit	natural	natural	0	
+src/bosses/sabata/impact.c	SceneActors_GetEffectiveTimeStep	natural	natural	0	
+src/bosses/sabata/impact.c	ActorResource_ClampDecrease	natural	natural	0	minor: result assigned in two steps (one-expression form differs)
+src/bosses/sabata/position_search.c	ActorVariation_SelectRandomPair	machine-shaped	machine-shaped	3	raw table address and index temporaries stay: RANDOM_NEXT forms do not match
+src/bosses/sabata/position_search.c	ActorMovement_FindQuarterTurnPoint	machine-shaped	partial	8	kept coordinates/center pointers, mask and speed locals
