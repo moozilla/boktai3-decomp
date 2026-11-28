@@ -1,59 +1,24 @@
 #include "global.h"
-#include "bosses/ratatosk/scene_directional_actor_layout.h"
+#include "bosses/ratatosk/ratatosk.h"
 
 u32 Trigger_ConsumePending(void *latch, u32 expected);
 
-// Tentative scene-actor layout; state semantics remain provisional.
-
-static inline u8 TakeEntry(struct SceneDirectionalActor *p)
+void SceneActor_UpdateDirectionalTrigger(struct Ratatosk *p)
 {
-    if (p->entered) {
-        p->entered = 0;
-        p->pending = 0;
-        return TRUE;
+    struct Ratatosk *q = p;
+    Ratatosk_SetFacing(p, p->requestedAngle);
+    if (Ratatosk_ConsumeActionEntry(p)) {
+        if (q->scaleMode == 0)
+            Ratatosk_SetAnimation(p, 3);
+        else
+            Ratatosk_SetAnimation(p, 4);
     }
-    return FALSE;
-}
-
-static inline u8 SelectState(s32 value)
-{
-    if (value == 0)
-        value = 3;
-    else
-        value = 4;
-    return value;
-}
-
-void SceneActor_UpdateDirectionalTrigger(struct SceneDirectionalActor *p)
-{
-    u8 *q = (u8 *)p;
-    p->direction = p->requestedDirection;
-    {
-        s32 direction = (p->direction + 0x60) >> 6;
-        u32 mask = 3;
-        mask &= direction;
-        p->direction4 = mask;
-    }
-    {
-        s32 direction = (p->direction + 0x70) >> 5;
-        u32 mask = 7;
-        mask &= direction;
-        p->direction8 = mask;
-    }
-    if (TakeEntry(p)) {
-        u8 state = SelectState(*(s16 *)(q + 0xE58));
-        u8 *dest = &p->state;
-        *dest = state;
-    }
-    if (p->pending) {
-        if (q[0xAB] != 3) {
-            Trigger_ConsumePending((u8 *)p + 0x118, 1);
+    if (p->actionFinished) {
+        if (q->actionState != 3) {
+            Trigger_ConsumePending(p->receiver2, 1);
             return;
         }
-        {
-            u32 state = 4;
-            q[0xAA] = state;
-        }
+        Ratatosk_SetAnimation(q, 4);
     }
-    p->timer++;
+    p->actionTimer++;
 }
