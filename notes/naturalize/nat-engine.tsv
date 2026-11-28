@@ -387,3 +387,4 @@ src/engine/video/sprite_component/SpriteComponent_SetFramePosition.c	SpriteCompo
 src/engine/video/sprite_component/SceneSpriteCollider_Init.c	SceneSpriteCollider_Init	contrived	minor	1	initialFrame local keeps the constant load before the store
 src/engine/video/sprite_component/SpriteComponent_Update.c	SpriteComponent_Update	contrived	minor	1	const s8 array holds the sort-order base (constant stays in a saved register)
 src/engine/video/sprite_component/ArmorIndicator_DestroySprite.c	ArmorIndicator_DestroySprite	minor	natural	1	
+src/engine/video/sprite_component/SpriteComponent_ConfigureCollider.c	SpriteComponent_ConfigureCollider	minor	natural	1	
