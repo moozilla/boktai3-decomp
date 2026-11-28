@@ -1817,7 +1817,7 @@ static inline u8 FindPath_FaceAndCheckStraightPath(struct ChaseActor *actor, s32
 
 u8 SceneActorPath_FaceAndCheckStraightPath(struct ChaseActor *actor)
 {
-    struct SceneActorContactTarget *target = (void *)actor->base.tracking.target;
+    struct SceneActorContactTarget *target = actor->base.tracking.target;
     s32 goal = target->cell->index;
     u8 saved = actor->base.body.direction;
     struct ContactPosition delta;
