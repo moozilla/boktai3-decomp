@@ -1,15 +1,12 @@
-#include "global.h"
+#include "scene/collision/contact_actor.h"
 
-void ContactActor_DestroySlot(u8 *, u8 *, s32);
+void ContactActor_DestroySlot(struct ContactActorPool *, struct ContactActor *, s32);
 
-u32 ContactActorPool_Destroy(u8 *p)
+u32 ContactActorPool_Destroy(struct ContactActorPool *pool)
 {
-    u8 *q = p + 0x3C;
-    s32 i = 0;
-    do {
-        ContactActor_DestroySlot(p, q, i);
-        i++;
-        q += 0x16c;
-    } while (i <= 15);
+    struct ContactActor *slot = pool->slots;
+    s32 i;
+    for (i = 0; i < 16; i++, slot++)
+        ContactActor_DestroySlot(pool, slot, i);
     return 0;
 }

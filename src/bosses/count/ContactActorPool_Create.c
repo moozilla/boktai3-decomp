@@ -1,7 +1,7 @@
 #include "scene/collision/contact_actor.h"
 s32 ContactActorPool_Initialize(struct ContactActorPool *, u32, u32, u32);
 u32 ContactActorPool_Update(struct ContactActorPool *);
-u32 ContactActorPool_Destroy(u8 *);
+u32 ContactActorPool_Destroy(struct ContactActorPool *);
 struct ContactActorPool *ContactActorPool_Create(u32 mode, u32 resourceId, u32 healthId)
 {
     struct ContactActorPool *pool = Task_Create(8, 0x1720);

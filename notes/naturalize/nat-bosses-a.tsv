@@ -153,3 +153,4 @@ src/bosses/count/ContactActor_UpdateRetreat.c	ContactActor_UpdateRetreat	contriv
 src/bosses/count/ContactActor_UpdateAwaitHide.c	ContactActor_UpdateAwaitHide	minor	natural	3	
 src/bosses/count/ContactActor_UpdateInactive.c	ContactActor_UpdateInactive	minor	natural	3	
 src/bosses/count/ContactActorPool_Update.c	ContactActorPool_Update	minor	minor	8	fade local and first/second palette pointers stay (inline expressions differ)
+src/bosses/count/ContactActorPool_Destroy.c	ContactActorPool_Destroy	contrived	natural	3	
