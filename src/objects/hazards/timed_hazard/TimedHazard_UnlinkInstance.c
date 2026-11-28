@@ -1,22 +1,17 @@
 #include "global.h"
-struct N {
-    u8 p[0x78];
-    struct N *prev;
-    struct N *next;
-};
-struct L {
-    u8 p[0x1c];
-    struct N *head;
-};
-u32 TimedHazard_UnlinkInstance(struct L *l, struct N *n)
+#include "engine/ram.h"
+#include "objects/hazards/timed_hazard.h"
+
+u32 TimedHazard_UnlinkInstance(struct TimedHazardPool *pool, struct TimedHazard *hazard)
 {
-    struct N *a = n->prev;
-    struct N *b = n->next;
-    if (a)
-        a->next = b;
+    struct TimedHazard *previous = hazard->previous;
+    struct TimedHazard *next = hazard->next;
+
+    if (previous)
+        previous->next = next;
     else
-        l->head = b;
-    if (b)
-        b->prev = a;
+        pool->head = next;
+    if (next)
+        next->previous = previous;
     return 0;
 }
