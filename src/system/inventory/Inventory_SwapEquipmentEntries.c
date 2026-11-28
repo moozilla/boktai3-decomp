@@ -1,6 +1,5 @@
-#include "global.h"
+#include "system/game_state/game_state.h"
 #include "player/player.h"
-extern u8 *gGameState;
 struct EquipEntry {
     u32 w[4];
 };
@@ -21,37 +20,35 @@ void Inventory_SwapEquipmentEntries(s32 a, s32 b)
     tmp = *ea;
     *ea = *eb;
     *eb = tmp;
-    for (i = 0; i <= 7; i++) {
-        u8 *g = gGameState;
-        s16 *q = (s16 *)(i * 2 + (u32)g + 0x68);
-        if (*q == a) {
-            *q = b;
-            Player_SetWeaponInstance((*(void **)gPlayers), eb);
-        } else if (*q == b) {
-            *q = a;
-            Player_SetWeaponInstance((*(void **)gPlayers), ea);
+    for (i = 0; i < 8; i++) {
+        if (*(i + gGameState->inventory) == a) {
+            *(i + gGameState->inventory) = b;
+            Player_SetWeaponInstance(gPlayers[0], eb);
+        } else if (*(i + gGameState->inventory) == b) {
+            *(i + gGameState->inventory) = a;
+            Player_SetWeaponInstance(gPlayers[0], ea);
         }
     }
     n = 0;
-    for (i = 0; i <= 15; i++) {
+    for (i = 0; i < 16; i++) {
         if (Inventory_IsEquipmentAssigned(i)) {
             list[n] = i;
             n++;
         }
     }
     pos = -1;
-    if (*(s16 *)(gGameState + 0x50) <= 7) {
+    if ((s16)gGameState->unk50 < 8) {
         for (i = 0; i < n; i++) {
-            if (*(s16 *)(gGameState + 0x68 + *(s16 *)(gGameState + 0x50) * 2) == list[i]) {
+            if (*((s16)gGameState->unk50 + gGameState->inventory) == list[i]) {
                 pos = i;
                 break;
             }
         }
     }
-    for (; n <= 7; n++)
+    for (; n < 8; n++)
         list[n] = -1;
-    for (i = 0; i <= 7; i++)
-        *(s16 *)(gGameState + i * 2 + 0x68) = list[i];
+    for (i = 0; i < 8; i++)
+        *(i + gGameState->inventory) = list[i];
     if ((u32)pos <= 7)
-        *(u16 *)(gGameState + 0x50) = pos;
+        gGameState->unk50 = pos;
 }

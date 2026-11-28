@@ -589,3 +589,4 @@ src/system/inventory/sub_0822D6EC.c	sub_0822D6EC	natural	natural	0
 src/system/inventory/Inventory_AddEquipmentFromRecord.c	Inventory_AddEquipmentFromRecord	contrived	minor	1	the -1 compared against is a const local so it stays in a register
 src/system/inventory/Inventory_TryAddEquipmentEntry.c	Inventory_TryAddEquipmentEntry	minor	natural	1	
 src/system/inventory/Inventory_RemoveEquipmentEntry.c	Inventory_RemoveEquipmentEntry	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
+src/system/inventory/Inventory_SwapEquipmentEntries.c	Inventory_SwapEquipmentEntries	contrived	minor	1	array indexed as *(i + field) for the index-first address sum; selected slot read as signed through a cast
