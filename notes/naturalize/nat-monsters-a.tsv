@@ -433,3 +433,5 @@ src/monsters/armor/Armor_UpdatePartRebound.c	Armor_UpdatePartRebound	contrived	c
 src/monsters/armor/Armor_DampPartWaveReturn.c	Armor_DampPartWaveReturn	minor	minor	0	open-coded halve-toward-zero blocks and a byte view of the parent
 src/monsters/armor/Armor_DampPartMovement.c	Armor_DampPartMovement	minor	minor	0	open-coded halve-toward-zero blocks and a byte view of the parent
 src/monsters/armor/SpinningApproach_DampReturnMovement.c	SpinningApproach_DampReturnMovement	minor	minor	0	open-coded halve-toward-zero blocks and a byte view of the parent
+src/monsters/armor/Armor_InitParts.c	Armor_InitParts	contrived	contrived	4	zero/active locals, per-case palette temps and chained stores kept: each removal changes constant sharing between the stores
+src/monsters/armor/Armor_QueueFallingParts.c	Armor_QueueFallingParts	contrived	contrived	3	three parallel part pointers in a do-while: a for loop or literal active flag changes the induction variables
