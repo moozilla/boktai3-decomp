@@ -267,3 +267,8 @@ src/scene/actor/behavior/SceneActorRoute_UpdateDelayedEntry.c	SceneActorRoute_Up
 src/scene/actor/behavior/SceneActorControl_UpdateContactWait.c	SceneActorControl_UpdateContactWait	natural	natural	0	-
 src/scene/actor/behavior/SceneActorRoute_UpdateReturnEntry.c	SceneActorRoute_UpdateReturnEntry	contrived	minor	6	motion flag result local before the branch
 src/scene/actor/behavior/SceneActorRoute_UpdateContactRecovery.c	SceneActorRoute_UpdateContactRecovery	contrived	contrived	10	motion flag pointer through helpers, parked masks around the interaction clear, phase pointer temp
+src/scene/actor/behavior/SceneActorControl_UpdateRouteApproach.c	SceneActorControl_UpdateRouteApproach	minor	minor	0	duration scale pointer assigned in both branches
+src/scene/actor/behavior/SceneActorBehavior_DispatchPrimaryOrEnterState2.c	SceneActorBehavior_DispatchPrimaryOrEnterState2	natural	natural	0	-
+src/scene/actor/behavior/SceneActorBehavior_DispatchOrEnterState2.c	SceneActorBehavior_DispatchOrEnterState2	natural	natural	0	-
+src/scene/actor/behavior/SceneActorBehavior_DispatchAlternateOrEnterState2.c	SceneActorBehavior_DispatchAlternateOrEnterState2	natural	natural	0	-
+src/scene/actor/behavior/SceneActorBehavior_InstallCallbackTables.c	SceneActorBehavior_InstallCallbackTables	natural	natural	0	-
