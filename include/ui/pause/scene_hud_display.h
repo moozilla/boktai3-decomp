@@ -284,7 +284,7 @@ struct SceneHudState {
     u8 accountSelection; /* 0x48E4: account prompt choice */
     u8 pageReturnToParent; /* 0x48E5 */
     u8 selectedQuantity;   /* 0x48E6: multiplied by valueRate */
-    u8 unknown48E7;
+    u8 loanOptionV;        /* 0x48E7: script -V, passed to the loan display */
     u8 quantityArrowFrame; /* 0x48E8: arrow keyframe base, 0x13 up and 0x16 down */
     u8 quantityArrowTimer; /* 0x48E9: arrow animation, wraps at sixteen */
     u16 valueRate;         /* 0x48EA */
