@@ -657,13 +657,12 @@ s32 Trigger_CreateDrop(struct SceneVec *position, s32 id, s32 kind, u32 script, 
     struct TriggerManager *manager = TriggerManager_GetOrCreate();
     struct Trigger *p;
     s32 i;
-    u32 *in, *out;
     if (!manager)
         return -1;
-    p = Heap_Alloc(188);
+    p = Heap_Alloc(sizeof(*p));
     if (!p)
         return -1;
-    Memory_Clear(p, 188);
+    Memory_Clear(p, sizeof(*p));
     p->id = id;
     p->kind = kind;
     p->actor = -1;
@@ -679,33 +678,23 @@ s32 Trigger_CreateDrop(struct SceneVec *position, s32 id, s32 kind, u32 script, 
     p->tick = 0;
     p->option = option;
     p->script = script;
-    in = arguments;
-    out = p->arguments;
-    i = 2;
-    do {
-        *out++ = *in++;
-    } while (--i >= 0);
-    p->sprite = Heap_Alloc(40);
+    for (i = 0; i < 3; i++)
+        p->arguments[i] = arguments[i];
+    p->sprite = Heap_Alloc(sizeof(*p->sprite));
     if (!p->sprite) {
         Heap_Free(p);
         return -1;
     }
-    Memory_Clear(p->sprite, 40);
+    Memory_Clear(p->sprite, sizeof(*p->sprite));
     ParticleSprite_Initialize(p->sprite, manager->graphics, 0);
     Effect_SetOrigin(p->sprite, -8, -10);
     if (Terrain_HasHigherCorner(position, 128)) {
-        {
-            struct TriggerSprite *sprite = p->sprite;
-            struct TriggerGraphics *graphics = manager->graphics;
-            sprite->tile = ((sprite->width >> 3) * (sprite->height >> 3)) * 35 + graphics->base;
-        }
+        p->sprite->tile =
+            manager->graphics->base + (p->sprite->width >> 3) * (p->sprite->height >> 3) * 35;
         p->sprite->mode = 1;
     } else {
-        {
-            struct TriggerSprite *sprite = p->sprite;
-            struct TriggerGraphics *graphics = manager->graphics;
-            sprite->tile = ((sprite->width >> 3) * (sprite->height >> 3)) * 32 + graphics->base;
-        }
+        p->sprite->tile =
+            manager->graphics->base + (p->sprite->width >> 3) * (p->sprite->height >> 3) * 32;
         p->sprite->mode = 2;
     }
     p->sprite->position = *position;

@@ -401,3 +401,4 @@ src/objects/items/item_container.c	TriggerManager_Update	contrived	minor	40	proj
 src/objects/items/item_container.c	TriggerManager_InsertTrigger	minor	natural	1	
 src/objects/items/item_container.c	TriggerManager_RemoveTrigger	minor	natural	1	
 src/objects/items/item_container.c	Trigger_UpdateShake	contrived	natural	12	
+src/objects/items/item_container.c	Trigger_CreateDrop	contrived	natural	8	
