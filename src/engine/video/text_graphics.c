@@ -135,6 +135,7 @@ s32 Text_DrawGlyph(u32 *data, u32 glyph, u32 part, u32 color, u32 wide)
     s32 i;
     u32 *dst;
     u32 *src;
+    u32 mhi, mlo;
 
     if (index >= 0) {
         u32 *e = (u32 *)((index << 2) + (u32)cache);
@@ -143,7 +144,7 @@ s32 Text_DrawGlyph(u32 *data, u32 glyph, u32 part, u32 color, u32 wide)
         *e = (v & 0xC03FFFFF) | (cnt + 0x400000);
         return index;
     }
-    for (i = 0; i <= 0xFF; cache++, i++) {
+    for (i = 0; i < 0x100; cache++, i++) {
         if (!(*cache & 0x3FC00000))
             break;
     }
@@ -155,14 +156,12 @@ s32 Text_DrawGlyph(u32 *data, u32 glyph, u32 part, u32 color, u32 wide)
     hi = fill << 6;
     lo = fill << 2;
     src = data;
-    {
-        u32 mhi = 0xF0F0F0F0;
-        u32 mlo = 0x0F0F0F0F;
-        dst = tile;
-        for (i = 7; i >= 0; i--) {
+    mhi = 0xF0F0F0F0;
+    mlo = 0x0F0F0F0F;
+    dst = tile;
+    for (i = 7; i >= 0; i--) {
             u32 w = *src++;
             *dst++ = (((w & mhi) | hi) & mhi) | (((w & mlo) | lo) & mlo);
-        }
     }
     Text_QueueTileUpload(index, tile);
     return index;

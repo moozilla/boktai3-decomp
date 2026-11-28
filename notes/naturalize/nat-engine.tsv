@@ -268,3 +268,4 @@ src/engine/video/sprite_oam.c	SpriteOam_QueueFlaggedProjectedSprites	contrived	c
 src/engine/video/sprite_oam.c	SpriteOam_QueueOverlayProjectedSprites	contrived	contrived	8	goto next and manual advance
 src/engine/video/text_graphics.c	Text_FlushTileUploads	contrived	natural	4	
 src/engine/video/text_graphics.c	Text_FindCachedGlyph	minor	natural	4	
+src/engine/video/text_graphics.c	Text_DrawGlyph	contrived	minor	12	cache entry address built by integer sum (operand order); nibble masks held in locals
