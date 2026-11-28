@@ -158,26 +158,27 @@ void ParticlePool_SpawnJitteredParticle(struct ParticlePool *pool, struct SceneV
     }
 }
 
-void SpriteParticles_UpdateEntries(struct ParticlePool *p)
+void SpriteParticles_UpdateEntries(struct ParticlePool *pool)
 {
-    struct PoolParticle *entry = p->particles;
-    struct ParticlePoolControl *control = &p->particles[0].tail.control;
-    int i = 15;
-    do {
+    struct PoolParticle *particle = pool->particles;
+    s32 i;
+
+    for (i = 0; i < 16; i++) {
+        struct ParticlePoolControl *control = &pool->particles[i].tail.control;
+
         if (control->active) {
             if (--control->lifetime == 0) {
-                entry->flags |= 1;
+                particle->flags |= 1;
                 control->active = 0;
             } else if (control->state == 0) {
-                SpiralParticles_UpdateParticle(p, entry);
+                SpiralParticles_UpdateParticle(pool, particle);
             } else {
-                ParticlePool_UpdateLinearParticle(p, entry);
+                ParticlePool_UpdateLinearParticle(pool, particle);
             }
         }
-        entry++;
-        control = (void *)((u8 *)control + sizeof(*entry));
-    } while (--i >= 0);
-    p->frame++;
+        particle++;
+    }
+    pool->frame++;
 }
 
 s32 ParticlePool_OnUpdate(struct ParticlePool *pool)
