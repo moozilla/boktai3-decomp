@@ -340,3 +340,4 @@ src/objects/hazards/timed_hazard/ColliderObject_Update.c	ColliderObject_Update	m
 src/objects/hazards/timed_hazard/ColliderSpritePool_Update.c	ColliderSpritePool_Update	minor	natural	1	
 src/objects/hazards/timed_hazard/ScriptSpriteManager_Destroy.c	ScriptSpriteManager_Destroy	minor	natural	1	
 src/objects/hazards/timed_hazard/ScriptSpriteManager_Init.c	ScriptSpriteManager_Init	contrived	natural	1	
+src/objects/hazards/timed_hazard/ColliderSpritePool_Create.c	ColliderSpritePool_Create	minor	natural	1	
