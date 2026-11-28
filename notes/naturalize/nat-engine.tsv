@@ -350,3 +350,4 @@ src/engine/video/palette/Video_RestoreWindowLayerMasks.c	Video_RestoreWindowLaye
 src/engine/video/palette/Video_SaveDisplayControl.c	Video_SaveDisplayControl	minor	natural	1	
 src/engine/video/palette/Video_RestoreDisplayControl.c	Video_RestoreDisplayControl	minor	natural	1	
 src/engine/video/palette/Video_SetBlendControl.c	Video_SetBlendControl	minor	natural	1	
+src/engine/video/palette/Video_SetBlendAlpha.c	Video_SetBlendAlpha	minor	natural	1	
