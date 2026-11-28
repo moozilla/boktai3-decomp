@@ -747,3 +747,4 @@ src/system/solar/Solar_CreateController.c	Solar_CreateController	minor	natural	1
 src/system/solar/Solar_InitTimer.c	Solar_InitTimer	minor	minor	1	mask inline and raw cartridge GPIO addresses stay
 src/system/solar/Solar_ShutdownTimer.c	Solar_ShutdownTimer	minor	minor	1	raw cartridge GPIO address
 src/system/solar/Solar_OnTimerInterrupt.c	Solar_OnTimerInterrupt	minor	minor	1	raw cartridge GPIO address
+src/system/solar/Solar_GetMeasurement.c	Solar_GetMeasurement	minor	natural	1	
