@@ -97,15 +97,13 @@ void Armor_ApplySceneCommands(u8 *arg)
                 Trigger_ConsumePending((p + 0xADC), 1);
                 break;
             }
-            case 12: {
-                s32 active = m[4];
-                if (active != 0)
+            case 12:
+                if (m[4] != 0)
                     SETF(p);
                 else
                     *(u16 *)(p + 0xB32) &= 0xFBFF;
                 Trigger_ConsumePending((p + 0xADC), 1);
                 break;
-            }
             case 13:
                 ActorController_SetBehavior(p, 0x2b);
                 if (m[4] != 0) {
