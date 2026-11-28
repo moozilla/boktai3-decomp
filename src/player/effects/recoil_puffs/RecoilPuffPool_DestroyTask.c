@@ -1,18 +1,13 @@
 #include "player/effects/recoil_puff_sprite.h"
 #include "engine/ram.h"
-void Effect_Remove(void *);
-u32 RecoilPuffPool_DestroyTask(struct RecoilPuffPool *p)
+void Effect_Remove(struct RecoilPuffSprite *);
+
+u32 RecoilPuffPool_DestroyTask(struct RecoilPuffPool *pool)
 {
-    struct RecoilPuffSprite *e = p->entries;
-    s32 i = 0x7;
-    do {
-        Effect_Remove(e);
-        e++;
-        i--;
-    } while (i >= 0);
-    {
-        u32 z = 0;
-        gRisingSpritePool = z;
-    }
+    s32 i;
+
+    for (i = 0; i < 8; i++)
+        Effect_Remove(&pool->entries[i]);
+    gRisingSpritePool = 0;
     return 0;
 }
