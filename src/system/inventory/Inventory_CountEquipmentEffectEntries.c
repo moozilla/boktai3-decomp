@@ -1,18 +1,28 @@
 #include "global.h"
-extern u8 gUnk_08E5FA6C[];
-/* Count the leading used entries (up to five, 12 bytes each) of a 64-byte record. */
+struct EquipmentEffectEntry {
+    u8 kind;
+    u8 unk1[11];
+};
+struct EquipmentEffects {
+    u8 unk0[4];
+    struct EquipmentEffectEntry entries[5];
+};
+extern struct EquipmentEffects gUnk_08E5FA6C[];
+
+/* Count the leading used entries (up to five) of the effect record for equipment p[0xd]. */
 s32 Inventory_CountEquipmentEffectEntries(u8 *p)
 {
-    u8 *record = gUnk_08E5FA6C + p[0xd] * 64;
+    struct EquipmentEffects *record = &gUnk_08E5FA6C[p[0xd]];
     s32 count = 0;
     s32 i = 0;
-    u8 *entry = record + 4;
+    struct EquipmentEffectEntry *entry = record->entries;
+
     do {
-        if (*entry == 0)
+        if (entry->kind == 0)
             break;
         count++;
-        entry += 12;
+        entry++;
         i++;
-    } while (i <= 4);
+    } while (i < 5);
     return count;
 }

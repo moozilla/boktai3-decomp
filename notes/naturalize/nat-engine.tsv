@@ -577,3 +577,4 @@ src/system/inventory/Inventory_GetEquipmentCondition.c	Inventory_GetEquipmentCon
 src/system/inventory/ItemDescriptor_Reset.c	ItemDescriptor_Reset	contrived	natural	1	
 src/system/inventory/Inventory_GetEquippedDescriptor.c	Inventory_GetEquippedDescriptor	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
 src/system/inventory/Inventory_InitEquipmentEntryFromDescriptor.c	Inventory_InitEquipmentEntryFromDescriptor	contrived	minor	1	values copied by walking word pointers: indexed array copies fold the offset into the induction variable
+src/system/inventory/Inventory_CountEquipmentEffectEntries.c	Inventory_CountEquipmentEffectEntries	contrived	minor	1	do loop with a walked entry pointer for the initialization order
