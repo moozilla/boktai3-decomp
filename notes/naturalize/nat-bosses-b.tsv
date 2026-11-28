@@ -398,3 +398,4 @@ src/bosses/vanargand/Vanargand_RunDefeatSequence.c	Vanargand_RunDefeatSequence	c
 src/bosses/vanargand/Vanargand_UpdateSequencedPairAttack.c	Vanargand_UpdateSequencedPairAttack	contrived	natural	40	self alias kept (compiler keeps a second register copy of the boss)
 src/bosses/vanargand/Vanargand_UpdateSynchronizedPairAttack.c	Vanargand_UpdateSynchronizedPairAttack	contrived	natural	40	self alias kept (compiler keeps a second register copy of the boss)
 src/bosses/vanargand/Vanargand_UpdateChargedPairAttack.c	Vanargand_UpdateChargedPairAttack	contrived	natural	40	self alias kept (compiler keeps a second register copy of the boss)
+src/bosses/vanargand/Vanargand_UpdateTimedAnimationAttack.c	Vanargand_UpdateTimedAnimationAttack	contrived	partial	40	kept: flags pointer, mask/one/five locals, shared result/limit variable (global alloc order of flags pointer vs result)
