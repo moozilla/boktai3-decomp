@@ -1045,16 +1045,9 @@ s32 Mod(s32, s32);
 
 s32 Player_RollModifierBonus(void)
 {
-    s32 r;
-
-    gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-    r = Mod(*(const u16 *)((const u8 *)gRandomTable + (gRandomIndex << 1)), 100);
-    if (r > 10) {
-        r = 0;
-    } else {
-        r = 10;
-    }
-    return r;
+    if (Mod(Player_NextStatusRandom(), 100) <= 10)
+        return 10;
+    return 0;
 }
 
 s32 Player_GetTargetFlag7Bonus(s32 unused0, s32 unused1, struct PlayerModifierTarget *p)

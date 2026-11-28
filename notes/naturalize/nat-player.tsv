@@ -69,3 +69,25 @@ src/player/appearance/player_visuals.c	SceneActor_UpdateVisualEffects	minor	mino
 src/player/appearance/player_visuals.c	Player_GetBlockedActionBonus	contrived	natural	1	-
 src/player/appearance/player_visuals.c	Player_DestroyEffects	natural	natural	0	-
 src/player/appearance/player_visuals.c	Player_InitEffects	contrived	minor	6	position copy through a two-word struct view; scene-mode helper materializes the bool the ROM tests
+src/player/appearance/player_visuals.c	Player_GetStateModifierBonus	minor	minor	1	cast address of counters628[slot]: array form computes the base first
+src/player/appearance/player_visuals.c	Player_GetEffectIntensity	natural	natural	0	-
+src/player/appearance/player_visuals.c	Player_GetStatAModifierBonus	natural	natural	0	-
+src/player/appearance/player_visuals.c	Player_GetStatBModifierBonus	natural	natural	0	-
+src/player/appearance/player_visuals.c	Player_GetEnergyRatioModifier	natural	natural	0	-
+src/player/appearance/player_visuals.c	Player_GetLifeRatioModifier	natural	natural	0	-
+src/player/appearance/player_visuals.c	Player_ModifyValueByMissingLife	natural	natural	0	-
+src/player/appearance/player_visuals.c	Player_ModifyValueByRemainingLife	natural	natural	0	-
+src/player/appearance/player_visuals.c	Player_ModifyValueByEquipmentLevel	natural	natural	0	-
+src/player/appearance/player_visuals.c	Player_GetScaledTargetFlagBonus	minor	minor	1	flag accessor: ROM loads the mask before the field
+src/player/appearance/player_visuals.c	Player_RollModifierBonus	natural	natural	0	-
+src/player/appearance/player_visuals.c	Player_GetTargetFlag7Bonus	minor	minor	2	flag accessor: ROM loads the mask before the field
+src/player/appearance/player_visuals.c	Player_GetTargetFlag8Bonus	minor	minor	2	flag accessor: ROM loads the mask before the field
+src/player/appearance/player_visuals.c	Player_GetTargetFlag9Bonus	minor	minor	2	flag accessor: ROM loads the mask before the field
+src/player/appearance/player_visuals.c	Player_GetTargetFlag10Bonus	minor	minor	2	flag accessor: ROM loads the mask before the field
+src/player/appearance/player_visuals.c	Player_GetTargetFlag11Bonus	minor	minor	2	flag accessor: ROM loads the mask before the field
+src/player/appearance/player_visuals.c	Player_OnWeaponHitApplySol	natural	natural	0	-
+src/player/appearance/player_visuals.c	Player_OnWeaponHitApplyFlame	natural	natural	0	-
+src/player/appearance/player_visuals.c	Player_OnWeaponHitApplyFrost	natural	natural	0	-
+src/player/appearance/player_visuals.c	Player_OnWeaponHitApplyCloud	natural	natural	0	-
+src/player/appearance/player_visuals.c	Player_OnWeaponHitApplyEarth	natural	natural	0	-
+src/player/appearance/player_visuals.c	Player_RollModifierBonus	natural	natural	4	
