@@ -1,0 +1,2 @@
+path	function	verdict before	verdict after	compiles	what stays and why
+src/scene/actor/actor_ability.c	CallbackStatus_ResetSelectorAndTest	contrived	natural	1	falls off the end when ready, as before (UB kept)

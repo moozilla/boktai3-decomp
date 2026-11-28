@@ -21,10 +21,8 @@ void CallbackList_SubtractStateTenValue(struct ActorStats *stats, struct ActorAb
 
 u32 CallbackStatus_ResetSelectorAndTest(struct ActorAbility *ability)
 {
-    u32 result;
     ability->request = 0xff;
-    result = Modifier_IsFourthSourceReady(ability);
-    if ((u8)result == 0)
+    if (!Modifier_IsFourthSourceReady(ability))
         return 0;
 }
 
