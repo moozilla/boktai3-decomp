@@ -21,7 +21,8 @@ struct TentacleBody {
     u16 routeHistory[6];
     struct SceneActorBody markedSegmentBody;
     u16 attackFlags;
-    u8 unknown8D2[2];
+    u8 unknown8D2;
+    u8 trailDelay; /* confidence=low: frames until the segment positions shift again */
     s8 oscillationDirection;
     u8 unknown8D5;
     s16 hitReactionTimer;

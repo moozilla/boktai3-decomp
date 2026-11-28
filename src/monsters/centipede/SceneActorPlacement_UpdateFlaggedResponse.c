@@ -3,6 +3,7 @@
 #include "scene/motion/scene_actor_chase_shared.h"
 #include "scene/actor/scene_actor_reset.h"
 #include "scene/actor/scene_actor_control_phase.h"
+#include "scene/motion/scene_actor_terrain_reaction.h"
 
 void CentipedeBody_UpdateSpreadWindup(void);
 void Centipede_SelectWanderRoute(struct ChaseActor *);
@@ -14,27 +15,10 @@ void SceneActorPlacement_UpdateFlaggedResponse(struct ChaseActor *p)
         Sound_PlaySong(0x19B);
     }
     if (p->base.controlKind == 39 && (u8)Callback_InvokeActor(p, p->base.contactQuery.opaque)) {
-        u32 two = 2;
-        u8 *field = &p->base.state2A8;
-        u32 zero = 0;
-        *field = zero;
-        p->base.phase2A9 = two;
-        p->base.behavior2AA = zero;
-        p->base.counter2AC = zero;
-        p->base.field2B1 = 1;
+        SceneActorTerrain_EnterState(p, 0, 2, 0);
     } else if (p->base.stepDone) {
-        u32 two;
-        u32 zero;
-        u8 *field;
         Centipede_SelectWanderRoute(p);
-        two = 2;
-        field = &p->base.state2A8;
-        zero = 0;
-        *field = zero;
-        p->base.phase2A9 = zero;
-        p->base.behavior2AA = two;
-        p->base.counter2AC = zero;
-        p->base.field2B1 = 1;
+        SceneActorTerrain_EnterState(p, 0, 0, 2);
         {
             u32 *flags = &p->base.statusFlags;
             u32 mask = ~0x100000;
