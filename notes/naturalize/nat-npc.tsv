@@ -131,3 +131,4 @@ src/npc/story_character/StoryCharacter_DispatchCommand.c	StoryCharacter_Dispatch
 src/npc/story_character/StoryCharacter_OnCommand.c	StoryCharacter_OnCommand	natural	natural	0	
 src/npc/story_character/StoryCharacter_EnterPendingState.c	StoryCharacter_EnterPendingState	contrived	natural	7	
 src/npc/story_character/StoryCharacter_OnUpdateState.c	StoryCharacter_OnUpdateState	minor	natural	1	
+src/npc/story_character/StoryCharacter_ProcessDirectionMessages.c	StoryCharacter_ProcessDirectionMessages	contrived	contrived	14	enter/height value locals, guarded do-while and callback local stay: constant load order and loop test shape differ without them

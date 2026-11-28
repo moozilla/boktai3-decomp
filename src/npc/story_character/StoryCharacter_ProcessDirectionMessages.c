@@ -31,51 +31,42 @@ void StoryCharacter_ProcessDirectionMessages(struct StateActor *actor)
                     actor->target.y = message->target.y;
                     actor->target.z = message->target.z;
                     actor->targetAngle = TargetAngle(&actor->target, &actor->position);
-                    {
-                        actor->unk2[0] = 0;
-                        actor->unk2[1] = 0;
-                        actor->state = 2;
-                        actor->timer = 0;
-                        actor->enterCommand = enter;
-                    }
+                    actor->unk2[0] = 0;
+                    actor->unk2[1] = 0;
+                    actor->state = 2;
+                    actor->timer = 0;
+                    actor->enterCommand = enter;
                     break;
                 }
                 case 3:
                     actor->targetAngle = (*(u8 *)&command->value + 5) << 5;
-                    {
-                        actor->unk2[0] = 0;
-                        actor->unk2[1] = 0;
-                        actor->state = 3;
-                        actor->timer = 0;
-                        actor->enterCommand = 1;
-                    }
+                    actor->unk2[0] = 0;
+                    actor->unk2[1] = 0;
+                    actor->state = 3;
+                    actor->timer = 0;
+                    actor->enterCommand = 1;
                     break;
             }
             SceneMessages_SetPendingTrigger(receiver, command);
             i++;
         } while (i < receiver->count[gSceneEventDispatchState->phase]);
     if (gPadState[1] & 2) {
-        const u16 *table = gRandomTable;
-        s32 x = ((s32)ParticleRandom_ReadDirectSample(table) >> 4) & 1023;
-        s32 z = ((s32)ParticleRandom_ReadDirectSample(table) >> 4) & 1023;
+        s32 x = ((s32)ParticleRandom_ReadDirectSample(gRandomTable) >> 4) & 1023;
+        s32 z = ((s32)ParticleRandom_ReadDirectSample(gRandomTable) >> 4) & 1023;
         struct StateActorPos *target = &actor->target;
-        {
-            u32 height;
-            x += 1024;
-            height = 256;
-            z += 1024;
-            target->x = x;
-            target->y = height;
-            target->z = z;
-        }
+        u32 height;
+        x += 1024;
+        height = 256;
+        z += 1024;
+        target->x = x;
+        target->y = height;
+        target->z = z;
         actor->targetAngle = TargetAngle(target, &actor->position);
-        {
-            actor->unk2[0] = 0;
-            actor->unk2[1] = 0;
-            actor->state = 2;
-            actor->timer = 0;
-            actor->enterCommand = 1;
-        }
+        actor->unk2[0] = 0;
+        actor->unk2[1] = 0;
+        actor->state = 2;
+        actor->timer = 0;
+        actor->enterCommand = 1;
         {
             void (*update)(void) = Actor_UpdateWalkToPosition;
             actor->prevState = 3;
