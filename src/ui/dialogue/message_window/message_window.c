@@ -285,12 +285,10 @@ u32 MessageWindow_SetNumberArgumentFromScript(void)
 u32 MessageWindow_SetStringArgument(u32 argument, u32 text)
 {
     struct MessageWindow *window = (void *)gMessageWindow;
-    u32 r;
-    if (window == 0)
-        r = 0;
-    else
-        r = TextState_SetString(&window->state, argument, text);
-    return r;
+
+    if (window)
+        return TextState_SetString(&window->state, argument, text);
+    return 0;
 }
 
 int MessageWindow_SetStringArgumentFromScript(void)
