@@ -23,7 +23,7 @@ struct TentacleAnimationSegment {
     u8 unknown109[0xB];
     struct ContactPosition targetPosition;
     struct ContactPosition offset;
-    u8 unknown124[4];
+    void *owner; /* the centipede that owns the segment */
 };
 
 typedef char

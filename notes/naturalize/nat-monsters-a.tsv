@@ -530,3 +530,4 @@ src/monsters/centipede/Centipede_ActivateMarkedSegment.c	Centipede_ActivateMarke
 src/monsters/centipede/CentipedeBody_RefreshDirectionalAnimations.c	CentipedeBody_RefreshDirectionalAnimations	contrived	contrived	1	hand-inlined sequence step and local body view: shared helpers read commands through a different pointer
 src/monsters/centipede/CentipedeBody_ResetDirectionalAnimations.c	CentipedeBody_ResetDirectionalAnimations	contrived	contrived	3	hand-inlined sequence step and local body view: shared helpers read commands through a different pointer
 src/monsters/centipede/CentipedeBody_RestartSegmentAnimations.c	CentipedeBody_RestartSegmentAnimations	contrived	contrived	2	local sequence step duplicates the shared one except the command table pointer, which the ROM reads through the state
+src/monsters/centipede/Centipede_ReactToContact.c	Centipede_ReactToContact	contrived	minor	6	second segment pointer and random table local remain

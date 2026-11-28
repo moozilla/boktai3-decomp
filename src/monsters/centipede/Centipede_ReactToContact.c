@@ -1,32 +1,16 @@
 #include "scene/actor/scene_actor_behavior.h"
 #include "scene/actor/scene_actor_placement.h"
+#include "monsters/centipede/centipede_body.h"
 void Collision_CalculateDamageResponse(struct SceneActorBehaviorContactView *,
                                        struct SceneActorBehaviorContactView *);
-void Centipede_EnterHitReaction(void *);
 s32 Math_Atan2(s32, s32);
-static inline u32 Unavailable(struct RoomActor *actor)
-{
-    return SceneActorPlacement_IsUnavailable(actor);
-}
-struct TentacleContactSegment {
-    u8 unknown0[0x108];
-    u8 reactionDirection;
-    u8 unknown109[0x124 - 0x109];
-    struct RoomActor *target;
-};
-struct TentacleContactTarget {
-    u8 unknown0[0x8EC];
-    u32 closestDistance;
-    void *closestSegment;
-};
-
 void Centipede_ReactToContact(struct SceneActorBehaviorContactView *source,
-                                  struct SceneActorBehaviorContactView *destination, void *input)
+                              struct SceneActorBehaviorContactView *destination, void *input)
 {
-    struct TentacleContactSegment *actor = input;
-    struct TentacleContactSegment *self = actor;
-    struct TentacleContactTarget *target = (void *)actor->target;
-    if (!Unavailable((void *)target)) {
+    struct TentacleAnimationSegment *segment = input;
+    struct TentacleAnimationSegment *self = segment;
+    struct TentacleBody *body = segment->owner;
+    if (!SceneActorPlacement_IsUnavailable(&body->base)) {
         struct ContactPosition difference;
         struct ContactPosition *delta = &difference;
         struct ContactPosition *right = (void *)((u8 *)destination + 0x24);
@@ -39,21 +23,21 @@ void Centipede_ReactToContact(struct SceneActorBehaviorContactView *source,
         table = gRandomTable;
         delta->z = (u16)left->z - (u16)right->z;
         distance = difference.x * difference.x + difference.z * difference.z;
-        if (distance < target->closestDistance) {
+        if (distance < body->pendingImpulse) {
             Collision_CalculateDamageResponse(source, destination);
             destination->parameter44 = source->parameter44;
             destination->power = source->power;
             if (source->flags & 0x100) {
-                self->reactionDirection = source->direction;
+                self->impulseHeading = source->direction;
             } else if (!difference.x && !difference.z) {
                 gRandomIndex = (gRandomIndex + 1) & 1023;
-                self->reactionDirection = table[gRandomIndex];
+                self->impulseHeading = table[gRandomIndex];
             } else {
-                self->reactionDirection = Math_Atan2(difference.x, difference.z);
+                self->impulseHeading = Math_Atan2(difference.x, difference.z);
             }
-            target->closestDistance = distance;
-            target->closestSegment = actor;
+            body->pendingImpulse = distance;
+            body->impulseSegment = segment;
         }
-        Centipede_EnterHitReaction(target);
+        Centipede_EnterHitReaction((void *)body);
     }
 }
