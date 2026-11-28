@@ -680,13 +680,11 @@ u32 PlayerClone_DestroyPool(struct PlayerCloneManager *a)
     struct PlayerCloneSlot *e = a->slots;
     s32 i;
     for (i = 2; i >= 0; i--, e++) {
-        u32 *q;
         Collider_Remove(&e->collider);
         ScaledShadow_Destroy(e->shadow);
-        q = &e->debris;
-        if (*q != 0) {
-            ActorDebris_Hide(*q);
-            Task_Kill((void *)*q);
+        if (e->debris != 0) {
+            ActorDebris_Hide(e->debris);
+            Task_Kill((void *)e->debris);
         }
         Anim_Remove(&e->animation);
     }
