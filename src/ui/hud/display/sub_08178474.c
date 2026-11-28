@@ -1,19 +1,15 @@
 #include "global.h"
 #include "engine/ram.h"
-struct HudGauge {
-    u8 pad[0xa78];
-    u16 a78, a7a, a7c;
-    u8 a7e;
-};
-void Hud_UpdateTransientStatGauge(struct HudGauge *);
+#include "ui/pause/scene_hud_display.h"
+void Hud_UpdateTransientStatGauge(struct SceneHudState *);
 
 void sub_08178474(void)
 {
-    struct HudGauge *hud = gFieldHud;
+    struct SceneHudState *hud = (struct SceneHudState *)gFieldHud;
     if (hud != NULL) {
-        hud->a78 = hud->a7a = 10;
-        hud->a7c = 300;
-        hud->a7e = 0;
+        hud->secondaryGaugeValue = hud->secondaryGaugeMaximum = 10;
+        hud->secondaryGaugeTimer = 300;
+        hud->secondaryGaugeFlashTimer = 0;
         Hud_UpdateTransientStatGauge(hud);
     }
 }
