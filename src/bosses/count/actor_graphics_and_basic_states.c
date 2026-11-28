@@ -514,33 +514,28 @@ void sub_08022878(BurstVec *p)
 
 void SceneActors_SpawnAmbientParticlePair(struct StateActor *p)
 {
-    u8 *graphics = (u8 *)p + 0x240;
+    struct AnimSprite *animation = &((struct SceneGraphicsActor *)p)->animation;
     struct PackedContactVector size;
     int i;
     for (i = 0; i < 2; i++) {
-        u32 angle, count;
-        u32 index;
-        u32 *indexPtr;
-        u32 value;
-        u32 speed;
+        u32 angle, count, speed;
+        u32 angleIndex, countIndex, speedIndex;
+        u32 table;
         size.x = 164;
         size.y = 16;
         size.z = 164;
-        indexPtr = &gRandomIndex;
-        value = (u32)gRandomTable;
-        index = HitSpark_NextIndex(*indexPtr, 1023);
-        angle = (u8)HitSpark_Sample(value, index);
-        index = HitSpark_NextIndex(index, 1023);
-        count = (HitSpark_Sample(value, index) & 3) + 2;
-        index = HitSpark_NextIndex(index, 1023);
-        *indexPtr = index;
-        speed = (HitSpark_Sample(value, index) & 3) + 20;
-        value = 3;
-        SparkParticle_Spawn((struct ContactPosition *)(graphics + 0x20), value, &size, angle, count,
-                            speed, 2, 2);
+        table = (u32)gRandomTable;
+        angleIndex = HitSpark_NextIndex(gRandomIndex, 1023);
+        angle = (u8)HitSpark_Sample(table, angleIndex);
+        countIndex = HitSpark_NextIndex(angleIndex, 1023);
+        count = (HitSpark_Sample(table, countIndex) % 4) + 2;
+        speedIndex = HitSpark_NextIndex(countIndex, 1023);
+        gRandomIndex = speedIndex;
+        speed = (HitSpark_Sample(table, speedIndex) % 4) + 20;
+        table = 3;
+        SparkParticle_Spawn(&animation->position, table, &size, angle, count, speed, 2, 2);
     }
 }
-
 void SceneActors_StopBackgroundFlash(struct StateActor *p)
 {
     BackgroundFlash_BeginDisappearance(((struct SceneGraphicsActor *)p)->graphics.backgroundFlash);
