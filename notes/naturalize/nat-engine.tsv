@@ -58,3 +58,4 @@ src/engine/math/ScalarApproach_SixteenthAngleArray.c	ScalarApproach_SixteenthAng
 src/engine/math/ScalarApproach_QuarterAngle.c	ScalarApproach_QuarterAngle	natural	natural	1	
 src/engine/math/ScalarApproach_EighthAngle.c	ScalarApproach_EighthAngle	natural	natural	1	
 src/engine/math/ScalarApproach_SixteenthAngle.c	ScalarApproach_SixteenthAngle	natural	natural	1	
+src/engine/math/ScalarApproach_ApplyAngleProfile.c	ScalarApproach_ApplyAngleProfile	minor	natural	1	
