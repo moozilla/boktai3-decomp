@@ -1652,34 +1652,18 @@ void SceneCharacter_UpdatePhaseWindowWaitState(struct SceneActorManager *manager
         actor->action = 1;
         Trigger_ConsumePending(actor->messageReceiver, 1);
     }
-    if (actor->cooldown)
-        goto decrement;
-    if (manager->weather)
-        goto tick;
-    {
-        u8 *phasePtr = &manager->hour;
-        u8 *firstPtr = &actor->paramA;
-        unsigned phase, first;
-        phase = *phasePtr;
-        first = *firstPtr;
-        if (phase == first && manager->minute >= actor->paramB)
-            goto transition;
-        if (phase > first && phase < actor->paramC)
-            goto transition;
-        if (phase != actor->paramC)
-            goto tick;
-        if (manager->minute >= actor->paramD)
-            goto tick;
-    }
-transition: {
-    SceneCharacter_EnterState(actor, 15);
-}
-    goto done;
-decrement:
-    actor->cooldown--;
-tick:
+    if (!actor->cooldown) {
+        if (!manager->weather) {
+            if ((manager->hour == actor->paramA && manager->minute >= actor->paramB) ||
+                (manager->hour > actor->paramA && manager->hour < actor->paramC) ||
+                (manager->hour == actor->paramC && manager->minute < actor->paramD)) {
+                SceneCharacter_EnterState(actor, 15);
+                return;
+            }
+        }
+    } else
+        actor->cooldown--;
     actor->ticks++;
-done:;
 }
 
 void SceneCharacter_UpdatePathResumeState(struct SceneActorManager *manager,

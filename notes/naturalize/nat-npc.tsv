@@ -70,3 +70,5 @@ src/npc/manager/scene_actor_animation.c	SceneCharacter_UpdatePathWaitState	contr
 src/npc/manager/scene_actor_animation.c	SceneCharacter_UpdatePathActionState	contrived	minor	1	same fudges as SceneCharacter_UpdatePathWaitState
 src/npc/manager/scene_actor_animation.c	SceneCharacter_UpdatePathTurnState	natural	natural	0	
 src/npc/manager/scene_actor_animation.c	SceneCharacter_UpdateTargetProximityState	contrived	minor	3	body passed to the range helper: ROM reads x through the body pointer
+src/npc/manager/scene_actor_animation.c	SceneCharacter_UpdatePhaseTransitionState	natural	natural	0	
+src/npc/manager/scene_actor_animation.c	SceneCharacter_UpdatePhaseWindowWaitState	contrived	natural	6	
