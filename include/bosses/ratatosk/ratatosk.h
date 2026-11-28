@@ -57,7 +57,7 @@ struct Ratatosk {
     u8 unknownB4[8];
     u32 contactAttack, contactFlags; /* 0xBC: cleared every frame by the collider update. */
     u32 actionTimer;                 /* 0xC4 */
-    u8 unknownC8[4];
+    s32 playerDistance;              /* 0xC8: squared distance to playerPosition. */
     u8 requestedAngle; /* 0xCC */
     u8 unknownCD[3];
     struct ContactPosition targetPosition; /* 0xD0 */
