@@ -160,3 +160,6 @@ src/ui/books/forging_book/CollectionBook_UpdateMenu.c	CollectionBook_UpdateMenu	
 src/ui/books/forging_book/sub_08213B50.c	sub_08213B50	minor	natural	1	
 src/ui/books/forging_book/ForgingBook_InitializePageFromScript.c	ForgingBook_InitializePageFromScript	minor	natural	1	
 src/ui/books/forging_book/ForgingBook_CreateFromScript.c	ForgingBook_CreateFromScript	natural	natural	1	
+src/ui/books/forging_book/Lookup_FindValueIndex.c	Lookup_FindValueIndex	natural	natural	0	
+src/ui/books/forging_book/ForgingBook_IsGridPositionValid.c	ForgingBook_IsGridPositionValid	natural	natural	0	
+src/ui/books/forging_book/ForgingBook_FinalizeState.c	ForgingBook_FinalizeState	natural	natural	0	empty
