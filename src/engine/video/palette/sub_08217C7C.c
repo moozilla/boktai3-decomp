@@ -9,11 +9,11 @@ static inline u32 Gray(s32 color)
     s32 r = color & 0x1F;
     s32 g = (color & 0x3E0) >> 5;
     s32 b = (color & 0x7C00) >> 10;
-    s32 v = r;
-    v += g; // accumulating keeps the loop body large enough that the masks stay inside
-    v += b;
-    v = (v >> 2) + (v >> 4) + (v >> 6);
-    return v | (v << 5) | (v << 10);
+    s32 gray = r;
+    gray += g;
+    gray += b;
+    gray = (gray >> 2) + (gray >> 4) + (gray >> 6);
+    return gray | (gray << 5) | (gray << 10);
 }
 
 void sub_08217C7C(void)
@@ -32,9 +32,9 @@ void sub_08217C7C(void)
         }
     }
     for (i = 13; i < 16; i++) {
-        CpuSet(((u16(*)[16])gBgPaletteBuffer)[i], buffer[i], 0x04000008);
+        CpuCopy32(((u16(*)[16])gBgPaletteBuffer)[i], buffer[i], 32);
     }
     if (gBackdropOverride) {
-        (*(s16 *)&gBackdropColor) = Gray((*(s16 *)&gBackdropColor));
+        gBackdropColor = Gray((s16)gBackdropColor);
     }
 }
