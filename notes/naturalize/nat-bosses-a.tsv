@@ -120,3 +120,5 @@ src/bosses/count/SceneActors_UpdateAnchoredReaction.c	SceneActors_UpdateAnchored
 src/bosses/count/SceneActors_UpdateUnmirroredReaction.c	SceneActors_UpdateUnmirroredReaction	contrived	natural	1	
 src/bosses/count/SceneActors_UpdateSwarmAttack.c	SceneActors_UpdateSwarmAttack	minor	natural	1	
 src/bosses/count/SceneActors_UpdateBlinkReaction.c	SceneActors_UpdateBlinkReaction	contrived	minor	3	two identical flag-setting branches (agbcc does not merge them; || shares one)
+src/bosses/count/SceneActors_RunUnpausedState.c	SceneActors_RunUnpausedState	natural	natural	0	
+src/bosses/count/SceneActors_TryApplyRequestedState.c	SceneActors_TryApplyRequestedState	contrived	natural	1	

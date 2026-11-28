@@ -1,32 +1,12 @@
 #include "global.h"
-extern const u32 gUnk_08604F08[];
-struct T {
-    u8 p0[0x90];
-    u32 w90;
-    u8 p1[0xa2 - 0x94];
-    u8 ba2;
-    u8 p2;
-    u32 wa4;
-    u8 p3[0xaa - 0xa8];
-    u8 baa;
-    u8 bab;
-    u8 p4[0xb1 - 0xac];
-    u8 bb1;
-    u8 p5[0x100 - 0xb2];
-    u32 w100;
-};
-u32 SceneActors_TryApplyRequestedState(struct T *p)
+#include "npc/story_character/state_actor.h"
+
+extern void (*const gUnk_08604F08[])(void *, int);
+
+u32 SceneActors_TryApplyRequestedState(struct StateActor *p)
 {
-    if ((u8)(p->baa - 1) > 0x27)
+    if ((u8)(p->actionAnimation - 1) > 39)
         return 0;
-    {
-        u32 v = gUnk_08604F08[p->baa];
-        p->bab = p->baa;
-        p->w100 = v;
-        p->w90 = 0;
-        p->bb1 = 1;
-        p->ba2 = 0;
-        p->wa4 = 0;
-        return 1;
-    }
+    SceneActorState_EnterAction(p, gUnk_08604F08[p->actionAnimation], p->actionAnimation);
+    return 1;
 }
