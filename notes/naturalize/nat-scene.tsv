@@ -2,3 +2,4 @@ path	function	verdict before	verdict after	compiles	what stays and why
 src/scene/actor/actor_ability.c	CallbackStatus_ResetSelectorAndTest	contrived	natural	1	falls off the end when ready, as before (UB kept)
 src/scene/actor/actor_ability.c	ActorAbility_SpawnProjectile	contrived	natural	4	
 src/scene/actor/actor_ability.c	ActorAbility_SpawnAlternateProjectile	contrived	natural	1	
+src/scene/actor/actor_ability.c	ActorAction_TrySpawn	contrived	natural	1	

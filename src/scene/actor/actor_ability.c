@@ -177,24 +177,23 @@ s32 ActorAction_TrySpawn(struct ActorAbility *ability)
     s32 cost;
     struct ActorAbilityProjectileParameters args;
     if (!Modifier_IsFourthSourceReady(ability))
-        goto fail;
+        return 0;
     owner = ability->owner;
     stats = &owner->actors[0].stats;
     cost = CallbackList_RunMatchingState(stats, ability->cost, 10);
     if (stats->value < cost)
-        goto fail;
+        return 0;
     args.projectile = owner->actors[0].control.projectile;
     args.y = 0;
     args.z = 0;
     ability->request = SpritePairPool_StartEntry(&stats->position, &stats->height, 0, &ability->id,
                                                  owner->actors[0].control.direction);
-    if ((s8)ability->request < 0) {
-    fail:
-        return 0;
+    if ((s8)ability->request >= 0) {
+        CallbackList_SubtractStateTenValue(stats, ability, cost);
+        ability->remaining = ability->duration;
+        return 1;
     }
-    CallbackList_SubtractStateTenValue(stats, ability, cost);
-    ability->remaining = ability->duration;
-    return 1;
+    return 0;
 }
 
 void Modifier_InitFourthSourceEffect(struct ActorStats *stats, u32 owner)
