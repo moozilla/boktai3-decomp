@@ -1383,7 +1383,7 @@ void Player_ConfigureActionCollider(struct Player *p)
             default:
                 return;
         }
-        Collider_Init(collider, 0, 0x2101, 0, (0x10000U << p->movementRequestBlocked) >> 16, &size,
+        Collider_Init(collider, 0, 0x2101, 0, (u16)(1 << p->movementRequestBlocked), &size,
                       &offset);
         Collider_SetAttackProperties(collider, p->statModifierContext.actionPhase,
                                      p->statModifierContext.actionTimer, category, 0,
@@ -1396,7 +1396,7 @@ void Player_ConfigureActionCollider(struct Player *p)
         offset.x = 0;
         offset.y = -20;
         offset.z = 0;
-        Collider_Init(collider, 0, 0x2101, 0, (0x10000U << p->movementRequestBlocked) >> 16, &size,
+        Collider_Init(collider, 0, 0x2101, 0, (u16)(1 << p->movementRequestBlocked), &size,
                       &offset);
         Collider_SetAttackProperties(collider, 20, 50, 16, 2, 20);
         Collider_SetCallback(collider, 0, p);

@@ -98,3 +98,4 @@ src/player/appearance/player_visuals.c	Player_RollSecondWeaponHitStatusLow	minor
 src/player/appearance/player_visuals.c	Player_RollSecondWeaponHitStatusHigh	minor	natural	4	
 src/player/appearance/player_visuals.c	Player_ApplyPeriodicStatChanges	minor	minor	4	HasFlag/TestFlags copy the mask to a local: ROM loads the mask before the flag word; a plain & loads the field first
 src/player/appearance/player_visuals.c	Player_BuildActionModifiers	contrived	minor	6	SetBonusFlag keeps pointer and mask locals: a plain |= changes 22 instructions (field loaded before mask)
+src/player/appearance/player_visuals.c	Player_ConfigureActionCollider	minor	natural	2	
