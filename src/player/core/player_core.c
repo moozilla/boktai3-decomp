@@ -278,8 +278,7 @@ void Player_CallCompletionScript(struct Player *player)
 s32 Player_GetSelectedSlotActionScale(void)
 {
     s32 scale;
-    s32 selectedAction =
-        ((struct GameState *)((u32)gGameState + gGameState->selected * sizeof(s16)))->slots88[0];
+    s32 selectedAction = *(gGameState->slots88 + gGameState->selected);
     scale = 4;
     if (selectedAction > 8) {
         scale = 0xc;
