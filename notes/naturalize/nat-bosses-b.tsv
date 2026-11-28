@@ -63,3 +63,4 @@ src/bosses/ratatosk/Ratatosk_UpdateEightDirectionAnimation.c	Ratatosk_UpdateEigh
 src/bosses/ratatosk/Ratatosk_BeginDirectionalReaction.c	Ratatosk_BeginDirectionalReaction	contrived	minor	7	actor alias, facing macro and one flag accessor stay: mask loaded before the field
 src/bosses/ratatosk/Ratatosk_UpdateDirectionalRecovery.c	Ratatosk_UpdateDirectionalRecovery	contrived	minor	8	one flag accessor stays
 src/bosses/ratatosk/SceneActors_UpdateTimedDirectionalAnimation.c	SceneActors_UpdateTimedDirectionalAnimation	contrived	natural	1	
+src/bosses/ratatosk/sub_081F62A8.c	sub_081F62A8	contrived	contrived	9	actor alias and local facing wrapper stay: they set the register allocation
