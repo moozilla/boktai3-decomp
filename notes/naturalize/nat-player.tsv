@@ -343,3 +343,5 @@ src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateStandDiagonalB	natural	
 src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateTargetDash	minor	minor	17	secondary animation, data and frame locals (inline start helper loads the frame first); case 2 keyframe pointer
 src/player/cutscene/player_script_stats.c	Script_GetActorIndex	contrived	natural	3	-
 src/player/cutscene/player_script_stats.c	Script_ReadPositionOption	minor	natural	3	-
+src/player/cutscene/player_script_stats.c	ScriptActor_SetPositionFromScript	natural	natural	0	-
+src/player/cutscene/player_script_stats.c	ScriptActor_GetFacingFromScript	minor	minor	3	actor/player alias pair fixes register copy order

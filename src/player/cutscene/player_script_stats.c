@@ -47,7 +47,7 @@ s32 ScriptActor_GetFacingFromScript(void)
     struct Player *player = actor;
     if (actor == NULL)
         return gGameState->unk36;
-    if ((u8)(actor->tetherMode - 4) <= 1)
+    if (actor->tetherMode == 4 || actor->tetherMode == 5)
         return (player->coordinateAxis + 4) & 7;
     return actor->facing;
 }
