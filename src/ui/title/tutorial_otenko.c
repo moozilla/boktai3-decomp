@@ -2,6 +2,7 @@
 #include "gba/io_reg.h"
 #include "engine/video/display_sequence.h"
 #include "ui/title/actor_animation_controller.h"
+#include "ui/title/title_display.h"
 #include "engine/video/display_sequence_step.h"
 #include "engine/video/render.h"
 #include "engine/input.h"
@@ -2652,7 +2653,7 @@ void Bg_SetupLayers(u32, u32, void *, u32, u32, u32, u32 *);
 
 void Bg_SetPriority(u32, u32);
 
-void TimeDisplay_InitBackgrounds(u8 *p)
+void TimeDisplay_InitBackgrounds(struct Display *p)
 {
     void *resource;
     u32 layer;
@@ -2661,7 +2662,7 @@ void TimeDisplay_InitBackgrounds(u8 *p)
     Bg_ClearTilemap(2);
     Bg_ClearTilemap(3);
     resource = ScriptProc_Start(0xc091, 0xc5a7);
-    *(void **)(p + 0x720) = resource;
+    p->resource = resource;
     layer = 0;
     Bg_SetupLayers(1, 16, resource, 0, 0, 1, &layer);
     Bg_SetPriority(2, 2);
@@ -2674,67 +2675,63 @@ void TimeDisplay_InitBackgrounds(u8 *p)
 
 void ResourceHeader_Relocate(u8 *, void *);
 
-void AnimSprite_InitLinked(u8 *, u8 *, u32, u32, u32, u32, u32, u32);
+void AnimSprite_InitLinked(void *, void *, u32, u32, u32, u32, u32, u32);
 
-void TimeDisplay_HideAnimatedObjects(u8 *);
+void TimeDisplay_HideAnimatedObjects(struct Display *);
 
-void TimeDisplay_InitAnimatedObjects(u8 *s)
+void TimeDisplay_InitAnimatedObjects(struct Display *p)
 {
-    void *p = ScriptProc_Start(0xCB05, 0x731D);
-    u8 *obj = s + 0x4E0;
-    ResourceHeader_Relocate(obj, p);
-    AnimSprite_InitLinked(s + 0x18, obj, 1, 0x10, 0, 0, 0, 0);
-    AnimSprite_InitLinked(s + 0xA0, obj, 2, 0x10, 0, 0, 0, 0);
-    AnimSprite_InitLinked(s + 0x128, obj, 11, 0x10, 2, 0, 0, 0);
-    AnimSprite_InitLinked(s + 0x1B0, obj, 11, 0x10, 2, 0, 0, 0);
-    AnimSprite_InitLinked(s + 0x458, obj, 0, 0x10, 0, 0, 0, 0);
-    AnimSprite_InitLinked(s + 0x238, obj, 7, 0x10, 0, 0, 0, 0);
-    AnimSprite_InitLinked(s + 0x2C0, obj, 3, 0x10, 0, 0, 0, 0);
-    AnimSprite_InitLinked(s + 0x348, obj, 7, 0x30, 1, 0, 0, 0);
-    AnimSprite_InitLinked(s + 0x3D0, obj, 3, 0x30, 1, 0, 0, 0);
-    TimeDisplay_HideAnimatedObjects(s);
+    void *data = ScriptProc_Start(0xCB05, 0x731D);
+    ResourceHeader_Relocate(p->keyframes, data);
+    AnimSprite_InitLinked(&p->widgets[0], p->keyframes, 1, 0x10, 0, 0, 0, 0);
+    AnimSprite_InitLinked(&p->widgets[1], p->keyframes, 2, 0x10, 0, 0, 0, 0);
+    AnimSprite_InitLinked(&p->widgets[2], p->keyframes, 11, 0x10, 2, 0, 0, 0);
+    AnimSprite_InitLinked(&p->widgets[3], p->keyframes, 11, 0x10, 2, 0, 0, 0);
+    AnimSprite_InitLinked(&p->widgets[8], p->keyframes, 0, 0x10, 0, 0, 0, 0);
+    AnimSprite_InitLinked(&p->widgets[4], p->keyframes, 7, 0x10, 0, 0, 0, 0);
+    AnimSprite_InitLinked(&p->widgets[5], p->keyframes, 3, 0x10, 0, 0, 0, 0);
+    AnimSprite_InitLinked(&p->widgets[6], p->keyframes, 7, 0x30, 1, 0, 0, 0);
+    AnimSprite_InitLinked(&p->widgets[7], p->keyframes, 3, 0x30, 1, 0, 0, 0);
+    TimeDisplay_HideAnimatedObjects(p);
 }
 
 /* Hide all nine animated display objects. */
 
-void TimeDisplay_HideAnimatedObjects(u8 *p)
+void TimeDisplay_HideAnimatedObjects(struct Display *p)
 {
-    *(u32 *)(p + 0x20) |= 1;
-    *(u32 *)(p + 0x350) |= 1;
-    *(u32 *)(p + 0x3d8) |= 1;
-    *(u32 *)(p + 0xa8) |= 1;
-    *(u32 *)(p + 0x1b8) |= 1;
-    *(u32 *)(p + 0x130) |= 1;
-    *(u32 *)(p + 0x240) |= 1;
-    *(u32 *)(p + 0x2c8) |= 1;
-    *(u32 *)(p + 0x460) |= 1;
+    p->widgets[0].flags |= 1;
+    p->widgets[6].flags |= 1;
+    p->widgets[7].flags |= 1;
+    p->widgets[1].flags |= 1;
+    p->widgets[3].flags |= 1;
+    p->widgets[2].flags |= 1;
+    p->widgets[4].flags |= 1;
+    p->widgets[5].flags |= 1;
+    p->widgets[8].flags |= 1;
 }
 
 /* Release the nine animated display objects. */
 
 void Anim_Remove(void *);
 
-void TimeDisplay_RemoveAnimatedObjects(u8 *p)
+void TimeDisplay_RemoveAnimatedObjects(struct Display *p)
 {
-    Anim_Remove(p + 0x3d0);
-    Anim_Remove(p + 0x348);
-    Anim_Remove(p + 0x458);
-    Anim_Remove(p + 0x1b0);
-    Anim_Remove(p + 0x128);
-    Anim_Remove(p + 0x2c0);
-    Anim_Remove(p + 0x238);
-    Anim_Remove(p + 0xa0);
-    Anim_Remove(p + 0x18);
+    Anim_Remove(&p->widgets[7]);
+    Anim_Remove(&p->widgets[6]);
+    Anim_Remove(&p->widgets[8]);
+    Anim_Remove(&p->widgets[3]);
+    Anim_Remove(&p->widgets[2]);
+    Anim_Remove(&p->widgets[5]);
+    Anim_Remove(&p->widgets[4]);
+    Anim_Remove(&p->widgets[1]);
+    Anim_Remove(&p->widgets[0]);
 }
 
-void Anim_LoadKeyframe(u8 *, u8 *, u16, s32);
+void Anim_LoadKeyframe(void *, u8 *, u16, s32);
 
-void TimeDisplay_SetSelectionKeyframe(u8 *p)
+void TimeDisplay_SetSelectionKeyframe(struct Display *p)
 {
-    u8 *a = p + 0x128;
-    u8 *b = p + 0x4E0;
-    u16 v = (u16)(*(u32 *)(p + 0x724) + 0xC);
-    Anim_LoadKeyframe(a, b, v, 0);
+    Anim_LoadKeyframe(&p->widgets[2], p->keyframes, (u16)(p->selection + 12), 0);
 }
 
 /* Show the paired foreground objects and their associated objects. */
@@ -2743,12 +2740,14 @@ struct Obj {
     u32 a, b, flags;
 };
 
-void TutorialOtenko_HideAuxiliarySprites(u8 *p)
+void TutorialOtenko_HideAuxiliarySprites(struct Display *p)
 {
-    ((struct Obj *)(p + 0x238))->flags &= ~1;
-    ((struct Obj *)(p + 0x2c0))->flags &= ~1;
-    *(u32 *)(p + 0x350) &= ~1;
-    *(u32 *)(p + 0x3d8) &= ~1;
+    struct TextEntryWidget *left = &p->widgets[4], *right;
+    left->flags &= ~1;
+    right = &p->widgets[5];
+    right->flags &= ~1;
+    p->widgets[6].flags &= ~1;
+    p->widgets[7].flags &= ~1;
 }
 
 /* Advance a paired four-frame display every tenth update. */
@@ -2757,14 +2756,14 @@ extern u8 gUnk_0824FDC8[];
 
 void memcpy(void *, const void *, u32);
 
-void TutorialOtenko_UpdatePairedSpriteAnimation(u8 *p)
+void TutorialOtenko_UpdatePairedSpriteAnimation(struct Display *p)
 {
     u8 frames[4][2];
-    if (Mod(++*(s32 *)(p + 0x744), 10) == 0) {
+    if (Mod(++p->pairTicks, 10) == 0) {
         memcpy(frames, gUnk_0824FDC8, 8);
-        if (++*(s32 *)(p + 0x740) > 3)
-            *(s32 *)(p + 0x740) = 0;
-        Anim_LoadKeyframe(p + 0x238, p + 0x4e0, frames[*(s32 *)(p + 0x740)][0], 0);
-        Anim_LoadKeyframe(p + 0x2c0, p + 0x4e0, frames[*(s32 *)(p + 0x740)][1], 0);
+        if (++p->pairFrame > 3)
+            p->pairFrame = 0;
+        Anim_LoadKeyframe(&p->widgets[4], p->keyframes, frames[p->pairFrame][0], 0);
+        Anim_LoadKeyframe(&p->widgets[5], p->keyframes, frames[p->pairFrame][1], 0);
     }
 }

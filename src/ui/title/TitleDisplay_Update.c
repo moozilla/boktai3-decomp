@@ -1,22 +1,9 @@
-#include "ui/title/text_entry_widget.h"
+#include "ui/title/title_display.h"
 #include "engine/video/render.h"
 #include "ui/menu_parameters.h"
 #include "engine/input.h"
 // confidence=low: menu ownership follows TitleDisplay_Create.
 
-// confidence=low: menu ownership follows TitleDisplay_Create; option meanings remain tentative.
-struct Display {
-    u8 task[0x18];
-    struct TextEntryWidget widgets[9];
-    u8 keyframes[0x20]; /* 0x4E0: the widgets' keyframe resource (size a guess, confidence=low) */
-    u16 palettes[17][16]; /* 0x500: palette banks; 0 is widget 1's, 16 the blend output (confidence=low) */
-    u8 unknown720[4];
-    s32 selection, count;
-    u32 state;
-    s32 result, counter, fadeShift, idleTimer, unused740, unused744, stateTimer;
-    u32 lastState;
-    s32 velocity, timer, slide, paletteStep, unused760, skipped, musicTimer;
-};
 struct Message {
     u32 count : 16;
     u32 unused : 16;

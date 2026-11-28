@@ -326,3 +326,10 @@ src/ui/title/tutorial_otenko.c	TutorialOtenko_UpdateInteractionMode	natural	natu
 src/ui/title/tutorial_otenko.c	TutorialOtenko_CheckResourceLifetime	natural	natural	0	
 src/ui/title/tutorial_otenko.c	TutorialOtenko_UpdateController	natural	natural	0	
 src/ui/title/tutorial_otenko.c	TutorialOtenko_ConfigureFromScript	contrived	natural	2	
+src/ui/title/tutorial_otenko.c	TimeDisplay_InitBackgrounds	contrived	natural	3	
+src/ui/title/tutorial_otenko.c	TimeDisplay_InitAnimatedObjects	contrived	natural	3	
+src/ui/title/tutorial_otenko.c	TimeDisplay_HideAnimatedObjects	contrived	natural	3	
+src/ui/title/tutorial_otenko.c	TimeDisplay_RemoveAnimatedObjects	contrived	natural	3	
+src/ui/title/tutorial_otenko.c	TimeDisplay_SetSelectionKeyframe	contrived	natural	3	
+src/ui/title/tutorial_otenko.c	TutorialOtenko_HideAuxiliarySprites	contrived	minor	5	two widget pointers (load offset form)
+src/ui/title/tutorial_otenko.c	TutorialOtenko_UpdatePairedSpriteAnimation	contrived	natural	1	
