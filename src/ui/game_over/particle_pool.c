@@ -27,48 +27,42 @@ void Palette_UpdateHighlightPulse(u16 *out, u8 *counter)
 
 extern const s16 gUnk_086149C4[];
 
-void SpiralParticles_UpdateParticle(struct ParticlePool *p, struct PoolParticle *s)
+static inline s32 TruncatePoolOffset(s32 value)
 {
-    s32 delta;
-    s32 product2;
-    s32 product;
-    s32 deltaZ;
-    s->tail.control.angle += s->tail.control.angularSpeed;
-    product2 = s->tail.control.radius * gUnk_086149C4[(s->tail.control.angle + 0x40) & 0xff];
-    if (product2 >= 0)
-        delta = product2 >> 12;
-    else
-        delta = -(-product2 >> 12);
-    s->tail.position.axis.x += delta;
-    product = s->tail.control.radius * gUnk_086149C4[s->tail.control.angle];
-    if (product >= 0)
-        deltaZ = product >> 12;
-    else
-        deltaZ = -(-product >> 12);
-    s->tail.position.axis.z += deltaZ;
-    if (p->frame >= s->tail.control.expandDelay) {
-        if (!(p->frame & 7) && s->tail.control.angularSpeed > 2)
-            s->tail.control.angularSpeed--;
-        s->tail.control.radius += 6;
-        s->tail.position.axis.y += s->tail.control.riseSpeed;
-    } else
-        s->tail.control.radius++;
-    switch (s->tail.control.kind) {
+    return value >= 0 ? value >> 12 : -(-value >> 12);
+}
+
+void SpiralParticles_UpdateParticle(struct ParticlePool *pool, struct PoolParticle *particle)
+{
+    particle->tail.control.angle += particle->tail.control.angularSpeed;
+    particle->tail.position.axis.x +=
+        TruncatePoolOffset(particle->tail.control.radius * gUnk_086149C4[(particle->tail.control.angle + 64) & 255]);
+    particle->tail.position.axis.z +=
+        TruncatePoolOffset(particle->tail.control.radius * gUnk_086149C4[particle->tail.control.angle]);
+    if (pool->frame >= particle->tail.control.expandDelay) {
+        if (!(pool->frame & 7) && particle->tail.control.angularSpeed > 2)
+            particle->tail.control.angularSpeed--;
+        particle->tail.control.radius += 6;
+        particle->tail.position.axis.y += particle->tail.control.riseSpeed;
+    } else {
+        particle->tail.control.radius++;
+    }
+    switch (particle->tail.control.kind) {
         case 0:
-            if (s->tail.control.animationPhase == 0)
-                SpriteDrawable_SelectTileFrame(s, p->resource, 2);
-            else if (s->tail.control.animationPhase == 4)
-                SpriteDrawable_SelectTileFrame(s, p->resource, 3);
+            if (particle->tail.control.animationPhase == 0)
+                SpriteDrawable_SelectTileFrame(particle, pool->resource, 2);
+            else if (particle->tail.control.animationPhase == 4)
+                SpriteDrawable_SelectTileFrame(particle, pool->resource, 3);
             break;
         case 1:
-            if (s->tail.control.animationPhase == 0)
-                SpriteDrawable_SelectTileFrame(s, p->resource, 4);
-            else if (s->tail.control.animationPhase == 4)
-                SpriteDrawable_SelectTileFrame(s, p->resource, 5);
+            if (particle->tail.control.animationPhase == 0)
+                SpriteDrawable_SelectTileFrame(particle, pool->resource, 4);
+            else if (particle->tail.control.animationPhase == 4)
+                SpriteDrawable_SelectTileFrame(particle, pool->resource, 5);
             break;
     }
-    if (++s->tail.control.animationPhase > 7)
-        s->tail.control.animationPhase = 0;
+    if (++particle->tail.control.animationPhase > 7)
+        particle->tail.control.animationPhase = 0;
 }
 
 void ParticlePool_UpdateLinearParticle(struct ParticlePool *pool, struct PoolParticle *particle)
@@ -94,11 +88,6 @@ void ParticlePool_UpdateLinearParticle(struct ParticlePool *pool, struct PoolPar
                 break;
         }
     }
-}
-
-static inline s32 TruncatePoolOffset(s32 value)
-{
-    return value >= 0 ? value >> 12 : -(-value >> 12);
 }
 
 void ParticlePool_SpawnJitteredParticle(struct ParticlePool *inPool, struct SceneVec *position,

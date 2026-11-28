@@ -387,3 +387,4 @@ src/ui/game_over/game_over.c	GameOver_UpdateCostPrompt	natural	natural	0
 src/ui/game_over/game_over.c	GameOver_UpdateExit	natural	natural	0	
 src/ui/game_over/game_over.c	GameOver_OnUpdate	natural	natural	0	
 src/ui/game_over/particle_pool.c	Palette_UpdateHighlightPulse	fudged	natural	1	
+src/ui/game_over/particle_pool.c	SpiralParticles_UpdateParticle	fudged	natural	6	moved TruncatePoolOffset above its first user
