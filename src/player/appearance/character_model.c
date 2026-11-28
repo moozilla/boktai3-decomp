@@ -346,10 +346,9 @@ void CharacterModel_SetComponentKeyframes(struct ScenePoolActor *actor,
 
 void CharacterModel_UpdateAccessoryAnimations(struct CharacterPreviewModel *model)
 {
-    struct ModifierGraphicsResource *resource;
-    Anim_Step(&model->view.parts[2], resource = &model->resource);
-    Anim_Step(&model->view.parts[3], resource);
-    Anim_Step(&model->view.parts[4], resource);
+    Anim_Step(&model->view.parts[2], &model->resource);
+    Anim_Step(&model->view.parts[3], &model->resource);
+    Anim_Step(&model->view.parts[4], &model->resource);
 }
 
 void CharacterModel_UpdatePairedAnimations(struct CharacterPreviewModel *model)
