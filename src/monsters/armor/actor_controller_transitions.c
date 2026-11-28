@@ -240,11 +240,8 @@ void ActorController_UpdateDecayingVelocity(struct SceneCombatActor *actor)
         struct ActorControllerVelocity *velocity = &actor->velocity;
         int angle = *heading;
         speed >>= shift;
-        {
-            int x = ActorController_TruncateFixed(gUnk_086149C4[(angle + 64) & 255] * speed);
-            velocity->x = x;
-            velocity->y = 0;
-        }
+        velocity->x = (ActorController_TruncateFixed(gUnk_086149C4[(angle + 64) & 255] * speed));
+        velocity->y = 0;
         {
             const s16 *table = gUnk_086149C4;
             const s16 *entry = (const void *)((angle * sizeof(*table)) + (const u8 *)table);
@@ -252,10 +249,7 @@ void ActorController_UpdateDecayingVelocity(struct SceneCombatActor *actor)
         }
     }
     if (actor->velocity.x || actor->velocity.z) {
-        u16 *flags = &actor->flags;
-        u32 value = *flags;
-        value |= 0x20;
-        *flags = value;
+        actor->flags |= 0x20;
         return;
     }
     actor->flags &= ~0x20;
