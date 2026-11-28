@@ -327,9 +327,9 @@ struct ActorAction {
 };
 
 struct ActorActionHost {
-    u8 unknown0[0x55];
-    u8 kind;
-    u8 unknown56[0x2b0 - 0x56];
+    u8 unknown0[0x48];
+    u8 modifierSources[0x10];
+    u8 unknown58[0x2b0 - 0x58];
     struct ActorAction action;
 };
 
@@ -342,15 +342,13 @@ s32 ActorEmitter_TryEmit(), ActorEmitter_TryEmitPair(), ActorEmitter_TryEmitLow(
 
 void ActorAction_InitializeMode(struct ActorActionHost *host, void *owner)
 {
-    u8 *source = (u8 *)host + 0x48;
+    u8 *source = host->modifierSources;
     struct ActorAction *action = &host->action;
-    u16 *params;
-    action->callback = 0;
+    action->callback = NULL;
     host->action.active = 0;
     action->owner = owner;
-    params = (u16 *)((u8 *)host + 0x2b4);
-    Memory_Clear(params, 16);
-    ScriptRecord_FindExtendedModifier(params, source[13]);
+    Memory_Clear(&action->unknown4, 16);
+    ScriptRecord_FindExtendedModifier(&action->unknown4, source[13]);
     switch (action->mode) {
         case 0:
             action->callback = ActorEmitter_TryEmit;

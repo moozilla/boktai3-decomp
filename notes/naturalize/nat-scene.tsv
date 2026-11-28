@@ -20,3 +20,4 @@ src/scene/actor/actor_emitter.c	ActorEmitter_TryEmitLow	contrived	minor	1	raw ow
 src/scene/actor/actor_emitter.c	ActorEmitter_TryEmitPair	contrived	minor	1	raw owner offsets (animation state) and local struct views
 src/scene/actor/actor_emitter.c	ActorEmitter_TryEmitAnimatedPair	contrived	minor	1	raw owner offsets (animation state) and local struct views
 src/scene/actor/actor_emitter.c	ActorEmitter_UpdateAnimation	contrived	minor	6	raw owner offsets for animation state
+src/scene/actor/actor_emitter.c	ActorAction_InitializeMode	contrived	natural	1	
