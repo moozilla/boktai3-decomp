@@ -506,3 +506,4 @@ src/player/effects/action_flash/ActionFlash_Initialize.c	ActionFlash_Initialize	
 src/player/effects/action_flash/ActionFlashBurst_Create.c	ActionFlashBurst_Create	natural	natural	0	-
 src/player/effects/action_flash/sub_082366A8.c	sub_082366A8	contrived	minor	7	descending pointer fill loop and flag pointer
 src/player/effects/action_flash/sub_08236790.c	sub_08236790	contrived	natural	2	-
+src/player/effects/action_flash/OrbitEffect_Initialize.c	OrbitEffect_Initialize	minor	minor	2	unchanged: one constant local and second sprite pointer fix register allocation
