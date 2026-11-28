@@ -418,3 +418,13 @@ src/monsters/golem/golem_main_2.c	Golem_Create	natural	natural	0
 src/monsters/golem/golem_2.c	Golem_UpdateHitReaction	minor	minor	1	void *object alias of actor for the route calls: passing actor itself changes register allocation across the function
 src/monsters/golem/golem_main_2.c	Golem_OnUpdate	minor	minor	1	mask local: literal 0x2000 is loaded after the flags
 src/monsters/armor/Armor_DispatchTypeUpdate.c	Armor_DispatchTypeUpdate	contrived	natural	5	
+src/monsters/armor/ArmorActor_UpdateFixedSpeedMotion.c	ArmorActor_UpdateFixedSpeedMotion	contrived	minor	8	phase pointer kept for the final write: *s = 0xFF via the pointer shares the address
+src/monsters/armor/actor_controller_requests.c	Armor_TryStartAction	minor	natural	1	
+src/monsters/armor/actor_controller_requests.c	ActorController_ForceAction	minor	natural	1	
+src/monsters/armor/armor_behavior.c	Armor_UpdateTurnTriggerCompletion	contrived	contrived	0	(u8*)p + 0xB40 - 0x64 passes an address derived from the phase byte; the member form recomputes it from the base
+src/monsters/armor/armor_actions.c	Armor_FinalizeDefeat	minor	minor	1	mask local and H() halfword view of the game state: literal mask is loaded after the flags
+src/monsters/armor/Armor_UpdatePartTravelXWave.c	Armor_UpdatePartTravelXWave	minor	natural	1	
+src/monsters/armor/Armor_UpdatePartTravelZWave.c	Armor_UpdatePartTravelZWave	minor	natural	1	
+src/monsters/armor/armor_actions.c	Armor_SpawnPairedProjectiles	contrived	contrived	4	strength-reduced offsetBytes and pos aliases partly kept: plain indexing changes the induction variables
+src/monsters/armor/armor_actions.c	Armor_UpdateTargetFacing	minor	minor	0	halfword copy of the player position through a u8 game-state pointer
+src/monsters/armor/Armor_UpdateContactBoost.c	Armor_UpdateContactBoost	minor	minor	0	open-coded fixed-point scale kept in nested blocks
