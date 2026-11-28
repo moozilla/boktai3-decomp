@@ -422,7 +422,6 @@ void Collider_SetAttackPowerAndForce(void *, u32, u32);
 s32 NidhoggrDuelMinionPool_SpawnActor(struct ContactSequenceOwner *pool,
                                       const struct ContactPosition *position, u32 variant)
 {
-    u32 savedVariant;
     struct ContactSequenceOwner *owner;
     struct ContactSequenceActor *actor;
     struct ContactPosition *actorPosition;
@@ -432,7 +431,6 @@ s32 NidhoggrDuelMinionPool_SpawnActor(struct ContactSequenceOwner *pool,
     const u8 *entry;
     u32 height, slope;
     struct ContactCollider *healthCollider, *resourceCollider;
-    savedVariant = variant;
     owner = pool;
     if (!owner)
         return -1;
@@ -478,12 +476,12 @@ s32 NidhoggrDuelMinionPool_SpawnActor(struct ContactSequenceOwner *pool,
     actor->stateFrame = 0;
     actor->flash = 0;
     actor->health = owner->initialHealth;
-    actor->variant = savedVariant;
+    actor->variant = variant;
     {
         struct DisplaySequenceState *state = &actor->sequence;
         void *resource = (void *)owner->sequenceResource;
         const struct ContactSequenceFrame *frames = gUnk_08605974;
-        Anim_SetSequence(state, resource, frames[savedVariant & 1].frame, 0, 8);
+        Anim_SetSequence(state, resource, frames[variant & 1].frame, 0, 8);
         actor->cooldown = 0;
         actor->active = 1;
     }
