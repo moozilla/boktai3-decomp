@@ -266,3 +266,4 @@ src/scene/actor/behavior/SceneActorRoute_UpdateRouteCompletion.c	SceneActorRoute
 src/scene/actor/behavior/SceneActorRoute_UpdateDelayedEntry.c	SceneActorRoute_UpdateDelayedEntry	minor	natural	1	-
 src/scene/actor/behavior/SceneActorControl_UpdateContactWait.c	SceneActorControl_UpdateContactWait	natural	natural	0	-
 src/scene/actor/behavior/SceneActorRoute_UpdateReturnEntry.c	SceneActorRoute_UpdateReturnEntry	contrived	minor	6	motion flag result local before the branch
+src/scene/actor/behavior/SceneActorRoute_UpdateContactRecovery.c	SceneActorRoute_UpdateContactRecovery	contrived	contrived	10	motion flag pointer through helpers, parked masks around the interaction clear, phase pointer temp

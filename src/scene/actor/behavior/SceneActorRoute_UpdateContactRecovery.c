@@ -33,7 +33,8 @@ static inline u8 TryRoute(struct ChaseActor *actor, void *route, struct ContactP
     *flags &= ~mask;
     return 0;
 }
-static inline void SubtractContactNode(struct ContactPosition *out, struct SceneActorContactNode *node,
+static inline void SubtractContactNode(struct ContactPosition *out,
+                                       struct SceneActorContactNode *node,
                                        struct ContactPosition *from)
 {
     struct SceneActorChaseTarget *target = node->object;
@@ -42,7 +43,6 @@ static inline void SubtractContactNode(struct ContactPosition *out, struct Scene
 void SceneActorRoute_UpdateContactRecovery(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
-    u8 result;
     u16 *motionFlags;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         SceneActorChase_SetControl(actor, actor->base.onStanding, 0);
@@ -50,25 +50,20 @@ void SceneActorRoute_UpdateContactRecovery(struct ChaseActor *actor)
     }
     if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
         return;
-    result = SceneActorReaction_BeginContactResponse(actor);
-    if (result)
+    if (SceneActorReaction_BeginContactResponse(actor))
         return;
     if (FlagsSave(actor, 0x1000, &motionFlags)) {
         struct ContactPosition delta;
         struct SceneActorContactNode *node = group->contactNode;
         SubtractContactNode(&delta, node, &actor->base.body.position);
         if (((u32)((delta.x * delta.x) + (delta.z * delta.z))) <= 0xFFFE) {
-            SceneActorControl_Begin(actor, group->contactArrivalControl, 0x19, result);
+            SceneActorControl_Begin(actor, group->contactArrivalControl, 0x19, 0);
             SceneActorBehavior_WriteSelector(3, &actor->base.state2A8);
             {
-                typeof(actor->base.phase2A9) *q1 = &actor->base.phase2A9;
-                *q1 = 1;
+                actor->base.phase2A9 = 1;
                 actor->base.behavior2AA = 0;
-                actor->base.counter2AC = result;
-                {
-                    typeof(actor->base.field2B1) *q2 = &actor->base.field2B1;
-                    *q2 = 1;
-                }
+                actor->base.counter2AC = 0;
+                actor->base.field2B1 = 1;
                 return;
             }
         }
