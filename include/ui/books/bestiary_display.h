@@ -52,9 +52,10 @@ struct BestiaryDisplay {
     u8 entryChanged;
     u8 unkA04[4];
     const struct BestiaryDisplayConfig *config;
+    u8 unkA0C[4];
 };
 
-typedef char BestiaryDisplaySizeCheck[sizeof(struct BestiaryDisplay) == 0xA0C ? 1 : -1];
+typedef char BestiaryDisplaySizeCheck[sizeof(struct BestiaryDisplay) == 0xA10 ? 1 : -1];
 
 extern const struct BestiaryDisplayConfig gUnk_086126E0[];
 

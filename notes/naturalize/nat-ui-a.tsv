@@ -37,3 +37,4 @@ src/ui/books/monster_book/BestiaryDisplay_SetEntry.c	BestiaryDisplay_SetEntry	mi
 src/ui/books/monster_book/BestiaryDisplay_Hide.c	BestiaryDisplay_Hide	minor	natural	1	
 src/ui/books/monster_book/BestiaryDisplay_Show.c	BestiaryDisplay_Show	minor	natural	1	
 src/ui/books/monster_book/BestiaryDisplay_SetPosition.c	BestiaryDisplay_SetPosition	minor	natural	1	
+src/ui/books/monster_book/BestiaryDisplay_Create.c	BestiaryDisplay_Create	minor	natural	2	
