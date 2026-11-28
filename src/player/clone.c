@@ -464,15 +464,6 @@ static inline CloneUpdateCallback CloneCallback_Get(struct CloneCallback operati
     return operation.callback;
 }
 
-static inline u16 CloneMemberOffset_Value(u16 value)
-{
-    struct {
-        u16 value : 16;
-    } field;
-    field.value = value;
-    return field.value;
-}
-
 static inline void Vec_FromAngle(struct ContactPosition *v, s32 angle, s32 speed)
 {
     v->x = Clone_ScaleCoordinate(gUnk_086149C4[(angle + 64) & 255] * speed);
@@ -534,16 +525,6 @@ static inline u8 Clone_ColliderHasFlags(struct CloneColliderHeader header, s16 m
     return mask != 0;
 }
 
-static inline void CloneAnim_SetPaletteFlags(struct AnimSprite *anim, u16 flags)
-{
-    anim->paletteBank = flags;
-}
-
-static inline void CloneAnim_SetPalette(struct AnimSprite *anim, void *palette)
-{
-    anim->palette = palette;
-}
-
 /* Advance each active clone, its animation and colliders, and its lifetime. */
 
 s32 PlayerClone_UpdatePool(struct PlayerCloneManager *pool)
@@ -552,8 +533,6 @@ s32 PlayerClone_UpdatePool(struct PlayerCloneManager *pool)
     s32 i = 0;
     struct CloneProjectionVectors projection;
     struct ContactPosition *positionRef = &projection.position;
-    u32 stride = sizeof(*slot);
-    u32 stateOffset = CloneMemberOffset_Value((u32) & ((struct PlayerCloneSlot *)0)->flags);
     do {
         struct AnimSprite *walkAnim = &slot->animation;
         struct ContactCollider *area;
@@ -638,12 +617,12 @@ s32 PlayerClone_UpdatePool(struct PlayerCloneManager *pool)
             if (slot->paletteTimer > 0) {
                 slot->paletteTimer--;
                 Anim_SelectPaletteBank(metadata, 0x192);
-                CloneAnim_SetPaletteFlags(walkAnim, 0xe013);
-                CloneAnim_SetPalette(walkAnim, pool->palette1);
+                walkAnim->paletteBank = 0xe013;
+                walkAnim->palette = pool->palette1;
             } else {
                 Anim_SelectPaletteBank(metadata, 0x1f4);
-                CloneAnim_SetPaletteFlags(walkAnim, 0xe000);
-                CloneAnim_SetPalette(walkAnim, pool->palette2);
+                walkAnim->paletteBank = 0xe000;
+                walkAnim->palette = pool->palette2;
             }
             if (slot->timer >= (u32)(i * 30 + 0x2b2))
                 PlayerClone_ReleaseSlot(pool, slot, i);
