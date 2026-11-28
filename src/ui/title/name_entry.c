@@ -1,4 +1,5 @@
 #include "ui/title/name_entry.h"
+#include "gba/io_reg.h"
 #include "engine/video/palette_pulse.h"
 #include "system/game_state/game_state.h"
 #include "global.h"
@@ -515,9 +516,9 @@ void NameEntry_Update(struct NameEntryTask *p)
         case 0:
             p->verticalHistory <<= 1;
             p->horizontalHistory <<= 1;
-            if (gPadState[0] & 0xC0)
+            if (gPadState[0] & (DPAD_UP | DPAD_DOWN))
                 p->verticalHistory |= 1;
-            if (gPadState[0] & 0x30)
+            if (gPadState[0] & (DPAD_LEFT | DPAD_RIGHT))
                 p->horizontalHistory |= 1;
             if (p->verticalHistory == 0xFFFF)
                 p->verticalRepeat++;
@@ -527,17 +528,19 @@ void NameEntry_Update(struct NameEntryTask *p)
                 p->horizontalRepeat++;
             else
                 p->horizontalRepeat = 1;
-            if ((gPadState[1] & 0x40) || (Mod(p->verticalRepeat, 5) == 0 && (gPadState[0] & 0x40)))
+            if ((gPadState[1] & DPAD_UP) ||
+                (Mod(p->verticalRepeat, 5) == 0 && (gPadState[0] & DPAD_UP)))
                 NameEntry_MoveCursorUp(p);
-            if ((gPadState[1] & 0x80) || (Mod(p->verticalRepeat, 5) == 0 && (gPadState[0] & 0x80)))
+            if ((gPadState[1] & DPAD_DOWN) ||
+                (Mod(p->verticalRepeat, 5) == 0 && (gPadState[0] & DPAD_DOWN)))
                 NameEntry_MoveCursorDown(p);
-            if ((gPadState[1] & 0x10) ||
-                (Mod(p->horizontalRepeat, 5) == 0 && (gPadState[0] & 0x10)))
+            if ((gPadState[1] & DPAD_RIGHT) ||
+                (Mod(p->horizontalRepeat, 5) == 0 && (gPadState[0] & DPAD_RIGHT)))
                 NameEntry_MoveCursorRight(p);
-            if ((gPadState[1] & 0x20) ||
-                (Mod(p->horizontalRepeat, 5) == 0 && (gPadState[0] & 0x20)))
+            if ((gPadState[1] & DPAD_LEFT) ||
+                (Mod(p->horizontalRepeat, 5) == 0 && (gPadState[0] & DPAD_LEFT)))
                 NameEntry_MoveCursorLeft(p);
-            if (gPadState[1] & 2) {
+            if (gPadState[1] & B_BUTTON) {
                 Sound_PlaySong(0xDE);
                 r = NameEntry_EraseCharacter(p);
                 if (r == 1) {
@@ -550,28 +553,28 @@ void NameEntry_Update(struct NameEntryTask *p)
                     gNameEntrySavedState[p->slot + 2] = 0;
                     Menu_StartFadeOut(p->fadeShift);
                     p->result = 0;
-                    p->state = r;
+                    p->state = 1;
                     break;
                 }
                 TextEntry_DrawName(p->name);
-            } else if (gPadState[1] & 4) {
+            } else if (gPadState[1] & SELECT_BUTTON) {
                 Sound_PlaySong(0xDD);
                 NameEntry_ToggleCharacterPage(p);
                 break;
-            } else if ((gPadState[1] & 8) && p->selection != 0x56) {
+            } else if ((gPadState[1] & START_BUTTON) && p->selection != 0x56) {
                 Sound_PlaySong(0xDD);
                 p->selection = 0x56;
                 NameEntry_UpdateCursor(p);
                 break;
-            } else if ((gPadState[1] & 1) || (gPadState[1] & 8)) {
+            } else if ((gPadState[1] & A_BUTTON) || (gPadState[1] & START_BUTTON)) {
                 Sound_PlaySong(0xDD);
-                if (p->selection <= 0x54 && (gPadState[1] & 1)) {
+                if (p->selection <= 0x54 && (gPadState[1] & A_BUTTON)) {
                     if (NameEntry_AppendChar(p) == 1) {
                         p->selection = 0x56;
                         NameEntry_UpdateCursor(p);
                     }
                 } else {
-                    if (p->selection == 0x55 && (gPadState[1] & 1))
+                    if (p->selection == 0x55 && (gPadState[1] & A_BUTTON))
                         NameEntry_ToggleCharacterPage(p);
                     if (p->selection == 0x56) {
                         s32 count = 0;
@@ -601,14 +604,8 @@ void NameEntry_Update(struct NameEntryTask *p)
                 }
                 TextEntry_DrawName(p->name);
             }
-            {
-                s32 x = p->position << 4;
-                u32 zero;
-                s16 *h = &p->widgets[3].x;
-                zero = 0;
-                *h = x;
-                p->widgets[3].y = zero;
-            }
+            p->widgets[3].x = p->position << 4;
+            p->widgets[3].y = 0;
             Palette_UpdateHighlightPulse(&p->keyColors[12], &p->highlightPulseState[0]);
             Palette_UpdateHighlightPulse(&p->cursorColors[12], &p->highlightPulseState[1]);
             break;
