@@ -161,3 +161,5 @@ src/bosses/count/ContactActorPool_Start.c	ContactActorPool_Start	contrived	contr
 src/bosses/count/CountBats_ApplyHealthContact.c	CountBats_ApplyHealthContact	contrived	minor	18	mask and state locals stay: only an enter-state helper or these locals give the register order
 src/bosses/count/CountBats_IgnoreResourceContact.c	CountBats_IgnoreResourceContact	natural	natural	0	
 src/bosses/count/CountBats_InitializeSlot.c	CountBats_InitializeSlot	contrived	minor	6	palette helper stays
+src/bosses/count/CountBats_DestroySlot.c	CountBats_DestroySlot	natural	natural	0	
+src/bosses/count/CountBats_HideSlot.c	CountBats_HideSlot	minor	natural	3	
