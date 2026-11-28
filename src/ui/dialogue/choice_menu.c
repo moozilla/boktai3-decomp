@@ -281,17 +281,13 @@ void ChoiceMenu_LayoutText(struct ChoiceMenu *p, void *window)
 {
     u8 *text = Text_LookupString(Script_ParseStringRef(window) + p->stringBase);
     s32 i;
-    u8 *rowStart, *rowEnd;
     p->count = 0;
     p->width = 0;
-    i = 0;
-    do {
+    for (i = 0; i < 8; i++) {
         p->rowStart[i] = 0;
         p->rowEnd[i] = 0;
         p->rowCount[i] = 0;
-        rowStart = p->rowStart;
-        rowEnd = p->rowEnd;
-    } while (++i < 8);
+    }
     p->rows = 0;
     for (;;) {
         if ((s8)*text < 0)
@@ -309,10 +305,10 @@ void ChoiceMenu_LayoutText(struct ChoiceMenu *p, void *window)
             p->textX = 0;
             p->width = 0;
             if (p->rows < p->maxRows) {
-                rowEnd[p->rows] = p->count ? p->count - 1 : 0;
+                p->rowEnd[p->rows] = p->count ? p->count - 1 : 0;
                 p->rows++;
                 if (p->rows < p->maxRows)
-                    rowStart[p->rows] = p->count;
+                    p->rowStart[p->rows] = p->count;
             }
             text++;
         } else {
@@ -342,7 +338,7 @@ void ChoiceMenu_LayoutText(struct ChoiceMenu *p, void *window)
         text += 2;
     }
     if (p->rows < p->maxRows)
-        rowEnd[p->rows] = p->count ? p->count - 1 : 0;
+        p->rowEnd[p->rows] = p->count ? p->count - 1 : 0;
 }
 
 s32 MessageWindow_GetSoundMode(void);

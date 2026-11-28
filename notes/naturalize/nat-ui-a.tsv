@@ -168,3 +168,4 @@ src/ui/books/forging_book/ForgingBook_ReleaseBackgrounds.c	ForgingBook_ReleaseBa
 src/ui/books/forging_book/CollectionBook_IsEntryCollectedFromScript.c	CollectionBook_IsEntryCollectedFromScript	natural	natural	0	
 src/ui/dialogue/choice_menu.c	ChoiceMenu_DispatchSelection	minor	natural	1	
 src/ui/dialogue/choice_menu.c	ChoiceMenu_FindSelectableRow	minor	natural	1	
+src/ui/dialogue/choice_menu.c	ChoiceMenu_LayoutText	contrived	minor	1	doubleCharacter goto shared by two tests
