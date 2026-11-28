@@ -937,13 +937,13 @@ u8 *TutorialOtenko_EnsureController(u32, u32);
 
 u8 TutorialOtenko_GetFacingDirection(void)
 {
-    u8 *p = gScriptedActorController;
-    if (p == 0) {
-        p = TutorialOtenko_EnsureController(0xBB34, 0);
-        if (p == 0)
+    struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
+    if (g == 0) {
+        g = (struct ActorAnimController *)TutorialOtenko_EnsureController(0xBB34, 0);
+        if (g == 0)
             return 0;
     }
-    return p[0xF68];
+    return g->facing;
 }
 
 void TutorialOtenko_SetSpritePriorityFromScript(void)
