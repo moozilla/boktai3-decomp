@@ -10,10 +10,8 @@ void Sound_PlaySong(u32);
 void ActorSequence_Begin(void *, s32, s32);
 void sub_08144F40(struct Player *p)
 {
-    s32 phase;
     Player_AddControlFlags(p, 4);
-    phase = p->tetherPhase;
-    switch (phase) {
+    switch (p->tetherPhase) {
         case 0: {
             struct SceneVec pos;
             pos = p->position;
@@ -40,7 +38,7 @@ void sub_08144F40(struct Player *p)
             if (++p->tetherFrame > 5) {
                 ActorSequence_Begin(p, 0x1B, 2);
                 p->terrainRecoveryCounter = 0;
-                p->secondaryPriority = phase;
+                p->secondaryPriority = 1;
                 Sound_PlaySong(0x1AE);
             }
             break;

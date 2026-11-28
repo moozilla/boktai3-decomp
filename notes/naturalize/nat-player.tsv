@@ -627,3 +627,7 @@ src/player/motions/Player_UpdateActionEighteen.c	Player_UpdateActionEighteen	nat
 src/player/motions/PileTrap_UpdatePlacementAction.c	PileTrap_UpdatePlacementAction	minor	natural	1	-
 src/player/motions/Player_OnRecoveryActionEnd.c	Player_OnRecoveryActionEnd	contrived	natural	1	-
 src/player/motions/PileTrap_UpdateSolarPileRecovery.c	PileTrap_UpdateSolarPileRecovery	contrived	minor	2	Player_SetStatusBits: ROM loads the mask before the status word
+src/player/motions/Player_OnChargeMotionExit.c	Player_OnChargeMotionExit	natural	natural	0	-
+src/player/motions/Player_UpdateChargeMotion.c	Player_UpdateChargeMotion	natural	natural	0	-
+src/player/motions/Player_UpdateCountdownAnimation.c	Player_UpdateCountdownAnimation	natural	natural	0	-
+src/player/motions/sub_08144F40.c	sub_08144F40	minor	natural	2	-
