@@ -480,3 +480,4 @@ src/objects/loot_deposits/LootDeposit_CallMemberScript.c	LootDeposit_CallMemberS
 src/objects/loot_deposits/LootDeposit_CreateFromScript.c	LootDeposit_CreateFromScript	contrived	minor	18	render pointer, argument address arithmetic and a script destination pointer: plain forms change 25-80 insns
 src/objects/loot_deposits/sub_08104748.c	sub_08104748	contrived	minor	9	self alias: without it the hit timer address is built from the argument register
 src/objects/loot_deposits/sub_081047B4.c	sub_081047B4	minor	natural	1	
+src/objects/loot_deposits/LootDeposit_UpdateMemberProximity.c	LootDeposit_UpdateMemberProximity	contrived	minor	4	local clear, scale and flag helpers kept

@@ -1,29 +1,9 @@
 #include "global.h"
+#include "engine/engine.h"
 #include "engine/ram.h"
+#include "objects/loot_deposits/callback_pool.h"
 #include "player/player.h"
-struct ActorGroupMember {
-    u32 flags;
-    u8 pad4[2];
-    u8 angle;
-    u8 pad7[0x15];
-    s16 x, y, z, pad22;
-    u8 pad24[0xF4];
-    s16 originX, originY, originZ, pad11E;
-    s16 turnStep;
-    u8 pad122[6];
-    s16 radiusX;
-    u8 pad12A[2];
-    s16 radiusZ;
-    u8 pad12E[2];
-    s32 previousDistanceSquared, distanceSquared;
-    u8 pad138[0x12];
-    s16 health;
-    u8 pad14C[6];
-    u16 state;
-    u8 pad154[8];
-    u16 frame;
-    u8 started;
-};
+
 extern const s16 gUnk_086149C4[];
 static inline s32 Scale(s32 x)
 {
@@ -31,9 +11,6 @@ static inline s32 Scale(s32 x)
         return x >> 12;
     return -((-x) >> 12);
 }
-u8 LootDepositFeedback_IsPlayerInsideOriginRange(void *);
-void LootDeposit_UpdateMemberSway(struct ActorGroupMember *);
-void Sound_PlaySong(u32);
 static inline void Clear(void *p)
 {
     u32 zero = 0;
@@ -54,26 +31,28 @@ static inline u32 LootDeposit_TestPlayerFlag(const struct Player *player, u8 mas
     return mask & player->statusFlags;
 }
 // confidence=low: starts a sway and advances the group member when the nearby player moves.
-void LootDeposit_UpdateMemberProximity(void *unused, struct ActorGroupMember *p)
+void LootDeposit_UpdateMemberProximity(void *unused, struct CallbackPoolEntry *entry)
 {
-    if (p->started) {
+    if (entry->defeated) {
         s32 x;
         s32 z;
-        p->frame = 0;
-        p->flags = (p->flags & ~1) | 2;
-        p->started = 0;
-        Clear(&p->radiusX);
-        p->radiusX = 41;
-        p->radiusZ = 148;
-        x = LootDeposit_ProjectComponent(p->radiusX * gUnk_086149C4[(p->angle + 64) & 255]) +
-            Scale(p->radiusZ * gUnk_086149C4[p->angle]);
-        z = LootDeposit_ProjectComponent(-(p->radiusX * gUnk_086149C4[p->angle])) +
-            Scale(p->radiusZ * gUnk_086149C4[(p->angle + 64) & 255]);
-        p->x = p->originX + x;
-        p->z = z + p->originZ;
+        entry->frame = 0;
+        entry->sprite.flags = (entry->sprite.flags & ~1) | 2;
+        entry->defeated = 0;
+        Clear(&entry->swayRadius);
+        entry->swayRadius.x = 41;
+        entry->swayRadius.z = 148;
+        x = LootDeposit_ProjectComponent(entry->swayRadius.x *
+                                         gUnk_086149C4[(entry->sprite.attribute + 64) & 255]) +
+            Scale(entry->swayRadius.z * gUnk_086149C4[entry->sprite.attribute]);
+        z = LootDeposit_ProjectComponent(
+                -(entry->swayRadius.x * gUnk_086149C4[entry->sprite.attribute])) +
+            Scale(entry->swayRadius.z * gUnk_086149C4[(entry->sprite.attribute + 64) & 255]);
+        entry->sprite.position.x = entry->savedPosition.x + x;
+        entry->sprite.position.z = z + entry->savedPosition.z;
     }
-    if (p->frame & 1) {
-        if (LootDepositFeedback_IsPlayerInsideOriginRange(p)) {
+    if (entry->frame & 1) {
+        if (LootDepositFeedback_IsPlayerInsideOriginRange(entry)) {
             if (!LootDeposit_TestPlayerFlag(gPlayers[0], 8)) {
                 s32 active;
                 if (gPlayerPassageState && !gPlayerInteractionMode)
@@ -81,12 +60,13 @@ void LootDeposit_UpdateMemberProximity(void *unused, struct ActorGroupMember *p)
                 else
                     active = 0;
                 if (!active && gPlayers[0]->actionMode != 3) {
-                    if (p->previousDistanceSquared != p->distanceSquared && p->turnStep == 0) {
-                        p->turnStep = 4;
-                        p->health--;
-                        if (p->health <= 0) {
-                            p->state = 3;
-                            p->started = 1;
+                    if (entry->previousDistanceSquared != entry->distanceSquared &&
+                        entry->motion.x == 0) {
+                        entry->motion.x = 4;
+                        entry->health--;
+                        if (entry->health <= 0) {
+                            entry->callbackIndex = 3;
+                            entry->defeated = 1;
                             return;
                         }
                         Sound_PlaySong(0x3C9);
@@ -95,6 +75,6 @@ void LootDeposit_UpdateMemberProximity(void *unused, struct ActorGroupMember *p)
             }
         }
     }
-    LootDeposit_UpdateMemberSway(p);
-    p->frame++;
+    LootDeposit_UpdateMemberSway(entry);
+    entry->frame++;
 }
