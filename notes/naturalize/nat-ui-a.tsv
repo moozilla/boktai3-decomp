@@ -106,3 +106,4 @@ src/ui/books/collection/CollectionMenu_OnTaskDestroy.c	CollectionMenu_OnTaskDest
 src/ui/books/collection/CollectionMenu_Create.c	CollectionMenu_Create	natural	natural	0	
 src/ui/books/forging_book/ForgingBook_GetCategoryEntryCount.c	ForgingBook_GetCategoryEntryCount	natural	natural	1	
 src/ui/books/forging_book/ForgingBook_GetEntryAnimation.c	ForgingBook_GetEntryAnimation	contrived	natural	1	
+src/ui/books/forging_book/ForgingBook_GetCategoryEntryOffset.c	ForgingBook_GetCategoryEntryOffset	natural	natural	1	
