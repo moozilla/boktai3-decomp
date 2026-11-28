@@ -579,34 +579,34 @@ static inline void Ivy_ClearHalf(u8 *p, u32 offset, u32 bits)
     field->value &= mask;
 }
 
-void SceneActorControl_UpdateAnimationTransition(u8 *p, s32 frame)
+// scope: put SceneActorControl_UpdateAnimationTransition begin
+void SceneActorControl_UpdateAnimationTransition(struct ChaseActor *actor, s32 frame)
 {
-    struct ChaseActor *actor = (void *)p;
     struct DisplaySequenceState *animation =
         &((struct SceneActorControlMotionDrawable *)actor->base.drawable)->sequence;
+
     if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
-        SceneActorAnimation_SelectDirectionalFlags((struct RoomActor *)p, 3);
-        ((struct IvyTransitionActor *)p)->complete = 0;
-        Ivy_SetBlend(p);
-        Ivy_SetHalf(p, 0x2C0, 0x800);
-        Ivy_SetHalf(p, 0x2D4, 0x20);
+        SceneActorAnimation_SelectDirectionalFlags(&actor->base, 3);
+        actor->base.restart = 0;
+        actor->base.colliderA.flags |= 4;
+        actor->base.colliderA.flags &= ~8;
+        HalfwordFlags_Set(0x800, &actor->base.placementFlags);
+        HalfwordFlags_Set(0x20, &actor->base.motionFlags);
     }
-    Ivy_SetHalf(p, 0x2D6, 0x10);
-    if ((((frame <= 17) && (animation->index == 0)) &&
-         (animation->elapsed == (animation->duration != 0))) &&
-        (animation->duration != 1))
+    HalfwordFlags_Set(0x10, &actor->base.reactionFlags);
+    if (frame <= 17 && animation->index == 0 && animation->elapsed == (animation->duration != 0) &&
+        animation->duration != 1)
         animation->elapsed = 0;
-    if (((struct IvyTransitionActor *)p)->complete) {
-        ((struct IvyTransitionActor *)p)->active = 0;
-        Ivy_ClearHalf(p, 0x2D4, 0x20);
-        Ivy_ClearWord(p, 0x2CC, 0x80);
-        Ivy_EnterActive(p, Ivy_UpdateActiveState, 0x22);
-        {
-            u32 value = ((struct IvyTransitionActor *)p)->savedDirection;
-            ((struct IvyTransitionActor *)p)->direction = value;
-        }
+    if (actor->base.restart) {
+        actor->base.stepDone = 0;
+        SceneActorChase_ClearMotionFlagComponent(actor, 0x20);
+        SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags, 0x80);
+        SceneActorChase_SetControl(actor, Ivy_UpdateActiveState, 0x22);
+        SceneActorChase_SetBehavior(actor, 0);
+        actor->base.body.direction = actor->base.tracking.heading;
     }
 }
+// scope: put SceneActorControl_UpdateAnimationTransition end
 
 void Ivy_UpdateRestartFlags(u8 *p)
 {
@@ -1186,7 +1186,7 @@ void Ivy_InitControlPresets(struct ChaseActor *actor)
     actor->base.callbacks294 = gUnk_086063F4;
 }
 
-void SceneActorControl_UpdateAnimationTransition(u8 *p, s32 frame);
+void SceneActorControl_UpdateAnimationTransition(struct ChaseActor *actor, s32 frame);
 
 s32 SceneActorControl_BeginSoundTransition(struct ChaseActor *actor)
 {
