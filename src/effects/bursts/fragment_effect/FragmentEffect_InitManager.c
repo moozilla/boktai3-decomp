@@ -1,17 +1,9 @@
-#include "global.h"
-#include "engine/ram.h"
+#include "effects/bursts/fragment_effect.h"
 
-struct S {
-    u8 filler[0x18];
-    u8 a[0x20];
-    u32 c;
-};
-void AnimData_Load(u8 *, u32);
-
-s32 FragmentEffect_InitManager(struct S *s)
+s32 FragmentEffect_InitManager(struct FragmentEffectPool *pool)
 {
-    s->c = 0;
-    AnimData_Load(s->a, 0x0000F422);
-    gFragmentEffectManager = s;
+    pool->occupied = 0;
+    AnimData_Load(pool->graphics, 0xF422);
+    gFragmentEffectManager = (u8 *)pool;
     return 0;
 }
