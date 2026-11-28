@@ -122,21 +122,12 @@ void Options_Destroy(struct OptionsScreen *p)
 
 s32 Options_InitScreen(struct OptionsScreen *screen)
 {
-    struct AnimSpriteResource *backgroundGraphics;
-    struct AnimSpriteResource *cursorGraphics;
-    struct AnimSpriteResource *leftArrowGraphics;
-    struct AnimSpriteResource *menuGraphics;
-    struct AnimSprite *leftArrow;
-    struct AnimSprite *rightArrow;
-    u16 *highlightPalette;
     u16 *originalPalette;
     s32 layer;
-    struct OptionsScreen *state;
     struct OptionsTextRect rect;
     void *background;
     void *palette;
     void *resource;
-    state = screen;
     Bg_ClearTilemap(0);
     BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0);
     Bg_ClearTilemap(2);
@@ -149,38 +140,34 @@ s32 Options_InitScreen(struct OptionsScreen *screen)
     palette = ScriptProc_Start(0x92B3, 0x204);
     CpuSet(((struct OptionsPalette *)palette)->colors, gBgPaletteBuffer, 0x100);
     resource = ScriptProc_Start(0xCB05, 0xE2AB);
-    backgroundGraphics = &screen->background.graphics;
-    ResourceHeader_Relocate(backgroundGraphics, resource);
-    AnimSprite_InitLinked(&screen->background.sprite, backgroundGraphics, 0x3A, 0x10, 0, 0, 0, 0);
+    ResourceHeader_Relocate(&screen->background.graphics, resource);
+    AnimSprite_InitLinked(&screen->background.sprite, &screen->background.graphics, 0x3A, 0x10, 0,
+                          0, 0, 0);
     resource = ScriptProc_Start(0xCB05, 0x530D);
-    menuGraphics = &screen->menu.graphics;
-    ResourceHeader_Relocate(menuGraphics, resource);
-    AnimSprite_InitLinked(&screen->menu.sprite, menuGraphics, 0x8A, 0x10, 0, 0, 0, 0);
-    cursorGraphics = &screen->cursor.graphics;
-    ResourceHeader_Relocate(cursorGraphics, resource);
-    AnimSprite_InitLinked(&screen->cursor.sprite, cursorGraphics, 0x47, 0x10, 0, 0, 0, 0);
-    leftArrowGraphics = &screen->leftArrow.graphics;
-    ResourceHeader_Relocate(leftArrowGraphics, resource);
-    leftArrow = &screen->leftArrow.sprite;
-    AnimSprite_InitLinked(leftArrow, leftArrowGraphics, 0x45, 0x10, 0, 0, 0, 0);
+    ResourceHeader_Relocate(&screen->menu.graphics, resource);
+    AnimSprite_InitLinked(&screen->menu.sprite, &screen->menu.graphics, 0x8A, 0x10, 0, 0, 0, 0);
+    ResourceHeader_Relocate(&screen->cursor.graphics, resource);
+    AnimSprite_InitLinked(&screen->cursor.sprite, &screen->cursor.graphics, 0x47, 0x10, 0, 0, 0, 0);
+    ResourceHeader_Relocate(&screen->leftArrow.graphics, resource);
+    AnimSprite_InitLinked(&screen->leftArrow.sprite, &screen->leftArrow.graphics, 0x45, 0x10, 0, 0,
+                          0, 0);
     rect.x = 0x40;
     rect.y = 0x60;
     rect.width = 0;
-    Menu_SetTextRect(leftArrow, &rect);
+    Menu_SetTextRect(&screen->leftArrow.sprite, &rect);
     ResourceHeader_Relocate(&screen->rightArrow.graphics, resource);
-    rightArrow = &screen->rightArrow.sprite;
-    AnimSprite_InitLinked(rightArrow, &screen->rightArrow.graphics, 0x46, 0x10, 0, 0, 0, 0);
+    AnimSprite_InitLinked(&screen->rightArrow.sprite, &screen->rightArrow.graphics, 0x46, 0x10, 0,
+                          0, 0, 0);
     rect.x = 0xD8;
     rect.y = 0x60;
     rect.width = 0;
-    Menu_SetTextRect(rightArrow, &rect);
+    Menu_SetTextRect(&screen->rightArrow.sprite, &rect);
     screen->cursor.sprite.flags |= 1;
     screen->leftArrow.sprite.flags |= 1;
     screen->rightArrow.sprite.flags |= 1;
     originalPalette = screen->originalPalette = screen->cursor.sprite.palette;
-    highlightPalette = screen->highlightPalette;
-    CpuSet(originalPalette, highlightPalette, 0x10);
-    screen->cursor.sprite.palette = highlightPalette;
+    CpuSet(originalPalette, screen->highlightPalette, 0x10);
+    screen->cursor.sprite.palette = screen->highlightPalette;
     screen->cursor.sprite.paletteBank = 0xE010;
     Menu_EraseRect(4, 4, 24, 6);
     Menu_EraseRect(4, 12, 4, 2);
@@ -191,11 +178,11 @@ s32 Options_InitScreen(struct OptionsScreen *screen)
     Menu_EraseRect(9, 12, 18, 2);
     Menu_DrawStringRef(9, 12, gChoiceMenuParameters.eBlock, screen->choice);
     if ((gChoiceMenuParameters.b == 0) || (gChoiceMenuParameters.n == 2))
-        state->fade = 3;
+        screen->fade = 3;
     else
-        state->fade = 0;
-    Menu_StartFadeIn(state->fade);
-    state->selection = gChoiceMenuParameters.n;
+        screen->fade = 0;
+    Menu_StartFadeIn(screen->fade);
+    screen->selection = gChoiceMenuParameters.n;
     return 0;
 }
 
