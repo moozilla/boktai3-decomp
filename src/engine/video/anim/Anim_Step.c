@@ -26,11 +26,10 @@ s32 Anim_Step(struct AnimSprite *anim, void *data)
     anim->value6++;
     if (++anim->elapsed >= anim->duration) {
         if (anim->playbackFlags & 2) {
-            if (anim->frameIndex == 0) {
+            if (anim->frameIndex == 0)
                 done = 1;
-                goto finished;
-            }
-            anim->frameIndex--;
+            else
+                anim->frameIndex--;
         } else {
             anim->frameIndex++;
             if (anim->frameIndex >= anim->frameCount) {
@@ -39,24 +38,21 @@ s32 Anim_Step(struct AnimSprite *anim, void *data)
             }
         }
         if (done) {
-        finished:
             anim->status |= 2;
             if (anim->mode == 2) {
                 anim->mode = 0;
-                goto reset;
-            }
-            if (anim->mode == 3) {
+            } else if (anim->mode == 3) {
                 anim->mode = 0;
                 anim->flags |= 1;
-                goto reset;
+            } else {
+                if (anim->playbackFlags & 2)
+                    anim->frameIndex = anim->frameCount - 1;
+                else
+                    anim->frameIndex = 0;
+                anim->status |= 4;
             }
-            if ((u16)(anim->playbackFlags & 2))
-                anim->frameIndex = anim->frameCount - 1;
-            else
-                anim->frameIndex = 0;
-        }
-        anim->status |= 4;
-    reset:
+        } else
+            anim->status |= 4;
         f = &anim->frames[anim->frameIndex];
         anim->elapsed = 0;
         anim->duration = Scale6(f->duration * anim->durationScale);

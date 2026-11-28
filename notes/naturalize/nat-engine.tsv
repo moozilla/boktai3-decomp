@@ -328,3 +328,4 @@ src/engine/video/anim/sub_08221548.c	sub_08221548	minor	natural	1
 src/engine/video/anim/Input_UpdateKeyRepeat.c	Input_UpdateKeyRepeat	contrived	natural	1	
 src/engine/video/anim/Anim_DrawDecimalDigits.c	Anim_DrawDecimalDigits	contrived	minor	1	DIGIT macro per decimal place; ((0 - x)
 src/engine/video/anim/Anim_SetFrameDurationScale.c	Anim_SetFrameDurationScale	minor	natural	1	
+src/engine/video/anim/Anim_Step.c	Anim_Step	contrived	natural	1	
