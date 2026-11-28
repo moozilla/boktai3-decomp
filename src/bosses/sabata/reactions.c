@@ -380,19 +380,17 @@ void Sabata_UpdateSummonSpinSequence(struct SabataActorState *eventActor)
             u32 zero = eventActor->pendingAction;
             if (!zero) {
                 Sabata_SetDirection(eventActor, 32);
+                SceneActors_StartEightDirectionAnimation(eventActor, &boss->graphics,
+                                                         &boss->animationResource, 0xF4, 1, 1, 4);
+                Sound_PlaySong(0x2E4);
+                Sound_PlaySong(0x1A8);
                 {
-                    SceneActors_StartEightDirectionAnimation(
-                        eventActor, &boss->graphics, &boss->animationResource, 0xF4, 1, 1, 4);
-                    Sound_PlaySong(0x2E4);
-                    Sound_PlaySong(0x1A8);
-                    {
-                        u8 paletteShift = 5;
-                        boss->paletteMode = 3;
-                        boss->paletteShift = paletteShift;
-                    }
-                    boss->paletteTimer = zero;
-                    boss->graphics.palette = boss->paletteData;
+                    u8 paletteShift = 5;
+                    boss->paletteMode = 3;
+                    boss->paletteShift = paletteShift;
                 }
+                boss->paletteTimer = zero;
+                boss->graphics.palette = boss->paletteData;
             }
             if ((++eventActor->pendingAction) > 8) {
                 Sabata_EnterSequenceStep(eventActor, 1);

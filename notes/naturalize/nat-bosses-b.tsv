@@ -260,3 +260,4 @@ src/bosses/sabata/attacks.c	Sabata_UpdatePursuitSpin	machine-shaped	machine-shap
 src/bosses/sabata/attacks.c	Sabata_UpdateImpactSlide	machine-shaped	machine-shaped	3	kept second actor alias (ROM keeps a copy) and facing helper
 src/bosses/sabata/reactions.c	Sabata_UpdateHitRecoil	machine-shaped	partial	24	kept actor alias and flag mask locals
 src/bosses/sabata/reactions.c	Sabata_UpdateRemovalSequence	machine-shaped	partial	24	kept flag mask local
+src/bosses/sabata/reactions.c	Sabata_UpdateSummonSpinSequence	machine-shaped	partial	24	kept boss alias, mask locals and palette shift local
