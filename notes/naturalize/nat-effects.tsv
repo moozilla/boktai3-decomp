@@ -73,3 +73,12 @@ src/effects/contact_impact.c	ContactImpactEffect_UpdateContact	contrived	natural
 src/effects/contact_impact.c	ContactImpactEffect_UpdateBlinkFrame	contrived	minor	9	SetFrame setter with the current state as the frame number
 src/effects/contact_impact.c	PopInSprite_CreateHidden	contrived	minor	3	motion pointer for the four reset stores
 src/effects/contact_impact.c	PopInSprite_Create	contrived	minor	3	registry pointer loaded before Task_Create; motion pointer
+src/effects/contact_impact.c	PopInSprite_ClearState	natural	natural	0	
+src/effects/contact_impact.c	SpriteController_UpdateStopped	natural	natural	0	
+src/effects/contact_impact.c	PopInSprite_UpdateVisibleIdle	natural	natural	0	
+src/effects/contact_impact.c	ContactImpactEffect_OnUnusedHook	natural	natural	0	
+src/effects/contact_impact.c	PopInSprite_OnTaskUpdate	natural	natural	0	
+src/effects/contact_impact.c	PopInSprite_OnTaskDestroy	natural	natural	0	
+src/effects/contact_impact.c	PopInSprite_Show	natural	natural	0	
+src/effects/contact_impact.c	PopInSprite_Hide	natural	natural	0	
+src/effects/contact_impact.c	ContactImpactEffect_ProcessMessages	minor	minor	0	left: plain for loop cross-jumps the two consume calls; only matched with new queue accessors, which the brief forbids; keeps the guarded do-while
