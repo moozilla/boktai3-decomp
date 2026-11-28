@@ -1,26 +1,21 @@
+#include "npc/manager/scene_actor_lifecycle.h"
+s32 DisplayAnimation_TestFinished(struct DisplayAnimation *);
 #include "global.h"
 #include "npc/story_character/state_actor.h"
 
-struct Context {
-    u8 pad[0x434];
-    struct StateActorPos *target;
-    struct StateActor *targetActor;
-};
-
-void Actor_PlayAnimationEntry(void *, u32, u32, u32, u32);
-s32 DisplayAnimation_TestFinished(void *);
 void *ActorAttachment_UpdateFromDescriptor(void *, void *, u32, u32, u32, u32, u32, u32);
-s32 sub_081C8FB0(struct Context *, struct StateActor *, s32);
+s32 sub_081C8FB0(struct StateActorTargetContext *, struct SceneActor *, s32);
 
-void StoryCharacter_StartKind5Animation9AndAttach(struct Context *ctx, struct StateActor *p, u32 a2)
+void StoryCharacter_StartKind5Animation9AndAttach(struct StateActorTargetContext *ctx,
+                                                  struct SceneActor *p, u32 a2)
 {
     u32 r;
     u32 mask;
 
-    if (p->enter != 0) {
-        p->enter = 0;
-        p->done = 0;
-        switch (p->kind) {
+    if (p->animationEntered != 0) {
+        p->animationEntered = 0;
+        p->finished = 0;
+        switch (p->variant) {
             case 4:
                 r = 0;
                 break;
@@ -106,22 +101,15 @@ void StoryCharacter_StartKind5Animation9AndAttach(struct Context *ctx, struct St
         Actor_PlayAnimationEntry(p, r, 1, 1, 4);
     }
 
-    if (sub_081C8FB0(ctx, p, 0)) {
-        u16 m = 0xa0 << 6;
-        p->displayFlags |= m;
-    }
-    {
-        u16 m = 0x80 << 5;
-        p->displayFlags |= m;
-    }
+    if (sub_081C8FB0(ctx, p, 0))
+        SceneActor_SetFlags(p, 0x2800);
+    SceneActor_SetFlags(p, 0x1000);
 
     mask = a2 & 0x3f;
-    if (mask == 0) {
-        void **slot = (void **)((u8 *)p + 0x2c0);
-        *slot =
-            ActorAttachment_UpdateFromDescriptor(*slot, p->motion, 2, 0, mask, mask, 0xfa, 0xfa);
-    }
+    if (mask == 0)
+        p->attachment = ActorAttachment_UpdateFromDescriptor(p->attachment, &p->body, 2, 0, mask,
+                                                             mask, 0xfa, 0xfa);
 
-    if (DisplayAnimation_TestFinished(&p->targetPosition.z))
-        p->done = 1;
+    if (DisplayAnimation_TestFinished(&p->drawable.common))
+        p->finished = 1;
 }
