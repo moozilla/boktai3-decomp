@@ -613,6 +613,7 @@ void BatFlockBat_AdvanceWithOffset(struct GroupObjects *m, struct GroupPiece *p,
     struct ContactPosition delta;
     struct ContactPosition *offset;
     int active;
+
     if (m->actor)
         p->target = m->actor->position;
     active = p->active;
@@ -626,24 +627,22 @@ void BatFlockBat_AdvanceWithOffset(struct GroupObjects *m, struct GroupPiece *p,
     Vec16_Lerp(&p->anchor, &p->anchor, &p->target, index + 8, 5);
     if (p->speed == 0) {
         const u16 *table;
+
         p->direction = Math_Atan2(-p->offset.x, -p->offset.z);
         table = (const u16 *)RANDOM_TABLE_ADDR;
         p->direction += (randomWith(table) & 15) - 7;
         p->speed = (randomWith(table) & 7) + 8;
-    } else
+    } else {
         p->speed--;
-    polar(&delta, p->direction, p->duration);
-    {
-        struct ContactPosition *src = &delta;
-        p->offset.x += delta.x;
-        offset->y += src->y;
-        offset->z += src->z;
     }
+    polar(&delta, p->direction, p->duration);
+    addPositionAt(&p->offset, offset, &delta);
     p->position.x = p->anchor.x + p->offset.x;
     p->position.z = p->anchor.z + p->offset.z;
     BatFlockBat_SetFacingAnim(m, p, 0);
     p->timer++;
 }
+
 void BatFlockBat_AdvanceStraight(struct GroupObjects *m, struct GroupPiece *p, int delay)
 {
     struct ContactPosition delta;

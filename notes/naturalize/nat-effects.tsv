@@ -17,3 +17,4 @@ src/effects/bat_flock.c	BatFlockBat_Launch	minor	natural	1
 src/effects/bat_flock.c	BatFlockBat_AdvanceStraight	minor	natural	1	
 src/effects/bat_flock.c	BatFlock_Update	minor	natural	5	
 src/effects/bat_flock.c	BatFlock_Initialize	minor	natural	1	
+src/effects/bat_flock.c	BatFlockBat_AdvanceWithOffset	contrived	minor	4	active flag local; random table through RANDOM_TABLE_ADDR (the symbol makes a second pool entry)
