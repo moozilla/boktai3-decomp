@@ -215,3 +215,8 @@ src/bosses/hresvelgr/Math_ApproachAngleArrayByHalf.c	Math_ApproachAngleArrayByHa
 src/bosses/hresvelgr/Math_ApproachAngleArrayByQuarter.c	Math_ApproachAngleArrayByQuarter	minor	minor	1	array helper stays
 src/bosses/hresvelgr/Math_ApproachAngleArrayByEighth.c	Math_ApproachAngleArrayByEighth	minor	minor	1	array helper stays
 src/bosses/hresvelgr/Math_ApproachAngleArrayBySixteenth.c	Math_ApproachAngleArrayBySixteenth	minor	minor	1	array helper stays
+src/bosses/hresvelgr/Hresvelgr_ApproachArrayHalf.c	Hresvelgr_ApproachArrayHalf	natural	natural	0	
+src/bosses/hresvelgr/Hresvelgr_ApproachArrayQuarter.c	Hresvelgr_ApproachArrayQuarter	natural	natural	0	
+src/bosses/hresvelgr/Hresvelgr_ApproachArrayEighth.c	Hresvelgr_ApproachArrayEighth	natural	natural	0	
+src/bosses/hresvelgr/Hresvelgr_ApproachArraySixteenth.c	Hresvelgr_ApproachArraySixteenth	natural	natural	0	
+src/bosses/hresvelgr/ScalarApproach_ApplyAngleProfileArray.c	ScalarApproach_ApplyAngleProfileArray	contrived	minor	3	index pointer copies stay
