@@ -55,3 +55,4 @@ src/player/appearance/player_visuals.c	Player_SelectSpriteResource	natural	natur
 src/player/appearance/player_visuals.c	Player_InitVisualState	natural	natural	0	-
 src/player/appearance/player_visuals.c	SceneActor_StartRandomizedEffect	natural	natural	0	-
 src/player/appearance/player_visuals.c	Player_EmitQueuedEffects	minor	natural	6	-
+src/player/appearance/player_visuals.c	Player_FlushQueuedEffects	minor	natural	1	-

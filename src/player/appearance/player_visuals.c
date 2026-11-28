@@ -453,15 +453,12 @@ void Player_FlushQueuedEffects(struct Player *p)
     if (p->movementModifierKind == 1) {
         EffectGroup_Reset(&p->effectGroup);
     } else {
-        u8 t = p->movementModifierActive;
-        s32 n;
-
-        if (t != 0) {
-            n = t;
-            do {
+        u8 count = p->movementModifierActive;
+        if (count) {
+            s32 i = count;
+            do
                 SceneActor_StartRandomizedEffect(p);
-                n--;
-            } while (n != 0);
+            while (--i);
         }
     }
 }
