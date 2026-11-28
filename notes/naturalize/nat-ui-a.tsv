@@ -229,3 +229,4 @@ src/ui/dialogue/script_prompt.c	ScriptPrompt_Destroy	natural	natural	0
 src/ui/dialogue/script_prompt.c	ScriptPrompt_SetFromScript	natural	natural	0	
 src/ui/dialogue/script_prompt.c	ScriptPrompt_Create	natural	natural	0	
 src/ui/dialogue/message_window/message_window.c	MessageWindow_IsCreated	contrived	natural	1	
+src/ui/dialogue/message_window/message_window.c	MessageWindow_LoadPalette	minor	natural	5	

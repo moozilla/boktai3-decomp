@@ -21,14 +21,12 @@ u32 MessageWindow_IsCreated(void)
 int MessageWindow_LoadPalette(struct MessageWindow *window, int palette)
 {
     void *data = ScriptProc_Start(0x92b3, (u16)palette);
-    int result;
-    if (data) {
-        window->palette = palette;
-        window->paletteData = data;
-        result = 0;
-    } else
-        result = -1;
-    return result;
+
+    if (!data)
+        return -1;
+    window->palette = palette;
+    window->paletteData = data;
+    return 0;
 }
 
 void MessageWindow_ApplyPalette(struct MessageWindow *window)
