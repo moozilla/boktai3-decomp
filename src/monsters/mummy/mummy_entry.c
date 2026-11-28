@@ -2695,15 +2695,15 @@ s32 BouncingBomb_GetNearbyHeading(const struct ContactPosition *);
 
 s32 SceneActor_StartAdjacentCellRoute(struct Mummy *actor);
 
-u8 BouncingObject_RefreshNearbyHeading(struct ChaseActor *arg)
+u8 BouncingObject_RefreshNearbyHeading(struct ChaseActor *actor)
 {
-    struct Mummy *context = arg->base.context;
+    struct Mummy *context = actor->base.context;
     if (context->flags6D4) {
         context->flags6D4--;
         return 0;
     }
-    if (BouncingBomb_GetNearbyHeading(&arg->base.body.position) < 0) {
-        struct Mummy *control = arg->base.context;
+    if (BouncingBomb_GetNearbyHeading(&actor->base.body.position) < 0) {
+        struct Mummy *control = actor->base.context;
         u16 *flags = &control->flags6F2;
         u32 mask = ~0x400;
         *flags &= mask;
@@ -2711,12 +2711,12 @@ u8 BouncingObject_RefreshNearbyHeading(struct ChaseActor *arg)
         return 0;
     }
     {
-        struct Mummy *control = arg->base.context;
+        struct Mummy *control = actor->base.context;
         u32 mask = 0x400;
         u16 *flags = &control->flags6F2;
         *flags = mask | *flags;
     }
-    SceneActor_StartAdjacentCellRoute(arg);
+    SceneActor_StartAdjacentCellRoute(actor);
     return 1;
 }
 
