@@ -191,3 +191,11 @@ src/ui/dialogue/dialogue_transition.c	DialogueTransition_ConsumeStateEntry	minor
 src/ui/dialogue/dialogue_transition.c	DialogueTransition_UpdateFadeIn	contrived	natural	1	
 src/ui/dialogue/dialogue_transition.c	DialogueTransition_UpdateSkipFadeOut	contrived	natural	1	
 src/ui/dialogue/dialogue_transition.c	DialogueTransition_LoadFromScript	contrived	natural	1	
+src/ui/dialogue/dialogue_transition.c	DialogueTransition_ApplyEntryBounds	natural	natural	0	
+src/ui/dialogue/dialogue_transition.c	DialogueTransition_SetState	natural	natural	0	
+src/ui/dialogue/dialogue_transition.c	DialogueTransition_UpdateHold	natural	natural	0	
+src/ui/dialogue/dialogue_transition.c	DialogueTransition_UpdateFadeOut	natural	natural	0	
+src/ui/dialogue/dialogue_transition.c	DialogueTransition_OnTaskUpdate	natural	natural	0	
+src/ui/dialogue/dialogue_transition.c	DialogueTransition_OnTaskDestroy	natural	natural	0	
+src/ui/dialogue/dialogue_transition.c	DialogueTransition_Initialize	minor	minor	7	display control built in a local from the saved value
+src/ui/dialogue/dialogue_transition.c	DialogueTransition_CreateFromScript	natural	natural	0	
