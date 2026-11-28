@@ -575,3 +575,4 @@ src/ui/town/storage/sub_081BEBE0.c	sub_081BEBE0	contrived	minor	3	storage text v
 src/ui/town/storage/Storage_HideItemDetails.c	Storage_HideItemDetails	contrived	natural	2	
 src/ui/town/storage/Storage_SetUpdateCallback.c	Storage_SetUpdateCallback	contrived	natural	1	
 src/ui/town/storage/Storage_SetInteractionMode.c	Storage_SetInteractionMode	contrived	natural	1	
+src/ui/town/storage/Storage_SetState.c	Storage_SetState	contrived	natural	3	

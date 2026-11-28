@@ -1,30 +1,27 @@
 #include "global.h"
-struct StorageWidget {
-    u32 unknown0[2];
-    u32 flags;
-};
-void Storage_SetInteractionMode(u8 *, u32);
+#include "ui/town/storage_screen.h"
+void Storage_SetInteractionMode(struct StorageScreen *, u32);
 void Storage_GetSlotPosition(void *, s32);
 
-void Storage_SetState(u8 *p, u32 state, u32 mode)
+void Storage_SetState(struct StorageScreen *screen, u32 state, u32 interactionMode)
 {
-    *(u32 *)(p + 0x17F4) = state;
-    Storage_SetInteractionMode(p, mode);
-    *(u16 *)(p + 0x174E) = 0;
-    if (*(u8 *)(p + 0x174C) == 0) {
-        ((struct StorageWidget *)(p + 0x13F8))->flags &= ~1;
-        switch (*(u32 *)(p + 0x1750)) {
+    screen->state = state;
+    Storage_SetInteractionMode(screen, interactionMode);
+    screen->timer = 0;
+    if (screen->interactionMode == 0) {
+        AnimSprite_Show(&screen->labels[0]);
+        switch (screen->mode) {
             case 1:
-                Storage_GetSlotPosition(p + 0x1418, 0x22);
+                Storage_GetSlotPosition(&screen->labels[0].position, 0x22);
                 break;
             case 3:
-                Storage_GetSlotPosition(p + 0x1418, 0x21);
+                Storage_GetSlotPosition(&screen->labels[0].position, 0x21);
                 break;
             case 2:
-                Storage_GetSlotPosition(p + 0x1418, 0x20);
+                Storage_GetSlotPosition(&screen->labels[0].position, 0x20);
                 break;
         }
     } else {
-        ((struct StorageWidget *)(p + 0x13F8))->flags |= 1;
+        AnimSprite_Hide(&screen->labels[0]);
     }
 }
