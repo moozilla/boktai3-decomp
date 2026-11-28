@@ -394,3 +394,8 @@ src/ui/game_over/particle_pool.c	SpriteParticles_UpdateEntries	fudged	natural	17
 src/ui/game_over/particle_pool.c	ParticlePool_OnDestroy	fudged	natural	1	
 src/ui/game_over/particle_pool.c	ParticlePool_Create	fudged	natural	1	
 src/ui/game_over/particle_pool.c	ParticlePool_EmitTriple	fudged	partial	2	self alias of the pool argument stays: without it the argument copies are emitted in another order
+src/ui/game_over/particle_pool.c	ParticlePool_InitParticles	fudged	fudged	28	unchanged: index pointer, mask, zero, angle offset and tail cursor locals fix the order loop hoists them; every removal changes it
+src/ui/game_over/particle_pool.c	ParticlePool_OnUpdate	natural	natural	0	
+src/ui/game_over/particle_pool.c	CollisionVolume_InitCollider	natural	natural	0	
+src/ui/game_over/particle_pool.c	ParticlePool_Init	natural	natural	0	
+src/ui/game_over/particle_pool.c	ParticlePool_Destroy	natural	natural	0	
