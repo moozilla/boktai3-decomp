@@ -82,12 +82,9 @@ s32 ScriptRecord_FindExtendedModifier(struct ScriptWideEntry *out, s32 id)
 
 s32 ScriptRecord_GetWideOption(void)
 {
-    s32 count;
-    if (gScriptRecordTable)
-        count = ((struct ScriptOptions *)gScriptRecordTable)->wideOption;
-    else
-        count = 0;
-    return count;
+    if (!gScriptRecordTable)
+        return 0;
+    return ((struct ScriptOptions *)gScriptRecordTable)->wideOption;
 }
 
 s32 ScriptRecord_FindAttributeModifier(struct ScriptShortEntry *out, s32 id)
