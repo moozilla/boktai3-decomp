@@ -189,26 +189,26 @@ void FloatingEffect_RiseAndShrink(struct LinkedWidgetSet *manager, struct Floati
                                   int index)
 {
     struct AnimSprite *sprite = &effect->sprite;
-    u8 *scale;
+
     if (effect->entered) {
         effect->entered = 0;
         effect->sprite.flags &= ~1;
         sprite->flags |= 2;
         sprite->rotation = 0;
-        effect->sprite.scaleX = 64;
-        effect->sprite.scaleY = 64;
+        sprite->scaleX = 64;
+        sprite->scaleY = 64;
     }
-    scale = &effect->sprite.scaleX;
-    if (*scale > 16)
-        *scale -= 16;
+    if (sprite->scaleX > 16)
+        sprite->scaleX -= 16;
     effect->position.y += 64;
     FloatingEffect_Project(effect);
-    sprite->position.x += (64 - *scale) >> 3;
+    sprite->position.x += (64 - sprite->scaleX) >> 3;
     if (effect->timer > 3) {
         FloatingEffect_Init(effect);
         manager->active &= ~(1 << index);
-    } else
+    } else {
         effect->timer++;
+    }
 }
 
 static inline int FloatingEffect_Scale4(int v)
