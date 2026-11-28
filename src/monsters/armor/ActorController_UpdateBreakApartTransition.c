@@ -54,25 +54,26 @@ void ActorController_UpdateBreakApartTransition(struct SceneCombatActor *actor)
 
     switch (st) {
         case 0:
-            Armor_SetAnimationFromStart(actor, &gUnk_0824EE50[((p[0xB39] + 0x60) >> 6) & 3]);
+            Armor_SetAnimationFromStart(actor, &gUnk_0824EE50[((actor->heading + 0x60) >> 6) & 3]);
             (*s)++;
             p[0xB41] = st;
             {
-                struct ActorControllerMotion *r = (struct ActorControllerMotion *)(p + 0x180);
+                struct ActorControllerMotion *r = &actor->colliderGroup.motion;
                 u32 one = 1;
                 r->flags |= one;
             }
             Sound_PlaySongChecked(0xC1);
             break;
         case 1:
-            if (p[0xB43] != 0) {
-                Armor_SetAnimationFromStart(actor, &gUnk_0824EE60[((p[0xB39] + 0x60) >> 6) & 3]);
+            if (actor->animationComplete != 0) {
+                Armor_SetAnimationFromStart(actor,
+                                            &gUnk_0824EE60[((actor->heading + 0x60) >> 6) & 3]);
                 {
                     u32 next = *s + 1;
                     u32 zero = 0;
                     *s = next;
                     p[0xB41] = zero;
-                    p[0xB42] = zero;
+                    actor->actionCounter = zero;
                 }
                 ActorPalette_BeginTransition(p);
             }
@@ -105,7 +106,7 @@ void ActorController_UpdateBreakApartTransition(struct SceneCombatActor *actor)
             (*s)++;
             *t = zero;
             SetLayers(p);
-            p[0xB44] = 0x14;
+            actor->shakeStrength = 0x14;
             *(u16 *)(p + 0x196) &= ~4;
             {
                 struct ContactCollider *c2 = (struct ContactCollider *)(p + 0x190);
@@ -142,11 +143,8 @@ void ActorController_UpdateBreakApartTransition(struct SceneCombatActor *actor)
             break;
         }
     }
-    {
-        u8 *t = p + 0xB44;
-        if (*t != 0) {
-            Camera_RequestShake(0x80);
-            (*t)--;
-        }
+    if (*(p + 0xB44) != 0) {
+        Camera_RequestShake(0x80);
+        (*(p + 0xB44))--;
     }
 }

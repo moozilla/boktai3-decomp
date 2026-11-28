@@ -158,3 +158,8 @@ src/monsters/armor/actor_controller_requests.c	ActorController_UpdateTargetMovem
 src/monsters/armor/armor_actions.c	Armor_UpdateScriptedAttack	contrived	natural	1	
 src/monsters/armor/armor_actions.c	Armor_UpdateDelayedAction12	contrived	natural	1	
 src/monsters/armor/armor_behavior.c	Armor_UpdateRandomFlankAction42	contrived	minor	4	
+src/monsters/armor/ActorController_UpdateLayeredEnd.c	ActorController_UpdateLayeredEnd	contrived	contrived	0	flags reached as phase pointer - 14: actor->flags is kept in a register across the call
+src/monsters/armor/ActorController_UpdateLayeredMidNoSound.c	ActorController_UpdateLayeredMidNoSound	contrived	contrived	0	flags reached as phase pointer - 14: actor->flags is kept in a register across the call
+src/monsters/armor/ActorController_UpdateLayeredMidWithRestoreDelay.c	ActorController_UpdateLayeredMidWithRestoreDelay	contrived	contrived	0	field rewrite tried: actor->flags address is kept across calls where the ROM recomputes it; parked masks
+src/monsters/armor/Armor_UpdateDefeatSequence.c	Armor_UpdateDefeatSequence	contrived	contrived	0	field rewrite tried: actor->flags address is kept across calls where the ROM recomputes it; parked masks
+src/monsters/armor/ActorController_UpdateBreakApartTransition.c	ActorController_UpdateBreakApartTransition	contrived	contrived	84	raw pointer, constant locals and layer helper remain
