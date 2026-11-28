@@ -7,26 +7,23 @@ void Sprite_Init(void *, void *, u32);
 
 void AttachmentSprite_Setup(struct SpiralTrailTask *owner, const struct ContactPosition *position)
 {
-    struct SpiralTrailSprite *sprite;
+    struct SpiralTrailSprite *sprite = &owner->sprite;
     struct SceneAnimation *anim;
-    u16 *c, *start, *lo;
-    u32 fill;
-    u8 *flag;
     u32 id;
-    u16 frame;
-    sprite = &owner->sprite;
-    frame = owner->kind;
-    if ((u8)frame == 0) {
+    u16 kind = owner->kind;
+    u32 fill;
+    s32 i;
+
+    if ((u8)kind == 0)
         id = 0xa2;
-    } else if ((u8)frame == 1) {
+    else if ((u8)kind == 1)
         id = 0xa1;
-    } else {
+    else
         id = 0xab;
-    }
     anim = &sprite->graphics;
     AnimData_Load(anim, 0xBA8);
     Sprite_Init(&sprite->drawable, anim, 0);
-    sprite->drawable.frame = frame;
+    sprite->drawable.frame = kind;
     sprite->drawable.priority = 3;
     sprite->drawable.position = *position;
     sprite->drawable.position.x += owner->offset.x;
@@ -35,15 +32,9 @@ void AttachmentSprite_Setup(struct SpiralTrailTask *owner, const struct ContactP
     sprite->drawable.flags |= 0x400;
     sprite->sourcePalette = (const u16 *)(gPaletteBankData + id * 32);
     fill = 0x3DEF;
-    start = &sprite->colors[0];
-    flag = &sprite->active;
-    lo = start;
-    c = &sprite->colors[15];
-    do {
-        *c = fill;
-        c--;
-    } while ((s32)c >= (s32)lo);
+    for (i = 0; i < 16; i++)
+        sprite->colors[i] = fill;
     anim->paletteIndex = id;
-    anim->palette = start;
-    *flag = 1;
+    anim->palette = sprite->colors;
+    sprite->active = 1;
 }
