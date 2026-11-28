@@ -36,8 +36,7 @@ void DialogueTransition_UpdateFadeIn(struct DialogueTransition *transition)
         gBgFadeLevel = 64;
         DialogueTransition_SetState(transition, 1);
     } else {
-        int result = Div(transition->ticks << 6, transition->fadeIn[transition->index]);
-        gBgFadeLevel = result;
+        gBgFadeLevel = Div(transition->ticks << 6, transition->fadeIn[transition->index]);
     }
 }
 
