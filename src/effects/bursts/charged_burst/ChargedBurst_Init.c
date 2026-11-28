@@ -1,20 +1,21 @@
-#include "global.h"
-#include "effects/bursts/pair33_a_layout.h"
-void ChargedBurst_InitCoreEffect(u8 *);
-void ChargedBurst_InitParticles(u8 *);
-void ChargedBurst_InitCollider(u8 *, u32, u32, u32);
+#include "effects/bursts/charged_burst.h"
+
+void ChargedBurst_InitCoreEffect(struct ChargedBurst *);
+void ChargedBurst_InitParticles(struct ChargedBurst *);
+void ChargedBurst_InitCollider(struct ChargedBurst *, u32, s32, s32);
 void Sound_PlaySong(u32);
-void TimedDisplay_AdvanceIntro(u8 *);
-void ChargedBurst_SetState(u8 *, void (*)(u8 *));
-s32 ChargedBurst_Init(u8 *p, struct Pair33A *q, u32 a, u32 b, u32 c, u32 d)
+void TimedDisplay_AdvanceIntro(struct ChargedBurst *);
+
+s32 ChargedBurst_Init(struct ChargedBurst *burst, struct ContactPosition *position,
+                      u32 contactFlags, u32 power, u32 b, u32 d)
 {
-    *(struct Pair33A *)(p + 0x18) = *q;
-    ChargedBurst_InitCoreEffect(p);
-    ChargedBurst_InitParticles(p);
-    ChargedBurst_InitCollider(p, a, b, c);
-    *(u16 *)(p + 0x206) = 0;
-    *(u16 *)(p + 0x208) = d;
+    burst->position = *position;
+    ChargedBurst_InitCoreEffect(burst);
+    ChargedBurst_InitParticles(burst);
+    ChargedBurst_InitCollider(burst, contactFlags, power, b);
+    burst->unk_206 = 0;
+    burst->unk_208 = d;
     Sound_PlaySong(920);
-    ChargedBurst_SetState(p, TimedDisplay_AdvanceIntro);
+    ChargedBurst_SetState(burst, TimedDisplay_AdvanceIntro);
     return 0;
 }
