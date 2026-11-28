@@ -2409,12 +2409,12 @@ void TetherActor_UpdateWanderingState(struct TetherActor *actor)
 
 void TetherActor_UpdateRecoveryState(struct TetherActor *actor)
 {
-    u32 frozen;
+    const u16 *table;
+    u32 sample;
     u16 *work;
     if (actor->state != 2)
         TetherActor_SetState(actor, 2);
-    frozen = gEngineFlags & 512;
-    if (frozen)
+    if (gEngineFlags & 512)
         return;
     if (actor->recoveryTimer > 64) {
         actor->glowMode = 2;
@@ -2429,32 +2429,23 @@ void TetherActor_UpdateRecoveryState(struct TetherActor *actor)
             actor->secondaryCollider.bounds.x = 128;
             actor->secondaryCollider.bounds.y = 32;
             actor->secondaryCollider.bounds.z = 128;
-            actor->transitionReason = frozen;
+            actor->transitionReason = 0;
         }
         Collider_SetPosition(&actor->secondaryCollider, &actor->position, 0);
         Collider_Refresh(&actor->secondaryCollider);
         work = &actor->recoveryTimer;
         if ((*work & 31) == 0) {
-            gRandomIndex = (gRandomIndex + 1) & 1023;
             actor->heading =
-                (actor->heading + Mod(((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex], 3) - 1) & 7;
+                (actor->heading +
+                 Mod(ParticleRandom_ReadDirectSample((const u16 *)RANDOM_TABLE_ADDR), 3) - 1) &
+                7;
             TetherActor_SetEntry(actor, 0);
         }
-        {
-            const u16 *table = (const u16 *)RANDOM_TABLE_ADDR;
-            u32 index = (gRandomIndex + 1) & 1023;
-            u32 sample = table[index];
-            u32 next;
-            sample &= 63;
-            actor->shakeX = sample - 31;
-            next = (index + 1) & 1023;
-            gRandomIndex = next;
-            {
-                u32 second = table[next];
-                second &= 63;
-                actor->shakeZ = second - 31;
-            }
-        }
+        table = (const u16 *)RANDOM_TABLE_ADDR;
+        sample = ParticleRandom_ReadDirectSample(table);
+        actor->shakeX = (sample & 63) - 31;
+        sample = ParticleRandom_ReadDirectSample(table);
+        actor->shakeZ = (sample & 63) - 31;
         if ((*work & 7) == 0)
             TetherActor_EmitRandomEffect(actor);
         if (actor->charge) {
@@ -2471,19 +2462,13 @@ void TetherActor_UpdateRecoveryState(struct TetherActor *actor)
         if (amplitude < 2)
             amplitude = 2;
         work = gRandomTable;
-        gRandomIndex = (gRandomIndex + 1) & 1023;
-        actor->shakeX = Mod(work[gRandomIndex], amplitude) - (amplitude >> 1);
-        gRandomIndex = (gRandomIndex + 1) & 1023;
-        actor->shakeZ = Mod(work[gRandomIndex], amplitude) - (amplitude >> 1);
-        actor->glowMode = frozen;
-        actor->charge = frozen;
-        actor->chargeReady = frozen;
+        actor->shakeX = Mod(ParticleRandom_ReadDirectSample(work), amplitude) - (amplitude >> 1);
+        actor->shakeZ = Mod(ParticleRandom_ReadDirectSample(work), amplitude) - (amplitude >> 1);
+        actor->glowMode = 0;
+        actor->charge = 0;
+        actor->chargeReady = 0;
         if ((++actor->lockSoundFrame & 7) == 0) {
-            u32 bit;
-            gRandomIndex = (gRandomIndex + 1) & 1023;
-            bit = work[gRandomIndex];
-            bit &= 1;
-            if (bit)
+            if (ParticleRandom_ReadDirectSample(work) & 1)
                 Sound_PlaySong(0x2B9);
         }
     }
