@@ -274,3 +274,4 @@ src/ui/dialogue/message_window/MessageWindow_Create.c	MessageWindow_Create	minor
 src/ui/dialogue/message_window/MessageWindow_GetTextBounds.c	MessageWindow_GetTextBounds	contrived	natural	1	
 src/ui/dialogue/message_window/MessageWindow_GetNumberWidth.c	MessageWindow_GetNumberWidth	minor	natural	2	
 src/ui/dialogue/message_window/MessageWindow_GetStringWidth.c	MessageWindow_GetStringWidth	minor	natural	2	
+src/ui/dialogue/message_window/MessageWindow_GetRemainingTextWidth.c	MessageWindow_GetRemainingTextWidth	minor	natural	1	

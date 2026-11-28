@@ -1,11 +1,12 @@
-#include "global.h"
-#include "engine/ram.h"
+#include "ui/dialogue/message_window.h"
 
-u32 TextState_MeasureTextColumns(u8 *);
+u32 TextState_MeasureTextColumns(struct MessagePlaybackState *);
+
 u32 MessageWindow_GetRemainingTextWidth(void)
 {
-    u8 *p = gMessageWindow;
-    if (p == 0)
+    struct MessageWindow *window = (void *)gMessageWindow;
+
+    if (!window)
         return 0;
-    return TextState_MeasureTextColumns(p + 0x18);
+    return TextState_MeasureTextColumns(&window->state);
 }
