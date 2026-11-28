@@ -1,19 +1,19 @@
 #include "global.h"
-void Storage_BeginItemSpecialMove(void *);
-void Storage_BeginEquipmentSpecialMove(void *);
-void sub_081BE730(void *);
-void Storage_BeginSelectedItemTransition(u8 *p)
+#include "ui/town/storage_screen.h"
+void Storage_BeginItemSpecialMove(struct StorageScreen *);
+void Storage_BeginEquipmentSpecialMove(struct StorageScreen *);
+void sub_081BE730(struct StorageScreen *);
+void Storage_BeginSelectedItemTransition(struct StorageScreen *screen)
 {
-    u8 *a = p + 0x1754, *b = p + 0x1758;
-    switch (b[*a] >> 1) {
+    switch (screen->categoryKinds[screen->category] >> 1) {
         case 0:
-            Storage_BeginItemSpecialMove(p);
+            Storage_BeginItemSpecialMove(screen);
             break;
         case 1:
-            Storage_BeginEquipmentSpecialMove(p);
+            Storage_BeginEquipmentSpecialMove(screen);
             break;
         case 2:
-            sub_081BE730(p);
+            sub_081BE730(screen);
             break;
     }
 }
