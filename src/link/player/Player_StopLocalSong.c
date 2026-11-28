@@ -1,18 +1,10 @@
 #include "global.h"
-#include "scene/areas/area_effect_link.h"
-struct S {
-    u8 p[0x18];
-    s16 id;
-};
+#include "scene/collision/scene_actor_damage_visibility.h"
+
 void Sound_StopSong(u32);
-static inline s32 gid(void)
+
+void Player_StopLocalSong(s32 player, u32 song)
 {
-    if (((struct S *)gLinkSession) == 0)
-        return -1;
-    return ((struct S *)gLinkSession)->id;
-}
-void Player_StopLocalSong(s32 a, u32 b)
-{
-    if (a == gid())
-        Sound_StopSong(b);
+    if (player == SceneActorDamage_LocalPlayer())
+        Sound_StopSong(song);
 }
