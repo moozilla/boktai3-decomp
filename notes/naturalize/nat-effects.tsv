@@ -213,3 +213,4 @@ src/effects/directional_effect/sub_08238FE0.c	sub_08238FE0	contrived	natural	5	d
 src/effects/directional_effect/DirectionalEffect_AddParticle.c	DirectionalEffect_AddParticle	contrived	natural	2	-
 src/effects/feathers/sub_08128B48.c	sub_08128B48	natural	natural	0	-
 src/effects/feathers/FeatherEffectPool_AllocEntry.c	FeatherEffectPool_AllocEntry	contrived	natural	2	-
+src/effects/feathers/FeatherEffectPool_UpdateOpeningAnimation.c	FeatherEffectPool_UpdateOpeningAnimation	minor	natural	6	-

@@ -1,29 +1,20 @@
 #include "effects/feathers/feather_effect_pool.h"
 #include "engine/ram.h"
 #include "player/cutscene/player_cue_sequence.h"
-static inline void SelectDirection(u8 *angle, u8 *row, u8 *flip)
+
+void FeatherEffectPool_UpdateOpeningAnimation(struct FeatherPool *pool, struct Feather *feather)
 {
-    u32 quadrant = ((*angle + 0x60) >> 6) & 3;
-    if (quadrant > 1) {
-        *flip = 1;
-        *row = 3 - quadrant;
-    } else {
-        *flip = 0;
-        *row = quadrant;
-    }
-}
-void FeatherEffectPool_UpdateOpeningAnimation(struct FeatherPool *pool, struct Feather *p)
-{
-    struct ContactSwarmSprite *sprite = &p->sprite;
+    struct FeatherSprite *sprite = &feather->sprite;
     u8 row, flip;
-    if (p->enter) {
-        p->sprite.flags &= ~1;
-        p->enter = 0;
+
+    if (feather->enter) {
+        feather->sprite.flags &= ~1;
+        feather->enter = 0;
     }
-    if (PlayerCue_StepSequenceEnded(sprite, &p->sequence)) {
-        SelectDirection(&p->angle, &row, &flip);
-        Anim_SetSequence(&p->sequence, pool->sequences, 1, row, flip);
-        p->state = 2;
-        p->enter = 1;
+    if (PlayerCue_StepSequenceEnded((struct ContactSwarmSprite *)sprite, &feather->sequence)) {
+        Feather_SelectDirection(feather->angle, &row, &flip);
+        Anim_SetSequence(&feather->sequence, pool->sequences, 1, row, flip);
+        feather->state = 2;
+        feather->enter = 1;
     }
 }
