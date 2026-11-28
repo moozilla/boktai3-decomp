@@ -103,3 +103,11 @@ src/monsters/ivy/child_group.c	ChildGroup_UpdateAlternatingCallbacks	minor	minor
 src/monsters/ivy/ivy_child.c	Ivy_UpdateActions	minor	natural	2	
 src/monsters/ivy/ivy_child.c	Ivy_UpdateChildBobbing	minor	natural	1	
 src/monsters/ivy/ivy_child.c	Ivy_UpdateDefeatBurst	contrived	contrived	16	partial: Ivy_TakeBurstStart/Sword_*/Ivy_ScaleOffset helpers and the parts pointer stay: strength reduction and mask load order; position write spelled with temps order
+src/monsters/ivy/ivy_child.c	Ivy_OnUpdateIdle	natural	natural	0	
+src/monsters/ivy/ivy_child.c	Ivy_OnChildDestroy	natural	natural	0	
+src/monsters/ivy/ivy_child.c	Ivy_BeginChildPulse	natural	natural	0	
+src/monsters/ivy/ivy_child.c	Ivy_ApproachChildBlend	natural	natural	0	
+src/monsters/ivy/ivy_child.c	Ivy_DispatchState	minor	minor	2	parked mask local m: mask loaded before the flag byte
+src/monsters/ivy/ivy_child.c	ActorPhase_ApproachNeutral	minor	minor	6	random-table read through offset local: ROM adds scaled index to base (base loaded after shift)
+src/monsters/ivy/ivy_child.c	Ivy_BeginChildRandomDelay	minor	minor	12	random-table read through byte-offset cast: same hoist order as ApproachNeutral
+src/monsters/ivy/ivy_child.c	Ivy_OnChildContact	contrived	contrived	0	unchanged: 12 interdependent helpers and private structs for a sword child view; not attempted
