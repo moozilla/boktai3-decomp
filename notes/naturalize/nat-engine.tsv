@@ -654,3 +654,4 @@ src/system/save/GameState_SetSavedSceneFromScript.c	GameState_SetSavedSceneFromS
 src/system/save/ChoiceMenu_GetHighlightColor.c	ChoiceMenu_GetHighlightColor	contrived	natural	1	
 src/system/save/Save_GetContinuationData.c	Save_GetContinuationData	minor	minor	1	offset 0x778 falls inside an unnamed range of the shared header
 src/system/save/Save_GetContinuationDataEnd.c	Save_GetContinuationDataEnd	minor	natural	1	
+src/system/save/Save_GetMainStateSize.c	Save_GetMainStateSize	minor	natural	1	
