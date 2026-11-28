@@ -338,3 +338,4 @@ src/objects/hazards/timed_hazard/sub_08232420.c	sub_0823269C	natural	natural	0
 src/objects/hazards/timed_hazard/TimedHazard_UpdateActivationDelay.c	TimedHazard_UpdateActivationDelay	minor	minor	4	shared active local: a literal reloads the constant for the second store
 src/objects/hazards/timed_hazard/ColliderObject_Update.c	ColliderObject_Update	minor	natural	1	
 src/objects/hazards/timed_hazard/ColliderSpritePool_Update.c	ColliderSpritePool_Update	minor	natural	1	
+src/objects/hazards/timed_hazard/ScriptSpriteManager_Destroy.c	ScriptSpriteManager_Destroy	minor	natural	1	

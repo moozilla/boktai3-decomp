@@ -1,21 +1,14 @@
 #include "global.h"
 #include "engine/ram.h"
-struct N {
-    u8 p[0x7c];
-    struct N *next;
-};
-struct L {
-    u8 p[0x1c];
-    struct N *head;
-};
-void ColliderSprite_Destroy(void *);
-u32 ScriptSpriteManager_Destroy(struct L *l)
+#include "objects/hazards/timed_hazard.h"
+
+u32 ScriptSpriteManager_Destroy(struct TimedHazardPool *pool)
 {
-    struct N *p = l->head;
+    struct TimedHazard *p = pool->head;
     while (p) {
-        struct N *n = p->next;
+        struct TimedHazard *next = p->next;
         ColliderSprite_Destroy(p);
-        p = n;
+        p = next;
     }
-    return gColliderSpritePool = 0;
+    return (u32)(gColliderSpritePool = 0);
 }
