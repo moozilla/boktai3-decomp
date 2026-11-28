@@ -227,3 +227,4 @@ src/link/player/Player_IsFlaggedBelowResourceLimit.c	Player_IsFlaggedBelowResour
 src/link/player/Player_IsUnflaggedBelowResourceLimit.c	Player_IsUnflaggedBelowResourceLimit	minor	natural	5	
 src/link/player/Player_UpdateFacingFromInputHistory.c	Player_UpdateFacingFromInputHistory	minor	natural	1	
 src/link/player/Player_UpdateChargeAction.c	Player_UpdateChargeAction	minor	natural	3	
+src/link/player/Player_UpdateConvergingChargeAction.c	Player_UpdateConvergingChargeAction	minor	natural	3	
