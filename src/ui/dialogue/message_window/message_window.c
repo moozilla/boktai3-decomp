@@ -181,7 +181,7 @@ s32 MessageWindow_SetTimedMessageTable(void *script, u32 count, u32 frame, u16 *
 u32 MessageWindow_SetMessageTableFromScript(void)
 {
     u32 v;
-    if (Script_SeekToKeyword(0x72) == 0)
+    if (Script_SeekToKeyword('r') == 0)
         v = (u32)Script_GetPc();
     else
         v = (u32)Script_GetTextSourcePc();

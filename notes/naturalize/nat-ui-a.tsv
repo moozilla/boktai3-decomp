@@ -233,3 +233,4 @@ src/ui/dialogue/message_window/message_window.c	MessageWindow_LoadPalette	minor	
 src/ui/dialogue/message_window/message_window.c	MessageWindow_UpdateSpeakerPortrait	contrived	minor	2	int function with no return value (callers forward r0); case list kept for the jump table
 src/ui/dialogue/message_window/message_window.c	MessageWindow_SetDisplayMode	contrived	minor	4	state pointer taken between the two stores for the address order
 src/ui/dialogue/message_window/message_window.c	MessageWindow_Clear	contrived	natural	4	
+src/ui/dialogue/message_window/message_window.c	MessageWindow_SetMessageTableFromScript	natural	natural	1	
