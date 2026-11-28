@@ -74,11 +74,8 @@ int ActorPool_InitManager(struct ActorPoolManager *manager)
 {
     int i;
     gActorPoolManager = manager;
-    {
-        int zero = 0;
-        for (i = 3; i >= 0; i--)
-            manager->targets[i] = (void *)zero;
-    }
+    for (i = 0; i < 4; i++)
+        manager->targets[i] = 0;
     manager->head = 0;
     ActorPool_RefreshTargets(manager);
     return 0;
