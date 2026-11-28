@@ -37,14 +37,13 @@ s32 DisplayAnimation_SetEntry(struct DisplayAnimation *display, u32 index, u32 v
 
 s32 DisplayAnimation_UpdatePlayback(struct DisplayAnimation *display)
 {
-    u32 kind = display->kind;
-    if (kind == 0)
+    if (display->kind == 0)
         return -1;
-    if (kind == 1) {
+    if (display->kind == 1) {
         if (display->resource.sequence.sequence)
             display->finished = PlayerCue_StepSequenceEndedWithFirstFlipMask(
                 (void *)&display->resource.sequence.sprite, &display->resource.sequence.playback,
-                kind);
+                display->kind);
     } else {
         struct AnimSpriteResource *resource = &display->resource.keyframes.resource;
         display->finished = Anim_Step(&display->resource.keyframes.sprite, resource);

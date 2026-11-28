@@ -173,3 +173,4 @@ src/engine/video/display_animation.c	DisplayAnimation_ClearFlags	minor	natural	1
 src/engine/video/fill_tilemap_rectangle.c	SceneTilemap_FillRectangle	contrived	natural	1	
 src/engine/video/display_animation.c	DisplayAnimation_TestFinished	minor	natural	1	
 src/engine/video/display_animation.c	DisplayAnimation_GetTileIndex	minor	natural	1	
+src/engine/video/display_animation.c	DisplayAnimation_UpdatePlayback	contrived	minor	6	keyframe resource pointer temp stays: the ROM computes its address first
