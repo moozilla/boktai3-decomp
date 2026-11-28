@@ -333,3 +333,6 @@ src/bosses/vanargand/VanargandPair_DispatchTransitionCommands.c	VanargandPair_Di
 src/bosses/vanargand/VanargandPair_ApplyPairTransition.c	VanargandPair_ApplyPairTransition	contrived	near-natural	3	second boss alias kept: register copy for reads
 src/bosses/vanargand/VanargandPair_UpdatePairConditions.c	VanargandPair_UpdatePairConditions	near-natural	near-natural	5	q alias, __divsi3 call and nested state locals kept: plain forms change codegen
 src/bosses/vanargand/VanargandPair_AdvancePairState.c	VanargandPair_AdvancePairState	contrived	near-natural	1	explicit case list kept: it sizes the jump table
+src/bosses/vanargand/VanargandPair_AdvanceConditionalPairState.c	VanargandPair_AdvanceConditionalPairState	near-natural	near-natural	1	
+src/bosses/vanargand/Vanargand_UpdateModeEffect.c	Vanargand_UpdateModeEffect	natural	natural	0	
+src/bosses/vanargand/VanargandPair_SelectPairTransition.c	VanargandPair_SelectPairTransition	natural	natural	0	
