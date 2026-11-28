@@ -3,9 +3,8 @@ s32 Shop_ClassifyConsumableMove(struct ShopControlView *panel)
 {
     s32 second;
     if (panel->grid.savedSelection <= 15) {
-        s32 first =
-            ((struct GameState *)((u8 *)gGameState + panel->grid.savedSelection * 2))->table160[0];
-        second = ((struct GameState *)((u8 *)gGameState + panel->grid.selection * 2))->table160[0];
+        s32 first = *(panel->grid.savedSelection + gGameState->table160);
+        second = *(panel->grid.selection + gGameState->table160);
         if (panel->grid.savedSelection == panel->grid.selection)
             return 0;
         if (first < 0 && second < 0)
@@ -18,8 +17,7 @@ s32 Shop_ClassifyConsumableMove(struct ShopControlView *panel)
             return 4;
         }
         if (panel->grid.selection <= 15) {
-            second =
-                ((struct GameState *)((u8 *)gGameState + panel->grid.selection * 2))->table160[0];
+            second = *(panel->grid.selection + gGameState->table160);
             if (second < 0)
                 return 4;
         }
