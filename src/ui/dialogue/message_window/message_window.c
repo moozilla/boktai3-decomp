@@ -336,22 +336,20 @@ s32 MessageWindow_SetArgumentFromScript(void)
 int MessageWindow_SetChoicesFromScript(void)
 {
     struct MessageWindow *window = (void *)gMessageWindow;
-    struct MessagePlaybackState *vm;
-    int result;
+    struct MessagePlaybackState *state;
+
     if (!window)
         return 0;
-    vm = &window->state;
-    vm->choiceCount = 0;
-    if (Script_SeekToKeyword(0x70)) {
+    state = &window->state;
+    state->choiceCount = 0;
+    if (Script_SeekToKeyword('p')) {
         while (Script_GetPc()) {
-            int value = Script_GetValue();
-            vm->choices[vm->choiceCount] = value;
-            vm->choiceCount++;
+            state->choices[state->choiceCount] = Script_GetValue();
+            state->choiceCount++;
         }
-        result = 0;
-    } else
-        result = -1;
-    return result;
+        return 0;
+    }
+    return -1;
 }
 
 int MessageWindow_SetAutoAdvance(int mode, int step, int flags)
