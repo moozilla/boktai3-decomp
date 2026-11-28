@@ -1,9 +1,10 @@
 #include "scene/actor/scene_actor_attachment.h"
-void SceneActorEffect_PlayCategorySoundIfEnabled(u32 inputGate, u32 inputEvent, u32 inputCategory,
-                                                 u32 inputVariant)
+void SceneActorEffect_PlayCategorySoundIfEnabled(u32 gateArg, u32 eventArg, u32 categoryArg,
+                                                 u32 variantArg)
 {
-    u8 gate = inputGate;
-    u8 event = inputEvent, category = inputCategory, variant = inputVariant;
-    if ((u8)gate == 0)
+    u8 gate = gateArg;
+    u8 event = eventArg, category = categoryArg, variant = variantArg;
+
+    if (gate == 0)
         SceneActorEffect_PlayCategorySound(event, category, variant);
 }

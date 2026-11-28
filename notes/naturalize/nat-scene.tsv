@@ -192,3 +192,4 @@ src/scene/actor/attachment/ActorAttachment_CreateSinglePartSlot.c	ActorAttachmen
 src/scene/actor/attachment/ActorAttachment_CreateMeterPartsSlot.c	ActorAttachment_CreateMeterPartsSlot	minor	minor	0	-
 src/scene/actor/attachment/ActorAttachment_CreateThreePartSlot.c	ActorAttachment_CreateThreePartSlot	natural	natural	0	-
 src/scene/actor/attachment/ActorAttachment_CreatePartsSlotWithCount.c	ActorAttachment_CreatePartsSlotWithCount	natural	natural	0	-
+src/scene/actor/attachment/SceneActorEffect_PlayCategorySoundIfEnabled.c	SceneActorEffect_PlayCategorySoundIfEnabled	minor	minor	3	u32 parameters with u8 locals: the shared header prototype takes u32 and narrowing it changes both callers
