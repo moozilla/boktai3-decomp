@@ -50,8 +50,7 @@ void Player_UpdateAttackColliderMotion(struct Player *p, s32 forced)
             p->statModifierContext.previousAnimation = animation;
             ++q->contactTimer;
             if (p->side) {
-                u8 *heading = &q->contactHeading;
-                angle = ((*heading) - (q->contactTimer * q->motionSpeed)) + 0x120;
+                angle = (q->contactHeading - q->contactTimer * q->motionSpeed) + 0x120;
                 angle &= 255;
             } else {
                 u8 *heading = &q->contactHeading;
@@ -136,8 +135,5 @@ void Player_UpdateAttackColliderMotion(struct Player *p, s32 forced)
                             Player_ComputeActionScale(p, &q->attackCollider));
     if (q->thresholdSatisfied == 1)
         ContactCollider_SetReactionFlags(&q->attackCollider, 0x800000);
-    {
-        u8 heading = q->contactHeading;
-        q->attackCollider.direction = heading;
-    }
+    q->attackCollider.direction = q->contactHeading;
 }
