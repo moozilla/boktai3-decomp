@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneActor_RemoveEffectArray SceneActors_RemoveConvergingParticles
 struct SceneActorComponents {
     u8 pad0[0x1cc];
     u8 collider[0x100];
@@ -19,7 +18,7 @@ s32 SceneActor_DestroyComponents(struct SceneActorComponents *p)
     Collider_Remove(p->collider);
     Anim_Remove(p->animation);
     SpriteComponent_Destroy(p->attachment);
-    SceneActor_RemoveEffectArray(p);
+    SceneActors_RemoveConvergingParticles(p);
     SceneActors_Destroy(p);
     return 0;
 }
