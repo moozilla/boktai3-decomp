@@ -128,13 +128,12 @@ struct TileAnimationChannel *TileAnimation_FindFreeChannel(struct TileAnimation 
 struct TileAnimationChannel *TileAnimation_FindChannel(struct TileAnimation *animation, u32 id)
 {
     struct TileAnimationChannel *channel = animation->channels;
-    s32 index = 0;
-    do {
+    s32 index;
+
+    for (index = 0; index < 8; index++, channel++) {
         if (channel->active != 0 && channel->id == id)
             return channel;
-        index++;
-        channel++;
-    } while (index <= 7);
+    }
     return 0;
 }
 
