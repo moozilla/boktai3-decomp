@@ -1,37 +1,13 @@
-#include "global.h"
-struct S {
-    u8 f[1];
-    u8 b1;
-    u8 f2[5];
-    u8 b7;
-    u8 b8;
-    u8 b9;
-    u8 f3[4];
-    u16 h0e;
-    u8 f4[0x18 - 0x10];
-    u8 b18;
-    u8 f5[0x54 - 0x19];
-    s16 h54;
-    s16 h56;
-    s16 h58;
-    u8 f6[0x68 - 0x5a];
-    s16 h68;
-    s16 h6a;
-    s16 h6c;
-};
-void Actor_PlayAnimationEntry(void *, u32, u32, u32, u32);
+#include "npc/manager/scene_actor_lifecycle.h"
 s32 ScalarApproach_StepSixteenth(s32, s32);
-void StoryCharacter_ApproachTargetPose(u32 a, struct S *p)
+void StoryCharacter_ApproachTargetPose(u32 a, struct SceneActor *p)
 {
-    {
-        u16 mask = 0x400;
-        p->h0e |= mask;
-    }
-    if (p->b9 != 0) {
+    SceneActor_SetFlags(p, 0x400);
+    if (p->animationEntered != 0) {
         u32 r1;
-        p->b9 = 0;
-        p->b7 = 0;
-        switch (p->b1) {
+        p->animationEntered = 0;
+        p->finished = 0;
+        switch (p->variant) {
             case 4:
             case 5:
             case 6:
@@ -66,19 +42,20 @@ void StoryCharacter_ApproachTargetPose(u32 a, struct S *p)
                 break;
         }
         Actor_PlayAnimationEntry(p, r1, 1, 1, 4);
-        p->b18 = 0;
+        p->animationPhase = 0;
     }
-    switch (p->b18) {
+    switch (p->animationPhase) {
         case 0:
-            p->h68 = ScalarApproach_StepSixteenth(p->h68, p->h54);
-            p->h6a = ScalarApproach_StepSixteenth(p->h6a, p->h56);
-            p->h6c = ScalarApproach_StepSixteenth(p->h6c, p->h58);
-            if (*(u32 *)&p->h68 == *(u32 *)&p->h54 && p->h6c == p->h58) {
-                p->b18++;
+            p->body.position.x = ScalarApproach_StepSixteenth(p->body.position.x, p->target.x);
+            p->body.position.y = ScalarApproach_StepSixteenth(p->body.position.y, p->target.y);
+            p->body.position.z = ScalarApproach_StepSixteenth(p->body.position.z, p->target.z);
+            if (*(u32 *)&p->body.position == *(u32 *)&p->target &&
+                p->body.position.z == p->target.z) {
+                p->animationPhase++;
             }
             break;
         case 1:
-            p->b7 = 1;
+            p->finished = 1;
             break;
     }
 }

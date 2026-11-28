@@ -173,3 +173,5 @@ src/npc/story_character/StoryCharacter_StartKind9Animation6Then5.c	StoryCharacte
 src/npc/story_character/StoryCharacter_UpdateAnimation13State.c	StoryCharacter_UpdateAnimation13State	minor	minor	3	speed copy (spd) stays: ROM keeps a second copy of the speed for both velocity components
 src/npc/story_character/StoryCharacter_UpdateAnimation16State.c	StoryCharacter_UpdateAnimation16State	contrived	contrived	6	parked flag masks stay: ROM materializes the mask before loading displayFlags; local Npc struct view
 src/npc/story_character/StoryCharacter_UpdateTargetApproach.c	StoryCharacter_UpdateTargetApproach	contrived	contrived	12	angle pointer pair, product local and out/value block stay: heading velocity code reallocates without them; local struct view
+src/npc/story_character/StoryCharacter_RunEntryAnimSequence.c	StoryCharacter_RunEntryAnimSequence	minor	minor	1	zero local stays: shared as argument and frame reset
+src/npc/story_character/StoryCharacter_ApproachTargetPose.c	StoryCharacter_ApproachTargetPose	contrived	natural	1	
