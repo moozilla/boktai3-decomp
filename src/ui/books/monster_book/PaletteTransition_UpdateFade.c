@@ -4,7 +4,8 @@ struct PaletteTransition {
     u32 frame;
     u8 state;
     u8 pad25[3];
-    u8 anim[1];
+    u8 anim[0x9da];
+    u8 flag;
 };
 void PaletteTransition_BlendBankColors(struct PaletteTransition *, int, int);
 void PaletteTransition_SetAlternateVariantParameters(struct PaletteTransition *);
@@ -29,7 +30,7 @@ void PaletteTransition_UpdateFade(struct PaletteTransition *p)
             if (DisplayAnimation_TestFinished(p->anim)) {
                 p->state++;
                 p->frame = 0;
-                *((u8 *)p + 0xa02) = 1;
+                p->flag = 1;
             }
             break;
         case 2:
@@ -38,7 +39,7 @@ void PaletteTransition_UpdateFade(struct PaletteTransition *p)
                 PaletteTransition_BlendSelectedBanks(p, 0x40, 6);
                 return;
             }
-            *((u8 *)p + 0xa02) = 1;
+            p->flag = 1;
             PaletteTransition_BlendSelectedBanks(p, p->frame, 6);
             break;
     }
