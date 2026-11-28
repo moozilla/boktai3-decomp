@@ -1,9 +1,7 @@
-#include "scene/collision/contact_position.h"
 #include "global.h"
-#define B(o)       (*(u8 *)(p + (o)))
-#define H(o)       (*(u16 *)(p + (o)))
-#define ANIMATE(n) Player_SetAnimation(p, ActorVariant_GetTableValue(B(0x418), n), 64, 1)
-extern u8 *gGameState;
+#include "player/player.h"
+#include "scene/collision/contact_position.h"
+#include "system/game_state/game_state.h"
 extern const s16 gUnk_086149C4[];
 u32 Player_ConsumeStateEntry(void *);
 void Player_SetActionPhase(void *, u8);
@@ -29,114 +27,112 @@ static inline s32 scale(s32 v)
     return v >= 0 ? v >> 12 : -((-v) >> 12);
 }
 // confidence=low: held input sustains the rotating attack collider while consuming energy.
-void Player_UpdateSustainedSpinAttack(u8 *p)
+void Player_UpdateSustainedSpinAttack(struct Player *p)
 {
     struct ContactPosition pos;
     if (Player_ConsumeStateEntry(p)) {
         Player_SetActionPhase(p, 0);
         Player_SetPendingCallback(p, Player_StopActionSongOnExit);
     }
-    switch (B(0x458)) {
+    switch (p->tetherPhase) {
         case 0:
-            if (ANIMATE(0x23)) {
+            if (Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0x23), 64, 1)) {
                 s32 cost;
-                H(0xC10) = 30;
-                Player_GetSpecialAttackDescriptor(B(0xBF4));
-                if (B(0xC18) == 1)
+                p->statModifierContext.chargeDuration = 30;
+                Player_GetSpecialAttackDescriptor(p->statModifierContext.actionKind);
+                if (p->statModifierContext.statBOverrideMode == 1)
                     cost = 0;
                 else
-                    cost = Player_GetSpecialAttackDescriptor(B(0xBF4))[2];
+                    cost = Player_GetSpecialAttackDescriptor(p->statModifierContext.actionKind)[2];
                 cost = ActorResponse_Apply(p, cost);
-                if (H(0x428) < cost || B(0xC18) == 6) {
+                if (p->currentStatB < cost || p->statModifierContext.statBOverrideMode == 6) {
                     Player_SetActionPhase(p, 5);
                     Sound_StopSong(0xD5);
                 } else {
                     Player_SetActionPhase(p, 1);
-                    {
-                        s32 angle = (B(0x3A4) << 5) & 255;
-                        H(0xC0A) = angle;
-                    }
+                    p->statModifierContext.contactTimer = (p->facing << 5) & 255;
                 }
             }
             break;
         case 1:
-            if (!H(0x45A))
+            if (!p->tetherFrame)
                 Sound_PlaySong(0x1F7);
             Player_UpdateAttackFacing(p);
-            ANIMATE(0x24);
-            if (++H(0x45A) > 6) {
+            Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0x24), 64, 1);
+            if (++p->tetherFrame > 6) {
                 s32 enough;
                 u8 *desc;
                 s32 power;
-                B(0xC0F) = 0;
+                p->statModifierContext.chargeTier = 0;
                 enough = 0;
-                desc = Player_GetSpecialAttackDescriptor(B(0xBF4));
-                if (!(H(0x45A) & 1)) {
+                desc = Player_GetSpecialAttackDescriptor(p->statModifierContext.actionKind);
+                if (!(p->tetherFrame & 1)) {
                     s32 cost;
-                    if (B(0xC18) == 1)
+                    if (p->statModifierContext.statBOverrideMode == 1)
                         cost = 0;
                     else
-                        cost = Player_GetSpecialAttackDescriptor(B(0xBF4))[2];
+                        cost =
+                            Player_GetSpecialAttackDescriptor(p->statModifierContext.actionKind)[2];
                     cost = ActorResponse_Apply(p, cost);
-                    if (H(0x428) < cost)
-                        H(0x428) = 0;
+                    if (p->currentStatB < cost)
+                        p->currentStatB = 0;
                     else {
-                        s32 remaining = H(0x428) - cost;
-                        H(0x428) = remaining;
+                        p->currentStatB -= cost;
                         enough = 1;
                     }
                 } else
                     enough = 1;
-                power = *(s16 *)(gGameState + 0x40) + desc[1];
-                if (!(**(u16 **)(p + 0x348) & 2) || !enough) {
+                power = gGameState->level + desc[1];
+                if (!(p->inputKeys[0] & 2) || !enough) {
                     Sound_StopSong(0xCC);
                     Player_SetActionPhase(p, 6);
                 } else {
                     s32 angle;
-                    u8 *collider;
-                    if (H(0x45A) == 8)
+                    struct ContactCollider *collider;
+                    if (p->tetherFrame == 8)
                         Sound_PlaySong(0xCC);
-                    H(0xC0A) = (H(0xC0A) + 16) & 255;
-                    DirectionalSpriteEffect_PlaceOppositeAngle(p, H(0xC0A), p + 0x30);
-                    pos = *(struct ContactPosition *)(p + 0x30);
-                    angle = (416 - H(0xC0A)) & 255;
+                    p->statModifierContext.contactTimer =
+                        (p->statModifierContext.contactTimer + 16) & 255;
+                    DirectionalSpriteEffect_PlaceOppositeAngle(
+                        p, p->statModifierContext.contactTimer, &p->position);
+                    pos = *(struct ContactPosition *)&p->position;
+                    angle = (416 - p->statModifierContext.contactTimer) & 255;
                     pos.x += scale(170 * gUnk_086149C4[(angle + 64) & 255]);
                     pos.y += 230;
                     pos.z += scale(170 * gUnk_086149C4[angle]);
-                    collider = p + 0xB8C;
-                    *(u16 *)(collider + 0x3C) = power;
+                    collider = &p->statModifierContext.attackCollider;
+                    collider->unknown3C = power;
                     Collider_SetPosition(collider, &pos, 0);
-                    B(0xBCE) = angle;
+                    collider->direction = angle;
                     Collider_Refresh(collider);
-                    *(u32 *)(collider + 0x38) = Player_GetAttackAttributeFlags(B(0xC18));
-                    {
-                        s32 facing = ((H(0xC0A) + 15) & 255) >> 5;
-                        B(0x3A4) = facing;
-                    }
+                    collider->reactionFlags =
+                        Player_GetAttackAttributeFlags(p->statModifierContext.statBOverrideMode);
+                    p->facing = ((p->statModifierContext.contactTimer + 15) & 255) >> 5;
                     Player_UpdateFacingSide(p);
                 }
-                ANIMATE(0x25);
+                Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0x25), 64, 1);
             }
             break;
         case 5:
-            ANIMATE(0x25);
-            if (++H(0x45A) > 4)
+            Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0x25), 64, 1);
+            if (++p->tetherFrame > 4)
                 Player_SetActionPhase(p, 6);
             break;
         case 6:
-            ANIMATE(0x24);
-            if (++H(0x45A) > 14) {
+            Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0x24), 64, 1);
+            if (++p->tetherFrame > 14) {
                 Sound_StopSong(0xCC);
-                B(0xBF6) = 0;
+                p->statModifierContext.bufferedAttack = 0;
                 Player_SetActionPhase(p, 7);
             }
             break;
         case 7:
-            ANIMATE(0x23);
-            if (++H(0x45A) > 4)
+            Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0x23), 64, 1);
+            if (++p->tetherFrame > 4)
                 ActorSequence_Begin(p, 0, 0);
             break;
     }
-    B(0xAC9) = Player_GetAttackEffectType(B(0xC18));
-    AnimData_SelectPaletteBank(p + 0x828, B(0xC18) + 75);
+    p->actionVariant = Player_GetAttackEffectType(p->statModifierContext.statBOverrideMode);
+    AnimData_SelectPaletteBank(p->directionalEffect[0].resourceHeader,
+                               p->statModifierContext.statBOverrideMode + 75);
 }
