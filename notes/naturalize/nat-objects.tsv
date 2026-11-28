@@ -230,3 +230,4 @@ src/objects/floor_switch/FloorSwitch_Release.c	FloorSwitch_Release	contrived	nat
 src/objects/floor_switch/SpriteSlots_UpdateActive.c	SpriteSlots_UpdateActive	contrived	natural	8	switches base local
 src/objects/floor_switch/FloorSwitch_OnManagerDestroy.c	FloorSwitch_OnManagerDestroy	contrived	natural	1	Tst() helper kept
 src/objects/floor_switch/FloorSwitch_InitManager.c	FloorSwitch_InitManager	contrived	natural	1	
+src/objects/floor_switch/FloorSwitch_GetOrCreateManager.c	FloorSwitch_GetOrCreateManager	minor	natural	1	
