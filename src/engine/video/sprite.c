@@ -565,11 +565,7 @@ void Sprite_RenderCameraRelativeList(void)
     s32 z;
     u32 width, height;
     s32 left, top;
-    u32 parity = gSceneEffectPalettePhase & 1;
-    u32 skip = 0x401;
-    if (parity) {
-        skip = 0x201;
-    }
+    u32 skip = (gSceneEffectPalettePhase & 1) ? 0x201 : 0x401;
     do {
         do {
             p = gSpriteListHeads[gRenderListIndex];
