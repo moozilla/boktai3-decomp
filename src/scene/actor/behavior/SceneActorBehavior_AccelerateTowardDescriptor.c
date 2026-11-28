@@ -1,4 +1,3 @@
-#include "engine/word_flags.h"
 #include "scene/actor/scene_actor_behavior.h"
 static inline s32 ScaleProduct(s32 product)
 {
@@ -19,13 +18,15 @@ u8 SceneActorBehavior_AccelerateTowardDescriptor(struct RoomActor *actor,
     s32 actorZ;
     s32 dz;
     s32 x, z;
+    u32 mask;
     destination = descriptor->destination.z;
     {
         s16 *field = &position->z;
         actorZ = *field;
     }
     dz = destination - actorZ;
-    if (HalfwordFlags_Test(0x1000, &actor->motionFlags)) {
+    mask = 0x1000;
+    if (actor->motionFlags & mask) {
         if (!(descriptor->flags & 1) && dx * dx + dz * dz <= 0x4000)
             return 1;
     } else if ((u32)abs(descriptor->position.x - actorX) <= rangeX &&
