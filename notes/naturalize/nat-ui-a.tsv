@@ -149,3 +149,4 @@ src/ui/books/forging_book/CollectionBook_RefreshCollectedEntryVisibility.c	Colle
 src/ui/books/forging_book/CollectionBook_RefreshCompletionDigits.c	CollectionBook_RefreshCompletionDigits	contrived	natural	1	
 src/ui/books/forging_book/CollectionBook_RefreshPageHeading.c	CollectionBook_RefreshPageHeading	minor	natural	1	
 src/ui/books/forging_book/CollectionBook_UpdateSelectionCursor.c	CollectionBook_UpdateSelectionCursor	contrived	natural	1	
+src/ui/books/forging_book/CollectionBook_UpdateTrackedEntryMarker.c	CollectionBook_UpdateTrackedEntryMarker	contrived	natural	1	

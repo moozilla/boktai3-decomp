@@ -1,24 +1,24 @@
 #include "global.h"
-s32 Lookup_FindValueIndex(void *, s32);
-s32 Mod(s32, s32);
+#include "ui/books/collection_book.h"
+s32 Lookup_FindValueIndex(struct CollectionBook *, s32);
 s32 Div(s32, s32);
-void Anim_LoadKeyframe(void *, void *, u32, u32);
-u32 CollectionBook_UpdateTrackedEntryMarker(u8 *p)
+s32 Mod(s32, s32);
+
+u32 CollectionBook_UpdateTrackedEntryMarker(struct CollectionBook *book)
 {
-    s32 value = Lookup_FindValueIndex(p, *(s16 *)(p + 0x722));
-    s32 page = *(s16 *)(p + 0x6f4);
-    if (value >= page * 10 && value < (page + 1) * 10) {
-        s32 digit = Mod(value, 10), a, b, x, y;
-        a = Mod(digit, 5);
-        b = Div(digit, 5);
-        x = a * 40 + 38;
-        *(u16 *)(p + 0x384) = x;
-        y = b * 40 + 38;
-        *(u16 *)(p + 0x386) = y;
-        *(u32 *)(p + 0x36c) &= ~1;
-        Anim_LoadKeyframe(p + 0x364, p + 0x44, 0x50, 0);
+    s32 index = Lookup_FindValueIndex(book, book->trackedEntry);
+
+    if (index >= book->page * 10 && index < (book->page + 1) * 10) {
+        s32 cell = Mod(index, 10);
+        s32 column = Mod(cell, 5);
+        s32 row = Div(cell, 5);
+
+        book->trackedMarker.position.x = column * 40 + 38;
+        book->trackedMarker.position.y = row * 40 + 38;
+        book->trackedMarker.flags &= ~1;
+        Anim_LoadKeyframe(&book->trackedMarker, &book->markerResource, 0x50, 0);
     } else {
-        *(u32 *)(p + 0x36c) |= 1;
+        book->trackedMarker.flags |= 1;
     }
     return 0;
 }
