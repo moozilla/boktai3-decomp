@@ -319,3 +319,4 @@ src/engine/video/anim/Anim_ApplyDurationScales.c	Anim_ApplyDurationScales	contri
 src/engine/video/anim/Anim_SetSequence.c	Anim_SetSequence	contrived	minor	1	address local reused for the frame list and first command; weight masked through a constant-first local
 src/engine/video/anim/Anim_RestartSequence.c	Anim_RestartSequence	contrived	natural	1	
 src/engine/video/anim/Anim_SetDurationScale.c	Anim_SetDurationScale	contrived	natural	1	
+src/engine/video/anim/Anim_ResetDurationScale.c	Anim_ResetDurationScale	contrived	natural	1	

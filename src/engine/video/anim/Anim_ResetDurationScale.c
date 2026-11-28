@@ -1,9 +1,9 @@
 // COMPILER: old_agbcc
-#include "global.h"
 /* Anim_ResetDurationScale: Restores the base frame duration and resets its scale to 64 */
+#include "engine/video/display_sequence.h"
 
-void Anim_ResetDurationScale(u8 *p)
+void Anim_ResetDurationScale(struct DisplaySequenceState *state)
 {
-    p[7] = p[6];
-    *(u16 *)(p + 0xc) = 64;
+    state->duration = state->frameWeight;
+    state->speed = 64;
 }
