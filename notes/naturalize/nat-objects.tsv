@@ -14,3 +14,5 @@ src/objects/animated_tile.c	AnimatedTile_CreateManager	natural	natural	0
 src/objects/animated_tile.c	AnimatedTile_ResetManager	natural	natural	0	
 src/objects/animated_tile.c	AnimatedTile_StartAlternateAnimationFromScript	natural	natural	0	
 src/objects/bat_curtain/debris_particles.c	sub_08012B34	contrived	minor	30	random-origin dance in the angle branches kept (ROM loads a dead 0x0403B714 per branch); velocity/position pointers kept: direct fields reallocate
+src/objects/bat_curtain/debris_particles.c	Debris_Update	natural	natural	0	
+src/objects/bat_curtain/breakable_barrier.c	BreakableBarrier_ConsumeEntered	contrived	natural	1	

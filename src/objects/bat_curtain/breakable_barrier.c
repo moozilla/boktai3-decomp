@@ -9,15 +9,11 @@ void BreakableBarrier_SetState(struct BreakableBarrier *s, u8 v)
 
 u32 BreakableBarrier_ConsumeEntered(struct BreakableBarrier *p)
 {
-    u8 *q = &p->entered;
-    u32 r;
-    if (*q == 0) {
-        r = 0;
-    } else {
-        *q = 0;
-        r = 1;
+    if (p->entered) {
+        p->entered = 0;
+        return 1;
     }
-    return r;
+    return 0;
 }
 
 struct BreakableBarrier *BreakableBarrier_SetPosition(struct BreakableBarrier *input,
