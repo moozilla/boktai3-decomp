@@ -367,3 +367,4 @@ src/bosses/vanargand/Vanargand_DispatchSecondaryState.c	Vanargand_DispatchSecond
 src/bosses/vanargand/Vanargand_RunSecondaryPhaseCallback.c	Vanargand_RunSecondaryPhaseCallback	contrived	natural	1	
 src/bosses/vanargand/Vanargand_RunInterruptibleModeCallback.c	Vanargand_RunInterruptibleModeCallback	contrived	natural	1	
 src/bosses/vanargand/Vanargand_RunSecondaryModeCallback.c	Vanargand_RunSecondaryModeCallback	contrived	natural	1	
+src/bosses/vanargand/Vanargand_RunSharedModeCallback.c	Vanargand_RunSharedModeCallback	contrived	natural	1	
