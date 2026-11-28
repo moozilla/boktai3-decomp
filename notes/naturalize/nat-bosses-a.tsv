@@ -251,3 +251,4 @@ src/bosses/hresvelgr/Hresvelgr_SteerTowardTarget.c	Hresvelgr_SteerTowardTarget	c
 src/bosses/hresvelgr/Hresvelgr_TryStartReaction.c	Hresvelgr_TryStartReaction	minor	minor	1	actor alias stays
 src/bosses/hresvelgr/sub_0819D190.c	sub_0819D190	contrived	natural	1	
 src/bosses/hresvelgr/OffsetActor_UpdateRepeatedAnimation.c	OffsetActor_UpdateRepeatedAnimation	contrived	minor	3	a second actor pointer (self) stays: the ROM keeps two registers
+src/bosses/hresvelgr/OffsetActor_UpdateAnimationSequence.c	OffsetActor_UpdateAnimationSequence	contrived	minor	3	a second actor pointer (self) stays: the ROM keeps two registers
