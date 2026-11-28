@@ -2869,47 +2869,37 @@ static inline void Polar(struct ContactPosition *out, u8 angle, s32 speed)
 }
 
 
-void Skeleton_BeginKnockedFlight(struct ChaseActor *input)
+void Skeleton_BeginKnockedFlight(struct ChaseActor *actor)
 {
-    struct ChaseActor *actor = input;
     struct Skeleton *context = actor->base.context;
     u32 origin;
-    u8 taken = SceneActorControl_TakeFlag(&actor->base.field2B2);
-    if (taken) {
+    u32 angle;
+    s32 random;
+    u16 argument;
+    if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
         ContactCollider_SetFlags(&context->bodyCollider, 4);
         ContactCollider_SetFlags(&context->attackCollider, 4);
         ContactCollider_SetFlags(&actor->base.colliderA, 4);
         ContactCollider_ClearFlags(&actor->base.colliderB, 4);
-        {
-            u8 direction = actor->base.body.direction;
-            s32 random;
-            PARTICLE_RANDOM_CAPTURE_ORIGIN(origin);
-            random = ParticleRandom_ReadDirectSample((const u16 *)RANDOM_TABLE_ADDR);
-            random &= 0xF;
-            {
-                u32 angle = direction;
-                Polar(&actor->base.secondaryMotion, angle, random + 0x1C);
-            }
-        }
+        angle = actor->base.body.direction;
+        PARTICLE_RANDOM_CAPTURE_ORIGIN(origin);
+        random = ParticleRandom_ReadDirectSample((const u16 *)RANDOM_TABLE_ADDR) & 0xF;
+        Polar(&actor->base.secondaryMotion, angle, random + 0x1C);
         actor->base.secondaryMotion.y =
-            (ParticleRandom_ReadRelativeSample(origin, (const u16 *)RANDOM_TABLE_ADDR) & 0x1F) +
-            0x18;
+            (ParticleRandom_ReadRelativeSample(origin, (const u16 *)RANDOM_TABLE_ADDR) & 0x1F) + 0x18;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0x11);
         ActorShadow_Enable(actor->base.shadow);
     } else {
-        if (**(u8 **)((u8 *)actor + 0x6C) & 1) {
-            actor->base.secondaryMotion.x = taken;
-            actor->base.secondaryMotion.z = taken;
+        if (*(u8 *)actor->base.body.movementProbe & 1) {
+            actor->base.secondaryMotion.x = 0;
+            actor->base.secondaryMotion.z = 0;
         }
-        {
-            if (SceneActorChase_StatusFlags(actor, 0x10)) {
-                u16 argument;
-                if (WordFlags_Has(0x800, &context->actionFlags))
-                    Sound_PlaySong(0x3AD);
-                ContactCollider_SetFlags(&actor->base.colliderB, 4);
-                argument = 1;
-                SceneActorPlacement_ResetActorState(actor, &argument);
-            }
+        if (SceneActorChase_StatusFlags(actor, 0x10)) {
+            if (WordFlags_Has(0x800, &context->actionFlags))
+                Sound_PlaySong(0x3AD);
+            ContactCollider_SetFlags(&actor->base.colliderB, 4);
+            argument = 1;
+            SceneActorPlacement_ResetActorState(actor, &argument);
         }
     }
 }
