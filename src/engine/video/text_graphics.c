@@ -114,14 +114,11 @@ s32 Text_FindCachedGlyph(u32 glyph, u32 part, u32 color, u32 wide)
 {
     u32 key = (glyph | (part << 16) | (color << 18) | (wide << 20)) & 0x3FFFFF;
     u32 *p = Text_GetGlyphCache();
-    s32 i = 0;
-    do {
-        u32 v = *p;
-        if ((v & 0x3FFFFF) == key && (v & 0x3FC00000) != 0)
+    s32 i;
+    for (i = 0; i < 0x100; p++, i++) {
+        if ((*p & 0x3FFFFF) == key && (*p & 0x3FC00000) != 0)
             return i;
-        p++;
-        i++;
-    } while (i <= 0xFF);
+    }
     return -1;
 }
 
