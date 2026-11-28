@@ -1,7 +1,7 @@
-#include "global.h"
-void Callback_InvokeActor(void *, u32);
-u32 SpiralBurst_OnTaskUpdate(u8 *s)
+#include "effects/bursts/spiral_burst.h"
+
+u32 SpiralBurst_OnTaskUpdate(struct SpiralBurst *burst)
 {
-    Callback_InvokeActor(s, *(u32 *)(s + 0x204));
+    Callback_InvokeActor(burst, burst->state);
     return 0;
 }
