@@ -1,12 +1,10 @@
-#include "global.h"
-void Effect_Remove(u8 *);
-u32 SpiralBurst_OnTaskDestroy(u8 *p)
+#include "effects/bursts/spiral_burst.h"
+
+u32 SpiralBurst_OnTaskDestroy(struct SpiralBurst *burst)
 {
     s32 i;
-    u8 *q = p + 0x78;
-    for (i = 7; i >= 0; i--) {
-        Effect_Remove(q);
-        q += 0x30;
-    }
+
+    for (i = 0; i < 8; i++)
+        Effect_Remove(&burst->particles[i]);
     return 0;
 }

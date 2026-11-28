@@ -193,3 +193,4 @@ src/effects/bursts/radial_burst/sub_08235DB0.c	sub_08235DB0	contrived	natural	3	
 src/effects/bursts/radial_burst/RadialBurstEffect_StartBurst.c	RadialBurstEffect_StartBurst	contrived	contrived	40	unchanged: indexed rewrite differs only in reload rotation of the two loop draws (table and mask registers)
 src/effects/bursts/spiral_burst/SpiralBurst_SetState.c	SpiralBurst_SetState	contrived	natural	1	-
 src/effects/bursts/spiral_burst/SpiralBurst_OnTaskUpdate.c	SpiralBurst_OnTaskUpdate	contrived	natural	2	-
+src/effects/bursts/spiral_burst/SpiralBurst_OnTaskDestroy.c	SpiralBurst_OnTaskDestroy	contrived	natural	1	-
