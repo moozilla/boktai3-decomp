@@ -12,16 +12,16 @@ struct Q {
 };
 u8 Math_Atan2(s32, s32);
 u32 Sqrt(u32);
-void Math_GetTargetAngleAndDistance(struct Q *q, struct P *pt, u8 *a, u16 *b)
+void Math_GetTargetAngleAndDistance(struct Q *q, struct P *pt, u8 *angle, u16 *distance)
 {
     s32 dx = pt->x - q->x;
     s32 dy = pt->y - q->y;
-    s32 d = dx * dx + dy * dy;
-    if (d == 0) {
-        *a = d;
-        *b = d;
+    s32 squared = dx * dx + dy * dy;
+    if (squared == 0) {
+        *angle = 0;
+        *distance = 0;
     } else {
-        *a = Math_Atan2(dx, dy);
-        *b = Sqrt(d);
+        *angle = Math_Atan2(dx, dy);
+        *distance = Sqrt(squared);
     }
 }
