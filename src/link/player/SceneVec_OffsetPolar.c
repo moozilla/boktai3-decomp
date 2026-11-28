@@ -1,4 +1,3 @@
-#define gSineTable gUnk_086149C4
 #include "global.h"
 #include "engine/math/scene_vec.h"
 extern const s16 gUnk_086149C4[];
