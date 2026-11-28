@@ -33,7 +33,8 @@ struct StateActorTag {
             u16 unknown8, fieldA;
         } halves;
     } state; /* +8; upper half cleared by 081CF84C, whole word by 081D2544. */
-    u8 unknownC[0xC];
+    u8 unknownC[0xA];
+    u16 field16;            /* +0x16; set to 1 by Kuro command states 21 and 26. */
     void *attachment;       /* +0x18 */
     s32 paletteBlendFrames; /* +0x1C, decremented by 081D25AC. */
 };

@@ -397,3 +397,4 @@ src/npc/otenko/SceneEffect_InitParticleRing.c	SceneEffect_InitParticleRing	contr
 src/npc/otenko/Otenko_IsTransitionEffectFinished.c	Otenko_IsTransitionEffectFinished	minor	natural	1	
 src/npc/otenko/Otenko_CreateTransitionEffect.c	Otenko_CreateTransitionEffect	minor	natural	1	
 src/npc/otenko/Otenko_DestroyTransitionEffect.c	Otenko_DestroyTransitionEffect	natural	natural	1	
+src/npc/kuro/Kuro_UpdateMode21.c	Kuro_UpdateMode21	contrived	natural	1	

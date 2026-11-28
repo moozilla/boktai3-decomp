@@ -1,13 +1,13 @@
-#include "global.h"
-void Trigger_ConsumePending(u8 *, u32);
-void Kuro_UpdateMode21(u8 *a, u8 *p)
+#include "npc/story_character/state_actor.h"
+
+void Kuro_UpdateMode21(void *ctx, struct StateActor *p)
 {
-    u8 *q = p + 0x20;
-    if (p[8] != 0) {
-        p[8] = 0;
-        p[7] = 0;
-        p[5] = 0x12;
-        Trigger_ConsumePending(p + 0x168, 1);
-        *(u16 *)(q + 0x16) = 1;
+    struct StateActorTag *tag = &p->tag;
+    if (p->enterCommand) {
+        p->enterCommand = 0;
+        p->done = 0;
+        p->nextState = 0x12;
+        Trigger_ConsumePending(p->receiver, 1);
+        tag->field16 = 1;
     }
 }
