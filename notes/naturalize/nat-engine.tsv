@@ -748,3 +748,12 @@ src/system/solar/Solar_InitTimer.c	Solar_InitTimer	minor	minor	1	mask inline and
 src/system/solar/Solar_ShutdownTimer.c	Solar_ShutdownTimer	minor	minor	1	raw cartridge GPIO address
 src/system/solar/Solar_OnTimerInterrupt.c	Solar_OnTimerInterrupt	minor	minor	1	raw cartridge GPIO address
 src/system/solar/Solar_GetMeasurement.c	Solar_GetMeasurement	minor	natural	1	
+src/system/solar/Solar_DestroyController.c	Solar_DestroyController	natural	natural	0	
+src/system/solar/Solar_InitController.c	Solar_InitController	natural	natural	0	
+src/system/solar/Solar_Enable.c	Solar_Enable	natural	natural	0	
+src/system/solar/Solar_Disable.c	Solar_Disable	natural	natural	0	
+src/system/solar/Solar_StartMeasurement.c	Solar_StartMeasurement	natural	natural	0	
+src/system/solar/Solar_StopMeasurement.c	Solar_StopMeasurement	natural	natural	0	
+src/system/solar/Solar_IsEnabled.c	Solar_IsEnabled	natural	natural	0	
+src/system/solar/Solar_GetMeasurementPhase.c	Solar_GetMeasurementPhase	natural	natural	0	
+src/system/solar/Solar_GetInterruptCounter.c	Solar_GetInterruptCounter	natural	natural	0	
