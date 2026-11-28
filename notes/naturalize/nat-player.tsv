@@ -94,3 +94,4 @@ src/player/appearance/player_visuals.c	Player_RollModifierBonus	natural	natural	
 src/player/appearance/player_visuals.c	Player_RollWeaponHitElementEffect	minor	natural	4	
 src/player/appearance/player_visuals.c	Player_RollFirstWeaponHitStatusLow	minor	natural	4	
 src/player/appearance/player_visuals.c	Player_RollFirstWeaponHitStatusHigh	minor	natural	4	
+src/player/appearance/player_visuals.c	Player_RollSecondWeaponHitStatusLow	minor	natural	4	
