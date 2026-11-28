@@ -509,12 +509,11 @@ void Modifier_StartDrainIfAboveThreshold(struct ScenePoolActor *o)
 
 void CallbackList_ResetDispatch(struct ScenePoolActor *list)
 {
+    struct ActorDrainState *drain;
     if (list->drain.effect >= 0)
         TimedSpriteEffect_RequestStop(list->drain.effect);
     list->drain.effect = -1;
-    {
-        struct ActorDrainState *control = &list->drain;
-        control->callback = Modifier_UpdateIdleDrain;
-        control->entered = 1;
-    }
+    drain = &list->drain;
+    drain->callback = Modifier_UpdateIdleDrain;
+    drain->entered = 1;
 }
