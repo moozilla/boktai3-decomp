@@ -138,7 +138,7 @@ void Hud_DrawEnergyRatio(struct SceneHudState *hud, u32 style, u32 x, u32 y)
 void Hud_DrawPlayerValue(struct SceneHudState *hud, s32 style, s32 x, s32 y)
 {
     if (hud->playerValueEnabled) {
-        if ((u16)((u16)gGameState->form - 1) <= 1) {
+        if (gGameState->form == 1 || gGameState->form == 2) {
             s32 current = Div(hud->actionOwner->statusValue, 4);
             s32 maximum = Div(4000, 4);
             Hud_DrawStatRatio(hud, style, 1000, 4, current, maximum, x, y);
