@@ -1,17 +1,13 @@
 #include "global.h"
-void Anim_Remove(u8 *);
-void SceneInput_DestroyMarkerPair(u8 *);
-void SceneInput_DestroyGlyphPair(u8 *);
-void Storage_Destroy(u8 *p)
+#include "ui/town/storage_screen.h"
+void Storage_Destroy(struct StorageScreen *screen)
 {
-    u8 *q = p + 0x18;
-    s32 i = 0x37;
-    do {
-        if (q[4])
-            Anim_Remove(q);
-        q += 0x60;
-        i--;
-    } while (i >= 0);
-    SceneInput_DestroyMarkerPair(p + 0x1558);
-    SceneInput_DestroyGlyphPair(p + 0x164c);
+    struct AnimSprite *sprites = screen->controls;
+    s32 i;
+    for (i = 0; i < 56; i++) {
+        if (sprites[i].active)
+            Anim_Remove(&sprites[i]);
+    }
+    SceneInput_DestroyMarkerPair(&screen->markers);
+    SceneInput_DestroyGlyphPair(&screen->glyphs);
 }
