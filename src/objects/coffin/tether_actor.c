@@ -2266,31 +2266,26 @@ u32 TetherActor_TestStepDelta(struct ContactPackedVector *origin, struct Contact
     if (!delta->x) {
         candidate = *origin;
         candidate.z += delta->z;
-        if (TetherActor_TestStepPosition((void *)origin, (void *)&candidate, mask))
-            goto yes;
-        goto no;
+        if (!TetherActor_TestStepPosition((void *)origin, (void *)&candidate, mask))
+            return 0;
     } else if (!delta->z) {
         candidate = *origin;
-        *(u16 *)&candidate += (u16)delta->x;
-        if (TetherActor_TestStepPosition((void *)origin, (void *)&candidate, mask))
-            goto yes;
-        goto no;
+        candidate.x += delta->x;
+        if (!TetherActor_TestStepPosition((void *)origin, (void *)&candidate, mask))
+            return 0;
     } else {
         candidate = *origin;
-        *(u16 *)&candidate += (u16)delta->x;
+        candidate.x += delta->x;
         if (!TetherActor_TestStepPosition((void *)origin, (void *)&candidate, mask))
-            goto no;
+            return 0;
         candidate = *origin;
-        ((u16 *)&candidate)[2] += (u16)delta->z;
+        candidate.z += delta->z;
         if (!TetherActor_TestStepPosition((void *)origin, (void *)&candidate, mask))
-            goto no;
-        *(u16 *)&candidate += (u16)delta->x;
+            return 0;
+        candidate.x += delta->x;
+        if (!TetherActor_TestStepPosition((void *)origin, (void *)&candidate, mask))
+            return 0;
     }
-    if (TetherActor_TestStepPosition((void *)origin, (void *)&candidate, mask))
-        goto yes;
-no:
-    return 0;
-yes:
     return 1;
 }
 

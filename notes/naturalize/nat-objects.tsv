@@ -132,3 +132,5 @@ src/objects/coffin/tether_actor.c	TetherActor_SelectNextState	contrived	contrive
 src/objects/coffin/tether_actor.c	TetherActor_BlockPlayerAcrossTerrain	contrived	natural	8	
 src/objects/coffin/tether_actor.c	TetherActor_LimitPlayerDistance	minor	minor	4	truncateShift stays for the position lerps
 src/objects/coffin/tether_actor.c	TetherActor_UpdateFollowingState	minor	natural	1	
+src/objects/coffin/tether_actor.c	TetherActor_UpdateSecondaryLock	natural	natural	0	
+src/objects/coffin/tether_actor.c	TetherActor_TestStepDelta	contrived	natural	2	
