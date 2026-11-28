@@ -45,3 +45,4 @@ src/bosses/ratatosk/Ratatosk_UpdateHomingShot.c	Ratatosk_UpdateHomingShot	minor	
 src/bosses/ratatosk/Ratatosk_UpdateKnockbackRecovery.c	Ratatosk_UpdateKnockbackRecovery	contrived	contrived	27	actor alias, hand-split u16 scale updates, sign-symmetric conversions and RATATOSK_SET_FACING macro stay: plain forms change allocation
 src/bosses/ratatosk/Ratatosk_UpdateOrbitingParticlePose.c	Ratatosk_UpdateOrbitingParticlePose	contrived	minor	8	one mask-parameter flag accessor stays
 src/bosses/ratatosk/Ratatosk_UpdateLongTimedPose.c	Ratatosk_UpdateLongTimedPose	minor	natural	2	
+src/bosses/ratatosk/Ratatosk_UpdateTimedPose.c	Ratatosk_UpdateTimedPose	minor	minor	2	actor alias stays: ROM keeps a second copy
