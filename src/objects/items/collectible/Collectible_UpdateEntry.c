@@ -1,120 +1,58 @@
-#include "engine/video/display_sequence_sprite.h"
-#include "effects/screen/background_controller.h"
-#include "objects/items/render_layout.h"
+#include "global.h"
+#include "engine/engine.h"
+#include "engine/ram.h"
+#include "engine/video/display_sequence_step.h"
+#include "objects/items/collectible.h"
+#include "scene/collision/spatial_index.h"
+
 struct Camera {
     u8 unknown0[0x44];
     s32 screenX, screenY;
 };
-// Per-frame update of a pooled collectible: animates, tests proximity and handles pickup hit.
-struct Col {
-    u8 pad0[0x1C];
-    struct Render render;
-    u8 pad30[0x38 - 0x30];
-    s16 screenX, screenY, screenZ;
-    u8 pad3E[0x48 - 0x3E];
-    struct DisplaySequenceState sequence;
-    u8 pad58[4];
-    u8 bodyEntry[0x40];
-    u32 entryFlags;
-    u8 pad9C[0xA8 - 0xA0];
-    u16 hit;
-    u8 hitFlag;
-    u8 padAB[0xDC - 0xAB];
-    s16 x, y, z;
-    u8 padE2[0xEC - 0xE2];
-    s16 hp;
-    u8 padEE[1];
-    u8 flagEF, padF0, tick;
-    u16 timer;
-    void (*callback)(void);
-};
-void SpatialIndex_SetPosition(void *, s32, s32, s32);
-void SpatialIndex_InsertEntry(void *);
-u8 Collectible_IsNearPlayer(void *);
-void Collectible_StartDeath(void);
-void Sound_PlaySong(u32);
-void AnimData_SelectPaletteBank(void *, s32);
-static inline u8 Collectible_ReadHit(u8 *hp)
-{
-    return *hp;
-}
-void Collectible_UpdateEntry(struct Col *p)
-{
-    struct Render *render;
-    u32 *flagsPtr;
-    u8 *ep;
-    if (p->tick) {
-        s16 *yp, *zp, *xp;
-        void *entry;
-        yp = &p->y;
-        p->screenY = *yp - gSceneCamera->screenY;
-        zp = &p->z;
-        p->screenZ = *zp;
-        p->render.flags &= ~1;
-        {
-            void *e = p->bodyEntry;
-            s32 x, y, z;
-            xp = &p->x;
-            x = *xp;
-            y = *yp;
-            y -= 0x60;
-            z = *zp;
-            SpatialIndex_SetPosition(e, x, y - z, z);
-        }
-        entry = &p->entryFlags;
-        {
-            s32 x = *xp;
-            s32 y = *yp;
-            s32 z;
-            y -= 0x60;
-            z = *zp;
-            SpatialIndex_SetPosition(entry, x, y - z, z);
-        }
-        SpatialIndex_InsertEntry(entry);
-        render = &p->render;
-        DisplaySequence_StepSprite((struct DisplaySequenceSprite *)render, &p->sequence);
 
-        p->tick = 0;
+// Per-frame update of a pooled collectible: animates, tests proximity and handles pickup hit.
+void Collectible_UpdateEntry(struct Collectible *item)
+{
+    if (item->entered) {
+        item->sprite.position.y = item->y - ((struct Camera *)gSceneCamera)->screenY;
+        item->sprite.position.z = item->z;
+        item->sprite.flags &= ~1;
+        SpatialIndex_SetPosition(&item->pickup, item->x, item->y - (item->z + 0x60), item->z);
+        SpatialIndex_SetPosition(&item->body, item->x, item->y - (item->z + 0x60), item->z);
+        SpatialIndex_InsertEntry(&item->body);
+        DisplaySequence_StepSprite(&item->sprite, &item->sequence);
+        item->entered = 0;
     }
-    p->screenX = p->x - gSceneCamera->screenX;
-    if (Collectible_IsNearPlayer(p)) {
-        u32 *f;
-        u32 m;
-        SpatialIndex_InsertEntry(p->bodyEntry);
-        f = &p->entryFlags;
-        m = ~1;
-        *f &= m;
-        flagsPtr = f;
+    item->sprite.position.x = item->x - ((struct Camera *)gSceneCamera)->screenX;
+    if (Collectible_IsNearPlayer(item)) {
+        struct SpatialEntry *body;
+        u32 mask;
+        SpatialIndex_InsertEntry(&item->pickup);
+        body = &item->body;
+        mask = ~1;
+        body->flags &= mask;
     } else {
-        u32 *f = &p->entryFlags;
-        u32 one = 1;
-        *f |= one;
-        flagsPtr = f;
+        struct SpatialEntry *body = &item->body;
+        u32 mask = 1;
+        body->flags |= mask;
     }
-    {
-        u8 *hp;
-        u32 hit;
-        hp = &p->hitFlag;
-        hit = Collectible_ReadHit(hp);
-        ep = &p->flagEF;
-        if (hit == 1) {
-            p->hp -= p->hit;
-            *hp = 0;
-            p->hit = 0;
-            *ep = 8;
-            if (p->hp <= 0) {
-                *flagsPtr |= hit;
-                p->callback = Collectible_StartDeath;
-                p->tick = hit;
-            } else {
-                Sound_PlaySong(0x13E);
-            }
+    if (item->body.hit == 1) {
+        item->health -= item->body.kind;
+        item->body.hit = 0;
+        item->body.kind = 0;
+        item->flash = 8;
+        if (item->health <= 0) {
+            item->body.flags |= 1;
+            item->update = Collectible_StartDeath;
+            item->entered = 1;
+        } else {
+            Sound_PlaySong(0x13E);
         }
     }
-    if (*ep) {
-        AnimData_SelectPaletteBank(p, 0x192);
-        (*ep)--;
+    if (item->flash) {
+        AnimData_SelectPaletteBank(item->graphics, 0x192);
+        item->flash--;
     } else {
-        AnimData_SelectPaletteBank(p, 0x104);
+        AnimData_SelectPaletteBank(item->graphics, 0x104);
     }
 }
