@@ -271,3 +271,4 @@ src/bosses/sabata/reactions.c	Sabata_UpdateChargePaletteSequence	machine-shaped	
 src/bosses/sabata/sub_0817F330.c	sub_0817F330	machine-shaped	partial	5	kept body pointer and delta/distance pair
 src/bosses/sabata/Sabata_RunUnpausedStateCallback.c	Sabata_RunUnpausedStateCallback	natural	natural	0	
 src/bosses/sabata/Sabata_ApplyPendingDamage.c	Sabata_ApplyPendingDamage	machine-shaped	partial	3	kept base alias and flag/health pointers
+src/bosses/sabata/Sabata_UpdateFrame.c	Sabata_UpdateFrame	machine-shaped	partial	3	kept owner alias, shake products and do/while target loop

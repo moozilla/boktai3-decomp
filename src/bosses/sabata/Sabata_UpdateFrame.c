@@ -51,70 +51,69 @@ s32 Math_Atan2(s32, s32);
 
 void Sabata_UpdateFrame(struct SabataTick *p)
 {
-    struct SabataTick *actor = p;
     struct SabataTick *owner = p;
     struct Sprite *sprite = &p->sprite;
     s32 i;
-    sub_0817B2DC(actor);
-    if (SceneActorState_TestFlags((struct StateActor *)actor, 0x80000))
-        actor->cell = 0;
-    else if (!actor->cell) {
-        CellObject_Init(actor->cellObject, &actor->sprite.position);
-        actor->cell = actor->cellObject;
+    sub_0817B2DC(p);
+    if (SceneActorState_TestFlags((struct StateActor *)p, 0x80000))
+        p->cell = 0;
+    else if (!p->cell) {
+        CellObject_Init(p->cellObject, &p->sprite.position);
+        p->cell = p->cellObject;
     }
     Obj_StepPosition(sprite);
-    NavMesh_UpdateProbe(actor->probe, &sprite->position);
-    SceneActors_UpdateAnimation(owner, actor->animation, actor->animationState);
-    actor->renderPosition.x = sprite->position.x;
-    actor->renderPosition.y = sprite->position.y;
-    actor->renderPosition.z = sprite->position.z;
+    NavMesh_UpdateProbe(p->probe, &sprite->position);
+    SceneActors_UpdateAnimation(owner, p->animation, p->animationState);
+    p->renderPosition.x = sprite->position.x;
+    p->renderPosition.y = sprite->position.y;
+    p->renderPosition.z = sprite->position.z;
     if (SceneActorState_TestFlags((struct StateActor *)owner, 0x20000)) {
         s32 product, x, z;
-        product = gUnk_086149C4[(actor->shakeAngle + 64) & 255] * (actor->shakeAmp << 2);
+        product = gUnk_086149C4[(p->shakeAngle + 64) & 255] * (p->shakeAmp << 2);
         if (product >= 0)
             x = product >> 12;
         else
             x = -(-product >> 12);
-        actor->renderPosition.x += x;
-        product = gUnk_086149C4[actor->shakeAngle] * (actor->shakeAmp << 2);
+        p->renderPosition.x += x;
+        product = gUnk_086149C4[p->shakeAngle] * (p->shakeAmp << 2);
         if (product >= 0)
             z = product >> 12;
         else
             z = -(-product >> 12);
-        actor->renderPosition.z += z;
+        p->renderPosition.z += z;
     }
-    if (actor->shake2) {
+    if (p->shake2) {
         u32 angle;
         s32 product, x, z;
         gRandomIndex = (gRandomIndex + 1) & 1023;
         angle = *(u16 *)(RANDOM_TABLE_ADDR + (gRandomIndex << 1));
-        product = gUnk_086149C4[(angle + 64) & 255] * (actor->shake2 << 2);
+        product = gUnk_086149C4[(angle + 64) & 255] * (p->shake2 << 2);
         if (product >= 0)
             x = product >> 12;
         else
             x = -(-product >> 12);
-        actor->renderPosition.x += x;
-        product = gUnk_086149C4[angle & 255] * (actor->shake2 << 2);
+        p->renderPosition.x += x;
+        product = gUnk_086149C4[angle & 255] * (p->shake2 << 2);
         if (product >= 0)
             z = product >> 12;
         else
             z = -(-product >> 12);
-        actor->renderPosition.z += z;
-        actor->shake2--;
+        p->renderPosition.z += z;
+        p->shake2--;
     }
-    if (actor->b475 <= 0x59)
-        actor->b475++;
+    if (p->b475 <= 0x59)
+        p->b475++;
     else
-        actor->b474 = 0;
-    if (actor->w4E6 == 0)
-        actor->b4E5 = 0;
+        p->b474 = 0;
+    if (p->w4E6 == 0)
+        p->b4E5 = 0;
     else {
-        actor->w4E6--;
-        actor->b4E5 = 1;
+        p->w4E6--;
+        p->b4E5 = 1;
     }
     SceneActors_UpdateTargetMetrics(owner);
     i = 0;
-    if (i < actor->targetCount) {
+    if (i < p->targetCount) {
         struct Sprite *base = &owner->sprite;
         do {
             struct Vec *target = owner->targets[i];
@@ -125,6 +124,6 @@ void Sabata_UpdateFrame(struct SabataTick *p)
                 owner->distances[i] = x * x + z * z;
             }
             i++;
-        } while (i < actor->targetCount);
+        } while (i < p->targetCount);
     }
 }
