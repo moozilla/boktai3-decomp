@@ -66,26 +66,15 @@ u32 Modifier_ReadPackedValue(u32 k, s32 n)
 /* Modifier_EnumerateSelection: Fills an output array with selected bit indices in ascending order and returns the count */
 
 
-static inline void Fill(s32 *p, s32 v, s32 n)
-{
-    s32 *q = p + n - 1;
-    do {
-        *q = v;
-        q--;
-    } while ((s32)q >= (s32)p);
-}
-
 s32 Modifier_EnumerateSelection(struct ModifierSelection *p, s32 *out)
 {
-    s32 *w;
     s32 n, i;
-    Fill(out, -1, 16);
+    for (i = 0; i < 16; i++)
+        out[i] = -1;
     n = 0;
-    for (i = 0, w = out; i <= 23; i++) {
-        if (Modifier_TestSelection(p, i) && n <= p->count) {
-            *w++ = i;
-            n++;
-        }
+    for (i = 0; i < 24; i++) {
+        if (Modifier_TestSelection(p, i) && n <= p->count)
+            out[n++] = i;
     }
     return n;
 }
