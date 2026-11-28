@@ -92,15 +92,11 @@ void TilemapPanel_DrawRegion(struct TilemapPanel *panel, s32 col, s32 row, s32 x
 
 void SceneTilemap_WaitCopyDelay(void)
 {
-    s32 row = 0;
-    do {
-        s32 next = row + 1;
-        s32 column = 31;
-        do {
-            column--;
-        } while (column >= 0);
-        row = next;
-    } while (row <= 0);
+    s32 i;
+    s32 j;
+    for (i = 0; i < 1; i++)
+        for (j = 0; j < 32; j++)
+            ;
 }
 
 void TilemapPanel_StreamColumns(struct TilemapPanel *panel)
