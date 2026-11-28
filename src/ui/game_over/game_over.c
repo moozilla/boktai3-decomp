@@ -231,14 +231,13 @@ void GameOver_InitOverlay(struct GameOver *panel)
 void GameOver_StartFromScript(void)
 {
     struct GameOver *panel = gGameOver;
-    if (panel != 0) {
+
+    if (panel) {
         GameOver_ShowGraphics(panel);
         Hud_SetMode(7);
         panel->closeState = 1;
-        if (Script_SeekToKeyword(0x66) != 0) {
-            if (Script_GetValue() != 0)
-                ScreenTransition_SendCommand(3, 5, 4, 4, 4, 0x1fff, 2);
-        }
+        if (Script_SeekToKeyword('f') && Script_GetValue())
+            ScreenTransition_SendCommand(3, 5, 4, 4, 4, 0x1FFF, 2);
     }
 }
 
