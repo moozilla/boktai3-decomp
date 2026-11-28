@@ -1,10 +1,5 @@
 #include "scene/actor/scene_actor_palette.h"
-static inline u8 Test(u32 value, u32 mask)
-{
-    if (value & mask)
-        return TRUE;
-    return FALSE;
-}
+#include "engine/word_flags.h"
 void SceneActorPalette_BeginTransition(u32 destinationBank, u32 sourceBank, u32 unused,
                                        s32 category, u32 auxiliaryFlag)
 {
@@ -13,7 +8,6 @@ void SceneActorPalette_BeginTransition(u32 destinationBank, u32 sourceBank, u32 
     const u16 *destination;
     const u16 *source;
     s32 i;
-    u32 activeFlag;
     if (!manager)
         return;
     switch (category) {
@@ -30,10 +24,9 @@ void SceneActorPalette_BeginTransition(u32 destinationBank, u32 sourceBank, u32 
     destination = (const u16 *)(gPaletteBankData + destinationBank * 32);
     source = (const u16 *)(gPaletteBankData + sourceBank * 32);
     transition->destinationBank = destinationBank;
-    activeFlag = 0x2000;
     for (i = 0; i < 16; i++) {
         s32 base;
-        if (Test(manager->flags, activeFlag) && transition->remaining != 32)
+        if (WordFlags_Has(0x2000, &manager->flags) && transition->remaining != 32)
             base = transition->colors[i];
         else
             base = source[i];
@@ -44,16 +37,10 @@ void SceneActorPalette_BeginTransition(u32 destinationBank, u32 sourceBank, u32 
         transition->green[i] = ((base >> 5) & 31) << 5;
         transition->blue[i] = ((base >> 10) & 31) << 5;
     }
-    {
-        u32 mask = 0x2000;
-        manager->flags |= mask;
-    }
+    WordFlags_Set(0x2000, &manager->flags);
     transition->remaining = 32;
-    if (auxiliaryFlag) {
-        u32 mask = 0x20000;
-        manager->flags |= mask;
-    } else {
-        u32 mask = ~0x20000;
-        manager->flags &= mask;
-    }
+    if (auxiliaryFlag)
+        WordFlags_Set(0x20000, &manager->flags);
+    else
+        WordFlags_And(~0x20000, &manager->flags);
 }
