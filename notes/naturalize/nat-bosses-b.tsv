@@ -191,3 +191,4 @@ src/bosses/sabata/position_target.c	SabataPosition_SaveSelectedPoint	natural	nat
 src/bosses/sabata/position_effects.c	SceneActors_RemoveConvergingParticles	machine-shaped	natural	2	
 src/bosses/sabata/position_effects.c	SceneActors_UpdateConvergingParticles	machine-shaped	partial	6	draw alias declaration remains where the particle copy is needed
 src/bosses/sabata/position_effects.c	SceneActors_SpawnConvergingParticle	machine-shaped	partial	8	kept draw alias for position copy (ROM keeps a second pointer)
+src/bosses/sabata/position_effects.c	SabataPosition_BeginReaction	machine-shaped	partial	10	kept state/request temporaries, pointer and zero locals (constant load order)

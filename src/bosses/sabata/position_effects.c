@@ -144,7 +144,6 @@ static inline void SabataPosition_StartReaction(struct SabataActorState *actor, 
 int SabataPosition_BeginReaction(struct SabataActorState *actor, int kind, int damage)
 {
     struct SceneActorBody *body = &actor->body;
-    int initialPhase;
     void (*callback)(void *);
     u32 requestedState;
     switch (kind) {
@@ -153,8 +152,7 @@ int SabataPosition_BeginReaction(struct SabataActorState *actor, int kind, int d
             actor->vitality += damage;
             actor->lastDamage = damage;
             Sabata_BeginCombatPhase(actor, 2);
-            initialPhase = 0;
-            SabataPosition_StartReaction(actor, initialPhase, 0);
+            SabataPosition_StartReaction(actor, 0, 0);
             callback = Sabata_UpdateHitJitter;
             state = 0xb;
             actor->controlPhase = state;
@@ -172,10 +170,7 @@ int SabataPosition_BeginReaction(struct SabataActorState *actor, int kind, int d
                 int rq = 0xc;
                 actor->state = rq;
             }
-            {
-                int angle = body->direction + 0x80;
-                actor->direction = angle;
-            }
+            actor->direction = body->direction + 0x80;
             break;
         case 1: {
             int angle = ((struct ActorDamageSource *)actor->damageTarget)->direction;
