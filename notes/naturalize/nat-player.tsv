@@ -279,3 +279,4 @@ src/player/core/Player_ApplyLatchedActionMode.c	Player_ApplyLatchedActionMode	na
 src/player/core/PlayerContact_UpdateThresholdEvent.c	PlayerContact_UpdateThresholdEvent	contrived	natural	3	
 src/player/core/Player_Update.c	Player_Update	minor	minor	2	positive reset value block local; void-pointer prototypes
 src/player/core/Player_InitializeFromScript.c	Player_InitializeFromScript	contrived	minor	5	data/sprite/state pointer locals
+src/player/core/Player_Destroy.c	Player_Destroy	minor	natural	1	

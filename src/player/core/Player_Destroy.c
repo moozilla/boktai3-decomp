@@ -1,4 +1,3 @@
-#define Player_RemoveEffects Player_DestroyEffects
 #include "global.h"
 #include "player/player.h"
 #include "engine/ram.h"
