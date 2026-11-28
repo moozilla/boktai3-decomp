@@ -6,11 +6,6 @@
 void Vanargand_SetPendingCue(void *, u16);
 u8 Callback_InvokeActor(void *, void *);
 void Vanargand_SetPairedMotionParameter(void *, u16);
-static inline s32 RandomValue(void)
-{
-    gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-    return *(u16 *)((gRandomIndex << 1) + (u32)gRandomTable);
-}
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, int, int, int);
 void Sound_PlaySong(u32);
 void Vanargand_UpdateChargedPairAttack(struct VanargandPairAttack *p)
@@ -26,10 +21,9 @@ void Vanargand_UpdateChargedPairAttack(struct VanargandPairAttack *p)
     if (result)
         return;
     if (p->pending) {
-        p->pending = result;
-        p->phase = result;
-        p->timer = result;
-        p->repeats = result;
+        p->pending = 0;
+        VanargandPairAttack_EnterPhase(p, 0);
+        p->repeats = 0;
     }
     switch (p->phase) {
         case 0:
@@ -40,10 +34,7 @@ void Vanargand_UpdateChargedPairAttack(struct VanargandPairAttack *p)
             }
             self->delay = 2;
             if (p->action > 3) {
-                p->phase = 1;
-                {
-                    p->timer = 0;
-                }
+                VanargandPairAttack_EnterPhase(p, 1);
             }
             break;
         case 1:
@@ -52,9 +43,7 @@ void Vanargand_UpdateChargedPairAttack(struct VanargandPairAttack *p)
                 p->timer++;
             }
             if (PairedSceneActor_AreSelectedHalvesFinished(self->pair)) {
-                u8 next = 2;
-                p->phase = next;
-                p->timer = 0;
+                VanargandPairAttack_EnterPhase(p, 2);
             }
             break;
         case 2:
@@ -78,9 +67,7 @@ void Vanargand_UpdateChargedPairAttack(struct VanargandPairAttack *p)
             if (p->timer == 0)
                 PairedSceneActor_ApplyToSelectedHalves(self->pair, 3, 0x17);
             if (++p->timer > 119) {
-                u8 next = 4;
-                p->phase = next;
-                p->timer = 0;
+                VanargandPairAttack_EnterPhase(p, 4);
             }
             break;
         case 4:
