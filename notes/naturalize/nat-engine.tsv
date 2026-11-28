@@ -252,3 +252,8 @@ src/engine/video/background_layers.c	Bg_UploadTileEntries	contrived	natural	9
 src/engine/video/background_layers.c	Bg_CopyTiles	minor	natural	9	
 src/engine/video/background_layers.c	Bg_SetupLayers	contrived	minor	12	origin and size pass through locals: storing the expressions directly reorders the entry reads
 src/engine/video/background_layers.c	Bg_SetLayerMap	contrived	minor	4	size through u16 locals: reading entry fields twice emits extra loads
+src/engine/video/background_layers.c	Bg_ResetScale	natural	natural		
+src/engine/video/background_layers.c	Bg_GetMapRow	natural	natural		
+src/engine/video/background_layers.c	Bg_SetupLayer	natural	natural		
+src/engine/video/background_layers.c	Text_DrawNumber	minor	minor	0	DIGIT macro per decimal place, as the ROM unrolls it
+src/engine/video/background_tilemap.c	BgGfx_LoadTilemap	minor	minor	5	screenX reused for the exposed row: a separate local swaps registers (18 insns); metatile column macro

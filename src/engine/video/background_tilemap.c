@@ -116,79 +116,75 @@ void BgGfx_LoadTilemap(u32 layer, s32 tileX, s32 tileY, s32 screenX, s32 screenY
                 }
             } else {
                 if (deltaX) {
+                    s32 blockX, blockRow, metatileX, y;
                     column = 0;
                     if (deltaX > 0)
                         column = 31;
-                    {
-                        s32 blockX, blockRow, metatileX, y;
-                        columnX = tileX + column;
-                        if (columnX < 0 || columnX >= width) {
-                            columnX &= 31;
-                            for (rowOffset = 0; rowOffset < 32; rowOffset += 2) {
-                                y = (tileY + rowOffset) & 31;
+                    columnX = tileX + column;
+                    if (columnX < 0 || columnX >= width) {
+                        columnX &= 31;
+                        for (rowOffset = 0; rowOffset < 32; rowOffset += 2) {
+                            y = (tileY + rowOffset) & 31;
+                            window[columnX + (y << 5)] = fill;
+                            window[columnX + ((y + 1) << 5)] = fill;
+                        }
+                    } else {
+                        blockX = ScreenBlock(columnX);
+                        columnX &= 31;
+                        metatileX = columnX >> 1;
+                        for (rowOffset = 0; rowOffset < 32; rowOffset += 2) {
+                            y = tileY + rowOffset;
+                            if (y < 0 || y >= height) {
+                                y &= 31;
                                 window[columnX + (y << 5)] = fill;
                                 window[columnX + ((y + 1) << 5)] = fill;
-                            }
-                        } else {
-                            blockX = ScreenBlock(columnX);
-                            columnX &= 31;
-                            metatileX = columnX >> 1;
-                            for (rowOffset = 0; rowOffset < 32; rowOffset += 2) {
-                                y = tileY + rowOffset;
-                                if (y < 0 || y >= height) {
-                                    y &= 31;
-                                    window[columnX + (y << 5)] = fill;
-                                    window[columnX + ((y + 1) << 5)] = fill;
-                                } else {
-                                    blockRow = y >> 5;
-                                    block = (blockX + blockRow * pitch) << 8;
-                                    y &= 31;
-                                    WRITE_METATILE_COLUMN(window, tiles,
-                                                          map[block + metatileX + ((y >> 1) << 4)],
-                                                          columnX, (y << 5), ((y + 1) << 5));
-                                }
+                            } else {
+                                blockRow = y >> 5;
+                                block = (blockX + blockRow * pitch) << 8;
+                                y &= 31;
+                                WRITE_METATILE_COLUMN(window, tiles,
+                                                      map[block + metatileX + ((y >> 1) << 4)],
+                                                      columnX, (y << 5), ((y + 1) << 5));
                             }
                         }
                     }
                 }
                 if (deltaY) {
+                    s32 row, nextRow, blockX, blockRow, metatileRow;
                     rowOffset = 0;
                     if (deltaY > 0)
                         rowOffset = 30;
-                    {
-                        s32 row, nextRow, blockX, blockRow, metatileRow;
-                        /* The scroll value was saved to the record above. Reuse it for the exposed row. */
-                        screenX = tileY + rowOffset;
-                        if (screenX < 0 || screenX >= height) {
-                            screenX &= 31;
-                            row = screenX << 5;
-                            nextRow = (screenX + 1) << 5;
-                            for (column = 0; column < 32; column++) {
-                                columnX = (tileX + column) & 31;
+                    /* The scroll value was saved to the record above. Reuse it for the exposed row. */
+                    screenX = tileY + rowOffset;
+                    if (screenX < 0 || screenX >= height) {
+                        screenX &= 31;
+                        row = screenX << 5;
+                        nextRow = (screenX + 1) << 5;
+                        for (column = 0; column < 32; column++) {
+                            columnX = (tileX + column) & 31;
+                            window[columnX + row] = fill;
+                            window[columnX + nextRow] = fill;
+                        }
+                    } else {
+                        blockRow = ScreenBlock(screenX);
+                        blockRow *= pitch;
+                        screenX &= 31;
+                        metatileRow = (screenX >> 1) << 4;
+                        row = screenX << 5;
+                        nextRow = (screenX + 1) << 5;
+                        for (column = 0; column < 32; column++) {
+                            columnX = tileX + column;
+                            if (columnX < 0 || columnX >= width) {
+                                columnX &= 31;
                                 window[columnX + row] = fill;
                                 window[columnX + nextRow] = fill;
-                            }
-                        } else {
-                            blockRow = ScreenBlock(screenX);
-                            blockRow *= pitch;
-                            screenX &= 31;
-                            metatileRow = (screenX >> 1) << 4;
-                            row = screenX << 5;
-                            nextRow = (screenX + 1) << 5;
-                            for (column = 0; column < 32; column++) {
-                                columnX = tileX + column;
-                                if (columnX < 0 || columnX >= width) {
-                                    columnX &= 31;
-                                    window[columnX + row] = fill;
-                                    window[columnX + nextRow] = fill;
-                                } else {
-                                    blockX = columnX >> 5;
-                                    block = (blockX + blockRow) << 8;
-                                    columnX &= 31;
-                                    WRITE_METATILE_COLUMN(window, tiles,
-                                                          map[block + (columnX >> 1) + metatileRow],
-                                                          columnX, row, nextRow);
-                                }
+                            } else {
+                                blockX = columnX >> 5;
+                                block = (blockX + blockRow) << 8;
+                                columnX &= 31;
+                                WRITE_METATILE_COLUMN(window, tiles,
+                                                      map[block + (columnX >> 1) + metatileRow],
+                                                      columnX, row, nextRow);
                             }
                         }
                     }
