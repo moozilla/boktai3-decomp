@@ -645,3 +645,4 @@ src/system/save/GameStats_SelectLeadingCounter.c	GameStats_SelectLeadingCounter	
 src/system/save/sub_082280F8.c	sub_082280F8	contrived	minor	1	values live in a byte-array field of the shared header, read through an s16 cast
 src/system/save/Time_GetSavedRegion.c	Time_GetSavedRegion	minor	natural	1	
 src/system/save/SaveData_GetPoints.c	SaveData_GetPoints	minor	natural	1	
+src/system/save/SaveData_GetCounterA.c	SaveData_GetCounterA	minor	natural	1	
