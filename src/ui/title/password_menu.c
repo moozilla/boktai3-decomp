@@ -1,4 +1,5 @@
 #include "ui/title/password_menu.h"
+#include "gba/io_reg.h"
 #include "engine/video/palette_pulse.h"
 #include "engine/video/render.h"
 #include "system/game_state/game_state.h"
@@ -453,9 +454,9 @@ void PasswordMenu_Update(struct PasswordMenu *p)
         case 0:
             p->verticalHistory <<= 1;
             p->horizontalHistory <<= 1;
-            if (gPadState[0] & 0xC0)
+            if (gPadState[0] & (DPAD_UP | DPAD_DOWN))
                 p->verticalHistory |= 1;
-            if (gPadState[0] & 0x30)
+            if (gPadState[0] & (DPAD_LEFT | DPAD_RIGHT))
                 p->horizontalHistory |= 1;
             if (p->verticalHistory == 0xFFFF)
                 p->verticalRepeat++;
@@ -465,17 +466,19 @@ void PasswordMenu_Update(struct PasswordMenu *p)
                 p->horizontalRepeat++;
             else
                 p->horizontalRepeat = 1;
-            if ((gPadState[1] & 0x40) || (Mod(p->verticalRepeat, 5) == 0 && (gPadState[0] & 0x40)))
+            if ((gPadState[1] & DPAD_UP) ||
+                (Mod(p->verticalRepeat, 5) == 0 && (gPadState[0] & DPAD_UP)))
                 PasswordMenu_MoveCursorUp(p);
-            if ((gPadState[1] & 0x80) || (Mod(p->verticalRepeat, 5) == 0 && (gPadState[0] & 0x80)))
+            if ((gPadState[1] & DPAD_DOWN) ||
+                (Mod(p->verticalRepeat, 5) == 0 && (gPadState[0] & DPAD_DOWN)))
                 PasswordMenu_MoveCursorDown(p);
-            if ((gPadState[1] & 0x10) ||
-                (Mod(p->horizontalRepeat, 5) == 0 && (gPadState[0] & 0x10)))
+            if ((gPadState[1] & DPAD_RIGHT) ||
+                (Mod(p->horizontalRepeat, 5) == 0 && (gPadState[0] & DPAD_RIGHT)))
                 PasswordMenu_MoveCursorRight(p);
-            if ((gPadState[1] & 0x20) ||
-                (Mod(p->horizontalRepeat, 5) == 0 && (gPadState[0] & 0x20)))
+            if ((gPadState[1] & DPAD_LEFT) ||
+                (Mod(p->horizontalRepeat, 5) == 0 && (gPadState[0] & DPAD_LEFT)))
                 PasswordMenu_MoveCursorLeft(p);
-            if (gPadState[1] & 1) {
+            if (gPadState[1] & A_BUTTON) {
                 if (p->selection != 0x41) {
                     Sound_PlaySong(0xDD);
                     if (PasswordMenu_AppendSelection(p)) {
@@ -485,7 +488,7 @@ void PasswordMenu_Update(struct PasswordMenu *p)
                 } else
                     p->state = 1;
             }
-            if (gPadState[1] & 2) {
+            if (gPadState[1] & B_BUTTON) {
                 Sound_PlaySong(0xDE);
                 if (PasswordMenu_EraseSelection(p)) {
                     Menu_StartFadeOut(p->fadeShift);
@@ -493,7 +496,7 @@ void PasswordMenu_Update(struct PasswordMenu *p)
                     p->state = 2;
                 }
             }
-            if (gPadState[1] & 8) {
+            if (gPadState[1] & START_BUTTON) {
                 if (p->selection != 0x41) {
                     Sound_PlaySong(0xDC);
                     p->selection = 0x41;
@@ -501,11 +504,11 @@ void PasswordMenu_Update(struct PasswordMenu *p)
                 } else
                     p->state = 1;
             }
-            if (gPadState[1] & 0x200) {
+            if (gPadState[1] & L_BUTTON) {
                 if (p->position > 0)
                     p->position--;
                 Sound_PlaySong(0xDC);
-            } else if (gPadState[1] & 0x100) {
+            } else if (gPadState[1] & R_BUTTON) {
                 if (p->position <= 22)
                     p->position++;
                 Sound_PlaySong(0xDC);
@@ -524,14 +527,10 @@ void PasswordMenu_Update(struct PasswordMenu *p)
             {
                 u8 *name = PlayerName_GetBuffer();
                 s32 i;
-                i = 0;
-                do {
-                    u32 ch = *name;
-                    if (ch == 0 && i <= 8)
-                        name[1] = ch;
-                    name++;
-                    i++;
-                } while (i <= 9);
+                for (i = 0; i < 10; name++, i++) {
+                    if (*name == 0 && i <= 8)
+                        name[1] = 0;
+                }
             }
             if (code == 0) {
                 Sound_PlaySong(0x296);
