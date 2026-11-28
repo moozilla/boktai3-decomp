@@ -3,12 +3,12 @@
 #include "engine/engine.h"
 #include "engine/math/monster_particle_random.h"
 #include "player/player.h"
-#include "npc/story_character/state_actor.h"
+#include "npc/manager/scene_actor_lifecycle.h"
 
 s32 DisplayAnimation_TestFinished(struct DisplayAnimation *);
 
-s32 ImpactParticleGroup_SpawnRadial(s32, s32, struct StateActorPos *, s32, s32, s32, s32, s32, s32,
-                                    s32, s32);
+s32 ImpactParticleGroup_SpawnRadial(s32, s32, struct ContactPosition *, s32, s32, s32, s32, s32,
+                                    s32, s32, s32);
 void PlayerCue_BeginModeSeven(struct Player *, s32);
 
 static inline u8 Burst_RollSound(void)
@@ -18,13 +18,13 @@ static inline u8 Burst_RollSound(void)
 }
 
 static inline void Burst_EmitOuter(const u16 *table, u8 variance, s32 angle,
-                                   struct StateActorPos *pos)
+                                   struct ContactPosition *pos)
 {
     s32 spread = ParticleRandom_ReadSample(table) & 63;
     ImpactParticleGroup_SpawnRadial(4, 0x26, pos, angle, spread, 12, 10, variance, 8, 8, variance);
 }
 
-static inline void Burst_EmitInner(const u16 *table, s32 angle, struct StateActorPos *pos)
+static inline void Burst_EmitInner(const u16 *table, s32 angle, struct ContactPosition *pos)
 {
     s32 spread = ParticleRandom_ReadSample(table) & 63;
     ImpactParticleGroup_SpawnRadial(2, 0x26, pos, angle, spread, 10, 4, 4, 4, 14, 4);
@@ -74,17 +74,17 @@ static inline u32 Burst_SelectAnimation(u8 kind, u32 selected)
     return animation;
 }
 
-void StoryCharacter_UpdateEightWayBurst(u32 context, struct StateActor *p, s32 tick)
+void StoryCharacter_UpdateEightWayBurst(u32 context, struct SceneActor *p, s32 tick)
 {
     u8 variance = 5;
     u32 animation;
-    if (p->enter != 0) {
-        p->enter = 0;
-        p->done = 0;
-        animation = Burst_SelectAnimation(p->kind, 8);
+    if (p->animationEntered != 0) {
+        p->animationEntered = 0;
+        p->finished = 0;
+        animation = Burst_SelectAnimation(p->variant, 8);
 
         Actor_PlayAnimationEntry(p, animation, 2, 0, 4);
-        p->phase = 0;
+        p->animationPhase = 0;
         {
             s32 choice = Burst_RollSound();
             if (choice <= 84)
@@ -95,40 +95,37 @@ void StoryCharacter_UpdateEightWayBurst(u32 context, struct StateActor *p, s32 t
                 Sound_PlaySong(0x2E0);
         }
     }
-    if ((u8)Callback_InvokeActor(p, p->animationCallback) == 1)
+    if ((u8)Callback_InvokeActor(p, p->query) == 1)
         return;
-    if ((p->phase == 0) && (tick == 3)) {
-        const u16 *table;
-        struct StateActorPos position = p->position;
+    if ((p->animationPhase == 0) && (tick == 3)) {
+        struct ContactPosition position = p->body.position;
         {
             u16 *x = (u16 *)&position.x;
-            u16 shifted = *x + 200;
-            *x = shifted;
+            *x += 200;
         }
-        table = gRandomTable;
-        Burst_EmitOuter(table, variance, 0, &position);
-        Burst_EmitOuter(table, variance, 64, &position);
-        Burst_EmitOuter(table, variance, 128, &position);
-        Burst_EmitOuter(table, variance, 192, &position);
+        Burst_EmitOuter(gRandomTable, variance, 0, &position);
+        Burst_EmitOuter(gRandomTable, variance, 64, &position);
+        Burst_EmitOuter(gRandomTable, variance, 128, &position);
+        Burst_EmitOuter(gRandomTable, variance, 192, &position);
 
-        Burst_EmitInner(table, 0, &position);
-        Burst_EmitInner(table, 64, &position);
-        Burst_EmitInner(table, 128, &position);
-        Burst_EmitInner(table, 192, &position);
+        Burst_EmitInner(gRandomTable, 0, &position);
+        Burst_EmitInner(gRandomTable, 64, &position);
+        Burst_EmitInner(gRandomTable, 128, &position);
+        Burst_EmitInner(gRandomTable, 192, &position);
         PlayerCue_BeginModeSeven(gPlayers[0], 2);
     }
-    if (DisplayAnimation_TestFinished((struct DisplayAnimation *)((u8 *)p + 0xD4))) {
-        switch (p->phase) {
+    if (DisplayAnimation_TestFinished(&p->drawable.common)) {
+        switch (p->animationPhase) {
             case 0:
-                animation = Burst_SelectAnimation(p->kind, 6);
+                animation = Burst_SelectAnimation(p->variant, 6);
 
                 Actor_PlayAnimationEntry(p, animation, 2, 0, 4);
-                p->phase++;
+                p->animationPhase++;
                 p->stateFrame = 0;
                 break;
             case 1:
-                p->done = 1;
-                p->phase++;
+                p->finished = 1;
+                p->animationPhase++;
                 p->stateFrame = 0;
                 break;
         }
