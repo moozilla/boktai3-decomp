@@ -1,9 +1,6 @@
-#include "global.h"
-struct O {
-    u8 f[8];
-    u32 fl;
-};
-void ResultGame_HideTargetMarker(u8 *p)
+#include "minigames/result_game/result_tutorial.h"
+
+void ResultGame_HideTargetMarker(struct ResultMenu *menu)
 {
-    ((struct O *)(p + 0x264))->fl |= 1;
+    AnimSprite_Hide(&menu->widgets[3]);
 }
