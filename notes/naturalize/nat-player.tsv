@@ -168,3 +168,4 @@ src/player/clone.c	PlayerClone_ReleaseSlot	contrived	natural	3	-
 src/player/clone.c	PlayerClone_DestroyPool	minor	natural	1	-
 src/player/clone.c	PlayerClone_InitializePool	contrived	natural	4	-
 src/player/clone.c	PlayerClone_FindFreeSlot	contrived	natural	2	-
+src/player/clone.c	PlayerClone_Spawn	contrived	minor	9	scratch struct and velocity-clear helper stay: direct CpuSet reorders the fill store

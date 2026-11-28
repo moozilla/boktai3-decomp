@@ -755,16 +755,12 @@ s32 PlayerClone_Spawn(struct PlayerCloneConfiguration *resource, struct ContactP
     } else {
         slot = PlayerClone_FindFreeSlot(pool, &scratch.index);
         if (slot) {
-            struct PlayerCloneConfiguration *handler = &slot->configuration;
-            struct AnimSprite *display;
-            struct ContactPosition *tmp;
-            Memory_Copy(handler, resource, sizeof(*resource));
+            Memory_Copy(&slot->configuration, resource, sizeof(*resource));
             slot->timer = 0;
             slot->behaviorPhase = 0;
             slot->paletteTimer = 0;
             slot->animationIndex = 0;
-            display = &slot->animation;
-            Anim_LoadKeyframe(display, &slot->resource, 0, 1);
+            Anim_LoadKeyframe(&slot->animation, &slot->resource, 0, 1);
             slot->speed = resource->speed;
             slot->animation.attribute1A = 2;
             slot->animation.position = *pos;
@@ -772,15 +768,14 @@ s32 PlayerClone_Spawn(struct PlayerCloneConfiguration *resource, struct ContactP
             slot->position.x = pos->x;
             slot->position.y = pos->y + 0x80;
             slot->position.z = pos->z;
-            tmp = Player_GetEffectivePosition(0);
-            slot->targetPosition = *tmp;
+            slot->targetPosition = *Player_GetEffectivePosition(0);
             {
                 struct ContactPosition *target = &slot->velocity;
                 scratch.fill = 0;
                 PlayerClone_ClearVelocity(&scratch.fill, target);
             }
-            display->flags |= 1;
-            PlayerClone_SetBehaviorCallback(handler, PlayerClone_UpdateBehavior);
+            AnimSprite_Hide(&slot->animation);
+            PlayerClone_SetBehaviorCallback(&slot->configuration, PlayerClone_UpdateBehavior);
             pool->activeSlots |= 1 << scratch.index;
             pool->count++;
             return scratch.index;
