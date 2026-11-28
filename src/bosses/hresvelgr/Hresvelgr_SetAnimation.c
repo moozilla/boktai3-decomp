@@ -19,8 +19,7 @@ struct HresvelgrAnim {
 void Hresvelgr_SetAnimation(struct HresvelgrAnimActor *actor, struct HresvelgrAnim *anim,
                             void *data, u32 index, u32 row, u32 flags)
 {
-    u8 *resetp = &actor->reset;
-    *resetp = 0;
+    actor->reset = 0;
     actor->index = index;
     Anim_SetKeyframes(anim, data, actor->index, (u16)row, (u16)flags);
     if (!(flags & 1))
