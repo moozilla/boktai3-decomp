@@ -1858,20 +1858,16 @@ u8 Mummy_RequestStraightRoute(struct ChaseActor *actor)
     struct Mummy *state = actor->base.context;
     struct SceneActorChaseGroup *nav = &actor->group;
     s32 dest;
-    s32 dir;
     struct ContactPosition pos;
-    u32 result;
 
     if (state->pursuitDelay)
         return 0;
-    dir = ((actor->base.body.direction + 0x20) >> 6) & 3;
-    dest = SceneActorTerrain_LastOpenCell(actor, dir);
+    dest = SceneActorTerrain_LastOpenCell(actor, (((actor->base.body.direction + 0x20) >> 6) & 3));
     if (dest == actor->base.terrainCell)
         return 0;
     SceneActorTerrain_GetCenter(dest, &pos);
     pos.y = actor->base.body.position.y;
-    result = SceneActorTerrain_RequestPath(actor, nav->route, &actor->base.body.position, &pos);
-    if (!result) {
+    if (!SceneActorTerrain_RequestPath(actor, nav->route, &actor->base.body.position, &pos)) {
         SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 0);
         SceneActorChase_SetState(actor, 3, 0, 0);
         return 0;
