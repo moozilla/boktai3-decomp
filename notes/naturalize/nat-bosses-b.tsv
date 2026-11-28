@@ -95,3 +95,4 @@ src/bosses/ratatosk/SceneActor_UpdateState1Command.c	SceneActor_UpdateState1Comm
 src/bosses/ratatosk/SceneActor_UpdateState24AndConditionalReturnCommand.c	SceneActor_UpdateState24AndConditionalReturnCommand	natural	natural	0	
 src/bosses/ratatosk/Ratatosk_UpdateScriptedState.c	Ratatosk_UpdateScriptedState	natural	natural	0	
 src/bosses/ratatosk/AnimationActor_ProcessKeys.c	AnimationActor_ProcessKeys	contrived	minor	7	second actor alias stays: ROM keeps a second copy of the pointer; index-first pointer add
+src/bosses/ratatosk/PreviewActor_UpdateHeading.c	PreviewActor_UpdateHeading	contrived	minor	4	second actor alias stays: ROM keeps a second copy of the pointer
