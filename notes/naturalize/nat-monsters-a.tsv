@@ -65,3 +65,4 @@ src/monsters/armor/armor_motion.c	Armor_UpdateNegativeTurn	natural	natural	0
 src/monsters/armor/armor_motion.c	Armor_UpdateWalkNormalWithScatterEffect	contrived	natural	1	
 src/monsters/armor/armor_motion.c	Armor_UpdateWalkFastWithTrailEffect	contrived	natural	1	
 src/monsters/armor/armor_motion.c	Armor_EnterFacingAnimation	contrived	natural	1	
+src/monsters/armor/actor_controller_transitions.c	ActorController_UpdateResetMotionTransition	contrived	natural	3	existing ActorController_ClearMotionFlags kept (field address stays based on motion)
