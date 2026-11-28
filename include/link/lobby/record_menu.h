@@ -30,7 +30,7 @@ struct RecordMenu {
     u8 textPanel[0x61c];
     u8 panelStorage[0xaa8];
     void (*update)(struct RecordMenu *);
-    u32 titleScript, choiceScript, recordScript;
+    const u8 *titleScript, *choiceScript, *recordScript;
     u8 pad14e8[4];
     u8 leaving, selection;
     u8 choice, pulsePhase;

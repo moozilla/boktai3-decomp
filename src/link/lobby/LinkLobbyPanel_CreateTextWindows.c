@@ -1,24 +1,16 @@
 #include "global.h"
-struct S {
-    u8 filler[0x14E0];
-    u32 g;
-    u8 pad[9];
-    u8 c;
-    u8 pad2[2];
-    u32 d;
-    u32 e;
-    u32 f;
-};
-u32 TextWindow_Create(s32, s32, s32, s32);
-void TextWindow_SetScript(u32, u32);
-void TextWindow_Refresh(u32, u32);
-void TextWindow_StartPlayback(u32);
-void LinkLobbyPanel_CreateTextWindows(struct S *s)
+#include "engine/engine.h"
+#include "link/lobby/record_menu.h"
+
+s32 TextWindow_Create(s32, s32, s32, s32);
+void TextWindow_StartPlayback(s32);
+
+void LinkLobbyPanel_CreateTextWindows(struct RecordMenu *menu)
 {
-    s->f = TextWindow_Create(1, 3, 0x1c, 2);
-    s->d = TextWindow_Create(1, 6, 0xa, 2);
-    s->e = TextWindow_Create(0x13, 6, 0xa, 2);
-    TextWindow_SetScript(s->f, s->g);
-    TextWindow_Refresh(s->f, s->c);
-    TextWindow_StartPlayback(s->f);
+    menu->titleWindow = TextWindow_Create(1, 3, 28, 2);
+    menu->nameWindows[0] = TextWindow_Create(1, 6, 10, 2);
+    menu->nameWindows[1] = TextWindow_Create(19, 6, 10, 2);
+    TextWindow_SetScript(menu->titleWindow, menu->choiceScript);
+    TextWindow_Refresh(menu->titleWindow, menu->selection);
+    TextWindow_StartPlayback(menu->titleWindow);
 }
