@@ -93,6 +93,7 @@ void Time_HandleRegionKeypad(struct RegionMenu *menu)
     s32 value = 1;
     struct ScriptCallArgs args;
     struct Rect16 rect;
+    u8 old;
     args.count = 1;
     args.values = &value;
     value = 1;
@@ -114,7 +115,6 @@ void Time_HandleRegionKeypad(struct RegionMenu *menu)
                 menu->state = 1;
                 menu->confirmed = 0;
             } else {
-                u8 old;
                 if (gPadState[1] & 0x100) {
                     if (++menu->page > 13)
                         menu->page = 1;
