@@ -204,3 +204,5 @@ src/player/control/Player_ResetLinkState.c	Player_ResetLinkState	natural	natural
 src/player/control/Player_BeginTerrainInteraction.c	Player_BeginTerrainInteraction	natural	natural	0	
 src/player/control/Player_BeginDirectionSequence.c	Player_BeginDirectionSequence	natural	natural	0	
 src/player/control/sub_08158E68.c	sub_08158E68	contrived	minor	1	followTarget halfword read at +6 (source type unknown)
+src/player/control/SceneActorControl_OnJitterPosition.c	SceneActorControl_OnJitterPosition	natural	natural	0	
+src/player/control/Player_BeginResourceStationInteraction.c	Player_BeginResourceStationInteraction	contrived	natural	1	
