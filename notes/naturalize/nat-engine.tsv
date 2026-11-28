@@ -48,3 +48,4 @@ src/engine/iwram_code.c	sub_080012E0	natural	natural	0
 src/engine/math/ScalarApproach_ClampCentered.c	ScalarApproach_ClampCentered	contrived	minor	1	assignment inside the condition
 src/engine/math/ScalarApproach_ClampAngle.c	ScalarApproach_ClampAngle	contrived	minor	1	assignment inside the condition
 src/engine/math/ScalarApproach_HalfAngle.c	ScalarApproach_HalfAngle	contrived	natural	1	
+src/engine/math/ScalarApproach_QuarterAngle.c	ScalarApproach_QuarterAngle	contrived	natural	1	
