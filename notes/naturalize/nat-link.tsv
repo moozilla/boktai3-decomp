@@ -251,3 +251,4 @@ src/link/player/Player_UpdateSlashAction.c	Player_UpdateSlashAction	contrived	mi
 src/link/player/sub_0823E704.c	sub_0823E704	natural	natural	0	
 src/link/player/Player_EmitScatterEffect.c	Player_EmitScatterEffect	minor	natural	3	
 src/link/player/Player_UpdateThrowArc.c	Player_UpdateThrowArc	minor	natural	5	attack collider position set through p-> chain, not the context pointer
+src/link/player/Player_UpdateTetherThrow.c	Player_UpdateTetherThrow	contrived	natural	1	
