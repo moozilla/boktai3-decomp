@@ -2,7 +2,6 @@
 #include "scene/actor/scene_actor_behavior.h"
 u8 *TerrainModifiers_FindCellOverride(u32, u32);
 #include "script/script_utility.h"
-#include "engine/word_flags.h"
 static inline struct TerrainCell *CellData(u32 cell)
 {
     struct TerrainCellOverride *override = (void *)TerrainModifiers_FindCellOverride(cell, 1);
@@ -15,8 +14,9 @@ void SceneActorBehavior_CallTerrainScript(struct RoomActor *actor)
     s32 values[12];
     struct ScriptUtilityArguments arguments;
     u32 script;
+    u32 mask = 0x80000;
     u32 flags;
-    if (Flags_MaskedWord(0x80000, &actor->statusFlags))
+    if (actor->statusFlags & mask)
         return;
     flags = CellData(actor->terrainCell)->flags;
     if (flags & 0x43)
