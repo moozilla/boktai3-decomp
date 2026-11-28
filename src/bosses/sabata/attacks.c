@@ -61,10 +61,8 @@ void ActorEffect_InitializeOffset(struct SabataAttackActor *actor)
     angle = ProjectileDirection(volume);
     x = gUnk_086149C4[(angle + 0x40) & 0xFF];
     z = gUnk_086149C4[angle & 0xFF];
-    x = ScaleQ12(0xB4 * x);
-    pos.x = pos.x + x;
-    z = ScaleQ12(0xB4 * z);
-    pos.z = pos.z + z;
+    pos.x += ScaleQ12(0xB4 * x);
+    pos.z += ScaleQ12(0xB4 * z);
     Projectile_CreateForOwner(&actor->projectileParameters, (s16 *)&pos, 1);
 }
 

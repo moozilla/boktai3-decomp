@@ -248,3 +248,9 @@ src/bosses/sabata/SceneActorState_WaitForFlagClear.c	SceneActorState_WaitForFlag
 src/bosses/sabata/Sabata_RunVariantCallback.c	Sabata_RunVariantCallback	natural	natural	0	
 src/bosses/sabata/Sabata_RunGuardedPhaseCallback.c	Sabata_RunGuardedPhaseCallback	natural	natural	0	
 src/bosses/sabata/Sabata_SelectCombatAction.c	Sabata_SelectCombatAction	machine-shaped	machine-shaped	9	kept address-returning accessors, second actor alias, zero local at the end and random inline: each plain replacement changes the code
+src/bosses/sabata/Sabata_RunPhaseEntryCallback.c	Sabata_RunPhaseEntryCallback	natural	natural	0	
+src/bosses/sabata/Sabata_RunPhaseExitCallback.c	Sabata_RunPhaseExitCallback	natural	natural	0	
+src/bosses/sabata/Sabata_ResetAndRunPhaseCallback.c	Sabata_ResetAndRunPhaseCallback	natural	natural	0	
+src/bosses/sabata/ActorAnimation_UpdateDirectional.c	ActorAnimation_UpdateDirectional	natural	natural	0	
+src/bosses/sabata/attacks.c	ActorEffect_UpdateTimedSequence	natural	natural	0	
+src/bosses/sabata/attacks.c	ActorEffect_InitializeOffset	machine-shaped	partial	3	kept origin setter with its zero local and x/z temporaries
