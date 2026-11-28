@@ -233,22 +233,14 @@ void SabataImpact_FindNearbyPoint(struct SabataActorImpact *actor, struct Contac
     struct ContactPosition *center = &actor->body.position;
     for (; attempt <= 7; attempt++) {
         u32 angle = (start + (attempt << 5)) & mask;
-        {
-            s32 x = SabataImpact_TruncateFixed(gUnk_086149C4[(angle + 64) & mask] * 256);
-            components->x = x;
-            components->y = 0;
-        }
+        s32 x = SabataImpact_TruncateFixed(gUnk_086149C4[(angle + 64) & mask] * 256);
+        components->x = x;
+        components->y = 0;
         {
             s32 sample = gUnk_086149C4[angle & mask];
-            s32 value = sample * speed;
-            s32 z = SabataImpact_TruncateFixed(value);
-            components->z = z;
-            {
-                u32 x = (u16)body->position.x;
-                u32 dx = (u16)components->x;
-                components->x = x + dx;
-            }
-            components->y = (u16)components->y + (u16)center->y;
+            components->z = SabataImpact_TruncateFixed(sample * speed);
+            components->x += body->position.x;
+            components->y += center->y;
             components->z += center->z;
         }
         if ((u8)Terrain_IsSegmentBelowHeightLimit(center, &point, 3, 256)) {
