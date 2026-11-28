@@ -1,20 +1,12 @@
 #include "global.h"
+#include "gba/m4a_internal.h"
 #include "engine/ram.h"
-struct Song {
-    u32 p;
-    u16 ms, me;
-};
-extern struct Song gSongTable[];
-struct MP {
-    u32 a, b, c;
-};
-extern struct MP gUnk_082643EC[];
-void m4aMPlayTempoControl(u32, u16);
-void Sound_SetChannel10Tempo(u32 t)
+
+void Sound_SetChannel10Tempo(u32 tempo)
 {
-    u16 s = gMusicSlotSongs[0x14 / 2];
-    if (s != 0) {
-        u32 m = gSongTable[s].ms;
-        m4aMPlayTempoControl(gUnk_082643EC[m].a, t);
+    u16 song = gMusicSlotSongs[10];
+    if (song != 0) {
+        u32 player = gSongTable[song].ms;
+        m4aMPlayTempoControl(gMPlayTable[player].info, tempo);
     }
 }
