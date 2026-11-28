@@ -103,3 +103,11 @@ src/objects/coffin/tether_actor.c	TetherActor_BeginKindFourStateTen	natural	natu
 src/objects/coffin/tether_actor.c	TetherActor_GetRequestStatus	minor	natural	1	
 src/objects/coffin/tether_actor.c	TetherActor_GetRequestMode	minor	natural	1	
 src/objects/coffin/tether_actor.c	TetherActor_InitInteractionFromScript	minor	natural	1	
+src/objects/coffin/tether_actor.c	TetherActor_RequestKindNineAction	natural	natural	0	
+src/objects/coffin/tether_actor.c	TetherActor_WriteTransformToScript	natural	natural	0	
+src/objects/coffin/tether_actor.c	TetherActor_RequestPositionSample	natural	natural	0	
+src/objects/coffin/tether_actor.c	TetherActor_StartAuxiliaryState	natural	natural	0	
+src/objects/coffin/tether_actor.c	TetherActor_GetSavedKind	natural	natural	0	
+src/objects/coffin/tether_actor.c	TetherActor_GetConfiguredKind	natural	natural	0	
+src/objects/coffin/tether_actor.c	TetherActor_InitKindFromScript	minor	minor	7	selectedKind pointer temps stay: plain gGameState->unk5AA stores reload the base and offset for the read
+src/objects/coffin/tether_actor.c	TetherActor_InitDisplayFromScript	contrived	natural	4	

@@ -1637,24 +1637,20 @@ void TetherActor_InitDisplayFromScript(struct TetherActor *actor)
 {
     struct DisplayPosition position;
     struct DisplayAnimation *display;
-    struct DisplayPosition *initialPosition;
     u32 value;
     actor->paletteIndex = 10;
-    initialPosition = &position;
-    ZeroFill8(initialPosition);
+    ZeroFill8(&position);
     if (actor->kind == 9) {
         display = &actor->display.animation;
-        DisplayAnimation_InitializeKeyframes(display, 0x35E3, 0, initialPosition);
+        DisplayAnimation_InitializeKeyframes(display, 0x35E3, 0, &position);
         DisplayAnimation_SetPriority(display, 2);
         value = Script_SeekToKeyword('d');
     } else {
         const u16 *palette;
         u16 *buffer;
-        const u16 *source;
-        u16 *destination;
         s32 i;
         display = &actor->display.animation;
-        DisplayAnimation_InitializeSequence(display, 0x2499, 0x3D95, 0, initialPosition);
+        DisplayAnimation_InitializeSequence(display, 0x2499, 0x3D95, 0, &position);
         TetherActor_SetEntry(actor, 0);
         actor->appliedPalette = actor->paletteIndex;
         DisplayAnimation_SelectPaletteBank(display, actor->appliedPalette + 0x283);
@@ -1663,12 +1659,8 @@ void TetherActor_InitDisplayFromScript(struct TetherActor *actor)
         else
             palette = actor->display.colors.palette;
         buffer = actor->palette;
-        source = palette;
-        destination = buffer;
-        i = 15;
-        do {
-            *destination++ = *source++;
-        } while (--i >= 0);
+        for (i = 0; i < 16; i++)
+            buffer[i] = palette[i];
         DisplayAnimation_SetTileSource(display, (u32)buffer);
         DisplayAnimation_SetPriority(display, 2);
         value = Script_SeekToKeyword('d');
