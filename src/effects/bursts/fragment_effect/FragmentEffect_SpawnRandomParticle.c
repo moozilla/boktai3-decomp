@@ -1,48 +1,36 @@
-#include "scene/motion/scene_steering_actor.h"
-#include "engine/engine.h"
+#include "effects/bursts/spiral_burst.h"
 #include "engine/ram.h"
 #include "engine/heap.h"
 #include "engine/resource_registry.h"
 #include "engine/math/monster_particle_random.h"
+
 extern const s16 gUnk_086149C4[];
 void DebrisMote_Create(struct ContactPosition *, struct ContactPosition *, s32, s32);
-static inline s32 Truncate(s32 v)
-{
-    if (v >= 0)
-        return v >> 12;
-    return -((-v) >> 12);
-}
+
 void FragmentEffect_SpawnRandomParticle(struct ContactPosition *position)
 {
     struct ContactPosition velocity;
     struct ContactPosition *planar;
-    u32 randomOrigin;
-    u32 sampleOrigin;
-    s32 heading;
-    s32 speed, vertical;
-
     /* The recovered bank origin cancels when converting a sample address to its table offset. */
-    randomOrigin = (u32)&gHeapHead + RESOURCE_REGISTRY_ENTRIES_ADDR;
-    heading = ParticleRandom_ReadDirectSample(gRandomTable) & 255;
+    u32 randomOrigin = (u32)&gHeapHead + RESOURCE_REGISTRY_ENTRIES_ADDR;
+    u32 sampleOrigin;
+    s32 heading = ParticleRandom_ReadDirectSample(gRandomTable) & 255;
+    s32 speed;
     {
-        s32 raw = ParticleRandom_ReadDirectSample(gRandomTable);
-        raw &= 31;
+        s32 raw = ParticleRandom_ReadDirectSample(gRandomTable) & 31;
+
         planar = &velocity;
         speed = raw - 16;
     }
     {
-        s32 x, zero, rawX;
-        rawX = gUnk_086149C4[(heading + 64) & 255] * speed;
+        s32 x = gUnk_086149C4[(heading + 64) & 255] * speed;
+
         sampleOrigin = randomOrigin;
-        x = Truncate(rawX);
-        zero = 0;
-        planar->x = x;
-        planar->y = zero;
-        planar->z = Truncate(gUnk_086149C4[heading] * speed);
+        planar->x = SpiralBurst_ScaleOffset(x);
     }
-    vertical = ParticleRandom_ReadRelativeSample(sampleOrigin, (const u16 *)RANDOM_TABLE_ADDR);
-    vertical &= 63;
-    vertical -= 48;
-    velocity.y = vertical;
+    planar->y = 0;
+    planar->z = SpiralBurst_ScaleOffset(gUnk_086149C4[heading] * speed);
+    velocity.y =
+        (ParticleRandom_ReadRelativeSample(sampleOrigin, (const u16 *)RANDOM_TABLE_ADDR) & 63) - 48;
     DebrisMote_Create(position, &velocity, 60, 3);
 }
