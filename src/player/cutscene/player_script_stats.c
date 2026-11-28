@@ -291,14 +291,8 @@ u32 ScriptActor_TestTimedEventCounter(void)
     struct Player *player;
     s32 actorIndex = Script_GetActorIndex();
     player = gPlayers[actorIndex];
-    if (player != 0) {
-        u32 slot = player->timedEventSlot;
-        struct GameState *state = gGameState;
-        if (slot[state->counters628] > 0)
-            goto positiveCounter;
-    }
-    return 0;
-positiveCounter:
+    if (player == NULL || *(gGameState->counters628 + player->timedEventSlot) <= 0)
+        return 0;
     return 1;
 }
 
