@@ -142,10 +142,9 @@ void ActorController_UpdateTargetMovement(struct SceneCombatActor *actor, s32 mo
     u32 result;
     u8 *phase;
     if ((actor->behaviorCounter & 7) == 0) {
-        struct GameState *game = gGameState;
-        targetPosition.x = game->positionX;
-        targetPosition.y = game->positionY;
-        targetPosition.z = game->positionZ;
+        targetPosition.x = gGameState->positionX;
+        targetPosition.y = gGameState->positionY;
+        targetPosition.z = gGameState->positionZ;
         result = Terrain_ApplyBlocked(&actor->navigation, &actor->navigation.referencePosition,
                                       &targetPosition);
         if (result == 1) {
