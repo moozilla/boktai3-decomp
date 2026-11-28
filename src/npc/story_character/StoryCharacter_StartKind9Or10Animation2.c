@@ -1,17 +1,14 @@
 #include "global.h"
-#include "npc/story_character/state_actor.h"
+#include "npc/manager/scene_actor_lifecycle.h"
 
-void Actor_PlayAnimationEntry(void *, u32, u32, u32, u32);
-s32 DisplayAnimation_TestFinished(void *);
-
-void StoryCharacter_StartKind9Or10Animation2(u32 ctx, struct StateActor *p)
+void StoryCharacter_StartKind9Or10Animation2(u32 ctx, struct SceneActor *p)
 {
     u32 r;
-    if (p->enter != 0) {
-        p->enter = 0;
-        p->done = 0;
-        if (p->kind == 9) {
-            switch (p->kind) {
+    if (p->animationEntered != 0) {
+        p->animationEntered = 0;
+        p->finished = 0;
+        if (p->variant == 9) {
+            switch (p->variant) {
                 case 4:
                     r = 0;
                     break;
@@ -96,7 +93,7 @@ void StoryCharacter_StartKind9Or10Animation2(u32 ctx, struct StateActor *p)
             }
             Actor_PlayAnimationEntry(p, r, 2, 0, 2);
         } else {
-            switch (p->kind) {
+            switch (p->variant) {
                 case 4:
                     r = 0;
                     break;
@@ -181,13 +178,13 @@ void StoryCharacter_StartKind9Or10Animation2(u32 ctx, struct StateActor *p)
             }
             Actor_PlayAnimationEntry(p, r, 2, 0, 2);
         }
-        p->phase = 0;
+        p->animationPhase = 0;
     }
-    if (p->phase != 0)
+    if (p->animationPhase != 0)
         return;
-    if (!DisplayAnimation_TestFinished(&p->targetPosition.z))
+    if (!DisplayAnimation_TestFinished(&p->drawable.common))
         return;
     Actor_PlayAnimationEntry(p, 0, 1, 0, 4);
-    p->done = 1;
-    p->phase = 1;
+    p->finished = 1;
+    p->animationPhase = 1;
 }
