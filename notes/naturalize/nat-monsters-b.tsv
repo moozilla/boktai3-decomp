@@ -174,3 +174,4 @@ src/monsters/ooze/SceneTask_DispatchUnlessPaused.c	SceneTask_DispatchUnlessPause
 src/monsters/poison_hand/PoisonHand_Update.c	PoisonHand_Update	contrived	minor	40	u16 amount copy of damage; dataOwner reused for the random bank and the final age++ (any plain form changes allocation across the particle loop)
 src/monsters/poison_hand/PoisonHand_InitializeFromScript.c	PoisonHand_InitializeFromScript	minor	natural	5	
 src/monsters/poison_hand/PoisonHand_RecordDefeat.c	PoisonHand_RecordDefeat	contrived	natural	1	file-local IncrementCounter replaces H/W/INC macros
+src/monsters/poison_hand/PoisonHand_InitCollider.c	PoisonHand_InitCollider	contrived	minor	2	(u16) casts on the s16 flag fields

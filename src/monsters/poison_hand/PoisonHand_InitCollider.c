@@ -1,30 +1,25 @@
 #include "global.h"
-#include "scene/collision/packed_contact_halfwords.h"
-#include "scene/collision/packed_collider_extents.h"
-void Collider_Init(u8 *, u16, u32, u32, u32, struct PackedColliderExtents *,
-                   struct PackedColliderExtents *);
-void Collider_SetCallback(u8 *, void (*)(void), u8 *);
-void Collider_SetPosition(u8 *, u8 *, u32);
-s32 Collider_Refresh(u8 *);
+#include "monsters/poison_hand.h"
+#include "engine/engine.h"
+
 void PoisonHand_ApplyHitReaction(void);
 void Collider_SetBodyProperties(void *, u32, u32, u32);
-struct Q {
-    u8 pad[6];
-    u16 flags;
-};
-void PoisonHand_InitCollider(u8 *p)
+
+void PoisonHand_InitCollider(struct PoisonHand *hand)
 {
-    struct PackedColliderExtents a, b;
-    u8 *q = p + 0x6c;
-    a.xy.lo = 100;
-    a.xy.hi = 120;
-    a.zAndPad.lo = 100;
-    *(u32 *)&b.xy = 0x780000;
-    *(u32 *)&b.zAndPad &= 0xFFFF0000;
-    Collider_Init(q, 0, 0x5009, 0, 0x10, &a, &b);
-    Collider_SetPosition(q, p + 0x40, 0);
-    Collider_SetCallback(q, PoisonHand_ApplyHitReaction, p);
-    Collider_SetBodyProperties(q, 0, *(u16 *)(p + 0x13a), *(u16 *)(p + 0x13c));
-    Collider_Refresh(q);
-    ((struct Q *)q)->flags |= 4;
+    struct ContactCollider *collider = &hand->collider;
+    struct ContactPosition bounds, offset;
+
+    bounds.x = 100;
+    bounds.y = 120;
+    bounds.z = 100;
+    offset.x = 0;
+    offset.y = 120;
+    offset.z = 0;
+    Collider_Init(collider, 0, 0x5009, 0, 0x10, &bounds, &offset);
+    Collider_SetPosition(collider, &hand->sprite.position, 0);
+    Collider_SetCallback(collider, PoisonHand_ApplyHitReaction, hand);
+    Collider_SetBodyProperties(collider, 0, (u16)hand->bodyReactionFlags, (u16)hand->sparkMask);
+    Collider_Refresh(collider);
+    collider->flags |= 4;
 }
