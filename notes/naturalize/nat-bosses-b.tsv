@@ -113,3 +113,7 @@ src/bosses/ratatosk/Ratatosk_UpdateSunOrbRelocation.c	Ratatosk_UpdateSunOrbReloc
 src/bosses/ratatosk/Ratatosk_UpdateRetreatSequence.c	Ratatosk_UpdateRetreatSequence	contrived	minor	6	actor alias and two unrolled-axis search loops with v/self pointers stay (direct struct access differs)
 src/bosses/ratatosk/Ratatosk_UpdateRepeatedRetreat.c	Ratatosk_UpdateRepeatedRetreat	contrived	minor	2	as Ratatosk_UpdateRetreatSequence: actor alias and v/self pointers in the two search loops
 src/bosses/ratatosk/Ratatosk_UpdateWaitTimer.c	Ratatosk_UpdateWaitTimer	contrived	natural	1	
+src/bosses/ratatosk/Ratatosk_UpdateTimedState16.c	Ratatosk_UpdateTimedState16	natural	natural	0	
+src/bosses/ratatosk/Ratatosk_UpdateRestartState17.c	Ratatosk_UpdateRestartState17	natural	natural	0	
+src/bosses/ratatosk/SceneEffect_EnterAndRestart.c	SceneEffect_EnterAndRestart	natural	natural	0	
+src/bosses/ratatosk/Ratatosk_UpdateAttackSelection.c	Ratatosk_UpdateAttackSelection	contrived	contrived	22	second actor alias, flag accessor, snapshot/snapshotWithState pair with a savedState pointer and a table-address randomByte stay: each plain form changes register allocation

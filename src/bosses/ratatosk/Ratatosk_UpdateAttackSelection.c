@@ -3,16 +3,13 @@
 #include "engine/engine_globals.h"
 #include "engine/ram.h"
 
-struct Vec {
-    s16 x, y, z, pad;
-};
 struct ChoiceTable {
     s32 entries[1][4];
 };
 extern const struct ChoiceTable gUnk_0824FDF8, gUnk_0824FE08, gUnk_0824FE18;
 extern void *const gUnk_08613F04[];
 u8 Callback_InvokeActor(void *, void *);
-struct Vec *Player_GetEffectivePosition(s32);
+struct ContactPosition *Player_GetEffectivePosition(s32);
 void Ratatosk_BeginInterruptState(void *);
 void Sound_StopSong(u32);
 void PaletteEffect_RefreshPalette(void *);
@@ -23,12 +20,6 @@ static inline u32 flags(struct Ratatosk *p, u32 mask)
 {
     return p->flags & mask;
 }
-static inline u32 randomB(void)
-{
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    return gRandomTable[gRandomIndex];
-}
-#define RANDOM_TABLE_ADDR 0x0203B400
 static inline s32 randomByte(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
@@ -64,17 +55,17 @@ void Ratatosk_UpdateAttackSelection(struct Ratatosk *p)
     struct Ratatosk *q = p;
     struct ChoiceTable choices;
     u32 *savedState;
-    Callback_InvokeActor(p, gUnk_08613F04[q->actionPhase]);
-    if (flags(p, 0x100000) && q->actionPhase == 6 && !p->interruptLock) {
-        struct Vec *player = Player_GetEffectivePosition(0);
-        struct Vec *anchor = &p->anchor;
+    Callback_InvokeActor(p, gUnk_08613F04[p->actionPhase]);
+    if (flags(p, 0x100000) && p->actionPhase == 6 && !p->interruptLock) {
+        struct ContactPosition *player = Player_GetEffectivePosition(0);
+        struct ContactPosition *anchor = &p->anchor;
         s32 dx = player->x - anchor->x;
         s32 dz = player->z - anchor->z;
         if (dx * dx + dz * dz <= 0x3ffff)
             Ratatosk_BeginInterruptState(p);
     }
-    if (!flags(q, 2) && !flags(q, 1) && !p->pendingAttack) {
-        if (flags(q, 0x400000) && p->healthPhase > 0 && q->actionPhase != 4 &&
+    if (!flags(q, 2) && !(q->flags & 1) && !p->pendingAttack) {
+        if (q->flags & 0x400000 && p->healthPhase > 0 && q->actionPhase != 4 &&
             q->actionPhase != 5) {
             if (q->actionPhase != 6 || p->hasOrb == 1) {
                 snapshot(p, q);
