@@ -170,29 +170,29 @@ u8 LinkParticipant_IsLocallySelected(void *);
 
 void Sound_PlaySong(u32);
 
-void Character_GetHeightAdjustedPosition(void *, s16 *);
+void Character_GetHeightAdjustedPosition(void *, void *);
 
 void SpatialIndex_SetPosition(void *, s32, s32, s32);
 
 void SpatialIndex_InsertEntry(void *);
+
+struct EmitterPosition {
+    s16 x, y, z;
+};
 
 s32 ActorEmitter_UpdateAnimation(struct ActorEmitter *emitter)
 {
     struct EmitterOwner *owner;
     struct EmitterActor *actor;
     s32 cost;
-    s16 position[3];
-    s16 *pos;
+    struct EmitterPosition position;
     if (!Modifier_IsFirstSourceReady(emitter))
-        goto fail;
+        return 0;
     owner = emitter->owner;
     actor = &owner->actor;
     cost = CallbackList_RunMatchingState(actor, emitter->id, 9);
-    if (owner->actor.energy >= cost)
-        goto active;
-fail:
-    return 0;
-active:
+    if (owner->actor.energy < cost)
+        return 0;
     if (emitter->entered) {
         Anim_SetKeyframes((u8 *)owner + 0x670, (u8 *)owner + 0x7F0, emitter->animation, 1, 0);
         if (LinkParticipant_IsLocallySelected(owner))
@@ -201,11 +201,9 @@ active:
     }
     CallbackList_SubtractClampedValue(actor, emitter, cost);
     Anim_Step((u8 *)owner + 0x670, (u8 *)owner + 0x7F0);
-    pos = position;
-    Character_GetHeightAdjustedPosition(actor, pos);
-    emitter = (struct ActorEmitter *)emitter->collision;
-    SpatialIndex_SetPosition(emitter, position[0], pos[1], pos[2]);
-    SpatialIndex_InsertEntry(emitter);
+    Character_GetHeightAdjustedPosition(actor, &position);
+    SpatialIndex_SetPosition(emitter->collision, position.x, position.y, position.z);
+    SpatialIndex_InsertEntry(emitter->collision);
     return 1;
 }
 
