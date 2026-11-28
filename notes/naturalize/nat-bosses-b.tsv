@@ -109,3 +109,4 @@ src/bosses/ratatosk/Ratatosk_UpdateArenaCheckedSequence.c	Ratatosk_UpdateArenaCh
 src/bosses/ratatosk/Ratatosk_UpdateSunOrbPlacement.c	Ratatosk_UpdateSunOrbPlacement	contrived	minor	10	second actor alias; random sample stays hand-expanded (RANDOM_NEXT forms add one instruction); slot block
 src/bosses/ratatosk/AnimationActor_UpdateRepeatedAttack.c	AnimationActor_UpdateRepeatedAttack	contrived	minor	2	second actor alias stays
 src/bosses/ratatosk/SceneSong_EnterAndWait.c	SceneSong_EnterAndWait	contrived	minor	5	second actor alias stays
+src/bosses/ratatosk/Ratatosk_UpdateSunOrbRelocation.c	Ratatosk_UpdateSunOrbRelocation	contrived	minor	8	second actor alias stays; ContactPosition/OrbitEffectPosition casts at the sun orb calls (two position types for one layout)
