@@ -67,7 +67,7 @@ void Ratatosk_UpdatePlayerOrbitAttack(struct Ratatosk *p)
         u32 config[6];
     } scratch;
     struct SceneVec offsetVector, deltaVector, positionVector;
-    if (Ratatosk_ConsumeActionEntry(q)) {
+    if (Ratatosk_ConsumeActionEntry(p)) {
         Ratatosk_SetAnimation(q, 9);
         p->sequence = 0;
         p->repeat = 0;
@@ -79,11 +79,9 @@ void Ratatosk_UpdatePlayerOrbitAttack(struct Ratatosk *p)
         case 0:
             if (q->actionFinished) {
                 if (p->hitTimer > 0) {
-                    struct SceneVec *playerPosition;
                     struct Player *player;
                     p->sequence = 1;
-                    playerPosition = Player_GetEffectivePosition(0);
-                    difference(&p->center, playerPosition, &q->body.position);
+                    difference(&p->center, Player_GetEffectivePosition(0), &q->body.position);
                     p->center.x = q->body.position.x + Div(p->center.x, 2);
                     p->center.y = q->body.position.y;
                     p->center.z = q->body.position.z + Div(p->center.z, 2);
@@ -103,12 +101,7 @@ void Ratatosk_UpdatePlayerOrbitAttack(struct Ratatosk *p)
                     p->duration = 64;
                     p->sequenceDone = 1;
                 } else {
-                    s32 index = Mod(randomB(), 9);
-                    struct RatatoskOrbitPoint *destination =
-                        (struct RatatoskOrbitPoint *)&p->destination;
-                    u32 address = index * sizeof(struct RatatoskOrbitPoint) + (u32)p;
-                    address += (u32) & ((struct Ratatosk *)0)->points;
-                    *destination = *(struct RatatoskOrbitPoint *)address;
+                    p->destination = *(Mod(randomB(), 9) + p->points);
                     Ratatosk_SetAnimation(q, 4);
                     p->sequence = 3;
                 }
@@ -132,32 +125,24 @@ void Ratatosk_UpdatePlayerOrbitAttack(struct Ratatosk *p)
                 Sound_StopSong(0x569);
             }
             if (!p->ended) {
-                {
-                    s32 sample = (u8)randomB();
-                    if (sample < 8 && !p->particleTimer)
-                        p->particleTimer = 10;
-                }
+                s32 sample = (u8)randomB();
+                if (sample < 8 && !p->particleTimer)
+                    p->particleTimer = 10;
                 if (p->particleTimer > 0) {
                     s32 step = Mod(q->callbackFrame, 32);
-                    struct SceneVec *delta;
-                    struct SceneVec *position;
-                    struct SceneVec *effectivePosition;
                     difference(&deltaVector, &q->body.position, Player_GetEffectivePosition(0));
-                    delta = &deltaVector;
                     if (!step) {
-                        ClearVector(delta, &scratch.zero);
+                        ClearVector(&deltaVector, &scratch.zero);
                     } else {
-                        delta->x = Div(delta->x * step, 32);
-                        delta->y = 196;
-                        delta->z = Div(delta->z * step, 32);
+                        deltaVector.x = Div(deltaVector.x * step, 32);
+                        deltaVector.y = 196;
+                        deltaVector.z = Div(deltaVector.z * step, 32);
                     }
-                    effectivePosition = Player_GetEffectivePosition(0);
-                    position = &positionVector;
-                    sum_081F7FD0(position, &deltaVector, effectivePosition);
-                    position->y += 128;
+                    sum_081F7FD0(&positionVector, &deltaVector, Player_GetEffectivePosition(0));
+                    positionVector.y += 128;
                     SlotMotion_Initialize(scratch.config);
                     Ratatosk_ConfigureParticle(scratch.config, 10, 0, 0, 0, 0);
-                    SceneParticles_SpawnAtPosition(scratch.config, position);
+                    SceneParticles_SpawnAtPosition(scratch.config, &positionVector);
                     p->particleTimer--;
                 }
             }
