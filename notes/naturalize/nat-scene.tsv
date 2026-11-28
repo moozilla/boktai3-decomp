@@ -145,3 +145,4 @@ src/scene/actor/animation/SceneActorScript_GetManagerField62.c	SceneActorScript_
 src/scene/actor/animation/SceneActorScript_SetManagerFlagsFromScript.c	SceneActorScript_SetManagerFlagsFromScript	natural	natural	0	
 src/scene/actor/animation/SceneActorScript_SetManagerModeFromScript.c	SceneActorScript_SetManagerModeFromScript	natural	natural	0	
 src/scene/actor/animation/SceneActorScript_SetControlBytesFromScript.c	SceneActorScript_SetControlBytesFromScript	contrived	natural	1	
+src/scene/actor/animation/SceneActorScript_SetFlagFromScript.c	SceneActorScript_SetFlagFromScript	minor	minor	3	WordFlags_And via a flags pointer: plain &= loads the mask after the field
