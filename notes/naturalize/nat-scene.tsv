@@ -433,3 +433,7 @@ src/scene/actor/reaction/SceneActorContacts_CanSelectNode.c	SceneActorContacts_C
 src/scene/actor/reaction/SceneActorContacts_FindNodeByKind.c	SceneActorContacts_FindNodeByKind	contrived	natural	6	-
 src/scene/actor/reaction/SceneActorContacts_ContainsActiveNode.c	SceneActorContacts_ContainsActiveNode	contrived	natural	2	-
 src/scene/actor/reaction/SceneActorContacts_FindObjectById.c	SceneActorContacts_FindObjectById	contrived	natural	2	-
+src/scene/actor/reaction/SceneActorContacts_ResetList.c	SceneActorContacts_ResetList	natural	natural	0	-
+src/scene/actor/reaction/SceneActorContacts_RegisterNode.c	SceneActorContacts_RegisterNode	natural	natural	0	-
+src/scene/actor/reaction/SceneActorContacts_RemoveNode.c	SceneActorContacts_RemoveNode	natural	natural	0	-
+src/scene/actor/reaction/SceneActorContacts_ReleaseInvalidOwners.c	SceneActorContacts_ReleaseInvalidOwners	contrived	contrived	17	partial: hoisted mask locals and the state pointer out-param stay; plain literals are not hoisted out of the loop by loop.c and the ROM keeps all of them in saved registers

@@ -30,21 +30,18 @@ void SceneActorContacts_ReleaseInvalidOwners(void)
             if ((node->flags & 1) && (node->flags & 2)) {
                 struct ChaseActor *actor = node->owner;
                 u16 *state;
-                if (!actor)
-                    goto invalid;
-                if (Unavailable(actor, &state, disabled, excluded) ||
+                if (!actor || Unavailable(actor, &state, disabled, excluded) ||
                     (actor->base.behaviorFlags & invalidMask)) {
-                invalid:
-                    node->flags &= 0xFD;
-                    node->owner = 0;
+                    node->flags &= ~2;
+                    node->owner = NULL;
                     node->cooldown = 120;
                     continue;
                 }
                 {
                     u32 value = *state & required;
                     if (!(u16)value) {
-                        node->flags &= 0xFD;
-                        node->owner = 0;
+                        node->flags &= ~2;
+                        node->owner = NULL;
                         value = 120;
                         node->cooldown = value;
                     }
