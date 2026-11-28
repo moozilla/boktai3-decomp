@@ -1,10 +1,9 @@
 #include "global.h"
-struct S {
-    u8 f[0x1C];
-    u32 a;
-};
-void PaletteTransition_StartDisplay(void *, u32);
-void SceneDisplay_InitCurrentAnimation(struct S *p)
+#include "ui/books/bestiary_display.h"
+
+void PaletteTransition_StartDisplay(struct BestiaryDisplay *, u32);
+
+void SceneDisplay_InitCurrentAnimation(struct BestiaryDisplay *p)
 {
-    PaletteTransition_StartDisplay(p, p->a);
+    PaletteTransition_StartDisplay(p, p->entry);
 }
