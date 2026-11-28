@@ -1,59 +1,36 @@
 #include "global.h"
+#include "bosses/vanargand/vanargand_pair_attack.h"
 
-struct VanargandDamage {
-    u8 pad0[0x90];
-    u32 timer;
-    s16 health;
-    u8 pad96[0xA2 - 0x96];
-    u8 phase, frame;
-    u32 phaseTimer;
-    u8 padA8[3];
-    u8 requestedState, actionActive, actionReset, action;
-    u8 padAF;
-    u8 actionPending, pendingAnimation;
-    u8 padB2[0xC4 - 0xB2];
-    u32 actionTimer;
-    u8 padC8[0x100 - 0xC8];
-    void (*callback)(void *);
-};
-void ActorSoundPhase_StartTimedAnimation(void *);
-void Vanargand_UpdateOffsetMotion(void *);
-void Vanargand_UpdatePaletteLeap(void *);
+void ActorSoundPhase_StartTimedAnimation(void *, s32);
+void Vanargand_UpdateOffsetMotion(void *, s32);
+void Vanargand_UpdatePaletteLeap(void *, s32);
 void DamageNumberDisplay_ShowWithDefaultScale(void *, s32, s32, void *, s32);
-static inline void StartAction(struct VanargandDamage *p, s32 one, s32 zero, s32 id)
+static inline void SetState(struct VanargandPairAttack *p, void (*callback)(void *, s32), s32 id)
 {
-    p->actionActive = one;
-    p->actionReset = zero;
-    p->action = id;
-    p->actionTimer = zero;
-    p->actionPending = one;
-}
-static inline void SetState(struct VanargandDamage *p, void (*callback)(void *), s32 id)
-{
-    p->requestedState = id;
-    p->callback = callback;
-    p->timer = 0;
-    p->pendingAnimation = 1;
+    p->state = id;
+    p->stateCallback = callback;
+    p->callbackFrame = 0;
+    p->pending = 1;
     p->phase = 0;
-    p->phaseTimer = 0;
+    p->timer = 0;
 }
-s32 Vanargand_OnDamage(struct VanargandDamage *p, s32 kind, s32 damage)
+s32 Vanargand_OnDamage(struct VanargandPairAttack *p, s32 kind, s32 damage)
 {
     switch (kind) {
         case 0:
             if (damage > 0)
-                DamageNumberDisplay_ShowWithDefaultScale((u8 *)p + 0x6C4, damage, 0,
-                                                         (u8 *)p + 0x1AC, 1);
-            StartAction(p, 1, 0, 4);
+                DamageNumberDisplay_ShowWithDefaultScale(&p->damageSource, damage, 0,
+                                                         &p->animation.position, 1);
+            Vanargand_StartAction(p, 1, 0, 4);
             SetState(p, ActorSoundPhase_StartTimedAnimation, 24);
             break;
         case 2:
-            StartAction(p, 1, 0, 5);
+            Vanargand_StartAction(p, 1, 0, 5);
             SetState(p, Vanargand_UpdateOffsetMotion, 25);
             break;
         case 1:
             p->health = 0;
-            StartAction(p, 1, 0, 6);
+            Vanargand_StartAction(p, 1, 0, 6);
             SetState(p, Vanargand_UpdatePaletteLeap, 20);
             break;
     }
