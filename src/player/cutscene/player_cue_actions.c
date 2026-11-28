@@ -1704,20 +1704,6 @@ void PlayerCue_UpdateFormChange(struct Player *player)
 
 // confidence=low: tentative player cue role; see callback body.
 
-static inline void PlayerCue_AdvanceSpiralCounters(struct Player *player, u16 trailLimit,
-                                                   u16 timerLimit)
-{
-    if ((player->actionEighteenDuration += 3) > trailLimit)
-        player->actionEighteenDuration = trailLimit;
-    if (++player->tetherFrame > timerLimit) {
-        player->actionLatch464 = 1;
-        player->actionLatch465 = 1;
-        Player_UpdateFacingSide(player);
-        PlayerCue_EnterStandUpdate(player);
-        player->pendingAnimationTrigger = 1;
-    }
-}
-
 void PlayerCue_UpdateSpiralMotion(struct Player *player)
 {
     if (player->tetherFrame == 0) {
@@ -1749,17 +1735,22 @@ void PlayerCue_UpdateSpiralMotion(struct Player *player)
         }
     }
     Player_SetAnimation(player, 0x9A, 64, 1);
-    {
-        player->animation.paletteBank = 0x16F;
-        player->animation.palette =
-            (u16 *)(gPaletteBankData + (player->animation.paletteBank << 5));
-    }
-    Anim_SetSequence(&player->cueCollider.sequence, (void *)player->cueCollider.setupResource, 0,
+    player->animation.paletteBank = 0x16F;
+    player->animation.palette = (u16 *)(gPaletteBankData + (player->animation.paletteBank << 5));
+    Anim_SetSequence(&player->cueCollider.sequence, player->cueCollider.setupResource, 0,
                      player->heading, player->side);
     PlayerCue_StepSequence((struct ContactSwarmSprite *)&player->secondaryDrawFlags,
                            &player->cueCollider.sequence);
     player->actionEighteenParameter = 0x2DD;
-    PlayerCue_AdvanceSpiralCounters(player, 32, 31);
+    if ((player->actionEighteenDuration += 3) > 32)
+        player->actionEighteenDuration = 32;
+    if (++player->tetherFrame > 31) {
+        player->actionLatch464 = 1;
+        player->actionLatch465 = 1;
+        Player_UpdateFacingSide(player);
+        PlayerCue_EnterStandUpdate(player);
+        player->pendingAnimationTrigger = 1;
+    }
 }
 
 void Player_RestartAnimationFromResource(struct Player *player)
