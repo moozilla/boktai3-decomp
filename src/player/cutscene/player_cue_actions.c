@@ -1341,7 +1341,7 @@ void PlayerCue_UpdateMotionFade(struct Player *player)
                              player->heading, player->side);
             PlayerCue_StepSequence((struct ContactSwarmSprite *)&player->secondaryDrawFlags,
                                    &player->cueCollider.sequence);
-            if ((++player->tetherFrame) > 27)
+            if (++player->tetherFrame > 27)
                 ActorSequence_Begin(player, 7, 1);
             break;
 
@@ -1351,13 +1351,13 @@ void PlayerCue_UpdateMotionFade(struct Player *player)
             PlayerCue_StepSequence((struct ContactSwarmSprite *)&player->secondaryDrawFlags,
                                    &player->cueCollider.sequence);
             player->secondaryDrawFlags |= 2;
-            player->secondaryScaleX = 64 - (((u8)player->tetherFrame) << 2);
+            player->secondaryScaleX = 64 - (player->tetherFrame << 2);
             if (player->tetherFrame > 8) {
                 player->secondaryScaleY = player->tetherFrame << 3;
                 player->terrainRecoveryCounter = (player->tetherFrame - 8) * 20;
                 Player_AddControlFlags(player, 4);
             }
-            if ((++player->tetherFrame) > 15)
+            if (++player->tetherFrame > 15)
                 ActorSequence_Begin(player, 7, 2);
             break;
 
@@ -1367,8 +1367,8 @@ void PlayerCue_UpdateMotionFade(struct Player *player)
                              player->heading, player->side);
             PlayerCue_StepSequence((struct ContactSwarmSprite *)&player->secondaryDrawFlags,
                                    &player->cueCollider.sequence);
-            player->terrainRecoveryCounter = (player->tetherFrame * 200) + 160;
-            if ((++player->tetherFrame) > 7) {
+            player->terrainRecoveryCounter = player->tetherFrame * 200 + 160;
+            if (++player->tetherFrame > 7) {
                 Player_AddControlFlags(player, 1);
                 ActorSequence_Begin(player, 0, 0);
                 player->triggerAnimationCallback = PlayerCue_UpdateHidden;
@@ -1385,8 +1385,8 @@ void PlayerCue_UpdateMotionFade(struct Player *player)
             player->secondaryDrawFlags |= 2;
             player->secondaryScaleX = 4;
             player->secondaryScaleY = 120;
-            player->terrainRecoveryCounter = ((8 - player->tetherFrame) * 200) + 160;
-            if ((++player->tetherFrame) > 7)
+            player->terrainRecoveryCounter = (8 - player->tetherFrame) * 200 + 160;
+            if (++player->tetherFrame > 7)
                 ActorSequence_Begin(player, 7, 4);
             break;
 
@@ -1396,7 +1396,7 @@ void PlayerCue_UpdateMotionFade(struct Player *player)
             PlayerCue_StepSequence((struct ContactSwarmSprite *)&player->secondaryDrawFlags,
                                    &player->cueCollider.sequence);
             player->secondaryDrawFlags |= 2;
-            player->secondaryScaleX = 64 - ((15 - ((u8)player->tetherFrame)) << 2);
+            player->secondaryScaleX = 64 - ((15 - player->tetherFrame) << 2);
             if (player->tetherFrame <= 7) {
                 player->secondaryScaleY = (15 - player->tetherFrame) << 3;
                 player->terrainRecoveryCounter = (8 - player->tetherFrame) * 20;
@@ -1405,7 +1405,7 @@ void PlayerCue_UpdateMotionFade(struct Player *player)
                 player->terrainRecoveryCounter = 0;
                 Player_AddControlFlags(player, 4);
             }
-            if ((++player->tetherFrame) > 15)
+            if (++player->tetherFrame > 15)
                 ActorSequence_Begin(player, 7, 5);
             break;
 
@@ -1415,7 +1415,7 @@ void PlayerCue_UpdateMotionFade(struct Player *player)
                              player->heading, player->side);
             PlayerCue_StepSequence((struct ContactSwarmSprite *)&player->secondaryDrawFlags,
                                    &player->cueCollider.sequence);
-            if ((++player->tetherFrame) > 3) {
+            if (++player->tetherFrame > 3) {
                 PlayerCue_EnterStandUpdate(player);
                 player->triggerAnimationCallback = Player_RestartAnimationFromSetup;
                 PlayerCue_CompleteAction(player);

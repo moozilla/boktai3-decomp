@@ -320,3 +320,6 @@ src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateRunTo	contrived	minor	2
 src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateRunTo	minor	minor	4	arrival facing mask local
 src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateRunOverlay	contrived	natural	1	-
 src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateTurningPalette	minor	natural	8	PackPaletteGreen kept (inlining the or changes operand loads)
+src/player/cutscene/player_cue_actions.c	Player_RestartAnimationFromSetup	natural	natural	0	-
+src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateWalkTarget	minor	minor	14	unchanged: u8 direction block in the moving branch (a plain store differs by one orr)
+src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateMotionFade	minor	natural	2	-
