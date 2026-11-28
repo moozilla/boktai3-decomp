@@ -36,9 +36,9 @@ s32 SlotMonitor_Initialize(struct SlotMonitor *obj, s32 timeout, u32 param, u32 
     obj->slots[1] = 0xffff;
     obj->slots[2] = 0xffff;
     obj->slots[3] = 0xffff;
-    obj->f80 = 0;
-    obj->f74 = 0;
-    obj->f78 = 0;
+    obj->context = 0;
+    obj->onSuccess = 0;
+    obj->onFailure = 0;
     obj->callback = SlotMonitor_PollResult;
     return 0;
 }

@@ -19,3 +19,5 @@ src/link/handshake/CallbackTask_Update.c	CallbackTask_Update	natural	natural	0
 src/link/handshake/LinkHandshake_OnDestroy.c	LinkHandshake_OnDestroy	natural	natural	0	
 src/link/handshake/LinkConnection_SetRetryOptions.c	LinkConnection_SetRetryOptions	contrived	natural	1	
 src/link/handshake/SlotMonitor_Initialize.c	SlotMonitor_Initialize	minor	natural	1	
+src/link/handshake/sub_08108FB4.c	sub_08108FB4	natural	natural	0	
+src/link/handshake/LinkConnection_SetCallbacks.c	LinkConnection_SetCallbacks	contrived	natural	1	cast of the u32 gSlotMonitor global (shared ram.h)

@@ -1,13 +1,16 @@
 #include "global.h"
 #include "engine/ram.h"
+#include "link/handshake/slot_monitor.h"
 
-void LinkConnection_SetCallbacks(void *p, u32 a, u32 b)
+void LinkConnection_SetCallbacks(void *context,
+                                 void (*onSuccess)(void *context, s32 role, s32 result, u32 mode),
+                                 void (*onFailure)(void *context, s32 role, s32 result, u32 mode))
 {
-    u8 *g = gSlotMonitor;
+    struct SlotMonitor *obj = (struct SlotMonitor *)gSlotMonitor;
 
-    if (g) {
-        *(void **)(g + 0x80) = p;
-        *(u32 *)(g + 0x74) = a;
-        *(u32 *)(g + 0x78) = b;
+    if (obj) {
+        obj->context = context;
+        obj->onSuccess = onSuccess;
+        obj->onFailure = onFailure;
     }
 }

@@ -31,10 +31,10 @@ struct SlotMonitor {
     u8 restartPending; /* confidence=low */
     u8 mode;           /* confidence=low */
     u32 checkTimeouts; /* confidence=low */
-    u32 f74;
-    u32 f78;
+    void (*onSuccess)(void *context, s32 role, s32 result, u32 mode);
+    void (*onFailure)(void *context, s32 role, s32 result, u32 mode);
     void (*callback)(struct SlotMonitor *obj);
-    u32 f80;
+    void *context;
 };
 
 void LinkConnection_SetRetryOptions(struct SlotMonitor *obj, u32 options);
