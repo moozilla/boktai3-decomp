@@ -183,3 +183,4 @@ src/scene/actor/attachment/ActorAttachment_CreateManager.c	ActorAttachment_Creat
 src/scene/actor/attachment/ActorAttachment_ClearManagerPointer.c	ActorAttachment_ClearManagerPointer	natural	natural	0	-
 src/scene/actor/attachment/ActorAttachment_IsUnavailable.c	ActorAttachment_IsUnavailable	natural	natural	0	-
 src/scene/actor/attachment/ActorAttachment_ReleaseAll.c	ActorAttachment_ReleaseAll	minor	natural	1	occupied predicate kept
+src/scene/actor/attachment/ActorAttachment_UpdateFromDescriptor.c	ActorAttachment_UpdateFromDescriptor	contrived	natural	12	Flags_MaskedWord: plain test loads the field before the mask
