@@ -12,83 +12,61 @@ u16 *StatusScreen_GetTilePtr(u32 bg, u32 x, s32 y)
 void NumericDisplay_DrawPair(void *unused, int left, int right)
 {
     int digits[2];
-    s16 *dst;
+    u16 *dst;
     int row, col;
-    int *values;
     digits[0] = left > 9;
     digits[1] = left - digits[0] * 10;
-    STATUS_SCREEN_BEGIN_DIGIT_GRID(dst, row, values, digits, 6, 11);
-    for (; row < 2; row++) {
-        int shift = row << 4;
-        int *digit = values;
-        s16 *out = dst;
+    dst = StatusScreen_GetTilePtr(0, 6, 11);
+    for (row = 0; row < 2; row++) {
         for (col = 0; col < 2; col++) {
-            int tile = *digit++ + 32;
-            *out++ = shift + tile | -12288;
+            u16 *out = &dst[col];
+            int tile = digits[col] + 32;
+            *out = ((row << 4) + tile) | 0xD000;
         }
         dst += gBgRecords[0].width * 2;
     }
 
     digits[0] = Div(right, 10);
     digits[1] = right - digits[0] * 10;
-    dst = (s16 *)StatusScreen_GetTilePtr(0, 10, 11);
-    row = 0;
-    values = digits;
-    for (; row < 2;) {
-        int next = row + 1;
-        row <<= 4;
-        {
-            int *digit = values;
-            s16 *out = dst;
-            for (col = 0; col < 2; col++) {
-                int tile = *digit++ + 32;
-                *out++ = row + tile | -12288;
-            }
-            dst += gBgRecords[0].width * 2;
+    dst = StatusScreen_GetTilePtr(0, 10, 11);
+    for (row = 0; row < 2; row++) {
+        for (col = 0; col < 2; col++) {
+            u16 *out = &dst[col];
+            int tile = digits[col] + 32;
+            *out = ((row << 4) + tile) | 0xD000;
         }
-        row = next;
+        dst += gBgRecords[0].width * 2;
     }
 }
 
 void NumericDisplay_DrawStatusValues(struct StatusScreen *unused)
 {
     int digits[2];
-    s16 *dst;
+    u16 *dst;
     int row, col;
-    int *values;
-    int left = SunClock_GetBaseHour(), right = SunClock_GetBaseMinute();
-    digits[0] = Div(left, 10);
-    digits[1] = left - digits[0] * 10;
-    STATUS_SCREEN_BEGIN_DIGIT_GRID(dst, row, values, digits, 16, 11);
-    for (; row < 2; row++) {
-        int shift = row << 4;
-        int *digit = values;
-        s16 *out = dst;
+    int hour = SunClock_GetBaseHour(), minute = SunClock_GetBaseMinute();
+    digits[0] = Div(hour, 10);
+    digits[1] = hour - digits[0] * 10;
+    dst = StatusScreen_GetTilePtr(0, 16, 11);
+    for (row = 0; row < 2; row++) {
         for (col = 0; col < 2; col++) {
-            int tile = *digit++ + 32;
-            *out++ = shift + tile | -12288;
+            u16 *out = &dst[col];
+            int tile = digits[col] + 32;
+            *out = ((row << 4) + tile) | 0xD000;
         }
         dst += gBgRecords[0].width * 2;
     }
 
-    digits[0] = Div(right, 10);
-    digits[1] = right - digits[0] * 10;
-    dst = (s16 *)StatusScreen_GetTilePtr(0, 20, 11);
-    row = 0;
-    values = digits;
-    for (; row < 2;) {
-        int next = row + 1;
-        row <<= 4;
-        {
-            int *digit = values;
-            s16 *out = dst;
-            for (col = 0; col < 2; col++) {
-                int tile = *digit++ + 32;
-                *out++ = row + tile | -12288;
-            }
-            dst += gBgRecords[0].width * 2;
+    digits[0] = Div(minute, 10);
+    digits[1] = minute - digits[0] * 10;
+    dst = StatusScreen_GetTilePtr(0, 20, 11);
+    for (row = 0; row < 2; row++) {
+        for (col = 0; col < 2; col++) {
+            u16 *out = &dst[col];
+            int tile = digits[col] + 32;
+            *out = ((row << 4) + tile) | 0xD000;
         }
-        row = next;
+        dst += gBgRecords[0].width * 2;
     }
 }
 

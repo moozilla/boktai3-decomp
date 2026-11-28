@@ -118,3 +118,5 @@ src/ui/save/scene_tilemap.c	SceneTilemap_SetScrollSource	natural	natural	0	-
 src/ui/save/scene_tilemap.c	SceneTilemap_CopyScrollSourceState	natural	natural	0	-
 src/ui/save/scene_tilemap.c	SceneTilemap_GetScrollLimit	natural	natural	0	-
 src/ui/save/scene_tilemap.c	Bg_SetControlFields	minor	minor	0	unchanged
+src/ui/status_screen/status_screen.c	NumericDisplay_DrawStatusValues	contrived	natural	2	-
+src/ui/status_screen/status_screen.c	NumericDisplay_DrawPair	contrived	natural	12	-
