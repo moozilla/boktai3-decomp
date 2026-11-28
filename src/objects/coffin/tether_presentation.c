@@ -112,9 +112,7 @@ static inline void projectPosition(struct ContactPosition *projected, struct Con
 void TetherActor_PositionRequestIndicator(struct TetherRequestIndicator *indicator)
 {
     struct ContactPosition *screen = &indicator->animation.position;
-    struct ContactPosition *world = TetherActor_GetPosition();
-    struct ContactPosition *projected = &indicator->projected;
-    projectPosition(projected, *(&world));
+    projectPosition(&indicator->projected, TetherActor_GetPosition());
     switch (DirectionMarker_Update(indicator)) {
         case 0:
             screen->x = (u16)indicator->projected.x - 32;
