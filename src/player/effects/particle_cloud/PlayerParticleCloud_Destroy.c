@@ -1,20 +1,19 @@
 #include "global.h"
 #include "engine/ram.h"
+#include "player/effects/player_particle_cloud.h"
 
-struct E {
-    u8 pad[0x48];
-};
-void MessageWindow_Clear(u8 *);
-void Effect_Remove(u8 *);
+void MessageWindow_Clear(struct CloudTask *);
+void Effect_Remove(struct CloudSprite *);
 
-u32 PlayerParticleCloud_Destroy(u8 *p)
+u32 PlayerParticleCloud_Destroy(struct CloudTask *task)
 {
-    u8 *e;
+    struct CloudParticle *particle;
     s32 i;
-    MessageWindow_Clear(p);
-    e = p + 0x30;
-    for (i = 39; i >= 0; i--, e += 0x48) {
-        Effect_Remove(e + 0x20);
-    }
-    return gCloudTask = 0;
+
+    MessageWindow_Clear(task);
+    particle = task->particles;
+    for (i = 0; i < 40; i++, particle++)
+        Effect_Remove(&particle->sprite);
+    gCloudTask = NULL;
+    return 0;
 }

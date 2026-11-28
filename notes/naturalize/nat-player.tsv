@@ -551,3 +551,4 @@ src/player/effects/particle_cloud/SabataFrost_InitModule.c	SabataFrost_InitModul
 src/player/effects/particle_cloud/SabataFrost_ShutdownModule.c	SabataFrost_ShutdownModule	natural	natural	0	-
 src/player/effects/particle_cloud/PlayerParticleCloud_InitModule.c	PlayerParticleCloud_InitModule	natural	natural	0	-
 src/player/effects/particle_cloud/sub_081D31EC.c	sub_081D31EC	contrived	minor	6	player pointer and parked 0x80 mask: ROM loads the mask before the flag word
+src/player/effects/particle_cloud/PlayerParticleCloud_Destroy.c	PlayerParticleCloud_Destroy	contrived	natural	3	-
