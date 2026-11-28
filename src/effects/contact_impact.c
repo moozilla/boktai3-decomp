@@ -431,38 +431,38 @@ void SceneMessages_RegisterReceiver(void *, s32, s32);
 
 struct ContactImpactEffect *PopInSprite_Create(u32 name)
 {
-    struct ContactImpactEffect **current = &gRegistryF3E4Actor;
-    struct ContactImpactEffect *p = Task_Create(8, 0xFC);
-    if (p)
-        Task_SetCallbacks(p, PopInSprite_OnTaskUpdate, PopInSprite_OnTaskDestroy);
-    *current = p;
-    p->name = name;
-    AnimData_Load(p->animation, 0x3641);
-    Sprite_Init(&p->sprite, p->animation, 2);
-    p->sprite.priority = 2;
+    struct ContactImpactEffect **registry = &gRegistryF3E4Actor;
+    struct ContactImpactEffect *effect = Task_Create(8, 0xFC);
+    struct OrbitMotion *motion;
+
+    if (effect)
+        Task_SetCallbacks(effect, PopInSprite_OnTaskUpdate, PopInSprite_OnTaskDestroy);
+    *registry = effect;
+    effect->name = name;
+    AnimData_Load(effect->animation, 0x3641);
+    Sprite_Init(&effect->sprite, effect->animation, 2);
+    effect->sprite.priority = 2;
     if (Script_SeekToKeyword('p')) {
-        p->sprite.position.x = Script_GetValue();
-        p->sprite.position.y = Script_GetValue();
-        p->sprite.position.z = Script_GetValue();
-    } else
-        ZeroFill8(&p->sprite.position);
+        effect->sprite.position.x = Script_GetValue();
+        effect->sprite.position.y = Script_GetValue();
+        effect->sprite.position.z = Script_GetValue();
+    } else {
+        ZeroFill8(&effect->sprite.position);
+    }
     if (Script_SeekToKeyword('c'))
-        AnimData_SelectPaletteBank(p->animation, Script_GetValue() + 0x4B);
-    p->coordinateMode = 2;
-    p->blinkTimer = 0;
-    p->blinkState = 0;
-    {
-        struct OrbitMotion *in = &p->motion;
-        in->position = 0;
-        in->state = 0;
-        in->mode = 0;
-        in->timer = 0;
-    }
-    SceneMessages_RegisterReceiver(&p->receiver, p->name, 10);
+        AnimData_SelectPaletteBank(effect->animation, Script_GetValue() + 0x4B);
+    effect->coordinateMode = 2;
+    effect->blinkTimer = 0;
+    effect->blinkState = 0;
+    motion = &effect->motion;
+    motion->position = 0;
+    motion->state = 0;
+    motion->mode = 0;
+    motion->timer = 0;
+    SceneMessages_RegisterReceiver(&effect->receiver, effect->name, 10);
     if (Script_SeekToKeyword('i') && Script_GetValue())
-        PopInSprite_SetHidden(p);
-    else {
-        ContactImpactEffect_EnterUpdate(p, PopInSprite_UpdateVisibleIdle);
-    }
-    return p;
+        PopInSprite_SetHidden(effect);
+    else
+        ContactImpactEffect_EnterUpdate(effect, PopInSprite_UpdateVisibleIdle);
+    return effect;
 }
