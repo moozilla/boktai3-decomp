@@ -1,12 +1,12 @@
-#include "global.h"
-#include "engine/ram.h"
-s32 TextState_MeasureStringLine(u8 *, s32);
-s32 MessageWindow_GetStringWidth(s32 a)
+#include "ui/dialogue/message_window.h"
+
+s32 TextState_MeasureStringLine(struct MessagePlaybackState *, s32);
+
+s32 MessageWindow_GetStringWidth(s32 string)
 {
-    s32 r;
-    if (((u8 *)gMessageWindow))
-        r = TextState_MeasureStringLine(((u8 *)gMessageWindow) + 0x18, a);
-    else
-        r = 0;
-    return r;
+    struct MessageWindow *window = (void *)gMessageWindow;
+
+    if (!window)
+        return 0;
+    return TextState_MeasureStringLine(&window->state, string);
 }
