@@ -892,15 +892,13 @@ s32 Trigger_CreateContainerFromScript(void)
 s32 TriggerManager_DestroyAllOfType(u32 type)
 {
     struct TriggerManager *s = TriggerManager_GetOrCreate();
-    struct Trigger *n;
+    struct Trigger *n, *next;
     if (s == 0)
         return -1;
-    n = s->head;
-    while (n != 0) {
-        struct Trigger *next = n->next;
+    for (n = s->head; n; n = next) {
+        next = n->next;
         if (n->type == type)
             Trigger_Destroy(n);
-        n = next;
     }
 }
 u32 TriggerManager_DestroyAllOfTypeFromScript(void)

@@ -410,3 +410,4 @@ src/objects/items/item_container.c	Trigger_MoveDropsByItemFromScript	contrived	n
 src/objects/items/item_container.c	Trigger_RunScript	contrived	natural	6	
 src/objects/items/item_container.c	Trigger_UpdateActivation	minor	natural	2	
 src/objects/items/item_container.c	Trigger_TryOpenNearby	contrived	minor	10	goto next shared between two advance paths (continue and nested-condition forms move the advance block)
+src/objects/items/item_container.c	TriggerManager_DestroyAllOfType	minor	natural	1	falls off the end (returns leftover)
