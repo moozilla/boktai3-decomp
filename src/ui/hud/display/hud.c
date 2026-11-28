@@ -236,18 +236,17 @@ void Hud_DrawPlayerGauge(struct SceneHudState *hud, s32 x, s32 y)
     u16 *tiles;
     if (!hud->playerValueEnabled) {
         tiles = Hud_GetTilemapCell(0, x - 3, y);
-        i = 0;
-        do {
+        for (i = 0; i < 14; i++)
             *tiles++ = 0xD000;
-        } while (++i < 14);
     } else {
-        if ((u8)(hud->actionOwner->actionMode - 1) <= 1) {
+        if (hud->actionOwner->actionMode == 1 || hud->actionOwner->actionMode == 2) {
             if (hud->actionOwner->statGaugeFull == 1)
                 filled = 10;
             else
                 filled = Div(hud->actionOwner->statusValue, 400);
-        } else
+        } else {
             filled = hud->actionOwner->statWhole;
+        }
         tiles = Hud_GetTilemapCell(0, x, y);
         for (i = 0; i < filled; i++)
             *tiles++ = 0xD05C;
