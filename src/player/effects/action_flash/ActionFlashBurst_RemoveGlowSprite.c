@@ -1,8 +1,14 @@
 #include "global.h"
+#include "engine/video/sprite.h"
 
-u32 Sprite_Remove(u8 *);
+struct ActionFlashGlowOwner {
+    u8 unknown0[0xC0];
+    struct DisplaySequenceSprite glow;
+};
 
-void ActionFlashBurst_RemoveGlowSprite(u8 *p)
+u32 Sprite_Remove(struct DisplaySequenceSprite *);
+
+void ActionFlashBurst_RemoveGlowSprite(struct ActionFlashGlowOwner *burst)
 {
-    Sprite_Remove(p + 0xC0);
+    Sprite_Remove(&burst->glow);
 }
