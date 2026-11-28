@@ -533,3 +533,4 @@ src/monsters/centipede/CentipedeBody_RestartSegmentAnimations.c	CentipedeBody_Re
 src/monsters/centipede/Centipede_ReactToContact.c	Centipede_ReactToContact	contrived	minor	6	second segment pointer and random table local remain
 src/monsters/centipede/Centipede_HasVisitedRoute.c	Centipede_HasVisitedRoute	contrived	natural	1	
 src/monsters/centipede/ActorTrail_ResetAtSavedPosition.c	ActorTrail_ResetAtSavedPosition	contrived	minor	6	random index block and drawable position casts stay
+src/monsters/centipede/Centipede_EnterHitReaction.c	Centipede_EnterHitReaction	contrived	minor	5	predicate mask, flag pointer and reused mode value: loads order before the stores
