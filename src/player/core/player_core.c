@@ -710,7 +710,6 @@ void Player_UpdateDirectionalEffectPair(struct Player *player)
     AddEffectOffset(&player->visualEffects778[0].position.coordinates, &projected, &offsets[0]);
     AddEffectOffset(&player->visualEffects7A0[0].sprite.position.coordinates, &projected,
                     &offsets[1]);
-    return;
 }
 
 void Player_InitDirectionalEffectPair(struct Player *player)

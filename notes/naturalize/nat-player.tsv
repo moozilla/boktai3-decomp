@@ -240,3 +240,15 @@ src/player/core/player_core.c	Player_InitVitalsAndCollisionFromScript	natural	na
 src/player/core/player_core.c	Player_RefreshVitalsAndCollision	natural	natural	0	
 src/player/core/player_core.c	Player_RefreshStatsAndVitals	natural	natural	0	
 src/player/core/player_core.c	SceneActor_SpawnModeParticles	minor	natural	1	
+src/player/core/player_core.c	Player_UpdateTimedEffect	natural	natural	0	
+src/player/core/player_core.c	HiddenEffect_StartAtPosition	natural	natural	0	
+src/player/core/player_core.c	Player_InitTimedEffect	natural	natural	0	
+src/player/core/player_core.c	Player_SetDirectionalEffectFrame	natural	natural	0	
+src/player/core/player_core.c	Player_InitDirectionalEffectPair	natural	natural	0	
+src/player/core/player_core.c	Player_UpdateOrbitingEffect	natural	natural	0	
+src/player/core/player_core.c	Player_InitOrbitingEffect	natural	natural	0	
+src/player/core/player_core.c	Player_OnOrbitingEffectIdle	natural	natural	0	
+src/player/core/player_core.c	DirectionalEffect_GetAnimationParams	natural	natural	0	
+src/player/core/player_core.c	ProjectEffectPosition	natural	natural	0	
+src/player/core/player_core.c	SetEffectOffset	natural	natural	0	
+src/player/core/player_core.c	Player_UpdateDirectionalEffectPair	minor	minor	1	unsigned halfword casts in the projection helpers
