@@ -166,3 +166,6 @@ src/effects/bursts/linked_effect/ActorEffect_UpdatePool.c	ActorEffect_UpdatePool
 src/effects/bursts/linked_effect/FragmentProjectilePool_Cleanup.c	FragmentProjectilePool_Cleanup	minor	natural	1	-
 src/effects/bursts/linked_effect/FragmentProjectilePool_Init.c	FragmentProjectilePool_Init	contrived	natural	1	-
 src/effects/bursts/linked_effect/FragmentProjectilePool_GetOrCreate.c	FragmentProjectilePool_GetOrCreate	minor	natural	1	-
+src/effects/bursts/linked_effect/FragmentProjectilePool_InitModule.c	FragmentProjectilePool_InitModule	natural	natural	0	
+src/effects/bursts/linked_effect/FragmentProjectilePool_ResetSingleton.c	FragmentProjectilePool_ResetSingleton	natural	natural	0	
+src/effects/bursts/linked_effect/FragmentProjectilePool_RequestRemovalAll.c	FragmentProjectilePool_RequestRemovalAll	contrived	natural	4	-
