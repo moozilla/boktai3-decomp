@@ -1,11 +1,11 @@
 #include "bosses/hresvelgr/hresvelgr_travel.h"
 
-void Hresvelgr_UpdateActionTwentySevenRequest(struct HresvelgrTravelActor *p)
+void Hresvelgr_UpdateActionTwentySevenRequest(struct HresvelgrTravelActor *actor)
 {
-    struct HresvelgrTravelActor *q = p;
-    if (Hresvelgr_EnterVulnerableBehavior(q)) {
-        Hresvelgr_SetActionAnimation(p, 27);
+    struct HresvelgrTravelActor *self = actor;
+    if (Hresvelgr_EnterVulnerableBehavior(self)) {
+        Hresvelgr_SetActionAnimation(actor, 27);
     }
-    if (p->finished)
-        q->behaviorFinished = 1;
+    if (actor->finished)
+        self->behaviorFinished = 1;
 }
