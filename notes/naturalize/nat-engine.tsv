@@ -742,3 +742,4 @@ src/system/solar/sub_0822C970.c	sub_0822C970	contrived	minor	1	scalar views of s
 src/system/solar/Solar_UpdateTask.c	Solar_UpdateTask	contrived	natural	1	
 src/system/solar/Solar_InitControllerState.c	Solar_InitControllerState	contrived	minor	1	scalar views of s16/byte fields where a member store changes the code
 src/system/solar/sub_0822CAA0.c	sub_0822CAA0	contrived	minor	1	state pointer kept for the reads after the minute store
+src/system/solar/sub_0822CB08.c	sub_0822CB08	contrived	minor	1	fields in unnamed ranges of the shared header are read through casts
