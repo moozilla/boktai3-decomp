@@ -7,72 +7,56 @@ void Sound_PlaySong(u32);
 void Collider_SetPosition(void *, void *, u32);
 s32 Collider_Refresh(void *);
 s32 Screamer_WaitForPlayerApproach(struct ScreamerState *);
-static inline u32 Screamer_StepScreamLoop(struct ScreamerState *owner, u32 initialBit)
-{
-    return PlayerCue_StepSequenceEndedWithFirstFlipMask(&owner->sprite, &owner->sequence,
-                                                        initialBit);
-}
 
-s32 Screamer_UpdateScream(struct ScreamerState *p)
+s32 Screamer_UpdateScream(struct ScreamerState *screamer)
 {
     s32 phase;
-    p->sprite.flags &= ~1;
-    phase = p->f1D6;
+    screamer->sprite.flags &= ~1;
+    phase = screamer->f1D6;
     switch (phase) {
         case 0:
-            Screamer_StepAnimation(p);
-            if (p->f1CA > p->f1D4) {
-                Anim_RestartSequence(&p->sequence, p->f218, 0x1B, (u8)p->f1D8, 0);
-                Anim_SetDurationScale(&p->sequence, 0x20);
-                p->f1D6 = 1;
+            Screamer_StepAnimation(screamer);
+            if (screamer->f1CA > screamer->f1D4) {
+                Anim_RestartSequence(&screamer->sequence, screamer->f218, 0x1B, (u8)screamer->f1D8,
+                                     0);
+                Anim_SetDurationScale(&screamer->sequence, 0x20);
+                screamer->f1D6 = 1;
                 Sound_PlaySong(0x51A);
             }
-            p->bodyCollider.flags &= ~4;
-            Collider_SetPosition((void *)&p->bodyCollider, &p->sprite.position, 0);
-            p->frontCollider.flags |= 4;
+            screamer->bodyCollider.flags &= ~4;
+            Collider_SetPosition(&screamer->bodyCollider, &screamer->sprite.position, 0);
+            screamer->frontCollider.flags |= 4;
             break;
         case 1:
-            if (Screamer_StepScreamLoop(p, phase)) {
-                {
-                    u16 *count = (u16 *)&p->f1D2;
-                    u32 next;
-                    s16 *limit;
-                    next = *count + 1;
-                    *count = next;
-                    limit = &p->f1D0;
-                    if ((s16)next >= *limit) {
-                        Anim_RestartSequence(&p->sequence, p->f218, 0x1D, (u8)p->f1D8, 0);
-                        p->f1D6 = 2;
-                    }
+            if (PlayerCue_StepSequenceEndedWithFirstFlipMask(&screamer->sprite, &screamer->sequence,
+                                                             phase)) {
+                if (++screamer->f1D2 >= screamer->f1D0) {
+                    Anim_RestartSequence(&screamer->sequence, screamer->f218, 0x1D,
+                                         (u8)screamer->f1D8, 0);
+                    screamer->f1D6 = 2;
                 }
             }
-            Collider_SetPosition((void *)&p->attackCollider, &p->sprite.position, 0);
-            Collider_Refresh((void *)&p->attackCollider);
-            p->bodyCollider.flags &= ~4;
-            p->frontCollider.flags |= 4;
+            Collider_SetPosition(&screamer->attackCollider, &screamer->sprite.position, 0);
+            Collider_Refresh(&screamer->attackCollider);
+            screamer->bodyCollider.flags &= ~4;
+            screamer->frontCollider.flags |= 4;
             break;
-        case 2: {
-            u32 playbackLimit;
-            s16 *timer;
-            s16 *limit;
-            playbackLimit = Screamer_StepAnimation(p);
-            timer = &p->f1CA;
-            limit = &p->f1CC;
-            /* Keep the playback limit live through recovery-field address setup. */
-            if (*timer > *limit) {
-                Anim_RestartSequence(&p->sequence, p->f218, 0x1A, (u8)p->f1D8, 0);
-                p->update = Screamer_WaitForPlayerApproach;
-                p->f1D6 = 0;
-                *timer = 0;
-                p->f1D2 = 0;
+        case 2:
+            Screamer_StepAnimation(screamer);
+            if (screamer->f1CA > screamer->f1CC) {
+                Anim_RestartSequence(&screamer->sequence, screamer->f218, 0x1A, (u8)screamer->f1D8,
+                                     0);
+                screamer->update = Screamer_WaitForPlayerApproach;
+                screamer->f1D6 = 0;
+                screamer->f1CA = 0;
+                screamer->f1D2 = 0;
             }
-            p->bodyCollider.flags &= ~4;
-            Collider_SetPosition((void *)&p->bodyCollider, &p->sprite.position, 0);
-            p->frontCollider.flags |= 4;
+            screamer->bodyCollider.flags &= ~4;
+            Collider_SetPosition(&screamer->bodyCollider, &screamer->sprite.position, 0);
+            screamer->frontCollider.flags |= 4;
             break;
-        }
     }
-    p->sprite.flags &= ~1;
-    p->f1CA++;
+    screamer->sprite.flags &= ~1;
+    screamer->f1CA++;
     return 0;
 }
