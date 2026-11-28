@@ -1,19 +1,6 @@
 #include "global.h"
-#include "scene/areas/area_effect_link.h"
-struct G {
-    u8 f[0x53];
-    u8 b;
-};
-struct S {
-    u8 f[0xFF0];
-    u32 e;
-    u8 p[8];
-    s32 i;
-    u32 pad;
-    u32 h;
-};
-void TextWindow_SetScript(u32, u32);
-void TextWindow_Refresh(u32, u32);
+#include "link/records/link_record_panel.h"
+#include "ui/save/save_menu.h"
 void TextWindow_SetString(u32, u32, void *);
 void TextWindow_StartPlayback(u32);
 static inline u8 ok(s32 v)
@@ -27,17 +14,17 @@ z:
 o:
     return 1;
 }
-void LinkScorePanel_RefreshPlayerName(struct S *s)
+void LinkScorePanel_RefreshPlayerName(struct SaveMenu *menu)
 {
-    s32 i = s->i;
-    struct G *g = gLinkSession;
-    if (g != 0 && g->b == 1 && ok(i)) {
-        u8 *q = (u8 *)g + ((i << 6) + 0x120);
-        if (q != 0) {
-            TextWindow_SetScript(s->h, s->e);
-            TextWindow_Refresh(s->h, 0);
-            TextWindow_SetString(s->h, 1, q + 0x10);
-            TextWindow_StartPlayback(s->h);
+    s32 i = menu->localPlayer;
+    struct AreaEffectLinkState *link = gLinkSession;
+    if (link != NULL && link->unavailable == 1 && ok(i)) {
+        struct LinkTimeRecord *record = &((struct LinkRecordPayload *)link->sessionData)->peers[i];
+        if (record != NULL) {
+            TextWindow_SetScript(menu->nameWindow, menu->nameScript);
+            TextWindow_Refresh(menu->nameWindow, 0);
+            TextWindow_SetString(menu->nameWindow, 1, record->displayName);
+            TextWindow_StartPlayback(menu->nameWindow);
         }
     }
 }
