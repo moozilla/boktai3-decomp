@@ -341,3 +341,5 @@ src/objects/hazards/timed_hazard/ColliderSpritePool_Update.c	ColliderSpritePool_
 src/objects/hazards/timed_hazard/ScriptSpriteManager_Destroy.c	ScriptSpriteManager_Destroy	minor	natural	1	
 src/objects/hazards/timed_hazard/ScriptSpriteManager_Init.c	ScriptSpriteManager_Init	contrived	natural	1	
 src/objects/hazards/timed_hazard/ColliderSpritePool_Create.c	ColliderSpritePool_Create	minor	natural	1	
+src/objects/hazards/timed_hazard/TimedHazard_ResetManager.c	TimedHazard_ResetManager	natural	natural	0	
+src/objects/hazards/timed_hazard/TimedHazard_OnAttackContact.c	TimedHazard_OnAttackContact	natural	natural	0	
