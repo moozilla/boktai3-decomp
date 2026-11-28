@@ -611,3 +611,4 @@ src/system/inventory/Inventory_SetConsumableEntry.c	Inventory_SetConsumableEntry
 src/system/inventory/Inventory_GetConsumableId.c	Inventory_GetConsumableId	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
 src/system/inventory/GameState_ClearConsumableSlot.c	GameState_ClearConsumableSlot	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
 src/system/inventory/Inventory_SwapSlots.c	Inventory_SwapSlots	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
+src/system/inventory/GameState_SortConsumableSlots.c	GameState_SortConsumableSlots	contrived	natural	1	
