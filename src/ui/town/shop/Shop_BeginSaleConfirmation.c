@@ -15,12 +15,7 @@ void Shop_BeginSaleConfirmation(struct ShopControlView *panel)
         }
         case 2: {
             const void *message = panel->consumableText;
-            u32 address = panel->grid.savedSelection;
-            struct GameState *game = gGameState;
-            s32 item;
-            address <<= 1;
-            address += (u32)game;
-            item = ((struct ShopConsumableSlot *)address)->id;
+            s32 item = *(panel->grid.savedSelection + gGameState->table160);
             SceneInputPanel_ShowDescription(panel, 1, message, item);
             break;
         }
@@ -28,6 +23,5 @@ void Shop_BeginSaleConfirmation(struct ShopControlView *panel)
     Shop_UpdateModePrompt(panel, 2);
     SceneInput_BeginChoice(&panel->display.prompt, &panel->display.widgetResource,
                            &panel->choiceValue, 0, &panel->choiceBlink);
-    Shop_SetControllerCallback(
-        panel, (ShopCallback)Shop_TickSaleConfirmation);
+    Shop_SetControllerCallback(panel, (ShopCallback)Shop_TickSaleConfirmation);
 }

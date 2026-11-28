@@ -483,3 +483,4 @@ src/ui/town/shop/Shop_FindActionDestination.c	Shop_FindActionDestination	natural
 src/ui/town/shop/Shop_SelectActionDestination.c	Shop_SelectActionDestination	minor	minor	10	u16 read narrowed to short and a mask-first column: plain reads swap registers
 src/ui/town/shop/Shop_BeginActionSelection.c	Shop_BeginActionSelection	natural	natural	0	
 src/ui/town/shop/Shop_BeginPurchaseConfirmation.c	Shop_BeginPurchaseConfirmation	contrived	minor	4	catalog view cast
+src/ui/town/shop/Shop_BeginSaleConfirmation.c	Shop_BeginSaleConfirmation	contrived	minor	2	index-first pointer sum into table160
