@@ -27,15 +27,13 @@ void Armor_RetractPartStretch(struct ArmorPart *p)
     if (stretch == 64) {
         u32 random;
         u8 one;
-        u32 offset;
         gRandomIndex = (gRandomIndex + 1) & 1023;
-        offset = gRandomIndex * 2;
-        random = *(const u16 *)(offset + (u32)gRandomTable);
+        random = *(gRandomTable + gRandomIndex);
         one = 1;
         random &= one;
         p->direction = random ? 1 : -1;
         p->byte11E = one;
         p->byte11F = one;
-        p->flags119 = one | p->flags119;
+        p->flags119 |= one;
     }
 }

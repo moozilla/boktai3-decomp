@@ -171,3 +171,34 @@ src/monsters/armor/armor_actions.c	Armor_UpdateFacingAction9	contrived	minor	1	p
 src/monsters/armor/armor_actions.c	Armor_UpdateFacingAction29	contrived	minor	1	player position copied through gGameState halfword reads
 src/monsters/armor/armor_actions.c	Armor_UpdateFacingAction6	contrived	natural	1	
 src/monsters/armor/armor_behavior.c	Armor_UpdateFacingActionSequence	contrived	natural	1	
+src/monsters/armor/armor_behavior.c	Armor_UpdateAxisChase	minor	minor	0	goto restarts the state dispatch after choosing a phase
+src/monsters/armor/Armor_InitCollider.c	Armor_InitCollider	natural	natural	0	
+src/monsters/armor/Armor_SetPlanarVelocity.c	Armor_SetPlanarVelocity	natural	natural	0	
+src/monsters/armor/Armor_UpdateAccumulatedBehavior.c	Armor_UpdateAccumulatedBehavior	natural	natural	0	
+src/monsters/armor/Armor_TriggerBehavior35.c	Armor_TriggerBehavior35	natural	natural	0	
+src/monsters/armor/Armor_InitCombatColliders.c	Armor_InitCombatColliders	natural	natural	0	
+src/monsters/armor/Armor_BeginPartStretch.c	Armor_BeginPartStretch	natural	natural	0	
+src/monsters/armor/Armor_UpdatePartStretch.c	Armor_UpdatePartStretch	natural	natural	0	
+src/monsters/armor/Armor_UpdatePartOrbit.c	Armor_UpdatePartOrbit	natural	natural	0	
+src/monsters/armor/Armor_BeginPartSpinup.c	Armor_BeginPartSpinup	natural	natural	0	
+src/monsters/armor/Armor_UpdatePartLunge.c	Armor_UpdatePartLunge	natural	natural	0	
+src/monsters/armor/Armor_UpdatePartRetraction.c	Armor_UpdatePartRetraction	natural	natural	0	
+src/monsters/armor/spinning_approach.c	SpinningApproach_InitMotion	natural	natural	0	
+src/monsters/armor/spinning_approach.c	SpinningApproach_UpdateSpinRamp	natural	natural	0	
+src/monsters/armor/spinning_approach.c	SpinningApproach_UpdateApproach	natural	natural	0	
+src/monsters/armor/spinning_approach.c	SpinningApproach_UpdateOwnerRelativeSegment	natural	natural	0	
+src/monsters/armor/Armor_CapturePartMotionEndpoint.c	Armor_CapturePartMotionEndpoint	natural	natural	0	
+src/monsters/armor/Armor_StartPartOrbitMotion.c	Armor_StartPartOrbitMotion	natural	natural	0	
+src/monsters/armor/Armor_StartPartSpinMotion.c	Armor_StartPartSpinMotion	natural	natural	0	
+src/monsters/armor/Armor_StartPartReturnMotion.c	Armor_StartPartReturnMotion	natural	natural	0	
+src/monsters/armor/Armor_StartPartApproachMotion.c	Armor_StartPartApproachMotion	natural	natural	0	
+src/monsters/armor/Armor_UpdatePartColliders.c	Armor_UpdatePartColliders	natural	natural	0	
+src/monsters/armor/SceneEffectPool_Update.c	SceneEffectPool_Update	natural	natural	0	
+src/monsters/armor/Armor_DestroySpriteColliders.c	Armor_DestroySpriteColliders	natural	natural	0	
+src/monsters/armor/actor_controller_requests.c	ActorController_SetBehavior	natural	natural	0	
+src/monsters/armor/armor_tracking.c	Armor_UpdateFacingAction25	minor	minor	0	byte pointer signature
+src/monsters/armor/armor_behavior.c	Armor_UpdatePlayerAlignmentAction25	minor	minor	0	byte pointer signature
+src/monsters/armor/Armor_SelectAlignedAttack.c	Armor_SelectAlignedAttack	minor	minor	0	goto-shaped decision tree
+src/monsters/armor/Armor_UpdateFacingDecision.c	Armor_UpdateFacingDecision	minor	minor	0	goto-shaped decision tree
+src/monsters/armor/Armor_ReceiveTargetEvent.c	Armor_ReceiveTargetEvent	minor	minor	0	goto-shaped decision tree
+src/monsters/armor/Armor_RetractPartStretch.c	Armor_RetractPartStretch	contrived	minor	2	parked one is shared by the flag stores
