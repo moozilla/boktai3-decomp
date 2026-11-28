@@ -154,3 +154,7 @@ src/bosses/count/ContactActor_UpdateAwaitHide.c	ContactActor_UpdateAwaitHide	min
 src/bosses/count/ContactActor_UpdateInactive.c	ContactActor_UpdateInactive	minor	natural	3	
 src/bosses/count/ContactActorPool_Update.c	ContactActorPool_Update	minor	minor	8	fade local and first/second palette pointers stay (inline expressions differ)
 src/bosses/count/ContactActorPool_Destroy.c	ContactActorPool_Destroy	contrived	natural	3	
+src/bosses/count/ContactActorPool_Initialize.c	ContactActorPool_Initialize	contrived	contrived	20	unchanged: pool/slot cursor union keeps both in one register; every plain loop or pointer spelling differs
+src/bosses/count/ContactActorPool_Create.c	ContactActorPool_Create	natural	natural	0	
+src/bosses/count/ContactActorPool_RequestClear.c	ContactActorPool_RequestClear	natural	natural	0	
+src/bosses/count/ContactActorPool_Start.c	ContactActorPool_Start	contrived	contrived	14	unchanged core: random-table halves union with BeginRandomSamples, draw-view of the health collider and pointer temps; plain table reads differ

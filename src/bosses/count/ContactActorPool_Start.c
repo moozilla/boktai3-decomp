@@ -1,16 +1,11 @@
 #include "scene/collision/contact_swarm.h"
+#include "scene/motion/scene_actor_charge_offset.h"
 void ContactActor_SetDirectionalSequence(struct ContactActorPool *, struct ContactActor *, u32);
 void Palette_InterpolateBanks(void *, void *, void *, s32, s32);
 union ContactRandomSource {
     const u16 *table;
     u16 halves[2];
 };
-static inline s32 TruncateShift12(s32 value)
-{
-    if (value >= 0)
-        return value >> 12;
-    return -((-value) >> 12);
-}
 static inline u32 NextSampleIndex(void)
 {
     u32 index = (gRandomIndex + 1) & 1023;
@@ -43,17 +38,15 @@ s32 ContactActorPool_Start(struct ContactActorPool *pool, const struct ContactPo
     pool->fadeMode = 1;
     pool->fadeLevel = 63;
     {
-        u8 *bank = gPaletteBankData;
-        void *first = bank + 0x5A60;
-        void *second = bank + 0x5AA0;
+        void *first = gPaletteBankData + 0x5A60;
+        void *second = gPaletteBankData + 0x5AA0;
         Palette_InterpolateBanks(pool->tileData, first, second, 63, 6);
     }
     source.halves[0] = (u16)RANDOM_TABLE_ADDR;
     source.halves[1] = RANDOM_TABLE_ADDR >> 16;
     pool->retreatCenter = *center;
-    slot = &pool->slots[0];
-    index = 0;
-    do {
+    slot = pool->slots;
+    for (index = 0; index < 16; index++, slot++) {
         struct ContactSwarmColliderAnimation *display;
         struct ContactSwarmSprite *sprite;
         struct ContactPosition *actorPosition;
@@ -81,10 +74,11 @@ s32 ContactActorPool_Start(struct ContactActorPool *pool, const struct ContactPo
         radius = (NextRandom(table) & 31) + 16;
         slot->desiredHeight = position->y;
         slot->targetHeight = position->y + (NextRandom(table) & 511);
-        slot->position.x =
-            position->x + TruncateShift12(gUnk_086149C4[(slot->direction + 64) & 255] * radius);
+        slot->position.x = position->x + SceneActor_ChargeComponent(
+                                             gUnk_086149C4[(slot->direction + 64) & 255] * radius);
         slot->position.y = slot->targetHeight;
-        slot->position.z = TruncateShift12(gUnk_086149C4[slot->direction] * radius) + position->z;
+        slot->position.z =
+            SceneActor_ChargeComponent(gUnk_086149C4[slot->direction] * radius) + position->z;
         slot->steeringTimer = (NextRandom(table) & 7) + 7;
         actorPosition = &slot->position;
         sprite->position = slot->position;
@@ -96,10 +90,8 @@ s32 ContactActorPool_Start(struct ContactActorPool *pool, const struct ContactPo
         Collider_SetPosition(&slot->resourceCollider, actorPosition, 0);
         health = &slot->healthCollider;
         Collider_SetPosition(health, actorPosition, 0);
-        health->flags |= 4;
-        index++;
-        slot++;
-    } while (index <= 15);
+        ContactCollider_SetFlags(health, 4);
+    }
     pool->state = 1;
     return 0;
 }
