@@ -175,3 +175,4 @@ src/npc/story_character/StoryCharacter_UpdateAnimation16State.c	StoryCharacter_U
 src/npc/story_character/StoryCharacter_UpdateTargetApproach.c	StoryCharacter_UpdateTargetApproach	contrived	contrived	12	angle pointer pair, product local and out/value block stay: heading velocity code reallocates without them; local struct view
 src/npc/story_character/StoryCharacter_RunEntryAnimSequence.c	StoryCharacter_RunEntryAnimSequence	minor	minor	1	zero local stays: shared as argument and frame reset
 src/npc/story_character/StoryCharacter_ApproachTargetPose.c	StoryCharacter_ApproachTargetPose	contrived	natural	1	
+src/npc/story_character/StoryCharacter_SpawnRaisedEffect.c	StoryCharacter_SpawnRaisedEffect	contrived	minor	8	effects word pointer into the unnamed 0x20 block and a target pointer: ROM keeps both addresses
