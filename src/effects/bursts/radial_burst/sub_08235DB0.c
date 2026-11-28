@@ -1,40 +1,18 @@
-#include "global.h"
-#include "engine/ram.h"
+#include "effects/bursts/radial_burst.h"
+#include "player/player.h"
+#include "player/player_timed_cue.h"
+#include "system/game_state/game_state.h"
 
-extern u8 *gGameState;
-
-struct CueTarget {
-    u8 pad0[0x428];
-    u16 f428;
-};
-struct CueTask {
-    u8 pad0[0x18];
-    u8 side;
-    u8 started;
-    u8 pad1A[2];
-    struct CueTarget *target;
-};
-
-void sub_08235DB0(struct CueTask *p)
+void sub_08235DB0(struct RadialBurst *burst)
 {
-    p->target->f428 = 0;
-    if (p->side == 0) {
-        *(u16 *)(gGameState + 0x2C) = 0;
-        {
-            u16 one = 1;
-            u16 time = 0x708;
-            gPlayerActionPending = one;
-            gPlayerCueTimer = time;
-        }
+    burst->player->currentStatB = 0;
+    if (burst->kind == 0) {
+        gGameState->unk2c = 0;
+        Player_SetTimedCue(1, 0x708);
         gPlayerEffectPendingCount++;
-        p->started = 1;
+        burst->started = 1;
     } else {
-        *(u16 *)(gGameState + 0x3A) = 0;
-        {
-            u16 two = 2;
-            u16 time = 0x708;
-            gPlayerActionPending = two;
-            gPlayerCueTimer = time;
-        }
+        gGameState->alternateStatB = 0;
+        Player_SetTimedCue(2, 0x708);
     }
 }
