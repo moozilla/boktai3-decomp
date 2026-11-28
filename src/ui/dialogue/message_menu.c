@@ -2,9 +2,8 @@
 
 void MessageMenu_LoadBackground(struct MessageMenu *m, int id)
 {
-    void *map = ScriptProc_Start(0xC091, 0x3536);
-    m->map = map;
-    Bg_SetupLayers(1, 0, map, 0, 0, 1, &id);
+    m->map = ScriptProc_Start(0xC091, 0x3536);
+    Bg_SetupLayers(1, 0, m->map, 0, 0, 1, &id);
     BgGfx_LoadTilemapSimple(2, 0, 0, 0, 0);
     m->palette = (u8 *)ScriptProc_Start(0x92B3, 0x204) + 20;
     CpuSet(m->palette, gBgPaletteBuffer, 256);
