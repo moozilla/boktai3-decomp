@@ -1,4 +1,3 @@
-#define gPlayerCueFlags gEngineFlags
 #include "global.h"
 #include "player/player.h"
 #include "engine/engine.h"

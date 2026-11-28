@@ -206,3 +206,4 @@ src/player/control/Player_BeginDirectionSequence.c	Player_BeginDirectionSequence
 src/player/control/sub_08158E68.c	sub_08158E68	contrived	minor	1	followTarget halfword read at +6 (source type unknown)
 src/player/control/SceneActorControl_OnJitterPosition.c	SceneActorControl_OnJitterPosition	natural	natural	0	
 src/player/control/Player_BeginResourceStationInteraction.c	Player_BeginResourceStationInteraction	contrived	natural	1	
+src/player/control/Player_BeginDirectionalCue.c	Player_BeginDirectionalCue	minor	natural	1	
