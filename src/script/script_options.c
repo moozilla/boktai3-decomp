@@ -16,13 +16,10 @@ enabled:
 
 u32 GameState_SetChallengeCompletionFlag(u32 index)
 {
-    u32 result;
-    if (index <= 11) {
-        gGameState->counters628[3] |= 1 << index;
-        result = 1;
-    } else
-        result = 0;
-    return result;
+    if (index > 11)
+        return 0;
+    gGameState->counters628[3] |= 1 << index;
+    return 1;
 }
 
 void GameState_SetChallengeCompletionFlagFromScript(void)
