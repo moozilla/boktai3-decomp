@@ -38,8 +38,7 @@ void Golem_ReturnHome(struct ChaseActor *actor)
     struct ContactPosition center;
     struct ContactPosition diff;
     if (Chase_TakeArrived(actor)) {
-        void *target = Golem_BeginChargeBuildup;
-        SceneActorChase_SetControl(actor, target, 0x25);
+        SceneActorChase_SetControl(actor, Golem_BeginChargeBuildup, 0x25);
         actor->base.body.direction = actor->base.tracking.heading;
         actor->base.stepDone = 0;
         body->charge688 = 0;
@@ -47,10 +46,8 @@ void Golem_ReturnHome(struct ChaseActor *actor)
     if (Golem_InvokeEnabledBehavior(actor))
         return;
     if (actor->base.stepDone) {
-        struct ContactPosition *dest = group->destination;
-        struct SceneActorRegistryRoute *link = &group->homeRoute;
-        SceneActorChase_SnapToRoute(dest, link);
-        (group->destination)->pad = 0;
+        SceneActorChase_SnapToRoute(group->destination, &group->homeRoute);
+        group->destination->pad = 0;
         body->field68D = 0;
         body->routeDelay = 0x78;
         body->counter686 = 0;
@@ -70,10 +67,7 @@ void Golem_ReturnHome(struct ChaseActor *actor)
             actor->base.body.direction = angle;
             body->direction68E = angle;
         }
-        {
-            void *target = Golem_UpdateRouteMotion;
-            SceneActorChase_SetControl(actor, target, 0x23);
-        }
+        SceneActorChase_SetControl(actor, Golem_UpdateRouteMotion, 0x23);
         SceneActorChase_SetPhase(actor, 2, 1);
     } else
         actor->base.counter2AC++;
