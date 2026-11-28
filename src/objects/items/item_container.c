@@ -393,13 +393,13 @@ void Trigger_UpdateGrounded(struct TriggerManager *manager, struct Trigger *p)
     }
 }
 
-void Trigger_UpdateDropTimer(struct TriggerManager *a, struct Trigger *b)
+void Trigger_UpdateDropTimer(struct TriggerManager *manager, struct Trigger *p)
 {
-    if (Sprite_BlinkUntilExpired(b->sprite, b->timer, 0x2d, 0x5a))
-        b->flags |= 1;
+    if (Sprite_BlinkUntilExpired(p->sprite, p->timer, 45, 90))
+        p->flags |= 1;
     else
-        Trigger_UpdateProximity(a, b);
-    b->timer++;
+        Trigger_UpdateProximity(manager, p);
+    p->timer++;
 }
 
 void Trigger_UpdateIdleAnimation(struct TriggerManager *manager, struct Trigger *p)
