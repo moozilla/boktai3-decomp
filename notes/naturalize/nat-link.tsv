@@ -4,3 +4,4 @@ src/link/encoded_records/EncodedRecord_ReadBits.c	EncodedRecord_ReadBits	contriv
 src/link/encoded_records/EncodedRecord_NextMaskWord.c	EncodedRecord_NextMaskWord	natural	natural	0	
 src/link/encoded_records/EncodedRecord_XorRange.c	EncodedRecord_XorRange	natural	natural	0	
 src/link/encoded_records/EncodedRecord_FormatRows.c	EncodedRecord_FormatRows	contrived	natural	2	
+src/link/encoded_records/EncodedRecord_EncodeFields.c	EncodedRecord_EncodeFields	contrived	natural	25	session view cast stays (gSessionState is a byte pointer)
