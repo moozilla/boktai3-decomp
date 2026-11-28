@@ -1,11 +1,7 @@
 #include "global.h"
+#include "system/game_state/game_state.h"
 #include "engine/runtime.h"
 #include "system/solar/solar_measurement_task.h"
-struct Context {
-    u8 pad[0x874];
-    s16 a, b;
-};
-extern u8 *gGameState;
 void Solar_StartMeasurement(void), sub_0822C598(struct SolarMeasurementTask *);
 s32 Solar_GetIntensity(void), Solar_GetLevelForIntensity(s32), Solar_ApplyIntensityModifiers(s32);
 void Solar_UpdateMeasurement(struct SolarMeasurementTask *obj)
@@ -27,12 +23,11 @@ void Solar_UpdateMeasurement(struct SolarMeasurementTask *obj)
         case 2:
             obj->a = Solar_GetIntensity();
             obj->gain = Solar_GetLevelForIntensity(obj->a);
-            (*(s16 *)(gGameState + 0x874)) = Solar_ApplyIntensityModifiers(obj->a);
-            (*(s16 *)(gGameState + 0x876)) =
-                Solar_GetLevelForIntensity((*(s16 *)(gGameState + 0x874)));
+            *(u16 *)&gGameState->unk874 = Solar_ApplyIntensityModifiers(obj->a);
+            gGameState->unk876 = Solar_GetLevelForIntensity(gGameState->unk874);
             sub_0822C598(obj);
-            gSolarSavedLevel = (*(s16 *)(gGameState + 0x874));
-            gSolarSavedCachedLevel = (*(s16 *)(gGameState + 0x876));
+            gSolarSavedLevel = gGameState->unk874;
+            gSolarSavedCachedLevel = gGameState->unk876;
             break;
     }
 }

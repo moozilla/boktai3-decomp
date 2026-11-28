@@ -729,3 +729,4 @@ src/system/solar/Solar_ApplyIntensityModifiers.c	Solar_ApplyIntensityModifiers	c
 src/system/solar/Solar_GetIntensity.c	Solar_GetIntensity	minor	natural	1	
 src/system/solar/Solar_SaveExposureTimestamp.c	Solar_SaveExposureTimestamp	minor	natural	1	
 src/system/solar/Solar_HasExposureCooldownElapsed.c	Solar_HasExposureCooldownElapsed	contrived	natural	1	
+src/system/solar/Solar_UpdateMeasurement.c	Solar_UpdateMeasurement	contrived	minor	1	scalar u16 view of the s16 field: a member store keeps gGameState cached
