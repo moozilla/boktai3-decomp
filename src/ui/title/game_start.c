@@ -1,4 +1,5 @@
 #include "ui/title/game_start_menu.h"
+#include "gba/io_reg.h"
 #include "system/game_state/game_state.h"
 #include "global.h"
 #include "engine/video/display_sprite_playback.h"
@@ -205,16 +206,16 @@ void GameStart_Update(struct GameStart *p)
     switch (state = p->state) {
         case 0:
             GameStart_UpdateSelectionPalette(p);
-            if (gPadState[1] & 2) {
+            if (gPadState[1] & B_BUTTON) {
                 Sound_PlaySong(0xDE);
                 p->fadeSpeed = 3;
                 Menu_StartFadeOut(3);
                 Sound_PauseChannel10(2);
                 p->state = 1;
-                p->result = state;
+                p->result = 0;
                 break;
             }
-            if (gPadState[1] & 1) {
+            if (gPadState[1] & A_BUTTON) {
                 if (p->selection == 0) {
                     Sound_PlaySong(0xE0);
                     p->fadeSpeed = 3;
@@ -224,7 +225,7 @@ void GameStart_Update(struct GameStart *p)
                     p->result = 1;
                 } else {
                     Sound_PlaySong(0xDD);
-                    p->fadeSpeed = state;
+                    p->fadeSpeed = 0;
                     Menu_StartFadeOut(0);
                     p->state = 1;
                     p->result = 2;
@@ -233,23 +234,23 @@ void GameStart_Update(struct GameStart *p)
             }
             if ((s16)gGameState->flag86E == 0)
                 break;
-            if (gPadState[1] & 0x40) {
+            if (gPadState[1] & DPAD_UP) {
                 if (--p->selection < 0)
                     p->selection = 1;
-            } else if (gPadState[1] & 0x80) {
+            } else if (gPadState[1] & DPAD_DOWN) {
                 if (++p->selection > 1)
-                    p->selection = state;
+                    p->selection = 0;
             } else
                 break;
             p->pulseTimer = state;
             Sound_PlaySong(0x37C);
             break;
         case 1:
-            if (p->fadeTimer > (state << p->fadeSpeed)) {
-                p->cursor.flags |= state;
-                p->title.flags |= state;
-                p->decoration.flags |= state;
-                p->background.flags |= state;
+            if (p->fadeTimer > (1 << p->fadeSpeed)) {
+                p->cursor.flags |= 1;
+                p->title.flags |= 1;
+                p->decoration.flags |= 1;
+                p->background.flags |= 1;
                 if (p->result == 0)
                     Script_Call(gListMenuParameters.c, 0);
                 else if (p->result == 2) {
