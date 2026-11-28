@@ -1,11 +1,15 @@
 #include "global.h"
 #include "engine/ram.h"
+#include "ui/dialogue/text_window.h"
+#include "ui/dialogue/text_window_manager.h"
 
-u32 TextWindowManager_FindWindow(u32, u32);
-u32 TextWindow_Find(u32 a)
+struct TextWindow *TextWindowManager_FindWindow(struct WindowManager *, int);
+
+struct TextWindow *TextWindow_Find(int id)
 {
-    u32 g = gWindowManager;
-    if (g == 0)
+    struct WindowManager *manager = (void *)gWindowManager;
+
+    if (!manager)
         return 0;
-    return TextWindowManager_FindWindow(g, a);
+    return TextWindowManager_FindWindow(manager, id);
 }
