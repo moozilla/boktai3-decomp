@@ -1,20 +1,20 @@
 #include "global.h"
+#include "player/player.h"
 
-s32 Player_CanUseAction(u8 *, s32);
-void Player_InitFacingDriftOffset(u8 *);
-void ActorMotion_ApplyHeadingDrift(u8 *);
-void Player_ClearMovementLock(u8 *);
+s32 Player_CanUseAction(struct Player *, s32);
+void Player_InitFacingDriftOffset(struct Player *);
+void ActorMotion_ApplyHeadingDrift(struct Player *);
+void Player_ClearMovementLock(struct Player *);
 
-void sub_0823B728(u8 *p, s32 action)
+void sub_0823B728(struct Player *p, s32 action)
 {
-    if ((**(u16 **)(p + 0x348) & 0x100) && Player_CanUseAction(p, action)) {
-        u32 kind = p[0x418];
-        if ((kind <= 1 || kind == 6) && p[0x457] == 4)
+    if ((p->inputKeys[0] & 0x100) && Player_CanUseAction(p, action)) {
+        if ((p->actionMode <= 1 || p->actionMode == 6) && p->tetherMode == 4)
             Player_InitFacingDriftOffset(p);
         else
             ActorMotion_ApplyHeadingDrift(p);
-    } else if (*(s16 *)(p + 0x4B6) != 0) {
+    } else if (p->cameraOffsetActive != 0) {
         Player_ClearMovementLock(p);
     }
-    p[0x4B9] = 1;
+    p->cameraInputProcessed = 1;
 }
