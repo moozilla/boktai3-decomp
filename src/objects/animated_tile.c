@@ -164,38 +164,23 @@ extern void *gUnk_08606530[];
 
 s32 sub_08249240(void *, void *, void *);
 
-static inline u8 AnimatedTile_IsSlotActive(u32 *used, s32 i)
+static inline void AnimatedTile_DispatchOccupied(struct AnimatedTileManager *manager,
+                                                 struct AnimatedTile *tile)
 {
-    u32 bit = 1 << i;
-    if (*used & bit)
-        return 1;
-    return 0;
+    sub_08249240(manager, tile, gUnk_08606530[tile->state]);
 }
 
-static inline void AnimatedTile_DispatchOccupied(struct AnimatedTileManager *obj,
-                                                 struct AnimatedTile *slots)
+s32 CallbackSlots_DispatchActive(struct AnimatedTileManager *manager)
 {
+    struct AnimatedTile *tiles = manager->tiles;
     s32 i;
-    u32 *used;
-    void **table;
-    i = 0;
-    used = &obj->used;
-    table = gUnk_08606530;
-    do {
-        if (AnimatedTile_IsSlotActive(used, i)) {
-            struct AnimatedTile *slot = (void *)((u32)i * sizeof(*slots) + (u32)slots);
-            sub_08249240(obj, slot, table[slot->state]);
-        }
-        i++;
-    } while (i < 3);
-}
 
-s32 CallbackSlots_DispatchActive(struct AnimatedTileManager *obj)
-{
-    struct AnimatedTile *slots = obj->tiles;
-    if (!obj->used)
+    if (manager->used == 0)
         return 0;
-    AnimatedTile_DispatchOccupied(obj, slots);
+    for (i = 0; i < 3; i++) {
+        if (AnimatedTile_TestSlot(manager, i))
+            AnimatedTile_DispatchOccupied(manager, &tiles[i]);
+    }
     return 0;
 }
 
