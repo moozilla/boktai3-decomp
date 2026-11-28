@@ -1,18 +1,14 @@
 #include "global.h"
+#include "bosses/vanargand/vanargand_pair_attack.h"
 #include "engine/video/render.h"
 
-struct A {
-    u8 pad[0x574];
-    u32 counter;
-};
+void Vanargand_UpdateAnimationAndTargets(struct VanargandPairAttack *p);
+void Vanargand_RunModeCallback(struct VanargandPairAttack *p);
+void Vanargand_ApplyRequestedMode(struct VanargandPairAttack *p);
+void Vanargand_UpdateStateCallback(struct VanargandPairAttack *p);
+void Vanargand_UpdatePresentation(struct VanargandPairAttack *p);
 
-void Vanargand_UpdateAnimationAndTargets(struct A *p);
-void Vanargand_RunModeCallback(struct A *p);
-void Vanargand_ApplyRequestedMode(struct A *p);
-void Vanargand_UpdateStateCallback(struct A *p);
-void Vanargand_UpdatePresentation(struct A *p);
-
-void Vanargand_Update(struct A *p)
+void Vanargand_Update(struct VanargandPairAttack *p)
 {
     if ((gEnginePauseFlags & 7) == 0) {
         Vanargand_UpdateAnimationAndTargets(p);
@@ -20,6 +16,6 @@ void Vanargand_Update(struct A *p)
         Vanargand_ApplyRequestedMode(p);
         Vanargand_UpdateStateCallback(p);
         Vanargand_UpdatePresentation(p);
-        p->counter = ((p->counter + 1) & 0xFFFF) + 1;
+        p->attackCounter = ((p->attackCounter + 1) & 0xFFFF) + 1;
     }
 }

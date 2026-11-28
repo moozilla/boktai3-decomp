@@ -52,10 +52,16 @@ struct VanargandPairAttack {
     u8 animationEvent;
     u8 padB3[0xC4 - 0xB3];
     u32 actionTimer; /* 0xC4: frames in the current action phase. */
-    u8 padC8[0x100 - 0xC8];
+    s32 targetDistances[1]; /* 0xC8 */
+    u8 targetBearings[1];   /* 0xCC */
+    u8 padCD[0xE1 - 0xCD];
+    u8 healthRatio; /* 0xE1 */
+    u8 padE2[0xF0 - 0xE2];
+    u32 scriptId; /* 0xF0 */
+    u8 padF4[0x100 - 0xF4];
     void (*stateCallback)(void *, s32);
     u8 (*callback)(struct VanargandPairAttack *);
-    u8 pad108[4];
+    void *modeCallback; /* 0x108 */
     struct Player *player;
     struct SceneVec *destination; /* 0x110 */
     u8 pad114[0x118 - 0x114];
@@ -70,13 +76,18 @@ struct VanargandPairAttack {
     struct VanargandDamagePart part;
     struct MotionTrack track;
     struct VanargandAttackPair *pair;
-    u8 pad570[0x580 - 0x570];
+    s32 targetCount;      /* 0x570 */
+    u32 attackCounter;    /* 0x574 (tentative) */
+    u32 impactShake;      /* 0x578 */
+    void *projectilePool; /* 0x57C */
     u32 selected;
     u16 parameter584;
     u16 parameter;
     u16 parameter588;
     u16 drainDamage;
-    u8 pad58C[0x598 - 0x58C];
+    u16 projectileCount; /* 0x58C */
+    u16 contactForce;    /* 0x58E (tentative) */
+    u8 pad590[0x598 - 0x590];
     u16 partThresholds[3];
     u16 thresholds[3];
     u32 hitFlags;
@@ -87,9 +98,10 @@ struct VanargandPairAttack {
     u16 delay;
     s16 drainStartFrame;
     s16 repeats;
-    u8 pad5B6[2];
+    s16 selectedHalf; /* 0x5B6 */
     u16 attackParameter5B8, attackParameter5BA;
-    u8 pad5BC[0x5C0 - 0x5BC];
+    u8 pad5BC[2];
+    u16 unknown5BE;
     u16 attackPhase; /* 0x5C0: cleared by the mode 25 transition (tentative). */
     s16 mode;
     u8 pairState;      /* 0x5C4: row of the pair transition table (tentative). */
@@ -113,7 +125,7 @@ struct VanargandPairAttack {
     s32 attachment; /* 0xF38: passed to Player_AddExperience on entering state 21. */
     u16 flash;
     u16 pendingCue;
-    u8 unknownF40[4];
+    u32 debugValue; /* 0xF40 */
     void *afterimages;
 };
 
