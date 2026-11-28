@@ -323,3 +323,4 @@ src/ui/dialogue/scrolling_dialogue/scrolling_dialogue.c	ScrollingDialogue_SetStr
 src/ui/dialogue/scrolling_dialogue/scrolling_dialogue.c	ScrollingDialogue_SetChoicesFromScript	natural	natural	1	
 src/ui/dialogue/scrolling_dialogue/scrolling_dialogue.c	ScrollingDialogue_RequestShow	minor	natural	1	
 src/ui/dialogue/scrolling_dialogue/scrolling_dialogue.c	ScrollingDialogue_RequestHide	minor	natural	1	
+src/ui/dialogue/scrolling_dialogue/scrolling_dialogue.c	ScrollingDialogue_HideImmediately	minor	natural	1	

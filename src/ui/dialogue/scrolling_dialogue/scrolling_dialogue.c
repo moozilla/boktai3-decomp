@@ -311,11 +311,8 @@ int ScrollingDialogue_RequestHide(void)
 
 s32 ScrollingDialogue_HideImmediately(void)
 {
-    s32 r;
-    if (gScrollingDialogue != 0) {
-        ScrollingDialogue_Hide((void *)gScrollingDialogue);
-        r = 0;
-    } else
-        r = -1;
-    return r;
+    if (!gScrollingDialogue)
+        return -1;
+    ScrollingDialogue_Hide((void *)gScrollingDialogue);
+    return 0;
 }
