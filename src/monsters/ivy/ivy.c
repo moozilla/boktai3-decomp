@@ -1425,29 +1425,26 @@ s32 Ivy_FindAdjacentTarget(struct ChaseActor *actor, s32 mode)
             actor->base.body.direction = 0xC0;
             return Keep(actor, target);
         }
-        goto fail;
     } else {
         switch (((actor->base.body.direction + 0x20) >> 6) & 3) {
             case 0:
-                if (actor->base.terrainCell + 1 != cell)
-                    goto fail;
-                return Keep(actor, target);
+                if (actor->base.terrainCell + 1 == cell)
+                    return Keep(actor, target);
+                break;
             case 1:
-                if (actor->base.terrainCell + MAP_WIDTH != cell)
-                    goto fail;
-                return Keep(actor, target);
+                if (actor->base.terrainCell + MAP_WIDTH == cell)
+                    return Keep(actor, target);
+                break;
             case 2:
-                if (actor->base.terrainCell - 1 != cell)
-                    goto fail;
-                return Keep(actor, target);
+                if (actor->base.terrainCell - 1 == cell)
+                    return Keep(actor, target);
+                break;
             case 3:
-                if (actor->base.terrainCell - MAP_WIDTH != cell)
-                    goto fail;
-                return Keep(actor, target);
+                if (actor->base.terrainCell - MAP_WIDTH == cell)
+                    return Keep(actor, target);
+                break;
         }
-        goto fail;
     }
-fail:
     return 0;
 }
 

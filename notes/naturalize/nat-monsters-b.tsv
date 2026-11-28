@@ -33,3 +33,5 @@ src/monsters/ivy/ivy.c	Ivy_InitProfileId	natural	natural	0
 src/monsters/ivy/ivy.c	Ivy_TickDrawable	minor	natural	3	drawable+0x40 position of the tile drawable stays a raw offset (no type for that drawable)
 src/monsters/ivy/ivy.c	Ivy_InitializeContactColliders	minor	minor	0	packed position words written through u32 casts
 src/monsters/ivy/ivy.c	SceneActor_BeginReaction22	minor	natural	9	
+src/monsters/ivy/ivy.c	SceneActor_FindNearbyPlayerTarget	contrived	contrived	35	unchanged: reversed do/while with parked blocked mask, delta/origin pointers and literal gPlayers address; plain for-loop leaves loop.c hoist order (players pointer hoisted before the 0x1000 mask and delta pointer) and mask/field load order for the leader flags
+src/monsters/ivy/ivy.c	Ivy_FindAdjacentTarget	minor	natural	3	
