@@ -4,7 +4,6 @@
 #include "engine/ram.h"
 #include "effects/bat_flock.h"
 #include "bosses/vanargand/screen_palette_transition_layout.h"
-#define gRandomTableIndex gRandomIndex
 
 extern u32 gUnk_02000560;
 s32 ScalarApproach_StepSixteenth(s32, s32);
