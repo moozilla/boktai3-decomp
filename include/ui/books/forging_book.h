@@ -36,7 +36,8 @@ struct ForgingBook {
     s16 category;
     u16 unknownB62;
     s16 column, row;
-    u16 selectedEntry, unknownB6A;
+    s16 selectedEntry;
+    u16 unknownB6A;
     s16 exiting, fadeShift, fadeTimer;
     u16 unknownB72;
     s32 textWindow;
