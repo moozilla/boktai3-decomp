@@ -2865,11 +2865,10 @@ void TetherActor_UpdateReverseDirectedState(struct TetherActor *actor)
     else
         TetherActor_SetEntry(actor, 0);
     if (!(gEngineFlags & 512)) {
-        u32 value = actor->interactionLock;
-        if (value)
+        if (actor->interactionLock)
             TetherActor_UpdateLockedShake(actor);
         else if (actor->chargeReady) {
-            actor->glowMode = value;
+            actor->glowMode = 0;
             TetherActor_UpdateShake(actor);
         } else {
             TetherActor_UpdateReverseDirectedMovement(actor);
