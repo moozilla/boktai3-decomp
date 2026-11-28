@@ -18,3 +18,4 @@ src/scene/actor/actor_ability.c	Modifier_InitSourceInfo	minor	minor	0	secondary 
 src/scene/actor/actor_emitter.c	ActorEmitter_TryEmit	contrived	minor	1	raw owner offsets (animation state) and local struct views
 src/scene/actor/actor_emitter.c	ActorEmitter_TryEmitLow	contrived	minor	1	raw owner offsets (animation state) and local struct views
 src/scene/actor/actor_emitter.c	ActorEmitter_TryEmitPair	contrived	minor	1	raw owner offsets (animation state) and local struct views
+src/scene/actor/actor_emitter.c	ActorEmitter_TryEmitAnimatedPair	contrived	minor	1	raw owner offsets (animation state) and local struct views

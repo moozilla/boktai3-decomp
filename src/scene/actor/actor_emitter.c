@@ -255,29 +255,27 @@ s32 ActorEmitter_TryEmitAnimatedPair(struct ActorEmitter *emitter)
     s32 height, cost;
     struct EmitterVector velocity;
     if (!Modifier_IsFirstSourceReady(emitter))
-        goto fail;
+        return 0;
     owner = emitter->owner;
     actor = &owner->actor;
     cost = CallbackList_RunMatchingState(actor, emitter->id, 9);
     if (owner->actor.energy < cost)
-        goto fail;
+        return 0;
     velocity.x = owner->velocity;
     velocity.y = 0;
     velocity.z = 0;
     height = actor->height - 0x8000;
     if (ProjectileEffect_CreateFromProfile(&owner->actor.position, height, &velocity,
                                            owner->actor.profile.data, owner->kind + 1, 1, 2,
-                                           0) >= 0)
-        goto success;
-fail:
+                                           0) >= 0) {
+        ProjectileEffect_CreateFromProfile(&owner->actor.position, height, &velocity,
+                                           owner->actor.profile.data, owner->kind + 1, 0, 1, 1);
+        Anim_SetKeyframes((u8 *)owner + 0x670, (u8 *)owner + 0x7F0, emitter->animation, 2, 0);
+        CallbackList_SubtractClampedValue(actor, emitter, cost);
+        emitter->timer = emitter->duration;
+        return 1;
+    }
     return 0;
-success:
-    ProjectileEffect_CreateFromProfile(&owner->actor.position, height, &velocity,
-                                       owner->actor.profile.data, owner->kind + 1, 0, 1, 1);
-    Anim_SetKeyframes((u8 *)owner + 0x670, (u8 *)owner + 0x7F0, emitter->animation, 2, 0);
-    CallbackList_SubtractClampedValue(actor, emitter, cost);
-    emitter->timer = emitter->duration;
-    return 1;
 }
 
 // Tentative descriptive names; inferred from static field accesses and callees.
