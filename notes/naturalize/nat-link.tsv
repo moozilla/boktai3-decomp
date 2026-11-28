@@ -290,3 +290,5 @@ src/link/player/sub_08242FAC.c	sub_08242FAC	contrived	natural	2
 src/link/player/sub_08243020.c	sub_08243020	contrived	natural	2	
 src/link/player/Player_SynchronizeColliderState.c	Player_SynchronizeColliderState	natural	natural	0	
 src/link/player/Player_ApplyContact.c	Player_ApplyContact	minor	natural	3	count local keeps the response test; goto done stays
+src/link/player/Player_ApplyGatedContact.c	Player_ApplyGatedContact	natural	natural	0	
+src/link/player/Player_ApplyTerrainDamage.c	Player_ApplyTerrainDamage	contrived	minor	6	goto one shares the return; cellProps cast for terrain flags

@@ -7,6 +7,8 @@
 #include "player/player_slot_status.h"
 #include "link/session/link_session_state.h"
 #include "scene/collision/scene_actor_damage_visibility.h"
+#include "scene/terrain/terrain_cell_probe.h"
+#include "scene/terrain/terrain_sampling.h"
 
 extern struct AreaEffectLinkState *gLinkSession;
 
@@ -22,7 +24,6 @@ static inline u32 Busy(struct Player *p)
     return r;
 }
 
-u8 *TerrainModifiers_FindCellOverride(s32, s32);
 s32 Div(s32, s32);
 void Player_SetTetherMode(struct Player *, s32, s32);
 s32 LinkPlayer_BeginTerrainRecovery(struct Player *);
@@ -31,21 +32,10 @@ void SceneHud_SetTimedState(u32, s32, s32, u32, u32, s32);
 
 s32 Player_ApplyTerrainDamage(struct Player *p)
 {
-    s32 x = (s16)p->position.x >> 8;
-    s32 z = (s16)p->position.z >> 8;
-    u32 cell;
     u8 *data;
     u32 flash;
 
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        cell = 0;
-    else
-        cell = gTerrainMap->rows[z] + x;
-    data = TerrainModifiers_FindCellOverride(cell, 1);
-    if (data)
-        data += 4;
-    else
-        data = gTerrainMap->cells + (cell * 4 + 12);
+    data = cellProps(Terrain_GetCellIndex((struct ContactPosition *)&p->position));
     if ((SceneCell_GetFlags((struct SceneCell *)data) & 0x40) && p->tetherStatusFlags == 0) {
         if (GameState_TestWorldFlags(0x4000))
             Player_SetTetherMode(p, 0x22, 0);
@@ -63,14 +53,10 @@ s32 Player_ApplyTerrainDamage(struct Player *p)
     if (p->terrainClampApplied)
         p->particleEmissionCount += LinkPlayer_BeginTerrainRecovery(p);
     if (p->positionResetValue == 0 && p->movementModifierKind == 1 && p->movementModifierActive) {
-        u16 *c;
-        u16 n;
         Player_SetStatusBits(&p->statusFlags, 0x200);
-        c = &p->terrainDamageTimer;
-        n = ++*c;
-        if (n >= Div(0x3c, p->movementModifierActive)) {
+        if (++p->terrainDamageTimer >= Div(0x3c, p->movementModifierActive)) {
             p->particleEmissionCount += 10;
-            *c = 0;
+            p->terrainDamageTimer = 0;
         }
     }
     if (p->particleEmissionCount) {
