@@ -557,3 +557,4 @@ src/player/effects/particle_cloud/sub_081D36D4.c	sub_081D36D4	contrived	natural	
 src/player/effects/particle_cloud/sub_081D3704.c	sub_081D3704	minor	natural	1	-
 src/player/effects/particle_cloud/PlayerParticleCloud_RequestStop.c	PlayerParticleCloud_RequestStop	minor	natural	1	-
 src/player/effects/particle_cloud/PlayerParticleCloud_ScatterAnchors.c	PlayerParticleCloud_ScatterAnchors	contrived	contrived	45	union-built table pointer, index/mask/bias locals, second draw by address arithmetic and compiled-out sign checks all steer register allocation
+src/player/effects/particle_cloud/PlayerParticleCloud_Create.c	PlayerParticleCloud_Create	contrived	natural	1	-
