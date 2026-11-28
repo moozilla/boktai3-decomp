@@ -257,3 +257,6 @@ src/engine/video/background_layers.c	Bg_GetMapRow	natural	natural
 src/engine/video/background_layers.c	Bg_SetupLayer	natural	natural		
 src/engine/video/background_layers.c	Text_DrawNumber	minor	minor	0	DIGIT macro per decimal place, as the ROM unrolls it
 src/engine/video/background_tilemap.c	BgGfx_LoadTilemap	minor	minor	5	screenX reused for the exposed row: a separate local swaps registers (18 insns); metatile column macro
+src/engine/video/background_tilemap.c	BgGfx_LoadTilemapAtPosition	natural	natural		
+src/engine/video/background_tilemap.c	BgGfx_LoadTilemapSimple	natural	natural		
+src/engine/video/sprite_oam.c	SpriteOam_QueueProjectedSprites	contrived	contrived	12	goto/continue-with-advance, parked matrix pointer and flag copies: see the next commits

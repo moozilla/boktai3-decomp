@@ -29,15 +29,32 @@ static inline void SpriteOam_ProjectPosition(struct ContactPosition *dst,
     dst->z = z - gCameraOrigin[2];
 }
 
+static inline s32 divide8(s32 input)
+{
+    return input >= 0 ? input >> 3 : -((-input) >> 3);
+}
+
+static inline s32 divide2(s32 input)
+{
+    return input >= 0 ? input >> 1 : -((-input) >> 1);
+}
+
+static inline s32 SpriteOam_AllocateAffineMatrix(u8 angle, s8 sx, s8 sy, s32 *count)
+{
+    if (*count > 31)
+        return 0;
+    gSpriteAffineParams[*count].angle = angle;
+    gSpriteAffineParams[*count].scaleX = sx;
+    gSpriteAffineParams[*count].scaleY = sy;
+    return (*count)++;
+}
+
 void SpriteOam_QueueProjectedSprites(void)
 {
     struct ContactPosition pos;
     struct SpriteDrawable *sprite;
     s32 *matrixCount;
-    u32 parity = gSceneEffectPalettePhase & 1;
-    u32 skip = 0x401;
-    if (parity)
-        skip = 0x201;
+    u32 skip = (gSceneEffectPalettePhase & 1) ? 0x201 : 0x401;
     sprite = gDrawableListHeads[gRenderListIndex];
     if (!sprite)
         return;
@@ -50,13 +67,12 @@ void SpriteOam_QueueProjectedSprites(void)
         u32 attr;
         s32 depth;
         s32 ox, oy;
-        u32 initialFlags = sprite->flags;
-        if (initialFlags & skip) {
+        if (sprite->flags & skip) {
             sprite = sprite->next;
             continue;
         }
 
-        if (!(initialFlags & 16)) {
+        if (!(sprite->flags & 16)) {
             SpriteOam_ProjectPosition(&pos, &sprite->position);
             x = pos.x;
             y = pos.y;
@@ -83,10 +99,7 @@ void SpriteOam_QueueProjectedSprites(void)
         y += oy;
         depth = z;
         x &= 511;
-        {
-            u32 shifted = x << 16;
-            attr = sprite->attributes | shifted;
-        }
+        attr = sprite->attributes | (x << 16);
         y &= 255;
         attr |= y;
         if (flags & 2) {
@@ -108,11 +121,9 @@ void SpriteOam_QueueProjectedSprites(void)
                 gSpriteAffineParams[*count].angle = angle;
                 gSpriteAffineParams[*count].scaleX = sx;
                 gSpriteAffineParams[*count].scaleY = sy;
-                {
-                    tmp = *count;
-                    matrix = tmp++;
-                    *count = tmp;
-                }
+                tmp = *count;
+                matrix = tmp++;
+                *count = tmp;
             }
             attr |= matrix << 25;
             flags = sprite->flags;
@@ -159,26 +170,6 @@ void SpriteOam_QueueProjectedSprites(void)
     next:
         sprite = sprite->next;
     } while (sprite);
-}
-
-static inline s32 divide8(s32 input)
-{
-    return input >= 0 ? input >> 3 : -((-input) >> 3);
-}
-
-static inline s32 divide2(s32 input)
-{
-    return input >= 0 ? input >> 1 : -((-input) >> 1);
-}
-
-static inline s32 SpriteOam_AllocateAffineMatrix(u8 angle, s8 sx, s8 sy, s32 *count)
-{
-    if (*count > 31)
-        return 0;
-    gSpriteAffineParams[*count].angle = angle;
-    gSpriteAffineParams[*count].scaleX = sx;
-    gSpriteAffineParams[*count].scaleY = sy;
-    return (*count)++;
 }
 
 void SpriteOam_QueueCameraRelativeSprites(void)
