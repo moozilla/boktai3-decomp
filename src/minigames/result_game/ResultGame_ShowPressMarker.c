@@ -1,13 +1,8 @@
-#include "global.h"
-struct O {
-    u8 f[8];
-    u32 fl;
-    u8 g[0x14];
-    u16 h;
-};
-void ResultGame_ShowPressMarker(u8 *p)
+#include "minigames/result_game/result_tutorial.h"
+
+void ResultGame_ShowPressMarker(struct ResultMenu *menu)
 {
-    struct O *o = (struct O *)(p + 0x1a4);
-    o->h = p[0xc0];
-    o->fl &= ~1;
+    struct AnimSprite *sprite = &menu->widgets[1];
+    sprite->position.x = menu->pressScore;
+    AnimSprite_Show(sprite);
 }
