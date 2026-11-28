@@ -4,10 +4,8 @@ void ContactActor_UpdateInactive(struct ContactActorPool *pool, struct ContactAc
                                  s32 index)
 {
     if (slot->enter) {
-        struct ContactCollider *collider;
         slot->enter = 0;
-        collider = &slot->healthCollider;
-        collider->flags |= 4;
+        ContactCollider_SetFlags(&slot->healthCollider, 4);
     }
     ContactActor_SetDirectionalSequence(pool, slot, 0);
     slot->stateFrame++;

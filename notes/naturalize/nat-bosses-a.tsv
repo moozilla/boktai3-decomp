@@ -151,3 +151,4 @@ src/bosses/count/ContactActor_UpdateBurst.c	ContactActor_UpdateBurst	contrived	m
 src/bosses/count/ContactActor_UpdateReaction.c	ContactActor_UpdateReaction	contrived	contrived	30	speed/direction/write temporaries and k2 palette constant stay: shared charge offset narrows direction and inline forms differ
 src/bosses/count/ContactActor_UpdateRetreat.c	ContactActor_UpdateRetreat	contrived	contrived	14	unchanged core: once-loops, mask/cursor union and a dead origin constant (ROM loads 0x403B714 into r8 and ORs its low bits); removing any of them changes allocation
 src/bosses/count/ContactActor_UpdateAwaitHide.c	ContactActor_UpdateAwaitHide	minor	natural	3	
+src/bosses/count/ContactActor_UpdateInactive.c	ContactActor_UpdateInactive	minor	natural	3	
