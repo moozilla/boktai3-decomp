@@ -148,3 +148,4 @@ src/objects/coffin/tether_actor.c	TetherActor_UpdatePassiveState	natural	natural
 src/objects/coffin/tether_actor.c	TetherActor_UpdateSpecialEntryTransition	contrived	natural	1	
 src/objects/coffin/tether_actor.c	TetherActor_UpdateDirectedEntryTransition	contrived	natural	1	
 src/objects/coffin/tether_actor.c	TetherActor_UpdateDirectedMovement	minor	natural	1	
+src/objects/coffin/tether_actor.c	TetherActor_UpdateDirectedState	contrived	natural	1	
