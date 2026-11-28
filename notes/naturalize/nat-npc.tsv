@@ -73,3 +73,4 @@ src/npc/manager/scene_actor_animation.c	SceneCharacter_UpdateTargetProximityStat
 src/npc/manager/scene_actor_animation.c	SceneCharacter_UpdatePhaseTransitionState	natural	natural	0	
 src/npc/manager/scene_actor_animation.c	SceneCharacter_UpdatePhaseWindowWaitState	contrived	natural	6	
 src/npc/manager/scene_actor_animation.c	SceneCharacter_UpdatePathResumeState	minor	natural	1	
+src/npc/manager/SceneActorManager_Destroy.c	SceneActorManager_Destroy	minor	natural	1	

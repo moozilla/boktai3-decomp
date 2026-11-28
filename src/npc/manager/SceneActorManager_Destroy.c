@@ -1,14 +1,15 @@
 #include "npc/manager/scene_actor_lifecycle.h"
 #include "engine/ram.h"
-int SceneActorManager_Destroy(struct SceneActorManager *m)
+int SceneActorManager_Destroy(struct SceneActorManager *manager)
 {
-    struct SceneActor *p = m->head;
-    while (p) {
-        struct SceneActor *prev = p->previous;
-        if (p->destroy)
-            p->destroy(m, p);
-        Actor_Destroy(p);
-        p = prev;
+    struct SceneActor *actor = manager->head;
+    while (actor) {
+        struct SceneActor *previous = actor->previous;
+        if (actor->destroy)
+            actor->destroy(manager, actor);
+        Actor_Destroy(actor);
+        actor = previous;
     }
-    return (gSceneActorListManager = 0);
+    gSceneActorListManager = 0;
+    return 0;
 }
