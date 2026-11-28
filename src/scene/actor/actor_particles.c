@@ -276,7 +276,7 @@ struct Self {
     u8 filler0[0x58];
     s16 value;
     u8 filler5A[0x2B0 - 0x5A];
-    u32 callback;
+    void (*callback)(void *, s32);
     u8 filler2B4[0x2B8 - 0x2B4];
     u16 threshold;
     u8 filler2BA[0x2BE - 0x2BA];
@@ -296,42 +296,33 @@ s32 SpriteParticle_SpawnSingleFrameBatch(struct ContactPosition *, struct Contac
 
 void ChargeMarker_TickHold(struct Self *self, struct Owner *owner, struct Input *input)
 {
-    u16 held;
-
-    if ((held = input->held & 2) != 0) {
+    if (input->held & 2) {
         if (self->value >= self->threshold) {
-            u16 t = ++self->timer;
-            if (t == 10)
+            self->timer++;
+            if (self->timer == 10)
                 Sound_PlaySong(0x1F8);
-            else if (t == 50)
+            else if (self->timer == 50)
                 Sound_PlaySong(0x1F8);
             if (self->timer > 60) {
                 ActorMarker_ShowSlot(owner->markerSlot);
-            } else {
-                s32 r = Mod(self->timer, 12);
-                if (r == 0) {
-                    struct ContactPosition pos;
-                    struct Size size;
-                    u32 n;
-                    pos = owner->pos;
-                    pos.x += 32;
-                    pos.y -= 16;
-                    size.w = 0x16;
-                    size.h = 0x14;
-                    gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 0x3FF;
-                    n = gUnk_086141BC[gEffectRandomTableIndex];
-                    n &= 3;
-                    n++;
-                    SpriteParticle_SpawnSingleFrameBatch(&pos, &owner->pos, &size, n, 1, r, r);
-                }
+            } else if (Mod(self->timer, 12) == 0) {
+                struct ContactPosition pos;
+                struct Size size;
+                pos = owner->pos;
+                pos.x += 32;
+                pos.y -= 16;
+                size.w = 0x16;
+                size.h = 0x14;
+                SpriteParticle_SpawnSingleFrameBatch(
+                    &pos, &owner->pos, &size, (ActorParticles_NextRandom() & 3) + 1, 1, 0, 0);
             }
         } else {
             self->timer = 0;
             ActorMarker_HideSlot(owner->markerSlot);
         }
     } else if ((input->pressed & 2) && self->timer) {
-        sub_08249240(&self->callback, 0, self->callback);
-        self->timer = held;
+        self->callback(&self->callback, 0);
+        self->timer = 0;
         ActorMarker_HideSlot(owner->markerSlot);
     }
 }
