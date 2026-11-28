@@ -3224,16 +3224,16 @@ void Mummy_ResumePlayerPursuit(struct ChaseActor *actor)
     struct SceneActorChaseGroup *group = &actor->group;
     struct Mummy *body = actor->base.context;
     if (SceneActorControl_TakeStateEntry(actor)) {
-        SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
+        SceneActorAnimation_SelectDirectionalEntry(actor, 0);
         SceneActorChase_SetControl(actor, SceneActor_UpdateDirectionalAnimation, 3);
     }
     if (actor->base.stepDone) {
         SceneActorChase_ClearFlagComponent(&body->flags6F2, 0x800);
         SceneActorChase_TrackPlayer(actor);
         if (Mummy_Arrive_ResumePlayerPursuit(actor)) {
-            SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
+            SceneActorAnimation_SelectDirectionalEntry(actor, 0);
             SceneActorChase_SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
-            SceneActorDelay_Prepare((void *)&group->saved, group->common.gate.control, 12, 30);
+            SceneActorDelay_Prepare(&group->saved, group->common.gate.control, 12, 30);
             SceneActorChase_SetState(actor, 3, 1, 0);
         }
     }

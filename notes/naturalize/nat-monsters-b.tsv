@@ -145,3 +145,4 @@ src/monsters/mummy/mummy_entry.c	SceneActor_TryTrackNearbyPlayer	contrived	contr
 src/monsters/mummy/mummy_entry.c	Mummy_ResetResponseState	contrived	contrived	22	half-word clear helper: 32-bit mask load
 src/monsters/mummy/mummy_entry.c	Mummy_UpdateTemporaryFlagTimer	minor	natural	6	
 src/monsters/mummy/mummy_entry.c	Mummy_SelectMovementResponse	contrived	contrived	33	flag accessors fix load order
+src/monsters/mummy/mummy_entry.c	Mummy_ResumePlayerPursuit	minor	minor	9	flag component helper remains
