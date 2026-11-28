@@ -383,10 +383,8 @@ s32 InteractionPrompt_ScriptCreate(void)
             findRegion = Script_GetKeywordValue('m', 0);
             p->startScript = Script_GetKeywordValue('b', 0);
             p->endScript = Script_GetKeywordValue('e', 0);
-            {
-                s32 distance = Script_GetKeywordValue('D', 230);
-                p->distance = distance * distance;
-            }
+            p->distance = Script_GetKeywordValue('D', 230);
+            p->distance *= p->distance;
             if (Script_SeekToKeyword('a')) {
                 s32 argument;
                 for (argument = 0; argument < 4; argument++) {
