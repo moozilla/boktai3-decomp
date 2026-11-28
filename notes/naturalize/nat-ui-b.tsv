@@ -7,3 +7,4 @@ src/ui/results/result_prompt.c	ResultPrompt_Destroy	natural	natural	0
 src/ui/results/result_prompt.c	ResultPrompt_Init	minor	minor	1	`r = -1; p->result = r; return r;` the ROM keeps one -1 in r5 for the store and the return; two literals get two registers
 src/ui/results/result_prompt.c	ResultPrompt_Create	minor	natural	1	
 src/ui/results/stage_results/ActorMarkerPool_UpdateMarkers.c	ActorMarkerPool_UpdateMarkers	natural	natural	1	
+src/ui/results/stage_results/PanelSpritePool_Init.c	PanelSpritePool_Init	contrived	natural	1	
