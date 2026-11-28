@@ -695,3 +695,4 @@ src/system/save/Save_ReadMainState.c	Save_ReadMainState	natural	natural	0
 src/system/save/Save_OnShutdown.c	Save_OnShutdown	natural	natural	0	
 src/system/save/Region_FindContaining.c	Region_FindContaining	natural	natural	1	
 src/system/save/Region_InitFromScript.c	Region_InitFromScript	contrived	natural	1	
+src/system/save/Region_CreateFromScript.c	Region_CreateFromScript	minor	natural	1	
