@@ -462,3 +462,4 @@ src/ui/town/shop/Shop_FindEmptyEquipmentSlot.c	Shop_FindEmptyEquipmentSlot	natur
 src/ui/town/shop/Shop_FindEmptyConsumableSlot.c	Shop_FindEmptyConsumableSlot	contrived	natural	1	
 src/ui/town/shop/Shop_FindEmptyItemSlot.c	Shop_FindEmptyItemSlot	natural	natural	0	
 src/ui/town/shop/Shop_FindConsumableAssignment.c	Shop_FindConsumableAssignment	contrived	natural	1	
+src/ui/town/shop/Shop_BeginConsumableRemoveMove.c	Shop_BeginConsumableRemoveMove	contrived	minor	3	widget-run view over the panel for the flag writes; index-first pointer sum into table160
