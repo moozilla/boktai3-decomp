@@ -166,8 +166,7 @@ s32 ActorDirection_ComputeRelativeCardinal(struct ContactCollider *source,
 {
     s32 angle;
     if (source->flags & 0x100) {
-        u32 t = source->direction;
-        angle = t + 0xe0;
+        angle = source->direction + 0xe0;
         return ImpactDirection(angle);
     } else {
         s32 x = source->x - target->x;

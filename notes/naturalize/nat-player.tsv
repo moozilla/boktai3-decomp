@@ -217,3 +217,7 @@ src/player/core/player_core.c	PlayerAnimation_SelectSecondaryKeyframes	contrived
 src/player/core/player_core.c	Player_SetPendingCallback	natural	natural	0	
 src/player/core/player_core.c	Player_RunPendingCallback	minor	natural	1	
 src/player/core/player_core.c	Player_ResetStatus	contrived	minor	6	status bit accessors and pointer-plus-index counter form: plain forms reorder loads
+src/player/core/player_core.c	Player_AddControlFlags	natural	natural	0	
+src/player/core/player_core.c	Player_GetControlFlags	natural	natural	0	
+src/player/core/player_core.c	Player_StopActionSounds	natural	natural	0	
+src/player/core/player_core.c	ActorDirection_ComputeRelativeCardinal	minor	natural	1	
