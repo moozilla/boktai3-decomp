@@ -2,13 +2,10 @@
 #include "engine/engine.h"
 #include "player/player.h"
 #include "player/player_slot_status.h"
+#include "scene/areas/area_effect_link.h"
+#include "scene/terrain/terrain_cell_probe.h"
+#include "scene/terrain/terrain_sampling.h"
 /* Player update using the half-rate link charge and alternate action table (tentative). */
-u8 *TerrainModifiers_FindCellOverride(s32, s32);
-struct LinkRefs {
-    u8 unk0[0x5c];
-    u8 charge[8];
-};
-extern struct LinkRefs *gLinkSession;
 extern u32 gUnk_08E87A90[];
 extern const s16 gUnk_086149C4[];
 void Player_AccumulateActionCharge(struct Player *, s32);
@@ -23,29 +20,6 @@ u32 Player_IsFlaggedWithGlobalModifier08(u32);
 void Player_SetSecondaryActionFlags(struct Player *, u32);
 s32 Callback_InvokeActor(void *, void *);
 
-/* Fields not yet exposed by the shared Player layout. */
-struct PlayerLinkUpdateState {
-    u8 unk_00[0x284];
-    u8 terrainFlags;
-    u8 unk_285[0x292 - 0x285];
-    u16 modifierFlags;
-    u8 unk_294[0x490 - 0x294];
-    struct SceneVec lockedVelocity;
-    u8 unk_498[0x4A6 - 0x498];
-    u16 ledgeCounter;
-};
-struct PlayerTerrainCell {
-    u8 height;
-    u8 unk_01;
-    u16 flags;
-};
-
-struct FloorPoint {
-    s16 x, y, z, pad;
-};
-struct PackedVec {
-    u32 x : 16, y : 16, z : 16, pad : 16;
-};
 static inline s32 Scale(int x)
 {
     if (x >= 0)
@@ -56,42 +30,13 @@ static inline u8 Charge(s32 slot)
 {
     if (!gLinkSession || slot < 0)
         return 0;
-    return gLinkSession->charge[slot];
+    return gLinkSession->playerValues[slot];
 }
 static inline s32 IsScene5(struct Player *p)
 {
     if (p->active != 0 && p->sceneMode == 5)
         return 1;
     return 0;
-}
-static inline u8 *CellAt(struct FloorPoint *position)
-{
-    s32 x = position->x >> 8, z = position->z >> 8;
-    s32 index;
-    u8 *cell;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        index = 0;
-    else
-        index = gTerrainMap->rows[z] + x;
-    cell = TerrainModifiers_FindCellOverride(index, 1);
-    if (cell)
-        return cell + 4;
-    return gTerrainMap->cells + 12 + index * 4;
-}
-static inline u32 GroundHeight(struct FloorPoint *position)
-{
-    u8 *cell = CellAt(position);
-    u32 kind = *cell >> 4;
-    s32 height = (*cell & 15) << 8;
-    switch (kind) {
-        case 1:
-            height -= (u8)position->z;
-            break;
-        case 2:
-            height -= (u8)position->x;
-            break;
-    }
-    return height;
 }
 void Player_UpdateHalfChargeLinkKind(struct Player *p)
 {
@@ -101,16 +46,14 @@ void Player_UpdateHalfChargeLinkKind(struct Player *p)
         case 1: {
             s32 cond;
             if (p->statusFlags & 0x10) {
-                s32 charge = Charge(p->slot);
-                Player_AccumulateActionCharge(p, (charge + 1) >> 1);
+                Player_AccumulateActionCharge(p, (Charge(p->slot) + 1) >> 1);
             }
             sub_082420D4(p);
             idx = Player_SelectInputMode(p);
             sub_0823B728(p, idx);
             Callback_InvokeActor(p, (void *)gUnk_08E87A90[idx]);
             if (p->movementVelocityLocked)
-                *(struct SceneVec *)&p->velocityX =
-                    ((struct PlayerLinkUpdateState *)p)->lockedVelocity;
+                *(struct SceneVec *)&p->velocityX = p->lockedVelocity;
             sub_082424D0(p);
             if (p->cameraOffsetActive != 0)
                 Player_SmoothCameraAnchor(p);
@@ -119,40 +62,37 @@ void Player_UpdateHalfChargeLinkKind(struct Player *p)
             if (p != NULL && IsScene5(p))
                 break;
             cond = 0;
-            if (!Player_IsFlaggedWithGlobalModifier08(
-                    ((struct PlayerLinkUpdateState *)p)->modifierFlags) &&
-                p->tetherMode == 1 &&
-                (((struct PlayerLinkUpdateState *)p)->terrainFlags & p->tetherMode))
+            if (!Player_IsFlaggedWithGlobalModifier08(p->movementStatus) && p->tetherMode == 1 &&
+                (p->movementContactFlags & p->tetherMode))
                 cond = (p->facing & p->tetherMode) != 0;
             if (cond) {
-                struct PackedVec pt;
+                struct ContactPosition pt;
                 u32 ang;
                 u8 *cell;
-                u32 flags, four;
-                if (++((struct PlayerLinkUpdateState *)p)->ledgeCounter != 5)
+                u32 flags;
+                if (++*(u16 *)&p->unk4A6 != 5)
                     break;
-                pt = *(struct PackedVec *)&p->position;
+                pt = *(struct ContactPosition *)&p->position;
                 ang = ((p->facing + 5) & 7) << 5;
                 pt.x += Scale(gUnk_086149C4[(ang + 0x40) & 0xff] * 0x32);
                 pt.z += Scale(gUnk_086149C4[ang] * 0x32);
-                if (GroundHeight((struct FloorPoint *)&pt) < (u32)(p->position.y + 0xc8))
+                if (Terrain_SampleHeight(&pt) < (u32)(p->position.y + 0xc8))
                     break;
-                cell = CellAt((struct FloorPoint *)&pt);
-                flags = ((struct PlayerTerrainCell *)cell)->flags;
-                four = 4;
-                flags &= four;
+                cell = cellProps(Terrain_GetCellIndex(&pt));
+                flags = ((struct TerrainCell *)cell)->flags;
+                flags &= 4;
                 if (flags)
                     break;
                 p->coordinateAxis = p->facing;
                 p->actionFourEnabled = flags;
-                p->tetherMode = four;
+                p->tetherMode = 4;
                 p->tetherPhase = flags;
             } else {
-                ((struct PlayerLinkUpdateState *)p)->ledgeCounter = cond;
+                *(u16 *)&p->unk4A6 = cond;
             }
             break;
         }
-        case 8: {
+        case 8:
             Player_SetSecondaryActionFlags(p, 8);
             if (p->tetherMode == 0x21) {
                 idx = p->tetherMode;
@@ -165,7 +105,6 @@ void Player_UpdateHalfChargeLinkKind(struct Player *p)
             Callback_InvokeActor(p, (void *)gUnk_08E87A90[idx]);
             sub_082424D0(p);
             break;
-        }
         case 2:
             Player_SetSecondaryActionFlags(p, 8);
             Callback_InvokeActor(p, (void *)p->triggerAnimationCallback);
