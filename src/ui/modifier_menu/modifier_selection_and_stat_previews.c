@@ -739,15 +739,13 @@ void ModifierMenu_DrawFourthSourceStats(struct ModifierMenu *menu)
     }
 }
 
-u32 ModifierMenu_LoadBackground(struct ModifierMenu *p, u32 x)
+u32 ModifierMenu_LoadBackground(struct ModifierMenu *menu, u32 flags)
 {
-    u32 v;
-    v = x;
-    p->backgroundResource = ScriptProc_Start(0xC091, 0xCE15);
-    Bg_SetupLayers(1, 0, p->backgroundResource, 0, 0, 1, &v);
+    menu->backgroundResource = ScriptProc_Start(0xC091, 0xCE15);
+    Bg_SetupLayers(1, 0, menu->backgroundResource, 0, 0, 1, &flags);
     BgGfx_LoadTilemapSimple(2, 0, 0, 0, 0);
-    p->tilemap = (u8 *)ScriptProc_Start(0x92B3, 0xA2F6) + 0x14;
-    CpuCopy16(p->tilemap, gBgPaletteBuffer, 0x200);
+    menu->tilemap = (u8 *)ScriptProc_Start(0x92B3, 0xA2F6) + 0x14;
+    CpuCopy16(menu->tilemap, gBgPaletteBuffer, 0x200);
     return 0;
 }
 

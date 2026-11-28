@@ -642,3 +642,4 @@ src/ui/modifier_menu/modifier_selection_and_stat_previews.c	ModifierMenu_BeginCl
 src/ui/modifier_menu/modifier_selection_and_stat_previews.c	ModifierMenu_DrawStatComparison	fudged	partial	14	kinds 9 and 10 repeat the same block: an || of the two compares folds into a range test
 src/ui/modifier_menu/modifier_selection_and_stat_previews.c	ModifierMenu_DrawCapacity	fudged	natural	4	
 src/ui/modifier_menu/modifier_selection_and_stat_previews.c	ModifierMenu_DrawBackground	fudged	natural	17	
+src/ui/modifier_menu/modifier_selection_and_stat_previews.c	ModifierMenu_LoadBackground	fudged	natural	1	
