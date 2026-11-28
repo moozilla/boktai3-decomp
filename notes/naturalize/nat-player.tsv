@@ -227,3 +227,5 @@ src/player/core/player_core.c	Player_AddEventFlags	minor	natural	1
 src/player/core/player_core.c	Player_GetEventFlags	natural	natural	0	
 src/player/core/player_core.c	Player_CallCompletionScript	natural	natural	0	
 src/player/core/player_core.c	Player_GetSelectedSlotActionScale	contrived	natural	1	
+src/player/core/player_core.c	Player_CallEventScript	minor	minor	8	count-mask and argument pointer locals: folded forms differ by one instruction
+src/player/core/player_core.c	ActorResponse_Apply	minor	minor	3	half-flag helper and status bit accessor: plain tests change the branch layout
