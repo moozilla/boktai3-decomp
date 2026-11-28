@@ -113,31 +113,22 @@ void Collection_UpdateHighlightPulse(struct CollectionMenu *p)
 
 u32 Collection_UpdateSelectedEntryText(struct CollectionMenu *p)
 {
-    s16 *idx = (s16 *)&p->selectedEntry;
-    if (Collection_IsEntryUnlocked(*idx)) {
-        s32 *obj = &p->textWindow;
-        u32 v;
-        s32 t;
-        TextWindow_SetScript(*obj, p->nameScript);
-        TextWindow_Refresh(*obj, *idx);
-        TextWindow_StartPlayback(*obj);
+    s32 id;
+
+    if (Collection_IsEntryUnlocked((s16)p->selectedEntry)) {
+        TextWindow_SetScript(p->textWindow, p->nameScript);
+        TextWindow_Refresh(p->textWindow, (s16)p->selectedEntry);
+        TextWindow_StartPlayback(p->textWindow);
         ScrollingDialogue_ClearScript();
-        v = Script_ParseStringRef(p->descriptionScript);
-        t = *idx;
-        t = v - -t; /* keeps the add's operand order (v + t) */
-        ScrollingDialogue_SetScript(Text_LookupString(t));
+        id = Script_ParseStringRef(p->descriptionScript);
+        ScrollingDialogue_SetScript(Text_LookupString(id + (s16)p->selectedEntry));
     } else {
-        s32 *obj = &p->textWindow;
-        u32 v;
-        s32 t;
-        TextWindow_SetScript(*obj, p->nameScript);
-        TextWindow_Refresh(*obj, 27);
-        TextWindow_StartPlayback(*obj);
+        TextWindow_SetScript(p->textWindow, p->nameScript);
+        TextWindow_Refresh(p->textWindow, 27);
+        TextWindow_StartPlayback(p->textWindow);
         ScrollingDialogue_ClearScript();
-        v = Script_ParseStringRef(p->lockedDescriptionScript);
-        t = *idx;
-        t = v - -t; /* keeps the add's operand order (v + t) */
-        ScrollingDialogue_SetScript(Text_LookupString(t));
+        id = Script_ParseStringRef(p->lockedDescriptionScript);
+        ScrollingDialogue_SetScript(Text_LookupString(id + (s16)p->selectedEntry));
     }
     return 0;
 }
