@@ -166,3 +166,4 @@ src/scene/actor/attachment/ActorAttachment_UpdateValueFrame.c	ActorAttachment_Up
 src/scene/actor/attachment/ActorAttachment_TickValueFrame.c	ActorAttachment_TickValueFrame	minor	minor	5	shakingBit and wave locals: literal test loads mask after address; unlocalized shift narrows the table load
 src/scene/actor/attachment/ActorAttachment_AllocateSlotHeader.c	ActorAttachment_AllocateSlotHeader	contrived	natural	1	-
 src/scene/actor/attachment/ActorAttachment_UpdateFollowingOffset.c	ActorAttachment_UpdateFollowingOffset	contrived	natural	1	-
+src/scene/actor/attachment/ActorAttachment_ReleaseResource.c	ActorAttachment_ReleaseResource	minor	natural	2	id local: the plain expression computes the mask address first

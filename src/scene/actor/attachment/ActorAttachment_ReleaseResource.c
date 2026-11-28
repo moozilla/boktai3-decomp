@@ -1,7 +1,8 @@
 #include "scene/actor/actor_attachment_manager.h"
 void Effect_Remove(void *);
 struct ActorAttachmentSlotView *
-ActorAttachment_ReleaseResource(struct ActorAttachmentSlotView *slot, u32 resourceKind, void *update)
+ActorAttachment_ReleaseResource(struct ActorAttachmentSlotView *slot, u32 resourceKind,
+                                void *update)
 {
     struct ActorAttachmentManagerView *manager;
     struct ActorAttachmentPartSprite *parts;
@@ -11,11 +12,10 @@ ActorAttachment_ReleaseResource(struct ActorAttachmentSlotView *slot, u32 resour
     parts = slot->parts;
     sprite = &slot->sprite;
     if (slot->resourceKind == resourceKind) {
+        s32 id = slot->slotId;
         u32 kind;
-        {
-            s32 id = slot->slotId;
-            manager->occupiedMask &= ~(1 << id);
-        }
+
+        manager->occupiedMask &= ~(1 << id);
         kind = slot->resourceKind;
         if (kind <= 1 || kind == 4 || kind == 5 || kind == 6) {
             if (slot->active48) {
