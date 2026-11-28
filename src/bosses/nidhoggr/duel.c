@@ -1336,19 +1336,15 @@ void NidhoggrDuel_UpdateAnimationAndTargets(struct GridAttackActor *p)
         actor->reactionCooldown--;
     }
     SceneActors_UpdateTargetMetrics(owner);
-    i = 0;
-    if (i < actor->targetCount) {
+    for (i = 0; i < actor->targetCount; i++) {
         struct SceneActorBody *base = &owner->transform;
-        do {
-            struct SceneVec *target = owner->targetPositions[i];
-            if (target) {
-                s32 x = target->x - base->position.x;
-                s32 z = target->z - base->position.z;
-                owner->requestedAngles[i] = Math_Atan2(x, z);
-                owner->targetDistances[i] = x * x + z * z;
-            }
-            i++;
-        } while (i < actor->targetCount);
+        struct SceneVec *target = owner->targetPositions[i];
+        if (target) {
+            s32 x = target->x - base->position.x;
+            s32 z = target->z - base->position.z;
+            owner->requestedAngles[i] = Math_Atan2(x, z);
+            owner->targetDistances[i] = x * x + z * z;
+        }
     }
 }
 
