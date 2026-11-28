@@ -180,12 +180,11 @@ void SceneHud_ShowFourDigits(struct SceneInputPanel *parent, const struct Contac
 
 void SceneHud_HideFourDigits(struct SceneInputPanel *parent)
 {
-    u8 *body = (u8 *)parent;
-    u8 *entry = body + ((u8 *)&parent->numericLabel - body);
-    s32 i = 0;
-    do {
-        struct AnimSprite *animSprite = (void *)entry;
+    struct AnimSprite *animSprite = &parent->numericLabel;
+    s32 i;
+
+    for (i = 0; i < 5; i++) {
         animSprite->flags |= 1;
-        entry += sizeof(*animSprite);
-    } while (++i < 5);
+        animSprite++;
+    }
 }
