@@ -42,17 +42,14 @@ void TextSequence_UpdateHold(struct TextSequence *p, struct TextSequenceStep *st
 
 void TextSequence_UpdateFadeOut(struct TextSequence *p, struct TextSequenceStep *step)
 {
-    s16 *timer = &p->timer;
-    if (*timer == 0)
+    if (p->timer == 0)
         gObjFadeColor = 0x1084;
-    if (++*timer >= step->fadeOutFrames) {
+    if (++p->timer >= step->fadeOutFrames) {
         TextSequence_SetState(p, 0);
-        do {
-            ++p->stepIndex;
-        } while (0);
+        p->stepIndex++;
         gObjFadeLevel = 0;
     } else {
-        gObjFadeLevel = 64 - Div(*timer << 6, step->fadeOutFrames);
+        gObjFadeLevel = 64 - Div(p->timer << 6, step->fadeOutFrames);
     }
 }
 
