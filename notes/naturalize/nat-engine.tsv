@@ -547,3 +547,4 @@ src/system/inventory/Inventory_SetKeyItemId.c	Inventory_SetKeyItemId	contrived	m
 src/system/inventory/Inventory_AddItemWithState.c	Inventory_AddItemWithState	contrived	natural	1	
 src/system/inventory/Inventory_AddItemFromScript.c	Inventory_AddItemFromScript	minor	natural	1	
 src/system/inventory/Inventory_RemoveItemFromScript.c	Inventory_RemoveItemFromScript	minor	natural	1	
+src/system/inventory/Inventory_HasItemFromScript.c	Inventory_HasItemFromScript	minor	natural	1	
