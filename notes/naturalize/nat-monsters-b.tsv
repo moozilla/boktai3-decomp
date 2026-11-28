@@ -50,3 +50,4 @@ src/monsters/ivy/ivy.c	Ivy_InitColorTransition	minor	natural	1
 src/monsters/ivy/ivy.c	ColorPulse_FinishRedFade	contrived	minor	3	finished flag: early returns reorder the shared epilogue
 src/monsters/ivy/ivy.c	ColorPulse_FadeRed	contrived	natural	1	
 src/monsters/ivy/ivy.c	Ivy_UpdateRedBrightening	natural	natural	1	
+src/monsters/ivy/ivy.c	ColorPulse_UnpackColor	contrived	minor	1	u8* parameter kept for the prototype
