@@ -1,44 +1,28 @@
 #include "global.h"
+#include "bosses/ratatosk/ratatosk.h"
 #include "engine/video/render.h"
+#include "gba/macro.h"
 
-#define PaletteEffect_GetPaletteIndex ActorResource_GetFixedId
-#define gEffectPaletteBanks           gPaletteBankData
-struct PaletteEffect {
-    u8 unknown0[0x394];
-    void *palette;
-    u8 unknown398[0x114];
-    u8 state, unknown4ad, dirty, unknown4af;
-    u32 paletteIndex;
-    u8 unknown4b4[4];
-    u8 paletteCopy[0x20];
-    u8 unknown4d8[0x3e0];
-    u8 paletteDefault[0x200];
-    u8 paletteAlternate[0x200];
-};
-s32 ActorResource_GetFixedId(struct PaletteEffect *);
-static inline void CpuSetArgs(int control, u8 *dest, void *source)
+s32 ActorResource_GetFixedId(struct Ratatosk *);
+
+static inline void Ratatosk_SelectPalette(struct Ratatosk *self, s32 bank)
 {
-    CpuSet(source, dest, control);
+    if (bank == 0) {
+        self->palette = self->paletteAlternate;
+    } else if (bank == 501) {
+        self->palette = self->paletteAlternate2;
+    } else {
+        CpuCopy32(gPaletteBankData + bank * 32, self->paletteBase, 32);
+        self->palette = self->paletteBase;
+    }
 }
-void PaletteEffect_RefreshPalette(struct PaletteEffect *p)
+
+void PaletteEffect_RefreshPalette(struct Ratatosk *self)
 {
-    s32 index, bank;
-    if (p->dirty) {
-        p->state = 0;
-        p->dirty = 0;
-        p->paletteIndex = ActorResource_GetFixedId(p);
-        index = ActorResource_GetFixedId(p);
-        bank = index;
-        if (index == 0)
-            p->palette = p->paletteDefault;
-        else if (index == 501)
-            p->palette = p->paletteAlternate;
-        else {
-            void *dest;
-            void *source = gPaletteBankData + (bank << 5);
-            dest = p->paletteCopy;
-            CpuSetArgs(0x04000008, p->paletteCopy, source);
-            p->palette = dest;
-        }
+    if (self->blendMode) {
+        self->blendStep = 0;
+        self->blendMode = 0;
+        self->blendBank = ActorResource_GetFixedId(self);
+        Ratatosk_SelectPalette(self, ActorResource_GetFixedId(self));
     }
 }
