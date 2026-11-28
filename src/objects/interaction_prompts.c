@@ -325,15 +325,13 @@ s32 InteractionPrompt_InitManager(struct DirectionalManager *manager, void *unus
     manager->pending = -1;
     manager->enabled = 0;
     manager->slots = Heap_Alloc(manager->count * sizeof(struct DirectionalController));
-    if (!manager->slots) {
-    fail:
+    if (!manager->slots)
         return -1;
-    }
     Memory_Clear(manager->slots, manager->count * sizeof(struct DirectionalController));
     p = manager->slots;
     for (i = 0; i < manager->count; i++, p++)
         if (InteractionPrompt_InitSlot(manager, p, i) < 0)
-            goto fail;
+            return -1;
     manager->actor = gPlayers[0];
     if (manager->actor)
         manager->position = manager->actor->position;
