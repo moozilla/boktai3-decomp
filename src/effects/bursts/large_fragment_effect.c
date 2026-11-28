@@ -91,11 +91,10 @@ void LargeFragmentEffect_InitCollider(struct ScriptedColliderActor *actor, u32 a
     Collider_SetPosition(actor->collider, &actor->position, 0);
 }
 
-void LargeFragmentEffect_UpdateCollider(u8 *p)
+void LargeFragmentEffect_UpdateCollider(struct ScriptedColliderActor *actor)
 {
-    u8 *q = p + 0x3C;
-    Collider_SetPosition(q, p + 0x1c, 0);
-    Collider_Refresh(q);
+    Collider_SetPosition(actor->collider, &actor->position, 0);
+    Collider_Refresh(actor->collider);
 }
 
 static inline u8 SceneSlot_IsOccupied(struct LargeFragmentSlotPool *pool, u32 index)
