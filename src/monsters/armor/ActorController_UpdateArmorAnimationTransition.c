@@ -10,36 +10,32 @@ void DirectionalActor_TryBeginState(void *p, u32 a);
 
 void ActorController_UpdateArmorAnimationTransition(struct SceneCombatActor *actor)
 {
-    u8 *p = (void *)actor;
-    u8 *s = p + 0xB40;
-    u8 st = *s;
     u32 song;
 
-    switch (st) {
-        case 0: {
-            Armor_SetAnimationFromStart(actor, &gUnk_0824EF00[((p[0xB39] + 0x60) >> 6) & 3]);
-            (*s)++;
-            p[0xB41] = st;
-            SceneCombatActor_SelectFirstCollider((struct SceneCombatActor *)p);
-            *(u16 *)(p + 0xB32) &= ~0x20;
-            switch (p[0xB38]) {
+    switch (actor->actionPhase) {
+        case 0:
+            Armor_SetAnimationFromStart(actor, &gUnk_0824EF00[((actor->heading + 0x60) >> 6) & 3]);
+            actor->actionPhase++;
+            actor->actionReady = 0;
+            SceneCombatActor_SelectFirstCollider(actor);
+            actor->flags &= ~0x20;
+            switch (actor->kind) {
                 case 3:
                 case 5:
                 case 7:
                 case 9:
                 case 13:
                 case 15:
-                    Armor_InitPaletteBanks(p);
+                    Armor_InitPaletteBanks(actor);
                     Sound_PlaySongChecked(0x14B);
                     break;
             }
             return;
-        }
         case 1:
-            switch (p[0xB38]) {
+            switch (actor->kind) {
                 case 0:
                 case 1:
-                    if (*(u16 *)(p + 0xC8) != 3)
+                    if (actor->animationEvent != 3)
                         break;
                     song = 0xBE;
                     goto play;
@@ -47,14 +43,14 @@ void ActorController_UpdateArmorAnimationTransition(struct SceneCombatActor *act
                 case 6:
                 case 11:
                 case 12:
-                    if (*(u16 *)(p + 0xC8) != 3)
+                    if (actor->animationEvent != 3)
                         break;
                     song = 0x5AB;
                     goto play;
                 case 4:
                 case 8:
                 case 14:
-                    if (*(u16 *)(p + 0xC8) != 3)
+                    if (actor->animationEvent != 3)
                         break;
                     song = 0xBF;
                     goto play;
@@ -64,18 +60,18 @@ void ActorController_UpdateArmorAnimationTransition(struct SceneCombatActor *act
                 case 9:
                 case 13:
                 case 15:
-                    if (*(u16 *)(p + 0xC8) != 9)
+                    if (actor->animationEvent != 9)
                         break;
                     song = 0xC3;
                 play:
                     Sound_PlaySongChecked(song);
-                    p[0xB40]++;
+                    actor->actionPhase++;
                     break;
             }
         case 2:
-            if (p[0xB43] != 0) {
-                p[0xB41] = 1;
-                DirectionalActor_TryBeginState(p, 0);
+            if (actor->animationComplete != 0) {
+                actor->actionReady = 1;
+                DirectionalActor_TryBeginState(actor, 0);
             }
             break;
     }
