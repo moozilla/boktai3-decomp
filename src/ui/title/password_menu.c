@@ -104,57 +104,57 @@ void PasswordMenu_UpdateKeyboardCursor(struct PasswordMenu *p)
 
 void PasswordMenu_MoveCursorUp(struct PasswordMenu *p)
 {
-    switch (*(u32 *)&p->selection) {
+    switch (p->selection) {
         case 0:
-            *(u32 *)&p->selection = 25;
+            p->selection = 25;
             break;
         case 1:
-            *(u32 *)&p->selection = 26;
+            p->selection = 26;
             break;
         case 2:
-            *(u32 *)&p->selection = 27;
+            p->selection = 27;
             break;
         case 3:
-            *(u32 *)&p->selection = 28;
+            p->selection = 28;
             break;
         case 4:
-            *(u32 *)&p->selection = 29;
+            p->selection = 29;
             break;
         case 30:
-            *(u32 *)&p->selection = 55;
+            p->selection = 55;
             break;
         case 31:
-            *(u32 *)&p->selection = 56;
+            p->selection = 56;
             break;
         case 32:
-            *(u32 *)&p->selection = 57;
+            p->selection = 57;
             break;
         case 33:
-            *(u32 *)&p->selection = 58;
+            p->selection = 58;
             break;
         case 34:
-            *(u32 *)&p->selection = 59;
+            p->selection = 59;
             break;
         case 60:
-            *(u32 *)&p->selection = 65;
+            p->selection = 65;
             break;
         case 61:
-            *(u32 *)&p->selection = 65;
+            p->selection = 65;
             break;
         case 62:
-            *(u32 *)&p->selection = 60;
+            p->selection = 60;
             break;
         case 63:
-            *(u32 *)&p->selection = 61;
+            p->selection = 61;
             break;
         case 64:
-            *(u32 *)&p->selection = 62;
+            p->selection = 62;
             break;
         case 65:
-            *(u32 *)&p->selection = 64;
+            p->selection = 64;
             break;
         default:
-            *(u32 *)&p->selection -= 5;
+            p->selection -= 5;
             break;
     }
     PasswordMenu_UpdateKeyboardCursor(p);
