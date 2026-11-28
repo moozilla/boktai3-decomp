@@ -35,3 +35,7 @@ src/monsters/ivy/ivy.c	Ivy_InitializeContactColliders	minor	minor	0	packed posit
 src/monsters/ivy/ivy.c	SceneActor_BeginReaction22	minor	natural	9	
 src/monsters/ivy/ivy.c	SceneActor_FindNearbyPlayerTarget	contrived	contrived	35	unchanged: reversed do/while with parked blocked mask, delta/origin pointers and literal gPlayers address; plain for-loop leaves loop.c hoist order (players pointer hoisted before the 0x1000 mask and delta pointer) and mask/field load order for the leader flags
 src/monsters/ivy/ivy.c	Ivy_FindAdjacentTarget	minor	natural	3	
+src/monsters/ivy/ivy.c	Ivy_GetAnimationStatus	natural	natural	0	
+src/monsters/ivy/ivy.c	Ivy_Update	natural	natural	0	
+src/monsters/ivy/ivy.c	Ivy_UpdateInteraction	natural	natural	0	
+src/monsters/ivy/ivy.c	Ivy_Destroy	contrived	minor	40	MonsterInit_TestMotionFlags and SceneActorPlacement_ReadFlags32 accessors (mask loaded before the field address)
