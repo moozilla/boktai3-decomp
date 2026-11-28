@@ -11,12 +11,7 @@ u32 DragonPuppy_UpdateAttackTiming(u8 *p)
         s16 *table = (s16 *)(p + 0x188);
         if (*(s32 *)(p + 0x18) > *(s16 *)((u8 *)table + selected)) {
             sub_0820B034(p);
-            {
-                void *obj = p + 0x10c;
-                void *res = *(void **)(p + 0x170);
-                u32 value = p[0x132];
-                Anim_SetSequence(obj, res, 4, value, 0);
-            }
+            Anim_SetSequence((p + 0x10c), (*(void **)(p + 0x170)), 4, p[0x132], 0);
             *(u16 *)(p + 0x12c) = 30;
             *(void **)(p + 0x108) = DragonPuppy_UpdateAttackRecovery;
             *(u32 *)(p + 0x18) = 0;
