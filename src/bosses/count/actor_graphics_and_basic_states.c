@@ -867,14 +867,12 @@ void SceneActorState_AdvanceToState1A(struct StateActor *p)
 
 void SceneActorState_AdvanceToState01(struct StateActor *p)
 {
-    u8 entered = StateActor_ConsumeActionEntry(p);
-    if (entered == TRUE) {
-        p->actionAnimation = entered;
+    if (StateActor_ConsumeActionEntry(p) == TRUE) {
+        SceneActorState_SetAnimation(p, 1);
         Trigger_ConsumePending(p->receiver2, 1);
     }
     p->actionTimer++;
 }
-
 void SceneActorState_AdvanceToState02(struct StateActor *p)
 {
     if (StateActor_ConsumeActionEntry(p)) {

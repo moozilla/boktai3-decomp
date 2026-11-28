@@ -74,3 +74,4 @@ src/bosses/count/actor_graphics_and_basic_states.c	SceneActorState_EnterPhase6An
 src/bosses/count/actor_graphics_and_basic_states.c	SceneActorState_WaitForFlagRelease	minor	minor	0	
 src/bosses/count/actor_graphics_and_basic_states.c	SceneActorState_UpdateActionController	minor	minor	0	
 src/bosses/count/actor_graphics_and_basic_states.c	SceneActorState_StartContactPool	contrived	minor	6	pointers to both stack positions (plain struct accesses become register pairs); health read through a local (value loaded before the field address)
+src/bosses/count/actor_graphics_and_basic_states.c	SceneActorState_AdvanceToState01	contrived	natural	1	
