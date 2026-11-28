@@ -5,15 +5,15 @@ s32 StageIconDisplay_Initialize(struct StageIconDisplay *display, s32 variant, u
                                 void (*completion)(void *, struct StageIconDisplay *),
                                 void *argument)
 {
+    s32 status;
+
     display->scriptCompletion = 0;
     display->completion = completion;
     display->completionArgument = argument;
     display->option = option;
     StageIconDisplay_InitAnimations(display, variant);
-    {
-        s32 status = StageIconDisplay_SelectUpdate(display, variant);
-        gStageIconDisplay = display;
-        display->revealedCount = 0;
-        return status;
-    }
+    status = StageIconDisplay_SelectUpdate(display, variant);
+    gStageIconDisplay = display;
+    display->revealedCount = 0;
+    return status;
 }
