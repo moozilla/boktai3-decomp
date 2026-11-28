@@ -102,6 +102,6 @@ s32 Ratatosk_SpawnAnimatedParticle(struct RatatoskParticleConfig *config,
     Sprite_LinkToList(&e->sprite, 0);
     e->sprite.priority = 1;
     pool->mask |= 1 << slot;
-    pool->activeCount += 1;
+    pool->activeCount++;
     return slot;
 }
