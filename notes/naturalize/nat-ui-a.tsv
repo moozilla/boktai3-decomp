@@ -134,3 +134,5 @@ src/ui/books/forging_book/ForgingBook_Create.c	ForgingBook_Create	natural	natura
 src/ui/books/forging_book/SceneGrid_IsCellBeforeLimit.c	SceneGrid_IsCellBeforeLimit	contrived	contrived	25	row*6+column must be accumulated in four statements (column stays in r0)
 src/ui/books/forging_book/ForgingBook_InitBackgrounds.c	ForgingBook_InitBackgrounds	contrived	minor	3	initial size 16 is overwritten but stored by the ROM
 src/ui/books/forging_book/ForgingBook_OnTaskDestroy.c	ForgingBook_OnTaskDestroy	minor	minor	2	u32 return with no value (epilogue register)
+src/ui/books/forging_book/ForgingBook_ReturnIdleStatus.c	ForgingBook_ReturnIdleStatus	natural	natural	0	old_agbcc unit
+src/ui/books/forging_book/ForgingBook_RefreshCategory.c	ForgingBook_RefreshCategory	minor	minor	2	unused local accounts for the stack frame
