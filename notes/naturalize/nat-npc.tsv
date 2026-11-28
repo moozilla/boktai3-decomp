@@ -168,3 +168,4 @@ src/npc/story_character/Actor_UpdateKindFiveEntryFourFlagsSix.c	Actor_UpdateKind
 src/npc/story_character/Actor_UpdateKindFiveEntryFive.c	Actor_UpdateKindFiveEntryFive	natural	natural	0	
 src/npc/story_character/Actor_BeginKindFourEntrySix.c	Actor_BeginKindFourEntrySix	contrived	natural	2	
 src/npc/story_character/StoryCharacter_StartKind9Or10Animation2.c	StoryCharacter_StartKind9Or10Animation2	minor	natural	1	
+src/npc/story_character/StoryCharacter_StartKind5Animation6Then7.c	StoryCharacter_StartKind5Animation6Then7	minor	natural	1	
