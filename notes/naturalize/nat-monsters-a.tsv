@@ -169,3 +169,4 @@ src/monsters/armor/ActorController_CompleteMotionTransition.c	ActorController_Co
 src/monsters/armor/ActorController_UpdateArmorAnimationTransition.c	ActorController_UpdateArmorAnimationTransition	contrived	minor	34	goto shares the sound tail between cases
 src/monsters/armor/armor_actions.c	Armor_UpdateFacingAction9	contrived	minor	1	player position copied through gGameState halfword reads
 src/monsters/armor/armor_actions.c	Armor_UpdateFacingAction29	contrived	minor	1	player position copied through gGameState halfword reads
+src/monsters/armor/armor_actions.c	Armor_UpdateFacingAction6	contrived	natural	1	

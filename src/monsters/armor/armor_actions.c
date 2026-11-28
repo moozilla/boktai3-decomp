@@ -44,27 +44,20 @@ s32 Math_Atan2(s32, s32);
 
 void Armor_UpdateFacingAction6(struct ArmorFacingAction6Actor *p)
 {
-    u8 *q = &p->b3d;
-    u8 r;
-    switch (*q) {
+    switch (p->b3d) {
         case 0: {
             struct ArmorPlayerPosition *g = gGameState;
             s32 a = Math_Atan2(g->x - p->a48, g->y - p->a4c);
             a = (a + 0x20) & 0xc0;
             if (p->b39 != a)
                 ActorController_StartTurn(p, a);
-            else if (Armor_TryStartAction(p, 6)) {
-                r = 1;
-                goto st;
-            }
+            else if (Armor_TryStartAction(p, 6))
+                p->b3d = 1;
             break;
         }
         case 1:
-            r = p->b40;
-            if (r == 0xff) {
-            st:
-                *q = r;
-            }
+            if (p->b40 == 0xff)
+                p->b3d = 0xff;
             break;
     }
 }
