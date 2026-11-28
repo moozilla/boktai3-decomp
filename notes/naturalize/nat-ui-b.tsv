@@ -397,3 +397,4 @@ src/ui/town/ScriptPanel_IsCallbackActive.c	ScriptPanel_IsCallbackActive	natural	
 src/ui/town/town_map.c	TownMap_SetState	natural	natural	0	
 src/ui/town/town_map.c	TownMap_ApplyPaletteStep	minor	natural	1	
 src/ui/town/town_map.c	TownMap_UpdateAnimations	minor	natural	4	
+src/ui/town/town_map.c	TownMap_InitAnimations	minor	natural	3	

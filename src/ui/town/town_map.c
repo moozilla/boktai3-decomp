@@ -111,11 +111,11 @@ void TownMap_InitAnimations(struct RegistryChoiceMenu *menu)
     struct AnimSpriteResource *resource = ScriptProc_Start(0xcb05, 0xa2db);
     if (resource) {
         struct AnimSprite *anim;
-        s32 count;
+        s32 i;
         menu->resource = *resource;
         ResourceHeader_Relocate(&menu->resource, resource);
         anim = menu->animations;
-        for (count = 0; count < 5; count++) {
+        for (i = 0; i < 5; i++) {
             AnimSprite_InitLinked(anim, &menu->resource, 0, 0x10, 2, 0, 0x3c, 0);
             anim->attribute1A = 3;
             anim++;
