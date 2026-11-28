@@ -251,3 +251,4 @@ src/effects/healing/HealthBurstEffect_UpdateBursts.c	HealthBurstEffect_UpdateBur
 src/effects/healing/sub_082356E4.c	sub_082356E4	minor	natural	4	
 src/effects/healing/sub_08235794.c	sub_08235794	contrived	minor	10	nested mode and timer tests: one condition merges the two halfword compares into a word compare
 src/effects/healing/sub_082358C0.c	sub_082358C0	minor	natural	4	
+src/effects/healing/HealthBurstEffect_OnUpdate.c	HealthBurstEffect_OnUpdate	minor	natural	2	
