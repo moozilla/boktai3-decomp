@@ -439,3 +439,4 @@ src/system/clock/SunClock_GetWeekday.c	SunClock_GetWeekday	minor	natural	1
 src/system/clock/SunClock_GetAuxiliaryState.c	SunClock_GetAuxiliaryState	minor	natural	1	
 src/system/clock/SunClock_GetDateTimeFromScript.c	SunClock_GetDateTimeFromScript	minor	natural	1	
 src/system/clock/Clock_GetWeekdayFromScript.c	Clock_GetWeekdayFromScript	minor	natural	1	
+src/system/clock/SunClock_GetSunriseSpanFromScript.c	SunClock_GetSunriseSpanFromScript	minor	natural	1	
