@@ -1367,10 +1367,9 @@ void Axe_ResetMovementFlags(struct ChaseActor *actor)
 {
     struct Axe *context = actor->base.context;
     u32 m = 0x100000;
-    u32 *p = &actor->base.statusFlags;
     u32 *p2;
     u32 m2;
-    *p = *p | m;
+    actor->base.statusFlags = actor->base.statusFlags | m;
     p2 = &context->flagsE4C;
     m2 = ~0x11;
     *p2 = *p2 & m2;
