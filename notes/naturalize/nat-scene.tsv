@@ -491,3 +491,4 @@ src/scene/actor/reaction/SceneActorReaction_TryBeginControl29.c	SceneActorReacti
 src/scene/actor/reaction/SceneActor_ClearReactionFlags.c	SceneActor_ClearReactionFlags	minor	minor	0	the clearing helper stays; &= reorders the load and mask
 src/scene/actor/reaction/SceneActorReaction_ResolveDamage.c	SceneActorReaction_ResolveDamage	contrived	contrived	7	partial: health owner, decision union, mask blocks and captured flag pointers stay; each plain form changes allocation or spill rotation
 src/scene/actor/reaction/SceneActorReaction_ResolvePlacementDamage.c	SceneActorReaction_ResolvePlacementDamage	contrived	contrived	6	partial: captured pointer owners, goto fail and mask blocks stay; plain forms reorder loads
+src/scene/actor/reaction/SceneActorReaction_UpdateTimedBurst.c	SceneActorReaction_UpdateTimedBurst	contrived	contrived	0	flag helpers, accessor calls and mask blocks stay; every plain operator form changes load order or registers
