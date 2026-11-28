@@ -721,7 +721,7 @@ struct DarkLoanScreen *DarkLoan_CreateHiddenDisplay(u32 rate, s32 confirmScript,
     do {
         rateField = &panel->rate;
         *rateField = rate;
-        if (rate - 2 > 7)
+        if (rate < 2 || rate > 9)
             *rateField = DarkLoan_GetDefaultRate();
     } while (0);
     DarkLoan_InitializeProcedure(panel);

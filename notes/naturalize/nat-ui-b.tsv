@@ -388,3 +388,7 @@ src/ui/town/dark_loan.c	DarkLoan_OnDestroy	natural	natural	0
 src/ui/town/dark_loan.c	DarkLoan_StartDisplayScript	natural	natural	0	
 src/ui/town/dark_loan.c	DarkLoan_InitializeProcedure	natural	natural	0	
 src/ui/town/dark_loan.c	DarkLoan_BuildDisplay	contrived	minor	24	u8 priority copied from a playback struct field to put zero in a register; one secondary resource local for the first uses
+src/ui/town/dark_loan.c	DarkLoan_GetDefaultRate	natural	natural	0	
+src/ui/town/dark_loan.c	DarkLoan_InitializeFromScript	natural	natural	0	
+src/ui/town/dark_loan.c	DarkLoan_Create	natural	natural	0	
+src/ui/town/dark_loan.c	DarkLoan_CreateHiddenDisplay	contrived	contrived	8	do-while(0) and rate field pointer: without the loop weight the panel pointer outranks the field address (r4/r5 swap)
