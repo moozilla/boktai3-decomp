@@ -99,3 +99,4 @@ src/ui/books/collection/collection.c	Collection_RefreshSelection	natural	natural
 src/ui/books/collection/CollectionMenu_InitGraphics.c	CollectionMenu_InitGraphics	contrived	natural	2	
 src/ui/books/collection/CollectionMenu_Init.c	CollectionMenu_Init	contrived	natural	1	
 src/ui/books/collection/CollectionMenu_Update.c	CollectionMenu_Update	contrived	natural	1	falls off the end of an s32 function (kept)
+src/ui/books/collection/CollectionMenu_DestroyGraphics.c	CollectionMenu_DestroyGraphics	contrived	natural	1	
