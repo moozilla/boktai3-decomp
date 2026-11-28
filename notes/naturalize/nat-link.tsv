@@ -127,3 +127,4 @@ src/link/player/Player_SetTetherMode.c	Player_SetTetherMode	natural	natural	0
 src/link/player/Player_ResetActionState.c	Player_ResetActionState	minor	minor	1	Player_AddStatusFlags accessor stays: the plain |= differs
 src/link/player/Player_SetSecondaryActionFlags.c	Player_SetSecondaryActionFlags	minor	natural	1	
 src/link/player/Player_GetSecondaryActionFlags.c	Player_GetSecondaryActionFlags	minor	natural	1	
+src/link/player/Player_PlayLocalSong.c	Player_PlayLocalSong	contrived	natural	1	
