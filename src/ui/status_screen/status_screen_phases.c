@@ -1,7 +1,6 @@
 #include "ui/status_screen/status_screen.h"
 #include "engine/video/render.h"
 
-
 void StatusScreen_BeginClose(struct StatusScreen *p)
 {
     if (!p->timer) {
@@ -26,18 +25,17 @@ static inline int StatusScreen_MapWidth(int bg)
 
 void sub_0800E974(struct StatusScreen *p)
 {
-    u16 zero = p->timer;
-    if (zero == 0) {
+    if (!p->timer) {
         Sound_PlaySong(225);
         p->start = 1;
         p->end = 5;
         p->blend = 0x1084;
-        p->fade = zero;
+        p->fade = 0;
         p->fadeStep = 4;
         p->effect = StatusScreen_FadeOutPalette;
-        p->top = zero;
+        p->top = 0;
         p->bottom = 116;
-        p->amplitude = zero;
+        p->amplitude = 0;
         p->delta = 4;
         p->noise = StatusScreen_UpdateScanlineNoise;
     }

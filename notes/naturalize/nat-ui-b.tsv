@@ -123,3 +123,4 @@ src/ui/status_screen/status_screen.c	NumericDisplay_DrawPair	contrived	natural	1
 src/ui/status_screen/status_screen.c	StatusScreen_DrawClock	contrived	natural	5	-
 src/ui/status_screen/status_screen.c	StatusScreen_GetTilePtr	minor	natural	14	-
 src/ui/status_screen/status_screen.c	StatusScreen_Close	contrived	natural	3	-
+src/ui/status_screen/status_screen_phases.c	sub_0800E974	contrived	minor	4	StatusScreen_MapWidth accessor kept: reading gBgRecords[0].width in the loop condition loads the record address differently (20 insns)
