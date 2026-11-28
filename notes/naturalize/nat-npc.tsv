@@ -457,3 +457,11 @@ src/script/demo_manager.c	SceneMessages_IsActive	natural	natural	0
 src/script/demo_manager.c	SceneMessages_Enqueue	natural	natural	0	
 src/script/demo_manager.c	SceneMessages_RunScript	contrived	contrived	22	nested do-while(0) in the argument copy: for-loop and indexed forms change the loop's base pointer or register order
 src/script/demo_manager.c	SceneMessages_FindScript	contrived	natural	3	
+src/script/demo_manager.c	SceneMessages_Dispatch	minor	minor	3	guarded do-while and dispatch-state local: a plain for loop moves the first state load
+src/script/demo_manager.c	SceneMessages_ScriptStart	minor	minor	3	self and script-count pointer locals: removing either changes which address is kept in a register
+src/script/script_selector.c	ScriptSelector_InitializeTask	natural	natural	0	
+src/script/script_selector.c	ScriptSelector_CreateTask	natural	natural	0	
+src/script/script_selector.c	SceneActorRegistry_IgnoreEntry1B77	natural	natural	0	
+src/script/script_selector.c	SceneActorRegistry_IgnoreScriptEntry	natural	natural	0	
+src/script/script_selector.c	SceneActorRegistry_IgnoreEntry3D0C	natural	natural	0	
+src/script/script_selector.c	ScriptSelector_MoveSelection	minor	natural	2	

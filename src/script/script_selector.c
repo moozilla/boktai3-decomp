@@ -7,7 +7,7 @@ void ScriptSelector_MoveSelection(struct ScriptSelector *selector, s32 delta)
     s32 index;
     selector->index += delta;
     if (selector->index < 0)
-        selector->index = procedure;
+        selector->index = 0;
     Script_SetPc(selector->scriptStart);
     for (index = 0; index <= selector->index; index++) {
         if (Script_GetPc() == 0) {
