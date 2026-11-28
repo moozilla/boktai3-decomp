@@ -549,31 +549,24 @@ void ModifierMenu_DrawUnavailableStat(u32 a, u32 b, u32 c)
 
 void Bg_SetTilemapEntry(s32, s32, s32, s32, s32, s32);
 
-void ModifierMenu_DrawCapacity(s32 a, s32 b, s32 count, s32 y, s32 width)
+void ModifierMenu_DrawCapacity(s32 used, s32 current, s32 next, s32 x, s32 y)
 {
-    s32 diff;
-    s32 color;
+    s32 change = next - current;
+    s32 tile;
     s32 i;
-    diff = count - b;
-    Bg_FillTilemapRectangle(2, y, width, 4, 1, 1, 0, 0);
-    color = 0x3b;
-    if (diff <= 0) {
-        color = 0x1b;
-        if (diff < 0)
-            color = 0x2b;
-    }
-    i = 0;
-    if (i < count) {
-        do {
-            s32 c;
-            c = color;
-            if (i >= a)
-                goto no_increment;
-            c++;
-        no_increment:
-            Bg_SetTilemapEntry(2, y + i, width, c, 0, 0);
-            i++;
-        } while (i < count);
+    Bg_FillTilemapRectangle(2, x, y, 4, 1, 1, 0, 0);
+    if (change > 0)
+        tile = 0x3b;
+    else if (change < 0)
+        tile = 0x2b;
+    else
+        tile = 0x1b;
+    for (i = 0; i < next; i++)
+    {
+        s32 filled = tile;
+        if (i < used)
+            filled++;
+        Bg_SetTilemapEntry(2, x + i, y, filled, 0, 0);
     }
 }
 
