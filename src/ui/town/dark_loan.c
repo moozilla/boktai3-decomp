@@ -380,7 +380,7 @@ void DarkLoan_UpdateAdjustment(struct DarkLoanScreen *panel)
         balance = &gGameState->unk2c;
         limit = (u16 *)gGameState->unk2E;
     }
-    if (gPadState[1] & 1) {
+    if (gPadState[1] & A_BUTTON) {
         if (!panel->adjustment)
             Sound_PlaySong(0xDE);
         else {
@@ -396,12 +396,12 @@ void DarkLoan_UpdateAdjustment(struct DarkLoanScreen *panel)
         DarkLoan_BeginClosing(panel);
         return;
     }
-    if (gPadState[1] & 2) {
+    if (gPadState[1] & B_BUTTON) {
         Sound_PlaySong(0xDE);
         DarkLoan_FinishOpening(panel);
         return;
     }
-    if ((gPadState[0] & 0x20) &&
+    if ((gPadState[0] & DPAD_LEFT) &&
         gGameState->menuRewardBalance + (panel->adjustment + 1) * panel->rate <= 9999 &&
         *balance + panel->adjustment < *limit) {
         Sound_PlaySong(0x37D);
@@ -416,7 +416,7 @@ void DarkLoan_UpdateAdjustment(struct DarkLoanScreen *panel)
         AnimData_SelectPaletteBank(&panel->animation, group + 0x1B4);
         if (++panel->changeFrame > 15)
             panel->changeFrame = 0;
-    } else if ((gPadState[0] & 0x10) && panel->adjustment) {
+    } else if ((gPadState[0] & DPAD_RIGHT) && panel->adjustment) {
         Sound_PlaySong(0x37D);
         panel->adjustment--;
         DarkLoan_UpdateBalanceDigits(panel);
@@ -442,7 +442,7 @@ void DarkLoan_UpdateAdjustment(struct DarkLoanScreen *panel)
         AnimData_SelectPaletteBank(&panel->animation, 0x1B4);
         Anim_LoadKeyframe(&panel->widgets[DARK_LOAN_PERCENT], &panel->resource, 18, 1);
     }
-    if ((gPadState[0] & 0x20) &&
+    if ((gPadState[0] & DPAD_LEFT) &&
         gGameState->menuRewardBalance + (panel->adjustment + 1) * panel->rate > 9999)
         panel->warningTimer = 60;
     if (panel->warningTimer) {

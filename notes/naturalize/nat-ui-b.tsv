@@ -376,3 +376,5 @@ src/ui/town/dark_loan.c	DarkLoan_UpdateHidden	natural	natural	0
 src/ui/town/dark_loan.c	DarkLoan_UpdateOpeningAnimation	minor	natural	1	
 src/ui/town/dark_loan.c	DarkLoan_ConfirmPreview	natural	natural	0	
 src/ui/town/dark_loan.c	DarkLoan_UpdateConfirmation	minor	natural	1	
+src/ui/town/dark_loan.c	DarkLoan_GetSelectionGroup	natural	natural	0	
+src/ui/town/dark_loan.c	DarkLoan_UpdateAdjustment	minor	minor	1	casts into unnamed or differently typed GameState fields (shared header not owned)
