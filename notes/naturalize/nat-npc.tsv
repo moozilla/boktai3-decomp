@@ -563,3 +563,4 @@ src/script/script_virtual_machine.c	Text_LookupString	contrived	natural	2
 src/script/script_virtual_machine.c	sub_0821AD98	contrived	natural	1	
 src/script/script_virtual_machine.c	Script_ReadProcTable	contrived	natural	6	cursor copy q of the table pointer: advancing the parameter swaps registers
 src/script/script_virtual_machine.c	Script_BackupVariableOperand	contrived	minor	8	reference index read as *(u16 *)(bytes + 6): ref.index moves the stack load relative to index = 0
+src/script/script_virtual_machine.c	Script_ReadBackupVariableOperand	contrived	minor	10	reference index read as *(u16 *)(bytes + 6): ref.index moves the stack load relative to index = 0
