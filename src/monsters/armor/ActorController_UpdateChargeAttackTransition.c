@@ -1,3 +1,4 @@
+#include "monsters/armor/actor_controller.h"
 #include "monsters/armor/scene_combat_colliders.h"
 #include "system/game_state/game_state.h"
 
@@ -21,36 +22,32 @@ s32 Math_Atan2(s32, s32);
 
 void ActorController_UpdateChargeAttackTransition(struct SceneCombatActor *actor)
 {
-    u8 *p = (void *)actor;
-
     switch (actor->actionPhase) {
-        case 0: {
-            u32 four = 4;
+        case 0:
             Armor_SetAnimationFromStart(actor, &gUnk_0824EE80[((actor->heading + 0x60) >> 6) & 3]);
             actor->actionPhase++;
             actor->actionReady = 0;
-            (&actor->colliderGroup.colliders[2])->flags |= four;
-            (&actor->colliderGroup.colliders[1])->flags &= ~four;
-            (&actor->colliderGroup.colliders[3])->flags &= ~four;
-            (&actor->colliderGroup.colliders[0])->flags |= four;
+            ActorController_SetColliderFlags(&actor->colliderGroup.colliders[2], 4);
+            ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[1], 4);
+            ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[3], 4);
+            ActorController_SetColliderFlags(&actor->colliderGroup.colliders[0], 4);
             {
-                struct ActorControllerMotion *render = &actor->colliderGroup.motion;
-                u32 one = 1;
-                render->flags |= one;
+                struct ActorControllerMotion *motion = &actor->colliderGroup.motion;
+                u32 mask = 1;
+                motion->flags |= mask;
             }
             actor->flags &= ~0x20;
             Sound_PlaySongChecked(0xC1);
             break;
-        }
         case 1:
             if (actor->animationComplete != 0) {
                 struct ContactCollider *c;
                 Armor_SetAnimationFromStart(actor,
                                             &gUnk_0824EE90[((actor->heading + 0x60) >> 6) & 3]);
-                actor->actionPhase = (actor->actionPhase + 1);
+                actor->actionPhase++;
                 actor->actionReady = 0;
                 actor->actionCounter = 0;
-                Armor_StartFastWhiteFade(p);
+                Armor_StartFastWhiteFade(actor);
                 actor->shakeStrength = 20;
                 actor->colliderGroup.colliders[0].flags &= ~4;
                 c = &actor->colliderGroup.colliders[0];
@@ -61,8 +58,9 @@ void ActorController_UpdateChargeAttackTransition(struct SceneCombatActor *actor
                 Collider_SetAttackPowerAndForce(c, 0, 0x50);
                 c->bounds = gUnk_0824EEA8;
                 c->offset = gUnk_0824EEA0;
-                p[0x1D2] = Math_Atan2(gGameState->positionX - *(s16 *)(p + 0x48),
-                                      gGameState->positionZ - *(s16 *)(p + 0x4C));
+                actor->colliderGroup.colliders[0].direction =
+                    Math_Atan2(gGameState->positionX - actor->navigation.referencePosition.x,
+                               gGameState->positionZ - actor->navigation.referencePosition.z);
                 Sound_PlaySongChecked(0x1BA);
             }
             break;
@@ -70,23 +68,17 @@ void ActorController_UpdateChargeAttackTransition(struct SceneCombatActor *actor
             if (actor->actionCounter > 7) {
                 Armor_SetAnimationFromStart(actor,
                                             &gUnk_0824EEB0[((actor->heading + 0x60) >> 6) & 3]);
-                actor->actionPhase = (actor->actionPhase + 1);
+                actor->actionPhase++;
                 actor->actionReady = 0;
-                Armor_StartPaletteTransition(p);
-                {
-                    u16 *flags = (u16 *)(p + 0x196);
-                    u32 old = *flags;
-                    u32 set = 4;
-                    set |= old;
-                    *flags = set;
-                }
+                Armor_StartPaletteTransition(actor);
+                actor->colliderGroup.colliders[0].flags |= 4;
             }
             break;
         case 3:
             if (actor->animationComplete != 0) {
                 actor->actionPhase = 0xFF;
                 actor->actionReady = 1;
-                ActorPalette_Reset(p);
+                ActorPalette_Reset(actor);
             }
             break;
     }

@@ -166,4 +166,4 @@ src/monsters/armor/ActorController_UpdateBreakApartTransition.c	ActorController_
 src/monsters/armor/ActorController_UpdateChargeAttackTransition.c	ActorController_UpdateChargeAttackTransition	contrived	contrived	33	raw pointer, parked masks remain
 src/monsters/armor/ActorController_FinishDelayedTransition.c	ActorController_FinishDelayedTransition	contrived	minor	5	phase pointer kept: flags address reuse
 src/monsters/armor/ActorController_CompleteMotionTransition.c	ActorController_CompleteMotionTransition	contrived	minor	6	phase pointer kept: flags address reuse
-src/monsters/armor/ActorController_UpdateArmorAnimationTransition.c	ActorController_UpdateArmorAnimationTransition	contrived	contrived	34	goto-shared sound tail, state byte reuse
+src/monsters/armor/ActorController_UpdateArmorAnimationTransition.c	ActorController_UpdateArmorAnimationTransition	contrived	minor	34	goto shares the sound tail between cases
