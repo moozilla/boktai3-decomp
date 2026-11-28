@@ -478,3 +478,4 @@ src/scene/actor/reaction/SceneActorReaction_SettleDisplacement.c	SceneActorReact
 src/scene/actor/reaction/SceneActorReaction_TryResumeRoute.c	SceneActorReaction_TryResumeRoute	contrived	natural	12	-
 src/scene/actor/reaction/SceneActorReaction_ApplyAreaDamage.c	SceneActorReaction_ApplyAreaDamage	contrived	contrived	6	partial: mask-first locals and halfword flag wrappers stay; plain operators load the field first
 src/scene/actor/reaction/SceneActorReaction_ApplyStaggerDamage.c	SceneActorReaction_ApplyStaggerDamage	contrived	contrived	6	partial: mask-first locals and halfword flag wrappers stay; plain operators load the field first
+src/scene/actor/reaction/SceneActorReaction_ApplyCategoryDamage.c	SceneActorReaction_ApplyCategoryDamage	contrived	contrived	6	partial: mask-first locals and halfword flag wrappers stay; plain operators load the field first
