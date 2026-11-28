@@ -2293,32 +2293,30 @@ void Player_UpdateStateMotionCue(struct Player *player)
 
 // confidence=low: timed held-action phases, animation and completion script.
 
-void Player_UpdateTimedChargeAction(struct Player *actor)
+void Player_UpdateTimedChargeAction(struct Player *player)
 {
-    struct Player *player = actor;
     Player_AddControlFlags(player, 8);
     switch (player->tetherPhase) {
         case 0:
             Player_SetAnimation(player, ActorVariant_GetTableValue(player->actionMode, 0), 64, 1);
-            if ((player->inputKeys[1]) & 1)
+            if (player->inputKeys[1] & 1)
                 ActorSequence_Begin(player, 7, 1);
             break;
 
-        case 1: {
-            u16 *frame = &player->tetherFrame;
-            if (!(*frame)) {
+        case 1:
+            if (!player->tetherFrame) {
                 player->facing = 4;
                 player->heading = 1;
                 player->side = 0;
                 Player_SetActionOrigin(player);
-                (*frame)++;
+                player->tetherFrame++;
             }
             player->resetValue6FC = 15;
             if (!Player_SetAnimation(player, ActorVariant_GetTableValue(player->actionMode, 8), 64,
                                      1))
                 break;
             Sound_PlaySong(203);
-            if (!((player->inputKeys[0]) & 1)) {
+            if (!(player->inputKeys[0] & 1)) {
                 ActorSequence_Begin(player, 7, 4);
                 break;
             }
@@ -2330,72 +2328,56 @@ void Player_UpdateTimedChargeAction(struct Player *actor)
                 break;
             }
             player->chargeCounter = 0;
-            {
-                ActorSequence_Begin(player, 7, 3);
-                break;
-            }
-        }
+            ActorSequence_Begin(player, 7, 3);
+            break;
 
-        case 2: {
-            u16 *count;
+        case 2:
             Player_AddStatusFlags(player, 0xA0);
-            count = &player->chargeCounter;
-            if ((*count) <= 4) {
-                if (((++(*count)) == 5) && (!(player->actionMode)))
+            if (player->chargeCounter <= 4) {
+                if (++player->chargeCounter == 5 && !player->actionMode)
                     Sound_PlaySong(296);
             }
             Player_SetAnimation(player, ActorVariant_GetTableValue(player->actionMode, 9), 64, 1);
             player->resetValue6FC = 30;
             ConvergingEffects_EmitNearParticle(player, &player->actionOrigin);
-            if (!((player->inputKeys[0]) & 1)) {
+            if (!(player->inputKeys[0] & 1)) {
                 Sound_StopSong(216);
                 player->chargeSoundActive = 0;
-                {
-                    ActorSequence_Begin(player, 7, 4);
-                    break;
-                }
+                ActorSequence_Begin(player, 7, 4);
+                break;
             }
             if (!Player_ReadStatusBits(&player->statusFlags, 16)) {
                 Sound_StopSong(216);
                 player->chargeSoundActive = 0;
-
                 ActorSequence_Begin(player, 7, 3);
-
                 break;
             }
             {
-                s32 elapsed = gGameState->unk876;
-                elapsed += player->cueElapsed;
-                player->cueElapsed = elapsed;
-                if ((u16)elapsed >= (player->cueRequired)) {
-                    u32 *scriptPtr;
-                    u32 script;
-                    Hud_ClearTimer();
-                    ActorSequence_Begin(player, 7, 5);
-                    scriptPtr = &player->cueParameter;
-                    script = *scriptPtr;
-                    if (script) {
-                        s32 value;
-                        struct ScriptUtilityArguments call;
-                        call.count = 1;
-                        call.values = &value;
-                        value = 1;
-                        *scriptPtr = 0;
-                        Script_Call(script, &call);
-                    }
-                }
-                break;
+                s32 rate = gGameState->unk876;
+                player->cueElapsed += rate;
             }
-        }
+            if (player->cueElapsed >= player->cueRequired) {
+                Hud_ClearTimer();
+                ActorSequence_Begin(player, 7, 5);
+                if (player->cueParameter) {
+                    u32 script = player->cueParameter;
+                    s32 value;
+                    struct ScriptUtilityArguments call;
+                    call.count = 1;
+                    call.values = &value;
+                    value = 1;
+                    player->cueParameter = 0;
+                    Script_Call(script, &call);
+                }
+            }
+            break;
 
-        case 3: {
+        case 3:
             Player_AddStatusFlags(player, 0x80);
             Player_SetAnimation(player, ActorVariant_GetTableValue(player->actionMode, 10), 64, 1);
             player->resetValue6FC = 30;
-            if (!((player->inputKeys[0]) & 1)) {
-
+            if (!(player->inputKeys[0] & 1)) {
                 ActorSequence_Begin(player, 7, 4);
-
                 break;
             }
             if (Player_ReadStatusBits(&player->statusFlags, 16)) {
@@ -2405,7 +2387,7 @@ void Player_UpdateTimedChargeAction(struct Player *actor)
                 ActorSequence_Begin(player, 7, 2);
             }
             break;
-        }
+
         case 4:
             player->resetValue6FC = 15;
             if (Player_SetAnimation(player, ActorVariant_GetTableValue(player->actionMode, 11), 64,
@@ -2422,23 +2404,20 @@ void Player_UpdateTimedChargeAction(struct Player *actor)
             break;
     }
 
-    if ((player->tetherPhase) != 5) {
-        if (!(--(player->cueRemaining))) {
-            u32 *scriptPtr;
-            u32 script;
+    if (player->tetherPhase != 5) {
+        if (!--player->cueRemaining) {
             Hud_ClearTimer();
             Sound_StopSong(216);
             Player_UpdateFacingSide(player);
             PlayerCue_EnterStandUpdate(player);
-            scriptPtr = &player->cueParameter;
-            script = *scriptPtr;
-            if (script) {
+            if (player->cueParameter) {
+                u32 script = player->cueParameter;
                 s32 value;
                 struct ScriptUtilityArguments call;
                 call.count = 1;
                 call.values = &value;
                 value = 0;
-                *scriptPtr = 0;
+                player->cueParameter = 0;
                 Script_Call(script, &call);
             }
         }

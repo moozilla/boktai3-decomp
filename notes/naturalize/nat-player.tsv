@@ -337,3 +337,4 @@ src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateSpiralRecovery	minor	na
 src/player/cutscene/player_cue_actions.c	PlayerCue_RestartAlternateAnimation	natural	natural	0	-
 src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateAlternateFade	minor	natural	1	-
 src/player/cutscene/player_cue_actions.c	Player_UpdateStateMotionCue	contrived	minor	3	flag accessor helpers (mask loaded before the flag word)
+src/player/cutscene/player_cue_actions.c	Player_UpdateTimedChargeAction	contrived	minor	11	signed frame rate held in an s32 before the accumulate
