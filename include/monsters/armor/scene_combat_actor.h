@@ -116,5 +116,5 @@ void BouncingEffect_RemoveSprite(struct BouncingSceneParticle *);
 void ActorOverlay_InitSprite(struct SceneCombatActor *);
 void SceneCombatActor_InitBouncingParticle(struct SceneCombatActor *);
 extern const u8 gUnk_0824E6A4[], gUnk_0824E6B4[], gUnk_0824E6C4[];
-extern const u8 gUnk_0824E6D4[], gUnk_0824E6E6[];
+extern const u8 gUnk_0824E6D4[], gUnk_0824E6E6[][9];
 #endif

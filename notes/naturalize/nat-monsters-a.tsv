@@ -1,0 +1,10 @@
+path	function	verdict_before	verdict_after	compiles	stays_and_why
+src/monsters/armor/scene_combat_actor.c	ArmorEffect_Stop	natural	natural	0	
+src/monsters/armor/scene_combat_actor.c	SceneCombatActor_ResetAttackMode	contrived	contrived	0	tried plain &= and unparked helper masks: ldr order of the shared ~mask and helper's two mask locals decide allocation
+src/monsters/armor/scene_combat_actor.c	SceneCombatActor_ResetDefenseMode	contrived	contrived	0	tried plain &= and unparked helper masks: ldr order of the shared ~mask and helper's two mask locals decide allocation
+src/monsters/armor/scene_combat_actor.c	SceneParticle_UpdateBounce	natural	natural	0	
+src/monsters/armor/scene_combat_actor.c	BouncingEffect_RemoveSprite	natural	natural	0	
+src/monsters/armor/scene_combat_actor.c	SceneCombatActor_InitBouncingParticle	natural	natural	0	
+src/monsters/armor/scene_combat_actor.c	ActorMarker_InitFacingSprite	natural	natural	0	
+src/monsters/armor/scene_combat_actor.c	ActorOverlay_InitSprite	natural	natural	0	
+src/monsters/armor/scene_combat_actor.c	ActorMarker_InitBouncingParticles	contrived	minor	4	SetParticleFrame stays: the store goes through the sprite pointer (strh [r,#0x10])

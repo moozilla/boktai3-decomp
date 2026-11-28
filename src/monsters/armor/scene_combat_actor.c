@@ -132,7 +132,8 @@ void SceneCombatActor_InitBouncingParticle(struct SceneCombatActor *actor)
     struct BouncingSceneParticle *particle;
     Sprite_Init(sprite, &actor->particleAnimation, 0);
     sprite->flags = 0x202;
-    SetParticleCallbacks(&actor->looseParticles[1], SceneParticle_UpdateBounce, BouncingEffect_RemoveSprite);
+    SetParticleCallbacks(&actor->looseParticles[1], SceneParticle_UpdateBounce,
+                         BouncingEffect_RemoveSprite);
     actor->looseParticles[1].bounced = 0;
     actor->looseParticles[1].floor = actor->position.values.floor;
     frame = gUnk_0824E6A4[actor->kind];
@@ -162,7 +163,8 @@ void ActorMarker_InitFacingSprite(struct SceneCombatActor *actor)
     u32 frame;
     Sprite_Init(sprite, &actor->markerAnimation, 0);
     sprite->flags = 0x202;
-    SetParticleCallbacks(&actor->facingMarker, SceneParticle_UpdateBounce, BouncingEffect_RemoveSprite);
+    SetParticleCallbacks(&actor->facingMarker, SceneParticle_UpdateBounce,
+                         BouncingEffect_RemoveSprite);
     actor->facingMarker.bounced = 0;
     actor->facingMarker.floor = actor->position.values.floor;
     frame = gUnk_0824E6B4[actor->kind];
@@ -190,7 +192,8 @@ void ActorOverlay_InitSprite(struct SceneCombatActor *actor)
     struct BouncingParticleSprite *sprite = &actor->looseParticles[0].sprite;
     Sprite_Init(sprite, &actor->fragmentAnimations[1], 0);
     sprite->flags = 0x202;
-    SetParticleCallbacks(&actor->looseParticles[0], SceneParticle_UpdateBounce, BouncingEffect_RemoveSprite);
+    SetParticleCallbacks(&actor->looseParticles[0], SceneParticle_UpdateBounce,
+                         BouncingEffect_RemoveSprite);
     actor->looseParticles[0].bounced = 0;
     actor->looseParticles[0].floor = actor->position.values.floor;
     sprite->frame = gUnk_0824E6C4[actor->kind];
@@ -238,19 +241,16 @@ void ActorMarker_InitBouncingParticles(struct SceneCombatActor *actor)
             case 11:
             case 12:
             case 14:
-            default: {
-                const u8 *table = gUnk_0824E6E6;
-                table += 9;
-                animation = table[i];
+            default:
+                animation = gUnk_0824E6E6[1][i];
                 break;
-            }
             case 3:
             case 5:
             case 7:
             case 9:
             case 13:
             case 15:
-                animation = gUnk_0824E6E6[i];
+                animation = gUnk_0824E6E6[0][i];
                 break;
         }
         Sprite_Init(&actor->fragments[i].sprite, &actor->fragmentAnimations[animation], 0);
@@ -258,7 +258,7 @@ void ActorMarker_InitBouncingParticles(struct SceneCombatActor *actor)
         actor->fragments[i].sprite.flags = 2;
         if (flip)
             actor->fragments[i].sprite.flags = 6;
-        if (1 & i)
+        if (i & 1)
             actor->fragments[i].sprite.flags |= 0x200;
         else
             actor->fragments[i].sprite.flags |= 0x400;
@@ -279,28 +279,32 @@ void SceneCombatActor_SpawnBouncingEffect(struct SceneCombatActor *actor)
     switch (((actor->heading + 0x60) >> 6) & 3) {
         case 0:
             actor->looseParticles[0].sprite.position.packed.x = actor->position.values.x + 0x64;
-            actor->looseParticles[0].sprite.position.packed.y = 0x28a + actor->position.values.floor;
+            actor->looseParticles[0].sprite.position.packed.y =
+                0x28a + actor->position.values.floor;
             actor->looseParticles[0].sprite.position.packed.z = actor->position.values.z + 0x64;
             actor->looseParticles[0].sprite.phase = 0xf;
             actor->looseParticles[0].velocity.packed.z = 0xf;
             break;
         case 1:
             actor->looseParticles[0].sprite.position.packed.x = actor->position.values.x;
-            actor->looseParticles[0].sprite.position.packed.y = 0x28a + actor->position.values.floor;
+            actor->looseParticles[0].sprite.position.packed.y =
+                0x28a + actor->position.values.floor;
             actor->looseParticles[0].sprite.position.packed.z = actor->position.values.z + 0xc8;
             actor->looseParticles[0].sprite.phase = 0xf;
             actor->looseParticles[0].velocity.packed.x = -0xf;
             break;
         case 2:
             actor->looseParticles[0].sprite.position.packed.x = actor->position.values.x + 0x96;
-            actor->looseParticles[0].sprite.position.packed.y = 0x28a + actor->position.values.floor;
+            actor->looseParticles[0].sprite.position.packed.y =
+                0x28a + actor->position.values.floor;
             actor->looseParticles[0].sprite.position.packed.z = actor->position.values.z;
             actor->looseParticles[0].sprite.phase = 0xf5;
             actor->looseParticles[0].velocity.packed.z = -0xf;
             break;
         case 3:
             actor->looseParticles[0].sprite.position.packed.x = actor->position.values.x + 0x64;
-            actor->looseParticles[0].sprite.position.packed.y = 0x28a + actor->position.values.floor;
+            actor->looseParticles[0].sprite.position.packed.y =
+                0x28a + actor->position.values.floor;
             actor->looseParticles[0].sprite.position.packed.z = actor->position.values.z + 0x64;
             actor->looseParticles[0].sprite.phase = 0xf5;
             actor->looseParticles[0].velocity.packed.x = 0xf;
