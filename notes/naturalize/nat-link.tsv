@@ -297,3 +297,4 @@ src/link/player/Script_GetOptionalIValue.c	Script_GetOptionalIValue	natural	natu
 src/link/player/sub_08243704.c	sub_08243704	natural	natural	0	
 src/link/player/sub_0824372C.c	sub_0824372C	contrived	natural	4	slot local keeps the reread after the store
 src/link/player/Player_SetTimedEffect.c	Player_SetTimedEffect	contrived	natural	1	
+src/link/player/Player_InitActionCallback.c	Player_InitActionCallback	contrived	natural	1	visualState is a u32 field so the sprite pointer is cast
