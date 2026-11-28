@@ -348,3 +348,9 @@ src/ui/title/mode_menu.c	ModeMenu_Initialize	contrived	natural	1
 src/ui/title/mode_menu.c	ModeMenu_ShowDescription	contrived	contrived	4	union reusing the menu register for the index; plain index locals differ in register choice
 src/ui/title/mode_menu.c	ModeMenu_LoadAvailableSave	contrived	minor	6	save flag read twice through an s16 local
 src/ui/title/mode_menu.c	ModeMenu_Update	contrived	contrived	12	do-while(0)/goto unlock loop with a parked magic constant, cursor pointer temps (hoisting order); a plain for loop is 14 insns off
+src/ui/title/mode_menu.c	ModeMenu_Destroy	natural	natural	0	
+src/ui/title/mode_menu.c	ModeMenu_SetParametersFromScript	natural	natural	0	
+src/ui/title/mode_menu.c	ModeMenu_Create	natural	natural	0	
+src/ui/title/mode_menu.c	ResultScreen_Update	natural	natural	0	
+src/ui/title/mode_menu.c	ResultScreen_Destroy	natural	natural	0	
+src/ui/title/mode_menu.c	ResultScreen_Initialize	contrived	natural	8	
