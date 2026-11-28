@@ -1,5 +1,6 @@
 #include "global.h"
 #include "objects/pile_driver/pile_driver_rig.h"
+#include "scene/collision/contact_position.h"
 
 struct GlowOwner {
     u8 pad0[0x1A];
@@ -8,12 +9,11 @@ struct GlowOwner {
 struct GlowTask {
     u32 flags;
     u8 pad4[0x18];
-    s16 x;
-    s16 y;
-    u8 pad20[0x28];
+    struct ContactPosition position;
+    u8 pad24[0x24];
     u32 flags48;
     u8 pad4C[0x18];
-    u32 savedPosition[2];
+    struct ContactPosition savedPosition;
     u8 pad6C[0x24];
     u8 f90;
     u8 f91;
@@ -33,10 +33,10 @@ void sub_08236790(struct GlowTask *p)
 {
     p->flags &= ~1;
     if (++p->timer <= 0x2F) {
-        p->y += p->f95;
+        p->position.y += p->f95;
         p->f95--;
         if (p->owner->flag1A != 0 && p->f95 > 0)
-            RadialBurstEffect_EmitOrbitParticle(p->owner, &p->x);
+            RadialBurstEffect_EmitOrbitParticle(p->owner, &p->position);
     } else if (p->owner->flag1A != 0) {
         p->flags |= 1;
         p->f90 = 0;
@@ -47,14 +47,9 @@ void sub_08236790(struct GlowTask *p)
         p->f91 = 1;
         p->flags |= 1;
         p->flags48 &= ~1;
-        {
-            u32 a = ((u32 *)&p->x)[0];
-            u32 b = ((u32 *)&p->x)[1];
-            p->savedPosition[0] = a;
-            p->savedPosition[1] = b;
-        }
+        p->savedPosition = p->position;
         p->callback = TimedSprite_UpdateFrames;
         p->timer = 0;
-        RadialBurstEffect_StartBurst(p->owner, &p->x);
+        RadialBurstEffect_StartBurst(p->owner, &p->position);
     }
 }
