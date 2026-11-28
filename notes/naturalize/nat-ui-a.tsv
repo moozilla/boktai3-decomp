@@ -577,3 +577,4 @@ src/ui/hud/display/Hud_BeginModeSixCue.c	Hud_BeginModeSixCue	fudged	natural	1
 src/ui/hud/display/Hud_UpdateCountdownDisplay.c	Hud_UpdateCountdownDisplay	fudged	natural	1	
 src/ui/hud/display/sub_081782AC.c	sub_081782AC	fudged	natural	1	
 src/ui/hud/display/Hud_RegisterTimer.c	Hud_RegisterTimer	fudged	natural	1	
+src/ui/hud/display/Hud_ClearTimer.c	Hud_ClearTimer	fudged	natural	1	
