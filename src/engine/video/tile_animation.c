@@ -38,7 +38,8 @@ u32 TileAnimation_Destroy(struct TileAnimation *animation)
         Heap_Free(animation->tiles);
         animation->tiles = 0;
     }
-    return gTileAnimation = 0;
+    gTileAnimation = 0;
+    return 0;
 }
 
 int TileAnimation_Initialize(struct TileAnimation *animation)
