@@ -496,10 +496,8 @@ void ChildGroup_UpdateLandingState(struct PhaseObject *p)
             p->entries[i].presentation.z = p->position.z;
             p->entries[i].phase = p->rotation;
             p->entries[i].flags &= ~1;
-            {
-                p->memberCollidersA[i].flags |= 4;
-                p->memberCollidersB[i].flags |= 4;
-            }
+            p->memberCollidersA[i].flags |= 4;
+            p->memberCollidersB[i].flags |= 4;
             p->landingHeight = (u16)Terrain_GetHeightAt(&p->position);
         }
         p->offsetX = 0;

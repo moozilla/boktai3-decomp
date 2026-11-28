@@ -86,3 +86,4 @@ src/monsters/ivy/PhaseObject_TickEntryReset.c	PhaseObject_TickEntryReset	natural
 src/monsters/ivy/child_group.c	ChildGroup_AdvanceLaunchCycle	minor	natural	1	(u8) on the callback result
 src/monsters/ivy/child_group.c	ChildGroup_WaitForInactiveMembers	contrived	natural	1	
 src/monsters/ivy/child_group.c	ChildGroup_UpdateTrailingMembers	contrived	natural	1	
+src/monsters/ivy/child_group.c	ChildGroup_UpdateLandingState	minor	natural	1	
