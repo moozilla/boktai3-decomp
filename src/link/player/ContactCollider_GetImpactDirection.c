@@ -11,8 +11,7 @@ s32 ContactCollider_GetImpactDirection(struct ContactCollider *a, struct Contact
 {
     s32 angle;
     if (a->flags & 0x100) {
-        u32 t = a->direction;
-        angle = t + 0xe0;
+        angle = a->direction + 0xe0;
         return ImpactDirection(angle);
     } else {
         s32 x = a->x - b->x;
@@ -20,9 +19,8 @@ s32 ContactCollider_GetImpactDirection(struct ContactCollider *a, struct Contact
         if (x == 0 && z == 0) {
             angle = b->direction + 0xe0;
             return ImpactDirection(angle);
-        } else {
-            angle = Math_Atan2(x, z) + 0x60;
         }
+        angle = Math_Atan2(x, z) + 0x60;
     }
     return ImpactDirection(angle);
 }
