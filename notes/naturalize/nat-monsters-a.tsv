@@ -43,3 +43,23 @@ src/monsters/armor/actor_palette.c	Armor_InitPaletteBanks	contrived	contrived	0	
 src/monsters/armor/actor_palette.c	ActorPalette_PulseBlendSaved	contrived	contrived	0	direct copy arguments tried: bank-offset and source temps fix address computation order
 src/monsters/armor/armor_motion.c	Armor_UpdateRunMotion	contrived	natural	1	
 src/monsters/armor/armor_motion.c	Armor_UpdateStrafeMotion	contrived	natural	2	
+src/monsters/armor/armor_motion.c	Armor_UpdateStrafeNormal	natural	natural	0	retyped with caller
+src/monsters/armor/armor_motion.c	Armor_UpdateStrafeFast	natural	natural	0	retyped with caller
+src/monsters/armor/armor_motion.c	Armor_UpdateStrafeFaster	natural	natural	0	retyped with caller
+src/monsters/armor/armor_motion.c	Armor_UpdateStrafeNormalWithScatterEffect	natural	natural	0	retyped with Armor_UpdateStrafeMotion
+src/monsters/armor/armor_motion.c	Armor_UpdateRun	natural	natural	0	retyped with Armor_UpdateRunMotion
+src/monsters/armor/armor_motion.c	Armor_UpdateRunWithScatterEffect	natural	natural	0	retyped with Armor_UpdateRunMotion
+src/monsters/armor/armor_motion.c	Armor_UpdateRunWithTrailEffect	natural	natural	0	retyped with Armor_UpdateRunMotion
+src/monsters/armor/armor_motion.c	ActorController_SetAnimation	natural	natural	0	
+src/monsters/armor/armor_motion.c	Armor_SetAnimationFromStart	natural	natural	0	
+src/monsters/armor/armor_motion.c	SceneActor_SpawnSpriteEffect	natural	natural	0	
+src/monsters/armor/armor_motion.c	Armor_UpdateWalkNormal	natural	natural	0	
+src/monsters/armor/armor_motion.c	Armor_UpdateWalkHeavy	natural	natural	0	
+src/monsters/armor/armor_motion.c	Armor_UpdateWalkFast	natural	natural	0	
+src/monsters/armor/armor_motion.c	Armor_UpdateWalkFaster	natural	natural	0	
+src/monsters/armor/armor_motion.c	Armor_UpdatePositiveTurnNormal	natural	natural	0	
+src/monsters/armor/armor_motion.c	Armor_SpawnScatterEffect	minor	minor	0	random sample read as raw address sum
+src/monsters/armor/armor_motion.c	Armor_UpdateWalk	natural	natural	0	
+src/monsters/armor/armor_motion.c	Armor_UpdatePositiveTurn	natural	natural	0	
+src/monsters/armor/armor_motion.c	Armor_UpdateNegativeTurn	natural	natural	0	
+src/monsters/armor/armor_motion.c	Armor_UpdateWalkNormalWithScatterEffect	contrived	natural	1	

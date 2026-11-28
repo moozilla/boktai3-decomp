@@ -295,10 +295,10 @@ void Armor_UpdateWalkFaster(u32 a)
     Armor_UpdateWalk(a, 0x12, 0x23);
 }
 
-void Armor_UpdateWalkNormalWithScatterEffect(u8 *p)
+void Armor_UpdateWalkNormalWithScatterEffect(struct ArmorWalkController *p)
 {
     Armor_UpdateWalk(p, 10, 0x40);
-    if ((p[0xB42] & 0x1f) == 0)
+    if ((p->ticks & 0x1f) == 0)
         Armor_SpawnScatterEffect(p);
 }
 
