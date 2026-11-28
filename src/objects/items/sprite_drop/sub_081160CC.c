@@ -1,62 +1,37 @@
 #include "global.h"
 #include "engine/ram.h"
-#include "scene/collision/packed_contact_vector.h"
-struct DropEntry {
-    u8 pad0[0x1C];
-    u32 renderFlags;
-    u8 pad20[0x48 - 0x20];
-    u8 sequence[0x10];
-    void *animation;
-    u8 pad5C[0x9C - 0x5C];
-    s16 x, y, z;
-    u8 padA2[0xAE - 0xA2];
-    u16 kind;
-    u8 active, tick;
-    u8 padB2[2];
-    void (*callback)(struct DropEntry *);
-};
-struct DropManager {
-    u8 pad0[0x18];
-    struct DropEntry entries[16];
-};
-struct DropManager *SpriteDrop_CreateManager(void);
-s32 Terrain_GetCellClearance(void *);
-void SpriteDrop_UpdateEntry(struct DropEntry *);
-void SpriteDrop_OnExpire(struct DropEntry *);
-void SpatialIndex_InitEntry(void *, struct PackedContactVector *, struct PackedContactVector *,
-                            struct PackedContactVector *, s32, s32, s32, s32, s32,
-                            void (*)(struct DropEntry *), struct DropEntry *);
-u32 Anim_SetSequence(void *, void *, u32, u32, u32);
+#include "objects/items/sprite_drop.h"
+#include "scene/collision/spatial_index.h"
 
-#define E (m->entries[i])
+s32 Terrain_GetCellClearance(s16 *);
+
 // confidence=low: claims a free drop entry at cell (x, y) and returns its index, or -1.
 s32 sub_081160CC(s32 x, s32 y, s32 kind)
 {
-    struct DropManager *m;
+    struct SpriteDropPool *pool;
     s32 i;
     if (!gCompactParticlePool) {
-        m = SpriteDrop_CreateManager();
-        if (!m)
+        pool = SpriteDrop_CreateManager();
+        if (!pool)
             return -1;
     } else
-        m = gCompactParticlePool;
-    for (i = 0; i < 16; i++) {
-        if (!E.active) {
-            struct PackedContactVector size, offset, position;
+        pool = gCompactParticlePool;
+    for (i = 0; i < SPRITE_DROP_COUNT; i++) {
+        if (!pool->items[i].active) {
+            struct ContactPosition size, offset, position;
             s32 clearance, duration;
-            struct DropEntry *e;
-            E.x = x << 3;
-            E.y = y << 3;
-            E.z = E.y - 96;
-            e = &E;
-            clearance = Terrain_GetCellClearance(&e->x);
-            if (clearance < E.y)
-                E.y = clearance;
-            E.active = 1;
-            E.tick = 1;
-            E.callback = SpriteDrop_UpdateEntry;
-            E.kind = kind;
-            if ((u16)kind == 0)
+
+            pool->items[i].x = x << 3;
+            pool->items[i].y = y << 3;
+            pool->items[i].z = pool->items[i].y - 96;
+            clearance = Terrain_GetCellClearance(&pool->items[i].x);
+            if (clearance < pool->items[i].y)
+                pool->items[i].y = clearance;
+            pool->items[i].active = 1;
+            pool->items[i].entered = 1;
+            pool->items[i].update = SpriteDrop_UpdateEntry;
+            pool->items[i].kind = kind;
+            if (pool->items[i].kind == 0)
                 duration = 600;
             else
                 duration = 200;
@@ -66,16 +41,17 @@ s32 sub_081160CC(s32 x, s32 y, s32 kind)
             offset.x = 0;
             offset.y = -size.y;
             offset.z = -2;
-            position.x = E.x;
-            position.y = E.y - (E.z + 96);
-            position.z = E.z;
-            SpatialIndex_InitEntry((u8 *)e + 0x5C, &position, &size, &offset, 12, 5, E.kind + 3,
-                                   duration, 12, SpriteDrop_OnExpire, e);
-            Anim_SetSequence(e->sequence, E.animation, 2, (u8)E.kind, 0);
-            E.renderFlags |= 1;
+            position.x = pool->items[i].x;
+            position.y = pool->items[i].y - (pool->items[i].z + 96);
+            position.z = pool->items[i].z;
+            SpatialIndex_InitEntry(&pool->items[i].pickup, &position, &size, &offset, 12, 5,
+                                   pool->items[i].kind + 3, duration, 12, SpriteDrop_OnExpire,
+                                   &pool->items[i]);
+            Anim_SetSequence(&pool->items[i].sequence, pool->items[i].sequences, 2,
+                             (u8)pool->items[i].kind, 0);
+            pool->items[i].sprite.flags |= 1;
             return i;
         }
     }
     return -1;
 }
-#undef E
