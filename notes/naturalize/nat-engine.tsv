@@ -39,4 +39,4 @@ src/engine/message_queue.c	MessageQueue_InitBuffers	natural	natural	0
 src/engine/message_queue.c	MessageQueue_SwapBuffers	contrived	natural	3	
 src/engine/message_queue.c	MessageQueue_GetMessagesById	contrived	minor	16	if + do/while for the count: a plain while lets jump2 cross-jump the return
 src/engine/message_queue.c	MessageQueue_PostMessage	natural	natural	0	
-src/engine/iwram_code.c	Palette_CacheObjectBankArm	contrived	minor	2	
+src/engine/iwram_code.c	Palette_CacheObjectBankArm	contrived	natural	3	
