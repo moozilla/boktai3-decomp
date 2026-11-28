@@ -1,0 +1,9 @@
+path	function	verdict_before	verdict_after	compiles	stays_and_why
+src/npc/manager/scene_actor_lifecycle.c	Actor_FindResourceData	natural	natural	0	
+src/npc/manager/scene_actor_lifecycle.c	Actor_FindResourceEntry	natural	natural	0	
+src/npc/manager/scene_actor_lifecycle.c	Actor_InitResources	natural	natural	0	
+src/npc/manager/scene_actor_lifecycle.c	Actor_LinkToManager	natural	natural	0	
+src/npc/manager/scene_actor_lifecycle.c	Actor_UnlinkFromManager	natural	natural	0	
+src/npc/manager/scene_actor_lifecycle.c	Actor_FindById	natural	natural	0	
+src/npc/manager/scene_actor_lifecycle.c	Actor_Allocate	natural	natural	0	
+src/npc/manager/scene_actor_lifecycle.c	Actor_RunCallbacks	contrived	natural	1	

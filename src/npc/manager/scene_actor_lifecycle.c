@@ -227,18 +227,11 @@ int Actor_Destroy(struct SceneActor *actor)
 
 int Actor_RunCallbacks(void *context, struct SceneActor *actor)
 {
-    int callbackIndex;
-    void (**callback)(void *, struct SceneActor *);
+    int i;
     if (!actor->active)
         return -1;
-    callbackIndex = 0;
-    callback = actor->callbacks;
-    for (;;) {
-        if (*callback)
-            (*callback)(context, actor);
-        callback++;
-        callbackIndex++;
-        if (callbackIndex >= 4)
-            return 0;
-    }
+    for (i = 0; i < 4; i++)
+        if (actor->callbacks[i])
+            actor->callbacks[i](context, actor);
+    return 0;
 }
