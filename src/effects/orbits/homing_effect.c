@@ -620,28 +620,14 @@ void EffectParticle_UpdateDriftAroundActor(struct EffectManager *manager, struct
             o->tile = (o->width >> 3) * (o->height >> 3) * factor + graphics->base;
         }
     }
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = a->flags;
-        bit = 1;
-        first = (u8)(control.raw & bit);
-        if (first != (((*entry & 0x30) >> 4) & bit))
-            p->sprite.flags |= 4;
-        else
-            p->sprite.flags &= ~4;
-    }
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = a->flags;
-        bit = 2;
-        first = (u8)(control.raw & bit);
-        if (first != (((*entry & 0x30) >> 4) & bit))
-            o->flags |= 8;
-        else
-            o->flags &= ~8;
-    }
+    if ((u8)(a->flags & 1) != DisplaySequence_MaskCommand((*entry & 0x30) >> 4, 1))
+        p->sprite.flags |= 4;
+    else
+        p->sprite.flags &= ~4;
+    if ((u8)(a->flags & 2) != DisplaySequence_MaskCommand((*entry & 0x30) >> 4, 2))
+        o->flags |= 8;
+    else
+        o->flags &= ~8;
     if (++a->timer >= a->rate) {
         a->timer = 0;
         if (a->flags & 4) {
