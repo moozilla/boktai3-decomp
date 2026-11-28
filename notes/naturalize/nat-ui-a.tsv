@@ -583,3 +583,4 @@ src/ui/hud/display/SceneHud_RefreshControls.c	SceneHud_RefreshControls	fudged	pa
 src/ui/hud/display/SceneHud_SetTimedState.c	SceneHud_SetTimedState	natural	natural	0	
 src/ui/hud/display/sub_0817845C.c	sub_0817845C	natural	natural	0	
 src/ui/hud/display/Hud_SetPanelIndexFromScript.c	Hud_SetPanelIndexFromScript	fudged	natural	1	
+src/ui/hud/display/Hud_SetValueSource.c	Hud_SetValueSource	fudged	natural	1	

@@ -1,15 +1,11 @@
 #include "global.h"
 #include "engine/ram.h"
-struct FieldHud {
-    u8 unknown0[0xA66];
-    u16 valueMode;
-    void *valueSource;
-};
-void Hud_SetValueSource(void *source, u32 mode)
+#include "ui/pause/scene_hud_display.h"
+void Hud_SetValueSource(u16 *source, u32 mode)
 {
-    struct FieldHud *hud = gFieldHud;
+    struct SceneHudState *hud = (struct SceneHudState *)gFieldHud;
     if (hud) {
-        hud->valueSource = source;
-        hud->valueMode = mode;
+        hud->fieldValueSource = source;
+        hud->fieldValueMode = mode;
     }
 }
