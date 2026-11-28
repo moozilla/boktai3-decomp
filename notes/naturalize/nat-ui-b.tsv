@@ -23,3 +23,4 @@ src/ui/results/stage_results/StageResults_InitCursorPositions.c	StageResults_Ini
 src/ui/results/stage_results/StageResults_InitPortraitDisplay.c	StageResults_InitPortraitDisplay	contrived	natural	1	
 src/ui/results/stage_results/SceneGauge_SelectThresholdFrame.c	SceneGauge_SelectThresholdFrame	minor	natural	1	threshold table has no name
 src/ui/results/stage_results/StageResults_HideSprites.c	StageResults_HideSprites	contrived	natural	1	
+src/ui/results/stage_results/StageResults_DestroySprites.c	StageResults_DestroySprites	contrived	natural	1	
