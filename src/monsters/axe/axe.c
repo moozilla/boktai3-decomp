@@ -626,15 +626,14 @@ void Axe_UpdateTurnAnimation(struct RoomActor *actor, u32 events)
         }
     }
     {
-        struct ChaseActor *state = (void *)actor;
         sequence = &((struct SceneActorAnimationSequenceDrawable *)actor->drawable)->sequence;
         {
             u16 *scale;
-            if (SceneActorChase_QueryMotionFlags(state, 0xA02F)) {
-                state->base.field2C2 = 64;
-                scale = &state->base.field2C2;
+            if (SceneActorChase_QueryMotionFlags((void *)actor, 0xA02F)) {
+                actor->field2C2 = 64;
+                scale = &actor->field2C2;
             } else {
-                u16 *p = &state->base.field2C2;
+                u16 *p = &actor->field2C2;
                 u16 value = *p;
                 scale = p;
                 if (!value)
