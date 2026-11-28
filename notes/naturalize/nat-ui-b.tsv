@@ -165,3 +165,13 @@ src/ui/title/options.c	Options_SetParametersFromScript	natural	natural	0	-
 src/ui/title/options.c	Options_GetSecondaryChoice	natural	natural	0	-
 src/ui/title/options.c	Options_Create	natural	natural	0	-
 src/ui/title/name_entry.c	TextEntry_DrawName	contrived	natural	3	-
+src/ui/title/name_entry.c	TextEntry_CopyInitialName	natural	natural	0	-
+src/ui/title/name_entry.c	NameEntry_CopyNameBuffer	natural	natural	0	-
+src/ui/title/name_entry.c	NameEntry_UpdateCursor	natural	natural	0	-
+src/ui/title/name_entry.c	NameEntry_MoveCursorUp	natural	natural	0	-
+src/ui/title/name_entry.c	NameEntry_MoveCursorDown	natural	natural	0	-
+src/ui/title/name_entry.c	NameEntry_MoveCursorRight	natural	natural	0	-
+src/ui/title/name_entry.c	NameEntry_MoveCursorLeft	natural	natural	0	-
+src/ui/title/name_entry.c	NameEntry_AppendChar	natural	natural	0	-
+src/ui/title/name_entry.c	NameEntry_ToggleCharacterPage	natural	natural	0	-
+src/ui/title/name_entry.c	NameEntry_EraseCharacter	minor	minor	3	goto draw stays: nested forms are 5-7 insns off
