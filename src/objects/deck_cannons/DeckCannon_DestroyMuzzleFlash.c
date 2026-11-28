@@ -1,8 +1,7 @@
 #include "global.h"
+#include "objects/deck_cannons/deck_cannon_battery.h"
 
-u32 Sprite_Remove(u8 *);
-
-void DeckCannon_DestroyMuzzleFlash(u8 *p)
+void DeckCannon_DestroyMuzzleFlash(struct DeckCannonShot *shot)
 {
-    Sprite_Remove(p + 0x24);
+    Sprite_Remove(&shot->sprite);
 }
