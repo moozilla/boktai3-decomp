@@ -446,3 +446,4 @@ src/system/clock/SunClock_GetMoonAgeTenths.c	SunClock_GetMoonAgeTenths	minor	nat
 src/system/clock/SunClock_GetMoonPhase.c	SunClock_GetMoonPhase	minor	natural	1	
 src/system/clock/SunClock_GetMoonPhaseIndex.c	SunClock_GetMoonPhaseIndex	minor	natural	1	
 src/system/clock/Clock_CheckRtcDate.c	Clock_CheckRtcDate	contrived	natural	1	
+src/system/clock/Clock_IsEarlyMorning.c	Clock_IsEarlyMorning	minor	natural	1	
