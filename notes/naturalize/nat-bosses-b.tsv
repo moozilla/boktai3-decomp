@@ -146,3 +146,4 @@ src/bosses/ratatosk/Ratatosk_FindFreeParticle.c	Ratatosk_FindFreeParticle	contri
 src/bosses/ratatosk/Ratatosk_SetParticleUpdateCallback.c	Ratatosk_SetParticleUpdateCallback	contrived	natural	3	
 src/bosses/ratatosk/Ratatosk_ConfigureParticle.c	Ratatosk_ConfigureParticle	contrived	natural	3	
 src/bosses/ratatosk/SlotMotion_Initialize.c	SlotMotion_Initialize	contrived	natural	3	
+src/bosses/ratatosk/sub_081FB7D8.c	sub_081FB7D8	contrived	minor	3	Sub256 helper stays (v - (x - 256) reassociates)
