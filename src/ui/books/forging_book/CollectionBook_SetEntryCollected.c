@@ -1,11 +1,10 @@
 // COMPILER: old_agbcc
-#include "global.h"
 /* CollectionBook_SetEntryCollected: Sets the indexed bit in the persistent ten-entry collection mask */
 
-extern u8 *gGameState;
+#include "global.h"
+#include "ui/books/collection_book.h"
 
-void CollectionBook_SetEntryCollected(s32 bit)
+void CollectionBook_SetEntryCollected(s32 entry)
 {
-    u16 *f = (u16 *)(gGameState + 0x596);
-    *f = (1 << bit) | *f;
+    gGameState->flags596 |= 1 << entry;
 }
