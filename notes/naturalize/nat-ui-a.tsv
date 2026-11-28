@@ -276,3 +276,4 @@ src/ui/dialogue/message_window/MessageWindow_GetNumberWidth.c	MessageWindow_GetN
 src/ui/dialogue/message_window/MessageWindow_GetStringWidth.c	MessageWindow_GetStringWidth	minor	natural	2	
 src/ui/dialogue/message_window/MessageWindow_GetRemainingTextWidth.c	MessageWindow_GetRemainingTextWidth	minor	natural	1	
 src/ui/dialogue/message_window/MessageWindow_GetTextCompletionState.c	MessageWindow_GetTextCompletionState	minor	natural	1	
+src/ui/dialogue/message_window/MessageWindow_GetSoundMode.c	MessageWindow_GetSoundMode	minor	natural	1	unk86C is declared u16 in the shared header; read signed here
