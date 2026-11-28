@@ -221,12 +221,11 @@ void Palette_InterpolateBanks(void *, void *, void *, int, int);
 void ScenePaletteFade_BlendPaletteBanks(u8 *destination, u8 *first, u8 *second, int frame,
                                         int shift, int banks)
 {
-    u16(*outputBank)[16] = (u16(*)[16])destination;
-    u16(*firstBank)[16] = (u16(*)[16])first;
-    u16(*secondBank)[16] = (u16(*)[16])second;
-    int bank;
+    s32 bank;
+
     for (bank = 0; bank < banks; bank++) {
-        Palette_InterpolateBanks(outputBank[bank], firstBank[bank], secondBank[bank], frame, shift);
+        Palette_InterpolateBanks(destination + bank * 32, first + bank * 32, second + bank * 32,
+                                 frame, shift);
     }
 }
 
