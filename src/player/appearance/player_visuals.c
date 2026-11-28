@@ -1129,16 +1129,9 @@ s32 Player_RollWeaponHitElementEffect(void)
 
 s32 Player_RollFirstWeaponHitStatusLow(void)
 {
-    s32 r;
-
-    gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-    r = Mod(*(const u16 *)((const u8 *)gRandomTable + (gRandomIndex << 1)), 100);
-    if (r > 10) {
-        r = 0;
-    } else {
-        r = 0x40000;
-    }
-    return r;
+    if (Mod(Player_NextStatusRandom(), 100) <= 10)
+        return 0x40000;
+    return 0;
 }
 
 s32 Player_RollFirstWeaponHitStatusHigh(void)
