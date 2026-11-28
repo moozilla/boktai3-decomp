@@ -291,3 +291,4 @@ src/objects/hazards/damage_controller.c	DamageController_AccumulateHit	natural	n
 src/objects/hazards/damage_controller.c	DamageController_Update	natural	natural	0	
 src/objects/hazards/damage_controller.c	DamageController_Destroy	natural	natural	0	
 src/objects/hazards/directional_force/DirectionalForce_Tick.c	DirectionalForce_Tick	contrived	minor	3200	one local draw helper that also returns the table remains: the second-mode magnitude draw needs the table loaded after the cursor into r3
+src/objects/hazards/directional_force/DirectionalForce_InitializeFromScript.c	DirectionalForce_InitializeFromScript	contrived	natural	52	

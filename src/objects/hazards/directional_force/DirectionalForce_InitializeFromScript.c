@@ -1,13 +1,8 @@
 #include "objects/hazards/directional_force.h"
 #include "engine/math/monster_particle_random.h"
+#include "objects/hazards/falling_objects.h"
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
-
-static inline u16 NextRandom(void)
-{
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    return *(const u16 *)((gRandomIndex << 1) + RANDOM_TABLE_ADDR);
-}
 
 static inline void ReadRanges(struct DirectionalForce *force)
 {
@@ -61,51 +56,36 @@ s32 DirectionalForce_InitializeFromScript(struct DirectionalForce *force, u32 id
             break;
         case 1:
             ReadRanges(force);
-            {
-                const u16 *random = gRandomTable;
-                u32 index = (gRandomIndex + 1) & 1023;
-                gRandomIndex = index;
-                force->targetAngle = ((const u8 *)random)[index * 2];
-                if (!force->magnitudeRange)
-                    value = force->baseMagnitude;
-                else {
-                    u32 next = (index + 1) & 1023;
-                    u32 sample;
-                    gRandomIndex = next;
-                    /* The shared macro's loop notes count random's refs twice in flow,
-                       so global alloc gives it r4 before the 1023 mask. */
-                    PARTICLE_RANDOM_READ_SAMPLE(sample, random, next);
-                    value = force->baseMagnitude + Mod(sample, force->magnitudeRange);
-                }
-            }
+            force->targetAngle = (u8)ParticleRandom_ReadSample(gRandomTable);
+            if (!force->magnitudeRange)
+                value = force->baseMagnitude;
+            else
+                value = force->baseMagnitude + Mod(FallingObject_Random(), force->magnitudeRange);
             force->targetMagnitude = value << 4;
             force->magnitude = force->baseMagnitude << 4;
-            /* Stored directly (a HImode copy), so jump2 does not cross-jump this arm into
-               case 2's; the random arm is shared with case 2's. */
             if (!force->delayRange)
                 force->delay = force->baseDelay;
             else {
-                value = force->baseDelay + Mod(NextRandom(), force->delayRange);
+                value = force->baseDelay + Mod(FallingObject_Random(), force->delayRange);
                 force->delay = value;
             }
             break;
-        case 2:
-            {
-                u32 direction = Script_SeekToKeyword('d');
-                if (direction)
-                    direction = Script_GetValue();
-                force->targetAngle = direction;
-            }
+        case 2: {
+            u32 direction = Script_SeekToKeyword('d');
+            if (direction)
+                direction = Script_GetValue();
+            force->targetAngle = direction;
+        }
             ReadRanges(force);
             if (!force->magnitudeRange)
                 value = force->baseMagnitude;
             else
-                value = force->baseMagnitude + Mod(NextRandom(), force->magnitudeRange);
+                value = force->baseMagnitude + Mod(FallingObject_Random(), force->magnitudeRange);
             force->targetMagnitude = value << 4;
             if (!force->delayRange)
                 value = force->baseDelay;
             else
-                value = force->baseDelay + Mod(NextRandom(), force->delayRange);
+                value = force->baseDelay + Mod(FallingObject_Random(), force->delayRange);
             force->delay = value;
             break;
     }
