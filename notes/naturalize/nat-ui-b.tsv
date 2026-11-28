@@ -354,3 +354,5 @@ src/ui/title/mode_menu.c	ModeMenu_Create	natural	natural	0
 src/ui/title/mode_menu.c	ResultScreen_Update	natural	natural	0	
 src/ui/title/mode_menu.c	ResultScreen_Destroy	natural	natural	0	
 src/ui/title/mode_menu.c	ResultScreen_Initialize	contrived	natural	8	
+src/ui/title/mode_menu.c	ResultScreen_SetParametersFromScript	natural	natural	0	
+src/ui/title/mode_menu.c	ResultScreen_Create	natural	natural	0	
