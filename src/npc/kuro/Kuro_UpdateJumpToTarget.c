@@ -1,110 +1,85 @@
-#include "global.h"
-struct Vec {
-    s16 x, y, z;
-};
-struct Tagged {
+#include "npc/manager/scene_actor_lifecycle.h"
+#include "engine/math/math_shift.h"
+
+struct KuroJumpTag {
     u16 tag, pad2, phase, entered;
     u32 ticks;
     s16 velocity;
     u16 duration;
-    u16 x, y, z;
+    u16 startX, startY, startZ;
 };
-struct Npc {
-    u8 pad0[7], done, pad8, entered;
-    u8 padA[4];
-    u16 flags;
-    u8 pad10[9], facing4, facing8, heading;
-    u8 pad1c[4];
-    struct Tagged tagged;
-    u8 pad38[0x1c];
-    struct Vec target;
-    u8 pad5c[9], angle;
-    u8 pad66[2];
-    struct Vec position;
-};
-void Kuro_PlayTaggedAnimation(void *, s32, s32, s32, s32);
-s32 DisplayAnimation_TestFinished(void *);
+void Kuro_PlayTaggedAnimation(struct SceneActor *, s32, s32, s32, s32);
+s32 DisplayAnimation_TestFinished(struct DisplayAnimation *);
 u16 Sqrt(u32);
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
-static inline void setFlags(struct Npc *p)
+
+void Kuro_UpdateJumpToTarget(void *manager, struct SceneActor *actor)
 {
-    u32 mask = 0x400;
-    p->flags = mask | p->flags;
-}
-static inline s32 half(s32 value)
-{
-    if (value >= 0)
-        return value >> 1;
-    return -((-value) >> 1);
-}
-// Remaining difference: entry-flag pointer lifetime in the airborne phase.
-void Kuro_UpdateJumpToTarget(void *manager, struct Npc *p)
-{
-    struct Tagged *new_var;
-    struct Tagged *t = &p->tagged;
-    struct Vec *pos = &p->position;
-    if (p->entered) {
+    struct KuroJumpTag *tag = (struct KuroJumpTag *)actor->unknown20;
+    struct ContactPosition *position = &actor->body.position;
+    if (actor->animationEntered) {
         u32 root;
-        p->entered = 0;
-        p->done = 0;
-        p->heading = 64;
-        p->angle = 64;
-        p->facing8 = 5;
-        p->facing4 = 2;
-        Kuro_PlayTaggedAnimation(p, 7, 2, 0, 4);
-        t->velocity = 0;
-        t->x = pos->x;
-        t->y = pos->y;
-        t->z = pos->z;
-        root = Sqrt(-200 * (p->target.y - t->y));
+        actor->animationEntered = 0;
+        actor->finished = 0;
+        actor->direction = 64;
+        actor->body.direction = 64;
+        actor->facing8 = 5;
+        actor->facing4 = 2;
+        Kuro_PlayTaggedAnimation(actor, 7, 2, 0, 4);
+        tag->velocity = 0;
+        tag->startX = position->x;
+        tag->startY = position->y;
+        tag->startZ = position->z;
+        root = Sqrt(-200 * (actor->target.y - tag->startY));
         if (Mod(root, 10) > 4)
-            t->duration = Div(root, 10) + 1;
+            tag->duration = Div(root, 10) + 1;
         else
-            t->duration = Div(root, 10);
+            tag->duration = Div(root, 10);
     }
-    setFlags(p);
-    switch (t->phase) {
+    SceneActor_SetFlags(actor, 0x400);
+    switch (tag->phase) {
         case 0: {
-            struct Tagged *a = &p->tagged;
-            a->entered = 0;
-            if (DisplayAnimation_TestFinished((u8 *)p + 0xd4)) {
-                a->phase = 1;
-                a->entered = 1;
-                a->ticks = 0;
+            struct KuroJumpTag *state = (struct KuroJumpTag *)actor->unknown20;
+            state->entered = 0;
+            if (DisplayAnimation_TestFinished(&actor->drawable.common)) {
+                state->phase = 1;
+                state->entered = 1;
+                state->ticks = 0;
             }
             break;
         }
         case 1: {
-            struct Tagged *a = &p->tagged;
-            u32 entered = a->entered;
-            s32 dx, dz, curve;
-            a->entered = 0;
-            new_var = a;
+            struct KuroJumpTag *state = (struct KuroJumpTag *)actor->unknown20;
+            u32 entered = state->entered;
+            struct KuroJumpTag *landing;
+            s32 dx, dz;
+            state->entered = 0;
+            landing = state;
             if (entered)
-                Kuro_PlayTaggedAnimation(p, 8, 2, 0, 4);
-            dx = p->target.x - t->x;
-            dz = p->target.z - t->z;
-            pos->x = t->x + Div(t->ticks * dx, t->duration);
-            pos->z = t->z + Div(t->ticks * dz, t->duration);
-            curve = half(-(s32)t->ticks * t->ticks);
-            pos->y = t->velocity * t->ticks + t->y + curve;
-            if (t->ticks >= t->duration) {
-                pos->y = p->target.y;
-                new_var->phase = 2;
-                new_var->entered = 1;
-                new_var->ticks = 0;
+                Kuro_PlayTaggedAnimation(actor, 8, 2, 0, 4);
+            dx = actor->target.x - tag->startX;
+            dz = actor->target.z - tag->startZ;
+            position->x = tag->startX + Div(tag->ticks * dx, tag->duration);
+            position->z = tag->startZ + Div(tag->ticks * dz, tag->duration);
+            position->y = tag->velocity * tag->ticks + tag->startY +
+                          Math_ShiftTowardZero(-(s32)tag->ticks * tag->ticks, 1);
+            if (tag->ticks >= tag->duration) {
+                position->y = actor->target.y;
+                landing->phase = 2;
+                landing->entered = 1;
+                landing->ticks = 0;
             }
             break;
         }
         case 2: {
-            struct Tagged *a = &p->tagged;
-            u32 entered = a->entered;
-            a->entered = 0;
+            struct KuroJumpTag *state = (struct KuroJumpTag *)actor->unknown20;
+            u32 entered = state->entered;
+            state->entered = 0;
             if (entered)
-                Kuro_PlayTaggedAnimation(p, 9, 2, 0, 4);
-            if (DisplayAnimation_TestFinished((u8 *)p + 0xd4))
-                p->done = 1;
+                Kuro_PlayTaggedAnimation(actor, 9, 2, 0, 4);
+            if (DisplayAnimation_TestFinished(&actor->drawable.common))
+                actor->finished = 1;
             break;
         }
     }

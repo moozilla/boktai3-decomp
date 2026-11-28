@@ -422,3 +422,5 @@ src/npc/kuro/Kuro_UpdateState16Animation.c	Kuro_UpdateState16Animation	contrived
 src/npc/kuro/Kuro_UpdateState17Animation.c	Kuro_UpdateState17Animation	contrived	natural	1	
 src/npc/kuro/Kuro_UpdateState17AnimationA.c	Kuro_UpdateState17AnimationA	contrived	minor	2	tag overlay cast over the actor's unnamed 0x20 block
 src/npc/kuro/Kuro_UpdateState17AnimationB.c	Kuro_UpdateState17AnimationB	contrived	minor	1	tag overlay cast over the actor's unnamed 0x20 block
+src/npc/kuro/Kuro_PlayTaggedAnimation.c	Kuro_PlayTaggedAnimation	minor	minor	0	one-field local view of the tag's animation set
+src/npc/kuro/Kuro_UpdateJumpToTarget.c	Kuro_UpdateJumpToTarget	contrived	contrived	5	per-case jump-tag pointers and a second copy for the landing stores: agbcc recomputes the tag address per case; cast overlay of the actor's 0x20 block
