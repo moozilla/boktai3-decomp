@@ -15,8 +15,8 @@ struct CombatActor {
     u8 pad34[0x136 - 0x34];
     s16 defeatEffectDisabled;
 };
-void TrapSpellParticles_CreateDefaultBurst(void *, u32, u32, u32, u32, u32, u32, u32, u32, u32,
-                                             u32, u32);
+void TrapSpellParticles_CreateDefaultBurst(void *, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32,
+                                           u32);
 void CombatActor_RecordDefeat(void *);
 u32 CombatActor_UpdateDefeatEffect(struct CombatActor *p)
 {
@@ -24,14 +24,13 @@ u32 CombatActor_UpdateDefeatEffect(struct CombatActor *p)
         if (p->timer - 13 <= 10) {
             struct CombatActorEffectPosition v;
             u16 *q = (u16 *)&v;
-            u32 idx, t;
+            u32 t;
             v = p->position;
             q[1] += 0x80;
             gRandomIndex = (gRandomIndex + 1) & 0x3ff;
-            idx = gRandomIndex;
-            t = *(u8 *)&gRandomTable[idx];
+            t = *(u8 *)&gRandomTable[gRandomIndex];
             TrapSpellParticles_CreateDefaultBurst(&v, 0x80, 0x20, 8, 8, 0x18, t, 0x20, 0x20, 1, 2,
-                                                    0x200);
+                                                  0x200);
         }
         if (p->timer == 1)
             CombatActor_RecordDefeat(p);
