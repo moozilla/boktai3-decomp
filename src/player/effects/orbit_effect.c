@@ -19,15 +19,13 @@ static inline s32 TruncateOrbitOffset(s32 value)
 void PlayerOrbitEffect_UpdateParticle(struct PlayerOrbitEffect *effect,
                                       struct PlayerOrbitParticle *particle)
 {
-    s32 value, delta;
-    s32 valueZ, deltaZ;
     particle->motion.angle += particle->motion.angularSpeed;
-    value = particle->motion.radius * gUnk_086149C4[(particle->motion.angle + 64) & 0xFF];
-    delta = TruncateOrbitOffset(value);
-    particle->position.x = (u16)effect->owner->position.x + delta;
-    valueZ = particle->motion.radius * gUnk_086149C4[particle->motion.angle];
-    deltaZ = TruncateOrbitOffset(valueZ);
-    particle->position.z = (u16)effect->owner->position.z + deltaZ;
+    particle->position.x = effect->owner->position.x +
+                           TruncateOrbitOffset(particle->motion.radius *
+                                               gUnk_086149C4[(particle->motion.angle + 64) & 0xFF]);
+    particle->position.z =
+        effect->owner->position.z +
+        TruncateOrbitOffset(particle->motion.radius * gUnk_086149C4[particle->motion.angle]);
     if (effect->particleFrame >= particle->motion.expandDelay) {
         if ((effect->particleFrame & 7) == 0 && particle->motion.angularSpeed > 2)
             particle->motion.angularSpeed--;
@@ -62,8 +60,8 @@ void PlayerBurst_UpdateParticle(struct PlayerOrbitEffect *effect,
         SpriteDrawable_SelectTileFrame(particle, effect->resource, 5);
 }
 
-void PlayerOrbitEffect_SpawnParticle(struct PlayerOrbitEffect *effect, struct ContactPosition *position,
-                                     s32 angle)
+void PlayerOrbitEffect_SpawnParticle(struct PlayerOrbitEffect *effect,
+                                     struct ContactPosition *position, s32 angle)
 {
     s32 slotIndex;
     struct PlayerOrbitParticle *particle;
