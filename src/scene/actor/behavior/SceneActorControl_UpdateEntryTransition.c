@@ -6,20 +6,18 @@
 u8 SceneActorReaction_BeginContactResponse(struct ChaseActor *);
 void SceneActorControl_UpdateEntryTransition(struct ChaseActor *actor)
 {
-    u8 result;
     struct SceneActorRegistryControlGroup *group = &actor->group.common;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         SceneActorTerrain_InstallControl(actor, actor->base.onEntry, 2);
     }
     if (!(u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque)) {
-        result = SceneActorReaction_BeginContactResponse(actor);
-        if (!result) {
+        if (!SceneActorReaction_BeginContactResponse(actor)) {
             if (actor->base.stepDone) {
                 SceneActorAnimation_SelectDirectionalEntry(actor, 0);
                 SceneActorBehavior_WriteSelector(12, &actor->base.behavior2AA);
-                actor->base.counter2AC = result;
+                actor->base.counter2AC = 0;
                 actor->base.field2B1 = 1;
-                SceneActorControl_Begin(actor, group->gate.control, 26, result);
+                SceneActorControl_Begin(actor, group->gate.control, 26, 0);
             } else {
                 ++actor->base.counter2AC;
             }

@@ -236,3 +236,6 @@ src/scene/actor/behavior/SceneActorReaction_BeginTargetRecovery.c	SceneActorReac
 src/scene/actor/behavior/SceneActor_UpdateActiveCallbacks.c	SceneActor_UpdateActiveCallbacks	minor	minor	0	dispatch(&callback, context) wrapper fixes the argument load order
 src/scene/actor/behavior/SceneActor_UpdateBehaviorCallbacks.c	SceneActor_UpdateBehaviorCallbacks	minor	minor	0	dispatch(&callback, context) wrapper fixes the argument load order
 src/scene/actor/behavior/SceneActor_SetContactReactionDirection.c	SceneActor_SetContactReactionDirection	minor	minor	8	delta pointer for the y and z stores
+src/scene/actor/behavior/SceneActorReaction_BeginContactResponse.c	SceneActorReaction_BeginContactResponse	contrived	contrived	0	goto fail/success layout and flag-pointer helpers: early returns lengthen every branch
+src/scene/actor/behavior/SceneActorReaction_UpdateContactRoute.c	SceneActorReaction_UpdateContactRoute	contrived	contrived	0	random-sample statement macro and heading helpers shared with other route code; same form fails to simplify in the detour
+src/scene/actor/behavior/SceneActorControl_UpdateEntryTransition.c	SceneActorControl_UpdateEntryTransition	minor	natural	2	-
