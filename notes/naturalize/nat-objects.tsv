@@ -165,3 +165,16 @@ src/objects/coffin/tether_presentation.c	ScenePaletteFade_Create	minor	natural	1
 src/objects/coffin/tether_presentation.c	DirectionMarker_Update	minor	natural	3	
 src/objects/coffin/tether_presentation.c	ScenePaletteFade_BlendPaletteBanks	minor	natural	1	
 src/objects/coffin/tether_presentation.c	ScenePaletteFade_SetState	minor	natural	1	
+src/objects/coffin/tether_presentation.c	DirectionMarker_GetAnimation	natural	natural	0	
+src/objects/coffin/tether_presentation.c	TetherActor_UpdateRequestIndicator	natural	natural	0	
+src/objects/coffin/tether_presentation.c	TetherActor_DestroyRequestIndicator	natural	natural	0	
+src/objects/coffin/tether_presentation.c	TetherActor_InitRequestIndicator	natural	natural	0	
+src/objects/coffin/tether_presentation.c	ScenePaletteFade_SetBackgroundOffsets	natural	natural	0	
+src/objects/coffin/tether_presentation.c	ScenePaletteFade_BeginDelay	natural	natural	0	
+src/objects/coffin/tether_presentation.c	ScenePaletteFade_BeginBlend	natural	natural	0	
+src/objects/coffin/tether_presentation.c	ScenePaletteFade_BeginHold	natural	natural	0	
+src/objects/coffin/tether_presentation.c	ScenePaletteFade_UpdateDelay	natural	natural	0	
+src/objects/coffin/tether_presentation.c	ScenePaletteFade_UpdateBlend	natural	natural	0	
+src/objects/coffin/tether_presentation.c	ScenePaletteFade_UpdateHold	natural	natural	0	
+src/objects/coffin/tether_presentation.c	ScenePaletteFade_Update	natural	natural	0	
+src/objects/coffin/tether_presentation.c	ScenePaletteFade_Destroy	natural	natural	0	
