@@ -97,3 +97,4 @@ src/link/panel/SlotText_CopySelectedString.c	SlotText_CopySelectedString	natural
 src/link/panel/LinkPanel_GetValueFromScript.c	LinkPanel_GetValueFromScript	contrived	contrived	9	goto session-data getter stays: if/return forms branch differently
 src/link/panel/LinkPanelSlots_InitBackgroundResources.c	LinkPanelSlots_InitBackgroundResources	contrived	natural	1	
 src/link/panel/SlotMenu_CreateTextWindows.c	SlotMenu_CreateTextWindows	minor	natural	1	
+src/link/panel/sub_0810BF60.c	sub_0810BF60	contrived	natural	1	
