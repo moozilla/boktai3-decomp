@@ -2706,6 +2706,7 @@ void TetherActor_UpdateBounceReturn(struct TetherActor *actor)
 
 void TetherActor_UpdateKindNineRecoil(struct TetherActor *actor)
 {
+    u32 angle;
     if (actor->state != 11) {
         TetherActor_SetState(actor, 11);
         if (!actor->movementProbe) {
@@ -2716,11 +2717,9 @@ void TetherActor_UpdateKindNineRecoil(struct TetherActor *actor)
     }
     if (!actor->stateFrame)
         actor->displayOffsetY = 300;
-    {
-        u32 angle = actor->actionAngle;
-        actor->movementDelta.x = scale(gUnk_086149C4[(angle + 64) & 255] * actor->actionMagnitude);
-        actor->movementDelta.z = scale(gUnk_086149C4[angle] * actor->actionMagnitude);
-    }
+    angle = actor->actionAngle;
+    actor->movementDelta.x = scale(gUnk_086149C4[(angle + 64) & 255] * actor->actionMagnitude);
+    actor->movementDelta.z = scale(gUnk_086149C4[angle] * actor->actionMagnitude);
     actor->actionMagnitude = (actor->actionMagnitude * 3) >> 2;
     if (actor->stateFrame > 3) {
         if (actor->displayOffsetY >= actor->stateFrame * 8)

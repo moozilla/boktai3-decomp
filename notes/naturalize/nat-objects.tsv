@@ -140,3 +140,4 @@ src/objects/coffin/tether_actor.c	TetherActor_UpdateWanderingState	minor	natural
 src/objects/coffin/tether_actor.c	TetherActor_UpdateRoamingState	minor	minor	8	sector/mask block for the heading stays: plain & 7 loads the mask before the shifted angle
 src/objects/coffin/tether_actor.c	TetherActor_UpdateAuxiliaryTransition	contrived	minor	60	frame/frameBits pair, mask local and goto show stay: each shifts allocation or the visible test
 src/objects/coffin/tether_actor.c	TetherActor_UpdateRecoveryState	contrived	contrived	30	work pointer still serves as timer pointer then random table: splitting it moves the table below the RNG constants in allocation
+src/objects/coffin/tether_actor.c	TetherActor_UpdateKindNineRecoil	minor	natural	2	
