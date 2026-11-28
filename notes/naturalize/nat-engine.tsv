@@ -603,3 +603,4 @@ src/system/inventory/RecordEntry_AddFromScript.c	RecordEntry_AddFromScript	minor
 src/system/inventory/Inventory_SetEntryFromScript.c	Inventory_SetEntryFromScript	natural	natural	0	
 src/system/inventory/Inventory_ContainsFromScript.c	Inventory_ContainsFromScript	natural	natural	0	
 src/system/inventory/Inventory_IsEquipmentAssigned.c	Inventory_IsEquipmentAssigned	contrived	natural	1	
+src/system/inventory/Inventory_ResetEquipmentAssignments.c	Inventory_ResetEquipmentAssignments	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
