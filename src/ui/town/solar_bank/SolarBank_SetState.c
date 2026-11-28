@@ -1,12 +1,7 @@
 #include "global.h"
-struct P {
-    u8 f[0x70C];
-    u16 b;
-    u8 g[0x730 - 0x70E];
-    u32 a;
-};
-void SolarBank_SetState(struct P *p, u32 v)
+#include "ui/town/solar_bank_panel.h"
+void SolarBank_SetState(struct SolarBankPanel *panel, void (*state)(void))
 {
-    p->a = v;
-    p->b = 0;
+    panel->state = state;
+    panel->timer = 0;
 }

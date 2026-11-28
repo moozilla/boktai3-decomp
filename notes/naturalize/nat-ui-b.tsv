@@ -544,3 +544,4 @@ src/ui/town/solar_bank/SolarBank_InitWidgets.c	SolarBank_InitWidgets	contrived	m
 src/ui/town/solar_bank/SolarBank_RefreshAmountDigits.c	SolarBank_RefreshAmountDigits	contrived	natural	2	
 src/ui/town/solar_bank/SolarBank_BeginAmountEntry.c	SolarBank_BeginAmountEntry	contrived	natural	3	
 src/ui/town/solar_bank/SpriteMenu_HideAll.c	SpriteMenu_HideAll	contrived	minor	1	sprite-array view starting at the label
+src/ui/town/solar_bank/SolarBank_SetState.c	SolarBank_SetState	contrived	natural	1	
