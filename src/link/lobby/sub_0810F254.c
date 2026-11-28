@@ -34,10 +34,10 @@ void sub_0810F268(struct RecordMenu *menu)
     }
 }
 
-void sub_0810F2B8(u8 *self)
+void sub_0810F2B8(struct RecordMenu *menu)
 {
-    if (*(u16 *)(self + 0x1500) != 0) {
-        Script_Call(*(u16 *)(self + 0x1500), 0);
-        Task_Kill(self);
+    if (menu->finishScript) {
+        Script_Call(menu->finishScript, NULL);
+        Task_Kill(menu);
     }
 }

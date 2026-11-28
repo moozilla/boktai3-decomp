@@ -37,3 +37,4 @@ src/link/lobby/LinkLobbyPanel_RemoveSprites.c	LinkLobbyPanel_RemoveSprites	contr
 src/link/lobby/sub_0810F254.c	sub_0810F254	natural	natural	0	
 src/link/lobby/sub_0810F254.c	sub_0810F264	natural	natural	0	
 src/link/lobby/sub_0810F254.c	sub_0810F268	contrived	natural	1	
+src/link/lobby/sub_0810F254.c	sub_0810F2B8	contrived	natural	1	
