@@ -1,10 +1,7 @@
 #include "global.h"
 #include "bosses/ratatosk/ratatosk.h"
 // Tentative family name: actor animation/state handlers; specific actor identity unknown.
-struct AnimationPosition {
-    u32 packedXY, packedZ;
-};
-void Ratatosk_GetPlayerOffsetFarthestFromSelf(struct Ratatosk *, struct AnimationPosition *);
+void Ratatosk_GetPlayerOffsetFarthestFromSelf(struct Ratatosk *, struct ContactPosition *);
 void Sound_PlaySong(u32);
 void AnimationActor_UpdateRepeatedAttack(struct Ratatosk *p)
 {
