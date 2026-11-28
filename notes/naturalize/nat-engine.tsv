@@ -223,3 +223,12 @@ src/engine/video/sprite.c	Sprite_RenderUnflippedList	minor	minor	1	edge temporar
 src/engine/video/sprite.c	SpriteTiles_LoadResource	contrived	natural	2	
 src/engine/video/sprite.c	AnimData_FindEntry	minor	natural	1	
 src/engine/video/sprite.c	ObjGfx_LoadTiles	contrived	contrived	25	queue length saved through src, entry alias and if + do/while: a plain for loop swaps the registers of i, entry and src (global alloc priority; one copy insn remains with an entry alias)
+src/engine/video/sprite.c	Video_OnRenderNoOp	natural	natural		
+src/engine/video/sprite.c	AnimData_InitPalettePool	natural	natural		
+src/engine/video/sprite.c	AnimData_SetResourceBank	natural	natural		
+src/engine/video/sprite.c	AnimData_SelectPaletteBank	natural	natural		
+src/engine/video/sprite.c	ObjGfx_ResetAllocationCounters	natural	natural		
+src/engine/video/sprite.c	ObjGfx_AllocateTileSlot	natural	natural		
+src/engine/video/sprite.c	ObjGfx_UploadQueuedTiles	natural	natural		
+src/engine/video/sprite.c	SpriteOam_ResetQueue	natural	natural		
+src/engine/video/sprite.c	AnimData_Load	contrived	minor	3	entry->offset + base10 computed twice; found flag kept in a register

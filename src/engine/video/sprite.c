@@ -758,12 +758,18 @@ void AnimData_SetResourceBank(struct AnimResourceHeader *h)
 
 /* Fills anim from the resource entry with this id; 0 if there is none. */
 
+struct AnimResourceInfo {
+    u16 unk00;
+    u16 paletteKey;
+    u32 tileOffset;
+};
+
 s32 AnimData_Load(struct SpriteRenderResource *anim, u32 id)
 {
     struct AnimResourceHeader *header = gAnimationResource;
     u8 *base10, *baseC;
     struct AnimResourceEntry *entry;
-    u16 *info;
+    struct AnimResourceInfo *info;
     s32 found, i;
     if (!header)
         return 0;
@@ -779,7 +785,7 @@ s32 AnimData_Load(struct SpriteRenderResource *anim, u32 id)
     }
     if (!found)
         return 0;
-    info = (u16 *)(entry->offset + base10);
+    info = (struct AnimResourceInfo *)(entry->offset + base10);
     anim->flags = entry->field2;
     anim->shape = 0;
     anim->unknown2 = 0;
@@ -788,9 +794,9 @@ s32 AnimData_Load(struct SpriteRenderResource *anim, u32 id)
     anim->offsetX = entry->field6;
     anim->offsetY = entry->field7;
     anim->unknown4 = 0;
-    anim->paletteKey = info[1];
+    anim->paletteKey = info->paletteKey;
     anim->palette = gPaletteBankData + anim->paletteKey * 32;
-    anim->tileData = ((u32 *)info)[1] + baseC;
+    anim->tileData = info->tileOffset + baseC;
     anim->frames = (struct SpriteRenderFrame *)(entry->offset + base10);
     return 1;
 }
