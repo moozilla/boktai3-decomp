@@ -7,61 +7,50 @@ void Collider_SetPosition(void *, void *, u32);
 s32 Collider_Refresh(void *);
 void Player_EmitRandomSpark(struct Player *, struct SceneVec *, u32, s32);
 
-struct SpinCtx {
-    u8 unk0[0x48];
-    u8 collider[0x54];
-    struct SceneVec dest;   /* 0x9C */
-    struct SceneVec origin; /* 0xA4 */
-    u8 unkAC[0x10];
-    u16 speed; /* 0xBC */
-    u16 unkBE;
-    u16 phase1; /* 0xC0 */
-    u16 phase2; /* 0xC2 */
-    u16 phase3; /* 0xC4 */
-    u16 timer;  /* 0xC6 */
-    u8 heading; /* 0xC8 */
-    s8 index;   /* 0xC9 */
-};
-
 static inline s32 scale(s32 product)
 {
     return product >= 0 ? product >> 12 : -((-product) >> 12);
 }
 
-#define PLACE(radius)                                                                              \
-    q->dest.x = q->origin.x + scale(gUnk_086149C4[(q->heading + 64) & 255] * (radius));            \
-    q->dest.y = q->origin.y;                                                                       \
-    q->dest.z = q->origin.z + scale(gUnk_086149C4[q->heading] * (radius));                         \
-    Collider_SetPosition(q->collider, &q->dest, 0);                                                \
-    Collider_Refresh(q->collider);
+static inline void PlaceAttack(struct PlayerStatModifierContext *q, s32 radius)
+{
+    q->contactDestination.x =
+        q->contactOrigin.x + scale(gUnk_086149C4[(q->contactHeading + 64) & 255] * radius);
+    q->contactDestination.y = q->contactOrigin.y;
+    q->contactDestination.z = q->contactOrigin.z + scale(gUnk_086149C4[q->contactHeading] * radius);
+    Collider_SetPosition(&q->attackCollider, &q->contactDestination, 0);
+    Collider_Refresh(&q->attackCollider);
+}
 
 s32 Player_UpdateSpinAction(struct Player *p)
 {
-    struct SpinCtx *q = (struct SpinCtx *)&p->statModifierContext;
-    if (p->statModifierContext.contactTimer == 0) {
+    struct PlayerStatModifierContext *q = &p->statModifierContext;
+    if (q->contactTimer == 0) {
         if (p->actionMode == 0)
             Player_PlayLocalSong(p->slot, 0x38F);
         else
             Player_PlayLocalSong(p->slot, 0x38D);
     }
-    if (q->timer < q->phase1) {
-        s32 radius = q->speed * q->timer + 0xCC;
-        PLACE(radius)
-        if (q->index >= 0) {
+    if (q->contactTimer < q->swingFrames) {
+        s32 radius = q->motionSpeed * q->contactTimer + 0xCC;
+        PlaceAttack(q, radius);
+        if (q->savedActionIndex >= 0) {
             Player_AddStatusFlags(p, 0x80000);
-            Player_EmitRandomSpark(p, &q->dest, q->heading, q->index);
+            Player_EmitRandomSpark(p, &q->contactDestination, q->contactHeading,
+                                   q->savedActionIndex);
         }
-    } else if (q->timer < q->phase1 + q->phase2) {
-        s32 radius = q->speed * q->phase1 + 0xCC;
-        PLACE(radius)
-        if (q->index >= 0) {
+    } else if (q->contactTimer < q->swingFrames + q->holdFrames) {
+        s32 radius = q->motionSpeed * q->swingFrames + 0xCC;
+        PlaceAttack(q, radius);
+        if (q->savedActionIndex >= 0) {
             Player_AddStatusFlags(p, 0x80000);
-            if (!(q->timer & 1))
-                Player_EmitRandomSpark(p, &q->dest, q->heading, q->index);
+            if (!(q->contactTimer & 1))
+                Player_EmitRandomSpark(p, &q->contactDestination, q->contactHeading,
+                                       q->savedActionIndex);
         }
     }
-    if (++q->timer >= q->phase1 + q->phase2 + q->phase3) {
-        q->timer = 0;
+    if (++q->contactTimer >= q->swingFrames + q->holdFrames + q->windupFrames) {
+        q->contactTimer = 0;
         return 1;
     }
     return 0;
