@@ -312,3 +312,7 @@ src/bosses/vanargand/Vanargand_UpdateCameraOffset.c	Vanargand_UpdateCameraOffset
 src/bosses/vanargand/Camera_UpdatePlayerBlendOffset.c	Camera_UpdatePlayerBlendOffset	unchanged	unchanged	5	out/position aliases kept: no simpler form matched
 src/bosses/vanargand/Vanargand_RemovePartSprites.c	Vanargand_RemovePartSprites	contrived	natural	1	
 src/bosses/vanargand/VanargandPair_InitAuxiliarySprite.c	VanargandPair_InitAuxiliarySprite	contrived	near-natural	6	width/height locals kept: ROM loads both scale constants before the first store
+src/bosses/vanargand/Vanargand_InitPart.c	Vanargand_InitPart	unchanged	unchanged	25	raw offsets kept: any member store of a constant before the later zero leaves cse a zero register the ROM does not have
+src/bosses/vanargand/Vanargand_InitPartCollider.c	Vanargand_InitPartCollider	unchanged	unchanged	4	u32 direction local: ROM loads the constant before the field address
+src/bosses/vanargand/Vanargand_ApplyPartDamage.c	Vanargand_ApplyPartDamage	natural	natural	0	
+src/bosses/vanargand/Vanargand_UpdatePartAnimation.c	Vanargand_UpdatePartAnimation	natural	natural	0	
