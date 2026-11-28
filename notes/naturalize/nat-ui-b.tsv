@@ -257,3 +257,4 @@ src/ui/title/tutorial_otenko.c	TutorialOtenko_UpdateIdlePhaseRestoration	natural
 src/ui/title/tutorial_otenko.c	TutorialOtenko_BeginInteractionSoundSequence	contrived	natural	0	
 src/ui/title/tutorial_otenko.c	TutorialOtenko_InitInteractionSoundDelay	contrived	natural	0	
 src/ui/title/tutorial_otenko.c	TutorialOtenko_UpdateInteractionSoundDelay	natural	natural	0	
+src/ui/title/tutorial_otenko.c	TutorialOtenko_UpdateScaleGrowth	minor	minor	0	scale kept in the palette fields of the shared sprite struct

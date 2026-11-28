@@ -423,17 +423,18 @@ static inline s32 absolute(s32 x)
 
 void TutorialOtenko_UpdateScaleGrowth(struct ActorAnimController *p)
 {
-    s32 x = (s8)p->obj.palette;
-    s32 y = (s8)p->obj.paletteVariant;
-    x += 2;
-    y += 2;
-    if (x > 127) {
-        y = 127;
-        x = 127;
+    /* the sprite's scale bytes, which this struct names palette fields */
+    s32 scaleX = (s8)p->obj.palette;
+    s32 scaleY = (s8)p->obj.paletteVariant;
+    scaleX += 2;
+    scaleY += 2;
+    if (scaleX > 127) {
+        scaleY = 127;
+        scaleX = 127;
         p->scaleFn = 0;
     }
-    p->obj.palette = x;
-    p->obj.paletteVariant = y;
+    p->obj.palette = scaleX;
+    p->obj.paletteVariant = scaleY;
 }
 
 /* Tentative role: arm the idle animation transition at its resting position. */
