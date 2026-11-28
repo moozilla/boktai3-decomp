@@ -161,3 +161,4 @@ src/bosses/ratatosk/Ratatosk_UpdateAnimatedParticlePool.c	Ratatosk_UpdateAnimate
 src/bosses/ratatosk/Ratatosk_OnAnimatedParticlePoolDestroy.c	Ratatosk_OnAnimatedParticlePoolDestroy	contrived	natural	2	
 src/bosses/ratatosk/Ratatosk_InitAnimatedParticlePool.c	Ratatosk_InitAnimatedParticlePool	contrived	natural	2	
 src/bosses/ratatosk/Ratatosk_CreateAnimatedParticlePool.c	Ratatosk_CreateAnimatedParticlePool	contrived	natural	2	falls off the end when the task is not created
+src/bosses/ratatosk/Ratatosk_FindFreeAnimatedParticle.c	Ratatosk_FindFreeAnimatedParticle	contrived	natural	2	
