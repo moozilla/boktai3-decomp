@@ -2,30 +2,30 @@
 #include "npc/manager/scene_actor_lifecycle.h"
 /* Blink for 15 frames: bit 0 of the phase sets display flag 0x100, and each
  * phase lasts one frame longer than the last. */
-void SceneCharacter_UpdateSlowingBlink(u8 *a, struct SceneActor *b)
+void SceneCharacter_UpdateSlowingBlink(void *context, struct SceneActor *actor)
 {
     u32 t;
     u8 phase;
-    if (b->animationEntered) {
-        b->animationEntered = 0;
-        b->finished = 0;
-        b->ticks = 1;
-        b->animationPhase = 1;
+    if (actor->animationEntered) {
+        actor->animationEntered = 0;
+        actor->finished = 0;
+        actor->ticks = 1;
+        actor->animationPhase = 1;
     }
-    t = b->ticks;
+    t = actor->ticks;
     if (t > 15) {
-        b->finished = 1;
+        actor->finished = 1;
         return;
     }
-    phase = b->animationPhase;
+    phase = actor->animationPhase;
     if (phase & 1)
-        SceneActor_SetFlags(b, 0x100);
+        SceneActor_SetFlags(actor, 0x100);
     if (t != 0) {
-        u32 left = t - 1;
-        b->ticks = left;
-        if (left == 0) {
-            b->animationPhase = phase + 1;
-            b->ticks = b->animationPhase;
+        u32 remaining = t - 1;
+        actor->ticks = remaining;
+        if (remaining == 0) {
+            actor->animationPhase = phase + 1;
+            actor->ticks = actor->animationPhase;
         }
     }
 }
