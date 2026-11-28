@@ -6,20 +6,19 @@ struct TimedSprite {
     u8 unknown74[0x1c];
     u8 active;
     u8 unknown91[5];
-    s16 ticks;
+    u16 ticks;
 };
 void TimedSprite_UpdateFrames(struct TimedSprite *effect)
 {
-    s16 ticks = effect->ticks;
     u32 frame;
     struct DisplaySequenceSprite *sprite;
-    if ((u16)ticks <= 7)
-        frame = (u16)ticks >> 2;
+    if (effect->ticks <= 7)
+        frame = effect->ticks >> 2;
     else
-        frame = ((u16)ticks >> 2) + 4;
+        frame = (effect->ticks >> 2) + 4;
     sprite = &effect->sprite;
     sprite->frame = frame;
-    if ((u16)++effect->ticks > 23) {
+    if (++effect->ticks > 23) {
         effect->sprite.flags |= 1;
         effect->active = 0;
     }

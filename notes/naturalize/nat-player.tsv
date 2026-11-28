@@ -499,3 +499,4 @@ src/player/cutscene/player_cue_dispatch.c	PlayerCue_ApplyColliderScale	minor	min
 src/player/effects/action_flash/ActionFlashBurst_RemoveGlowSprite.c	ActionFlashBurst_RemoveGlowSprite	contrived	natural	1	-
 src/player/effects/action_flash/ActionFlashBurst_RemovePrimarySprites.c	ActionFlashBurst_RemovePrimarySprites	contrived	natural	1	-
 src/player/effects/action_flash/ActionFlash_Destroy.c	ActionFlash_Destroy	minor	natural	1	-
+src/player/effects/action_flash/TimedSprite_UpdateFrames.c	TimedSprite_UpdateFrames	contrived	minor	4	sprite pointer local
