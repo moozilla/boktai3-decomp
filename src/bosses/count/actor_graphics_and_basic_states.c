@@ -692,45 +692,45 @@ void Path_SnapToRandomFarPoint(void *, void *, u32, u32);
 struct SnapVector {
     u32 a, b;
 };
-void SceneActorState_SnapReactionPosition(u8 *p, struct SnapVector *position)
+void SceneActorState_SnapReactionPosition(struct SceneGraphicsActor *actor,
+                                          struct ContactPosition *position)
 {
-    u8 *sprite = p + 0x48;
-    switch (*(u16 *)(p + 0x3b2)) {
+    struct SceneActorBody *body = &actor->body;
+    switch (actor->graphics.stepTableValue) {
         case 0:
-            Path_SnapToRandomFarPoint(position, sprite + 12, 0, 65536);
-            *(u16 *)(p + 0x354) = 64;
+            Path_SnapToRandomFarPoint(position, &body->position, 0, 65536);
+            actor->graphics.approachFrames = 64;
             return;
         case 1:
-            Path_SnapToRandomFarPoint(position, sprite + 12, 2, 65536);
-            *(u16 *)(p + 0x354) = 64;
+            Path_SnapToRandomFarPoint(position, &body->position, 2, 65536);
+            actor->graphics.approachFrames = 64;
             return;
         case 2:
-            Path_SnapToRandomFarPoint(position, sprite + 12, 1, 65536);
-            *(u16 *)(p + 0x354) = 32;
+            Path_SnapToRandomFarPoint(position, &body->position, 1, 65536);
+            actor->graphics.approachFrames = 32;
             return;
         case 3:
-            Path_SnapToRandomFarPoint(position, sprite + 12, 3, 65536);
-            *(u16 *)(p + 0x354) = 64;
+            Path_SnapToRandomFarPoint(position, &body->position, 3, 65536);
+            actor->graphics.approachFrames = 64;
             return;
         case 4:
-            Path_SnapToRandomFarPoint(position, sprite + 12, 3, 65536);
-            *(u16 *)(p + 0x354) = 64;
+            Path_SnapToRandomFarPoint(position, &body->position, 3, 65536);
+            actor->graphics.approachFrames = 64;
             return;
         case 5:
-            Path_SnapToRandomFarPoint(position, sprite + 12, 3, 65536);
-            *(u16 *)(p + 0x354) = 64;
+            Path_SnapToRandomFarPoint(position, &body->position, 3, 65536);
+            actor->graphics.approachFrames = 64;
             return;
         case 6:
-            Path_SnapToRandomFarPoint(position, sprite + 12, 2, 65536);
-            *(u16 *)(p + 0x354) = 64;
+            Path_SnapToRandomFarPoint(position, &body->position, 2, 65536);
+            actor->graphics.approachFrames = 64;
             return;
         default:
-            *position = *(struct SnapVector *)(p + 0x54);
+            *position = *(struct ContactPosition *)&((struct StateActor *)actor)->target;
             break;
     }
-    *(u16 *)(p + 0x354) = 64;
+    actor->graphics.approachFrames = 64;
 }
-
 /* Scene commands set actor states, positions, graphics variants and background flashes. */
 typedef struct {
     u16 id;
