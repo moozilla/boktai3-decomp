@@ -1,38 +1,22 @@
-#include "effects/bursts/fragment_sprite_layout.h"
-#define SpriteGroup_CallCompletion FragmentBurst_RunCompletionScript
-#include "global.h"
-struct SpriteGroup {
-    struct FragmentSprite sprites[4];
-    u8 unknownB0[0xa4];
-    u16 age;
-    u8 active;
-    s8 slot;
-    u32 completionScript;
-    u8 unknown15C[2];
-    u8 pendingRelease;
-};
-struct SpriteGroupPool {
-    u8 unknown00[0x38];
-    u32 used;
-};
+#include "effects/bursts/fragment_burst.h"
+
 void Sprite_Remove(void *);
-void FragmentBurst_RunCompletionScript(struct SpriteGroup *);
-void SpriteGroup_Release(struct SpriteGroupPool *pool, struct SpriteGroup *group)
+void FragmentBurst_RunCompletionScript(struct FragmentBurst *);
+
+void SpriteGroup_Release(struct FragmentBurstPool *pool, struct FragmentBurst *burst)
 {
     s32 i;
-    if (group->pendingRelease) {
-        pool->used &= ~(1 << group->slot);
-        group->active = 0;
-        i = 0;
-        do {
-            struct FragmentSprite *sprite = &group->sprites[i];
-            if (sprite->active)
-                Sprite_Remove(sprite);
-            i++;
-        } while (i < 4);
-        group->slot = -1;
-        group->age = 0;
-        FragmentBurst_RunCompletionScript(group);
-        group->pendingRelease = 0;
+
+    if (burst->enter) {
+        pool->occupied &= ~(1 << burst->slot);
+        burst->state = 0;
+        for (i = 0; i < 4; i++) {
+            if (burst->sprites[i].unknown4[0])
+                Sprite_Remove(&burst->sprites[i]);
+        }
+        burst->slot = -1;
+        burst->age = 0;
+        FragmentBurst_RunCompletionScript(burst);
+        burst->enter = 0;
     }
 }

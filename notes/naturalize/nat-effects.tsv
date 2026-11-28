@@ -127,3 +127,4 @@ src/effects/bursts/charged_burst/ChargedBurst_Create.c	ChargedBurst_Create	minor
 src/effects/bursts/fragment_burst/FragmentBurst_RunCompletionScript.c	FragmentBurst_RunCompletionScript	contrived	natural	2	-
 src/effects/bursts/fragment_burst/sub_081281D0.c	sub_081281D0	minor	minor	4	collider pointer assigned after the size vectors
 src/effects/bursts/fragment_burst/FragmentBurst_UpdateRadialAnimation.c	FragmentBurst_UpdateRadialAnimation	contrived	minor	27	FragmentSequence_Prepare helper and owner alias order the two loop pointers; masked sine index
+src/effects/bursts/fragment_burst/SpriteGroup_Release.c	SpriteGroup_Release	minor	natural	1	-
