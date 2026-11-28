@@ -7,11 +7,8 @@ s32 SceneActorControl_AdvancePositionCurve(struct ChaseActor *actor)
     struct ContactPosition start, end;
     start = ctx->vectors[0];
     end = ctx->vectors[1];
-    {
-        u32 mask = 0xFFFF;
-        *(u32 *)&start = mask & *(u32 *)&start;
-        *(u32 *)&end = mask & *(u32 *)&end;
-    }
+    start.y = 0;
+    end.y = 0;
     MovementCurve_InterpolatePosition(&ctx->curvePosition, &start, &end, 1, ctx->field3E0, 0,
                                       ctx->sway);
     if (ctx->field3E0 > 1023) {

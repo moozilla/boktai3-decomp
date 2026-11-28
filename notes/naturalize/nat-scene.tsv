@@ -323,3 +323,4 @@ src/scene/actor/control/SceneActorControl_SetDefaultProfile.c	SceneActorControl_
 src/scene/actor/control/SceneActorControl_InitPositionCurveEndpoints.c	SceneActorControl_InitPositionCurveEndpoints	contrived	natural	1	-
 src/scene/actor/control/SceneActorControl_TickSway.c	SceneActorControl_TickSway	natural	natural	0	-
 src/scene/actor/control/SceneActorControl_GetTravelProfile.c	SceneActorControl_GetTravelProfile	contrived	minor	12	TestFlags predicate with a parked mask: a plain test loses the materialized 0/1
+src/scene/actor/control/SceneActorControl_AdvancePositionCurve.c	SceneActorControl_AdvancePositionCurve	contrived	natural	2	-
