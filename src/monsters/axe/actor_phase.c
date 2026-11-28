@@ -78,9 +78,8 @@ void ActorPhase_UpdateReverseFlicker(struct ChaseActor *actor, s32 frame)
     }
     if (ActorPhase_UpdateReverseFlickerTimer(&flags, frame, 10, 30)) {
         SceneActorTerrain_InstallControl(actor, ActorPhase_UpdateReverseFlickerExit, 0x30);
-        goto visible;
+        Axe_SetAuxiliarySpriteParameters(actor, axe->blackPalette, 0x13c);
     } else if (flags & 1) {
-    visible:
         Axe_SetAuxiliarySpriteParameters(actor, axe->blackPalette, 0x13c);
     } else {
         Axe_SetAuxiliarySpriteParameters(actor, axe->originalEffectPalette, 0x13f);
