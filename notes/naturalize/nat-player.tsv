@@ -153,3 +153,4 @@ src/player/attack/Player_HasWeaponComboEntry.c	Player_HasWeaponComboEntry	contri
 src/player/attack/Player_IsActionCueReady.c	Player_IsActionCueReady	contrived	minor	10	record pointer plus separate offset local
 src/player/attack/Player_InitializeActionContact.c	Player_InitializeActionContact	natural	natural	0	-
 src/player/attack/Player_UpdateWeaponCueCombo.c	Player_UpdateWeaponCueCombo	minor	minor	6	InvalidatePreviousAnimation keeps a typed -1 local: a plain store changes 15 instructions
+src/player/attack/Player_GetSpecialAttackDescriptor.c	Player_GetSpecialAttackDescriptor	contrived	natural	3	-

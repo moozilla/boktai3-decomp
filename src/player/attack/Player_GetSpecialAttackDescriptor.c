@@ -1,8 +1,11 @@
 #include "global.h"
+#include "player/player.h"
 
-extern u8 gUnk_08E60F4C[];
+extern struct PlayerIndexedAction gUnk_08E60F4C[];
 
-u8 *Player_GetSpecialAttackDescriptor(s32 idx)
+struct PlayerIndexedAction *Player_GetSpecialAttackDescriptor(s32 action)
 {
-    return gUnk_08E60F4C + ((idx - 1) << 2);
+    s32 index = action - 1;
+
+    return &gUnk_08E60F4C[index];
 }
