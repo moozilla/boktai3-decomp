@@ -159,3 +159,4 @@ src/objects/coffin/tether_actor.c	TetherActor_InitializeFromScript	natural	natur
 src/objects/coffin/tether_presentation.c	TetherActor_IsNearRequestTerrain	contrived	natural	13	u16 cellFlags() accessor keeps the value-then-mask AND order; position pointer inside the probe loop keeps one address register for the stack vector
 src/objects/coffin/tether_presentation.c	TetherActor_PositionRequestIndicator	contrived	natural	7	actorBlocked() accessor keeps the mask-first operand order
 src/objects/coffin/tether_presentation.c	ScenePaletteFade_InitFromScript	contrived	natural	8	
+src/objects/coffin/tether_presentation.c	PaletteScreen_LoadResources	minor	natural	2	

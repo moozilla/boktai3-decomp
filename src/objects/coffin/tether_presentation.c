@@ -1,6 +1,7 @@
 #include "objects/coffin/tether_presentation.h"
 #include "scene/motion/scene_actor_terrain.h"
 #include "engine/video/render.h"
+#include "gba/macro.h"
 
 /* Tentative: caller derives quadrant from x/y, then selects a sprite animation. */
 
@@ -238,7 +239,6 @@ u8 *sub_08216E54(u16);
 void PaletteScreen_LoadResources(struct ScenePaletteFade *fade)
 {
     u8 *resource;
-    u8 *palette;
     s32 layers[2];
     resource = sub_08216E54(0x4ff);
     fade->background = resource;
@@ -247,9 +247,9 @@ void PaletteScreen_LoadResources(struct ScenePaletteFade *fade)
     Bg_SetupLayers(1, 0, resource, 0, 0, 2, layers);
     Bg_SetPriority(2, 2);
     Bg_SetPriority(3, 3);
-    palette = (u8 *)((struct ScreenPaletteResource *)ScriptProc_Start(0x92b3, 0x663d))->colors;
-    fade->firstPalette = palette;
-    CpuSet(palette, gBgPaletteBuffer, 0x4000080);
+    fade->firstPalette =
+        (u8 *)((struct ScreenPaletteResource *)ScriptProc_Start(0x92b3, 0x663d))->colors;
+    CpuCopy32(fade->firstPalette, gBgPaletteBuffer, 0x200);
     fade->secondPalette =
         (u8 *)((struct ScreenPaletteResource *)ScriptProc_Start(0x92b3, 0x673d))->colors;
 }
