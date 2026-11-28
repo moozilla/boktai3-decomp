@@ -730,3 +730,10 @@ src/system/solar/Solar_GetIntensity.c	Solar_GetIntensity	minor	natural	1
 src/system/solar/Solar_SaveExposureTimestamp.c	Solar_SaveExposureTimestamp	minor	natural	1	
 src/system/solar/Solar_HasExposureCooldownElapsed.c	Solar_HasExposureCooldownElapsed	contrived	natural	1	
 src/system/solar/Solar_UpdateMeasurement.c	Solar_UpdateMeasurement	contrived	minor	1	scalar u16 view of the s16 field: a member store keeps gGameState cached
+src/system/solar/Solar_EnableControlFlag.c	Solar_EnableControlFlag	natural	natural	0	
+src/system/solar/Solar_DisableControlFlag.c	Solar_DisableControlFlag	natural	natural	0	
+src/system/solar/Solar_GetLevelForIntensity.c	Solar_GetLevelForIntensity	natural	natural	0	
+src/system/solar/Solar_GetLevelUpperBound.c	Solar_GetLevelUpperBound	natural	natural	0	
+src/system/solar/Solar_GetLevelLowerBound.c	Solar_GetLevelLowerBound	natural	natural	0	
+src/system/solar/sub_0822C4D8.c	sub_0822C4D8	contrived	contrived	20	raw-offset macro: member stores keep gGameState cached, the ROM reloads it before the clamp store
+src/system/solar/sub_0822C598.c	sub_0822C598	contrived	contrived	8	raw-offset macros: member accesses change when gGameState is reloaded
