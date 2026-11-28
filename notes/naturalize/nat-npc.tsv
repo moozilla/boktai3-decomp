@@ -493,3 +493,4 @@ src/script/script_utility.c	ScriptUtility_WritePauseLatchToReference	natural	nat
 src/script/script_utility.c	ScriptUtility_ClearControlFlag	contrived	contrived	8	parked u32 mask = ~8: the ROM loads the mask before the pause flags; &=, reversed operands and casts load the flags first
 src/script/script_utility.c	ScriptUtility_GetKeys	contrived	natural	11	
 src/script/script_options.c	GameState_SetChallengeCompletionFlag	minor	natural	2	
+src/script/script_options.c	StateFlags_TestIndexedFlag	contrived	natural	8	

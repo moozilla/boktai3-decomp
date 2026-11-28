@@ -3,15 +3,13 @@
 
 s32 StateFlags_TestIndexedFlag(s32 index)
 {
-    if ((u32)index <= 11) {
-        if (Engine_PauseBits(0x800) && index > 5)
-            goto enabled;
-        if ((gGameState->counters628[3] >> index) & 1)
-            goto enabled;
-    }
+    if ((u32)index > 11)
+        return 0;
+    if (Engine_PauseBits(0x800) && index > 5)
+        return 1;
+    if ((gGameState->counters628[3] >> index) & 1)
+        return 1;
     return 0;
-enabled:
-    return 1;
 }
 
 u32 GameState_SetChallengeCompletionFlag(u32 index)
