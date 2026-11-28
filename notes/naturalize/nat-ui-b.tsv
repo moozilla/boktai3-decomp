@@ -224,3 +224,4 @@ src/ui/title/game_start.c	GameStart_DrawSaveInfo	contrived	contrived	12	digit sp
 src/ui/title/game_start.c	GameStart_RunInitHook	natural	natural	0	-
 src/ui/title/game_start.c	GameStart_SetParametersFromScript	natural	natural	0	-
 src/ui/title/game_start.c	GameStart_Create	natural	natural	0	-
+src/ui/title/sound_test.c	SoundTest_Update	minor	natural	1	-

@@ -1,4 +1,5 @@
 #include "ui/title/sound_test.h"
+#include "gba/io_reg.h"
 #include "engine/video/palette_pulse.h"
 #include "ui/menu_parameters.h"
 #include "engine/input.h"
@@ -236,7 +237,7 @@ void SoundTest_Update(struct SoundTest *p)
     s32 direction, interval;
     switch (p->state) {
         case 0:
-            if ((gPadState[1] & 2) && SoundTest_StopSelection(p)) {
+            if ((gPadState[1] & B_BUTTON) && SoundTest_StopSelection(p)) {
                 Menu_StartFadeOut(p->fadeShift);
                 p->state = 1;
                 p->exitFlag = 0;
@@ -244,14 +245,14 @@ void SoundTest_Update(struct SoundTest *p)
                 break;
             }
             SoundTest_UpdatePlaybackIndicators(p);
-            if (gPadState[1] & 1)
+            if (gPadState[1] & A_BUTTON)
                 SoundTest_PlaySelection(p);
-            if (gPadState[1] & 64) {
+            if (gPadState[1] & DPAD_UP) {
                 if (--p->selection < 0)
                     p->selection = 2;
                 SoundTest_MoveCategoryCursor(p);
                 Sound_PlaySong(0x37c);
-            } else if (gPadState[1] & 128) {
+            } else if (gPadState[1] & DPAD_DOWN) {
                 if (++p->selection > 2)
                     p->selection = 0;
                 SoundTest_MoveCategoryCursor(p);
@@ -259,16 +260,16 @@ void SoundTest_Update(struct SoundTest *p)
             }
             direction = 0;
             interval = 5;
-            if (gPadState[1] & 32)
+            if (gPadState[1] & DPAD_LEFT)
                 direction = 1;
-            else if (gPadState[1] & 16)
+            else if (gPadState[1] & DPAD_RIGHT)
                 direction = 2;
-            else if (gPadState[0] & 48) {
+            else if (gPadState[0] & (DPAD_LEFT | DPAD_RIGHT)) {
                 if (++p->repeatTimer > 14) {
                     if (p->repeatTimer > 199)
                         interval = 2;
                     if (Mod(p->repeatTimer, interval) == 0) {
-                        if (gPadState[0] & 32)
+                        if (gPadState[0] & DPAD_LEFT)
                             direction = 1;
                         else
                             direction = 2;
@@ -360,21 +361,24 @@ s32 SoundTest_Initialize(struct SoundTest *p)
     ResourceHeader_Relocate(&p->labelResource, asset);
     AnimSprite_InitLinked(&p->categoryLabel, &p->labelResource, 47, 16, 0, 0, 0, 0);
     for (i = 0; i < 3; i++) {
-        AnimSprite_InitLinked(&p->playbackIndicators[i], &p->digitsResource, 43, 48, 1, 0, 60, &pos);
+        AnimSprite_InitLinked(&p->playbackIndicators[i], &p->digitsResource, 43, 48, 1, 0, 60,
+                              &pos);
         p->playbackIndicators[i].flags |= 1;
         pos.y += 32;
     }
     pos.x = 184;
     pos.y = 64;
     for (i = 0; i < 3; i++) {
-        AnimSprite_InitLinked(&p->secondCategoryDigits[i], &p->digitsResource, 0, 48, 0, 0, 60, &pos);
+        AnimSprite_InitLinked(&p->secondCategoryDigits[i], &p->digitsResource, 0, 48, 0, 0, 60,
+                              &pos);
         p->secondCategoryDigits[i].flags |= 1;
         pos.x += 8;
     }
     pos.x = 184;
     pos.y = 96;
     for (i = 0; i < 3; i++) {
-        AnimSprite_InitLinked(&p->thirdCategoryDigits[i], &p->digitsResource, 0, 48, 0, 0, 60, &pos);
+        AnimSprite_InitLinked(&p->thirdCategoryDigits[i], &p->digitsResource, 0, 48, 0, 0, 60,
+                              &pos);
         p->thirdCategoryDigits[i].flags |= 1;
         pos.x += 8;
     }
