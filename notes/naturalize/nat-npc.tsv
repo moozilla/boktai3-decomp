@@ -465,3 +465,4 @@ src/script/script_selector.c	SceneActorRegistry_IgnoreEntry1B77	natural	natural	
 src/script/script_selector.c	SceneActorRegistry_IgnoreScriptEntry	natural	natural	0	
 src/script/script_selector.c	SceneActorRegistry_IgnoreEntry3D0C	natural	natural	0	
 src/script/script_selector.c	ScriptSelector_MoveSelection	minor	natural	2	
+src/script/script_selector.c	ScriptSelector_UpdateTask	minor	natural	4	

@@ -25,13 +25,8 @@ s32 ScriptSelector_UpdateTask(struct ScriptSelector *selector)
 {
     u16 *keys = gPadState;
     u32 held = keys[0];
-    u32 vertical = held & 0xC0;
-    if (vertical) {
-        u32 up = held & 0x40;
-        s32 step;
-        step = 1;
-        if (up)
-            step -= 2;
+    if (held & 0xC0) {
+        s32 step = (held & 0x40) ? -1 : 1;
         if (selector->lastDirection == step) {
             selector->repeatDelay--;
             if (selector->repeatDelay < 0) {
@@ -44,7 +39,7 @@ s32 ScriptSelector_UpdateTask(struct ScriptSelector *selector)
             selector->lastDirection = step;
         }
     } else {
-        selector->lastDirection = vertical;
+        selector->lastDirection = 0;
     }
     if (keys[1] & 2) {
         s32 oldIndex;
