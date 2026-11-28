@@ -1902,8 +1902,7 @@ void Axe_BeginPaletteTransition(void *object, s32 destinationBank, s32 sourceBan
     s32 i;
     transition->destinationBank = destinationBank;
     destination = (void *)((u8 *)palettes + destinationOffset);
-    i = 0;
-    do {
+    for (i = 0; i < 16; i++) {
         s32 color;
         s32 red, green, blue;
         if (transition->remaining != 256)
@@ -1920,8 +1919,7 @@ void Axe_BeginPaletteTransition(void *object, s32 destinationBank, s32 sourceBan
         transition->green[i] = green << 8;
         transition->blue[i] = blue << 8;
         destination++;
-        i++;
-    } while (i < 16);
+    }
     transition->remaining = duration;
     {
         u32 mask = 2;
