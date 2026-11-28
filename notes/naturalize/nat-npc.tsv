@@ -126,3 +126,4 @@ src/npc/actor_sequence.c	SceneActorSequence_OnDestroy	natural	natural	0
 src/npc/actor_sequence.c	SceneActorSequence_InitDisplayResources	contrived	contrived	22	display pointer, mask-first local and enabled-bits local: ROM loads address, mask, then the register, and builds the bits after the and
 src/npc/actor_sequence.c	SceneActorSequence_InitFromScript	natural	natural	0	
 src/npc/actor_sequence.c	SceneActorSequence_CreateFromScript	natural	natural	0	
+src/npc/actor_sequence.c	SceneActorSequence_InitDisplayResources	contrived	natural	1	
