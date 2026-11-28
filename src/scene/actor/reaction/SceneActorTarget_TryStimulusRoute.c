@@ -9,15 +9,6 @@ void SceneActorPosition_ResolveTaggedPosition(struct SceneActorTaggedPosition *,
                                               const struct SceneActorPositionSource *, void *, s32);
 void SceneActorAttachment_RetargetNearestPlayer(void *, const struct ContactPosition *);
 
-static inline s8 SceneActorTarget_FindStimulus(struct ChaseActor *owner,
-                                               struct SceneActorChaseGroup *group)
-{
-    struct ContactPosition *position = &owner->base.body.position;
-    return SceneStimulus_FindOverlap(position->x, owner->base.body.position.z,
-                                     group->common.control.radius, group->common.control.active,
-                                     (u16)owner->base.body.id);
-}
-
 // confidence=low: starts a route to the tagged position of an overlapping stimulus.
 u32 SceneActorTarget_TryStimulusRoute(void *object)
 {
@@ -30,15 +21,15 @@ u32 SceneActorTarget_TryStimulusRoute(void *object)
     u8 tag;
     u32 started;
     u32 busy = SceneActorStimulus_CheckBusy(actor);
-    struct ContactPosition *position;
     s8 found;
     if (busy)
         return 0;
     group->common.control.mode = busy;
     started = 0;
-    found = SceneActorTarget_FindStimulus(actor, group);
+    found = SceneStimulus_FindOverlap(actor->base.body.position.x, actor->base.body.position.z,
+                                      group->common.control.radius, group->common.control.active,
+                                      actor->base.body.id);
     tag = found;
-    position = &actor->base.body.position;
     if (found < 0)
         goto failed;
     timer = &group->common.control.timer;
@@ -77,7 +68,7 @@ u32 SceneActorTarget_TryStimulusRoute(void *object)
     group->destination->y = actor->base.body.position.y;
     group->destination->pad = 0;
 
-    if (!SceneActorChase_TryRoute(object, group->route, position,
+    if (!SceneActorChase_TryRoute(object, group->route, &actor->base.body.position,
                                   &group->common.control.targetPosition)) {
         Callback_InvokeActor(actor, group->fallback);
         return 1;
