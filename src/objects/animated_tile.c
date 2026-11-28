@@ -4,23 +4,23 @@
 #include "engine/engine.h"
 #include "script/script_utility.h"
 
-static inline u8 AnimatedTile_TestSlot(u32 *m, s32 i)
+static inline u8 AnimatedTile_TestSlot(struct AnimatedTileManager *manager, s32 i)
 {
-    if (*m & (1 << i))
+    if (manager->used & (1 << i))
         return TRUE;
     return FALSE;
 }
 
 struct AnimatedTile *AnimatedTile_Allocate(struct AnimatedTileManager *manager)
 {
-    s32 index;
-    struct AnimatedTile *tile;
-    for (index = 0; index < 3; index++) {
-        if (!AnimatedTile_TestSlot(&manager->used, index)) {
-            tile = &manager->tiles[index];
-            manager->used |= 1 << index;
+    s32 i;
+
+    for (i = 0; i < 3; i++) {
+        if (!AnimatedTile_TestSlot(manager, i)) {
+            struct AnimatedTile *tile = &manager->tiles[i];
+            manager->used |= 1 << i;
             Memory_Clear(tile, sizeof(*tile));
-            tile->slot = index;
+            tile->slot = i;
             return tile;
         }
     }
@@ -214,13 +214,11 @@ void Sprite_Remove(void *);
 
 u32 AnimatedTile_OnManagerDestroy(struct AnimatedTileManager *manager)
 {
-    s32 index = 0;
-    u32 *used = &manager->used;
-    for (; index < 3; index++) {
-        if (AnimatedTile_TestSlot(used, index)) {
-            struct AnimatedTile *tile = &manager->tiles[index];
-            Sprite_Remove(tile);
-        }
+    s32 i;
+
+    for (i = 0; i < 3; i++) {
+        if (AnimatedTile_TestSlot(manager, i))
+            Sprite_Remove(&manager->tiles[i]);
     }
     return gNamedEntryPool = 0;
 }
