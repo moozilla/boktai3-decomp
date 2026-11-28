@@ -77,3 +77,4 @@ src/objects/coffin/tether_actor.c	TetherActor_BeginDirectedState	contrived	minor
 src/objects/coffin/tether_actor.c	TetherActor_SelectInteractionState	natural	natural	0	
 src/objects/coffin/tether_actor.c	TetherActor_ClearInstance	natural	natural	0	
 src/objects/coffin/tether_actor.c	TetherActor_AdjustSlopeMovement	contrived	natural	14	
+src/objects/coffin/tether_actor.c	TetherActor_TestNearbyInteraction	contrived	minor	30	one goto yes keeps the single return-TRUE copy in the neighbor branch (jump2 would keep the last copy); cornerPosition pointer keeps &corner in a register

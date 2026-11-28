@@ -1098,84 +1098,40 @@ done:
     return r;
 }
 
-#define NEAR_CELL(out, px, pz)                                                                     \
-    do {                                                                                           \
-        s32 cx_ = (px) >> 8;                                                                       \
-        s32 cz_ = (pz) >> 8;                                                                       \
-        if (cx_ < 0 || cz_ < 0 || (u32)cx_ >= gTerrainWidth || (u32)cz_ >= gTerrainHeight)         \
-            out = 0;                                                                               \
-        else                                                                                       \
-            out = gTerrainMap->rows[cz_] + cx_;                                                    \
-    } while (0)
-
-#define NEAR_HEIGHT(out, pos, index)                                                               \
-    do {                                                                                           \
-        u8 *properties_ = TerrainModifiers_FindCellOverride(index, 1);                             \
-        u32 surface_;                                                                              \
-        if (properties_)                                                                           \
-            properties_ += 4;                                                                      \
-        else {                                                                                     \
-            struct EngineMap *map_ = gTerrainMap;                                                  \
-            u32 offset_ = index * 4 + 12;                                                          \
-            properties_ = map_->cells + offset_;                                                   \
-        }                                                                                          \
-        surface_ = *properties_ >> 4;                                                              \
-        out = (*properties_ & 15) << 8;                                                            \
-        switch (surface_) {                                                                        \
-            case 1:                                                                                \
-                out -= (u8)(pos)->z;                                                               \
-                break;                                                                             \
-            case 2:                                                                                \
-                out -= (u8)(pos)->x;                                                               \
-                break;                                                                             \
-        }                                                                                          \
-    } while (0)
-
 u32 TetherActor_TestNearbyInteraction(struct ContactPosition *position, u32 tag, u32 flags)
 {
     s32 dx;
     s32 dz;
-    s32 own;
-    s32 other = 0;
-    struct EngineMap *map;
-    s32 height;
+    s32 cell;
+    s32 actorCell;
     s32 diff;
-    u32 state;
     struct ContactPosition corner;
+    struct ContactPosition *cornerPosition;
     if (!gTetherActor)
-        goto no;
+        return 0;
     dx = position->x - gTetherActor->position.x;
     dz = position->z - gTetherActor->position.z;
     if (dx * dx + dz * dz > 48400)
-        goto no;
-    state = gTetherActor->state;
-    if ((u8)(state - 16) <= 1)
+        return 0;
+    if (gTetherActor->state == 16 || gTetherActor->state == 17)
         goto yes;
-    if ((u8)state != 0 && (u8)state != 3 && (u8)state != 4)
-        goto no;
+    if (gTetherActor->state != 0 && gTetherActor->state != 3 && gTetherActor->state != 4)
+        return 0;
     if (!TetherActor_TestMatchingStatus(tag, flags, gTetherActor->statusTag,
                                         gTetherActor->statusFlags))
-        goto no;
-    NEAR_CELL(own, position->x, position->z);
-    {
-        struct ContactPosition *p = &gTetherActor->position;
-        s32 cx = p->x >> 8;
-        s32 cz = p->z >> 8;
-        if (cx < 0 || cz < 0 || (u32)cx >= gTerrainWidth || (u32)cz >= gTerrainHeight)
-            other = 0;
-        else
-            other = gTerrainMap->rows[cz] + cx;
-    }
-    if (own == other)
+        return 0;
+    cell = SceneActorTerrain_GetCellIndex(position);
+    actorCell = SceneActorTerrain_GetCellIndex(&gTetherActor->position);
+    if (cell == actorCell)
         goto yes;
-    if (own == other + 1 || own == other - 1 ||
-        own == other + ((s16 *)(map = gTerrainMap)->cells)[2] ||
-        own == other - ((s16 *)map->cells)[2]) {
+    if (cell == actorCell + 1 || cell == actorCell - 1 ||
+        cell == actorCell + SceneActorTerrain_Width() ||
+        cell == actorCell - SceneActorTerrain_Width()) {
         diff = position->y - gTetherActor->position.y;
         if (diff < 0)
             diff = -diff;
         if (diff > 255)
-            goto no;
+            return 0;
     yes:
         return 1;
     }
@@ -1183,37 +1139,25 @@ u32 TetherActor_TestNearbyInteraction(struct ContactPosition *position, u32 tag,
     if (diff < 0)
         diff = -diff;
     if (diff > 255)
-        goto no;
+        return 0;
     corner.x = position->x - dx;
     corner.z = position->z;
-    {
-        struct ContactPosition *cp = &corner;
-        s32 cx = cp->x >> 8;
-        s32 cz = cp->z >> 8;
-        if (cx < 0 || cz < 0 || (u32)cx >= gTerrainWidth || (u32)cz >= gTerrainHeight)
-            own = 0;
-        else
-            own = map->rows[cz] + cx;
-        NEAR_HEIGHT(height, cp, own);
-    }
-    diff = position->y - height;
+    cornerPosition = &corner;
+    diff = position->y - SceneActorTerrain_GetHeight(SceneActorTerrain_GetCellIndex(cornerPosition),
+                                                     cornerPosition);
     if (diff < 0)
         diff = -diff;
     if (diff <= 127)
         goto yes;
     corner.x = position->x;
     corner.z = position->z - dz;
-    {
-        struct ContactPosition *cp = &corner;
-        NEAR_CELL(own, cp->x, cp->z);
-        NEAR_HEIGHT(height, cp, own);
-    }
-    diff = position->y - height;
+    cornerPosition = &corner;
+    diff = position->y - SceneActorTerrain_GetHeight(SceneActorTerrain_GetCellIndex(cornerPosition),
+                                                     cornerPosition);
     if (diff < 0)
         diff = -diff;
     if (diff <= 127)
         goto yes;
-no:
     return 0;
 }
 
