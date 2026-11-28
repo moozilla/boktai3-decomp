@@ -5,11 +5,6 @@
 void Vanargand_SetPendingCue(void *, u16);
 u8 Callback_InvokeActor(void *, void *);
 void Vanargand_SetPairedMotionParameter(void *, u16);
-static inline s32 RandomValue(void)
-{
-    gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-    return *(u16 *)((gRandomIndex << 1) + (u32)gRandomTable);
-}
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, int, int, int);
 void Sound_PlaySong(u32);
 void Vanargand_UpdateSequencedPairAttack(struct VanargandPairAttack *p)
@@ -25,9 +20,8 @@ void Vanargand_UpdateSequencedPairAttack(struct VanargandPairAttack *p)
     if (result)
         return;
     if (p->pending) {
-        p->pending = result;
-        p->phase = result;
-        p->timer = result;
+        p->pending = 0;
+        VanargandPairAttack_EnterPhase(p, 0);
     }
     switch (p->phase) {
         case 0:
