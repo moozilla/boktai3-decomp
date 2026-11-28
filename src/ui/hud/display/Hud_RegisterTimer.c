@@ -1,20 +1,14 @@
 #include "global.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
-struct FieldHud {
-    u8 unknown0[0xAFF];
-    u8 timerEnabled;
-    u8 timerOption;
-    u8 unknownB01[3];
-    void *timer;
-};
-void Hud_RegisterTimer(void *timer)
+#include "ui/pause/scene_hud_display.h"
+void Hud_RegisterTimer(u16 *timer)
 {
-    struct FieldHud *hud = gFieldHud;
+    struct SceneHudState *hud = (struct SceneHudState *)gFieldHud;
     if (hud) {
-        hud->timer = timer;
-        hud->timerEnabled = 1;
+        hud->countdownValue = timer;
+        hud->countdownEnabled = 1;
         if (gEngineFlags & 0x800)
-            hud->timerOption = 1;
+            hud->actionCueInitialized = 1;
     }
 }
