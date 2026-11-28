@@ -253,28 +253,19 @@ void SceneActorGraphics_UpdateVariant(struct SceneGraphicsActor *actor)
         actor->graphics.variantTogglePrev = actor->graphics.variantToggle;
     }
 }
-/* A flat `pad[0x344]` prefix (matching groundEffect's offset) rather than
- * struct StateActor + a nested SceneActorGraphics cast: the two-step access
- * changes register allocation enough to break the match. Fields are
- * SceneActorGraphics's scale/scaleMin/scaleMax/scaleStep (0x344-0x34B). */
 
-typedef struct {
-    u8 pad[0x344];
-    s16 scale, min, max, step;
-} Actor;
-
-void SceneActorGraphics_OscillateScale(Actor *p)
+void SceneActorGraphics_OscillateScale(struct SceneGraphicsActor *actor)
 {
-    p->scale += p->step;
-    if (p->step > 0) {
-        if (p->scale >= p->max) {
-            p->scale = p->max;
-            p->step = -32;
+    actor->graphics.scale += actor->graphics.scaleStep;
+    if (actor->graphics.scaleStep > 0) {
+        if (actor->graphics.scale >= actor->graphics.scaleMax) {
+            actor->graphics.scale = actor->graphics.scaleMax;
+            actor->graphics.scaleStep = -32;
         }
     } else {
-        if (p->scale <= p->min) {
-            p->scale = p->min;
-            p->step = 32;
+        if (actor->graphics.scale <= actor->graphics.scaleMin) {
+            actor->graphics.scale = actor->graphics.scaleMin;
+            actor->graphics.scaleStep = 32;
         }
     }
 }

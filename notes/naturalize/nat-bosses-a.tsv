@@ -7,3 +7,4 @@ src/bosses/count/actor_graphics_and_basic_states.c	SceneActorGraphics_Initialize
 src/bosses/count/actor_graphics_and_basic_states.c	SceneActorGraphics_InitBodyNoOp	natural	natural	0	
 src/bosses/count/actor_graphics_and_basic_states.c	SceneActorGraphics_InitializeOverlay	natural	natural	0	
 src/bosses/count/actor_graphics_and_basic_states.c	SceneActorGraphics_UpdateVariant	contrived	natural	2	TestFlags accessor kept (plain & loads the word before the mask)
+src/bosses/count/actor_graphics_and_basic_states.c	SceneActorGraphics_OscillateScale	minor	natural	1	
