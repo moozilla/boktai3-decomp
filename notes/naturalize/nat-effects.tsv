@@ -15,3 +15,4 @@ src/effects/bat_flock.c	BatFlockBat_HomeToTarget	contrived	minor	2	one position 
 src/effects/bat_flock.c	BatFlockBat_ChasePlayer	contrived	minor	20	active flag local, position/target pointers and the split vector add: the ROM keeps both addresses in registers
 src/effects/bat_flock.c	BatFlockBat_Launch	minor	natural	1	
 src/effects/bat_flock.c	BatFlockBat_AdvanceStraight	minor	natural	1	
+src/effects/bat_flock.c	BatFlock_Update	minor	natural	5	

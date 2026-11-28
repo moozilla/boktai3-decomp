@@ -700,6 +700,7 @@ int BatFlock_Update(struct GroupObjects *m)
 {
     int i;
     struct GroupPiece *p;
+
     BatFlockBats_DispatchCommands(m);
     if (m->active) {
         if (m->actorId)
@@ -715,15 +716,16 @@ int BatFlock_Update(struct GroupObjects *m)
                 m->paletteActive = -1;
             }
         } else if (m->paletteActive == 2) {
-            if (++m->paletteMask > 31) {
+            if (++m->paletteMask >= 32) {
                 m->paletteMask = 32;
                 m->paletteActive = -1;
             }
         }
         if (m->paletteActive >= 0) {
-            void *first = gPaletteBankData + 0x5A60;
-            void *second = gPaletteBankData + 0x5AA0;
-            Palette_InterpolateBanks(m->palette, first, second, m->paletteMask, 6);
+            u8 *from = gPaletteBankData + 0x5A60;
+            u8 *to = gPaletteBankData + 0x5AA0;
+
+            Palette_InterpolateBanks(m->palette, from, to, m->paletteMask, 6);
         }
         p = m->pieces;
         for (i = 0; i < 16; i++, p++) {
