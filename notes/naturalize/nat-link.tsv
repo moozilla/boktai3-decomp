@@ -347,3 +347,4 @@ src/link/score_panel/LinkMenu_LoadSelectionSprite.c	LinkMenu_LoadSelectionSprite
 src/link/score_panel/LinkScorePanel_HideSprites.c	LinkScorePanel_HideSprites	contrived	natural	1	
 src/link/score_panel/LinkScorePanel_RemoveSprites.c	LinkScorePanel_RemoveSprites	contrived	natural	1	
 src/link/score_panel/LinkScorePanel_SetNumber.c	LinkScorePanel_SetNumber	minor	natural	3	local prototype keeps AnimSprite_SelectGlyph taking u16
+src/link/score_panel/LinkMenu_DrawRandomizedFourDigitNumber.c	LinkMenu_DrawRandomizedFourDigitNumber	minor	minor	1	random draw blocks stay

@@ -1,11 +1,8 @@
-#include "link/link_score_panel.h"
-#define LinkMenu_DrawFourDigitNumber LinkScorePanel_SetNumber
-#define gRandomTableIndex            gEffectRandomTableIndex
-#define gRandomValues                gUnk_086141BC
+#include "ui/save/save_menu.h"
 #include "global.h"
 #include "engine/ram.h"
 extern const u16 gUnk_086141BC[];
-void LinkScorePanel_SetNumber(struct LinkScorePanel *, s32, s32);
+void LinkScorePanel_SetNumber(struct SaveMenu *, s32, s32);
 static inline u32 nextRandom(void)
 {
     u32 value;
@@ -13,9 +10,9 @@ static inline u32 nextRandom(void)
     value = gUnk_086141BC[gEffectRandomTableIndex];
     return value;
 }
-void LinkMenu_DrawRandomizedFourDigitNumber(struct LinkScorePanel *menu, s32 row)
+void LinkMenu_DrawRandomizedFourDigitNumber(struct SaveMenu *menu, s32 row)
 {
-    s32 number = (menu->h * menu->h) >> 2;
+    s32 number = (menu->timer * menu->timer) >> 2;
     {
         u32 value = nextRandom();
         value &= 7;
