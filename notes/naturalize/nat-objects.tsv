@@ -484,3 +484,4 @@ src/objects/loot_deposits/LootDeposit_UpdateMemberProximity.c	LootDeposit_Update
 src/objects/loot_deposits/LootDeposit_UpdateMemberSway.c	LootDeposit_UpdateMemberSway	contrived	minor	1	local scale helpers kept
 src/objects/loot_deposits/LootDeposit_UpdateMemberRemoval.c	LootDeposit_UpdateMemberRemoval	contrived	natural	3	
 src/objects/loot_deposits/LootDepositPool_InitManager.c	LootDepositPool_InitManager	contrived	natural	2	
+src/objects/loot_deposits/LootDepositPool_CreateManager.c	LootDepositPool_CreateManager	contrived	natural	2	
