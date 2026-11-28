@@ -452,8 +452,7 @@ void CentipedeBody_BeginDirectedAttack(struct ChaseActor *actor)
         {
             u16 *bodyFlags = &body->attackFlags;
             s32 mask = ~2;
-            u32 value = *bodyFlags;
-            mask &= value;
+            mask &= *bodyFlags;
             mask |= 4;
             body->attackFlags = mask;
         }

@@ -217,3 +217,4 @@ src/monsters/armor/Armor_UpdatePartLungeDelay.c	Armor_UpdatePartLungeDelay	minor
 src/monsters/armor/Armor_AcceleratePartReturnTurn.c	Armor_AcceleratePartReturnTurn	minor	minor	0	byte pointer signature or temp
 src/monsters/centipede/tentacle_body.c	CentipedeBody_OnBodyContact	minor	natural	1	
 src/monsters/centipede/tentacle_body.c	ActorTrail_RestoreSavedState	contrived	contrived	7	remaining: zeroone,block,constlocal,mask,ptrtemp
+src/monsters/centipede/tentacle_body.c	CentipedeBody_BeginDirectedAttack	contrived	contrived	23	remaining: bytep,block,constlocal,mask,ptrtemp,maskhelper
