@@ -1,30 +1,25 @@
 #include "global.h"
-#include "scene/collision/packed_contact_halfwords.h"
-#include "scene/collision/packed_collider_extents.h"
-void Collider_Init(u8 *, u16, u32, u32, u32, struct PackedColliderExtents *,
-                   struct PackedColliderExtents *);
-void Collider_SetCallback(u8 *, void (*)(void), u8 *);
-void Collider_SetPosition(u8 *, u8 *, u32);
-s32 Collider_Refresh(u8 *);
+#include "monsters/popbud/popbud_playback.h"
+#include "engine/engine.h"
+
 void Combat_ApplyHitReaction(void);
 void Collider_SetBodyProperties(void *, u32, u32, u32);
-struct Q {
-    u8 pad[6];
-    u16 flags;
-};
-void Popbud_InitCollider(u8 *p)
+
+void Popbud_InitCollider(struct PinkSpineState *popbud)
 {
-    struct PackedColliderExtents a, b;
-    u8 *q = p + 0x6c;
-    a.xy.lo = 100;
-    a.xy.hi = 120;
-    a.zAndPad.lo = 100;
-    *(u32 *)&b.xy = 0x780000;
-    *(u32 *)&b.zAndPad &= 0xFFFF0000;
-    Collider_Init(q, 0, 0x5009, 0, 0x10, &a, &b);
-    Collider_SetPosition(q, p + 0x40, 0);
-    Collider_SetCallback(q, Combat_ApplyHitReaction, p);
-    Collider_SetBodyProperties(q, 0, 0, 0);
-    Collider_Refresh(q);
-    ((struct Q *)q)->flags |= 4;
+    struct ContactCollider *collider = &popbud->collider;
+    struct ContactPosition bounds, offset;
+
+    bounds.x = 100;
+    bounds.y = 120;
+    bounds.z = 100;
+    offset.x = 0;
+    offset.y = 120;
+    offset.z = 0;
+    Collider_Init(collider, 0, 0x5009, 0, 0x10, &bounds, &offset);
+    Collider_SetPosition(collider, &popbud->sprite.position, 0);
+    Collider_SetCallback(collider, Combat_ApplyHitReaction, popbud);
+    Collider_SetBodyProperties(collider, 0, 0, 0);
+    Collider_Refresh(collider);
+    collider->flags |= 4;
 }

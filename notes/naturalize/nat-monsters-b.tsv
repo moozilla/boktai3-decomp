@@ -188,3 +188,4 @@ src/monsters/pollen_flowers/PollenFlower_ReturnZero.c	PollenFlower_ReturnZero	na
 src/monsters/pollen_flowers/PollenFlower_Destroy.c	PollenFlower_Destroy	minor	minor	0	raw +0x20: s32 tail return needs Sprite_Remove declared s32
 src/monsters/popbud/Popbud_InitFromScript.c	Popbud_InitFromScript	contrived	natural	3	
 src/monsters/popbud/Popbud_UpdateDamageAnimation.c	Popbud_UpdateDamageAnimation	minor	natural	1	
+src/monsters/popbud/Popbud_InitCollider.c	Popbud_InitCollider	contrived	natural	1	
