@@ -1118,10 +1118,7 @@ void PlayerCue_UpdateRunTo(struct Player *player)
 
 void PlayerCue_UpdateRunOverlay(struct Player *player)
 {
-    u16 *parameter = &player->actionEighteenParameter;
-    u16 value = 0xBA;
-    value <<= 1;
-    *parameter = value;
+    player->actionEighteenParameter = 0x174;
     player->actionEighteenDuration = 0x18;
 }
 
