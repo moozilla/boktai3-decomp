@@ -1,57 +1,19 @@
 #include "global.h"
 #include "engine/ram.h"
+#include "ui/dialogue/text_window.h"
 #include "ui/dialogue/text_window_manager.h"
-struct TextState {
-    u8 x, y, left, top, width, height, palette, style;
-    u8 entered, mode, skip, busy, padC, choiceCount, padE, fresh, pad10, voice, toggle, lastWidth,
-        pad14;
-    s8 current;
-    u8 instant, wrap;
-    u32 frame;
-    const u8 *pc, *streams[4];
-    u8 pad30[0xD8];
-    u8 depth, styles[7];
-};
-struct TextWindow {
-    s32 id;
-    u8 x, y, width, height;
-    u32 enabled;
-    u16 clock, index, symbol, pad12;
-    const u8 *script;
-    u16 sequenceIndex, sequenceCount;
-    u16 sequence[32];
-    void *callback;
-    struct TextState text;
-    u8 pad170[0x54];
-    struct TextWindow *next, *previous;
-};
-void *Heap_Alloc(int);
-void Memory_Clear(void *, int);
-void Heap_Free(void *);
-void TextWindow_BlankRect(int, int, int, int);
-void TextState_Init(struct TextState *, int, int, int, int);
-void TextState_SetBounds(struct TextState *, int, int, int, int);
-void TextState_Reset(struct TextState *);
-int Script_ParseStringRef(const void *);
-const u8 *Text_LookupString(int);
-void TextWindow_OnIdle(void);
-void TextWindow_OnPlayback(void);
-struct TextWindow *TextWindowManager_FindWindow(struct WindowManager *, int);
+
 struct TextWindow *TextWindow_Find(int);
-int TextWindowManager_AllocateWindowId(struct WindowManager *);
-const u8 *TextWindow_ResolveString(struct TextWindow *, int);
+void TextWindow_BlankRect(int, int, int, int);
+void TextWindow_OnIdle(struct WindowManager *, struct TextWindow *);
+
 int TextWindow_Clear(int id)
 {
-    struct TextWindow *w = TextWindow_Find(id);
-    int result;
-    if (!w)
-        goto fail;
-    TextWindow_BlankRect(w->x, w->y, w->width, w->height);
-    w->callback = TextWindow_OnIdle;
-    result = 0;
-    goto done;
-fail:
-    result = -1;
-done:
-    return result;
+    struct TextWindow *window = TextWindow_Find(id);
+
+    if (!window)
+        return -1;
+    TextWindow_BlankRect(window->x, window->y, window->width, window->height);
+    window->callback = TextWindow_OnIdle;
+    return 0;
 }

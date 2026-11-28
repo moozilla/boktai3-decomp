@@ -339,3 +339,4 @@ src/ui/dialogue/text_window/TextWindow_Find.c	TextWindow_Find	fudged	natural	1
 src/ui/dialogue/text_window/TextWindowManager_AllocateWindowId.c	TextWindowManager_AllocateWindowId	fudged	natural	1	
 src/ui/dialogue/text_window/TextWindow_Destroy.c	TextWindow_Destroy	fudged	natural	1	moved the unlink into a static inline next to Create's link helper pattern
 src/ui/dialogue/text_window/TextWindow_StartPlayback.c	TextWindow_StartPlayback	fudged	natural	1	
+src/ui/dialogue/text_window/TextWindow_Clear.c	TextWindow_Clear	fudged	natural	1	
