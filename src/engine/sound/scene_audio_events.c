@@ -82,19 +82,17 @@ void SceneAudioEvent_FadeOutChannel12(struct SceneEventDispatchTask *owner,
 
 static inline s32 SceneAudioEvent_GetPendingCount(struct SceneEventReceiver *receiver)
 {
-    u8 *phase = &gSceneEventDispatchState->phase;
-    u8 *count = receiver->count;
-    return count[*phase];
+    return receiver->count[gSceneEventDispatchState->phase];
 }
 
 s32 SceneAudioEvent_DispatchPending(struct SceneEventDispatchTask *owner)
 {
     struct SceneEventReceiver *receiver = &owner->messages.queue;
-    s32 index = 0;
-    while (index < SceneAudioEvent_GetPendingCount(receiver)) {
+    s32 index;
+
+    for (index = 0; index < SceneAudioEvent_GetPendingCount(receiver); index++) {
         struct SceneEventDispatchState *state = gSceneEventDispatchState;
-        struct SceneEventCommand *command;
-        command = receiver->pending[state->phase][index];
+        struct SceneEventCommand *command = receiver->pending[state->phase][index];
         SceneMessages_SetPendingTrigger(receiver, command);
         switch ((u32)command->kind) {
             case 0:
@@ -128,7 +126,6 @@ s32 SceneAudioEvent_DispatchPending(struct SceneEventDispatchTask *owner)
                 SceneAudioEvent_FadeOutChannel12(owner, receiver, command);
                 break;
         }
-        index++;
     }
     /* The task driver discards the original incidental return register. */
 }
