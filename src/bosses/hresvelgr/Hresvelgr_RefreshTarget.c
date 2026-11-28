@@ -34,9 +34,7 @@ s32 Hresvelgr_RefreshTarget(struct HresvelgrTravelActor *p)
     Polar(&v, (p->side << 6) | 0x80, 0x300);
     {
         struct SceneVec *o = obj->origin;
-        struct SceneVec *vp;
-        vp = &v;
-        Add(vp, o);
+        Add(&v, o);
     }
     p->target = v;
     obj->facing = angles.a[p->side];

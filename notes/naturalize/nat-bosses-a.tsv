@@ -244,3 +244,4 @@ src/bosses/hresvelgr/DirectionGate_IsAngleInModeRange.c	DirectionGate_IsAngleInM
 src/bosses/hresvelgr/Hresvelgr_SetSineScaledVelocity.c	Hresvelgr_SetSineScaledVelocity	minor	minor	0	s16 angle and product operand order (see source comment)
 src/bosses/hresvelgr/Hresvelgr_SetCosineScaledVelocity.c	Hresvelgr_SetCosineScaledVelocity	minor	minor	0	s16 angle and product operand order (see source comment)
 src/bosses/hresvelgr/ColliderActor_SetTargetPosition.c	ColliderActor_SetTargetPosition	contrived	minor	8	delta/position pointers stay
+src/bosses/hresvelgr/Hresvelgr_RefreshTarget.c	Hresvelgr_RefreshTarget	minor	minor	5	obj alias and origin local stay
