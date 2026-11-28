@@ -36,13 +36,11 @@ void Vanargand_UpdateCaptureSetup(struct VanargandPairAttack *p)
     if (p->pending) {
         void *animation;
         void *drawable;
-        struct SceneVec *base;
         u32 two;
         s32 animationFlags;
         p->pending = 0;
         animationFlags = SetPositionAndGetHeight(&position, 128, 0, 128);
-        base = &position;
-        AddPosition(&position, &p->position, base);
+        AddPosition(&position, &p->position, &position);
         animation = &p->animation;
         drawable = p->drawable;
         two = 2;
