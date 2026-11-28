@@ -21,13 +21,6 @@ static inline u32 FlagAt(void *object, u32 offset, u32 mask)
     bits = mask;
     return *field & bits;
 }
-static inline u32 ReadHalf(struct Player *p, u32 offset)
-{
-    u32 fieldOffset = offset;
-    u16 *field;
-    field = (u16 *)((u8 *)p + fieldOffset);
-    return *field;
-}
 static inline s32 ReadBonus(void)
 {
     return gGameState->unk876;
@@ -44,11 +37,11 @@ s32 Player_ComputeActionScale(struct Player *p, struct SceneCollider *contact)
 {
     s32 scale = 64;
     if (ActionFlag(p, 0x8000000))
-        scale = Div(ReadHalf(p, 0x41E), 10) + 64;
+        scale = Div(p->derivedStats[1], 10) + 64;
     if (contact) {
-        if (ActionFlag(p, 0x10000000) && ReadHalf(p, 0x3A0) == 0x81)
+        if (ActionFlag(p, 0x10000000) && p->animationIndex == 0x81)
             scale += 13;
-        if (ActionFlag(p, 0x20000000) && ReadHalf(p, 0x3A0) == 0x72)
+        if (ActionFlag(p, 0x20000000) && p->animationIndex == 0x72)
             scale += 13;
         if (ActionFlag(p, 0x40000000) && (contact->contactFlags & 7))
             scale += 13;

@@ -144,3 +144,4 @@ src/player/attack/Player_UpdateTargetMotion.c	Player_UpdateTargetMotion	contrive
 src/player/attack/Player_FindNearestVisibleTarget.c	Player_FindNearestVisibleTarget	contrived	minor	1	ProjectPosition keeps its sum copy; TargetPosition view casts
 src/player/attack/Player_OnGrabMotionExit.c	Player_OnGrabMotionExit	contrived	natural	1	-
 src/player/attack/Player_UpdateGrabMotion.c	Player_UpdateGrabMotion	contrived	contrived	13	gPlayerPendingActor casts, pending-clear locals, heading pointer, link-damage local, frame accessor: each plain form changes codegen
+src/player/attack/Player_ComputeActionScale.c	Player_ComputeActionScale	contrived	contrived	14	FlagAt takes a byte offset and parks the mask: typed helpers differ in register choice; SignedActionFlags and ReadBonus accessors stay
