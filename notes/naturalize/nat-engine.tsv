@@ -28,3 +28,4 @@ src/engine/task_scheduler.c	TaskSystem_RunFrame	natural	natural	0
 src/engine/task_scheduler.c	Task_Kill	natural	natural	0	
 src/engine/task_scheduler.c	Task_TryDestroy	natural	natural	0	
 src/engine/resource_registry.c	ResourceRegistry_ClearEntries	minor	natural	2	
+src/engine/resource_registry.c	ResourceRegistry_RegisterResource	contrived	natural	7	

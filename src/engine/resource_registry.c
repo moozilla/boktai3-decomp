@@ -60,16 +60,13 @@ void ResourceRegistry_ClearEntries(u32 keep)
 
 struct ResourceRegistryEntry *ResourceRegistry_AllocateEntry(void);
 
-void ResourceRegistry_RegisterResource(u32 id, void *data, u32 flags)
+void ResourceRegistry_RegisterResource(u16 id, void *data, s32 flags)
 {
-    void *saved_data = data;
-    s32 saved_flags = flags;
-    u16 saved_id = id;
     struct ResourceRegistryEntry *entry = ResourceRegistry_AllocateEntry();
-    if (entry) {
-        entry->id = saved_id;
-        entry->data = saved_data;
-        entry->flags = saved_flags | (s8)0x80;
+    if (entry != 0) {
+        entry->id = id;
+        entry->data = data;
+        entry->flags = flags | 0x80;
     }
 }
 
