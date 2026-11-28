@@ -622,10 +622,9 @@ void TetherActor_CreateAuxiliarySprite(struct TetherActor *actor)
 
 void TetherActor_RemoveAuxiliarySprite(struct TetherActor *actor)
 {
-    u8 *active = &actor->auxiliaryActive;
-    if (*active == 1) {
+    if (actor->auxiliaryActive == 1) {
         Sprite_Remove(&actor->auxiliarySprite);
-        *active = 0;
+        actor->auxiliaryActive = 0;
     }
 }
 
