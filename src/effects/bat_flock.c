@@ -367,39 +367,38 @@ int BatFlockBats_StartActorChase(struct GroupObjects *m, struct GroupQueue *q, s
     return 0;
 }
 
-static inline int count(struct GroupQueue *q)
+static inline int GroupQueue_GetCount(struct GroupQueue *queue)
 {
-    u8 *bank = &gSceneEventDispatchState->bank;
-    return q->count[*bank];
+    return queue->count[gSceneEventDispatchState->bank];
 }
 
 int BatFlockBats_DispatchCommands(struct GroupObjects *manager)
 {
     struct GroupQueue *queue = &manager->queue;
     int i;
-    for (i = 0; i < count(queue); i++) {
-        struct GroupGlobals *g = gSceneEventDispatchState;
-        {
-            struct GroupCommand *cmd = queue->commands[g->bank][i];
-            SceneMessages_SetPendingTrigger(queue, cmd);
-            switch (cmd->type) {
-                case 0:
-                    BatFlockBats_StartStraightAdvance(manager, queue, cmd);
-                    Trigger_ConsumePending(&manager->queue, 1);
-                    break;
-                case 1:
-                    BatFlockBats_StartLaunch(manager, queue, cmd);
-                    Trigger_ConsumePending(&manager->queue, 1);
-                    break;
-                case 2:
-                    BatFlockBats_StartActorChase(manager, queue, cmd);
-                    Trigger_ConsumePending(&manager->queue, 1);
-                    break;
-                case 11:
-                    BatFlockBats_StartConvergence(manager, queue, cmd);
-                    Trigger_ConsumePending(&manager->queue, 1);
-                    break;
-            }
+
+    for (i = 0; i < GroupQueue_GetCount(queue); i++) {
+        struct GroupGlobals *dispatch = gSceneEventDispatchState;
+        struct GroupCommand *cmd = queue->commands[dispatch->bank][i];
+
+        SceneMessages_SetPendingTrigger(queue, cmd);
+        switch (cmd->type) {
+            case 0:
+                BatFlockBats_StartStraightAdvance(manager, queue, cmd);
+                Trigger_ConsumePending(&manager->queue, 1);
+                break;
+            case 1:
+                BatFlockBats_StartLaunch(manager, queue, cmd);
+                Trigger_ConsumePending(&manager->queue, 1);
+                break;
+            case 2:
+                BatFlockBats_StartActorChase(manager, queue, cmd);
+                Trigger_ConsumePending(&manager->queue, 1);
+                break;
+            case 11:
+                BatFlockBats_StartConvergence(manager, queue, cmd);
+                Trigger_ConsumePending(&manager->queue, 1);
+                break;
         }
     }
     return 0;
