@@ -241,3 +241,4 @@ src/link/player/SceneVec_OffsetPolar.c	SceneVec_OffsetPolar	minor	natural	1
 src/link/player/Player_GetTerrainHeightAtPosition.c	Player_GetTerrainHeightAtPosition	minor	natural	2	
 src/link/player/Terrain_ClassifyOffsetHeight.c	Terrain_ClassifyOffsetHeight	minor	natural	1	
 src/link/player/sub_0823C6BC.c	sub_0823C6BC	contrived	natural	4	
+src/link/player/sub_0823C760.c	sub_0823C760	contrived	natural	1	dash speed/duration bytes still unnamed (unk4EF)
