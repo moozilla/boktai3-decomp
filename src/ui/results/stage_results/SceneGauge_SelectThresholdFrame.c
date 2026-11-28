@@ -1,13 +1,10 @@
 #include "global.h"
+#include "ui/results/stage_results.h"
+
 s32 AnimSprite_SelectGlyph(void *, void *, u32);
 extern const u8 gUnk_086106B0[];
-struct SceneGauge {
-    u8 unknown0[0x204];
-    u8 sprite[0x8C4 - 0x204];
-    u8 animation[0x8EE - 0x8C4];
-    u16 frame;
-};
-s32 SceneGauge_SelectThresholdFrame(struct SceneGauge *s, s32 value)
+
+s32 SceneGauge_SelectThresholdFrame(struct StageResults *results, s32 value)
 {
     s32 level = -1;
     s32 i;
@@ -19,7 +16,7 @@ s32 SceneGauge_SelectThresholdFrame(struct SceneGauge *s, s32 value)
     }
     if (level < 0)
         level = 4;
-    s->frame = level + 0x22;
-    AnimSprite_SelectGlyph(s->sprite, s->animation, s->frame);
+    results->spriteIds[5] = level + 0x22;
+    AnimSprite_SelectGlyph(&results->sprites[5], results->animation, results->spriteIds[5]);
     return level;
 }
