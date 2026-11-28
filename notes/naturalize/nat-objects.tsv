@@ -217,3 +217,10 @@ src/objects/dungeon_prop/scenery.c	DungeonScenery_Initialize	minor	minor	4	palet
 src/objects/dungeon_prop/scenery.c	DungeonScenery_ApplyHitFlash	contrived	minor	7	local copy of the object parameter and an unused 4-byte scratch array give the original frame and register choice
 src/objects/dungeon_prop/scenery_motion.c	SceneryMotion_SteerXZ	contrived	contrived	12	vector pointer temps, split distance/u16 locals and saved velocity pointer each pin an address register; only the atan2 delta block came out
 src/objects/dungeon_prop/scenery_motion.c	SceneryMotion_SteerXY	contrived	contrived	2	same pointer and distance temps as SteerXZ
+src/objects/dungeon_prop/scenery_motion.c	DungeonProp_CreateFromScript	natural	natural	0	
+src/objects/dungeon_prop/scenery_motion.c	SceneryMotion_UpdateAngle	natural	natural	0	
+src/objects/dungeon_prop/scenery_motion.c	SceneryMotion_UpdateFoldedOrbit	natural	natural	0	
+src/objects/dungeon_prop/scenery_motion.c	SceneryMotion_UpdateAbsoluteSines	natural	natural	0	
+src/objects/dungeon_prop/scenery_motion.c	SceneryMotion_InterpolatePosition	natural	natural	0	
+src/objects/dungeon_prop/scenery_motion.c	SceneryMotion_CalculateArcCenter	natural	natural	0	
+src/objects/dungeon_prop/scenery_motion.c	SceneryMotion_UpdateCrossedSines	minor	minor	1	destination x pointer in the projection helper keeps the store address order
