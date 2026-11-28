@@ -143,7 +143,6 @@ struct DamageNumberDisplay *DamageNumberDisplay_SetGroup(struct DamageNumberDisp
 {
     struct ContactPosition screen;
     struct DamageNumberGroup *group = &display->groups[index];
-    u32 glyphBase;
     group->sourceKey = key;
     group->priority = priority;
     group->phaseFrame = 0;
@@ -153,17 +152,10 @@ struct DamageNumberDisplay *DamageNumberDisplay_SetGroup(struct DamageNumberDisp
     group->position.y += (u16)offset->y;
     group->position.z += (u16)offset->z;
     DamageNumber_ProjectPosition(&screen, &group->position);
-    if (priority == 0 || priority == 2) {
-        glyphBase = 42;
-        if (!kind)
-            glyphBase = 32;
-        DamageNumberDisplay_RenderDigits(display, group, amount, glyphBase, &screen);
-    } else {
-        glyphBase = 62;
-        if (!kind)
-            glyphBase = 52;
-        DamageNumberDisplay_RenderDigits(display, group, amount, glyphBase, &screen);
-    }
+    if (priority == 0 || priority == 2)
+        DamageNumberDisplay_RenderDigits(display, group, amount, !kind ? 32 : 42, &screen);
+    else
+        DamageNumberDisplay_RenderDigits(display, group, amount, !kind ? 52 : 62, &screen);
     return DamageNumberDisplay_SetActiveBit(display, index);
 }
 

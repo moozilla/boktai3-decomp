@@ -459,3 +459,4 @@ src/ui/hud/field_hud.c	FieldHud_InitializeWidgets	natural	natural	0
 src/ui/hud/damage_numbers/damage_number_display.c	DamageNumberDisplay_FindSource	fudged	natural	7	
 src/ui/hud/damage_numbers/damage_number_display.c	DamageNumberDisplay_FindAvailableGroup	fudged	natural	7	
 src/ui/hud/damage_numbers/damage_number_display.c	DamageNumberDisplay_RenderDigits	fudged	partial	13	if/do-while clamp stays (a while loop swaps registers); open-coded signed shift
+src/ui/hud/damage_numbers/damage_number_display.c	DamageNumberDisplay_SetGroup	fudged	natural	2	
