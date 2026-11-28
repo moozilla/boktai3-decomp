@@ -1,14 +1,10 @@
-#include "global.h"
-#include "engine/ram.h"
+#include "ui/dialogue/message_window.h"
 
-struct S {
-    u8 f[0x19c];
-    u32 a;
-};
 u32 MessageWindow_GetTextCompletionState(void)
 {
-    struct S *p = gMessageWindow;
-    if (!p)
+    struct MessageWindow *window = (void *)gMessageWindow;
+
+    if (!window)
         return 0;
-    return p->a;
+    return window->playbackCounter;
 }
