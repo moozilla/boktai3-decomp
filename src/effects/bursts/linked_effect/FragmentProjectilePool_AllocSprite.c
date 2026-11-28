@@ -1,16 +1,13 @@
-#include "global.h"
+#include "effects/bursts/linked_effect.h"
 
-struct Unk0812B084 {
-    u32 unk0;
-};
+struct LinkedEffect *LargeEffectPool_AllocateSlot(struct LinkedEffectPool *);
 
-struct Unk0812B084 *LargeEffectPool_AllocateSlot(void *);
-
-// &p->unk0 == p, but agbcc keeps the null test for the address expression
-u32 *FragmentProjectilePool_AllocSprite(void *pool)
+// &effect->sprite == effect, but agbcc keeps the null test for the address expression
+struct FragmentEffectSprite *FragmentProjectilePool_AllocSprite(struct LinkedEffectPool *pool)
 {
-    struct Unk0812B084 *p = LargeEffectPool_AllocateSlot(pool);
-    if (!p)
+    struct LinkedEffect *effect = LargeEffectPool_AllocateSlot(pool);
+
+    if (!effect)
         return NULL;
-    return &p->unk0;
+    return &effect->sprite;
 }
