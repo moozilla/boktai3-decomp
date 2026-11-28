@@ -26,14 +26,15 @@ void Storage_ShowEquipmentDescription(struct StoragePanel *panel)
     struct EquipmentDescriptor *data;
     if (panel->savedSelection <= 31) {
         entry = Inventory_GetEquipmentEntry(panel->items[panel->savedSelection]);
-        if (entry->kind == 0xFF)
-            goto hide;
+        if (entry->kind == 0xFF) {
+            Storage_HideItemDetails(panel);
+            return;
+        }
         Inventory_GetEquipmentDescriptor(panel->items[panel->savedSelection], &descriptor);
         data = &descriptor;
     } else
         data = 0;
     if (!data) {
-    hide:
         Storage_HideItemDetails(panel);
     } else {
         struct AnimSprite *banner = &panel->banner;

@@ -614,3 +614,4 @@ src/ui/town/storage/sub_081BE140.c	sub_081BE140	natural	natural	0	empty delay lo
 src/ui/town/storage/sub_081BE150.c	sub_081BE150	natural	natural	0	
 src/ui/town/storage/sub_081BE154.c	sub_081BE154	natural	natural	0	empty delay loops
 src/ui/town/storage/Storage_ShowConsumableDescription.c	Storage_ShowConsumableDescription	contrived	minor	3	index-first pointer sum into table160; private panel view
+src/ui/town/storage/Storage_ShowEquipmentDescription.c	Storage_ShowEquipmentDescription	contrived	minor	2	banner and resource pointer locals; private panel view
