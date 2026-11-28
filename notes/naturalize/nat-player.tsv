@@ -390,3 +390,4 @@ src/player/cutscene/player_cue_commands.c	PlayerCue_Idle	natural	natural	0	-
 src/player/cutscene/player_cue_commands.c	PlayerCue_StandVariant2	natural	natural	0	-
 src/player/cutscene/player_cue_commands.c	PlayerCue_StandVariant3	contrived	contrived	13	unchanged: heading/side pointer locals and the two quadrant helpers order the address and test
 src/player/cutscene/player_cue_commands.c	PlayerCue_WalkTo	minor	natural	1	-
+src/player/cutscene/player_cue_commands.c	PlayerCue_MoveTo	minor	natural	1	-

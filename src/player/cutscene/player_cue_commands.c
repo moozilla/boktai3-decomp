@@ -195,10 +195,10 @@ void PlayerCue_MoveTo(struct Player *player, const struct ContactPosition *posit
                       s32 animated, u32 parameter)
 {
     if (position == 0)
-        (*(struct ContactPosition *)&player->cueDestination) =
-            (*(struct ContactPosition *)&player->position);
+        *(struct ContactPosition *)&player->cueDestination =
+            *(struct ContactPosition *)&player->position;
     else
-        (*(struct ContactPosition *)&player->cueDestination) = *position;
+        *(struct ContactPosition *)&player->cueDestination = *position;
     player->cueParameter = parameter;
     player->animationBranchRequested = animated;
     player->targetFacing = facing;
