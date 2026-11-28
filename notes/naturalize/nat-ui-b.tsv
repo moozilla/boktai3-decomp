@@ -196,3 +196,4 @@ src/ui/title/password_menu.c	PasswordMenu_LoadSelections	contrived	natural	1	-
 src/ui/title/password_menu.c	PasswordMenu_ResetSelections	contrived	natural	1	-
 src/ui/title/password_menu.c	PasswordMenu_JoinTextRows	contrived	natural	1	-
 src/ui/title/password_menu.c	PasswordMenu_MoveCursorUp	minor	natural	1	-
+src/ui/title/password_menu.c	PasswordMenu_MoveCursorDown	minor	natural	1	-
