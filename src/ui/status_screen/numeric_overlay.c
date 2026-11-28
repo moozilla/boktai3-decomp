@@ -3,10 +3,9 @@
 
 u16 *NumericOverlay_GetTileMapPtr(u32 bg, u32 x, s32 y)
 {
-    struct BackgroundLayer *t = &gBgRecords[bg];
-    u16 *p = t->map;
-    p = p + x;
-    return p + (t->width << 1) * y;
+    struct BackgroundLayer *layer = &gBgRecords[bg];
+    u16 *map = layer->map;
+    return map + x + (layer->width << 1) * y;
 }
 
 void sub_0800F4EC(struct NumericOverlay *unused)
