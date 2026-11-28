@@ -26,9 +26,12 @@ struct ResultMenu {
     u8 markerAnimationState, unknown49, nextFeedbackSlot;
     u8 unknown4B[5];
     s32 level;
-    u8 unknown54[0x14];
+    s32 startLevel; /* 0x54: level when this round began */
+    u8 unknown58[8];
+    s32 unknown60, unknown64;
     s32 gaugePosition; /* 0x68: clamped to 0..0x1600; purpose unclear */
-    u8 unknown6C[8];
+    s32 unknown6C;
+    u8 unknown70[4];
     void *messageTable, *owner;
     struct SceneValueEquipment transformationResult;
     s32 playerPosition, playerVelocity;
@@ -48,7 +51,8 @@ struct ResultMenu {
     u8 transformationOutcome; /* 0xC5: which modifier message the result shows (guess) */
     u8 gradeRaised, unknownC7;
     s16 rankChange; /* 0xC8: new definition rank minus the old one (guess) */
-    u8 unknownCA[0xE];
+    u8 unknownCA[0xA];
+    s32 unknownD4;
     s32 preciseCount, closeCount, missedCount;
     u16 meterPalette[16];
     struct AnimSpriteResource primaryResource, secondaryResource;

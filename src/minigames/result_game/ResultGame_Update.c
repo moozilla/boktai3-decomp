@@ -1,44 +1,43 @@
-#include "global.h"
+#include "minigames/result_game/result_tutorial.h"
+void ResultGame_SetUpdateCallback(struct ResultMenu *menu, void (*callback)(struct ResultMenu *));
+void ResultGame_TrackTarget(struct ResultMenu *menu);
 int ResultMenu_IsPhaseStart(void *);
-void ResultGame_SetUpdateCallback(void *, void *);
-void ResultGame_TrackTarget(void *);
-void Callback_InvokeActor(void *, void *);
-void Sound_StopSong(int);
 void ResultMenu_SetPhase(void *, void *);
 void ResultGame_Finish(void *);
-void ResultGame_Update(u8 *p)
+
+void ResultGame_Update(struct ResultMenu *menu)
 {
-    if (ResultMenu_IsPhaseStart(p)) {
-        ResultGame_SetUpdateCallback(p, ResultGame_TrackTarget);
-        *(int *)(p + 0x68) = 0;
-        *(int *)(p + 0x60) = 0;
-        *(int *)(p + 0x64) = 32;
-        p[0x4a] = 0;
-        *(int *)(p + 0xd4) = 0;
-        *(int *)(p + 0xd8) = 0;
-        *(int *)(p + 0xdc) = 0;
-        *(int *)(p + 0xe0) = 0;
-        *(int *)(p + 0x6c) = 2;
-        if (*(u32 *)(p + 0x50) > 10)
-            *(u32 *)(p + 0x50) = 10;
-        *(u32 *)(p + 0x54) = *(u32 *)(p + 0x50);
-        *(u16 *)(p + 0xa0) = 0;
-        *(u16 *)(p + 0xa2) = 0;
-        *(u16 *)(p + 0xa4) = 0;
-        *(u16 *)(p + 0xa6) = 0;
-        p[0xc4] = 0;
+    if (ResultMenu_IsPhaseStart(menu)) {
+        ResultGame_SetUpdateCallback(menu, ResultGame_TrackTarget);
+        menu->gaugePosition = 0;
+        menu->unknown60 = 0;
+        menu->unknown64 = 32;
+        menu->nextFeedbackSlot = 0;
+        menu->unknownD4 = 0;
+        menu->preciseCount = 0;
+        menu->closeCount = 0;
+        menu->missedCount = 0;
+        menu->unknown6C = 2;
+        if ((u32)menu->level > 10)
+            menu->level = 10;
+        menu->startLevel = menu->level;
+        menu->trackingScore = 0;
+        menu->trackingSamples = 0;
+        menu->pressScoreTotal = 0;
+        menu->pressSamples = 0;
+        menu->finishState = 0;
     }
-    p[0xbe] = 0;
-    Callback_InvokeActor(p, *(void **)(p + 0x7a8));
-    if (p[0xc4] == 2) {
+    menu->unknownBD[1] = 0;
+    Callback_InvokeActor(menu, menu->gameUpdate);
+    if (menu->finishState == 2) {
         Sound_StopSong(0x3ed);
         Sound_StopSong(0x3ee);
-        ResultMenu_SetPhase(p, ResultGame_Finish);
+        ResultMenu_SetPhase(menu, ResultGame_Finish);
     } else {
-        if (*(u16 *)(p + 0xac) == 0)
-            p[0xc4] = 1;
+        if (menu->countdown == 0)
+            menu->finishState = 1;
         else
-            --*(u16 *)(p + 0xac);
-        ++*(u32 *)(p + 0x3c);
+            menu->countdown--;
+        menu->phaseFrame++;
     }
 }

@@ -697,3 +697,4 @@ src/minigames/result_game/ResultMenu_UpdateIntro.c	ResultMenu_UpdateIntro	natura
 src/minigames/result_game/ResultGame_SetUpdateCallback.c	ResultGame_SetUpdateCallback	natural	natural	0	
 src/minigames/result_game/ResultGame_InitializeDisplay.c	ResultGame_InitializeDisplay	contrived	minor	6	half-width table pointer local (load order); palette expressed relative to meterPalette
 src/minigames/result_game/sub_0801C24C.c	sub_0801C24C	contrived	minor	18	range pointer with position/left locals (load order before the sprite pointer); level compared unsigned; unused time division kept as in ROM
+src/minigames/result_game/ResultGame_Update.c	ResultGame_Update	contrived	natural	2	
