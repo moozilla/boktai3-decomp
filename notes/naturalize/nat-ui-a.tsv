@@ -202,3 +202,4 @@ src/ui/dialogue/dialogue_transition.c	DialogueTransition_CreateFromScript	natura
 src/ui/dialogue/text_sequence.c	TextSequence_SetState	contrived	natural	1	
 src/ui/dialogue/text_sequence.c	TextSequence_UpdateHold	contrived	natural	1	
 src/ui/dialogue/text_sequence.c	TextSequence_UpdateFadeOut	contrived	natural	1	
+src/ui/dialogue/text_sequence.c	TextSequence_InitializeFromScript	minor	natural	1	

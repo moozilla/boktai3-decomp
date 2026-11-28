@@ -89,7 +89,7 @@ s32 TextSequence_InitializeFromScript(struct TextSequence *p, u32 arg)
     struct TextSequenceStep *e;
     s32 i;
     e = p->steps;
-    if (Script_SeekToKeyword(0x74)) {
+    if (Script_SeekToKeyword('t')) {
         Script_SetPc(sub_08227E9C());
         for (i = 0; i < 64; i++) {
             e->holdFrames = Script_GetValue();
@@ -107,7 +107,7 @@ s32 TextSequence_InitializeFromScript(struct TextSequence *p, u32 arg)
         }
     }
     e = p->steps;
-    if (Script_SeekToKeyword(0x63)) {
+    if (Script_SeekToKeyword('c')) {
         Script_SetPc(sub_08227E9C());
         for (i = 0; i < 64; i++) {
             e->x = Script_GetValue();
