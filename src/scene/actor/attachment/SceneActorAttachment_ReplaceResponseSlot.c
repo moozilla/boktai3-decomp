@@ -46,10 +46,11 @@ void SceneActorAttachment_ReplaceResponseSlot(struct ChaseActor *actor, u32 inpu
                                                                      (void *)follow->identity, y, z,
                                                                      category, actor, follow);
                 SceneActorEffect_PlayCategorySoundIfEnabled(kind, event, category,
-                                                            *(u8 *)&owner->base.paletteOffset);
+                                                            (u8)owner->base.paletteOffset);
                 if ((event == 0) || (event == 3))
                     SceneStimulus_AddTagged(follow->anchor.x, follow->anchor.z,
-                                            (s16)group->common.control.parameter, 0, 1, (u16)follow->identity);
+                                            (s16)group->common.control.parameter, 0, 1,
+                                            (u16)follow->identity);
                 break;
 
             case 1:
@@ -68,7 +69,7 @@ void SceneActorAttachment_ReplaceResponseSlot(struct ChaseActor *actor, u32 inpu
                         event, &actor->base.body.position, (void *)actor->base.body.id, y, z,
                         category, value, initial, flag, actor, follow);
                     SceneActorEffect_PlayCategorySoundIfEnabled(1, event, category,
-                                                                *(u8 *)&actor->base.paletteOffset);
+                                                                (u8)actor->base.paletteOffset);
                 }
                 break;
 
