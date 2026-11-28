@@ -1042,23 +1042,6 @@ void PlayerCue_UpdateAim(struct Player *player)
 
 // confidence=low: tentative cue role inferred from named callers (PlayerCue_RunTo).
 
-static inline s32 MultiplyMotion(s32 v, s32 k)
-{
-    return v * k;
-}
-
-static inline s32 ScaleDirectionalMotion(s32 v, s32 k)
-{
-    s32 product;
-    if (k == 40)
-        product = ((v << 2) + v) << 3;
-    else
-        product = v * k;
-    if (product >= 0)
-        return product >> 6;
-    return -((-product) >> 6);
-}
-
 void PlayerCue_UpdateRunTo(struct Player *player)
 {
     s32 deltaX;
@@ -1109,18 +1092,18 @@ void PlayerCue_UpdateRunTo(struct Player *player)
         Player_AddControlFlags(player, 1);
     }
     player->tetherFrame++;
-    player->velocityX = TruncateQ12(MultiplyMotion(gUnk_086149C4[(angle + 64) & 255], speed));
-    player->velocityZ = TruncateQ12(MultiplyMotion(gUnk_086149C4[angle & 255], speed));
+    player->velocityX = TruncateQ12(gUnk_086149C4[(angle + 64) & 255] * speed);
+    player->velocityZ = TruncateQ12(gUnk_086149C4[angle & 255] * speed);
     if (player->velocityScaleAxis == 1) {
         if (player->velocityZ < 0)
-            player->velocityZ = ScaleDirectionalMotion(player->velocityZ, 40);
+            player->velocityZ = TruncateQ6(player->velocityZ * 40);
         else
-            player->velocityZ = ScaleDirectionalMotion(player->velocityZ, 0x34);
+            player->velocityZ = TruncateQ6(player->velocityZ * 0x34);
     } else if (player->velocityScaleAxis == 2) {
         if (player->velocityX < 0)
-            player->velocityX = ScaleDirectionalMotion(player->velocityX, 40);
+            player->velocityX = TruncateQ6(player->velocityX * 40);
         else
-            player->velocityX = ScaleDirectionalMotion(player->velocityX, 0x34);
+            player->velocityX = TruncateQ6(player->velocityX * 0x34);
     }
     player->facing = ((((angle + 16) & 255) >> 5) + 3) & 7;
     if (player->facing > 4) {
