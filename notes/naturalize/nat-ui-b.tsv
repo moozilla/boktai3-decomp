@@ -593,3 +593,4 @@ src/ui/town/storage/MenuPanel_SwapConsumableSlots.c	MenuPanel_SwapConsumableSlot
 src/ui/town/storage/MenuPanel_ShowDescription.c	MenuPanel_ShowDescription	minor	natural	1	
 src/ui/town/storage/sub_081BECF0.c	sub_081BECF0	minor	natural	1	
 src/ui/town/storage/Storage_LoadDisplayResources.c	Storage_LoadDisplayResources	contrived	minor	2	text view cast: the palette pointer overlaps the glyph pair
+src/ui/town/storage/Storage_InitEntries.c	Storage_InitEntries	contrived	natural	2	
