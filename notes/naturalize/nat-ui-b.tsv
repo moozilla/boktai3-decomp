@@ -460,3 +460,5 @@ src/ui/town/shop/Shop_BeginEquipmentCatalogMove.c	Shop_BeginEquipmentCatalogMove
 src/ui/town/shop/Shop_ClassifyEquipmentMove.c	Shop_ClassifyEquipmentMove	minor	minor	0	private cursor view of the controller
 src/ui/town/shop/Shop_FindEmptyEquipmentSlot.c	Shop_FindEmptyEquipmentSlot	natural	natural	0	
 src/ui/town/shop/Shop_FindEmptyConsumableSlot.c	Shop_FindEmptyConsumableSlot	contrived	natural	1	
+src/ui/town/shop/Shop_FindEmptyItemSlot.c	Shop_FindEmptyItemSlot	natural	natural	0	
+src/ui/town/shop/Shop_FindConsumableAssignment.c	Shop_FindConsumableAssignment	contrived	natural	1	

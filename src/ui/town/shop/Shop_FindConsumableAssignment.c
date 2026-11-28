@@ -1,17 +1,11 @@
+#include "system/game_state/game_state.h"
 #include "global.h"
-
-struct ShopSlotsView {
-    u8 unknown0[0x58];
-    s16 slots[4];
-};
-extern struct ShopSlotsView *gGameState;
 
 s32 Shop_FindConsumableAssignment(s32 slot)
 {
-    s32 i = 0;
-    s16 *p = gGameState->slots;
-    for (; i < 4; p++, i++) {
-        if (*p == slot)
+    s32 i;
+    for (i = 0; i < 4; i++) {
+        if (gGameState->party[i] == slot)
             return i;
     }
     return -1;
