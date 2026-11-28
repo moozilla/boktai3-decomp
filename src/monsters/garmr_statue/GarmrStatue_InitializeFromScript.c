@@ -34,13 +34,11 @@ s32 GarmrStatue_InitializeFromScript(struct GarmrStatue *p, void *parent)
         p->effectC = 30;
     }
     if (Script_SeekToKeyword('l')) {
-        {
-            s32 health = Script_GetValue();
-            p->maxHealth = health;
-            p->health = health;
-            if ((s16)health < 0)
-                p->defeatDelay = 1;
-        }
+        s32 health = Script_GetValue();
+        p->maxHealth = health;
+        p->health = health;
+        if ((s16)health < 0)
+            p->defeatDelay = 1;
     } else {
         p->maxHealth = 120;
         p->health = 120;
@@ -91,17 +89,16 @@ s32 GarmrStatue_InitializeFromScript(struct GarmrStatue *p, void *parent)
     } else {
         p->update = sub_082086B8;
         p->defeated = 1;
-        sequenceResult =
-            Anim_SetSequence(&p->sequence, p->resource, 10, 0, 0);
+        sequenceResult = Anim_SetSequence(&p->sequence, p->resource, 10, 0, 0);
     }
-    PlayerCue_StepSequenceEnded((struct ContactSwarmSprite *)(&p->sprite.display), (void *)(&p->sequence));
+    PlayerCue_StepSequenceEnded((struct ContactSwarmSprite *)(&p->sprite.display),
+                                (void *)(&p->sequence));
     if (p->defeatDelay == 0)
         GarmrStatue_InitCollider(p);
     if (p->showTerrainBody != 0) {
-        u8 *body = p->terrainBody;
-        SceneBody_Init(body, p->hud, &p->sprite.coordinates.position, 0, 4, p);
-        SceneBody_SetSprite(body, &p->sprite.display);
-        TerrainOverlay_QueueAddActor(body);
+        SceneBody_Init(p->terrainBody, p->hud, &p->sprite.coordinates.position, 0, 4, p);
+        SceneBody_SetSprite(p->terrainBody, &p->sprite.display);
+        TerrainOverlay_QueueAddActor(p->terrainBody);
     }
 #ifdef UBFIX
     // falls off the end with r0 left over from its last statement; the creator only tests

@@ -280,3 +280,4 @@ src/monsters/axe_armor/AxeArmor_InitializeFromScript.c	AxeArmor_InitializeFromSc
 src/monsters/cannons/vulcan/VulcanCannon_UpdateTargeting.c	VulcanCannon_UpdateTargeting	contrived	minor	8	remaining: constlocal
 src/monsters/cannons/vulcan/VulcanCannon_UpdateDamageState.c	VulcanCannon_UpdateDamageState	contrived	contrived	12	remaining: block,constlocal
 src/monsters/garmr_statue/GarmrStatue_FireAimedVolley.c	GarmrStatue_FireAimedVolley	contrived	contrived	4	remaining: constlocal,mask
+src/monsters/garmr_statue/GarmrStatue_InitializeFromScript.c	GarmrStatue_InitializeFromScript	contrived	contrived	2	remaining: mask,structcast
