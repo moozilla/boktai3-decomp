@@ -1,15 +1,10 @@
-#include "global.h"
-/* TextState_SetChoiceProcedures: Copies choice procedure identifiers into the table at offset 0xC8 and sets the choice count */
+#include "ui/dialogue/message_window.h"
 
-s32 TextState_SetChoiceProcedures(u8 *p, s32 count, u32 *src)
+s32 TextState_SetChoiceProcedures(struct MessagePlaybackState *state, s32 count, u32 *procedures)
 {
-    if (count > 0) {
-        u32 *s = src;
-        u32 *dst = (u32 *)(p + 0xc8);
-        s32 n = count;
-        do {
-            *dst++ = *s++;
-        } while (--n != 0);
-    }
-    p[0xd] = count;
+    s32 i;
+
+    for (i = 0; i < count; i++)
+        state->choices[i] = procedures[i];
+    state->choiceCount = count;
 }

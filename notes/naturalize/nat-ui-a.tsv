@@ -302,3 +302,4 @@ src/ui/dialogue/text_interpreter/TextState_SetBounds.c	TextState_SetBounds	minor
 src/ui/dialogue/text_interpreter/TextState_ResetPlaybackMode.c	TextState_ResetPlaybackMode	minor	minor	3	mode read into an s32 temp for the signed load
 src/ui/dialogue/text_interpreter/TextState_SetNumber.c	TextState_SetNumber	minor	natural	3	u32 function with no return value; header declaration updated to match
 src/ui/dialogue/text_interpreter/TextState_SetString.c	TextState_SetString	minor	natural	1	u32 function with no return value
+src/ui/dialogue/text_interpreter/TextState_SetChoiceProcedures.c	TextState_SetChoiceProcedures	contrived	natural	1	s32 function with no return value
