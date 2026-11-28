@@ -406,3 +406,4 @@ src/bosses/vanargand/Vanargand_UpdateOffsetMotion.c	Vanargand_UpdateOffsetMotion
 src/bosses/vanargand/Vanargand_UpdateChargeSequence.c	Vanargand_UpdateChargeSequence	contrived	partial	30	kept: Vg_ sprite/animation view structs over actionSequence, local sequence-step helper (shared DisplaySequence_StepSprite differs), charge-offset input blocks, self alias
 src/bosses/vanargand/Vanargand_ApplyPendingDamage.c	Vanargand_ApplyPendingDamage	contrived	partial	12	kept: ReadAccumulatedDamage out-pointer, partFlags accessor, self alias, mask local
 src/bosses/vanargand/Vanargand_ApplyRequestedMode.c	Vanargand_ApplyRequestedMode	contrived	partial	4	kept: parameter locals a/b (constants loaded together), callback local
+src/bosses/vanargand/Vanargand_UpdateAnimationAndTargets.c	Vanargand_UpdateAnimationAndTargets	contrived	partial	40	local boss view kept: the target pointer array at 0x110 and a full switch to the shared struct change loop address allocation

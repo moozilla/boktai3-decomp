@@ -1,34 +1,25 @@
 #include "global.h"
+#include "bosses/vanargand/vanargand_pair_attack.h"
+#include "scene/actor/scene_actor_components.h"
+#include "player/player.h"
 
-// Remaining differences: temporary registers for field offsets and target coordinate loads.
 // confidence=low: advances presentation and caches bearings and planar target distances.
-struct TargetVec {
-    s16 x, y, z, pad;
-};
-struct TargetSprite {
-    u8 pad0[12];
-    struct TargetVec position;
-};
-struct TargetPlayer {
-    u8 pad0[0x457];
-    u8 state;
-};
 struct VanargandTargets {
     u8 pad0[0x48];
-    struct TargetSprite sprite;
-    u8 pad5C[0x9C - 0x5C];
+    struct SceneActorBody sprite;
+    u8 pad5C[0x9C - 0x48 - sizeof(struct SceneActorBody)];
     u32 flags;
     u8 padA0[0xC8 - 0xA0];
     s32 distances[1];
     u8 bearings[1];
     u8 padCD[0x10C - 0xCD];
-    struct TargetPlayer *player;
-    struct TargetVec *targets[1];
+    struct Player *player;
+    struct SceneVec *targets[1];
     u8 pad114[0x174 - 0x114];
     u8 projection[0x18C - 0x174];
     u8 animation[0x60];
     u8 drawable[0x20C - 0x1EC];
-    struct TargetVec renderPosition;
+    struct ContactPosition renderPosition;
     u8 pad214[0x2D0 - 0x214];
     u8 arc[0x3FC - 0x2D0];
     u8 part[0x570 - 0x3FC];
@@ -48,46 +39,35 @@ void PositionedEffect_InterpolateArcNodes(void *);
 void PositionedEffect_UpdateVectors(void *);
 void SceneActors_UpdateTargetMetrics(void *);
 s32 Math_Atan2(s32, s32);
-static inline u32 TestFlags(struct VanargandTargets *p, u32 mask)
-{
-    return p->flags & mask;
-}
 static inline u32 TestGlobal(u32 mask, u32 *flags)
 {
     return *flags & mask;
 }
 void Vanargand_UpdateAnimationAndTargets(struct VanargandTargets *p)
 {
-    struct VanargandTargets *actor = p;
     struct VanargandTargets *owner = p;
-    struct TargetSprite *sprite = &actor->sprite;
+    struct SceneActorBody *sprite = &p->sprite;
     s32 i;
-    VanargandPair_DispatchTransitionCommands(actor);
-    Vanargand_UpdatePartAnimation(actor, actor->part);
+    VanargandPair_DispatchTransitionCommands(p);
+    Vanargand_UpdatePartAnimation(p, p->part);
     Obj_StepPosition(sprite);
-    if (!TestFlags(actor, 0x4000000))
-        SceneActors_UpdateAnimation(actor, actor->animation, actor->drawable);
-    actor->renderPosition.x = sprite->position.x;
-    actor->renderPosition.y = sprite->position.y;
-    {
-        u32 offset;
-        s16 z = sprite->position.z;
-        {
-            s16 *out = &actor->renderPosition.z;
-            *out = z;
-        }
-    }
-    if (!TestFlags(actor, 0x100000) && !TestGlobal(4, &gUnk_02000560))
-        PositionedEffect_UpdateOscillatingCoordinates(actor, actor->counter);
-    ScreenPalette_ProjectPositionAt88(actor->projection);
-    PositionedEffect_InterpolateArcNodes(actor->arc);
-    PositionedEffect_UpdateVectors(actor->animation);
+    if (!VanargandPairAttack_TestFlags((struct VanargandPairAttack *)p, 0x4000000))
+        SceneActors_UpdateAnimation(p, p->animation, p->drawable);
+    p->renderPosition.x = sprite->position.x;
+    p->renderPosition.y = sprite->position.y;
+    p->renderPosition.z = sprite->position.z;
+    if (!VanargandPairAttack_TestFlags((struct VanargandPairAttack *)p, 0x100000) &&
+        !TestGlobal(4, &gUnk_02000560))
+        PositionedEffect_UpdateOscillatingCoordinates(p, p->counter);
+    ScreenPalette_ProjectPositionAt88(p->projection);
+    PositionedEffect_InterpolateArcNodes(p->arc);
+    PositionedEffect_UpdateVectors(p->animation);
     SceneActors_UpdateTargetMetrics(owner);
     i = 0;
-    if (i < actor->targetCount) {
-        struct TargetSprite *base = &owner->sprite;
+    if (i < p->targetCount) {
+        struct SceneActorBody *base = &owner->sprite;
         do {
-            struct TargetVec *target = owner->targets[i];
+            struct SceneVec *target = owner->targets[i];
             if (target) {
                 s32 x = target->x - base->position.x;
                 s32 z = target->z - base->position.z;
@@ -95,12 +75,12 @@ void Vanargand_UpdateAnimationAndTargets(struct VanargandTargets *p)
                 owner->distances[i] = x * x + z * z;
             }
             i++;
-        } while (i < actor->targetCount);
+        } while (i < p->targetCount);
     }
-    if ((u32)actor->distances[0] <= 0x3FFFF) {
-        if (actor->player->state != 24)
-            actor->proximityTimer++;
+    if ((u32)p->distances[0] <= 0x3FFFF) {
+        if (p->player->tetherMode != 24)
+            p->proximityTimer++;
     } else {
-        actor->proximityTimer = 0;
+        p->proximityTimer = 0;
     }
 }
