@@ -2082,9 +2082,9 @@ extern const u32 gUnk_08613D34[];
 
 void Callback_InvokeActor(u8 *, u32);
 
-void TutorialOtenko_DispatchAnimationPhase(u8 *p)
+void TutorialOtenko_DispatchAnimationPhase(struct ActorAnimController *p)
 {
-    Callback_InvokeActor(p, gUnk_08613D34[*(u16 *)(p + 0xF5A) >> 4]);
+    Callback_InvokeActor((u8 *)p, gUnk_08613D34[p->phase]);
 }
 
 /* Tentative role: Prepare the actor and dispatch its mode. */
