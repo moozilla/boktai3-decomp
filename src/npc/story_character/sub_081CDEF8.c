@@ -1,50 +1,46 @@
 #include "global.h"
-extern s16 gUnk_086149C4[];
-s32 Actor_PlayAnimationEntry(void *actor, s32 id, s32 a, s32 b, s32 c);
-void sub_081CDEF8(u8 *a, u8 *b)
+#include "engine/math/math_shift.h"
+#include "npc/story_character/scene_character.h"
+#include "npc/manager/scene_actor_lifecycle.h"
+
+extern const s16 gUnk_086149C4[];
+
+void sub_081CDEF8(void *context, struct SceneActor *actor)
 {
-    s32 v;
-    s32 off;
-    s32 id;
-    if (*(s16 *)(b + 0x26) == 1) {
-        {
-            s32 bit = 0x400;
-            *(u16 *)(b + 0xe) |= bit;
-        }
-        v = gUnk_086149C4[(*(s32 *)(b + 0x10) << 2) & 0xff] << 4;
-        if (v >= 0)
-            off = v >> 12;
-        else
-            off = -((-v) >> 12);
-        (*(u16 **)(b + 0x160))[1] += 0x80, (*(u16 **)(b + 0x160))[1] += off;
-        if (b[1] == 0x1d && b[4] == 1) {
-            switch (b[1]) {
+    struct SceneCharacterEffects *effects = (struct SceneCharacterEffects *)actor->unknown20;
+    if (effects->tag == 1) {
+        s32 bob;
+        SceneActor_SetFlags(actor, 0x400);
+        bob = Math_ShiftTowardZero(gUnk_086149C4[(actor->stateFrame << 2) & 0xff] << 4, 12);
+        ((struct ContactPosition *)actor->drawable.sequence.position)->y += 0x80 + bob;
+        if (actor->variant == 0x1d && actor->state == 1) {
+            u32 animation;
+            switch (actor->variant) {
                 case 4:
-                    id = 0;
+                    animation = 0;
                     break;
                 case 9:
-                    id = 0;
+                    animation = 0;
                     break;
                 case 0x10:
-                    id = 0;
+                    animation = 0;
                     break;
                 case 0x14:
-                    id = 0;
+                    animation = 0;
                     break;
                 case 0x18:
-                    id = 0;
+                    animation = 0;
                     break;
                 case 0x1d:
-                    id = 0xb;
+                    animation = 0xb;
                     break;
                 default:
-                    id = 0;
+                    animation = 0;
                     break;
             }
-            Actor_PlayAnimationEntry(b, id, 1, 0, 1);
+            Actor_PlayAnimationEntry(actor, animation, 1, 0, 1);
         }
-    } else if (b[4] == 0x54) {
-        s32 bit = 0x400;
-        *(u16 *)(b + 0xe) |= bit;
+    } else if (actor->state == 0x54) {
+        SceneActor_SetFlags(actor, 0x400);
     }
 }
