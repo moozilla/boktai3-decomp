@@ -247,33 +247,24 @@ void Mosaic_UploadRegisters(void);
 
 u32 InterruptsAndVideo_OnVideoUploadTask(void)
 {
-    u32 *flags;
-    vu16 *disp;
     Bg_UpdateScrollShadow();
     InterruptsAndVideo_WaitForVBlank();
     ScanlineEffect_StageTransfer();
-    flags = &gVideoUploadFlags;
-    if (*flags & 1) {
-        struct VideoDmaRegisters *dma = (struct VideoDmaRegisters *)REG_ADDR_DMA3SAD;
-        dma->source = (u32)gOamBuffer;
-        dma->destination = 0x07000000;
-        dma->control = 0x84000100;
-        (void)dma->control;
-        *flags &= ~1;
+    if (gVideoUploadFlags & 1) {
+        DmaCopy32(3, gOamBuffer, OAM, 0x400);
+        gVideoUploadFlags &= ~1;
     }
     Palette_UploadBuffers();
     ObjGfx_UploadQueuedTiles();
     Text_FlushTileUploads();
     Bg_UploadMapsAndTiles();
     TileAnimation_Upload();
-    disp = &REG_DISPCNT;
-    *disp &= 0xe0ff;
-    if (!gSceneEntryActive) {
-        u16 mask = gDispCntShadow;
-        *disp |= mask | 0x1000;
-    }
+    REG_DISPCNT &= 0xe0ff;
+    if (!gSceneEntryActive)
+        REG_DISPCNT |= gDispCntShadow | 0x1000;
     Mosaic_UploadRegisters();
-    return gVBlankUploadPending = 0;
+    gVBlankUploadPending = 0;
+    return 0;
 }
 
 void Palette_ResetObjectAllocation(void);
