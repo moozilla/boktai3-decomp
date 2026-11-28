@@ -201,3 +201,4 @@ src/npc/story_character/StoryCharacter_UpdateDescendingDash.c	StoryCharacter_Upd
 src/npc/story_character/StoryCharacter_StartKind5Animation9AndAttach.c	StoryCharacter_StartKind5Animation9AndAttach	contrived	natural	2	
 src/npc/story_character/StoryCharacter_UpdateEightWayBurst.c	StoryCharacter_UpdateEightWayBurst	contrived	minor	6	variance = 5 parked (passed to both emit calls from a register); u16 pointer add on position.x (member add rewrites the whole word)
 src/npc/story_character/StoryCharacter_UpdateHoverBob.c	StoryCharacter_UpdateHoverBob	contrived	minor	1	SceneActor_SetFlags (mask materialized before the load); raw 0x1CC palette buffer offset; ContactPosition view of the display position
+src/npc/story_character/StoryCharacter_UpdateRiseToTerrain.c	StoryCharacter_UpdateRiseToTerrain	contrived	minor	9	SceneActor_SetFlags; local RiseTag view of unknown20; ContactPosition view of the display position
