@@ -1,4 +1,3 @@
-#define Player_RefreshCueCollider Player_UpdateColliderRefreshCountdown
 #include "global.h"
 #include "player/player.h"
 #include "system/game_state/game_state.h"
