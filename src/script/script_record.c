@@ -363,20 +363,12 @@ s32 ModifierStats_ApplyKind3(struct ScenePoolActor *stats, s32 value)
 
 s32 CallbackList_RunMatchingState(struct ScenePoolActor *list, s32 value, s32 state)
 {
-    struct StatModifier *base = (*&list)->modifiers;
-    s32 i = 0;
-    if (i < list->modifierCount) {
-        struct StatModifier *entry = base;
-        struct StatModifier *cursor = base;
-        do {
-            if (cursor->state.record.kind == state || cursor->state.record.kind == 13)
-                value = cursor->callback(entry, value);
-            cursor++;
-            entry++;
-            i++;
-        } while (i < list->modifierCount);
-    }
-    return (s32)value;
+    struct StatModifier *modifiers = list->modifiers;
+    s32 i;
+    for (i = 0; i < list->modifierCount; i++)
+        if (modifiers[i].state.record.kind == state || modifiers[i].state.record.kind == 13)
+            value = modifiers[i].callback(&modifiers[i], value);
+    return value;
 }
 
 void StatModifier_InitializeCallbacks(struct ScenePoolActor *p, struct StatModifierOwner *owner)
