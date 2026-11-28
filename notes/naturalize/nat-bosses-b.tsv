@@ -390,3 +390,4 @@ src/bosses/vanargand/Vanargand_WaitForActionRelease.c	Vanargand_WaitForActionRel
 src/bosses/vanargand/Vanargand_Update.c	Vanargand_Update	contrived	near-natural	3	constant locals and second aliases kept where present
 src/bosses/vanargand/Vanargand_UpdateDescendTrack.c	Vanargand_UpdateDescendTrack	contrived	near-natural	3	constant locals and second aliases kept where present
 src/bosses/vanargand/Vanargand_UpdatePairedAttack.c	Vanargand_UpdatePairedAttack	contrived	near-natural	3	constant locals and second aliases kept where present
+src/bosses/vanargand/Vanargand_UpdateLeapTrack.c	Vanargand_UpdateLeapTrack	contrived	near-natural	3	constant locals and second aliases kept where present
