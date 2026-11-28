@@ -1,14 +1,12 @@
 #include "global.h"
+#include "link/lobby/record_menu.h"
 
-void Anim_Remove(u8 *);
+void Anim_Remove(void *);
 
-void LinkLobbyPanel_RemoveSprites(u8 *p)
+void LinkLobbyPanel_RemoveSprites(struct RecordMenu *menu)
 {
-    u8 *q = p + 0x24;
     s32 i;
 
-    for (i = 8; i >= 0; i--) {
-        Anim_Remove(q);
-        q += 0x60;
-    }
+    for (i = 0; i < 9; i++)
+        Anim_Remove(&menu->sprites[i]);
 }
