@@ -521,3 +521,4 @@ src/ui/town/shop/Shop_TickDiscardTransition.c	Shop_TickDiscardTransition	minor	m
 src/ui/town/shop/Shop_RefreshCatalogDisplay.c	Shop_RefreshCatalogDisplay	minor	minor	0	page and panel view casts
 src/ui/town/shop/Shop_ClearDescription.c	Shop_ClearDescription	natural	natural	0	
 src/ui/town/shop/Shop_UpdateDisplay.c	Shop_UpdateDisplay	minor	minor	2	panel view casts
+src/ui/town/shop/Shop_BuildUnlockedEquipmentCatalog.c	Shop_BuildUnlockedEquipmentCatalog	minor	minor	5	u8 view keeps the byte store of -1

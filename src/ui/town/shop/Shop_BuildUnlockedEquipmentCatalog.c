@@ -10,7 +10,7 @@ void Shop_BuildUnlockedEquipmentCatalog(struct ShopScriptCatalog *p)
         for (i = 0; i < 8; i++) {
             s32 kind = gUnk_0824DF3C[page * 8 + i];
             u32 enabled;
-            ((u8 *)p->catalog)[page * 8 + i] = 0xFF;
+            ((u8 *)p->catalog)[page * 8 + i] = -1;
             if (kind >= 0) {
                 if (kind < 32)
                     enabled = gGameState->unlockedEquipment[0] & (1 << kind);
