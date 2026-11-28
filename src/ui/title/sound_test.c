@@ -329,6 +329,7 @@ s32 SoundTest_Initialize(struct SoundTest *p)
     struct ContactPosition pos;
     u32 zero;
     void *asset;
+    void *background;
     s32 option, i;
     ClearPosition(&zero, &pos);
     Bg_ClearTilemap(0);
@@ -336,11 +337,9 @@ s32 SoundTest_Initialize(struct SoundTest *p)
     Bg_ClearTilemap(2);
     BgGfx_LoadTilemapSimple(2, 0, 0, 0, 0);
     Bg_ClearTilemap(3);
-    {
-        void *background = ScriptProc_Start(0xc091, 0x3536);
-        option = 10;
-        Bg_SetupLayers(2, 0, background, 0, 0, 1, &option);
-    }
+    background = ScriptProc_Start(0xc091, 0x3536);
+    option = 10;
+    Bg_SetupLayers(2, 0, background, 0, 0, 1, &option);
     BgGfx_LoadTilemapSimple(3, 0, 0, 0, 0);
     CpuSet(((struct SoundTestPalette *)ScriptProc_Start(0x92b3, 0x204))->colors, gBgPaletteBuffer,
            256);

@@ -226,3 +226,4 @@ src/ui/title/game_start.c	GameStart_SetParametersFromScript	natural	natural	0	-
 src/ui/title/game_start.c	GameStart_Create	natural	natural	0	-
 src/ui/title/sound_test.c	SoundTest_Update	minor	natural	1	-
 src/ui/title/sound_test.c	SoundTest_Destroy	contrived	minor	1	literal mask 3 passed to Bg_DisableDisplay
+src/ui/title/sound_test.c	SoundTest_Initialize	minor	minor	2	ClearPosition helper kept: CpuFill32 computes the position address after the zero (2 insns)
