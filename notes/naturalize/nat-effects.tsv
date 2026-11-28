@@ -9,3 +9,4 @@ src/effects/bat_flock.c	BatFlockBats_StartConvergence	contrived	minor	40	twin pi
 src/effects/bat_flock.c	BatFlockBats_StartActorChase	contrived	contrived	30	index/mask pointer locals and RandomTableView union stay: every plain random spelling changes the table/index load order
 src/effects/bat_flock.c	BatFlockBats_DispatchCommands	minor	natural	6	
 src/effects/bat_flock.c	BatFlockBat_Wander	contrived	contrived	35	four nested do/while(0) around the table load: constant-address pseudos get half priority, so table needs the loop-depth weight
+src/effects/bat_flock.c	BatFlockBat_ApproachTarget	contrived	minor	6	one position pointer for the dz read (ROM keeps &p->position in r7)
