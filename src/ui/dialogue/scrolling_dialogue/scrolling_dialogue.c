@@ -291,16 +291,12 @@ s32 ScrollingDialogue_SetChoicesFromScript(void)
 
 s32 ScrollingDialogue_RequestShow(void)
 {
-    s32 ret;
-
     struct ScrollingDialogue *dialogue = (void *)gScrollingDialogue;
-    if (dialogue) {
-        dialogue->showRequest = 1;
-        ret = 0;
-    } else {
-        ret = -1;
-    }
-    return ret;
+
+    if (!dialogue)
+        return -1;
+    dialogue->showRequest = 1;
+    return 0;
 }
 
 int ScrollingDialogue_RequestHide(void)
