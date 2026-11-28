@@ -1,5 +1,6 @@
 #include "npc/otenko/otenko_actor.h"
 #include "engine/video/render.h"
+#include "scene/motion/scene_facing.h"
 
 extern u8 *gSceneEventDispatchState;
 
@@ -18,38 +19,11 @@ static inline void SetNpcState(struct OtenkoActor *npc, u32 sub)
     npc->timer = 0;
 }
 
-static inline void SetNpcFacing(struct OtenkoActor *npc, u32 a)
+static inline void SetNpcFacing(struct OtenkoActor *npc, u32 angle)
 {
-    npc->body.direction = a;
-    {
-        s32 shifted = (s32)(a + 0x70) >> 5;
-        u32 mask = 7;
-        mask &= shifted;
-        npc->facing8 = mask;
-    }
-    {
-        s32 shifted = (s32)(a + 0x60) >> 6;
-        u32 mask = 3;
-        mask &= shifted;
-        npc->facing4 = mask;
-    }
-}
-static inline void ApplyCommandFacing(struct OtenkoActor *npc, u32 a)
-{
-    npc->body.direction = a;
-    a = (u8)a;
-    {
-        s32 shifted = (s32)(a + 0x70) >> 5;
-        u32 mask = 7;
-        mask &= shifted;
-        npc->facing8 = mask;
-    }
-    {
-        s32 shifted = (s32)(a + 0x60) >> 6;
-        u32 mask = 3;
-        mask &= shifted;
-        npc->facing4 = mask;
-    }
+    npc->body.direction = angle;
+    npc->facing8 = SceneFacing_EightWay(angle);
+    npc->facing4 = SceneFacing_FourWay(angle);
 }
 static inline u16 FacingBits(s8 mask, u32 shifted)
 {
@@ -59,12 +33,7 @@ static inline u16 FacingBits(s8 mask, u32 shifted)
 static inline void SetFlaggedFacing(struct OtenkoActor *npc, u32 a, u8 directionMask)
 {
     npc->body.direction = a;
-    {
-        s32 shifted = (s32)(a + 0x70) >> 5;
-        u32 mask = 7;
-        mask &= shifted;
-        npc->facing8 = mask;
-    }
+    npc->facing8 = SceneFacing_EightWay(a);
     {
         npc->facing4 = FacingBits(directionMask, (s32)(a + 0x60) >> 6);
     }
@@ -132,7 +101,7 @@ void Otenko_DispatchCommands(struct OtenkoActor *npc)
                     break;
 
                 case 1:
-                    ApplyCommandFacing(npc, (u8)((((u8 *)m)[8] + 5) << 5));
+                    SetNpcFacing(npc, (u8)((((u8 *)m)[8] + 5) << 5));
                     if (effect->attached) {
                         SetNpcState(npc, 0x23);
                         npc->commandEntered = 1;
@@ -295,7 +264,7 @@ void Otenko_DispatchCommands(struct OtenkoActor *npc)
                     break;
 
                 case 19:
-                    ApplyCommandFacing(npc, (u8)((((u8 *)m)[8] + 5) << 5));
+                    SetNpcFacing(npc, (u8)((((u8 *)m)[8] + 5) << 5));
                     SetNpcState(npc, 0x19);
                     npc->commandEntered = 1;
                     break;
@@ -316,7 +285,7 @@ void Otenko_DispatchCommands(struct OtenkoActor *npc)
                     break;
 
                 case 23:
-                    ApplyCommandFacing(npc, (u8)((((u8 *)m)[8] + 5) << 5));
+                    SetNpcFacing(npc, (u8)((((u8 *)m)[8] + 5) << 5));
                     SetNpcState(npc, 0x1D);
                     npc->commandEntered = 1;
                     break;

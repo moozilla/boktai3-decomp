@@ -383,3 +383,4 @@ src/npc/otenko/Otenko_CommandFromScript.c	Otenko_CommandFromScript	contrived	min
 src/npc/otenko/Otenko_UpdateTransitionFade.c	Otenko_UpdateTransitionFade	contrived	minor	5	origin pointer, graphics pointer and parked 0x300 masks (mask loaded before the flags)
 src/npc/otenko/sub_081CF398.c	sub_081CF398	contrived	minor	1	graphics pointer locals
 src/npc/otenko/Otenko_UpdateDashSlide.c	Otenko_UpdateDashSlide	contrived	natural	6	
+src/npc/otenko/Otenko_DispatchCommands.c	Otenko_DispatchCommands	contrived	contrived	22	s16 message view with byte casts, parked mode bit and copy word, flag-mask helpers, SetFlaggedFacing and guarded do-while: each plain form moves cross-jump tails or register choice
