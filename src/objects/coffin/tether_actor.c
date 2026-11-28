@@ -703,20 +703,13 @@ void TetherActor_EmitRingEffects(struct TetherActor *actor)
 void TetherActor_EmitPointEffect(const struct ContactPackedVector *source, const void *config)
 {
     struct ContactPackedVector position = *source;
-    const u16 *table = gRandomTable;
-    {
-        s32 x;
-        u32 sample = ParticleRandom_ReadDirectSample(table);
-        x = (u16)position.x - 15;
-        position.x = x + (sample & 31);
-    }
-    {
-        s32 z;
-        u32 sample = ParticleRandom_ReadDirectSample(table);
-        z = (u16)position.z - 15;
-        position.z = z + (sample & 31);
-    }
-    position.y = position.y - 16 - (ParticleRandom_ReadDirectSample(table) & 63);
+    s32 sample;
+
+    sample = ParticleRandom_ReadDirectSample(gRandomTable);
+    position.x += (sample & 31) - 15;
+    sample = ParticleRandom_ReadDirectSample(gRandomTable);
+    position.z += (sample & 31) - 15;
+    position.y = position.y - 16 - (ParticleRandom_ReadDirectSample(gRandomTable) & 63);
     ImpactBurst_Create(1, &position, config);
 }
 
