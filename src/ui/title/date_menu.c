@@ -352,12 +352,9 @@ void Anim_Remove(void *);
 
 void DateMenu_Destroy(struct DateMenu *p)
 {
-    struct AnimSprite *entry = p->digits;
-    s32 i = 11;
-    do {
-        Anim_Remove(entry);
-        entry++;
-    } while (--i >= 0);
+    s32 i;
+    for (i = 0; i < 12; i++)
+        Anim_Remove(&p->digits[i]);
     Anim_Remove(&p->widgets[3]);
     Anim_Remove(&p->widgets[2]);
     Anim_Remove(&p->widgets[1]);
