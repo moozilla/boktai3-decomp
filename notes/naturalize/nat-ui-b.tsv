@@ -543,3 +543,4 @@ src/ui/town/shop/Shop_CreateGariGariKunStall.c	Shop_CreateGariGariKunStall	minor
 src/ui/town/solar_bank/SolarBank_InitWidgets.c	SolarBank_InitWidgets	contrived	minor	8	position pointer and resource locals in the digit loops; labelPlayback copy for the first priority
 src/ui/town/solar_bank/SolarBank_RefreshAmountDigits.c	SolarBank_RefreshAmountDigits	contrived	natural	2	
 src/ui/town/solar_bank/SolarBank_BeginAmountEntry.c	SolarBank_BeginAmountEntry	contrived	natural	3	
+src/ui/town/solar_bank/SpriteMenu_HideAll.c	SpriteMenu_HideAll	contrived	minor	1	sprite-array view starting at the label
