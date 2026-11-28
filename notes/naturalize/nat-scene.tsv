@@ -264,3 +264,5 @@ src/scene/actor/behavior/SceneActorRoute_UpdateAdvancePhase.c	SceneActorRoute_Up
 src/scene/actor/behavior/SceneActorRoute_UpdateTriggeredWaitPhase.c	SceneActorRoute_UpdateTriggeredWaitPhase	minor	minor	0	finished/flags locals order the status test
 src/scene/actor/behavior/SceneActorRoute_UpdateRouteCompletion.c	SceneActorRoute_UpdateRouteCompletion	contrived	minor	5	parked masks around the interaction clear, descriptor field pointer, scale pointer assigned in both branches
 src/scene/actor/behavior/SceneActorRoute_UpdateDelayedEntry.c	SceneActorRoute_UpdateDelayedEntry	minor	natural	1	-
+src/scene/actor/behavior/SceneActorControl_UpdateContactWait.c	SceneActorControl_UpdateContactWait	natural	natural	0	-
+src/scene/actor/behavior/SceneActorRoute_UpdateReturnEntry.c	SceneActorRoute_UpdateReturnEntry	contrived	minor	6	motion flag result local before the branch

@@ -9,24 +9,20 @@ u8 SceneActorReaction_BeginContactResponse(struct ChaseActor *);
 void SceneActorRoute_UpdateReturnEntry(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
-    u8 result;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1))
         SceneActorTerrain_InstallControl(actor, actor->base.onEntry, 2);
     if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
         return;
-    result = SceneActorReaction_BeginContactResponse(actor);
-    if (result)
+    if (SceneActorReaction_BeginContactResponse(actor))
         return;
     {
-        u8 *finished = &actor->base.stepDone;
-        if (*finished) {
+        if (actor->base.stepDone) {
             u16 flags = SceneActorContact_MotionFlags(actor, 0x10);
             if (flags) {
                 SceneActorTerrain_EnterState(actor, 0, 0, 8);
-                SceneActorControl_Begin(actor, group->routeChoiceControl, 0x13, result);
+                SceneActorControl_Begin(actor, group->routeChoiceControl, 0x13, 0);
             } else {
-                u32 bits = actor->base.behaviorFlags & 0x10;
-                if (bits)
+                if (actor->base.behaviorFlags & 0x10)
                     SceneActorTerrain_EnterState(actor, 0, 0, 7);
                 else
                     SceneActorTerrain_EnterState(actor, 0, 0, 2);
