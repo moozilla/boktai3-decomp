@@ -1,4 +1,3 @@
-#define gSceneNpcStateCallbacks gUnk_0861265C
 #include "global.h"
 #include "npc/story_character/state_actor.h"
 extern void (*const gUnk_0861265C[])(void);
@@ -7,7 +6,7 @@ s32 Kuro_EnterRequestedState(struct StateActor *p)
 {
     struct StateActorTag *tag = &p->tag;
     s32 result;
-    if ((u8)(p->nextState - 1) <= 0x17) {
+    if (p->nextState >= 1 && p->nextState <= 24) {
         void (*callback)(void) = gUnk_0861265C[p->nextState];
         p->prevState = p->nextState;
         p->stateCallback = callback;
