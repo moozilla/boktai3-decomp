@@ -1791,23 +1791,22 @@ void TetherActor_InitStateParameters(struct TetherActor *p)
 
 void TetherActor_AccumulateCharge(struct TetherActor *p, u32 a)
 {
-    u16 *q = &p->charge;
-    u32 v = *q + a;
-    *q = v;
+    p->charge += a;
     if (p->chargeReady == 0) {
-        if ((u16)v > 0x4B0) {
-            *q = 0x4B0;
+        if (p->charge > 0x4B0) {
+            p->charge = 0x4B0;
             if (p->interactionLock == 0) {
                 if (p->state != 2) {
                     p->chargeReady = 1;
                     p->pendingEffectHandle = ActorAttachment_UpdateFromDescriptor(
-                        p->pendingEffectHandle, &p->bodyConfig, 1, 0, (u32)q, 0x4B0, 0xFA, 0x122);
+                        p->pendingEffectHandle, &p->bodyConfig, 1, 0, (u32)&p->charge, 0x4B0, 0xFA,
+                        0x122);
                 }
             }
         }
     } else {
-        if ((u16)v > 0x4B0)
-            *q = 0x4B0;
+        if (p->charge > 0x4B0)
+            p->charge = 0x4B0;
     }
 }
 

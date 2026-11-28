@@ -113,3 +113,4 @@ src/objects/coffin/tether_actor.c	TetherActor_InitKindFromScript	minor	minor	7	s
 src/objects/coffin/tether_actor.c	TetherActor_InitDisplayFromScript	contrived	natural	4	
 src/objects/coffin/tether_actor.c	TetherActor_InitBodyFromScript	contrived	minor	9	initialConfig/config copy stays: one pointer gives a 3-insn difference after the display-kind branch
 src/objects/coffin/tether_actor.c	TetherActor_InitSecondaryCollider	contrived	natural	1	
+src/objects/coffin/tether_actor.c	TetherActor_AccumulateCharge	minor	natural	1	
