@@ -1,14 +1,10 @@
-#include "global.h"
 #include "system/game_state/game_state.h"
 void ItemDescriptor_Reset(void *);
 void Inventory_GetEquipmentDescriptor(s32, void *);
-void Inventory_GetEquippedDescriptor(u32 i, void *p)
+void Inventory_GetEquippedDescriptor(u32 i, void *descriptor)
 {
-    u8 *g = gGameState;
-    u8 *b = (u8 *)(i * 2 + (u32)g);
-    s16 *q = (s16 *)(b + 0x68);
-    if (*q < 0)
-        ItemDescriptor_Reset(p);
+    if (*(i + gGameState->inventory) < 0)
+        ItemDescriptor_Reset(descriptor);
     else
-        Inventory_GetEquipmentDescriptor(*q, p);
+        Inventory_GetEquipmentDescriptor(*(i + gGameState->inventory), descriptor);
 }

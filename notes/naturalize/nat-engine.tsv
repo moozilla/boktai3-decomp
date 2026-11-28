@@ -575,3 +575,4 @@ src/system/inventory/sub_0822D650.c	sub_0822D650	contrived	natural	1
 src/system/inventory/Inventory_MarkEquipmentObtained.c	Inventory_MarkEquipmentObtained	contrived	natural	1	
 src/system/inventory/Inventory_GetEquipmentCondition.c	Inventory_GetEquipmentCondition	contrived	natural	1	
 src/system/inventory/ItemDescriptor_Reset.c	ItemDescriptor_Reset	contrived	natural	1	
+src/system/inventory/Inventory_GetEquippedDescriptor.c	Inventory_GetEquippedDescriptor	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
