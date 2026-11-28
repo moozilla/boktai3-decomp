@@ -186,3 +186,8 @@ src/ui/title/date_menu.c	DateMenu_HandleClockInput	contrived	natural	1	-
 src/ui/title/date_menu.c	DateMenu_Update	minor	natural	1	-
 src/ui/title/date_menu.c	DateMenu_Destroy	contrived	natural	1	-
 src/ui/title/date_menu.c	DateMenu_Initialize	contrived	natural	1	-
+src/ui/title/date_menu.c	DateMenu_HideAnimations	natural	natural	0	-
+src/ui/title/date_menu.c	DateMenu_InitializeDigitWidgets	natural	natural	0	-
+src/ui/title/date_menu.c	DateMenu_UpdateDigits	natural	natural	0	-
+src/ui/title/date_menu.c	DateMenu_SetParametersFromScript	natural	natural	0	-
+src/ui/title/date_menu.c	DateMenu_Create	natural	natural	0	-
