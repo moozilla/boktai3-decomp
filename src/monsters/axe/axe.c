@@ -2318,9 +2318,8 @@ void ActorPhase_EmitTrailSprite(struct ChaseActor *actor, const struct ContactPo
 
 void Axe_TickAuxiliarySpriteTimers(struct ChaseActor *actor)
 {
-    u8 *q = actor->base.context;
-    u32 *flags = &((struct Axe *)q)->trail[0].sprite.flags;
-    u8 *p = q;
+    u32 *flags = &((struct Axe *)actor->base.context)->trail[0].sprite.flags;
+    u8 *p = actor->base.context;
     u32 off = (u32) & ((struct Axe *)0)->trail[0].lifetime;
     s32 i = 3;
     u32 one = 1;
