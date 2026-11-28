@@ -373,15 +373,9 @@ void CharacterModel_SetAnimationFlags(struct CharacterPreviewModel *model, u32 m
 
 void CharacterModel_ClearAnimationFlags(struct CharacterPreviewModel *model, u32 mask)
 {
-    u32 *flags;
-    s32 partIndex;
-    mask = ~mask;
-    flags = &model->view.parts[0].flags;
-    partIndex = 4;
-    do {
-        *flags &= mask;
-        flags += sizeof(struct ModifierDisplayObject) / sizeof(*flags);
-    } while (--partIndex >= 0);
+    s32 i;
+    for (i = 0; i < 5; i++)
+        model->view.parts[i].flags &= ~mask;
 }
 
 void CharacterModel_SetComponentRenderMode(struct ModifierDisplayObject *parts, u32 mode)
