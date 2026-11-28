@@ -2958,19 +2958,20 @@ s32 TetherActor_InitializeFromScript(struct TetherActor *actor, u32 entry, u32 u
     return 0;
 }
 
-struct TetherActor *TetherActor_CreateFromScript(u32 a, u32 b)
+struct TetherActor *TetherActor_CreateFromScript(u32 entry, u32 unused)
 {
-    struct TetherActor *r;
+    struct TetherActor *actor;
+
     if (gTetherActor != 0)
         return gTetherActor;
-    r = Task_Create(9, sizeof(*r));
-    if (r) {
-        Task_SetCallbacks(r, (void (*)(void *))TetherActor_Tick,
+    actor = Task_Create(9, sizeof(*actor));
+    if (actor) {
+        Task_SetCallbacks(actor, (void (*)(void *))TetherActor_Tick,
                           (void (*)(void *))TetherActor_Destroy);
-        if (TetherActor_InitializeFromScript(r, a, b) < 0) {
-            Task_Kill(r);
+        if (TetherActor_InitializeFromScript(actor, entry, unused) < 0) {
+            Task_Kill(actor);
             return 0;
         }
     }
-    return r;
+    return actor;
 }
