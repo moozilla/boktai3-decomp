@@ -515,3 +515,10 @@ src/player/effects/attack/PlayerAttackEffect_Destroy.c	PlayerAttackEffect_Destro
 src/player/effects/attack/PlayerAttackEffect_Create.c	PlayerAttackEffect_Create	natural	natural	0	-
 src/player/effects/attack/PlayerAttackEffect_AllocateParticle.c	PlayerAttackEffect_AllocateParticle	minor	minor	1	unchanged: pointer-plus-index sprite flag access and parallel state/slot cursors
 src/player/effects/attack/PlayerAttackEffect_EmitPaletteBaseTrail.c	PlayerAttackEffect_EmitPaletteBaseTrail	contrived	minor	16	split shift helpers, offset constant local, temporary angle block
+src/player/effects/attack/PlayerAttackEffect_EmitPaletteZeroTrail.c	PlayerAttackEffect_EmitPaletteZeroTrail	contrived	contrived	2	unchanged: shift12/shift_distance/mask8 helpers (plain forms change register choice)
+src/player/effects/attack/PlayerAttackEffect_EmitPaletteFiveTrail.c	PlayerAttackEffect_EmitPaletteFiveTrail	contrived	contrived	2	unchanged: shift12/shift_distance/mask8 helpers (plain forms change register choice)
+src/player/effects/attack/PlayerAttackEffect_EmitPaletteTwoTrail.c	PlayerAttackEffect_EmitPaletteTwoTrail	contrived	contrived	2	unchanged: shift12/shift_distance/mask8 helpers (plain forms change register choice)
+src/player/effects/attack/PlayerAttackEffect_EmitPaletteThreeTrail.c	PlayerAttackEffect_EmitPaletteThreeTrail	contrived	contrived	2	unchanged: shift12/shift_distance/mask8 helpers (plain forms change register choice)
+src/player/effects/attack/PlayerAttackEffect_EmitPaletteFourTrail.c	PlayerAttackEffect_EmitPaletteFourTrail	contrived	contrived	2	unchanged: shift12/shift_distance/mask8 helpers (plain forms change register choice)
+src/player/effects/attack/PlayerAttackEffect_Initialize.c	PlayerAttackEffect_Initialize	natural	natural	0	-
+src/player/effects/attack/PlayerAttackEffect_UpdateParticles.c	PlayerAttackEffect_UpdateParticles	contrived	contrived	5	unchanged: one constant local, motion pointer, sprite reference wrapper all steer allocation
