@@ -42,14 +42,12 @@ u32 DamageNumberDisplay_GetActiveBit(struct DamageNumberDisplay *display, u32 in
 s32 DamageNumberDisplay_FindSource(struct DamageNumberDisplay *display, u32 key)
 {
     struct DamageNumberGroup *group = display->groups;
-    s32 index = 0;
-    do {
-        if (DamageNumberDisplay_GetActiveBit(display, index) && group->sourceKey == key) {
-            return index;
-        }
-        ++index;
-        ++group;
-    } while (index <= 3);
+    s32 i;
+
+    for (i = 0; i < 4; i++, group++) {
+        if (DamageNumberDisplay_GetActiveBit(display, i) && group->sourceKey == key)
+            return i;
+    }
     return -1;
 }
 
