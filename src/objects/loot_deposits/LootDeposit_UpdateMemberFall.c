@@ -1,34 +1,16 @@
-/* Provisional ActorGroup names: static behavior established; semantic ownership tentative. */
 #include "global.h"
 #include "engine/engine.h"
-#include "engine/math/scene_vec.h"
-struct ActorGroupMember {
-    u8 unk0[0x1C];
-    struct SceneVec position;
-    u8 unk24[0x100 - 0x24];
-    u8 unk100[0x20];
-    s16 motionX, velocity, motionZ;
-    u8 unk126[0x22];
-    u16 ground;
-    u8 unk14A[8];
-    u16 state;
-    u8 unk154[10];
-    u8 started;
-};
-u8 *TerrainModifiers_FindCellOverride(s32, s32);
-void TrapSpellParticles_CreateDefaultBurst(void *, u32, u32, u32, u32, u32, u32, u32, u32, u32,
-                                             u32, u32);
-static inline s32 cellIndex(struct SceneVec *pos)
-{
-    s32 x = pos->x >> 8, z = pos->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        return 0;
-    return gTerrainMap->rows[z] + x;
-}
-static inline s32 groundHeight(struct SceneVec *position)
+#include "engine/ram.h"
+#include "objects/loot_deposits/callback_pool.h"
+#include "scene/motion/scene_actor_terrain.h"
+
+void TrapSpellParticles_CreateDefaultBurst(void *, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32,
+                                           u32);
+
+static inline s32 groundHeight(struct ContactPosition *position)
 {
     s32 x = position->x >> 8, z = position->z >> 8;
-    struct SceneVec *savedPosition = position;
+    struct ContactPosition *savedPosition = position;
     s32 index, height;
     u8 *cell;
     u32 kind;
@@ -58,23 +40,23 @@ static inline void ClearMotion(void *dest)
     u32 zero = 0;
     CpuSet(&zero, dest, 0x05000002);
 }
-void LootDeposit_UpdateMemberFall(void *unused, struct ActorGroupMember *member)
+void LootDeposit_UpdateMemberFall(void *unused, struct CallbackPoolEntry *entry)
 {
     s32 i;
-    if (member->started) {
-        member->ground = groundHeight(&member->position);
-        member->started = 0;
-        ClearMotion(&member->motionX);
+    if (entry->defeated) {
+        entry->ground = groundHeight(&entry->sprite.position);
+        entry->defeated = 0;
+        ClearMotion(&entry->motion);
     } else {
-        member->position.y -= member->velocity;
-        member->velocity += 2;
-        if (member->ground >= member->position.y) {
-            member->position.y = member->ground;
-            member->state = 4;
-            member->started = 1;
+        entry->sprite.position.y -= entry->motion.y;
+        entry->motion.y += 2;
+        if (entry->ground >= entry->sprite.position.y) {
+            entry->sprite.position.y = entry->ground;
+            entry->callbackIndex = 4;
+            entry->defeated = 1;
             for (i = 0; i < 8; i++)
-                TrapSpellParticles_CreateDefaultBurst(&member->position, 8, 16, 4, 12, 18, i << 5,
-                                                        8, 64, 1, 1, 0);
+                TrapSpellParticles_CreateDefaultBurst(&entry->sprite.position, 8, 16, 4, 12, 18,
+                                                      i << 5, 8, 64, 1, 1, 0);
         }
     }
 }

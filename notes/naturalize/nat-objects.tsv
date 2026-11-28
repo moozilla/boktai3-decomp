@@ -485,3 +485,4 @@ src/objects/loot_deposits/LootDeposit_UpdateMemberSway.c	LootDeposit_UpdateMembe
 src/objects/loot_deposits/LootDeposit_UpdateMemberRemoval.c	LootDeposit_UpdateMemberRemoval	contrived	natural	3	
 src/objects/loot_deposits/LootDepositPool_InitManager.c	LootDepositPool_InitManager	contrived	natural	2	
 src/objects/loot_deposits/LootDepositPool_CreateManager.c	LootDepositPool_CreateManager	contrived	natural	2	
+src/objects/loot_deposits/LootDeposit_UpdateMemberFall.c	LootDeposit_UpdateMemberFall	contrived	minor	6	local ground height helper with a position alias: the shared terrain helpers reorder 9 insns
