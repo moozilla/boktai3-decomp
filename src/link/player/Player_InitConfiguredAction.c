@@ -1,6 +1,10 @@
 #include "global.h"
-void Player_InitializeActionState(void *, u32);
-void Player_InitConfiguredAction(u8 *s)
+#include "player/player.h"
+
+void Player_InitializeActionState(struct Player *, const struct PlayerActionConfig *);
+
+void Player_InitConfiguredAction(struct Player *p)
 {
-    Player_InitializeActionState(s, *(u32 *)(s + 0x344) + 0x1c);
+    Player_InitializeActionState(
+        p, (const struct PlayerActionConfig *)((const u8 *)p->actionConfig + 0x1C));
 }

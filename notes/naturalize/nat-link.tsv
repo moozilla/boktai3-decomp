@@ -192,3 +192,4 @@ src/link/player/sub_0823ADB4.c	sub_0823ADB4	contrived	minor	4	two game state cle
 src/link/player/keyframe_actor.c	KeyframeActor_InitKeyframeDisplay	contrived	natural	4	
 src/link/player/keyframe_actor.c	KeyframeActor_InitAuxiliarySprite	contrived	minor	33	zero local and data, sprite and sequence pointers stay: register allocation
 src/link/player/keyframe_actor.c	KeyframeActor_InitBodyFromScript	contrived	natural	22	
+src/link/player/Player_InitConfiguredAction.c	Player_InitConfiguredAction	contrived	minor	1	second config entry is reached by byte offset
