@@ -100,3 +100,4 @@ src/bosses/ratatosk/Ratatosk_ProcessDefeatState.c	Ratatosk_ProcessDefeatState	mi
 src/bosses/ratatosk/SceneActor_UpdateDirectionalTrigger.c	SceneActor_UpdateDirectionalTrigger	contrived	minor	8	second actor alias stays: ROM keeps a second copy of the pointer
 src/bosses/ratatosk/Ratatosk_UpdateDirectionalTrigger.c	Ratatosk_UpdateDirectionalTrigger	contrived	minor	6	second actor alias stays: ROM keeps a second copy of the pointer
 src/bosses/ratatosk/Ratatosk_ApplyQueuedDamage.c	Ratatosk_ApplyQueuedDamage	contrived	contrived	30	unchanged apart from the cast and some alias uses: second actor alias, inline defeat reaction with a changed local (ROM sets 1 before loading the callback), spark loop needs hand-hoisted pointers/masks (plain for loop differs in ~100 insns)
+src/bosses/ratatosk/Ratatosk_PlayAttachmentEffect.c	Ratatosk_PlayAttachmentEffect	contrived	natural	1	

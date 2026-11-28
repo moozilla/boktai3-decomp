@@ -74,7 +74,10 @@ struct Ratatosk {
     s8 savedAngle; /* 0x114 */
     u8 unknown115[3];
     u8 receiver2[0x10]; /* 0x118: StateActor receiver2. */
-    u8 unknown128[0x17C - 0x128];
+    u8 unknown128[0x14C - 0x128];
+    void *attachment; /* 0x14C: Ratatosk_PlayAttachmentEffect. */
+    s16 attachmentParams[2];
+    u8 unknown154[0x17C - 0x154];
     u32 actionCounter; /* 0x17C: frames or events counted by the current action. */
     s32 sequence;      /* 0x180: step of the current action's sequence. */
     u32 sequenceDone;  /* 0x184 */
