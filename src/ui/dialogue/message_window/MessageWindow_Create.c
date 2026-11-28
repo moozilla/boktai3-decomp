@@ -1,23 +1,20 @@
-#include "global.h"
-#include "engine/ram.h"
-void *Task_Create(int, int);
-void Task_SetCallbacks(void *, void *, void *);
-void Task_Kill(void *);
-void MessageWindow_Update(void);
-void MessageWindow_OnDestroy(void);
+#include "ui/dialogue/message_window.h"
+
 int sub_0803198C(void *, void *);
+
 void *MessageWindow_Create(void *config)
 {
-    void *p = gMessageWindow;
-    if (!p) {
-        p = Task_Create(12, 720);
-        if (p) {
-            Task_SetCallbacks(p, MessageWindow_Update, MessageWindow_OnDestroy);
-            if (sub_0803198C(p, config) < 0) {
-                Task_Kill(p);
+    struct MessageWindow *window = (void *)gMessageWindow;
+
+    if (!window) {
+        window = Task_Create(12, sizeof(struct MessageWindow));
+        if (window) {
+            Task_SetCallbacks(window, MessageWindow_Update, MessageWindow_OnDestroy);
+            if (sub_0803198C(window, config) < 0) {
+                Task_Kill(window);
                 return 0;
             }
         }
     }
-    return p;
+    return window;
 }
