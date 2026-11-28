@@ -34,3 +34,4 @@ src/objects/bouncing_bombs/BouncingBomb_Allocate.c	BouncingBomb_Allocate	minor	n
 src/objects/bouncing_bombs/BouncingBomb_UpdatePool.c	BouncingBomb_UpdatePool	contrived	minor	12	mask = 4 local kept: the ROM loads the mask before the flag word
 src/objects/bouncing_bombs/BouncingBomb_DestroyPool.c	BouncingBomb_DestroyPool	contrived	natural	1	
 src/objects/bouncing_bombs/BouncingBomb_GetNearbyHeading.c	BouncingBomb_GetNearbyHeading	contrived	natural	15	
+src/objects/bouncing_bombs/BouncingBomb_ApplyContactImpulse.c	BouncingBomb_ApplyContactImpulse	contrived	minor	8	out/from pointer locals: ROM forms the output and subtrahend addresses first

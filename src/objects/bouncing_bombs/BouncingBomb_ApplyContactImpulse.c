@@ -1,4 +1,5 @@
 #include "objects/bouncing_bombs/bouncing_object.h"
+#include "scene/motion/scene_actor_terrain.h"
 static inline s32 Truncate(s32 product)
 {
     if (product >= 0)
@@ -12,23 +13,20 @@ static inline void Vector(struct ContactPosition *result, s32 angle, s32 magnitu
     result->z = Truncate(gUnk_086149C4[angle & 255] * magnitude);
 }
 void BouncingBomb_ApplyContactImpulse(struct BouncingContact *a, struct BouncingContact *b,
-                                        struct BouncingObject *object)
+                                      struct BouncingObject *object)
 {
-    struct ContactPosition difference;
-    struct ContactPosition *delta = &difference;
+    struct ContactPosition delta;
     struct ContactPosition impulse;
+    struct ContactPosition *out;
+    const struct ContactPosition *from;
     s32 angle;
-    {
-        const struct ContactPosition *right = &b->position;
-        const struct ContactPosition *left;
-        left = &a->position;
-        difference.x = a->position.x - b->position.x;
-        delta->y = left->y - right->y;
-        delta->z = left->z - right->z;
-    }
-    angle = Math_Atan2(difference.x, delta->z);
+
+    out = &delta;
+    from = &b->position;
+    SceneActorTerrain_Subtract(out, &a->position, from);
+    angle = Math_Atan2(delta.x, delta.z);
     angle = (((angle + 16) & 255) >> 5) << 5;
-    if ((s32)((u32)(u16)delta->y << 16) > 0) {
+    if (delta.y > 0) {
         Vector(&impulse, angle, 4);
         impulse.y = -4;
         object->velocity.x = impulse.x;
