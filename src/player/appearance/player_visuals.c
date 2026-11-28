@@ -228,33 +228,21 @@ void Player_UpdateAlternateVisualPalette(struct Player *p, u32 requestedMode)
     if (p->visualEffectMode == 1) {
         p->actionRequestTimer = 0;
         if (p->actionEighteenDuration > 31) {
-            {
-                const u16 *source =
-                    (const u16 *)(gPaletteBankData + p->actionEighteenParameter * 32);
-                u16 *destination, *base;
-                s32 i;
-                if (!p->unk419) {
-                    u16 **palette;
-                    i = 0;
-                    palette = &p->animation.palette;
-                    destination = p->workPalette;
-                    base = p->basePalette;
-                    for (; i < 16; i++) {
-                        if ((u32)(i - 5) <= 1 || i == 13)
-                            *destination = *base;
-                        else
-                            *destination = *source;
-                        source++;
-                        destination++;
-                        base++;
-                    }
-                    *palette = p->workPalette;
-                } else {
-                    destination = p->workPalette;
-                    for (i = 15; i >= 0; i--)
-                        *destination++ = *source++;
-                    p->visualObject->parameters = (u32)p->workPalette;
+            const u16 *source = (const u16 *)(gPaletteBankData + p->actionEighteenParameter * 32);
+            s32 i;
+            if (!p->unk419) {
+                for (i = 0; i < 16; i++) {
+                    if (i == 5 || i == 6 || i == 13)
+                        p->workPalette[i] = p->basePalette[i];
+                    else
+                        p->workPalette[i] = *source;
+                    source++;
                 }
+                p->animation.palette = p->workPalette;
+            } else {
+                for (i = 0; i < 16; i++)
+                    p->workPalette[i] = *source++;
+                p->visualObject->parameters = (u32)p->workPalette;
             }
         } else {
             const u16 *source = (const u16 *)(gPaletteBankData + p->actionEighteenParameter * 32);
@@ -273,33 +261,21 @@ void Player_UpdateAlternateVisualPalette(struct Player *p, u32 requestedMode)
     } else if (p->actionEighteenDuration) {
         p->actionRequestTimer = 0;
         if (p->actionEighteenDuration > 31) {
-            {
-                const u16 *source =
-                    (const u16 *)(gPaletteBankData + p->actionEighteenParameter * 32);
-                u16 *destination, *base;
-                s32 i;
-                if (!p->unk419) {
-                    u16 **palette;
-                    i = 0;
-                    palette = &p->animation.palette;
-                    destination = p->workPalette;
-                    base = p->basePalette;
-                    for (; i < 16; i++) {
-                        if ((u32)(i - 5) <= 1 || i == 13)
-                            *destination = *base;
-                        else
-                            *destination = *source;
-                        source++;
-                        destination++;
-                        base++;
-                    }
-                    *palette = p->workPalette;
-                } else {
-                    destination = p->workPalette;
-                    for (i = 15; i >= 0; i--)
-                        *destination++ = *source++;
-                    p->visualObject->parameters = (u32)p->workPalette;
+            const u16 *source = (const u16 *)(gPaletteBankData + p->actionEighteenParameter * 32);
+            s32 i;
+            if (!p->unk419) {
+                for (i = 0; i < 16; i++) {
+                    if (i == 5 || i == 6 || i == 13)
+                        p->workPalette[i] = p->basePalette[i];
+                    else
+                        p->workPalette[i] = *source;
+                    source++;
                 }
+                p->animation.palette = p->workPalette;
+            } else {
+                for (i = 0; i < 16; i++)
+                    p->workPalette[i] = *source++;
+                p->visualObject->parameters = (u32)p->workPalette;
             }
         } else {
             const u16 *source = (const u16 *)(gPaletteBankData + p->actionEighteenParameter * 32);
