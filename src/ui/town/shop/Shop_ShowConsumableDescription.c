@@ -3,15 +3,9 @@ void Shop_ShowConsumableDescription(struct ShopPanel *panel)
 {
     s32 item;
     if (panel->selection <= 15) {
-        item = ((struct GameState *)((u8 *)gGameState + panel->selection * 2))->table160[0];
+        item = *(panel->selection + gGameState->table160);
     } else if (panel->selection <= 23) {
-        s32 offset = panel->page * 8;
-        offset -= 16;
-        {
-            u32 selected = panel->selection;
-            offset += selected;
-        }
-        item = panel->catalog[offset];
+        item = panel->catalog[panel->selection - 16 + panel->page * 8];
     } else
         item = -1;
     if (item < 0) {
@@ -28,10 +22,8 @@ void Shop_ShowConsumableDescription(struct ShopPanel *panel)
         MessageWindow_SetDisplayMode(1);
         MessageWindow_ShowMessage(item);
         {
-            s32 text = Script_ParseStringRef(panel->consumableText);
-            text += 48;
-            text += item;
-            ScrollingDialogue_SetScript(Text_LookupString(text));
+            s32 text = Script_ParseStringRef(panel->consumableText) + 48;
+            ScrollingDialogue_SetScript(Text_LookupString(text + item));
         }
     }
     SceneInputPanel_ShowItemComparison(panel->comparison[0], panel->comparison[1],
