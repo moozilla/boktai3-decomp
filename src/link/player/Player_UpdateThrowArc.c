@@ -8,10 +8,6 @@ void Collider_SetPosition(void *, void *, u32);
 s32 Collider_Refresh(void *);
 void Player_EmitScatterEffect(struct Player *, struct SceneVec *, u32, u32, s32);
 
-struct Vec16 {
-    u32 x : 16, y : 16, z : 16;
-};
-
 static inline s32 scale(s32 product)
 {
     return product >= 0 ? product >> 12 : -((-product) >> 12);
@@ -41,25 +37,23 @@ s32 Player_UpdateThrowArc(struct Player *p)
             Player_EmitScatterEffect(p, &q->contactDestination, angle, q->contactHeading,
                                      q->savedActionIndex);
         if (q->contactTimer > q->windupFrames + q->swingFrames - 2) {
-            struct Vec16 pos;
+            struct SceneVec pos;
             s32 radius = 0xAA;
             pos.x =
                 q->contactOrigin.x + scale(gUnk_086149C4[(q->contactHeading + 64) & 255] * radius);
             pos.y = (q->windupFrames + q->swingFrames - q->contactTimer + 1) * 90 +
                     q->contactOrigin.y - 0x104;
             pos.z = q->contactOrigin.z + scale(gUnk_086149C4[q->contactHeading] * radius);
-            if (q->savedActionIndex >= 0) {
+            if (q->savedActionIndex >= 0)
                 Player_AddStatusFlags(p, 0x80000);
-            }
             Collider_SetPosition(&p->statModifierContext.attackCollider, &pos, 0);
             Collider_Refresh(&q->attackCollider);
         }
         return 0;
     }
     if (q->contactTimer <= q->windupFrames + q->swingFrames + q->holdFrames) {
-        if (q->savedActionIndex >= 0) {
+        if (q->savedActionIndex >= 0)
             Player_AddStatusFlags(p, 0x80000);
-        }
         Collider_Refresh(&p->statModifierContext.attackCollider);
         return 0;
     }
