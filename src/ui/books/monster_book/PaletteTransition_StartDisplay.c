@@ -33,17 +33,17 @@ s32 PaletteTransition_StartDisplay(struct PaletteTransition *p, int index)
 {
     void *anim = p->anim;
     struct PaletteDisplayEntry *e = &gUnk_086126E0[index];
-    u16 t = p->timer;
-    if (t == 0) {
+    if (p->timer == 0) {
         s32 x = e->offsetX;
         s32 y = e->offsetY;
         u16 *origin = p->origin;
+
         x += 0x40;
         y += 0x54;
         origin[0] = x;
         origin[1] = y;
-        origin[2] = t;
-        origin[3] = t;
+        origin[2] = 0;
+        origin[3] = 0;
     }
     if (e->kind == 2) {
         if (DisplayAnimation_InitializeKeyframes(anim, e->id, 0x10, p->origin) < 0)
