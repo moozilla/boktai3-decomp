@@ -21,13 +21,13 @@ void MessageQueue_InitBuffers(void)
 
 void MessageQueue_SwapBuffers(void)
 {
-    struct MessageQueueBuffer *b = MessageQueue_GetBuffers();
+    struct MessageQueueBuffer *buffers = MessageQueue_GetBuffers();
     if (gEnginePauseFlags == 0) {
-        struct MessageQueueBuffer *e;
+        struct MessageQueueBuffer *buffer;
         gMessageQueueBufferIndex ^= 1;
-        e = (struct MessageQueueBuffer *)((u8 *)b + gMessageQueueBufferIndex * sizeof(*b));
-        e->count = 0;
-        e->used = 0;
+        buffer = &buffers[gMessageQueueBufferIndex];
+        buffer->count = 0;
+        buffer->used = 0;
     }
 }
 

@@ -29,3 +29,11 @@ src/engine/task_scheduler.c	Task_Kill	natural	natural	0
 src/engine/task_scheduler.c	Task_TryDestroy	natural	natural	0	
 src/engine/resource_registry.c	ResourceRegistry_ClearEntries	minor	natural	2	
 src/engine/resource_registry.c	ResourceRegistry_RegisterResource	contrived	natural	7	
+src/engine/resource_registry.c	ResourceRegistry_AllocateEntry	contrived	contrived	20	two do/while(0) stay: without them global alloc gives r2 to i (entry's constant first set doubles its live length)
+src/engine/resource_registry.c	ResourceRegistry_FindEntry	natural	natural	0	
+src/engine/resource_registry.c	ResourceRegistry_Initialize	natural	natural	0	
+src/engine/resource_registry.c	ResourceRegistry_UnregisterResource	natural	natural	0	
+src/engine/resource_registry.c	ResourceRegistry_GetResource	natural	natural	0	
+src/engine/message_queue.c	MessageQueue_GetBuffers	natural	natural	0	
+src/engine/message_queue.c	MessageQueue_InitBuffers	natural	natural	0	
+src/engine/message_queue.c	MessageQueue_SwapBuffers	contrived	natural	3	
