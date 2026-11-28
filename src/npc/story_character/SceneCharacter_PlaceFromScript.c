@@ -3,6 +3,7 @@
 #include "engine/ram.h"
 #include "engine/task_manager.h"
 #include "scene/collision/packed_contact_vector.h"
+#include "scene/motion/scene_facing.h"
 s32 SceneCharacter_GetModelId(s32);
 s32 SceneCharacter_GetPaletteIndex(s32);
 s32 SceneCharacter_GetResourceVariant(s32);
@@ -135,25 +136,8 @@ void SceneCharacter_PlaceFromScript(void)
     Actor_InitShadow(npc, (u32)npc->display.position, 1, 0, 0x40);
     SceneCharacter_RegisterMessageReceiver(npc, name);
     npc->body.direction = angle;
-    {
-        u16 a = angle;
-        {
-            s32 t;
-            u32 m;
-            t = a + 0x70;
-            t >>= 5;
-            m = 7;
-            m &= t;
-            npc->facing8 = m;
-        }
-        {
-            s32 t = (a + 0x60) >> 6;
-            u32 m;
-            m = 3;
-            m &= t;
-            npc->facing4 = m;
-        }
-    }
+    npc->facing8 = SceneFacing_EightWay(angle);
+    npc->facing4 = SceneFacing_FourWay(angle);
     Task_SetManager(SceneCharacter_OnStateChange, &npc->callbacks[5]);
     Task_SetManager(SceneNpc_UpdateCommands, &npc->callbacks[0]);
     Task_SetManager(SceneCharacter_OnCommandUpdate, &npc->callbacks[1]);
