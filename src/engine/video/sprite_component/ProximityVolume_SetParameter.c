@@ -1,10 +1,8 @@
 #include "global.h"
-struct ProximityVolume {
-    u8 unknown0[0x3A];
-    u16 parameter;
-};
-void ProximityVolume_SetParameter(struct ProximityVolume *volume, u32 parameter)
+#include "engine/video/proximity_volume.h"
+
+void ProximityVolume_SetParameter(struct ProximityVolume *volume, u32 damage)
 {
     if (volume)
-        volume->parameter = parameter;
+        volume->damage = damage;
 }

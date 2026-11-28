@@ -397,3 +397,4 @@ src/engine/video/sprite_component/ProximityVolume_ContainsPlayer.c	ProximityVolu
 src/engine/video/sprite_component/ProximityVolume_DispatchUpdate.c	ProximityVolume_DispatchUpdate	minor	natural	1	
 src/engine/video/sprite_component/ProximityVolume_SetPosition.c	ProximityVolume_SetPosition	minor	natural	1	
 src/engine/video/sprite_component/ProximityVolume_ClearLatch.c	ProximityVolume_ClearLatch	natural	natural	1	
+src/engine/video/sprite_component/ProximityVolume_SetParameter.c	ProximityVolume_SetParameter	natural	natural	1	
