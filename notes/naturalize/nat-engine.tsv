@@ -65,3 +65,4 @@ src/engine/math/ScalarApproach_EighthArray.c	ScalarApproach_EighthArray	minor	na
 src/engine/math/ScalarApproach_SixteenthArray.c	ScalarApproach_SixteenthArray	minor	natural	1	
 src/engine/math/ScalarApproach_UnwrapAngleArray.c	ScalarApproach_UnwrapAngleArray	minor	natural	1	
 src/engine/math/sub_08221D04.c	sub_08221D04	minor	natural	1	
+src/engine/math/sub_08221FEC.c	sub_08221FEC	minor	natural	1	

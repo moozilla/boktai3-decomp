@@ -1,11 +1,12 @@
 #include "engine/math/scalar_approach.h"
 void sub_08221FEC(s16 *values, const s16 *targets, s32 count, s32 step)
 {
-    s16 *v = values;
-    const s16 *t = targets;
+    s16 *value = values;
+    const s16 *target = targets;
+
     while (--count >= 0) {
-        *v = ScalarApproach_Step(ScalarApproach_Unwrap(*v, *t), *t, step);
-        v++;
-        t++;
+        *value = ScalarApproach_Step(ScalarApproach_Unwrap(*value, *target), *target, step);
+        value++;
+        target++;
     }
 }
