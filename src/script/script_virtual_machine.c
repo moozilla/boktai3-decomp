@@ -38,7 +38,6 @@ u8 *Script_LookupResource(u8 *base, u32 unused, u16 key, u16 context)
 u32 Script_LookupArchive(u32 key, struct ScriptArchiveEntry *tbl, s32 lo, s32 hi)
 {
     s32 mid;
-    struct ScriptArchiveEntry *e;
     while (lo < hi) {
         mid = (lo + hi) >> 1;
         if (tbl[mid].key < key)
@@ -46,9 +45,8 @@ u32 Script_LookupArchive(u32 key, struct ScriptArchiveEntry *tbl, s32 lo, s32 hi
         else
             hi = mid;
     }
-    e = (struct ScriptArchiveEntry *)((lo << 3) + (u32)tbl);
-    if (e->key == key)
-        return e->value;
+    if (tbl[lo].key == key)
+        return tbl[lo].value;
     return 0;
 }
 
@@ -449,14 +447,12 @@ s32 Script_GetValue(void)
 
 /* Script_GetVector32: Reads a three component thirty two bit vector from the current script PC */
 
-
 s32 Script_GetVector32(void *p)
 {
     return Script_ReadVector32(Script_GetPc(), p);
 }
 
 /* Script_GetVector: Decodes three operands at the current script cursor into a signed 16-bit vector */
-
 
 s32 Script_GetVector(void *p)
 {
@@ -476,7 +472,6 @@ u32 Script_GetValueSafe(void)
 }
 
 /* Script_GetStringRef: Parses a string reference at the current script cursor and advances it */
-
 
 s32 Script_GetStringRef(void)
 {
@@ -672,14 +667,12 @@ s32 Script_LoadScript(u8 *p)
 
 /* Script_GetSectionThreeData: Returns data after the fourth resolved section pointer's header with section purpose tentative */
 
-
 u8 *Script_GetSectionThreeData(void)
 {
     return gScriptSectionBases[3] + 4;
 }
 
 /* Script_SaveContext: Copies the loaded script context and section pointers into caller storage */
-
 
 struct Block0821AEDC {
     u32 w[4];
@@ -692,7 +685,6 @@ void Script_SaveContext(struct Block0821AEDC *dst)
 }
 
 /* Script_RestoreContext: Restores the loaded script context and section pointers from caller storage */
-
 
 struct Block0821AF04 {
     u32 w[4];
