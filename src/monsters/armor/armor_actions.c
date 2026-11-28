@@ -168,17 +168,14 @@ void Armor_SpawnPairedProjectiles(struct ArmorProjectileActor *p)
     u16 pos[3];
     u16 *out = pos;
     u16 *base = p->position;
-    s32 offsetBytes = direction << 3;
     for (; i < 2; i++) {
         const struct ArmorProjectileActorProjectileOffset *offset =
-            (const struct ArmorProjectileActorProjectileOffset *)((const u8 *)gUnk_0824EFDC +
-                                                                  offsetBytes);
+            &((const struct ArmorProjectileActorProjectileOffset *)gUnk_0824EFDC)[direction + i];
         out[0] = base[0] + offset->x;
         out[1] = base[1] + offset->y;
         out[2] = base[2] + offset->z;
         ActorEffect_Spawn(pos, owner + 0x30, p->projectileParam, 20, 0x40000, 30, 20, 120, 240,
                           ((i << 6) + p->direction - 32) & 255);
-        offsetBytes += 8;
     }
 }
 
