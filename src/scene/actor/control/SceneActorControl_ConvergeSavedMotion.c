@@ -41,27 +41,17 @@ void SceneActorControl_ConvergeSavedMotion(struct ChaseActor *actor)
             u16 *flags = &actor->base.motionFlags;
             *flags = mask | *flags;
         }
-        SceneActorAnimation_SelectDirectionalEntry((void *)actor, 3);
+        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)actor, 3);
         {
             struct ContactCollider *collider = &actor->base.colliderB;
             collider->flags |= 4;
         }
     }
     WordFlags_Set(0x100000, &actor->base.statusFlags);
-    {
-        s32 current = actor->base.reactionStart.x;
-        s16 *field = &actor->base.reactionEnd.x;
-        s32 difference = current - *field;
-        priorX = field;
-        x = SceneActorDisplacement_Quarter(difference);
-    }
-    {
-        s32 current = actor->base.reactionStart.z;
-        s16 *field = &actor->base.reactionEnd.z;
-        s32 difference = current - *field;
-        priorZ = field;
-        z = SceneActorDisplacement_Quarter(difference);
-    }
+    x = SceneActorDisplacement_ReadAxis(actor->base.reactionStart.x, &actor->base.reactionEnd.x,
+                                        &priorX);
+    z = SceneActorDisplacement_ReadAxis(actor->base.reactionStart.z, &actor->base.reactionEnd.z,
+                                        &priorZ);
     x = Clamp(x);
     z = Clamp(z);
     actor->base.body.motion.x += x;
@@ -86,7 +76,8 @@ void SceneActorControl_ConvergeSavedMotion(struct ChaseActor *actor)
         tracked = SceneActorChase_TrackingFlags(tracking, 8);
         if (tracked) {
             SceneActorReaction_EnableMotionFlags(0x100, flags);
-            SceneActorControl_StartPositionCurve(actor, (const struct ContactPosition *)&gPlayers[0]->position);
+            SceneActorControl_StartPositionCurve(
+                actor, (const struct ContactPosition *)&gPlayers[0]->position);
             SceneActorTerrain_EnterState(actor, 0, 2, 0);
             SceneActorControl_ResetCollisionPhase(actor);
         } else {
