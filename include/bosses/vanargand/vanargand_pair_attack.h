@@ -32,7 +32,8 @@ struct VanargandPairAttack {
     u8 pad0[0x48];
     u32 bodyHeader[3]; /* SceneBody header preceding the world position. */
     struct SceneVec position;
-    u8 pad5C[0x90 - 0x5C];
+    struct SceneVec velocity; /* 0x5C */
+    u8 pad64[0x90 - 0x64];
     u32 callbackFrame; /* 0x90: StateActor callbackFrame. */
     s16 health;
     u8 pad96[6];
