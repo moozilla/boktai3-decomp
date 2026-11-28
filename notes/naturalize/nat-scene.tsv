@@ -51,3 +51,15 @@ src/scene/actor/actor_pool/pooled_actor_helpers.c	Actor_SetActionParameters	mino
 src/scene/actor/actor_pool/pooled_actor_helpers.c	Actor_StepFacingAngle	contrived	natural	4	
 src/scene/actor/actor_pool/pooled_actor_helpers.c	Actor_FindTargetInFacingArc	contrived	natural	8	
 src/scene/actor/actor_pool/pooled_actor_helpers.c	Actor_RefreshTarget	contrived	natural	4	
+src/scene/actor/actor_pool/pooled_actor_helpers.c	Actor_RequestRemoval	natural	natural	0	
+src/scene/actor/actor_pool/pooled_actor_helpers.c	Actor_InitEntity	natural	natural	0	
+src/scene/actor/actor_pool/pooled_actor_helpers.c	Actor_SetFacingAngle	natural	natural	0	
+src/scene/actor/actor_pool/pooled_actor_helpers.c	Actor_SetLifecycleCallbacks	natural	natural	0	
+src/scene/actor/actor_pool/pooled_actor_helpers.c	Actor_SetHealthLimits	natural	natural	0	
+src/scene/actor/actor_pool/pooled_actor_helpers.c	Actor_SetHealth	natural	natural	0	
+src/scene/actor/actor_pool/pooled_actor_helpers.c	Actor_SubtractHealth	natural	natural	0	
+src/scene/actor/actor_pool/pooled_actor_helpers.c	Actor_ClearPendingHit	natural	natural	0	
+src/scene/actor/actor_pool/pooled_actor_helpers.c	Actor_GetPartyTarget	natural	natural	0	
+src/scene/actor/actor_pool/pooled_actor_helpers.c	Actor_InitHitSensor	minor	minor	0	PooledActor_SetFlags accessor (shared header)
+src/scene/actor/actor_pool/pooled_actor_helpers.c	Actor_InitBodyCollider	minor	minor	0	PooledActor_SetFlags accessor (shared header)
+src/scene/actor/actor_pool/pooled_actor_helpers.c	Actor_UpdateSelectedTarget	minor	minor	0	selected flag materialized in the ROM (inline bool in the original); direct comparison loses it
