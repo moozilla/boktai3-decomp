@@ -594,3 +594,4 @@ src/system/inventory/Inventory_SortEquipment.c	Inventory_SortEquipment	minor	nat
 src/system/inventory/GameState_ApplySelectedItem.c	GameState_ApplySelectedItem	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
 src/system/inventory/ItemRecord_MeetsLevelRequirement.c	ItemRecord_MeetsLevelRequirement	contrived	natural	1	
 src/system/inventory/Inventory_AddAssignedSlot.c	Inventory_AddAssignedSlot	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
+src/system/inventory/Inventory_RemoveAssignedSlot.c	Inventory_RemoveAssignedSlot	contrived	minor	1	array indexed as *(i + field) for the index-first address sum; selected slot read as signed through a cast
