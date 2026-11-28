@@ -859,7 +859,7 @@ s32 Trigger_CreateContainerFromScript(void)
     s32 arguments[3];
     struct SceneVec position;
     s32 flip, id, kind, startScript, script, bob, sound, hidden, condition;
-    s32 *out, count;
+    s32 i;
     if (Script_SeekToKeyword('s')) {
         position.x = Script_GetValue();
         position.y = Script_GetValue();
@@ -883,15 +883,11 @@ s32 Trigger_CreateContainerFromScript(void)
     sound = Script_GetKeywordValue('M', 0);
     hidden = Script_GetKeywordValue('S', 0);
     condition = Script_GetKeywordValue('c', 0);
-    for (count = 0; count < 3; count++)
-        arguments[count] = 0;
+    for (i = 0; i < 3; i++)
+        arguments[i] = 0;
     if (Script_SeekToKeyword('a')) {
-        count = 0;
-        out = arguments;
-        while (Script_GetPc() && count < 3) {
-            *out++ = Script_GetValue();
-            count++;
-        }
+        for (i = 0; Script_GetPc() && i < 3; i++)
+            arguments[i] = Script_GetValue();
     }
     return Trigger_CreateContainer(&position, id, kind, flip, bob, startScript, script, arguments,
                                    sound, hidden, condition);
