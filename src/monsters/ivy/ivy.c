@@ -1007,8 +1007,7 @@ void Ivy_UpdateDefeat(struct ChaseActor *actor, s32 frame)
 
 s32 Ivy_SetAuxiliaryColliderFlag(struct ChaseActor *actor)
 {
-    struct ContactCollider *collider = &actor->base.colliderB;
-    collider->flags = 4 | collider->flags;
+    ContactCollider_SetFlags(&actor->base.colliderB, 4);
     return 1;
 }
 
