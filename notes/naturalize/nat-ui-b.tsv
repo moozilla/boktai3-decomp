@@ -585,3 +585,4 @@ src/ui/town/storage/Storage_RefreshSelectedItemDetails.c	Storage_RefreshSelected
 src/ui/town/storage/Storage_SortSelectedCategory.c	Storage_SortSelectedCategory	minor	minor	1	sort order read from slots[16]
 src/ui/town/storage/Storage_BeginSelectedItemTransition.c	Storage_BeginSelectedItemTransition	contrived	natural	1	
 src/ui/town/storage/Storage_BeginCategoryBrowse.c	Storage_BeginCategoryBrowse	minor	natural	2	
+src/ui/town/storage/Storage_UpdateItemTransition.c	Storage_UpdateItemTransition	contrived	natural	1	

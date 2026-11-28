@@ -1,11 +1,11 @@
 #include "global.h"
-s32 SceneInput_TickPairTransition(u8 *);
-void sub_081BECF0(u8 *);
-void Storage_BeginCategoryBrowse(u8 *);
-void Storage_UpdateItemTransition(u8 *p)
+#include "ui/town/storage_screen.h"
+void sub_081BECF0(struct StorageScreen *);
+void Storage_BeginCategoryBrowse(struct StorageScreen *);
+void Storage_UpdateItemTransition(struct StorageScreen *screen)
 {
-    if (SceneInput_TickPairTransition(p + 0x1558)) {
-        sub_081BECF0(p);
-        Storage_BeginCategoryBrowse(p);
+    if (SceneInput_TickPairTransition(&screen->markers)) {
+        sub_081BECF0(screen);
+        Storage_BeginCategoryBrowse(screen);
     }
 }
