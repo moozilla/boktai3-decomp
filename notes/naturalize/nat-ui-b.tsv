@@ -17,3 +17,4 @@ src/ui/results/stage_results/StageResults_LoadBackgroundResources.c	StageResults
 src/ui/results/stage_results/StageResults_CreateTextWindows.c	StageResults_CreateTextWindows	minor	natural	1	
 src/ui/results/stage_results/StageResults_ShowSummaryText.c	StageResults_ShowSummaryText	natural	natural	1	
 src/ui/results/stage_results/StageResults_DestroyTextWindows.c	StageResults_DestroyTextWindows	natural	natural	1	
+src/ui/results/stage_results/StageResults_InitAnimationIds.c	StageResults_InitAnimationIds	minor	natural	1	
