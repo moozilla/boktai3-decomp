@@ -242,19 +242,16 @@ void TownMap_CreateSelectionCursor(struct RegistryChoiceMenu *menu, s32 selectio
 s32 TownMap_InitFromScript(struct RegistryChoiceMenu *menu, void *arg)
 {
     s32 i;
-    s32 *entry;
+
     Video_SetRenderCallbacks(0, SpriteOam_QueueProjectedSprites, Sprite_RenderScaledList,
                              sub_08219624);
     TownMap_InitBackground(menu);
     TownMap_InitAnimations(menu);
     if (Script_SeekToKeyword('p')) {
-        entry = menu->entryScripts;
-        i = 10;
-        do {
-            *entry++ = Script_GetValue();
-        } while (--i >= 0);
+        for (i = 0; i < 11; i++)
+            menu->entryScripts[i] = Script_GetValue();
     } else {
-        for (i = 0; i <= 10; i++)
+        for (i = 0; i < 11; i++)
             menu->entryScripts[i] = 0;
     }
     if (Script_SeekToKeyword('P'))

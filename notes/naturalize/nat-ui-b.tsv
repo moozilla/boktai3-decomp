@@ -410,3 +410,4 @@ src/ui/town/town_map.c	TownMap_StartClosingFade	natural	natural	0
 src/ui/town/town_map.c	TownMap_OnUpdate	natural	natural	0	
 src/ui/town/town_map.c	TownMap_OnDestroy	contrived	natural	1	
 src/ui/town/town_map.c	TownMap_CreateSelectionCursor	minor	natural	1	
+src/ui/town/town_map.c	TownMap_InitFromScript	contrived	natural	1	
