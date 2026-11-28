@@ -71,3 +71,4 @@ src/effects/contact_impact.c	ContactImpactEffect_UpdateShakingPosition	contrived
 src/effects/contact_impact.c	ContactImpactEffect_UpdateInterpolatedPosition	contrived	natural	1	-
 src/effects/contact_impact.c	ContactImpactEffect_UpdateContact	contrived	natural	1	u8 * cast for MotionTrack_Update
 src/effects/contact_impact.c	ContactImpactEffect_UpdateBlinkFrame	contrived	minor	9	SetFrame setter with the current state as the frame number
+src/effects/contact_impact.c	PopInSprite_CreateHidden	contrived	minor	3	motion pointer for the four reset stores

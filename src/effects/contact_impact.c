@@ -389,27 +389,27 @@ void PopInSprite_OnTaskDestroy(void *arg)
     gRegistryF3E4Actor = 0;
 }
 
-struct ContactImpactEffect *PopInSprite_CreateHidden(s32 field3B, s32 mode)
+struct ContactImpactEffect *PopInSprite_CreateHidden(s32 priority, s32 coordinateMode)
 {
-    struct ContactImpactEffect *p = Task_Create(0xA, 0xFC);
-    if (p)
-        Task_SetCallbacks(p, PopInSprite_OnTaskUpdate, PopInSprite_OnTaskDestroy);
-    p->coordinateMode = mode;
-    AnimData_Load(p->animation, 0x3641);
-    Sprite_Init(&p->sprite, p->animation, 0x12);
-    p->sprite.priority = field3B;
-    ZeroFill8(&p->sprite.position);
-    p->blinkTimer = 0;
-    p->blinkState = 0;
-    {
-        struct OrbitMotion *in = &p->motion;
-        in->position = 0;
-        in->state = 0;
-        in->mode = 0;
-        in->timer = 0;
-    }
-    PopInSprite_SetHidden(p);
-    return p;
+    struct ContactImpactEffect *effect = Task_Create(0xA, 0xFC);
+    struct OrbitMotion *motion;
+
+    if (effect)
+        Task_SetCallbacks(effect, PopInSprite_OnTaskUpdate, PopInSprite_OnTaskDestroy);
+    effect->coordinateMode = coordinateMode;
+    AnimData_Load(effect->animation, 0x3641);
+    Sprite_Init(&effect->sprite, effect->animation, 0x12);
+    effect->sprite.priority = priority;
+    ZeroFill8(&effect->sprite.position);
+    effect->blinkTimer = 0;
+    effect->blinkState = 0;
+    motion = &effect->motion;
+    motion->position = 0;
+    motion->state = 0;
+    motion->mode = 0;
+    motion->timer = 0;
+    PopInSprite_SetHidden(effect);
+    return effect;
 }
 
 void PopInSprite_Show(void)
