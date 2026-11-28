@@ -28,7 +28,7 @@ void Hud_SetupBackgroundLayer(s32 unused, void *map, s32 offset, s32 format, con
     Bg_SetupLayers(0, (s16)offset, map, 0, 0, 1, &initialScroll);
     Bg_SetLayerMap(0, map, format);
     BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0);
-    CpuSet(palette, (void *)0x03005160, 0x04000018);
+    CpuCopy32(palette, (void *)0x03005160, 0x60);
 }
 
 u16 *Hud_GetTilemapCell(s32 layer, u32 x, u32 y)
