@@ -1,19 +1,20 @@
 #include "global.h"
-void Script_WriteReferenceValue(u8 *, s32, u32);
-/* Write saved values back through the descriptors written by SavedVariables_CaptureVariableValues. */
-s32 SavedVariables_RestoreVariableValues(u32 *save)
+#include "system/save/saved_variables.h"
+/* Write saved values back through the references read by SavedVariables_CaptureVariableValues. */
+s32 SavedVariables_RestoreVariableValues(struct SavedVariables *save)
 {
-    u8 *desc = (u8 *)(save + 1);
-    u32 *value = (u32 *)((u8 *)save + 0x1004);
-    u32 n = 0;
-    while (n < *save) {
-        s32 i = 0;
-        u8 *next = desc + 8;
-        for (; i < *(u16 *)(desc + 4) && n < *save; i++) {
-            Script_WriteReferenceValue(desc, i, *value++);
-            n++;
+    struct ScriptUtilityReference *reference = save->references;
+    u32 *value = save->values;
+    u32 restored = 0;
+
+    while (restored < save->count) {
+        s32 i;
+
+        for (i = 0; i < reference->count && restored < save->count; i++) {
+            Script_WriteReferenceValue(reference, i, *value++);
+            restored++;
         }
-        desc = next;
+        reference++;
     }
     return 0;
 }
