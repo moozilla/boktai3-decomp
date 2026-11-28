@@ -152,3 +152,4 @@ src/monsters/armor/Armor_InitExtendedCollider.c	Armor_InitExtendedCollider	natur
 src/monsters/armor/ActorController_UpdateBounceParticle.c	ActorController_UpdateBounceParticle	contrived	minor	8	remaining pointer temps and constants fix register choices
 src/monsters/armor/actor_controller_motion.c	ActorController_UpdateRetreatMotion	contrived	natural	10	
 src/monsters/armor/actor_controller_motion.c	ActorController_UpdateTimedMotion	contrived	natural	6	
+src/monsters/armor/ActorController_UpdateAnimation.c	ActorController_UpdateAnimation	contrived	minor	6	view casts and constant locals remain

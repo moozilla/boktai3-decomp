@@ -24,14 +24,12 @@ void ActorController_UpdateAnimation(struct SceneCombatActor *p)
     anim = (void *)((u8 *)p + 0xB4);
     if (Anim_Step(anim, (u8 *)p + 0x94))
         *finished = 1;
-    {
-        if (p->animationStatus & 1)
-            *finished = 1;
-        if (p->flags & 0x800)
-            anim->flags |= 1;
-        else
-            anim->flags &= ~1;
-    }
+    if (p->animationStatus & 1)
+        *finished = 1;
+    if (p->flags & 0x800)
+        anim->flags |= 1;
+    else
+        anim->flags &= ~1;
     if (p->flags & 0x400)
         anim->flags |= 0x200;
     else
