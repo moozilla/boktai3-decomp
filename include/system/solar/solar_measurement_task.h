@@ -10,7 +10,7 @@ struct SolarMeasurementTask {
     s16 a;
     u16 gain; /* confidence=low */
     u16 count;
-    u8 pad22[0x2];
+    u16 debugRepeat; /* 0x22: paces the simulated intensity buttons */
     u16 frame;
     u16 idle;
     u16 frac;
@@ -18,5 +18,13 @@ struct SolarMeasurementTask {
 };
 
 typedef char SolarMeasurementTaskSizeCheck[sizeof(struct SolarMeasurementTask) == 0x2c ? 1 : -1];
+
+/* The controller task behind gSolarController: measurement state and its per-frame mode. */
+struct SolarController {
+    struct SolarMeasurementTask measurement;
+    void (*mode)(struct SolarMeasurementTask *); /* 0x2C */
+};
+
+typedef char SolarControllerSizeCheck[sizeof(struct SolarController) == 0x30 ? 1 : -1];
 
 #endif
