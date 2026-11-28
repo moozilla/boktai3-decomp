@@ -143,3 +143,4 @@ src/ui/books/forging_book/CollectionBook_GetPageEntryCount.c	CollectionBook_GetP
 src/ui/books/forging_book/CollectionBook_SetEntryCollected.c	CollectionBook_SetEntryCollected	contrived	natural	1	
 src/ui/books/forging_book/CollectionBook_IsEntryCollected.c	CollectionBook_IsEntryCollected	minor	natural	1	
 src/ui/books/forging_book/CollectionBook_SetEntryCollectedFromScript.c	CollectionBook_SetEntryCollectedFromScript	minor	natural	1	
+src/ui/books/forging_book/CollectionBook_CountCollectedEntries.c	CollectionBook_CountCollectedEntries	minor	natural	1	

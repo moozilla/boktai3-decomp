@@ -1,18 +1,15 @@
 #include "global.h"
-struct G {
-    u8 pad[0x596];
-    s16 f596;
-};
-extern struct G *gGameState;
+#include "ui/books/collection_book.h"
+
 s32 CollectionBook_CountCollectedEntries(void)
 {
-    s32 n = 0;
+    s32 count = 0;
     s32 i = 0;
-    s32 v = gGameState->f596;
-    do {
-        if ((v >> i) & 1)
-            n++;
-        i++;
-    } while (i <= 9);
-    return n;
+    s32 collected = gGameState->flags596;
+
+    for (; i < 10; i++) {
+        if ((collected >> i) & 1)
+            count++;
+    }
+    return count;
 }
