@@ -229,9 +229,9 @@ void TutorialOtenko_ProjectAndClampToScreen(struct ActorAnimController *p)
 
 u8 Math_Atan2(s32, s32);
 
-void TutorialOtenko_SetInteractionControlFlag(u8 *);
+void TutorialOtenko_SetInteractionControlFlag(struct ActorAnimController *);
 
-void TutorialOtenko_BeginInteractionSoundSequence(u8 *);
+void TutorialOtenko_BeginInteractionSoundSequence(struct ActorAnimController *);
 
 void TutorialOtenko_OnInteractionChildRelease(struct ActorAnimController *,
                                               struct ActorChildSlot *);
@@ -301,7 +301,7 @@ void TutorialOtenko_TryInteraction(struct ActorAnimController *p, struct Interac
             u8 one = 1;
             q->flags |= one;
         }
-        TutorialOtenko_SetInteractionControlFlag((u8 *)p);
+        TutorialOtenko_SetInteractionControlFlag(p);
     } else {
         TutorialOtenko_SetState(p, 1, 2);
         {
@@ -313,7 +313,7 @@ void TutorialOtenko_TryInteraction(struct ActorAnimController *p, struct Interac
             u8 one = 1;
             q->flags |= one;
         }
-        TutorialOtenko_BeginInteractionSoundSequence((u8 *)p);
+        TutorialOtenko_BeginInteractionSoundSequence(p);
     }
 }
 
@@ -397,16 +397,15 @@ void TutorialOtenko_SelectNearestInteraction(struct ActorAnimController *p)
 
 void ScriptUtility_SetControlFlag(u8);
 
-void TutorialOtenko_SetInteractionControlFlag(u8 *p)
+void TutorialOtenko_SetInteractionControlFlag(struct ActorAnimController *p)
 {
-    ScriptUtility_SetControlFlag(((struct ActorAnimController *)p)->option);
+    ScriptUtility_SetControlFlag(p->option);
 }
 
-void TutorialOtenko_RestoreSavedAnimationPlayback(u8 *p)
+void TutorialOtenko_RestoreSavedAnimationPlayback(struct ActorAnimController *p)
 {
-    struct ActorAnimController *g = (struct ActorAnimController *)p;
-    g->anim.index = g->savedFrame;
-    g->anim.elapsed = g->savedTimer;
+    p->anim.index = p->savedFrame;
+    p->anim.elapsed = p->savedTimer;
 }
 
 /* Tentative role: arm the idle animation transition at its resting position. */
@@ -534,18 +533,20 @@ void TutorialOtenko_UpdateIdlePhaseRestoration(struct ActorAnimController *p)
 
 void Sound_PlaySong(s32);
 
-void TutorialOtenko_BeginInteractionSoundSequence(u8 *p)
+void TutorialOtenko_InitInteractionSoundDelay(struct ActorAnimController *);
+
+void TutorialOtenko_BeginInteractionSoundSequence(struct ActorAnimController *p)
 {
     Sound_PlaySong(0x11E);
-    *(u32 *)(p + 0xF98) = 0x081E44F9;
+    p->otherFn = TutorialOtenko_InitInteractionSoundDelay;
 }
 
 void TutorialOtenko_UpdateInteractionSoundDelay(struct ActorAnimController *);
 
-void TutorialOtenko_InitInteractionSoundDelay(u8 *p)
+void TutorialOtenko_InitInteractionSoundDelay(struct ActorAnimController *p)
 {
-    *(u8 *)(p + 0xF88) = 0xc;
-    *(void (**)(void))(p + 0xF98) = TutorialOtenko_UpdateInteractionSoundDelay;
+    p->delayCounter = 12;
+    p->otherFn = TutorialOtenko_UpdateInteractionSoundDelay;
 }
 
 /* Finish a delayed controller callback, selecting the time-of-day sound. */

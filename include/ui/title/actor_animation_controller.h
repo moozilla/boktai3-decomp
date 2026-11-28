@@ -123,8 +123,8 @@ struct ActorAnimController {
     u16 resource;              /* 0xF8A */
     void (*previous)(void *);  /* 0xF8C */
     void (*fn)(void *);        /* 0xF90 */
-    void (*scaleFn)(void *);   /* 0xF94 */
-    void (*otherFn)(void *);   /* 0xF98 */
+    void (*scaleFn)(struct ActorAnimController *);   /* 0xF94 */
+    void (*otherFn)(struct ActorAnimController *);   /* 0xF98 */
     s32 timer;                 /* 0xF9C */
     u32 variant;               /* 0xFA0 */
 };
