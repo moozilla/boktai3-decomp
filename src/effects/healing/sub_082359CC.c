@@ -1,33 +1,23 @@
-#include "global.h"
-struct Blob59 {
+#include "effects/healing/healing_effect.h"
+#include "engine/engine.h"
+#include "ui/hud/stage_icon_display.h"
+
+struct IconHeader {
     u32 words[8];
 };
-struct Blob59 *ScriptProc_Start(u32, u32);
-void ResourceHeader_Relocate(struct Blob59 *, struct Blob59 *);
-void AnimSprite_InitLinked(u8 *, struct Blob59 *, u32, u32, u32, u32, u32, void *);
-void sub_082359CC(u8 *p)
+
+void sub_082359CC(struct HealthBurstEffect *effect)
 {
-    struct Blob59 *data = ScriptProc_Start(0xcb05, 0x5d04);
-    struct Blob59 copy = *data;
-    u32 kind, zero, x, value;
-    u16 *dest, *src, *q, v;
-    ResourceHeader_Relocate(&copy, data);
-    value = *(u16 *)(p + 0x34c);
-    kind = 48;
-    if (value == 0)
-        kind = 47;
-    src = (u16 *)(p + 0x84);
-    x = *src - 8;
-    dest = (u16 *)(p + 0x7c);
-    zero = 0;
-    *dest = x;
-    v = *(u16 *)(p + 0x86) - 40;
-    dest++;
-    *dest = v;
-    v = *(u16 *)(p + 0x88);
-    q = (u16 *)(p + 0x80);
-    *q = v;
-    AnimSprite_InitLinked((u8 *)q - 0x64, &copy, kind + 104, 50, 1, zero, 60, src);
-    p[0x51] = 34;
-    p[0x50] = 34;
+    struct IconHeader *source = (struct IconHeader *)ScriptProc_Start(0xCB05, 0x5D04);
+    struct IconHeader header = *source;
+    u32 kind;
+
+    ResourceHeader_Relocate(&header, source);
+    kind = effect->mode == 0 ? 47 : 48;
+    effect->targetPosition.x = effect->startPosition.x - 8;
+    effect->targetPosition.y = effect->startPosition.y - 40;
+    effect->targetPosition.z = effect->startPosition.z;
+    AnimSprite_InitLinked(&effect->icon, &header, kind + 104, 50, 1, 0, 60, &effect->startPosition);
+    effect->icon.scaleY = 34;
+    effect->icon.scaleX = 34;
 }

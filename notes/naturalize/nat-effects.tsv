@@ -253,3 +253,4 @@ src/effects/healing/sub_08235794.c	sub_08235794	contrived	minor	10	nested mode a
 src/effects/healing/sub_082358C0.c	sub_082358C0	minor	natural	4	
 src/effects/healing/HealthBurstEffect_OnUpdate.c	HealthBurstEffect_OnUpdate	minor	natural	2	
 src/effects/healing/SceneEffectGroup_Remove.c	SceneEffectGroup_Remove	minor	natural	3	
+src/effects/healing/sub_082359CC.c	sub_082359CC	contrived	natural	6	
