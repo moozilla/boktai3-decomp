@@ -203,3 +203,4 @@ src/monsters/screamer/Screamer_ApplyHitReaction.c	Screamer_ApplyHitReaction	cont
 src/monsters/screamer/Screamer_InitColliders.c	Screamer_InitColliders	contrived	natural	2	(u16) casts on s16 reaction flags passed as u32
 src/monsters/screamer/Screamer_WaitForPlayerApproach.c	Screamer_WaitForPlayerApproach	minor	minor	1	kept temps the ROM spills
 src/monsters/screamer/Screamer_UpdateScream.c	Screamer_UpdateScream	contrived	minor	5	counter pointer temps in the loop case force load/store order
+src/monsters/screamer/SceneDrawablePair_SetFlags.c	SceneDrawablePair_SetFlags	contrived	natural	1	
