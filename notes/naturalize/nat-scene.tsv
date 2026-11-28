@@ -475,3 +475,4 @@ src/scene/actor/reaction/SceneActorReaction_SinkAndRemove.c	SceneActorReaction_S
 src/scene/actor/reaction/SceneActorReaction_BeginHiddenDefeat.c	SceneActorReaction_BeginHiddenDefeat	contrived	contrived	5	partial: Flag selector helper, IsPrimary, show flag and duplicate sound cases stay; direct forms change code
 src/scene/actor/reaction/SceneActorReaction_PlayStaggerBurst.c	SceneActorReaction_PlayStaggerBurst	contrived	contrived	0	state store reuse, mask locals and drawable casts stay; plain forms change the random mask register
 src/scene/actor/reaction/SceneActorReaction_SettleDisplacement.c	SceneActorReaction_SettleDisplacement	contrived	contrived	7	partial: accessor helpers and the stopped-motion predicate stay; plain forms change load order and registers
+src/scene/actor/reaction/SceneActorReaction_TryResumeRoute.c	SceneActorReaction_TryResumeRoute	contrived	natural	12	-

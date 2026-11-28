@@ -3,100 +3,12 @@
 #include "scene/actor/scene_actor_reaction.h"
 #include "scene/actor/scene_actor_init_actor.h"
 #include "scene/motion/scene_actor_chase_shared.h"
+#include "monsters/scene_actor_chase_step.h"
+#include "scene/collision/scene_actor_delayed_response.h"
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
-struct RouteResponseGroup {
-    u8 unknown0[0x74];
-    struct RoutePointView {
-        u8 unknown0[8];
-        const u16 *point;
-    } route;
-    u8 unknown80[0xC];
-    struct RouteResponse {
-        u8 unknown0[8];
-        u8 state, phase, behavior, unknownB;
-        s32 threshold;
-        void *control;
-    } response;
-    u8 unknownA0[0x1FC - 0xA0];
-    void *context;
-    struct ContactPosition *destination;
-};
-static inline u32 CellBits(const u8 *data, u32 mask)
-{
-    u32 bits = mask;
-    bits &= *data;
-    return bits;
-}
-static inline u8 CoordinateFraction(s16 coordinate)
-{
-    return coordinate;
-}
-static inline u32 TerrainHeight(struct ContactPosition *position)
-{
-    s32 x = position->x >> 8, z = position->z >> 8;
-    u32 cell, flags, shape, height;
-    u8 *data;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        cell = 0;
-    else
-        cell = gTerrainMap->rows[z] + x;
-    data = TerrainModifiers_FindCellOverride(cell, 1);
-    if (data)
-        data += 4;
-    else {
-        struct EngineMap *map = gTerrainMap;
-        u32 offset = cell * 4 + 12;
-        data = map->cells + offset;
-    }
-    flags = *data;
-    shape = flags >> 4;
-    height = CellBits(data, 15) << 8;
-    switch (shape) {
-        case 1:
-            height -= CoordinateFraction(position->z);
-            break;
-        case 2:
-            height -= CoordinateFraction(position->x);
-            break;
-    }
-    return height;
-}
-static inline void SnapToRoute(struct ContactPosition *position, struct RoutePointView *route)
-{
-    position->x = route->point[0];
-    position->z = route->point[1];
-    position->y = TerrainHeight(position);
-}
-static inline u8 TryRoute(struct ChaseActor *actor, void *context, struct ContactPosition *source,
-                          struct ContactPosition *destination)
-{
-    s32 result;
-    if (!Nav_IsPositionInMesh(context, source, destination)) {
-        SceneActorChase_ClearBits(&actor->base.motionFlags, 0x200);
-        return 0;
-    }
-    result = Terrain_ApplyBlocked(context, source, destination);
-    if (result) {
-        if (result != 2)
-            Memory_Clear(&actor->base.body.motion, 8);
-        return 1;
-    }
-    SceneActorChase_ClearBits(&actor->base.motionFlags, 0x200);
-    return 0;
-}
-
-static inline void SetResponse(struct RouteResponse *response, void *control, u32 state, u32 phase,
-                               u32 behavior, s32 threshold)
-{
-    response->threshold = threshold;
-    response->control = control;
-    response->state = state;
-    response->phase = phase;
-    response->behavior = behavior;
-}
 void SceneActorReaction_TryResumeRoute(struct ChaseActor *actor, s32 frame)
 {
-    struct RouteResponseGroup *group = (void *)&actor->group.common;
+    struct SceneActorChaseGroup *group = &actor->group;
     if (SceneActorReaction_TakePrepared(actor)) {
         actor->base.body.direction = (((actor->base.reactionDirection + 3) & 7) << 5) - 64;
         SceneActorAnimation_SelectDirectionalEntry(&actor->base, 0);
@@ -105,8 +17,9 @@ void SceneActorReaction_TryResumeRoute(struct ChaseActor *actor, s32 frame)
     if (frame > 60 && actor->base.restart) {
         actor->base.stepDone = 1;
         SceneActorAttachment_ReplaceResponseSlot(actor, 0, 2, actor->base.category);
-        SnapToRoute(group->destination, &group->route);
-        if (!TryRoute(actor, group->context, &actor->base.body.position, group->destination)) {
+        SceneActorChase_SnapToRoute(group->destination, &group->homeRoute);
+        if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,
+                                      group->destination)) {
             SceneActorTerrain_InstallControl(actor, SceneActorControl_OnIdle, 0);
             MonsterInit_SetState(actor, 3, 0, 0);
         } else {
@@ -115,7 +28,7 @@ void SceneActorReaction_TryResumeRoute(struct ChaseActor *actor, s32 frame)
             SceneActorTerrain_InstallControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
             MonsterInit_SetBehaviorFlags(actor, 0x10);
             actor->base.field2C2 = 64;
-            SetResponse(&group->response, actor->base.onAlternateEntry, 0, 0, 7, 60);
+            SceneActorDelay_Prepare((void *)&group->saved, actor->base.onAlternateEntry, 7, 60);
         }
     }
 }
