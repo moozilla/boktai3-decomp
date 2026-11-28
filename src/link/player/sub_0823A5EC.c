@@ -1,17 +1,11 @@
 #include "global.h"
+#include "player/player.h"
 struct HitSource {
     u8 pad[0xc];
     struct {
         u8 kind;
         u8 pad[3];
     } slots[3];
-};
-struct P0823A5EC {
-    u8 pad0[0x444];
-    u32 flags;
-    u8 pad448[0xC8C - 0x448];
-    void *hitHandlers[3];
-    void *bonusHandlers[3];
 };
 void Player_OnWeaponHitApplyFlame(void);
 void Player_OnWeaponHitApplyFrost(void);
@@ -34,72 +28,68 @@ static inline void SetFlags(u32 *f, u32 mask)
 {
     *f |= mask;
 }
-void sub_0823A5EC(struct P0823A5EC *p, struct HitSource *src)
+void sub_0823A5EC(struct Player *p, struct HitSource *src)
 {
     s32 i;
-    void **q;
-    u32 zero = 0;
-    q = p->hitHandlers;
-    for (i = 2; i >= 0; i--) {
-        q[0] = zero;
-        q[3] = zero;
-        q++;
+    for (i = 0; i < 3; i++) {
+        p->flagCallbacks[i] = NULL;
+        p->contactCostCallbacks[i] = NULL;
     }
     for (i = 0; i <= 2; i++) {
         switch (src->slots[i].kind) {
             case 2:
                 break;
             case 36:
-                p->bonusHandlers[i] = ActorEffect_TestStatusFlags;
+                p->contactCostCallbacks[i] = ActorEffect_TestStatusFlags;
                 break;
             case 35:
-                p->bonusHandlers[i] = Player_RollModifierBonus;
+                p->contactCostCallbacks[i] = Player_RollModifierBonus;
                 break;
             case 37:
-                p->bonusHandlers[i] = Player_GetTargetFlag7Bonus;
+                p->contactCostCallbacks[i] = Player_GetTargetFlag7Bonus;
                 break;
             case 38:
-                p->bonusHandlers[i] = Player_GetTargetFlag8Bonus;
+                p->contactCostCallbacks[i] = Player_GetTargetFlag8Bonus;
                 break;
             case 39:
-                p->bonusHandlers[i] = Player_GetTargetFlag9Bonus;
+                p->contactCostCallbacks[i] = Player_GetTargetFlag9Bonus;
                 break;
             case 40:
-                p->bonusHandlers[i] = Player_GetTargetFlag10Bonus;
+                p->contactCostCallbacks[i] = Player_GetTargetFlag10Bonus;
                 break;
             case 41:
-                p->bonusHandlers[i] = Player_GetTargetFlag11Bonus;
+                p->contactCostCallbacks[i] = Player_GetTargetFlag11Bonus;
                 break;
             case 5:
-                p->hitHandlers[i] = Player_OnWeaponHitApplyFlame;
+                p->flagCallbacks[i] = Player_OnWeaponHitApplyFlame;
                 break;
             case 6:
-                p->hitHandlers[i] = Player_OnWeaponHitApplyFrost;
+                p->flagCallbacks[i] = Player_OnWeaponHitApplyFrost;
                 break;
             case 7:
-                p->hitHandlers[i] = Player_OnWeaponHitApplyCloud;
+                p->flagCallbacks[i] = Player_OnWeaponHitApplyCloud;
                 break;
             case 8:
-                p->hitHandlers[i] = Player_OnWeaponHitApplyEarth;
+                p->flagCallbacks[i] = Player_OnWeaponHitApplyEarth;
                 break;
             case 42:
-                p->hitHandlers[i] = Player_RollWeaponHitElementEffect;
+                p->flagCallbacks[i] = Player_RollWeaponHitElementEffect;
                 break;
             case 11:
-                p->hitHandlers[i] = Player_RollSecondWeaponHitStatusLow;
+                p->flagCallbacks[i] = Player_RollSecondWeaponHitStatusLow;
                 break;
             case 44:
                 if (p)
-                    ClearFlags(&p->flags, 1);
+                    ClearFlags(&p->statBonusFlags, 1);
                 break;
             case 43:
                 if (p)
-                    ClearFlags(&p->flags, 2);
+                    ClearFlags(&p->statBonusFlags, 2);
                 break;
             case 13:
             case 14:
                 if (p)
-                    SetFlags(&p->flags, 4);
+                    SetFlags(&p->statBonusFlags, 4);
                 break;
         }
     }

@@ -165,3 +165,6 @@ src/link/player/LinkPlayer_InitializeActor.c	LinkPlayer_InitializeActor	minor	mi
 src/link/player/LinkPlayer_BlendPalette.c	LinkPlayer_BlendPalette	contrived	contrived	9	hoisted palette and brightness pointers stay: indexed loops compile very differently
 src/link/player/sub_0823A518.c	sub_0823A518	contrived	natural	1	
 src/link/player/ActorEffect_TestStatusFlags.c	ActorEffect_TestStatusFlags	contrived	minor	14	mask local stays: the ROM loads the first mask before the flags
+src/link/player/sub_0823A53C.c	sub_0823A53C	natural	natural	0	
+src/link/player/Player_NotifyFirstSelectedSlot.c	Player_NotifyFirstSelectedSlot	natural	natural	0	
+src/link/player/sub_0823A5EC.c	sub_0823A5EC	contrived	minor	6	flag set and clear accessors stay: plain operators differ
