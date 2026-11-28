@@ -1,6 +1,5 @@
 #include "ui/widgets/scene_input_compare.h"
-void SceneInputPanel_ShowAttributeComparison(struct AnimSprite *first,
-                                             struct AnimSprite *second,
+void SceneInputPanel_ShowAttributeComparison(struct AnimSprite *first, struct AnimSprite *second,
                                              struct AnimSprite *third,
                                              struct AnimSpriteResource *resource, s32 candidate)
 {
@@ -21,18 +20,8 @@ void SceneInputPanel_ShowAttributeComparison(struct AnimSprite *first,
             comparison = 2;
     }
     SceneInputPanel_SplitThreeDigits(target0, digits);
-    {
-        s32 offset;
-        s32 *digit;
-        struct AnimSprite *animSprite;
-        offset = comparison * 10;
-        digit = digits;
-        animSprite = first;
-        for (i = 2; i >= 0; i--) {
-            Anim_LoadKeyframe(animSprite, resource, (u16)(*digit++ + offset), 1);
-            animSprite++;
-        }
-    }
+    for (i = 0; i < 3; i++)
+        Anim_LoadKeyframe(&first[i], resource, (u16)(digits[i] + comparison * 10), 1);
     comparison = 1;
     if (current1 >= target1) {
         comparison = 0;
@@ -40,18 +29,8 @@ void SceneInputPanel_ShowAttributeComparison(struct AnimSprite *first,
             comparison = 2;
     }
     SceneInputPanel_SplitThreeDigits(target1, digits);
-    {
-        s32 offset;
-        s32 *digit;
-        struct AnimSprite *animSprite;
-        offset = comparison * 10;
-        digit = digits;
-        animSprite = second;
-        for (i = 2; i >= 0; i--) {
-            Anim_LoadKeyframe(animSprite, resource, (u16)(*digit++ + offset), 1);
-            animSprite++;
-        }
-    }
+    for (i = 0; i < 3; i++)
+        Anim_LoadKeyframe(&second[i], resource, (u16)(digits[i] + comparison * 10), 1);
     comparison = 1;
     if (current2 >= target2) {
         comparison = 0;
@@ -59,16 +38,6 @@ void SceneInputPanel_ShowAttributeComparison(struct AnimSprite *first,
             comparison = 2;
     }
     SceneInputPanel_SplitThreeDigits(target2, digits);
-    {
-        s32 offset;
-        s32 *digit;
-        struct AnimSprite *animSprite;
-        offset = comparison * 10;
-        digit = digits;
-        animSprite = third;
-        for (i = 2; i >= 0; i--) {
-            Anim_LoadKeyframe(animSprite, resource, (u16)(*digit++ + offset), 1);
-            animSprite++;
-        }
-    }
+    for (i = 0; i < 3; i++)
+        Anim_LoadKeyframe(&third[i], resource, (u16)(digits[i] + comparison * 10), 1);
 }

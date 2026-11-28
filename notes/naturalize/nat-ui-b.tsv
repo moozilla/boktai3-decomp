@@ -431,3 +431,5 @@ src/ui/town/shop/SceneInputPanel_HighlightPrompt.c	SceneInputPanel_HighlightProm
 src/ui/town/shop/SceneInputPanel_ResetHighlights.c	SceneInputPanel_ResetHighlights	natural	natural	0	
 src/ui/town/shop/SceneInputPanel_SplitThreeDigits.c	SceneInputPanel_SplitThreeDigits	natural	natural	0	
 src/ui/town/shop/SceneInputPanel_GetEquippedValues.c	SceneInputPanel_GetEquippedValues	contrived	minor	7	index-first pointer sums and a reloaded equipment pointer (address operand order)
+src/ui/town/shop/SceneInputPanel_ShowItemComparison.c	SceneInputPanel_ShowItemComparison	natural	natural	0	
+src/ui/town/shop/SceneInputPanel_ShowAttributeComparison.c	SceneInputPanel_ShowAttributeComparison	contrived	natural	1	
