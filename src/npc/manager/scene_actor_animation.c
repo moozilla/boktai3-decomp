@@ -633,52 +633,23 @@ int Actor_BeginScriptControl(void)
 
 int Actor_EndScriptControl(void)
 {
-    void *m = gSceneActorListManager;
+    struct SceneActorManager *manager = gSceneActorListManager;
     struct SceneActor *actor;
     int mode;
-    struct SceneActor **alias;
-    if (!m) {
+    if (!manager)
         return -1;
-    }
-    actor = Actor_FindById(m, Script_GetKeywordValue(0x6e, 0));
-    if (!actor) {
+    actor = Actor_FindById(manager, Script_GetKeywordValue('n', 0));
+    if (!actor)
         return -1;
-    }
-    {
-        u8 *controlled = &actor->controlled;
-        int zero;
-        zero = 0;
-        *controlled = zero;
-        mode = Script_GetKeywordValue(0x69, 0);
-        {
-            u32 command = mode;
-            alias = &actor;
-            switch (command) {
-                default:
-                    break;
-
-                case 0:
-
-                {
-                    int one = 1;
-                    (*alias)->stage = command;
-                    (*alias)->phase = command;
-                    actor->state = one;
-                    actor->ticks = command;
-                    actor->commandEntered = one;
-                    break;
-                }
-
-                case 1:
-                    (*alias)->stage = zero;
-                    (*alias)->phase = zero;
-                    (*alias)->state = zero;
-                    actor->ticks = zero;
-                    (*alias)->commandEntered = command;
-                    break;
-                    return mode;
-            }
-        }
+    actor->controlled = 0;
+    mode = Script_GetKeywordValue('i', 0);
+    switch (mode) {
+        case 0:
+            Actor_SetScriptState(actor, 1);
+            break;
+        case 1:
+            Actor_SetScriptState(actor, 0);
+            break;
     }
 }
 

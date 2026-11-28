@@ -34,3 +34,4 @@ src/npc/manager/scene_actor_animation.c	Actor_IsWithinHorizontalRange	natural	na
 src/npc/manager/scene_actor_animation.c	Actor_SetAttachmentEffect	natural	natural	0	
 src/npc/manager/scene_actor_animation.c	Packet_QueueFromScript	natural	natural	0	
 src/npc/manager/scene_actor_animation.c	Actor_IsInReactionStateFromScript	contrived	natural	8	(u8)(state-13) > 2 range test: two comparisons are not folded
+src/npc/manager/scene_actor_animation.c	Actor_EndScriptControl	contrived	natural	2	
