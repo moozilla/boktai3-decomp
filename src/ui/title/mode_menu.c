@@ -81,7 +81,7 @@ void ModeMenu_Update(struct ModeMenu *p)
 
     switch (p->state) {
         case 0:
-            if (gPadState[1] & 1) {
+            if (gPadState[1] & A_BUTTON) {
                 ScrollingDialogue_RequestHide();
                 if (p->selection == 0) {
                     Confirm(p);
@@ -114,7 +114,7 @@ void ModeMenu_Update(struct ModeMenu *p)
                     break;
                 }
             }
-            if (gPadState[1] & 2) {
+            if (gPadState[1] & B_BUTTON) {
                 Sound_PlaySong(0xDE);
                 ScrollingDialogue_RequestHide();
                 p->fadeShift = 3;
@@ -123,7 +123,7 @@ void ModeMenu_Update(struct ModeMenu *p)
                 p->result = 0;
                 break;
             }
-            if (gPadState[1] & 0x40) {
+            if (gPadState[1] & DPAD_UP) {
                 Sound_PlaySong(0xDC);
                 p->selection--;
                 if (p->selection < 0)
@@ -131,7 +131,7 @@ void ModeMenu_Update(struct ModeMenu *p)
                 ScrollingDialogue_ClearScript();
                 ModeMenu_ShowDescription(p);
             }
-            if (gPadState[1] & 0x80) {
+            if (gPadState[1] & DPAD_DOWN) {
                 Sound_PlaySong(0xDC);
                 p->selection++;
                 if (p->selection >= p->choiceCount)
@@ -206,7 +206,7 @@ void ModeMenu_Update(struct ModeMenu *p)
         case 3:
             if (p->frame == 0)
                 Sound_PlaySong(0x192);
-            if ((gPadState[1] & 1) || (gPadState[1] & 2)) {
+            if ((gPadState[1] & A_BUTTON) || (gPadState[1] & B_BUTTON)) {
                 Sound_PlaySong(0xDE);
                 p->fadeShift = 3;
                 Menu_StartFadeOut(3);
