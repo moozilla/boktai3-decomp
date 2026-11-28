@@ -278,3 +278,4 @@ src/monsters/axe_armor/AxeArmor_ApplyHitReaction.c	AxeArmor_ApplyHitReaction	con
 src/monsters/axe_armor/AxeArmor_UpdateAttackTiming.c	AxeArmor_UpdateAttackTiming	minor	natural	1	
 src/monsters/axe_armor/AxeArmor_InitializeFromScript.c	AxeArmor_InitializeFromScript	contrived	contrived	17	remaining: block,ptrtemp,structcast
 src/monsters/cannons/vulcan/VulcanCannon_UpdateTargeting.c	VulcanCannon_UpdateTargeting	contrived	minor	8	remaining: constlocal
+src/monsters/cannons/vulcan/VulcanCannon_UpdateDamageState.c	VulcanCannon_UpdateDamageState	contrived	contrived	12	remaining: block,constlocal
