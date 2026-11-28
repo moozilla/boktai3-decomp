@@ -838,7 +838,7 @@ void Hud_DrawClockLabelA(u32 x, u32 y)
 
 void Hud_DrawSelectedClock(struct SceneHudState *hud)
 {
-    if ((u8)(hud->mode - 1) <= 1 || hud->mode == 5 || hud->mode == 3 || hud->mode == 4 ||
+    if (hud->mode == 1 || hud->mode == 2 || hud->mode == 5 || hud->mode == 3 || hud->mode == 4 ||
         hud->mode == 6) {
         if (hud->clockSelection == 0) {
             Hud_DrawDecimalDigits(SunClock_GetBaseHour(), 10, 24, 0, 0);
