@@ -154,3 +154,5 @@ src/objects/coffin/tether_actor.c	TetherActor_UpdateReverseDirectedState	minor	n
 src/objects/coffin/tether_actor.c	TetherActor_UpdateSpecialEntryState	natural	natural	0	
 src/objects/coffin/tether_actor.c	TetherActor_Tick	minor	natural	5	segmentsOnly() helper keeps the mask-first operand order of the pause flag test
 src/objects/coffin/tether_actor.c	TetherActor_CreateFromScript	minor	natural	1	
+src/objects/coffin/tether_actor.c	TetherActor_Destroy	natural	natural	0	
+src/objects/coffin/tether_actor.c	TetherActor_InitializeFromScript	natural	natural	0	

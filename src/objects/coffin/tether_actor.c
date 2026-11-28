@@ -24,78 +24,9 @@ static inline s32 scaleEmission(s32 value)
     return -((-value) >> 12);
 }
 
-static inline s32 cellIndex_08049840(s32 x, s32 z)
-{
-    s32 index;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        index = 0;
-    else
-        index = gTerrainMap->rows[z] + x;
-    return index;
-}
-
-static inline s32 terrainHeight(struct ContactPackedVector *position, s32 index)
-{
-    u8 *properties = TerrainModifiers_FindCellOverride(index, 1);
-    u32 surface, height;
-    if (properties)
-        properties += 4;
-    else {
-        struct EngineMap *map = gTerrainMap;
-        u32 offset = index * 4 + 12;
-        properties = map->cells + offset;
-    }
-    surface = *properties >> 4;
-    height = (*properties & 15) << 8;
-    switch (surface) {
-        case 1:
-            height -= (u8)position->z;
-            break;
-        case 2:
-            height -= (u8)position->x;
-            break;
-    }
-    return height;
-}
-
-static inline s32 absolute_08049840(s32 value)
-{
-    if (value < 0)
-        value = -value;
-    return value;
-}
-
-static inline s32 cellIndex_0804AF80(s32 x, s32 z)
-{
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        return 0;
-    return gTerrainMap->rows[z] + x;
-}
-
 static inline u8 *cellProperties(s32 cell)
 {
     u8 *properties = TerrainModifiers_FindCellOverride(cell, 1);
-    if (properties)
-        properties += 4;
-    else {
-        struct EngineMap *map = gTerrainMap;
-        u32 offset = cell * 4 + 12;
-        properties = map->cells + offset;
-    }
-    return properties;
-}
-
-static inline u8 *propertiesAt_0804B1CC(struct ContactPosition *position)
-{
-    s32 x = position->x >> 8;
-    s32 z = position->z >> 8;
-    s32 cell;
-    u8 *properties;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        cell = 0;
-    else
-        cell = gTerrainMap->rows[z] + x;
-    properties = TerrainModifiers_FindCellOverride(cell, 1);
     if (properties)
         properties += 4;
     else {
@@ -148,25 +79,6 @@ static inline s32 scale(s32 value)
     if (value >= 0)
         return value >> 12;
     return -(-value >> 12);
-}
-
-static inline u8 *propertiesAt_0804C748(s32 x, s32 z)
-{
-    s32 cell;
-    u8 *properties;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        cell = 0;
-    else
-        cell = gTerrainMap->rows[z] + x;
-    properties = TerrainModifiers_FindCellOverride(cell, 1);
-    if (properties)
-        properties += 4;
-    else {
-        struct EngineMap *map = gTerrainMap;
-        u32 offset = cell * 4 + 12;
-        properties = map->cells + offset;
-    }
-    return properties;
 }
 
 static inline s32 absolute_0804D270(s32 value)
