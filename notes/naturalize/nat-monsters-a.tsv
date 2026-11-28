@@ -513,3 +513,8 @@ src/monsters/centipede/SceneActorPlacement_UpdateFlaggedResponse.c	SceneActorPla
 src/monsters/centipede/CentipedeBody_ClearStateEntryFlag.c	CentipedeBody_ClearStateEntryFlag	contrived	natural	1	
 src/monsters/centipede/CentipedeBody_InitBehaviorTable.c	CentipedeBody_InitBehaviorTable	contrived	natural	1	
 src/monsters/centipede/CentipedeBody_UpdateSegmentPositions.c	CentipedeBody_UpdateSegmentPositions	contrived	natural	1	
+src/monsters/centipede/tentacle_body.c	CentipedeBody_UpdateHiddenTransition	minor	minor	3	restart now stores the literal; flags 
+src/monsters/centipede/tentacle_body.c	CentipedeBody_OnAttackCollision	minor	minor	9	pointer and mask locals: the mask constant loads before the field
+src/monsters/centipede/tentacle_body.c	CentipedeBody_UpdateSpreadWindup	minor	minor	1	direction pointer and spin sample blocks: plain reads change address materialization; stage count temp stays
+src/monsters/centipede/tentacle_body.c	CentipedeBody_UpdateSpreadRelease	minor	minor	4	direction pointer and spin sample blocks: plain reads change address materialization; stage count temp stays
+src/monsters/centipede/tentacle_body.c	CentipedeBody_UpdateChargeSpread	minor	minor	4	direction pointer and spin sample blocks: plain reads change address materialization; stage count temp stays
