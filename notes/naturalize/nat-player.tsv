@@ -307,3 +307,5 @@ src/player/cutscene/player_cue_actions.c	Player_UpdateTimedCueAnimation	natural	
 src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateDeparture	natural	natural	0	
 src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateMoveDestination	contrived	minor	5	facing setter helper with mask temporaries
 src/player/cutscene/player_cue_actions.c	Player_UpdateSongCueAnimation	minor	natural	3	-
+src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateKnockdownRecovery	natural	natural	0	-
+src/player/cutscene/player_cue_actions.c	Player_UpdateRecoilAction	minor	natural	3	-
