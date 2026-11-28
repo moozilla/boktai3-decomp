@@ -90,3 +90,4 @@ src/monsters/ivy/child_group.c	ChildGroup_UpdateLandingState	minor	natural	1
 src/monsters/ivy/child_group.c	Ivy_SetSegmentFlags	contrived	natural	1	u8* parameter kept for callers
 src/monsters/ivy/child_group.c	Ivy_SetSegmentProperties	contrived	natural	1	u8* parameter kept for callers
 src/monsters/ivy/child_group.c	ChildGroup_LaunchNextInactiveMember	contrived	contrived	1	stride, address and callback offset locals: strength reduction and the order of the activation stores
+src/monsters/ivy/child_group.c	ChildGroup_UpdateOrbitingMembers	contrived	contrived	16	radius/cos/sin/angle pointers in a do-while: loop.c hoist order and register choice

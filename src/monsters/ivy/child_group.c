@@ -6,6 +6,7 @@
 #include "ui/hud/damage_number_display.h"
 #include "ui/pause/scene_hud_display.h"
 #include "monsters/scene_actor_init_primitives.h"
+#include "engine/math/math_shift.h"
 
 s32 Callback_InvokeActor(void *, void *);
 
@@ -397,14 +398,6 @@ void Ivy_WaitForSecondaryActionCompletion(struct PhaseObject *);
 
 s32 Div(s32, s32);
 
-// concession-ok(literal-param): truncating shift helper; the width written in place in its body gives the same code
-static inline s32 truncateShift(s32 value, s32 shift)
-{
-    if (value >= 0)
-        return value >> shift;
-    return -(-value >> shift);
-}
-
 void ChildGroup_UpdateOrbitingMembers(struct PhaseObject *p)
 {
     int i;
@@ -439,10 +432,10 @@ void ChildGroup_UpdateOrbitingMembers(struct PhaseObject *p)
         s32 *a = p->orbitAngles;
         do {
             p->entries[i].presentation.x =
-                p->position.x + truncateShift(cosT[(*a + 64) & 255] * *radius, 10);
+                p->position.x + Math_ShiftTowardZero(cosT[(*a + 64) & 255] * *radius, 10);
             p->entries[i].presentation.y = p->position.y;
             p->entries[i].presentation.z =
-                p->position.z + truncateShift(sinT[*a & 255] * *radius, 10);
+                p->position.z + Math_ShiftTowardZero(sinT[*a & 255] * *radius, 10);
             *a += p->turnSpeed;
             if (*a > 255) {
                 if (p->orbitFrames > 0x46)
