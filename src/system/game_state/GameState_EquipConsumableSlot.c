@@ -1,9 +1,9 @@
 #include "global.h"
-extern u8 *gGameState;
+#include "system/game_state/game_state.h"
+
 u8 *GameState_GetConsumableDescriptor(s32);
-void GameState_EquipConsumableSlot(u32 a)
+void GameState_EquipConsumableSlot(u32 slot)
 {
-    *(u16 *)(gGameState +
-             GameState_GetConsumableDescriptor(*(s16 *)(gGameState + a * 2 + 0x160))[0xc] * 2 +
-             0x58) = a;
+    *(GameState_GetConsumableDescriptor(*(slot + gGameState->table160))[0xc] + gGameState->party) =
+        slot;
 }

@@ -478,3 +478,4 @@ src/system/game_state/GameState_IsConsumableSlotEquipped.c	GameState_IsConsumabl
 src/system/game_state/GameState_HasEquippedConsumable.c	GameState_HasEquippedConsumable	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
 src/system/game_state/GameState_UnequipConsumableSlot.c	GameState_UnequipConsumableSlot	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
 src/system/game_state/GameState_ResetListsFromScript.c	GameState_ResetListsFromScript	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
+src/system/game_state/GameState_EquipConsumableSlot.c	GameState_EquipConsumableSlot	contrived	minor	1	arrays indexed as *(i + field) for the index-first address sum
