@@ -2,25 +2,23 @@
 #include "scene/terrain/terrain_collision.h"
 #include "player/cutscene/player_cue_sequence.h"
 
-
 void FallingObjectManager_ClearGlobal(void)
 {
     gFallingObjectManager = 0;
 }
 
-void FallingObject_ReceiveHit(struct FallingHit *a, u32 unused, struct FallingObject *b)
+void FallingObject_ReceiveHit(struct FallingHit *hit, u32 unused, struct FallingObject *object)
 {
-    struct FallingObject *c = b;
-    if (c->type == 0) {
-        u32 fl = a->flags;
-        u32 d;
-        d = a->damage;
-        if (fl & 8) {
-            d <<= 1;
-            b->health -= d;
+    struct FallingObject *target = object;
+    if (target->type == 0) {
+        u32 flags = hit->flags;
+        u32 damage = hit->damage;
+        if (flags & 8) {
+            damage <<= 1;
+            object->health -= damage;
         }
-        if (c->health < 0)
-            c->health = 0;
+        if (target->health < 0)
+            target->health = 0;
     }
 }
 
