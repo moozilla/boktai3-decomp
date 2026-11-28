@@ -693,4 +693,4 @@ src/system/save/Save_WriteAlternateSlotAndSelect.c	Save_WriteAlternateSlotAndSel
 src/system/save/Region_SetCurrentFromScript.c	Region_SetCurrentFromScript	contrived	natural	1	
 src/system/save/Save_ReadMainState.c	Save_ReadMainState	natural	natural	0	
 src/system/save/Save_OnShutdown.c	Save_OnShutdown	natural	natural	0	
-src/system/save/Region_FindContaining.c	Region_FindContaining	natural	natural	0	
+src/system/save/Region_FindContaining.c	Region_FindContaining	natural	natural	1	

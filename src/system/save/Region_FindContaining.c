@@ -1,11 +1,7 @@
 #include "global.h"
 #include "engine/ram.h"
+#include "system/save/region_list.h"
 
-/* Up to 16 region ids (positive; the list ends at the first id <= 0). */
-struct RegionList {
-    u8 pad0[0x18];
-    s32 regions[16];
-};
 u8 Terrain_IsPositionInBox(u16 region, void *position); /* position inside region? */
 
 /* The first listed region containing position, or -1; callers keep it as
