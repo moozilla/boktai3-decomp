@@ -1,17 +1,12 @@
 #include "global.h"
 #include "ui/town/shop_panel.h"
-struct MenuPanel {
-    u8 pad0[0x10A0];
-    u32 bannerFlags;
-    u8 pad10A4[0x1740 - 0x10A4];
-    const void *text;
-};
-void MenuPanel_ShowDescription(struct MenuPanel *panel, s32 mode)
+#include "ui/town/storage_screen.h"
+void MenuPanel_ShowDescription(struct StorageScreen *screen, s32 message)
 {
     ScrollingDialogue_ClearScript();
-    panel->bannerFlags |= 1;
-    MessageWindow_SetMessageTable(panel->text);
+    screen->indicators[4].flags |= 1;
+    MessageWindow_SetMessageTable(screen->text);
     MessageWindow_SetBounds(0, 16, 30, 2);
     MessageWindow_SetDisplayMode(1);
-    MessageWindow_ShowMessage(mode);
+    MessageWindow_ShowMessage(message);
 }
