@@ -1,29 +1,21 @@
 #include "global.h"
 #include "engine/video/render.h"
+#include "scene/areas/area_effect_link.h"
 #include "engine/ram.h"
 #include "engine/engine_pause_flags.h"
 
-struct SceneSelection {
-    u8 pad0[0x1a];
-    u16 slotCount;
-    u8 pad1c[0x14];
-    u32 timer;
-    u8 pad34[10];
-    u16 command;
-    u16 *slots;
-};
-u8 LinkSession_ConsumeStateEntry(struct SceneSelection *);
-s32 LinkSession_CheckSessionReady(struct SceneSelection *);
-void LinkSession_BeginShutdown(struct SceneSelection *, void (*)(void));
+u8 LinkSession_ConsumeStateEntry(struct AreaEffectLinkState *);
+s32 LinkSession_CheckSessionReady(struct AreaEffectLinkState *);
+void LinkSession_BeginShutdown(struct AreaEffectLinkState *, void (*)(void));
 void ScriptPanel_OpenTextWindow(void);
 void Sound_FadeOutChannel10(u32);
-void LinkSession_SetState(struct SceneSelection *, u32, void (*)(void));
+void LinkSession_SetState(struct AreaEffectLinkState *, u32, void (*)(void));
 void SessionMenu_CreateStageIconDisplay(void);
-static inline u16 GetSlot(struct SceneSelection *p, s32 i)
+static inline u16 GetSlot(struct AreaEffectLinkState *p, s32 i)
 {
     if (i < 0)
         return 0xffff;
-    return p->slots[i];
+    return p->selection[i];
 }
 static inline u8 IsTransitionSlot(u32 value)
 {
@@ -31,7 +23,7 @@ static inline u8 IsTransitionSlot(u32 value)
         return 1;
     return 0;
 }
-s32 SceneSelection_WaitForSlotTransition(struct SceneSelection *p)
+s32 SceneSelection_WaitForSlotTransition(struct AreaEffectLinkState *p)
 {
     s32 count, i, length;
     gLinkMenuActive = 1;
@@ -40,7 +32,7 @@ s32 SceneSelection_WaitForSlotTransition(struct SceneSelection *p)
         gObjFadeLevel = 0x40;
         Sound_FadeOutChannel10(1);
     }
-    if (p->timer == 1)
+    if (p->menuElapsed == 1)
         Engine_SetPauseFlags(4);
     if (LinkSession_CheckSessionReady(p) < 0) {
         LinkSession_BeginShutdown(p, ScriptPanel_OpenTextWindow);
@@ -48,7 +40,7 @@ s32 SceneSelection_WaitForSlotTransition(struct SceneSelection *p)
     }
     count = 0;
     i = 0;
-    length = p->slotCount;
+    length = p->participantCount;
     if (i < length) {
         unsigned short mask = 0x3c00;
         do {
@@ -59,8 +51,8 @@ s32 SceneSelection_WaitForSlotTransition(struct SceneSelection *p)
     }
     if (count == length)
         LinkSession_SetState(p, 16, SessionMenu_CreateStageIconDisplay);
-    else if (p->timer > 9) {
-        p->command = 0x2000;
+    else if (p->menuElapsed > 9) {
+        p->requestedMode = 0x2000;
         Engine_ClearPauseFlags(4);
     }
     return 0;

@@ -357,3 +357,4 @@ src/link/score_panel/LinkScorePanel_OnWaitSessionReady.c	LinkScorePanel_OnWaitSe
 src/link/score_panel/sub_0810FDDC.c	sub_0810FDDC	contrived	contrived	4	dead row++ stays: keeps the hundreds slot register separate
 src/link/score_panel/RecordList_InitializeSprites.c	sub_0810FADC	contrived	natural	1	second function of the unit; committed with RecordList_InitializeSprites
 src/link/selection/LinkSelection_WaitForEmptySlots.c	LinkSelection_WaitForEmptySlots	minor	minor	6	sessionData pointer taken first stays
+src/link/selection/SceneSelection_WaitForSlotTransition.c	SceneSelection_WaitForSlotTransition	contrived	minor	7	mask local and guarded do-while stay: a for loop reorders the mask load
