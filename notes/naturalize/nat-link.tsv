@@ -12,3 +12,4 @@ src/link/handshake/LinkHandshake_ResetInstance.c	LinkHandshake_ResetInstance	nat
 src/link/handshake/SlotMonitor_CheckTimeout.c	SlotMonitor_CheckTimeout	minor	natural	2	
 src/link/handshake/LinkHandshake_AdvanceTimeout.c	LinkHandshake_AdvanceTimeout	contrived	natural	1	
 src/link/handshake/CallbackTask_Finish.c	CallbackTask_Finish	minor	natural	1	
+src/link/handshake/LinkHandshake_UpdateRestartState.c	LinkHandshake_UpdateRestartState	contrived	natural	1	

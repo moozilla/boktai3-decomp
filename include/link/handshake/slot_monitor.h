@@ -12,13 +12,13 @@ struct SlotMonitor {
     u32 f28;    /* confidence=low */
     u32 f2c;    /* confidence=low */
     u32 f30;
-    s32 elapsed; /* confidence=low; counts toward timeout */
-    u32 f38;     /* confidence=low */
-    u32 f3c;     /* confidence=low */
-    u32 f40;     /* confidence=low */
-    s32 f44;     /* confidence=low */
-    s32 f48;     /* confidence=low */
-    s32 field4c; /* confidence=low */
+    s32 elapsed;        /* confidence=low; counts toward timeout */
+    u32 f38;            /* confidence=low */
+    u32 errorFrames;    /* confidence=low */
+    s32 roleRetryTimer; /* confidence=low; frames without a serial role */
+    s32 f44;            /* confidence=low */
+    s32 f48;            /* confidence=low */
+    s32 field4c;        /* confidence=low */
     s32 retryTimer;
     s32 ticks;
     s32 ticks58; /* confidence=low */
@@ -28,16 +28,18 @@ struct SlotMonitor {
     u16 slots[4]; /* confidence=low */
     u16 limit;    /* confidence=low */
     u16 config;
-    u8 unk6e; /* confidence=low */
-    u8 mode;  /* confidence=low */
-    u32 f70;  /* confidence=low */
+    u8 restartPending; /* confidence=low */
+    u8 mode;           /* confidence=low */
+    u32 f70;           /* confidence=low */
     u32 f74;
     u32 f78;
-    void (*callback)(void);
+    void (*callback)(struct SlotMonitor *obj);
     u32 f80;
 };
 
 u8 LinkHandshake_AdvanceTimeout(struct SlotMonitor *obj);
+void LinkHandshake_UpdateRestartState(struct SlotMonitor *obj);
+void SlotMonitor_PollResult(struct SlotMonitor *obj);
 
 typedef char SlotMonitorSizeCheck[sizeof(struct SlotMonitor) == 0x84 ? 1 : -1];
 

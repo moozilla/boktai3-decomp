@@ -1,21 +1,18 @@
 #include "global.h"
+#include "link/handshake/slot_monitor.h"
 
-extern void SerialLink_ResetMultiplayer(void);
-void SlotMonitor_PollResult(void);
+void SerialLink_ResetMultiplayer(void);
 
-void LinkHandshake_UpdateRestartState(u8 *p)
+void LinkHandshake_UpdateRestartState(struct SlotMonitor *obj)
 {
-    u8 *r4 = p + 0x6E;
-    u32 v = *r4;
-
-    if (v != 0) {
+    if (obj->restartPending) {
         SerialLink_ResetMultiplayer();
-        *r4 = 0;
+        obj->restartPending = FALSE;
     } else {
-        *(void **)(p + 0x7C) = SlotMonitor_PollResult;
-        *(u32 *)(p + 0x50) = v;
-        *(u32 *)(p + 0x3C) = v;
-        *(u32 *)(p + 0x40) = v;
-        *(u32 *)(p + 0x58) = v;
+        obj->callback = SlotMonitor_PollResult;
+        obj->retryTimer = 0;
+        obj->errorFrames = 0;
+        obj->roleRetryTimer = 0;
+        obj->ticks58 = 0;
     }
 }

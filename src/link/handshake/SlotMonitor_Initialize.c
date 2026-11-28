@@ -5,7 +5,6 @@ void Solar_PauseMeasurement(void);
 void Serial_InitMultiplayer(void);
 void sub_08223180(void);
 void LinkConnection_SetRetryOptions(void *, u32);
-void SlotMonitor_PollResult(void);
 s32 SlotMonitor_Initialize(struct SlotMonitor *obj, s32 timeout, u32 param, u32 setting, s32 config,
                            u32 mode)
 {
