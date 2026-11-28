@@ -106,3 +106,9 @@ src/effects/bursts/explosion.c	Explosion_InitCollider	contrived	natural	1	-
 src/effects/bursts/explosion.c	Explosion_InitColliderWithFlags	contrived	natural	1	-
 src/effects/bursts/explosion.c	Explosion_Init	contrived	natural	1	-
 src/effects/bursts/explosion.c	Explosion_InitWithCollisionFlags	contrived	natural	1	-
+src/effects/bursts/explosion.c	Explosion_Destroy	natural	natural	0	
+src/effects/bursts/explosion.c	Explosion_CreateImmediate	natural	natural	0	
+src/effects/bursts/explosion.c	Explosion_CreateDelayed	natural	natural	0	
+src/effects/bursts/explosion.c	Explosion_Create	natural	natural	0	
+src/effects/bursts/explosion.c	Explosion_CreateAt	natural	natural	0	
+src/effects/bursts/explosion.c	Explosion_CreateWithCollisionFlags	natural	natural	0	
