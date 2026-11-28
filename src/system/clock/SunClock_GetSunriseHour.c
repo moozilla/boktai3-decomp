@@ -1,10 +1,8 @@
 // COMPILER: old_agbcc
-#include "global.h"
+#include "system/clock/sun_clock.h"
 /* SunClock_GetSunriseHour: Returns the hour stored by the sunrise setter */
-
-extern u8 gSunClock[];
 
 u8 SunClock_GetSunriseHour(void)
 {
-    return gSunClock[10];
+    return gSunClock.hourA;
 }
