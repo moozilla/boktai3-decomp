@@ -134,9 +134,9 @@ s32 MovingGlyph_InitializeFromScript(void *p, u32 unusedA, u32 unusedB)
         position.packed.y = Script_GetValue();
         position.packed.z = Script_GetValue();
     } else {
-        u32 mask = 0xFFFF0000;
-        position.words[0] = 0;
-        position.words[1] &= mask;
+        position.packed.x = 0;
+        position.packed.y = 0;
+        position.packed.z = 0;
     }
     if (Script_SeekToKeyword('c'))
         palette = Script_GetValue() + 0x4B;
