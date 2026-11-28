@@ -1,12 +1,15 @@
 #include "global.h"
-void Collectible_ApplyPickupReward(u8 *, u32);
-void Collectible_StartDeath(void);
-void Collectible_OnPickup(u8 *s, u32 arg)
+#include "engine/engine.h"
+#include "engine/ram.h"
+#include "objects/items/collectible.h"
+
+void Collectible_OnPickup(void *owner, struct SpatialEntry *other)
 {
-    u32 *p = (u32 *)(s + 0x9c);
+    struct Collectible *item = owner;
+    struct SpatialEntry *body = &item->body;
     u32 mask = 1;
-    *p |= mask;
-    Collectible_ApplyPickupReward(s, arg);
-    *(u32 *)(s + 0xf4) = (u32)Collectible_StartDeath;
-    s[0xf1] = mask;
+    body->flags |= mask;
+    Collectible_ApplyPickupReward(item, other);
+    item->update = Collectible_StartDeath;
+    item->entered = mask;
 }

@@ -438,3 +438,4 @@ src/objects/items/collectible/Collectible_DestroyManager.c	Collectible_DestroyMa
 src/objects/items/collectible/ActorParticles_InitPool.c	ActorParticles_InitPool	minor	natural	3	
 src/objects/items/collectible/Collectible_CreateManager.c	Collectible_CreateManager	minor	natural	1	
 src/objects/items/collectible/Collectible_ApplyPickupReward.c	Collectible_ApplyPickupReward	contrived	natural	1	
+src/objects/items/collectible/Collectible_OnPickup.c	Collectible_OnPickup	contrived	minor	6	body pointer and mask locals fix the constant-before-load order
