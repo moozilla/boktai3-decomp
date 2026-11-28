@@ -216,3 +216,4 @@ src/effects/feathers/FeatherEffectPool_AllocEntry.c	FeatherEffectPool_AllocEntry
 src/effects/feathers/FeatherEffectPool_UpdateOpeningAnimation.c	FeatherEffectPool_UpdateOpeningAnimation	minor	natural	6	-
 src/effects/feathers/FeatherEffectPool_ClipScatterPath.c	FeatherEffectPool_ClipScatterPath	contrived	partial	40	cell variable reused for the random table address (constant-pseudo priority); UBFIX return
 src/effects/feathers/FeatherEffectPool_SpawnGroundScatter.c	FeatherEffectPool_SpawnGroundScatter	contrived	partial	60	data pointer reused for table and cell (constant-pseudo priority); assignment inside the cell test; mask local for the floor height
+src/effects/feathers/FeatherEffectPool_UpdateScatterAnimation.c	FeatherEffectPool_UpdateScatterAnimation	contrived	natural	2	-
