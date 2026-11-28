@@ -172,3 +172,10 @@ src/ui/dialogue/choice_menu.c	ChoiceMenu_LayoutText	contrived	minor	1	doubleChar
 src/ui/dialogue/choice_menu.c	ChoiceMenu_Initialize	minor	natural	1	
 src/ui/dialogue/choice_menu.c	ChoiceMenu_CreateFromScript	contrived	natural	1	
 src/ui/dialogue/choice_menu.c	ChoiceMenu_ReloadFromScript	minor	natural	1	
+src/ui/dialogue/choice_menu.c	ChoiceMenu_Select	natural	natural	0	
+src/ui/dialogue/choice_menu.c	ChoiceMenu_HandleInput	natural	natural	0	
+src/ui/dialogue/choice_menu.c	ChoiceMenu_Update	natural	natural	0	
+src/ui/dialogue/choice_menu.c	ChoiceMenu_Destroy	natural	natural	0	
+src/ui/dialogue/choice_menu.c	ChoiceMenu_PrintText	natural	natural	0	
+src/ui/dialogue/choice_menu.c	ChoiceMenu_ParseTag	minor	minor	1	shared tag-argument macro; text = Find(); return text keeps the exits separate
+src/ui/dialogue/choice_menu.c	ChoiceMenu_Create	natural	natural	0	
