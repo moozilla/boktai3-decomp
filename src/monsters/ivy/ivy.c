@@ -1021,20 +1021,12 @@ s32 Ivy_UpdateColliderPosition(struct ChaseActor *actor)
 
 void Ivy_UpdateGrabAttack(struct ChaseActor *actor);
 
-static inline void SetCollider(struct ContactCollider *collider)
+void SceneActorControl_WaitForTarget(struct ChaseActor *actor)
 {
-    u32 flags = ~4;
-    flags &= collider->flags;
-    flags |= 8;
-    collider->flags = flags;
-}
-
-void SceneActorControl_WaitForTarget(struct ChaseActor *input)
-{
-    struct ChaseActor *actor = input;
     struct Ivy *state = actor->base.context;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
-        SetCollider(&actor->base.colliderA);
+        ContactCollider_ClearFlags(&actor->base.colliderA, 4);
+        ContactCollider_SetFlags(&actor->base.colliderA, 8);
         HalfwordFlags_Clear(&actor->base.placementFlags, 0x800);
     }
     if (!Ivy_FindAdjacentTarget(actor, 1))
