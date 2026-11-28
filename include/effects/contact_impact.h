@@ -26,8 +26,8 @@ struct ContactImpactPackedPosition {
 u32 PopInSprite_GetStateResult(struct ContactImpactEffect *);
 void ContactImpactEffect_BeginMotion(void *object, struct ContactPosition *,
                                      struct ContactPosition *, u32, u32, u32, s32, u32);
-void SceneTarget_BeginMove(struct ContactImpactEffect *, struct ContactPosition *,
-                           struct ContactPosition *, s32, u32, u32, u32);
+void SceneTarget_BeginMove(void *object, struct ContactPosition *, struct ContactPosition *, s32,
+                           u32, u32, u32);
 void ContactImpactEffect_BeginTimedPosition(struct ContactImpactEffect *, struct ContactPosition *,
                                             u32);
 void PopInSprite_ClearState(struct ContactImpactEffect *);

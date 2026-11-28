@@ -96,19 +96,6 @@ void ContactImpactEffect_BeginMotion(void *object, struct ContactPosition *from,
 
 void OrbitMotion_BeginArc(void *, void *, void *, u32, u32);
 
-static inline void FromScreenCapture(struct ContactPosition *out,
-                                     const struct ContactPosition *screen, s32 offset,
-                                     struct ContactPosition **capture)
-{
-    s32 x = screen->x + (s16)gCameraOrigin[0] - 120;
-    s32 y = screen->y + (s16)gCameraOrigin[1] - 80;
-    s32 first = __divsi3((x + y) << 5, 3) + offset;
-    *capture = out;
-    out->x = Half(first);
-    out->y = offset;
-    out->z = Half(__divsi3((y - x) << 5, 3) + offset);
-}
-
 static inline void ToScreenArc(struct ContactPosition *screen, struct ContactPosition *world)
 {
     s32 x = world->x;
@@ -129,56 +116,36 @@ static inline void ToScreenArc(struct ContactPosition *screen, struct ContactPos
     screen->z -= gCameraOrigin[2];
 }
 
-void SceneTarget_BeginMove(struct ContactImpactEffect *input, struct ContactPosition *source,
-                           struct ContactPosition *destination, s32 initialScale, u32 rampTo,
-                           u32 arcParameter, u32 trackMode)
+void SceneTarget_BeginMove(void *object, struct ContactPosition *from, struct ContactPosition *to,
+                           s32 rampFrom, u32 rampTo, u32 arcParameter, u32 trackMode)
 {
-    struct ContactPosition *from = source;
-    struct ContactPosition *to = destination;
-    s32 rampFrom = initialScale;
-    struct ContactImpactEffect *effect = input;
-    struct ContactPosition *origin;
-    struct ContactPosition *target;
-    if (!effect)
-        return;
-    if (!to)
+    struct ContactImpactEffect *effect = object;
+
+    if (!effect || !to)
         return;
     if (from) {
-        if (!effect->coordinateMode) {
-            struct ContactPosition *out = &effect->world;
-            FromScreenCapture(out, from, 0, &origin);
-        } else {
-            struct ContactPosition *out = &effect->world;
-            *out = *from;
-            origin = out;
-        }
+        if (!effect->coordinateMode)
+            FromScreen(&effect->world, from, 0);
+        else
+            effect->world = *from;
     } else if (!effect->coordinateMode) {
-        struct ContactPosition *out = &effect->world;
-        struct ContactPosition *in = &effect->sprite.position;
-        FromScreenCapture(out, in, 0, &origin);
+        FromScreen(&effect->world, &effect->sprite.position, 0);
     } else {
-        struct ContactPosition *out = &effect->world;
-        struct ContactPosition *in = &effect->sprite.position;
-        s32 height = to->y;
-        FromScreenCapture(out, in, height, &origin);
+        FromScreen(&effect->world, &effect->sprite.position, to->y);
     }
-    if (!effect->coordinateMode) {
-        struct ContactPosition *out = &effect->target;
-        FromScreenCapture(out, to, 0, &target);
-    } else {
-        struct ContactPosition *out = &effect->target;
-        *out = *to;
-        target = out;
-    }
+    if (!effect->coordinateMode)
+        FromScreen(&effect->target, to, 0);
+    else
+        effect->target = *to;
     if (rampFrom < 0)
         effect->rampFrom = (s8)effect->sprite.scaleX;
     else
         effect->rampFrom = rampFrom;
     effect->rampTo = rampTo;
-    ToScreenArc(&effect->sprite.position, origin);
+    ToScreenArc(&effect->sprite.position, &effect->world);
     effect->sprite.scaleX = effect->rampFrom;
     effect->sprite.scaleY = effect->rampFrom;
-    OrbitMotion_BeginArc(&effect->motion, origin, target, arcParameter, trackMode);
+    OrbitMotion_BeginArc(&effect->motion, &effect->world, &effect->target, arcParameter, trackMode);
     effect->shakeThreshold = trackMode;
     effect->sprite.flags &= ~1;
     ContactImpactEffect_EnterUpdate(effect, ContactImpactEffect_UpdateContact);
