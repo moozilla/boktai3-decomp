@@ -13,7 +13,7 @@ void ArmorActor_UpdateFixedSpeedMotion(struct SceneCombatActor *p)
 
     if (p->actionPhase == 0) {
         Armor_SetAnimationFromStart(p, &gUnk_0824EDF8[((p->heading + 0x60) >> 6) & 3]);
-        *s = 0xFF;
+        p->actionPhase = 0xFF;
         p->actionReady = 1;
         p->flags |= 2;
         ActorController_SelectDefenseColliders(p);
@@ -22,10 +22,8 @@ void ArmorActor_UpdateFixedSpeedMotion(struct SceneCombatActor *p)
     }
     if ((p->actionCounter & 0x1F) == 0) {
         u8 *ap = &p->heading;
-        u8 a;
         w = &p->velocity;
-        a = *ap;
-        ActorController_SetMotion(w, a, 32);
+        ActorController_SetMotion(w, *ap, 32);
         p->flags |= 0x20;
         if (p->velocity.x == 0) {
             s32 distance = (u8)p->navigation.referencePosition.x;
