@@ -567,3 +567,4 @@ src/ui/town/solar_bank/SolarBank_UpdateTransferInput.c	SolarBank_UpdateTransferI
 src/ui/town/storage/Storage_RefreshItemSlots.c	Storage_RefreshItemSlots	contrived	contrived	40	byte-offset row pointers, rowBytes counter and a goto: plain nested loops reverse the column counter and split the flags pointer
 src/ui/town/storage/Storage_RefreshConsumableSlots.c	Storage_RefreshConsumableSlots	contrived	contrived	1	byte-offset cell pointers and gotos (not reworked)
 src/ui/town/storage/Storage_RefreshEquipmentSlots.c	Storage_RefreshEquipmentSlots	contrived	contrived	2	byte-offset cell pointers and gotos (not reworked)
+src/ui/town/storage/Storage_BeginSwapTransition.c	Storage_BeginSwapTransition	contrived	minor	40	array base pointers set in the loop header; flags pointer for the consumable markers; slots pointer local
