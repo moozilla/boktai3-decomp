@@ -435,3 +435,4 @@ src/objects/items/collectible/Collectible_IsNearPlayer.c	Collectible_IsNearPlaye
 src/objects/items/collectible/Collectible_UpdateEntry.c	Collectible_UpdateEntry	contrived	minor	25	body pointer and mask locals fix the constant-before-load order; local camera view
 src/objects/items/collectible/CallbackPool_InvokeActive.c	CallbackPool_InvokeActive	minor	natural	1	
 src/objects/items/collectible/Collectible_DestroyManager.c	Collectible_DestroyManager	contrived	natural	2	
+src/objects/items/collectible/ActorParticles_InitPool.c	ActorParticles_InitPool	minor	natural	3	
