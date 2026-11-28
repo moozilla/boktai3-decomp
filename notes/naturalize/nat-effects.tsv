@@ -228,3 +228,4 @@ src/effects/healing/FlickerParticle_UpdateMotion.c	FlickerParticle_UpdateMotion	
 src/effects/healing/HealthRestoreEffect_StartParticleBurst.c	HealthRestoreEffect_StartParticleBurst	contrived	contrived	0	unchanged: typed indexed loop leaves the random-table load order (union/table pseudo hoisted after the induction inits and spilled); thousands of spellings, walking offsets and the union stay
 src/effects/healing/FlickerParticle_UpdateVerticalMotion.c	FlickerParticle_UpdateVerticalMotion	minor	natural	2	
 src/effects/healing/HealthRestoreEffect_InitRisingParticle.c	HealthRestoreEffect_InitRisingParticle	minor	natural	6	
+src/effects/healing/FlickerParticle_UpdateStationary.c	FlickerParticle_UpdateStationary	minor	natural	2	
