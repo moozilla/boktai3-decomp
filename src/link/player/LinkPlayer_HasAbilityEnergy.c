@@ -1,10 +1,13 @@
 #include "global.h"
-s32 LinkPlayer_GetSelectedAbilityCost(void *);
-u32 LinkPlayer_HasAbilityEnergy(u8 *s)
+#include "player/player.h"
+
+s32 LinkPlayer_GetSelectedAbilityCost(struct Player *);
+
+u32 LinkPlayer_HasAbilityEnergy(struct Player *p)
 {
-    s32 r = LinkPlayer_GetSelectedAbilityCost(s);
-    s32 a = *(u16 *)(s + 0x428);
-    if (a >= r)
+    s32 cost = LinkPlayer_GetSelectedAbilityCost(p);
+
+    if (p->currentStatB >= cost)
         return 1;
     return 0;
 }
