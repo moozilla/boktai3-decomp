@@ -565,3 +565,4 @@ src/script/script_virtual_machine.c	Script_ReadProcTable	contrived	natural	6	cur
 src/script/script_virtual_machine.c	Script_BackupVariableOperand	contrived	minor	8	reference index read as *(u16 *)(bytes + 6): ref.index moves the stack load relative to index = 0
 src/script/script_virtual_machine.c	Script_ReadBackupVariableOperand	contrived	minor	10	reference index read as *(u16 *)(bytes + 6): ref.index moves the stack load relative to index = 0
 src/script/script_virtual_machine.c	Script_EvalExpression	contrived	natural	8	a copy of the slot pointer and the opcode category local around the assignment
+src/script/script_virtual_machine.c	Script_LoadScript	contrived	minor	14	(u32) cast on the block base: pointer-typed sums swap the add operands

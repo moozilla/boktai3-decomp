@@ -651,12 +651,7 @@ s32 Script_LoadScript(u8 *p)
     gScriptSectionBases[3] = base + read_word(base + 12);
     base += read_word(base);
     ctx->body = base + 4;
-    {
-        u32 size = read_word(base);
-        size += (u32)base;
-        size += 8;
-        ctx->mainBlock = (u8 *)size;
-    }
+    ctx->mainBlock = (u8 *)(read_word(base) + (u32)base) + 8;
     return 0;
 }
 
