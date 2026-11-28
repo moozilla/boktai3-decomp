@@ -1,13 +1,11 @@
 #include "global.h"
 #include "system/game_state/game_state.h"
-void GameState_UnequipConsumableSlot(s32 a)
+void GameState_UnequipConsumableSlot(s32 slot)
 {
-    s32 i = 0;
-    do {
-        u8 *g = gGameState;
-        s16 *q = (s16 *)(i * 2 + (u32)g + 0x58);
-        if (*q == a)
-            *q = -1;
-        i++;
-    } while (i <= 3);
+    s32 i;
+
+    for (i = 0; i < 4; i++) {
+        if (*(i + gGameState->party) == slot)
+            *(i + gGameState->party) = -1;
+    }
 }
