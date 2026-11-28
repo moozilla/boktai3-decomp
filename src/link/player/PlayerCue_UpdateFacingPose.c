@@ -2,53 +2,33 @@
 #include "engine/math/scene_vec.h"
 #include "engine/engine.h"
 #include "player/cutscene/player_cue_sequence.h"
-struct P {
-    u8 pad0[0x14C];
-    struct ContactSwarmSprite sprite;
-    u8 pad1[0x3A2 - 0x14C - sizeof(struct ContactSwarmSprite)];
-    u8 facing, flip, dir;
-    u8 pad2[0x3FC - 0x3A5];
-    struct DisplaySequenceState seq;
-    u32 unknown40C;
-    const void *resource;
-    const void *resource2;
-    u8 pad3[0x458 - 0x418];
-    u8 phase;
-    u8 pad4;
-    u16 timer;
-    u8 pad5[0x4E8 - 0x45C];
-    u16 scale;
-    u8 pad6[0x58C - 0x4EA];
-    void (*fn)(struct P *);
-};
-void Player_SetTetherMode(struct P *, s32, s32);
-void Player_UpdateActionFacingSide(struct P *);
-#define B(o) (*(u8 *)((u8 *)p + (o)))
-#define H(o) (*(u16 *)((u8 *)p + (o)))
-#define S(o) (*(s16 *)((u8 *)p + (o)))
+#include "player/player.h"
+void Player_SetTetherMode(struct Player *, s32, s32);
+void Player_UpdateActionFacingSide(struct Player *);
 // confidence=low: input-facing pose sequence exits when the action status becomes negative.
-void PlayerCue_UpdateFacingPose(struct P *p)
+void PlayerCue_UpdateFacingPose(struct Player *p)
 {
-    if (B(0x457) != 0x17)
+    if (p->tetherMode != 0x17)
         Player_SetTetherMode(p, 0x17, 0);
-    if (S(0x34C) >= 0) {
-        u8 *direction = &p->dir;
-        *direction = (H(0x34C) & 254) + 1;
-        if (p->dir > 4) {
-            s32 side = (8 - p->dir) >> 1;
-            u8 *facing = &p->facing;
+    if ((s16)p->directionHistory[0] >= 0) {
+        u8 *direction = &p->facing;
+        *direction = (p->directionHistory[0] & 254) + 1;
+        if (p->facing > 4) {
+            s32 side = (8 - p->facing) >> 1;
+            u8 *facing = &p->heading;
             *facing = side;
-            p->flip = 1;
+            p->side = 1;
         } else {
-            u32 side = p->dir >> 1;
-            u8 *facing = &p->facing;
+            u32 side = p->facing >> 1;
+            u8 *facing = &p->heading;
             *facing = side;
-            p->flip = 0;
+            p->side = 0;
         }
     }
-    Anim_SetSequence(&p->seq, (void *)p->resource, 2, p->facing, p->flip);
-    PlayerCue_StepSequence(&p->sprite, &p->seq);
-    if ((s8)B(0x4F3) < 0) {
+    Anim_SetSequence(&p->cueCollider.sequence, p->cueCollider.sideResource, 2, p->heading, p->side);
+    PlayerCue_StepSequence((struct ContactSwarmSprite *)&p->secondaryDrawFlags,
+                           &p->cueCollider.sequence);
+    if ((s8)p->movementAnimationState < 0) {
         Player_UpdateActionFacingSide(p);
         Player_SetTetherMode(p, 0, 0);
     }
