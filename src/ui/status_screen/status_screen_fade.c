@@ -145,8 +145,7 @@ void StatusScreen_UpdateScanlineNoise(struct StatusScreen *p)
     s32 i;
     for (i = 0; i < p->top; i++)
         p->rows[p->active][i] = 0;
-    i = p->top;
-    for (; i < p->bottom; i++) {
+    for (i = p->top; i < p->bottom; i++) {
         p->rows[p->active][i] = (StatusScreen_Random() * p->amplitude) >> 18;
     }
     for (i = p->bottom; i < 160; i++)
