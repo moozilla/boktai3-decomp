@@ -656,11 +656,11 @@ struct TileTrigger *FloorTrapPool_FindByName(u32 key)
 
 void Tile_SetEnabledFromScript(void)
 {
-    s32 name = Script_GetKeywordValue(0x69, -1);
+    s32 name = Script_GetKeywordValue('i', -1);
     s32 enabled;
     struct TileTrigger *tile;
     if (name >= 0) {
-        enabled = Script_GetKeywordValue(0x73, 0);
+        enabled = Script_GetKeywordValue('s', 0);
         tile = FloorTrapPool_FindByName(name);
         if (tile) {
             if (enabled == 1) {

@@ -253,3 +253,4 @@ src/objects/floor_traps.c	FloorTrapPool_RunPendingScripts	natural	natural	0
 src/objects/floor_traps.c	FloorTrap_RestartHold	natural	natural	0	
 src/objects/floor_traps.c	FloorTrapPool_EnterStateThree	natural	natural	0	
 src/objects/floor_traps.c	FloorTrap_SetStateFromScript	contrived	natural	7	
+src/objects/floor_traps.c	Tile_SetEnabledFromScript	minor	natural	1	
