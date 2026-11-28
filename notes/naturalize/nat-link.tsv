@@ -53,11 +53,10 @@ src/link/menu/ScriptPanel_ConfirmSelection.c	ScriptPanel_ConfirmSelection	minor	
 src/link/menu/ScriptPanel_WaitForSelectionData.c	ScriptPanel_WaitForSelectionData	minor	natural	1	
 src/link/menu/sub_0810A304.c	sub_0810A304	contrived	natural	1	
 src/link/menu/SessionMenu_WaitForSelection.c	SessionMenu_WaitForSelection	minor	natural	1	
-src/link/menu/LinkMenu_UpdateSelection.c	LinkMenu_UpdateSelection	contrived	natural	2	
-src/link/menu/LinkMenu_WaitSelectionMode.c	LinkMenu_WaitSelectionMode	contrived	minor	20	mode test takes &p so gcse PRE does not reuse the selection load; double return 0 needed for the shared SetState call
+src/link/menu/LinkMenu_UpdateSelection.c	LinkMenu_UpdateSelection	contrived	natural	3	
+src/link/menu/LinkMenu_WaitSelectionMode.c	LinkMenu_WaitSelectionMode	contrived	minor	21	mode test takes &p so gcse PRE does not reuse the selection load; double return 0 needed for the shared SetState call
 src/link/menu/LinkMenu_ExchangeChoices.c	LinkMenu_ExchangeChoices	minor	natural	2	
 src/link/menu/SessionMenu_RunEventScript.c	SessionMenu_RunEventScript	minor	natural	1	
-src/link/menu/LinkMenu_ShowReadyMessage.c	LinkMenu_ShowReadyMessage	contrived	natural	1	
-src/link/menu/LinkMenu_UpdateSelection.c	LinkMenu_UpdateSelection	contrived	minor	1	follow-up: local mode test without a mask argument (no literal-param warning)
-src/link/menu/LinkMenu_WaitSelectionMode.c	LinkMenu_WaitSelectionMode	contrived	minor	1	follow-up: local mode test without a mask argument (no literal-param warning)
+src/link/menu/LinkMenu_ShowReadyMessage.c	LinkMenu_ShowReadyMessage	contrived	minor	1	shared mode test takes the mask (literal-param warning): a mask-free test does not keep 0x3c00 in a register across the loop
 src/link/menu/LinkMenu_ShowChoiceMessage.c	LinkMenu_ShowChoiceMessage	contrived	minor	3	shared mode test takes the mask (literal-param warning): a mask-free test does not keep 0x3c00 in a register across the loop
+src/link/menu/LinkMenu_ExchangePayload.c	LinkMenu_ExchangePayload	contrived	minor	1	shared mode test takes the mask
