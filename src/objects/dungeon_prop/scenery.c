@@ -211,18 +211,15 @@ void DungeonScenery_ApplyHitFlash(struct ContactCollider *source, void *unused,
                                   struct SceneScriptObject *object)
 {
     u8 scratch[4]; /* unused; the original reserves a 4-byte frame */
-    struct {
-        struct SceneScriptObject *object;
-    } context;
+    struct SceneScriptObject *prop = object;
 
-    context.object = object;
     if (!(source->reactionFlags & 0x40))
-        --context.object->lifetime;
-    if (context.object->lifetime > 0) {
-        context.object->fadeTimer = 6;
-        context.object->holdTimer = 15;
-        context.object->resource.paletteIndex = 0x192;
-        CpuSet(gPaletteBankData + 0x3240, context.object->resource.palette, 0x04000008);
+        --prop->lifetime;
+    if (prop->lifetime > 0) {
+        prop->fadeTimer = 6;
+        prop->holdTimer = 15;
+        prop->resource.paletteIndex = 0x192;
+        CpuSet(gPaletteBankData + 0x3240, prop->resource.palette, 0x04000008);
         Sound_PlaySong(0x13E);
     }
 }

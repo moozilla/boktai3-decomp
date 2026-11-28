@@ -214,3 +214,4 @@ src/objects/dungeon_prop/scenery.c	DungeonScenery_InitHitCollider	natural	natura
 src/objects/dungeon_prop/scenery.c	DungeonScenery_UpdateFade	contrived	minor	39	collider widget pointer plus ClearFlags(w, -5) and `4 | flags` keep the flag register order; constant-first mask local in the fading branch; Next() helper and dest local
 src/objects/coffin/tether_presentation.c	ScenePaletteFade_InitFromScript	natural	natural	1	
 src/objects/dungeon_prop/scenery.c	DungeonScenery_Initialize	minor	minor	4	palette upload block keeps the CpuSet mode local so the constant is loaded before the bank address
+src/objects/dungeon_prop/scenery.c	DungeonScenery_ApplyHitFlash	contrived	minor	7	local copy of the object parameter and an unused 4-byte scratch array give the original frame and register choice
