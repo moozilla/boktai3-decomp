@@ -41,7 +41,8 @@ void Player_UpdateFlaggedResourceRecovery(struct Player *p)
             }
             Sound_PlaySong(0xcb);
             if (!(*p->inputKeys & 1)) {
-                goto finish;
+                Player_SetActionPhase(p, 4);
+                break;
             }
             if (Player_CanRecoverResourceWhileFlagged(p)) {
                 Sound_PlaySong(0xd8);
@@ -51,12 +52,13 @@ void Player_UpdateFlaggedResourceRecovery(struct Player *p)
                 break;
             }
             p->chargeCounter = 0;
-            goto pause;
-        case 2: {
+            Player_SetActionPhase(p, 3);
+            break;
+        case 2:
             Player_SetStatusBits(&p->statusFlags, 0xa0);
-            if ((p->chargeCounter) <= 4) {
-                if ((++(p->chargeCounter)) == 5) {
-                    if ((p->actionMode) == 1) {
+            if (p->chargeCounter <= 4) {
+                if (++p->chargeCounter == 5) {
+                    if (p->actionMode == 1) {
                         Sound_PlaySong(0x308);
                     } else {
                         Sound_PlaySong(0x128);
@@ -70,15 +72,14 @@ void Player_UpdateFlaggedResourceRecovery(struct Player *p)
             if (!(*p->inputKeys & 1)) {
                 Sound_StopSong(0xd8);
                 p->chargeSoundActive = 0;
-                goto finish;
+                Player_SetActionPhase(p, 4);
+                break;
             }
             if (Player_CanRecoverResourceWhileFlagged(p)) {
                 break;
             }
             Sound_StopSong(0xd8);
             p->chargeSoundActive = 0;
-        }
-        pause:
             Player_SetActionPhase(p, 3);
             break;
         case 3:
@@ -86,7 +87,6 @@ void Player_UpdateFlaggedResourceRecovery(struct Player *p)
             Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 10), 64, 1);
             p->resetValue6FC = 30;
             if (!(*p->inputKeys & 1)) {
-            finish:
                 Player_SetActionPhase(p, 4);
                 break;
             }
