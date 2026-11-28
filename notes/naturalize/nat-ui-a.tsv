@@ -333,3 +333,4 @@ src/ui/dialogue/scrolling_dialogue/scrolling_dialogue.c	ScrollingDialogue_SetStr
 src/ui/dialogue/scrolling_dialogue/scrolling_dialogue.c	ScrollingDialogue_SetStringReferenceFromScript	natural	natural	0	
 src/ui/dialogue/scrolling_dialogue/TextWindowManager_ResetInstance.c	TextWindowManager_ResetInstance	natural	natural	0	
 src/ui/dialogue/scrolling_dialogue/TextWindowManager_IsCreated.c	TextWindowManager_IsCreated	contrived	natural	1	
+src/ui/dialogue/text_window/TextWindow_ResolveString.c	TextWindow_ResolveString	fudged	natural	1	

@@ -1,12 +1,12 @@
 #include "global.h"
+#include "engine/ram.h"
+#include "ui/dialogue/text_window.h"
+#include "ui/dialogue/text_window_manager.h"
 
-struct S {
-    u8 f[0x14];
-    u32 a;
-};
-u32 Script_ParseStringRef(u32);
-u32 Text_LookupString(u32);
-u32 TextWindow_ResolveString(struct S *p, u32 i)
+int Script_ParseStringRef(const void *);
+const u8 *Text_LookupString(int);
+
+const u8 *TextWindow_ResolveString(struct TextWindow *window, int index)
 {
-    return Text_LookupString(Script_ParseStringRef(p->a) + i);
+    return Text_LookupString(Script_ParseStringRef(window->script) + index);
 }
