@@ -555,3 +555,4 @@ src/script/script_record.c	Modifier_UpdateIdleDrain	natural	natural	0
 src/script/script_record.c	ActorDrain_Update	natural	natural	0	
 src/script/script_record.c	Modifier_InitDrainState	natural	natural	0	
 src/script/script_virtual_machine.c	Script_LookupArchive	contrived	natural	3	
+src/script/script_virtual_machine.c	Script_GetStackArgument	contrived	natural	4	

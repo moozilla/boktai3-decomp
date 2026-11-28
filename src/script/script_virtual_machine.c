@@ -287,7 +287,7 @@ u32 Script_GetCallArgument(s32 n)
 
 u32 Script_GetStackArgument(s32 n)
 {
-    return *(u32 *)((u8 *)gScriptVm.argSp - (n * 4 + 4));
+    return *(gScriptVm.argSp - (n + 1));
 }
 
 void Script_SetStackArgument(s32 n, u32 v)
