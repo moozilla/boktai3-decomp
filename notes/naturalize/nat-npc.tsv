@@ -326,3 +326,4 @@ src/npc/story_character/SceneNpc_SetKindMotionVector.c	SceneNpc_SetKindMotionVec
 src/npc/story_character/SceneCharacter_PlaceFromScript.c	SceneCharacter_PlaceFromScript	contrived	contrived	6	parked k2/one locals, the updates[2] callback array, keyframes and body pointer blocks all change allocation when removed
 src/npc/story_character/SceneCharacter_CommandFromScript.c	SceneCharacter_CommandFromScript	contrived	contrived	0	same shapes as PlaceFromScript: one local, updates[2] callback array, body pointer blocks; case 2 falls into case 4
 src/npc/otenko/Otenko_UpdateAnimation14.c	Otenko_UpdateAnimation14	contrived	natural	1	
+src/npc/otenko/Otenko_UpdateAnimation18.c	Otenko_UpdateAnimation18	contrived	natural	1	
