@@ -11,70 +11,64 @@ u16 *NumericOverlay_GetTileMapPtr(u32 bg, u32 x, s32 y)
 void sub_0800F4EC(struct NumericOverlay *unused)
 {
     int digits[2];
-    s16 *dst;
-    int row, col, n, base;
+    u16 *dst;
+    int row, col, width, base;
     u32 hours, minutes;
-    struct StatusGameState *c = &gSunClock;
-    if (!c)
+    struct StatusGameState *clock = &gSunClock;
+    if (!clock)
         return;
-    if (c->mode == 0 || c->mode == 4 || c->mode == 5) {
-        dst = (s16 *)NumericOverlay_GetTileMapPtr(0, 4, 15);
-        hours = c->altCounters[0];
-        minutes = c->altCounters[1];
+    if (clock->mode == 0 || clock->mode == 4 || clock->mode == 5) {
+        dst = NumericOverlay_GetTileMapPtr(0, 4, 15);
+        hours = clock->altCounters[0];
+        minutes = clock->altCounters[1];
     } else {
-        dst = (s16 *)NumericOverlay_GetTileMapPtr(0, 4, 15);
-        hours = c->counters[0];
-        minutes = c->counters[1];
+        dst = NumericOverlay_GetTileMapPtr(0, 4, 15);
+        hours = clock->counters[0];
+        minutes = clock->counters[1];
     }
     for (row = 0; row < 2; row++) {
-        int shift = row << 4;
         base = 0x6a;
         for (col = 0; col < 4; col++)
-            dst[col] = (shift + base + col) | -12288;
+            dst[col] = ((row << 4) + base + col) | 0xD000;
         dst += gBgRecords[0].width * 2;
     }
 
-    dst = (s16 *)NumericOverlay_GetTileMapPtr(0, 8, 15);
-    if (c->mode == 0 || c->mode == 4 || c->mode == 5) {
-        n = 2;
+    dst = NumericOverlay_GetTileMapPtr(0, 8, 15);
+    if (clock->mode == 0 || clock->mode == 4 || clock->mode == 5) {
+        width = 2;
         base = 0x6e;
     } else {
-        n = 2;
+        width = 2;
         base = 0x4e;
     }
     for (row = 0; row < 2; row++) {
-        int shift = row << 4;
-        for (col = 0; col < n; col++)
-            dst[col] = (shift + base + col) | -12288;
+        for (col = 0; col < width; col++)
+            dst[col] = ((row << 4) + base + col) | 0xD000;
         dst += gBgRecords[0].width * 2;
     }
 
     digits[0] = Div(hours, 10);
     digits[1] = hours - digits[0] * 10;
-    dst = (s16 *)NumericOverlay_GetTileMapPtr(0, 16, 15);
-    row = 0;
-    for (; row < 2; row++) {
+    dst = NumericOverlay_GetTileMapPtr(0, 16, 15);
+    for (row = 0; row < 2; row++) {
         for (col = 0; col < 2; col++) {
-            s16 *out = dst + col;
+            u16 *out = &dst[col];
             int tile = digits[col] + 0x60;
-            *out = (row << 4) + tile | -12288;
+            *out = ((row << 4) + tile) | 0xD000;
         }
         dst += gBgRecords[0].width * 2;
     }
 
     digits[0] = Div(minutes, 10);
     digits[1] = minutes - digits[0] * 10;
-    dst = (s16 *)NumericOverlay_GetTileMapPtr(0, 22, 15);
-    row = 0;
-    for (; row < 2;) {
-        int next = row + 1;
+    dst = NumericOverlay_GetTileMapPtr(0, 22, 15);
+    for (row = 0; row < 2; row++) {
         for (col = 0; col < 2; col++) {
-            s16 *out = dst + col;
+            u16 *out = &dst[col];
             int tile = digits[col] + 0x60;
-            *out = (row << 4) + tile | -12288;
+            *out = ((row << 4) + tile) | 0xD000;
         }
         dst += gBgRecords[0].width * 2;
-        row = next;
     }
 }
 

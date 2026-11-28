@@ -144,3 +144,4 @@ src/ui/status_screen/status_screen_fade.c	StatusScreen_Initialize	natural	natura
 src/ui/status_screen/status_screen_fade.c	StatusScreen_Open	natural	natural	0	-
 src/ui/status_screen/status_screen_fade.c	NumericOverlay_ClearActive	natural	natural	0	-
 src/ui/status_screen/numeric_overlay.c	NumericOverlay_GetTileMapPtr	minor	natural	2	-
+src/ui/status_screen/numeric_overlay.c	sub_0800F4EC	contrived	natural	2	-
