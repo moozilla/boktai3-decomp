@@ -4,24 +4,14 @@
 s32 Nidhoggr_ChangeCompletedPartState(void *object, s32 index, s32 state)
 {
     struct Nidhoggr *boss = object;
-    u8 *base = (u8 *)boss;
-    u8 *ready;
-    u8 *stateBase;
-    u8 *current;
-    u32 zero;
-    base += 0x7210;
-    ready = base + index;
-    if (*ready == 0)
+
+    if (!boss->rowDoneFlag[index])
         return 0;
-    stateBase = (u8 *)boss;
-    stateBase += 0x71C2;
-    current = stateBase + index;
-    if (*current == state)
+    if (boss->partState[index] == state)
         return 0;
-    zero = 0;
-    *current = state;
-    boss->rowInitFlag[index] = zero;
-    boss->rowCounter[index] = zero;
-    *ready = zero;
+    boss->partState[index] = state;
+    boss->rowInitFlag[index] = 0;
+    boss->rowCounter[index] = 0;
+    boss->rowDoneFlag[index] = 0;
     return 1;
 }
