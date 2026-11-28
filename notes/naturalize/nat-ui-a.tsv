@@ -100,3 +100,7 @@ src/ui/books/collection/CollectionMenu_InitGraphics.c	CollectionMenu_InitGraphic
 src/ui/books/collection/CollectionMenu_Init.c	CollectionMenu_Init	contrived	natural	1	
 src/ui/books/collection/CollectionMenu_Update.c	CollectionMenu_Update	contrived	natural	1	falls off the end of an s32 function (kept)
 src/ui/books/collection/CollectionMenu_DestroyGraphics.c	CollectionMenu_DestroyGraphics	contrived	natural	1	
+src/ui/books/collection/CollectionMenu_IsValidGridPosition.c	CollectionMenu_IsValidGridPosition	natural	natural	0	
+src/ui/books/collection/CollectionMenu_FinalizeState.c	CollectionMenu_FinalizeState	natural	natural	0	empty
+src/ui/books/collection/CollectionMenu_OnTaskDestroy.c	CollectionMenu_OnTaskDestroy	minor	minor	0	u32 parameter passed through
+src/ui/books/collection/CollectionMenu_Create.c	CollectionMenu_Create	natural	natural	0	
