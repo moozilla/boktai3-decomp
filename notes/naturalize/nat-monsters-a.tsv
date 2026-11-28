@@ -562,3 +562,9 @@ src/monsters/golem/golem_main.c	Golem_UpdateDying	contrived	contrived	2	reused m
 src/monsters/golem/golem_main.c	Golem_UpdateChargeBuildup	minor	minor	1	second context pointer for the wait time
 src/monsters/golem/golem_main.c	Golem_UpdateChargeWindup	contrived	minor	2	reaction flag mask block and direct random table address remain
 src/monsters/golem/golem_main.c	Golem_UpdateRouteMotion	natural	natural	0	
+src/monsters/golem/golem_main.c	Golem_UpdateRecoil	contrived	minor	2	quadrant mask locals remain
+src/monsters/golem/golem_main.c	Golem_ResumeBehaviorAfterDisplacement	contrived	natural	1	
+src/monsters/golem/golem_2.c	Golem_ResumeDelayedRoute	contrived	natural	1	
+src/monsters/golem/golem_2.c	Golem_TickFacingQuadrant	minor	minor	1	quadrant mask local: the literal loads before the shift
+src/monsters/golem/golem_main_2.c	Golem_ResumeRouteAfterControl	minor	minor	2	flag pointer and returning local remain
+src/monsters/golem/golem_main.c	SceneActorReaction_SlideBack	contrived	contrived	1	hand-inlined animation selection with pointer temps and goto: the shared selector computes addresses differently
