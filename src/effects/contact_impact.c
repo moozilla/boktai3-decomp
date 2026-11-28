@@ -154,25 +154,24 @@ void SceneTarget_BeginMove(void *object, struct ContactPosition *from, struct Co
 
 // confidence=low: begins a stationary world-position effect with a timed callback.
 
-void ContactImpactEffect_BeginTimedPosition(struct ContactImpactEffect *input,
-                                            struct ContactPosition *source, u32 time)
+void ContactImpactEffect_BeginTimedPosition(void *object, struct ContactPosition *from,
+                                            u32 duration)
 {
-    struct ContactPosition *from = source;
-    u32 duration = time;
-    struct ContactImpactEffect *effect = input;
-    if (effect) {
-        if (from) {
-            if (!effect->coordinateMode)
-                FromScreen((struct ContactPosition *)&effect->world.x, from, 0);
-            else
-                *(struct ContactPosition *)&effect->world.x = *from;
-        } else
-            FromScreen((struct ContactPosition *)&effect->world.x,
-                       (struct ContactPosition *)(u16 *)&effect->sprite.position.x, 0);
-        effect->shakeThreshold = duration;
-        effect->sprite.flags &= ~1;
-        ContactImpactEffect_EnterUpdate(effect, ContactImpactEffect_UpdateShakingPosition);
+    struct ContactImpactEffect *effect = object;
+
+    if (!effect)
+        return;
+    if (from) {
+        if (!effect->coordinateMode)
+            FromScreen(&effect->world, from, 0);
+        else
+            effect->world = *from;
+    } else {
+        FromScreen(&effect->world, &effect->sprite.position, 0);
     }
+    effect->shakeThreshold = duration;
+    effect->sprite.flags &= ~1;
+    ContactImpactEffect_EnterUpdate(effect, ContactImpactEffect_UpdateShakingPosition);
 }
 
 void PopInSprite_ClearState(struct ContactImpactEffect *p)
