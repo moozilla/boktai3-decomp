@@ -313,12 +313,8 @@ void ContactImpactEffect_UpdateBlinkFrame(struct ContactImpactEffect *effect)
 
 void PopInSprite_StartAppearing(struct ContactImpactEffect *p)
 {
-    void (*f)(struct ContactImpactEffect *);
     p->sprite.flags &= ~1;
-    f = SpriteController_AnimateGrowing;
-    p->update = f;
-    p->timer = 0;
-    p->stateResult = 0;
+    ContactImpactEffect_EnterUpdate(p, SpriteController_AnimateGrowing);
 }
 
 void PopInSprite_StartDisappearing(struct ContactImpactEffect *p)
