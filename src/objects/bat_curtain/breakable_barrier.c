@@ -297,7 +297,9 @@ int BreakableBarrier_Initialize(struct BreakableBarrierManager *, struct Breakab
 int BreakableBarriers_Initialize(struct BreakableBarrierManager *m)
 {
     int i;
-    struct BreakableBarrier *p;
+    int blend;
+    struct BreakableBarrier *barrier;
+
     m->count = 0;
     m->remaining = 0;
     m->health = Script_GetKeywordValue('l', 5);
@@ -311,31 +313,23 @@ int BreakableBarriers_Initialize(struct BreakableBarrierManager *m)
         m->remaining = i;
     }
     if (Script_SeekToKeyword('d')) {
-        u32 *d;
-        i = 0;
-        if (i < m->count) {
-            d = m->direction;
-            do {
-                *d++ = Script_GetValue();
-                i++;
-            } while (i < m->count);
-        }
+        for (i = 0; i < m->count; i++)
+            m->direction[i] = Script_GetValue();
     }
-    p = m->barriers;
-    for (i = 0; i < 4; i++, p++)
-        if (BreakableBarrier_Initialize(m, p, i) < 0)
+    barrier = m->barriers;
+    for (i = 0; i < 4; i++, barrier++) {
+        if (BreakableBarrier_Initialize(m, barrier, i) < 0)
             return -1;
+    }
     m->script = Script_GetKeywordValue('c', 0);
     gBgFadeColor = 0x1084;
     gBgFadeBankMask = 0x1FFF;
-    {
-        int v = 64 - (int)(m->remaining * 40) / m->count;
-        if (v > 63)
-            v = 64;
-        else if (v < 0)
-            v = 0;
-        m->blend = v;
-    }
+    blend = 64 - (int)(m->remaining * 40) / m->count;
+    if (blend > 63)
+        blend = 64;
+    else if (blend < 0)
+        blend = 0;
+    m->blend = blend;
     return 0;
 }
 

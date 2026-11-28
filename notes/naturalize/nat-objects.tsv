@@ -18,3 +18,4 @@ src/objects/bat_curtain/debris_particles.c	Debris_Update	natural	natural	0
 src/objects/bat_curtain/breakable_barrier.c	BreakableBarrier_ConsumeEntered	contrived	natural	1	
 src/objects/bat_curtain/breakable_barrier.c	BreakableBarriers_Update	minor	natural	4	
 src/objects/bat_curtain/breakable_barrier.c	BreakableBarriers_Destroy	minor	natural	1	
+src/objects/bat_curtain/breakable_barrier.c	BreakableBarriers_Initialize	contrived	natural	6	barrier pointer walks with i
