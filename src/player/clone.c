@@ -459,19 +459,15 @@ void PlayerClone_InitSlot(void *unused, struct PlayerCloneSlot *s, u32 arg)
 
 void ActorDebris_Hide(u32);
 
-void PlayerClone_ReleaseSlot(struct PlayerCloneManager *a, struct PlayerCloneSlot *b, u32 n)
+void PlayerClone_ReleaseSlot(struct PlayerCloneManager *pool, struct PlayerCloneSlot *slot,
+                             u32 index)
 {
-    struct ContactCollider *s;
-    struct AnimSprite *w;
-    u32 m;
-    a->count--;
-    ScaledShadow_Disable(b->shadow);
-    ActorDebris_Hide(b->debris);
-    s = &b->collider;
-    s->flags = 4 | s->flags;
-    w = &b->animation;
-    w->flags = w->flags | 1;
-    a->activeSlots &= ~(1 << n);
+    pool->count--;
+    ScaledShadow_Disable(slot->shadow);
+    ActorDebris_Hide(slot->debris);
+    ContactCollider_SetFlags(&slot->collider, 4);
+    AnimSprite_Hide(&slot->animation);
+    pool->activeSlots &= ~(1 << index);
 }
 
 struct PlayerCloneSlot;
