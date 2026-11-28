@@ -12,3 +12,5 @@ src/monsters/ivy/ivy.c	Ivy_BeginRelease	contrived	minor	4	MonsterInit_SetMotionF
 src/monsters/ivy/ivy.c	Ivy_UpdateHold	minor	minor	1	
 src/monsters/ivy/ivy.c	Ivy_ReleaseCapturedPlayer	contrived	minor	3	ContactCollider_SetFlags on colliderA/B (ROM addresses flags through the collider pointer), HalfwordFlags_Set on placement flags
 src/monsters/ivy/ivy.c	SceneActorControl_UpdateAnimationTransition	contrived	contrived	25	existing flag accessors (HalfwordFlags_Set, SceneActorChase_ClearMotionFlagComponent, ClearWordFlags): plain operators change mask width and reload registers; much more readable (field names, no casts)
+src/monsters/ivy/ivy.c	Ivy_UpdateRestartFlags	minor	minor	0	u8 * parameter with RoomActor cast
+src/monsters/ivy/ivy.c	Ivy_UpdateRestartFlags	minor	natural	1	

@@ -608,9 +608,8 @@ void SceneActorControl_UpdateAnimationTransition(struct ChaseActor *actor, s32 f
 }
 // scope: put SceneActorControl_UpdateAnimationTransition end
 
-void Ivy_UpdateRestartFlags(u8 *p)
+void Ivy_UpdateRestartFlags(struct ChaseActor *actor)
 {
-    struct ChaseActor *actor = (void *)p;
     if (SceneActorControl_TakeFlag(&actor->base.field2B2))
         SceneActorAnimation_SelectDirectionalFlags(&actor->base, 0x10);
     if (actor->base.restart) {
@@ -1160,7 +1159,7 @@ void SceneActorControl_HideAndDisableCollision(struct ChaseActor *actor)
     actor->base.counter2AC++;
 }
 
-void Ivy_UpdateRestartFlags(u8 *p);
+void Ivy_UpdateRestartFlags(struct ChaseActor *actor);
 
 void Ivy_UpdateIdle(struct ChaseActor *actor)
 {
