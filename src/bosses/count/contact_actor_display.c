@@ -18,13 +18,9 @@ void SparkParticle_Spawn(void *, u32, const void *, u32, u32, u32, u32, u32);
 
 extern const u8 gUnk_0824DE9C[];
 
-void ContactActor_ApplyHealthContact(struct ContactCollider *sourceInput,
-                                     struct ContactCollider *otherInput,
-                                     struct ContactActor *ownerInput)
+void ContactActor_ApplyHealthContact(struct ContactCollider *source, struct ContactCollider *other,
+                                     struct ContactActor *owner)
 {
-    struct ContactCollider *source = sourceInput;
-    struct ContactCollider *other = otherInput;
-    struct ContactActor *owner = ownerInput;
     struct ContactPackedVector size;
     u32 directionMask;
     struct ContactPosition *position;
@@ -68,12 +64,11 @@ void ContactActor_ApplyHealthContact(struct ContactCollider *sourceInput,
         Sound_PlaySongChecked(0x211);
     } else {
         Sound_PlaySong(0x108);
-        if (source->reactionFlags & mode) {
-            u32 index = (gRandomIndex + 1) & 1023;
+        if (source->reactionFlags & 1) {
             u32 angle;
-            gRandomIndex = index;
-            angle = ((const u8 *)RANDOM_TABLE_ADDR)[index * 2];
-            SparkParticle_Spawn(position, 1, gUnk_0824DE9C, angle, 3, 8, 2, 2);
+            gRandomIndex = (gRandomIndex + 1) & 1023;
+            angle = *(u8 *)(RANDOM_TABLE_ADDR + gRandomIndex * 2);
+            SparkParticle_Spawn(&owner->position, 1, gUnk_0824DE9C, angle, 3, 8, 2, 2);
         }
     }
 }
