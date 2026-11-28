@@ -6,7 +6,7 @@ void SceneActorAttachment_ApplySlotCommand(struct ChaseActor *actor, void *attac
     s32 mode = (u8)inputMode;
     u8 event = inputEvent;
     u8 category = inputCategory;
-    struct ActorAttachmentFollowView *follow = (void *)(&actor->base.body.id);
+    struct ActorAttachmentFollowView *follow = (void *)&actor->base.body.id;
     s32 y;
     s32 z;
     if (event == 127) {
