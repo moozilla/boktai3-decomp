@@ -1,12 +1,7 @@
 #include "scene/collision/contact_actor.h"
 #include "scene/actor/scene_actor_part_burst.h"
+#include "scene/motion/scene_actor_charge_offset.h"
 void ContactActor_SetDirectionalSequence(struct ContactActorPool *, struct ContactActor *, u32);
-static inline s32 truncateShift12(s32 value)
-{
-    if (value >= 0)
-        return value >> 12;
-    return -((-value) >> 12);
-}
 static inline u32 nextRandom(void)
 {
     u32 index = (gRandomIndex + 1) & 1023;
@@ -31,9 +26,9 @@ static inline s32 distanceSq(const struct ContactPosition *a, const struct Conta
 }
 static inline void polarOffset(struct ContactPosition *write, u32 angle, u32 radius)
 {
-    write->x = truncateShift12(gUnk_086149C4[(angle + 64) & 255] * radius);
+    write->x = SceneActor_ChargeComponent(gUnk_086149C4[(angle + 64) & 255] * radius);
     write->y = 0;
-    write->z = truncateShift12(gUnk_086149C4[angle] * radius);
+    write->z = SceneActor_ChargeComponent(gUnk_086149C4[angle] * radius);
 }
 static inline void addPosition(struct ContactPosition *out, const struct ContactPosition *base,
                                const struct ContactPosition *delta)
@@ -45,11 +40,8 @@ static inline void addPosition(struct ContactPosition *out, const struct Contact
 void ContactActor_UpdateRoaming(struct ContactActorPool *pool, struct ContactActor *slot, s32 index)
 {
     struct ContactPosition delta;
-    /* Scratch pointer: the health collider on entry, the random table while steering. */
-    void *work;
 
     if (slot->enter) {
-        const u16 *table;
         s32 jitter;
         slot->enter = 0;
         if (slot->targetIndex >= 0) {
@@ -57,32 +49,30 @@ void ContactActor_UpdateRoaming(struct ContactActorPool *pool, struct ContactAct
             addPosition(&slot->destination, pool->targets[slot->targetIndex], &delta);
         }
         slot->direction = headingTo(&slot->destination, &slot->position);
-        table = gRandomTable;
-        jitter = (SceneActorEffects_NextSample(table) & 63) - 32;
+        jitter = (SceneActorEffects_NextSample(gRandomTable) & 63) - 32;
         slot->direction += jitter;
-        slot->steeringTimer = (SceneActorEffects_NextSample(table) & 15) + 16;
-        work = &slot->healthCollider;
-        ContactCollider_ClearFlags(work, 4);
+        slot->steeringTimer = (SceneActorEffects_NextSample(gRandomTable) & 15) + 16;
+        ContactCollider_ClearFlags(&slot->healthCollider, 4);
     }
     if (pool->clearRequested) {
         ContactActor_EnterState(slot, 6);
         return;
     }
     if (!slot->steeringTimer) {
+        const u16 *table = gRandomTable;
         s32 roll;
-        work = (void *)gRandomTable;
-        roll = SceneActorEffects_NextSample(work) & 255;
+        roll = ParticleRandom_ReadSample(table) & 255;
         if (roll <= 191) {
             s32 jitter;
             if (slot->targetIndex >= 0) {
-                polarOffset(&delta, SceneActorEffects_NextSample(work) & 255, 256);
+                polarOffset(&delta, SceneActorEffects_NextSample(table) & 255, 256);
                 addPosition(&slot->destination, pool->targets[slot->targetIndex], &delta);
             }
             slot->direction = headingTo(&slot->destination, &slot->position);
             jitter = (nextRandom() & 63) - 32;
             slot->direction += jitter;
         } else
-            slot->direction = SceneActorEffects_NextSample(work);
+            slot->direction = ParticleRandom_ReadSample(table);
         slot->steeringTimer = (nextRandom() & 15) + 16;
     } else
         slot->steeringTimer--;
@@ -99,7 +89,7 @@ void ContactActor_UpdateRoaming(struct ContactActorPool *pool, struct ContactAct
     } else {
         if (slot->retargetTimer) {
             slot->retargetTimer--;
-            if (slot->retargetTimer == 0) {
+            if (!slot->retargetTimer) {
                 if (pool->mode == 2) {
                     if (index <= 7)
                         slot->targetIndex = 1;
