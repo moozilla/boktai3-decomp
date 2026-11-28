@@ -2,23 +2,18 @@
 void ActorAttachment_TickWideShake(void *unused, struct ActorAttachmentSlotView *slot)
 {
     struct ContactSwarmSprite *sprite = &slot->sprite;
+
     if (slot->timer <= 0) {
-        u32 one = 1;
-        if (ActorAttachment_TestByteFlags(&slot->status[0], one)) {
-            u8 *f = &slot->status[0];
-            s32 m = -2;
-            *f = *f & m;
+        u32 shaking = 1;
+        if (ActorAttachment_TestByteFlags(&slot->status[0], shaking)) {
+            s32 mask = ~1;
+            slot->status[0] &= mask;
         }
     } else {
-        u32 one = 1;
-        if (ActorAttachment_TestByteFlags(&slot->status[0], one)) {
-            int r;
-            u32 v;
+        u32 shaking = 1;
+        if (ActorAttachment_TestByteFlags(&slot->status[0], shaking)) {
             gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-            r = Mod(*(u16 *)((gRandomIndex << 1) + (u32)gRandomTable), 0x14);
-            v = (u16)sprite->position.x;
-            v -= 10;
-            sprite->position.x = v + r;
+            sprite->position.x += Mod(((u16 *)RANDOM_TABLE_ADDR)[gRandomIndex], 20) - 10;
         }
         slot->timer--;
     }

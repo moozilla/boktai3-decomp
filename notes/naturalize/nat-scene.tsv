@@ -148,3 +148,4 @@ src/scene/actor/animation/SceneActorScript_SetControlBytesFromScript.c	SceneActo
 src/scene/actor/animation/SceneActorScript_SetFlagFromScript.c	SceneActorScript_SetFlagFromScript	minor	minor	3	WordFlags_And via a flags pointer: plain &= loads the mask after the field
 src/scene/actor/animation/SceneActorScript_SetPositionFromScript.c	SceneActorScript_SetPositionFromScript	contrived	minor	12	terrain slope switch replaces goto chain; y-pointer assigned between GetPc and GetValue stays (CSE keeps &position.y in r7)
 src/scene/actor/animation/SceneActorScript_SetPropertiesFromScript.c	SceneActorScript_SetPropertiesFromScript	minor	minor	6	keyword/type helper inlines and a pointer to rangeSquared (store order)
+src/scene/actor/attachment/ActorAttachment_TickWideShake.c	ActorAttachment_TickWideShake	contrived	minor	20	per-branch shaking=1 and mask=~1 locals: literal flag test loads mask after address and u8 &= folds mask to 0xFE
