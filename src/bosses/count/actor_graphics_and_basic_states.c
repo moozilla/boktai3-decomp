@@ -299,22 +299,22 @@ void SceneActorState_SetValueClampedWhenActive(struct StateActor *p, u32 v)
 
 void SceneActors_StartDirectionalAnimation(void *, void *, void *, int, int, int, int);
 
-void SceneActors_StartDisappearEffect(u32 *position)
+void SceneActors_StartDisappearEffect(struct StateActorPos *position)
 {
     struct StateActor *p = SceneActors_GetBySlot(0);
     if (p) {
+        struct SceneGraphicsActor *actor = (struct SceneGraphicsActor *)p;
         int sequence;
         SceneActorState_StartAction(p, 0, 0, 13);
-        p->target = *(struct StateActorPos *)position;
+        p->target = *position;
         SceneActors_SetFacing(p, p->requestedAngle);
-        sequence = (((struct SceneGraphicsActor *)p)->graphics.animationFlags & 1) ? 24 : 62;
-        SceneActors_StartDirectionalAnimation(p, (u8 *)p + 0x240, (u8 *)p + 0x220, sequence, 1, 1,
-                                              6);
+        sequence = (actor->graphics.animationFlags & 1) ? 24 : 62;
+        SceneActors_StartDirectionalAnimation(p, &actor->animation, &actor->animationResource,
+                                              sequence, 1, 1, 6);
         Sound_PlaySongChecked(839);
         Sound_PlaySongChecked(1335);
     }
 }
-
 void ContactActorPool_RequestClear(struct ContactActorPool *);
 
 void SceneActors_RequestContactPoolClear(void)

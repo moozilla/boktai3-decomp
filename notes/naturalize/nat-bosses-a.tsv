@@ -8,3 +8,7 @@ src/bosses/count/actor_graphics_and_basic_states.c	SceneActorGraphics_InitBodyNo
 src/bosses/count/actor_graphics_and_basic_states.c	SceneActorGraphics_InitializeOverlay	natural	natural	0	
 src/bosses/count/actor_graphics_and_basic_states.c	SceneActorGraphics_UpdateVariant	contrived	natural	2	TestFlags accessor kept (plain & loads the word before the mask)
 src/bosses/count/actor_graphics_and_basic_states.c	SceneActorGraphics_OscillateScale	minor	natural	1	
+src/bosses/count/actor_graphics_and_basic_states.c	SceneActorGraphics_GetEffectState	natural	natural	0	
+src/bosses/count/actor_graphics_and_basic_states.c	SceneActorState_SetValueClampedWhenInactive	natural	natural	0	
+src/bosses/count/actor_graphics_and_basic_states.c	SceneActorState_SetValueClampedWhenActive	natural	natural	0	
+src/bosses/count/actor_graphics_and_basic_states.c	SceneActors_StartDisappearEffect	minor	natural	1	
