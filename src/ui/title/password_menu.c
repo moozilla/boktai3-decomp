@@ -717,52 +717,36 @@ s32 PasswordDisplay_Initialize(struct PasswordDisplay *p)
     s32 row, i, j, code;
     u8 *out;
     s32 *w;
-    u32 size;
+    u32 layer;
 
     EncodedRecord_EncodeFields(p->encoded);
     src = p->encoded;
-    row = 0;
-    do {
+    for (row = 0; row < 4; row++) {
         out = p->text.rows[row];
-        i = 0;
-        do {
+        for (i = 0; i < 6; i++) {
             code = *src++ << 1;
             if (code > 0x59) {
-                j = 0;
-                do {
+                for (j = 0; j < 8; j++)
                     *out++ = gUnk_086136D8[j];
-                    j++;
-                } while (j <= 7);
             }
-            {
-                u8 *m = gScriptMessageParameters.text + code;
-                *out++ = m[0];
-                *out++ = m[1];
-            }
+            *out++ = gScriptMessageParameters.text[code];
+            *out++ = gScriptMessageParameters.text[code + 1];
             if (code > 0x59) {
-                j = 0;
-                do {
+                for (j = 0; j < 9; j++)
                     *out++ = gUnk_086136E4[j];
-                    j++;
-                } while (j <= 8);
             }
-            i++;
-        } while (i <= 5);
+        }
         *out = 0;
-        row++;
-    } while (row <= 3);
+    }
 
     Bg_ClearTilemap(0);
     BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0);
     Bg_ClearTilemap(2);
     BgGfx_LoadTilemapSimple(2, 0, 0, 0, 0);
     Bg_ClearTilemap(3);
-    {
-        u8 *res = ScriptProc_Start(0xc091, 0x3536);
-        p->background = res;
-        size = 12;
-        Bg_SetupLayers(2, 0, res, 0, 0, 1, &size);
-    }
+    p->background = ScriptProc_Start(0xc091, 0x3536);
+    layer = 12;
+    Bg_SetupLayers(2, 0, p->background, 0, 0, 1, &layer);
     BgGfx_LoadTilemapSimple(3, 0, 0, 0, 0);
     CpuSet(((struct PasswordMenuPalette *)ScriptProc_Start(0x92b3, 0x204))->colors,
            gBgPaletteBuffer, 0x100);
