@@ -231,3 +231,4 @@ src/bosses/sabata/combat_commands.c	SabataState_UpdateSelectedAnimation	natural	
 src/bosses/sabata/combat_commands.c	SabataState_BeginReverseAnimation	natural	natural	0	minor: single-use state/mask locals and goto-shared state store are needed to match
 src/bosses/sabata/combat_commands.c	SabataState_UpdateRestartableAnimation	natural	natural	0	minor: single-use state/mask locals and goto-shared state store are needed to match
 src/bosses/sabata/combat_states.c	Sabata_UpdateTurningAttackChoice	machine-shaped	partial	45	kept actor/input pair and pulse-trigger inline (ROM re-derives the owner pointer)
+src/bosses/sabata/combat_states.c	Sabata_FollowHazardPath	machine-shaped	partial	4	kept path alias, state locals and random inline

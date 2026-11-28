@@ -110,9 +110,7 @@ void Sabata_FollowHazardPath(struct SabataActorState *actor)
             u32 state = 4;
             actor->state = state;
         }
-        {
-            path->attackFlags |= 2;
-        }
+        path->attackFlags |= 2;
     }
     if (Sabata_GetAttackActivity(actor))
         Sabata_BeginCombatPhase(actor, 2);
