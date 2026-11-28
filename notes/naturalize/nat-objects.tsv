@@ -71,3 +71,6 @@ src/objects/coffin/tether_actor.c	TetherActor_RemoveStatusFlags	contrived	natura
 src/objects/coffin/tether_actor.c	TetherActor_BeginAuxiliaryState	contrived	minor	12	do-while(0) around cell index stays: without it the constant 0 cell pseudo outranks actor in global alloc (r4/r5 swap)
 src/objects/coffin/tether_actor.c	TetherActor_SetTransformFromScript	contrived	natural	3	
 src/objects/coffin/tether_actor.c	TetherActor_CopyPosition	minor	natural	2	
+src/objects/coffin/tether_actor.c	TetherActor_TestInteractionPath	contrived	contrived	9	comma expression and u8 views stay: every early-return/flag form orders the 1 and 0 returns differently (jump2 tail order)
+src/objects/coffin/tether_actor.c	TetherActor_SetPosition	minor	minor	4	double-pointer view of display position stays: single pointer local drops 4 bytes (reload folded)
+src/objects/coffin/tether_actor.c	TetherActor_BeginDirectedState	contrived	minor	15	savedActor reload and ARMOR_CAPTURE_COMPONENT_DELTA stay: the plain subtraction allocates the address/actor pseudos to r5/r6 swapped

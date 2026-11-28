@@ -1616,33 +1616,15 @@ void TetherActor_BeginDirectedState(struct ContactPosition *position)
         savedActor->directedStep = 16;
         {
             struct Player *player = gPlayers[0];
-            {
-                s32 playerX = player->position.x;
-                struct ContactPosition *targetPosition = &savedActor->directedTarget;
-                s16 actorX = targetPosition->x;
-                ARMOR_CAPTURE_COMPONENT_DELTA(dx, playerX, actorX);
-            }
+            ARMOR_CAPTURE_COMPONENT_DELTA(dx, player->position.x, savedActor->directedTarget.x);
             dz = player->position.z - savedActor->directedTarget.z;
         }
         if (dx || dz) {
             s32 angle = ((Math_Atan2(dx, dz) + 16) & 255) >> 5;
             gTetherActor->directedHeading = (angle + 7) & 7;
         } else {
-            u32 index = (gRandomIndex + 1) & 1023;
-            gRandomIndex = index;
-            {
-                u32 byteOffset = index << 1;
-                const u16 *table;
-                register u32 sample;
-                u16 *heading;
-                table = (const u16 *)RANDOM_TABLE_ADDR;
-                sample = *(const u16 *)(byteOffset + (u32)table);
-                sample &= 7;
-                {
-                    heading = &savedActor->directedHeading;
-                }
-                *heading = sample;
-            }
+            savedActor->directedHeading =
+                ParticleRandom_ReadDirectSample((const u16 *)RANDOM_TABLE_ADDR) & 7;
         }
         gTetherActor->directedTimer = 29;
     }
