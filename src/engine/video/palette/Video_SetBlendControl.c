@@ -1,6 +1,7 @@
 #include "global.h"
+#include "gba/io_reg.h"
 
-void Video_SetBlendControl(u32 a, u32 b, u32 c)
+void Video_SetBlendControl(u32 effect, u32 firstTargets, u32 secondTargets)
 {
-    *(vu16 *)0x04000050 = b | (c << 8) | (a << 6);
+    REG_BLDCNT = firstTargets | (secondTargets << 8) | (effect << 6);
 }
