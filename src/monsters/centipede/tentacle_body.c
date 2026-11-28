@@ -5,7 +5,7 @@
 #include "engine/word_flags.h"
 
 void CentipedeBody_OnAttackCollision(u8 *unused, struct ContactCollider *collider,
-                                    struct ChaseActor *actor)
+                                     struct ChaseActor *actor)
 {
     int mask;
     u32 *flags;
@@ -23,10 +23,10 @@ static inline u8 CentipedeBody_IsUnavailable(struct ChaseActor *actor)
 }
 
 void CentipedeBody_OnBodyContact(struct SceneActorBehaviorContactView *source,
-                                struct SceneActorBehaviorContactView *destination,
-                                struct ChaseActor *actor)
+                                 struct SceneActorBehaviorContactView *destination,
+                                 struct ChaseActor *actor)
 {
-    if (CentipedeBody_IsUnavailable(actor))
+    if ((SceneActorPlacement_IsUnavailable(&actor->base)))
         return;
     SceneActorBehavior_ApplyContactReaction(source, destination, (void *)actor);
     Centipede_EnterHitReaction(actor);
@@ -96,8 +96,7 @@ void CentipedeBody_UpdateHiddenTransition(struct ChaseActor *actor, s32 frame, u
             drawable->flags = value | mask;
         } else {
             struct ActorSprite *drawable = actor->base.drawable;
-            struct AnimSprite *tile =
-                &((struct SceneActorAnimationTileDrawable *)drawable)->tile;
+            struct AnimSprite *tile = &((struct SceneActorAnimationTileDrawable *)drawable)->tile;
             u32 value = tile->flags;
             tile->flags = value | mask;
         }
@@ -245,18 +244,22 @@ void CentipedeBody_UpdateSpreadWindup(struct ChaseActor *actor)
                     case 0:
                         body->segments[segmentIndex].position.x =
                             (u16)actor->base.body.position.x -
-                            SceneRoute_ScaleComponent(gUnk_086149C4[(actor->base.body.direction + 64) & 255] * 54);
+                            SceneRoute_ScaleComponent(
+                                gUnk_086149C4[(actor->base.body.direction + 64) & 255] * 54);
                         body->segments[segmentIndex].position.z =
                             (u16)actor->base.body.position.z -
-                            SceneRoute_ScaleComponent(gUnk_086149C4[actor->base.body.direction] * 54);
+                            SceneRoute_ScaleComponent(gUnk_086149C4[actor->base.body.direction] *
+                                                      54);
                         break;
                     case 1:
                         body->segments[segmentIndex].position.x =
                             (u16)actor->base.body.position.x -
-                            SceneRoute_ScaleComponent(gUnk_086149C4[(actor->base.body.direction + 64) & 255] * 20);
+                            SceneRoute_ScaleComponent(
+                                gUnk_086149C4[(actor->base.body.direction + 64) & 255] * 20);
                         body->segments[segmentIndex].position.z =
                             (u16)actor->base.body.position.z -
-                            SceneRoute_ScaleComponent(gUnk_086149C4[actor->base.body.direction] * 20);
+                            SceneRoute_ScaleComponent(gUnk_086149C4[actor->base.body.direction] *
+                                                      20);
                         break;
                     default:
                         body->segments[segmentIndex].position.x = (u16)actor->base.body.position.x;
@@ -300,8 +303,8 @@ void CentipedeBody_UpdateSpreadRelease(struct ChaseActor *actor, s32 frame)
     for (segmentIndex = 0; segmentIndex < body->segmentCount; segmentIndex++) {
         if (CentipedeSpread_Test(&body->segments[segmentIndex], 2) &&
             !CentipedeSpread_Test(&body->segments[segmentIndex], 5)) {
-            CENTIPEDE_SPREAD_SET_OFFSET(body->segments[segmentIndex].offset, actor->base.body.motion,
-                                       segmentIndex + 1);
+            CENTIPEDE_SPREAD_SET_OFFSET(body->segments[segmentIndex].offset,
+                                        actor->base.body.motion, segmentIndex + 1);
             switch (activeSegment) {
                 case 0:
                     body->segments[segmentIndex].position.x =
@@ -398,8 +401,8 @@ void CentipedeBody_UpdateChargeSpread(struct ChaseActor *actor, s32 frame)
     for (segmentIndex = 0; segmentIndex < body->segmentCount; segmentIndex++) {
         if (CentipedeSpread_Test(&body->segments[segmentIndex], 2) &&
             !CentipedeSpread_Test(&body->segments[segmentIndex], 5)) {
-            CENTIPEDE_SPREAD_SET_OFFSET(body->segments[segmentIndex].offset, actor->base.body.motion,
-                                       segmentIndex + 1);
+            CENTIPEDE_SPREAD_SET_OFFSET(body->segments[segmentIndex].offset,
+                                        actor->base.body.motion, segmentIndex + 1);
             switch (activeSegment) {
                 case 0:
                     body->segments[segmentIndex].position.x =

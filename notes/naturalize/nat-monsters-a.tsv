@@ -215,3 +215,4 @@ src/monsters/armor/Armor_OnPartStateSound.c	Armor_OnPartStateSound	minor	minor	0
 src/monsters/armor/Armor_AcceleratePartTurn.c	Armor_AcceleratePartTurn	minor	minor	0	byte pointer signature or temp
 src/monsters/armor/Armor_UpdatePartLungeDelay.c	Armor_UpdatePartLungeDelay	minor	minor	0	byte pointer signature or temp
 src/monsters/armor/Armor_AcceleratePartReturnTurn.c	Armor_AcceleratePartReturnTurn	minor	minor	0	byte pointer signature or temp
+src/monsters/centipede/tentacle_body.c	CentipedeBody_OnBodyContact	minor	natural	1	
