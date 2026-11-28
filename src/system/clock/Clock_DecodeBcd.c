@@ -1,15 +1,10 @@
 #include "global.h"
 u16 Clock_DecodeBcd(u16 value)
 {
-    u32 word = (u32)value << 16;
-    u32 mask = 15;
-    u32 result = (word & 0x000f0000) >> 16;
-    u32 a = (word >> 20) & mask;
-    u32 b, c;
-    result += 10 * a;
-    b = (word >> 24) & mask;
-    result += 100 * b;
-    c = (word >> 28) & mask;
-    result += 1000 * c;
+    u32 result = value & 0xf;
+
+    result += 10 * ((value >> 4) & 0xf);
+    result += 100 * ((value >> 8) & 0xf);
+    result += 1000 * ((value >> 12) & 0xf);
     return result;
 }

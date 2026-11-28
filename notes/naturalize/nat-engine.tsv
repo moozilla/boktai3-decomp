@@ -419,3 +419,4 @@ src/system/clock/region_menu.c	Time_DestroyRegionMenu	natural	natural
 src/system/clock/region_menu.c	RegionMenuParams_SetFromScript	natural	natural		
 src/system/clock/region_menu.c	Time_CreateRegionMenu	natural	natural		
 src/system/clock/Clock_ClearState.c	Clock_ClearState	minor	natural	1	
+src/system/clock/Clock_DecodeBcd.c	Clock_DecodeBcd	contrived	natural	1	
