@@ -179,7 +179,7 @@ void ScanlineEffect_StopTransfer(void)
     vu16 *target;
     buffer = (u16 *)ScanlineEffect_GetBuffer();
     Memory_Clear(buffer, 320);
-    target = (vu16 *)0x0400001C;
+    target = &REG_BG3HOFS;
     switch ((s32)gScanlineEffectMode) {
         case 0:
             target = ScanlineEffect_GetHorizontalScrollRegister(gScanlineEffectLayer);

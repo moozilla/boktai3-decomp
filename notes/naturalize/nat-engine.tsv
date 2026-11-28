@@ -288,3 +288,4 @@ src/engine/video/text_graphics.c	BackgroundMap_ClearTextRect	natural	natural
 src/engine/video/text_graphics.c	TextWindow_DrawNarrowGlyph	natural	natural		
 src/engine/video/text_graphics.c	TextWindow_InitializeGraphics	natural	natural		
 src/engine/video/scanline_effect.c	ScanlineEffect_StageTransfer	minor	minor	11	signed switch cast on the mode; BG3 scroll default before the switch
+src/engine/video/scanline_effect.c	ScanlineEffect_StopTransfer	minor	minor	11	signed switch cast on the mode; BG3 scroll default before the switch
