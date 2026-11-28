@@ -92,3 +92,4 @@ src/scene/actor/actor_pool/pooled_actor_controller.c	Actor_SetFourDirectionAnima
 src/scene/actor/actor_pool/pooled_actor_controller.c	Actor_SetMirroredAnimationEntry	minor	minor	0	dead facing temp kept in the else arm: removing it changes register allocation
 src/scene/actor/actor_pool/pooled_actor_controller.c	Actor_CreateControllerFromScript	minor	minor	0	allocated alias keeps a second register
 src/scene/actor/actor_pool/pooled_motion.c	MotionPool_InitializeSlot	contrived	natural	5	
+src/scene/actor/actor_pool/pooled_motion.c	MotionPool_Destroy	minor	natural	1	
