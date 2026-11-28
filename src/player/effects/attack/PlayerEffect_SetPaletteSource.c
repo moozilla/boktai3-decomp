@@ -1,24 +1,21 @@
 #include "global.h"
 #include "engine/video/render.h"
+#include "engine/task.h"
+#include "scene/scene_animation.h"
 
-struct P {
-    u8 f00[0x1e];
-    u16 h1e;
-    u8 f20[4];
-    u32 w24;
-};
-struct G {
-    u8 f00[0x540];
-    u32 w;
+struct PaletteSourceEffect {
+    struct Task task;
+    struct SceneAnimation graphics;
 };
 
-void PlayerEffect_SetPaletteSource(struct P *p, u32 h, u32 w)
+void PlayerEffect_SetPaletteSource(struct PaletteSourceEffect *effect, u32 paletteIndex,
+                                   u32 palette)
 {
-    if (p != 0) {
-        p->h1e = h;
-        if (w == 0)
-            p->w24 = (u32) & (*(struct G **)&gPaletteBankData)->w;
+    if (effect != NULL) {
+        effect->graphics.paletteIndex = paletteIndex;
+        if (palette == 0)
+            effect->graphics.palette = gPaletteBankData + 0x540;
         else
-            p->w24 = w;
+            effect->graphics.palette = (void *)palette;
     }
 }
