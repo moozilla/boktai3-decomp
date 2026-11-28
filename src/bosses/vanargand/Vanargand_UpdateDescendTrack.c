@@ -1,60 +1,38 @@
 #include "global.h"
-#include "bosses/vanargand/vanargand_part_layout.h"
+#include "bosses/vanargand/vanargand_pair_attack.h"
 /* Vanargand_UpdateDescendTrack: starts the unmirrored animation, then runs two motion-track legs (origin heights 0x300 then 0x100) and on completion resets the part animation and flags the state finished (provisional name) */
-struct Vanargand {
-    u8 pad0[0x54];
-    u8 motionData[0x9C - 0x54];
-    u32 flags;
-    u8 padA0[2];
-    u8 phase;
-    u8 padA3;
-    u32 timer;
-    u8 padA8[0xAF - 0xA8];
-    u8 finished, entered, pendingAnimation;
-    u8 padB2[0x18C - 0xB2];
-    u8 animation[0x60];
-    u8 drawable[0x3FC - 0x1EC];
-    struct VanargandPart part;
-    u8 pad410[0x500 - 0x410];
-    u16 partActive;
-    u8 pad502[0x534 - 0x502];
-    u8 track[0x29];
-    u8 trackState;
-    u8 pad55E[0x5C2 - 0x55E];
-    u16 counter;
-};
-void MotionTrack_Initialize(void *, const void *, const void *, const void *, u32);
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, int, int, int);
 void Vanargand_SetPendingCue(void *, u16);
 void MotionTrack_Update(void *);
 void Anim_SetFrameDurationScale(void *, u32);
-static inline u8 complete(struct Vanargand *p)
+static inline u8 complete(struct VanargandPairAttack *p)
 {
     u8 result = 0;
-    if (p->trackState == 2)
+    if (p->track.active == 2)
         result = 1;
     return result;
 }
 
-static inline void initialize(void *track, void *data, s16 x, s16 y, s16 z, s16 *target, u32 mode,
-                              s16 *origin)
+static inline void initialize(struct MotionTrack *track, const void *data, s16 x, s16 y, s16 z,
+                              const struct MotionTrackVector *target, u32 mode,
+                              struct MotionTrackVector *origin)
 {
-    s16 *q = origin;
+    s16 *q = &origin->x;
     *q = x;
-    origin[1] = y;
-    origin[2] = z;
+    origin->y = y;
+    origin->z = z;
     MotionTrack_Initialize(track, data, origin, target, mode);
 }
 
-void Vanargand_UpdateDescendTrack(struct Vanargand *p)
+void Vanargand_UpdateDescendTrack(struct VanargandPairAttack *p)
 {
-    void *animation = p->animation;
+    void *animation = &p->animation;
     u32 mask = 4;
-    s16 first[4], second[4];
+    struct MotionTrackVector first, second;
     p->flags |= mask;
     Vanargand_SetPendingCue(p, 1);
-    if (p->pendingAnimation) {
-        p->pendingAnimation = 0;
+    if (p->pending) {
+        p->pending = 0;
         p->phase = 0;
         p->timer = 0;
         SceneActors_StartUnmirroredAnimation(p, animation, p->drawable, 2, 1, mask);
@@ -63,10 +41,10 @@ void Vanargand_UpdateDescendTrack(struct Vanargand *p)
     switch (p->phase) {
         case 0:
             if (p->timer == 0) {
-                initialize(p->track, p->motionData, 0x400, 0x300, 0x400, 0, mask, first);
+                initialize(&p->track, &p->position, 0x400, 0x300, 0x400, 0, mask, &first);
                 p->timer++;
             }
-            MotionTrack_Update(p->track);
+            MotionTrack_Update(&p->track);
             if (complete(p)) {
                 p->phase = 1;
                 p->timer = 0;
@@ -74,17 +52,15 @@ void Vanargand_UpdateDescendTrack(struct Vanargand *p)
             break;
         case 1:
             if (p->timer == 0) {
-                initialize(p->track, p->motionData, 0x400, 0x100, 0x400, 0, 2, second);
+                initialize(&p->track, &p->position, 0x400, 0x100, 0x400, 0, 2, &second);
                 p->timer++;
             }
-            MotionTrack_Update(p->track);
+            MotionTrack_Update(&p->track);
             if (complete(p)) {
-                {
-                    struct VanargandPart *part = &p->part;
-                    part->state = 7;
-                }
-                p->partActive = 0;
-                p->counter = 1;
+                struct VanargandDamagePart *part = &p->part;
+                part->sprite.frame = 7;
+                p->part.animation = 0;
+                p->mode = 1;
                 p->finished = 1;
                 p->phase = 2;
                 p->timer = 0;
