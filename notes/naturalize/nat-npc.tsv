@@ -350,3 +350,4 @@ src/npc/otenko/Otenko_DispatchModeHandler.c	Otenko_DispatchModeHandler	contrived
 src/npc/otenko/Otenko_UpdateMode.c	Otenko_UpdateMode	natural	natural	0	
 src/npc/otenko/Otenko_ApplyDeceleratingBlink.c	Otenko_ApplyDeceleratingBlink	contrived	minor	1	u32 mask parked before the display flag OR
 src/npc/otenko/Otenko_UpdateAnimationEight.c	Otenko_UpdateAnimationEight	contrived	natural	2	
+src/npc/otenko/Otenko_UpdateBlinkOut.c	Otenko_UpdateBlinkOut	contrived	minor	3	existing orr helper materializes the mask before the load

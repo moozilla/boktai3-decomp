@@ -1,13 +1,16 @@
-#include "global.h"
-s32 Otenko_ApplyDeceleratingBlink(u8 *, u32, u32);
+#include "npc/otenko/otenko_actor.h"
+
+s32 Otenko_ApplyDeceleratingBlink(struct OtenkoActor *, u32, u32);
+
 static inline void orr(u16 *a, u32 m)
 {
     *a = m | *a;
 }
-void Otenko_UpdateBlinkOut(u8 *a, u8 *b, u32 c)
+
+void Otenko_UpdateBlinkOut(void *context, struct OtenkoActor *npc, u32 tick)
 {
-    if (Otenko_ApplyDeceleratingBlink(b, c, 0x10)) {
-        orr((u16 *)(b + 0xe), 0x100);
-        b[7] = 1;
+    if (Otenko_ApplyDeceleratingBlink(npc, tick, 0x10)) {
+        orr(&npc->displayFlags, 0x100);
+        npc->done = 1;
     }
 }
