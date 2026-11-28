@@ -215,3 +215,4 @@ src/bosses/sabata/Sabata_ResetAttackSequence.c	Sabata_ResetAttackSequence	natura
 src/bosses/sabata/SceneActors_SetParticleControlMode.c	SceneActors_SetParticleControlMode	natural	natural	0	
 src/bosses/sabata/Sabata_UpdateSequencePalette.c	Sabata_UpdateSequencePalette	natural	natural	0	
 src/bosses/sabata/Sabata_SpawnBobbingFormation.c	Sabata_SpawnBobbingFormation	contrived	partial	7	kept second actor alias, position pointers, mask local and random helper (plain forms change allocation)
+src/bosses/sabata/sub_0817B2DC.c	sub_0817B2DC	contrived	partial	7	kept do/while command loop, globals/zero/mode temporaries and per-field pointers in case 1

@@ -9,11 +9,9 @@ void sub_0817B2DC(struct SabataAttackActor *p)
     if (i < p->receiver.count[gSceneEventDispatchState->bank]) {
         do {
             struct PileDriverCommandGlobals *globals = gSceneEventDispatchState;
-            s32 op;
             struct PileDriverCommand *command = receiver->commands[globals->bank][i];
             SceneMessages_SetPendingTrigger(receiver, command);
-            op = command->opcode;
-            switch (op) {
+            switch (command->opcode) {
                 case 1: {
                     s32 zero = 0;
                     u8 *action = &p->action;
@@ -24,7 +22,7 @@ void sub_0817B2DC(struct SabataAttackActor *p)
                     *subaction = zero;
                     *choice = zero;
                     *timer = zero;
-                    p->queued = op;
+                    p->queued = 1;
                     break;
                 }
 
