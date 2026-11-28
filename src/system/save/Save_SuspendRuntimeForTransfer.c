@@ -1,6 +1,7 @@
 #include "global.h"
 #include "engine/ram.h"
 #include "engine/runtime.h"
+#include "gba/io_reg.h"
 #include "engine/video/render.h"
 struct Snapshot {
     u32 a, b;
@@ -24,10 +25,10 @@ u32 Save_SuspendRuntimeForTransfer(void)
     gVideoTransferControl = 0;
     m4aSoundVSyncOff();
     InterruptsAndVideo_WaitForVBlank();
-    *(volatile u16 *)0x04000208 = 0;
+    REG_IME = 0;
     gTransferSavedRuntimeFlag = gClockSynced;
     gClockSynced = 1;
-    *(volatile u16 *)0x04000208 = 1;
+    REG_IME = 1;
     Solar_PauseMeasurement();
     return 0;
 }
