@@ -1117,14 +1117,12 @@ void SceneActorState_WaitForDelayedAction(struct StateActor *p)
         else
             SceneActorState_SetAnimation(p, 2);
     }
-    if (p->actionTimer > actor->graphics.recoveryTimer && SceneActorState_StepTableByKind(actor)) {
-        SceneActorState_SnapReactionPosition((u8 *)actor,
-                                             &actor->graphics.snapPosition);
+    if (p->actionTimer > actor->graphics.recoveryTimer && SceneActorState_StepTableByKind((struct StateActor *)actor)) {
+        SceneActorState_SnapReactionPosition(actor, &actor->graphics.snapPosition);
         SceneActorState_EnterPhase(p, 1);
     } else
         p->actionTimer++;
 }
-
 void SceneActorState_UpdateVariantActionPlayback(struct SceneGraphicsActor *actor)
 {
     struct StateActor *p = (struct StateActor *)actor;
