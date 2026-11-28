@@ -35,7 +35,7 @@ struct PooledActor {
     u8 targetArc;
     u8 unknown13D[3];
     u32 targetDistanceSquared;
-    u8 targetAngleDelta;
+    s8 targetAngleDelta;
     s8 targetIndex;
     u8 targetCount, updateSlot;
     s32 maxHealth;

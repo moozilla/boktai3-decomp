@@ -178,16 +178,13 @@ void Actor_UpdateSelectedTarget(struct PooledActor *actor)
 void Actor_StepFacingAngle(struct PooledActor *actor)
 {
     if (actor->targetIndex >= 0) {
-        s8 *deltaPtr = (s8 *)(&actor->targetAngleDelta);
-        int delta;
         int angle;
-        if ((*deltaPtr) > 3) {
+        if (actor->targetAngleDelta > 3)
             angle = actor->body.direction + 4;
-        } else if ((*deltaPtr) <= (-4)) {
+        else if (actor->targetAngleDelta <= -4)
             angle = actor->body.direction - 4;
-        } else {
-            angle = (*deltaPtr) + actor->body.direction;
-        }
+        else
+            angle = actor->targetAngleDelta + actor->body.direction;
         Actor_SetFacingAngle(actor, angle);
     }
 }
