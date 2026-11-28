@@ -308,3 +308,6 @@ src/ui/dialogue/text_interpreter/TextState_ClearSelectedChoices.c	TextState_Clea
 src/ui/dialogue/text_interpreter/TextState_RunSelectedProcedures.c	TextState_RunSelectedProcedures	minor	natural	2	
 src/ui/dialogue/text_interpreter/TextState_RenderNextGlyph.c	TextState_RenderNextGlyph	contrived	minor	5	shift pair around the high-bit test; high and low byte locals
 src/ui/dialogue/text_interpreter/TextState_MeasureStringLine.c	TextState_MeasureStringLine	contrived	minor	8	shift pair around the high-bit test; tag parsing expanded in place (not the out-of-line parser)
+src/ui/dialogue/text_interpreter/TextState_Reset.c	TextState_Reset	natural	natural	0	
+src/ui/dialogue/text_interpreter/TextState_Init.c	TextState_Init	natural	natural	0	
+src/ui/dialogue/text_interpreter/TextWindow_ClearSingleton.c	TextWindow_ClearSingleton	natural	natural	0	
