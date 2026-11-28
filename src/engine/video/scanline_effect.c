@@ -135,31 +135,31 @@ void ScanlineEffect_StageTransfer(void)
     if (!gScanlineEffectSource)
         return;
     buffer = (u16 *)ScanlineEffect_GetBuffer();
-    target = (vu16 *)0x0400001C;
+    target = &REG_BG3HOFS;
     switch ((s32)gScanlineEffectMode) {
         case 0:
-            target = ScanlineEffect_GetHorizontalScrollRegister((s32)gScanlineEffectLayer);
-            scroll = (u16)gBgRecords[(s32)gScanlineEffectLayer].x & 0x1FF;
-            for (i = 0; i <= 159; i++)
-                buffer[i] = (*(u16 *)(i * 2 + (u32)gScanlineEffectSource) + scroll) & 0x1FF;
+            target = ScanlineEffect_GetHorizontalScrollRegister(gScanlineEffectLayer);
+            scroll = (u16)gBgRecords[gScanlineEffectLayer].x & 0x1FF;
+            for (i = 0; i < 160; i++)
+                buffer[i] = (gScanlineEffectSource[i] + scroll) & 0x1FF;
             break;
         case 1:
-            target = ScanlineEffect_GetVerticalScrollRegister((s32)gScanlineEffectLayer);
-            scroll = (u16)gBgRecords[(s32)gScanlineEffectLayer].y & 0x1FF;
-            for (i = 0; i <= 159; i++)
-                buffer[i] = (*(u16 *)(i * 2 + (u32)gScanlineEffectSource) + scroll) & 0x1FF;
+            target = ScanlineEffect_GetVerticalScrollRegister(gScanlineEffectLayer);
+            scroll = (u16)gBgRecords[gScanlineEffectLayer].y & 0x1FF;
+            for (i = 0; i < 160; i++)
+                buffer[i] = (gScanlineEffectSource[i] + scroll) & 0x1FF;
             break;
         case 2:
             target = &REG_MOSAIC;
-            for (i = 0; i <= 159; i++)
-                buffer[i] = *(u16 *)(i * 2 + (u32)gScanlineEffectSource);
+            for (i = 0; i < 160; i++)
+                buffer[i] = gScanlineEffectSource[i];
             break;
         case 3:
             REG_BLDALPHA = 0x810;
             REG_BLDCNT = 0xEDE;
             target = &REG_BLDY;
-            for (i = 0; i <= 159; i++)
-                buffer[i] = *(u16 *)(i * 2 + (u32)gScanlineEffectSource) & 31;
+            for (i = 0; i < 160; i++)
+                buffer[i] = gScanlineEffectSource[i] & 31;
             break;
     }
     gScanlineDmaSource = buffer;
