@@ -1,38 +1,20 @@
 #include "global.h"
-/* Paired Vanargand actor. Field names follow observed state and sprite operations. */
+#include "bosses/vanargand/vanargand_pair_attack.h"
 
-struct VanargandPairInput {
-    u8 pad0[0xAA];
-    u8 timer;
-    u8 padAB[4];
-    u8 active;
-    u8 pending;
-};
-struct VanargandPairSelection {
-    u8 pad0[0xF28];
-    u32 scripts[3];
-    s32 selection;
-};
 void Script_Call(u32, void *);
-static inline u8 VanargandPair_ConsumePending(struct VanargandPairInput *panel)
+
+void VanargandPair_RunSelectionScript(struct VanargandPairAttack *boss)
 {
-    if (panel->pending != 0) {
-        panel->pending = 0;
-        panel->active = 0;
-        return TRUE;
+    struct VanargandPairAttack *self = boss;
+
+    if (Vanargand_ConsumeActionEntry(self)) {
+        u8 animation = 30;
+
+        self->requestedAnimation = animation;
     }
-    return FALSE;
-}
-void VanargandPair_RunSelectionScript(struct VanargandPairSelection *panel)
-{
-    struct VanargandPairInput *input = (struct VanargandPairInput *)panel;
-    if (VanargandPair_ConsumePending(input)) {
-        u8 timer = 30;
-        input->timer = timer;
-    }
-    if (input->active) {
-        Script_Call(panel->scripts[panel->selection], 0);
-        if (panel->selection <= 2)
-            panel->selection++;
+    if (self->finished) {
+        Script_Call(boss->stageQueued[boss->transition], 0);
+        if (boss->transition <= 2)
+            boss->transition++;
     }
 }
