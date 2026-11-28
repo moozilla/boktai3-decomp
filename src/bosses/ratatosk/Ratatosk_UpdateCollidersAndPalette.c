@@ -1,9 +1,6 @@
 #include "engine/video/anim_sprite.h"
 #include "bosses/ratatosk/ratatosk.h"
 #include "engine/video/render.h"
-struct HalfBits {
-    s32 bits : 16;
-};
 extern const s16 gUnk_086149C4[];
 extern u32 gUnk_02000560;
 void Collider_SetPosition(void *, void *, u32);
@@ -37,14 +34,6 @@ static inline u32 globalFlags(u32 mask)
 {
     return gUnk_02000560 & mask;
 }
-static inline void fade(struct AnimSprite *a)
-{
-    a->flags |= 0x200;
-}
-static inline void unfade(struct AnimSprite *a)
-{
-    a->flags &= ~0x200;
-}
 static inline u32 flags(struct Ratatosk *a, u32 mask)
 {
     return a->flags & mask;
@@ -71,37 +60,25 @@ void Ratatosk_UpdateCollidersAndPalette(struct Ratatosk *p)
         else {
             clearColliderFlags(collider, 4);
             Collider_SetPosition(collider, &p->anchor, 0);
-            {
-                u32 direction = sprite->direction;
-                p->hurtCollider.direction = direction;
-            }
+            p->hurtCollider.direction = sprite->direction;
         }
         collider = &p->wideBodyCollider;
         if (flags(actor, 0x800000)) {
             clearColliderFlags(collider, 4);
             Collider_SetPosition(collider, &p->anchor, 0);
-            {
-                u32 direction = sprite->direction;
-                p->wideBodyCollider.direction = direction;
-            }
+            p->wideBodyCollider.direction = sprite->direction;
         } else
             collider->flags |= 4;
         collider = &p->outerCollider;
         if (flags(actor, 0x800000)) {
             Collider_SetPosition(collider, &p->anchor, 0);
-            {
-                u32 direction = sprite->direction;
-                p->outerCollider.direction = direction;
-            }
+            p->outerCollider.direction = sprite->direction;
             Collider_Refresh(collider);
         }
         collider = &p->bodyCollider;
         if (!flags(actor, 8)) {
             Collider_SetPosition(collider, &p->anchor, 0);
-            {
-                u32 direction = sprite->direction;
-                p->bodyCollider.direction = direction;
-            }
+            p->bodyCollider.direction = sprite->direction;
             Collider_Refresh(collider);
         }
         collider = &p->frontCollider;
@@ -114,10 +91,7 @@ void Ratatosk_UpdateCollidersAndPalette(struct Ratatosk *p)
                 v->z = v->z + b->z;
             }
             Collider_SetPosition(collider, &pos, 0);
-            {
-                u32 direction = sprite->direction;
-                collider->direction = direction;
-            }
+            collider->direction = sprite->direction;
             Collider_Refresh(collider);
             clearFlags(actor, 0x20000);
         }
@@ -135,13 +109,13 @@ void Ratatosk_UpdateCollidersAndPalette(struct Ratatosk *p)
         if (flags(actor, 0x40000)) {
             if (!actor->locked)
                 CameraTracking_ClearRequests(&p->camera, 1);
-            fade((struct AnimSprite *)p->animationData);
+            ((struct AnimSprite *)p->animationData)->flags |= 0x200;
         } else {
             if (!actor->locked) {
                 CameraTracking_SetRequests(&p->camera, 1);
                 Camera_FollowPlayerWithoutCompletion(30);
             }
-            unfade((struct AnimSprite *)p->animationData);
+            ((struct AnimSprite *)p->animationData)->flags &= ~0x200;
         }
         ScaledShadow_Enable(p->shadow);
         Ratatosk_SetFlags(actor, 32);
@@ -153,13 +127,13 @@ void Ratatosk_UpdateCollidersAndPalette(struct Ratatosk *p)
     if (!actor->locked && flags(actor, 0x1000000))
         CameraTracking_ClearRequests(&p->camera, 1);
     if (p->flashTimer > 0) {
-        fade((struct AnimSprite *)p->animationData);
+        ((struct AnimSprite *)p->animationData)->flags |= 0x200;
         p->flashTimer--;
     }
     if (flags(actor, 0x2000000))
         ScaledShadow_Disable(p->shadow);
     if (flags(actor, 32))
-        ((struct HalfBits *)&p->hurtCollider.flags)->bits |= 8;
+        p->hurtCollider.flags |= 8;
     else
         p->hurtCollider.flags &= ~8;
     if (p->hurtCollider.responseValue) {
@@ -175,11 +149,7 @@ void Ratatosk_UpdateCollidersAndPalette(struct Ratatosk *p)
         p->damageTimer--;
     } else {
         AnimData_SelectPaletteBank(p->paletteAnimation, 498);
-        {
-            void **dest = &p->palette;
-            palette = p->paletteBase;
-            *dest = palette;
-        }
+        p->palette = palette = p->paletteBase;
         zero = 0;
         base = Ratatosk_GetDefaultPaletteIndex(p);
         bank = p->blendBank;
@@ -208,13 +178,13 @@ void Ratatosk_UpdateCollidersAndPalette(struct Ratatosk *p)
             } else {
                 p->blendStep--;
                 if (p->blendStep <= 0) {
-                    p->blendStep = zero;
-                    p->blendReturning = zero;
+                    p->blendStep = 0;
+                    p->blendReturning = 0;
                 }
             }
         } else if (p->blendMode == 4) {
-            Palette_InterpolateBanks(palette, gPaletteBankData + base * 32, p->paletteNormal, p->blendStep,
-                                     p->blendShift);
+            Palette_InterpolateBanks(palette, gPaletteBankData + base * 32, p->paletteNormal,
+                                     p->blendStep, p->blendShift);
             if (!p->blendReturning) {
                 p->blendStep++;
                 if (p->blendStep > 31) {
@@ -224,7 +194,7 @@ void Ratatosk_UpdateCollidersAndPalette(struct Ratatosk *p)
             } else {
                 p->blendStep--;
                 if (p->blendStep <= 0) {
-                    p->blendStep = zero;
+                    p->blendStep = 0;
                     p->blendReturning = zero;
                 }
             }

@@ -136,3 +136,5 @@ src/bosses/ratatosk/Ratatosk_ApplyDamageReaction.c	Ratatosk_ApplyDamageReaction	
 src/bosses/ratatosk/Ratatosk_UpdateSunOrbPlayerTransfer.c	Ratatosk_UpdateSunOrbPlayerTransfer	contrived	natural	4	playerFlags accessor kept (a bare mask test differs)
 src/bosses/ratatosk/Ratatosk_UpdateAnimatedPosition.c	Ratatosk_UpdateAnimatedPosition	contrived	minor	1	second actor alias and body pointer stay
 src/bosses/ratatosk/Ratatosk_RemoveAnimation.c	Ratatosk_RemoveAnimation	contrived	natural	1	
+src/bosses/ratatosk/SceneResource_InitializeHiddenSprite.c	SceneResource_InitializeHiddenSprite	minor	minor	0	local view of the sprite flags; falls off the end of a u32 function as the ROM does
+src/bosses/ratatosk/Ratatosk_UpdateCollidersAndPalette.c	Ratatosk_UpdateCollidersAndPalette	contrived	minor	35	actor alias, flag accessors with mask arguments, polar/scale helpers and the front-collider vector add stay (plain operators change mask load order/registers)
