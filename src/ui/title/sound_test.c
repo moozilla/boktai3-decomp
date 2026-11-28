@@ -301,24 +301,14 @@ void SoundTest_Update(struct SoundTest *p)
 void SoundTest_Destroy(struct SoundTest *p)
 {
     s32 i;
-    struct AnimSprite *a, *b, *c;
-    {
-        s32 mask = 3;
-        gDispCntShadow = ~mask & gDispCntShadow;
-    }
+    Bg_DisableDisplay(3);
     p->cursor.flags |= 1;
     p->panel.flags |= 1;
     p->background.flags |= 1;
-    c = p->thirdCategoryDigits;
-    b = p->secondCategoryDigits;
-    a = p->playbackIndicators;
-    for (i = 2; i >= 0; i--) {
-        Anim_Remove(a);
-        Anim_Remove(b);
-        Anim_Remove(c);
-        c++;
-        b++;
-        a++;
+    for (i = 0; i < 3; i++) {
+        Anim_Remove(&p->playbackIndicators[i]);
+        Anim_Remove(&p->secondCategoryDigits[i]);
+        Anim_Remove(&p->thirdCategoryDigits[i]);
     }
     Anim_Remove(&p->cursor);
     Anim_Remove(&p->panel);
