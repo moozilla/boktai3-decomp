@@ -414,3 +414,16 @@ src/objects/items/item_container.c	TriggerManager_DestroyAllOfType	minor	natural
 src/objects/items/item_container.c	Trigger_UpdateDropTimer	minor	natural	1	
 src/objects/items/item_container.c	Trigger_UpdateFalling	minor	natural	1	
 src/objects/items/item_container.c	Trigger_UpdateProximity	contrived	contrived	30	box/pointer aliases (out, v, o, proj = i*8+manager+60): the array index and direct box forms strength-reduce or reorder 4-50 insns
+src/objects/items/item_container.c	TriggerManager_Initialize	contrived	contrived	10	projection address built as i*8+p+60: &p->projected[i] strength-reduces into a stepping register
+src/objects/items/item_container.c	Trigger_Destroy	natural	natural	0	
+src/objects/items/item_container.c	Trigger_UpdateLanding	natural	natural	0	
+src/objects/items/item_container.c	Trigger_UpdateBobbingAnimation	natural	natural	0	
+src/objects/items/item_container.c	Trigger_UpdateGrounded	natural	natural	0	
+src/objects/items/item_container.c	Trigger_UpdateIdleAnimation	natural	natural	0	
+src/objects/items/item_container.c	Trigger_UpdateOpeningAnimation	natural	natural	0	
+src/objects/items/item_container.c	Trigger_UpdateLockedPause	natural	natural	0	
+src/objects/items/item_container.c	Trigger_UpdateLockedRecovery	natural	natural	0	
+src/objects/items/item_container.c	TriggerManager_DestroyManager	natural	natural	0	
+src/objects/items/item_container.c	TriggerManager_GetOrCreate	natural	natural	0	
+src/objects/items/item_container.c	TriggerManager_DestroyAllOfTypeFromScript	natural	natural	0	
+src/objects/items/item_container.c	Trigger_MoveDropsByItem	natural	natural	0	
