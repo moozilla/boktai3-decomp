@@ -327,3 +327,23 @@ src/npc/story_character/SceneCharacter_PlaceFromScript.c	SceneCharacter_PlaceFro
 src/npc/story_character/SceneCharacter_CommandFromScript.c	SceneCharacter_CommandFromScript	contrived	contrived	0	same shapes as PlaceFromScript: one local, updates[2] callback array, body pointer blocks; case 2 falls into case 4
 src/npc/otenko/Otenko_UpdateAnimation14.c	Otenko_UpdateAnimation14	contrived	natural	1	
 src/npc/otenko/Otenko_UpdateAnimation18.c	Otenko_UpdateAnimation18	contrived	natural	1	
+src/npc/otenko/Otenko_UpdateAnimation15.c	Otenko_UpdateAnimation15	natural	natural	0	
+src/npc/otenko/Otenko_EnterTriggeredMode.c	Otenko_EnterTriggeredMode	natural	natural	0	
+src/npc/otenko/Otenko_UpdateAnimation17.c	Otenko_UpdateAnimation17	natural	natural	0	
+src/npc/otenko/Otenko_UpdateAnimation3AtCurrentPosition.c	Otenko_UpdateAnimation3AtCurrentPosition	natural	natural	0	
+src/npc/otenko/Otenko_UpdateAnimation19.c	Otenko_UpdateAnimation19	natural	natural	0	
+src/npc/otenko/Otenko_UpdateAnimation20.c	Otenko_UpdateAnimation20	natural	natural	0	
+src/npc/otenko/Otenko_UpdateAnimation21.c	Otenko_UpdateAnimation21	natural	natural	0	
+src/npc/otenko/Otenko_UpdateAnimation22.c	Otenko_UpdateAnimation22	natural	natural	0	
+src/npc/otenko/Otenko_UpdateAnimation23.c	Otenko_UpdateAnimation23	natural	natural	0	
+src/npc/otenko/Otenko_UpdateAnimation24.c	Otenko_UpdateAnimation24	natural	natural	0	
+src/npc/otenko/Otenko_UpdateAnimation25.c	Otenko_UpdateAnimation25	natural	natural	0	
+src/npc/otenko/Otenko_UpdateAnimation26.c	Otenko_UpdateAnimation26	natural	natural	0	
+src/npc/otenko/Otenko_UpdateAnimation27.c	Otenko_UpdateAnimation27	natural	natural	0	
+src/npc/otenko/Otenko_UpdateAnimation28.c	Otenko_UpdateAnimation28	natural	natural	0	
+src/npc/otenko/Otenko_EnterState29.c	Otenko_EnterState29	natural	natural	0	
+src/npc/otenko/Otenko_EnterState30.c	Otenko_EnterState30	natural	natural	0	
+src/npc/otenko/Otenko_UpdateState31.c	Otenko_UpdateState31	natural	natural	0	
+src/npc/otenko/Otenko_UpdateState32.c	Otenko_UpdateState32	natural	natural	0	
+src/npc/otenko/Otenko_UpdateState33.c	Otenko_UpdateState33	natural	natural	0	
+src/npc/otenko/Otenko_DispatchModeHandler.c	Otenko_DispatchModeHandler	contrived	natural	2	

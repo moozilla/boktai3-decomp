@@ -1,9 +1,8 @@
-#include "global.h"
+#include "npc/otenko/otenko_actor.h"
 
 extern u32 gUnk_086124D4[];
-void sub_08249240(u32, u8 *, u32);
 
-void Otenko_DispatchModeHandler(u32 a, u8 *b)
+void Otenko_DispatchModeHandler(void *context, struct OtenkoActor *npc)
 {
-    sub_08249240(a, b, gUnk_086124D4[b[4]]);
+    sub_08249240(context, npc, gUnk_086124D4[npc->state]);
 }
