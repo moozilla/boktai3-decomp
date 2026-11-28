@@ -1,11 +1,12 @@
 #include "global.h"
-#include "engine/engine_globals.h"
+#include "bosses/ratatosk/ratatosk.h"
 #include "engine/ram.h"
+#include "engine/engine_globals.h"
+#include "link/wireless/random.h"
+
 s32 Mod(s32, s32);
-u8 *Ratatosk_GetRandomMovementPoint(u8 *p)
+
+struct ContactPosition *Ratatosk_GetRandomMovementPoint(struct Ratatosk *self)
 {
-    u32 i;
-    gRandomIndex = (gRandomIndex + 1) & 0x3ff;
-    i = gRandomIndex;
-    return p + (Mod(*(u16 *)((i << 1) + (u32)gRandomTable), 8) * 8 + 0xccc);
+    return &self->points[Mod(RANDOM_NEXT(), 8)];
 }
