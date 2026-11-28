@@ -1,30 +1,11 @@
-#include "global.h"
-#include "engine/math/monster_particle_random.h"
+#include "effects/orbits/converging_effects.h"
 #include "engine/engine_globals.h"
 #include "engine/ram.h"
-#include "bosses/sabata/converging_particles.h"
-// Cleanup: remove the angle register hint while retaining exact codegen.
+
 /* Tentative role: periodically spawn an inward-moving effect in a four-slot ring. */
-typedef struct ConvergingParticlePoint Point;
-typedef struct Effect {
-    u32 flags;
-    u8 pad4[0x14];
-    Point pos;
-    u8 pad20[8];
-    u8 active, ticks, speed, kind;
-    s16 dx;
-    u8 pad2e[2];
-    s16 dy;
-    u8 pad32[2];
-} Effect;
-typedef struct State {
-    u8 pad0[0x9a8];
-    void *graphics;
-    u8 active, next, ticks, pad9af;
-    Effect effects[4];
-} State;
 extern const s16 gUnk_086149C4[];
-void SpriteDrawable_SelectTileFrame(Effect *, void *, s32);
+void SpriteDrawable_SelectTileFrame(struct ConvergingParticle *, void *, s32);
+
 static inline s32 random_value(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
@@ -36,31 +17,30 @@ static inline s32 scale(s32 v)
         return v >> 12;
     return -((-v) >> 12);
 }
-void Player_EmitConvergingParticle(State *s, Point *pos)
+void Player_EmitConvergingParticle(struct Player *p, struct SceneVec *position)
 {
-    if ((++s->ticks & 3) == 0) {
-        Effect *e = &s->effects[s->next];
-        Effect *draw = e;
+    if ((++p->convergingEffects.ticks & 3) == 0) {
+        struct ConvergingParticle *e = &p->convergingEffects.particles[p->convergingEffects.next];
+        struct ConvergingParticle *draw = e;
         s32 angle;
         s32 radius;
         u16 radiusSample;
         draw->flags &= ~1;
         e->kind = 4;
-        SpriteDrawable_SelectTileFrame(draw, s->graphics, 4);
+        SpriteDrawable_SelectTileFrame(draw, p->convergingEffects.graphics, 4);
         angle = ParticleRandom_ReadDirectSample(gRandomTable) & 255;
         radiusSample = ParticleRandom_ReadDirectSample(gRandomTable);
         radius = radiusSample % 128 + 256;
-        e->dx = scale(radius * gUnk_086149C4[(angle + 64) & 255]);
-        e->dy = scale(radius * gUnk_086149C4[angle]);
-        draw->pos = *pos;
-        draw->pos.x += (u16)e->dx;
-        draw->pos.y += (u16)e->dy;
+        e->offsetX = scale(radius * gUnk_086149C4[(angle + 64) & 255]);
+        e->offsetZ = scale(radius * gUnk_086149C4[angle]);
+        draw->position = *position;
+        draw->position.x += (u16)e->offsetX;
+        draw->position.z += (u16)e->offsetZ;
         e->speed = (random_value() & 7) + 28;
         e->ticks = 0;
         e->active = 1;
-        s->active = 1;
-        if ((++s->next) > 3) {
-            s->next = 0;
-        }
+        p->convergingEffects.active = 1;
+        if (++p->convergingEffects.next > 3)
+            p->convergingEffects.next = 0;
     }
 }
