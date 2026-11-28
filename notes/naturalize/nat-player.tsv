@@ -303,3 +303,6 @@ src/player/cutscene/player_cue_actions.c	Player_UpdateTimedDirectionAction	contr
 src/player/cutscene/player_cue_actions.c	Player_UpdateTimedCueAnimation	natural	natural	0	
 src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateDeparture	natural	natural	0	
 src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateScaleTransition	contrived	natural	6	
+src/player/cutscene/player_cue_actions.c	Player_UpdateTimedCueAnimation	natural	natural	0	
+src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateDeparture	natural	natural	0	
+src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateMoveDestination	contrived	minor	5	facing setter helper with mask temporaries

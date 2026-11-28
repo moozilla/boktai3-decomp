@@ -331,9 +331,9 @@ static inline void SetFacingFromMotionAngle(struct Player *player, u16 angle)
 
 void PlayerCue_UpdateMoveDestination(struct Player *player)
 {
-    s32 deltaX = (player->cueDestination.x) - (player->position.x);
-    s32 dz = (player->cueDestination.z) - (player->position.z);
-    s32 distance = (deltaX * deltaX) + (dz * dz);
+    s32 deltaX = player->cueDestination.x - player->position.x;
+    s32 dz = player->cueDestination.z - player->position.z;
+    s32 distance = deltaX * deltaX + dz * dz;
     s32 x = 0;
     s32 z = 0;
     s32 moving;
@@ -341,27 +341,24 @@ void PlayerCue_UpdateMoveDestination(struct Player *player)
     s32 angle;
     if (!distance) {
         anim = ActorVariant_GetTableValue(player->actionMode, 16);
-        if ((player->targetFacing) >= 0) {
+        if (player->targetFacing >= 0) {
             player->facing = player->targetFacing;
             player->targetFacing = -1;
-            {
-                u32 direction = player->facing;
-                if (direction > 4) {
-                    player->heading = 8 - direction;
-                    player->side = 1;
-                } else {
-                    player->heading = direction;
-                    player->side = 0;
-                }
+            if (player->facing > 4) {
+                player->heading = 8 - player->facing;
+                player->side = 1;
+            } else {
+                player->heading = player->facing;
+                player->side = 0;
             }
         }
         if (player->animationBranchRequested) {
             if (player->cuePhase) {
                 moving = 1;
-                angle = (((player->facing) + 1) & 7) << 5;
+                angle = ((player->facing + 1) & 7) << 5;
                 x = gUnk_086149C4[(angle + 64) & 255];
                 z = gUnk_086149C4[angle & 255];
-                player->cuePhase = ((player->cuePhase) * 7) >> 3;
+                player->cuePhase = (player->cuePhase * 7) >> 3;
             } else {
                 moving = 0;
                 if (player->cueParameter) {
@@ -383,10 +380,10 @@ void PlayerCue_UpdateMoveDestination(struct Player *player)
         anim = ActorVariant_GetTableValue(player->actionMode, 17);
         moving = 1;
         SetFacingFromMotionAngle(player, Math_Atan2(deltaX, dz));
-        angle = (((player->facing) + 1) & 7) << 5;
+        angle = ((player->facing + 1) & 7) << 5;
         x = gUnk_086149C4[(angle + 64) & 255];
         z = gUnk_086149C4[angle & 255];
-        if ((player->animation.frameIndex) & 3) {
+        if (player->animation.frameIndex & 3) {
             if (distance <= 64) {
                 player->position.x = player->cueDestination.x;
                 player->position.z = player->cueDestination.z;
@@ -394,20 +391,20 @@ void PlayerCue_UpdateMoveDestination(struct Player *player)
                 s32 speed = 8;
                 player->velocityX = -TruncateQ12(x * speed);
                 player->velocityZ = -TruncateQ12(z * speed);
-                if ((player->velocityScaleAxis) == 1) {
-                    if ((player->velocityZ) < 0)
-                        player->velocityZ = TruncateQ6((player->velocityZ) * 40);
+                if (player->velocityScaleAxis == 1) {
+                    if (player->velocityZ < 0)
+                        player->velocityZ = TruncateQ6(player->velocityZ * 40);
                     else
-                        player->velocityZ = TruncateQ6((player->velocityZ) * 52);
-                } else if ((player->velocityScaleAxis) == 2) {
-                    if ((player->velocityX) < 0)
-                        player->velocityX = TruncateQ6((player->velocityX) * 40);
+                        player->velocityZ = TruncateQ6(player->velocityZ * 52);
+                } else if (player->velocityScaleAxis == 2) {
+                    if (player->velocityX < 0)
+                        player->velocityX = TruncateQ6(player->velocityX * 40);
                     else
-                        player->velocityX = TruncateQ6((player->velocityX) * 52);
+                        player->velocityX = TruncateQ6(player->velocityX * 52);
                 }
             }
-            if ((player->animationBranchRequested) && ((player->cuePhase) <= 149))
-                player->cuePhase = ((player->cuePhase) * 15) >> 4;
+            if (player->animationBranchRequested && player->cuePhase <= 149)
+                player->cuePhase = (player->cuePhase * 15) >> 4;
         }
     }
     Player_SetAnimation(player, anim, 64, 1);
