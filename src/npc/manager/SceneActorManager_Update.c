@@ -3,40 +3,36 @@
 
 int Weather_GetType(void);
 
-int SceneActorManager_Update(struct SceneActorManager *m)
+int SceneActorManager_Update(struct SceneActorManager *manager)
 {
     struct Player *player = gPlayers[0];
-    m->player = player;
-    if (player) {
-        m->target = (struct ContactPosition *)&player->position;
-    } else {
-        m->target = 0;
-    }
-    m->weather = Weather_GetType();
-    m->hour = SunClock_GetBaseHour();
-    m->minute = SunClock_GetBaseMinute();
-    if (m->previousMinute != m->minute)
-        m->minuteChanged = 1;
+    struct SceneActor *actor;
+
+    manager->player = player;
+    if (player)
+        manager->target = (struct ContactPosition *)&player->position;
     else
-        m->minuteChanged = 0;
-    m->previousMinute = m->minute;
-    {
-        u32 buffer = 1 - m->buffer;
-        m->buffer = buffer;
-        m->count[buffer] = 0;
+        manager->target = 0;
+    manager->weather = Weather_GetType();
+    manager->hour = SunClock_GetBaseHour();
+    manager->minute = SunClock_GetBaseMinute();
+    if (manager->previousMinute != manager->minute)
+        manager->minuteChanged = 1;
+    else
+        manager->minuteChanged = 0;
+    manager->previousMinute = manager->minute;
+    manager->buffer = 1 - manager->buffer;
+    manager->count[manager->buffer] = 0;
+    actor = manager->head;
+    while (actor) {
+        struct SceneActor *previous = actor->previous;
+        Actor_RunCallbacks(manager, actor);
+        actor = previous;
     }
-    {
-        struct SceneActor *p = m->head;
-        while (p) {
-            struct SceneActor *prev = p->previous;
-            Actor_RunCallbacks(m, p);
-            p = prev;
-        }
-    }
-    Actor_UpdateInteractionCue(m);
-    if (m->player) {
-        Actor_EmitTowardNearbyActors((struct SceneActorBody *)&m->player->positionalEffectGroup);
-    }
-    m->ticks++;
+    Actor_UpdateInteractionCue(manager);
+    if (manager->player)
+        Actor_EmitTowardNearbyActors(
+            (struct SceneActorBody *)&manager->player->positionalEffectGroup);
+    manager->ticks++;
     return 0;
 }
