@@ -7,7 +7,7 @@ void Vanargand_SetPendingCue(void *, u16);
 void MotionTrack_Update(void *);
 void Anim_SetFrameDurationScale(void *, u32);
 
-static inline u8 complete(struct VanargandPairAttack *p)
+static inline u8 MotionComplete(struct VanargandPairAttack *p)
 {
     u8 result = 0;
     if (p->track.active == 2)
@@ -15,13 +15,14 @@ static inline u8 complete(struct VanargandPairAttack *p)
     return result;
 }
 
-static inline void initialize(void *track, void *data, s16 x, s16 y, s16 z, s16 *target, u32 mode,
-                              s16 *origin)
+static inline void StartTrack(void *track, void *data, s16 x, s16 y, s16 z,
+                              struct MotionTrackVector *target, u32 mode,
+                              struct MotionTrackVector *origin)
 {
-    s16 *q = origin;
+    s16 *q = &origin->x;
     *q = x;
-    origin[1] = y;
-    origin[2] = z;
+    origin->y = y;
+    origin->z = z;
     MotionTrack_Initialize(track, data, origin, target, mode);
 }
 
@@ -30,10 +31,9 @@ void VanargandAfterimagePool_Spawn(void *, void *);
 
 void Vanargand_UpdatePaletteLeap(struct VanargandPairAttack *p, s32 frame)
 {
-    s32 savedFrame = frame;
     struct VanargandPairAttack *self = p;
     u8 *animation;
-    s16 first[4];
+    struct MotionTrackVector first;
     animation = (u8 *)&p->animation;
     VanargandPairAttack_SetFlags(p, 4);
     Vanargand_SetPendingCue(p, 1);
@@ -41,7 +41,7 @@ void Vanargand_UpdatePaletteLeap(struct VanargandPairAttack *p, s32 frame)
         p->pending = 0;
         Vanargand_LoadStagePalette(p, self);
         SceneActors_StartUnmirroredAnimation(p, animation, animation + 0x60, 4, 3, 4);
-        initialize(&self->track, &p->position, 0x280, 0x300, 0x280, 0, 4, first);
+        StartTrack(&self->track, &p->position, 0x280, 0x300, 0x280, 0, 4, &first);
         Sound_PlaySong(0x13E);
         self->delay = 8;
         {
@@ -53,11 +53,9 @@ void Vanargand_UpdatePaletteLeap(struct VanargandPairAttack *p, s32 frame)
         PairedSceneActor_ApplyToSelectedHalves(self->pair, 3, 0x16);
     }
     MotionTrack_Update(&self->track);
-    if (complete(self) && savedFrame > 0x3C) {
-        {
-            struct VanargandDamagePart *part = &self->part;
-            part->sprite.frame = 7;
-        }
+    if (MotionComplete(self) && frame > 0x3C) {
+        struct VanargandDamagePart *part = &self->part;
+        part->sprite.frame = 7;
         self->part.animation = 0;
         p->finished = 1;
         return;
