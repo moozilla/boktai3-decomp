@@ -4,13 +4,9 @@
 
 extern const u32 gUnk_08614114[];
 
-u32 TaskSystem_InitLists(void)
+void TaskSystem_InitLists(void)
 {
-    struct VideoDmaRegisters *d = (struct VideoDmaRegisters *)0x040000D4;
-    d->source = (u32)gUnk_08614114;
-    d->destination = (u32)&gTaskLists;
-    d->control = 0x8400001C;
-    return d->control;
+    DmaCopy32(3, gUnk_08614114, gTaskLists, sizeof(gTaskLists));
 }
 
 void Task_LinkToPriorityList(struct RuntimeTask *task)
