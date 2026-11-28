@@ -602,3 +602,4 @@ src/ui/town/storage/Storage_Init.c	Storage_Init	contrived	natural	2
 src/ui/town/storage/Storage_BeginCategoryMode.c	Storage_BeginCategoryMode	contrived	minor	18	mode-1 and -1 locals order the mode store and the message argument
 src/ui/town/storage/Storage_CompleteCategoryRemoval.c	Storage_CompleteCategoryRemoval	contrived	minor	4	index-first pointer sum into table160; private menu struct
 src/ui/town/storage/Storage_RefreshCategoryWidgets.c	Storage_RefreshCategoryWidgets	contrived	minor	5	function-pointer cast on the state word
+src/ui/town/storage/Storage_RebuildGrid.c	Storage_RebuildGrid	contrived	natural	6	
