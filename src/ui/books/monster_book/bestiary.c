@@ -385,23 +385,16 @@ void Script_ConsumeOptionalKeywordValue(void)
 
 void Bestiary_UpdateCompletionBadges(struct MonsterBook *book)
 {
-    if (Bestiary_AreAllEntriesUnlocked()) {
-        struct AnimSprite *badge = &book->completionBadge;
-        badge->flags &= ~1;
-    } else {
-        struct AnimSprite *badge = &book->completionBadge;
-        badge->flags |= 1;
-    }
+    if (Bestiary_AreAllEntriesUnlocked())
+        AnimSprite_Show(&book->completionBadge);
+    else
+        AnimSprite_Hide(&book->completionBadge);
     if (book->mode != 2) {
         if (book->mode == 0) {
-            s32 group = Bestiary_GetEntryGroup(book->entry);
-            if (Bestiary_IsGroupComplete(group)) {
-                struct AnimSprite *badge = &book->groupBadge;
-                badge->flags &= ~1;
-            } else {
-                struct AnimSprite *badge = &book->groupBadge;
-                badge->flags |= 1;
-            }
+            if (Bestiary_IsGroupComplete(Bestiary_GetEntryGroup(book->entry)))
+                AnimSprite_Show(&book->groupBadge);
+            else
+                AnimSprite_Hide(&book->groupBadge);
         } else {
             book->groupBadge.flags |= 1;
         }
