@@ -64,10 +64,7 @@ void SceneActorSequence_UpdateFadeInHold(struct SceneActorSequence *p)
     p->layer3X = Fixed8_Interpolate(192, 168, 64, p->timer);
     p->layer1X = Fixed8_Interpolate(32, 16, 64, p->timer);
 
-    {
-        s32 n = p->timer + 1;
-        p->timer = n;
-    }
+    p->timer++;
 
     if (PopInSprite_GetStateResult(p->actor)) {
         if (p->timer > 63)
