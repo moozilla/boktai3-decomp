@@ -1,16 +1,11 @@
 #include "global.h"
+#include "bosses/vanargand/vanargand_pair_attack.h"
 
 extern u32 gUnk_08612014[];
-struct A {
-    u8 f[0xa1];
-    u8 a;
-    u8 g[0xa];
-    u8 i;
-};
 void Callback_InvokeActor(void *, u32);
 
-void Vanargand_RunModeCallback(struct A *p)
+void Vanargand_RunModeCallback(struct VanargandPairAttack *boss)
 {
-    p->a = 0;
-    Callback_InvokeActor(p, gUnk_08612014[p->i]);
+    boss->modeInterrupted = 0;
+    Callback_InvokeActor(boss, gUnk_08612014[boss->actionMode]);
 }
