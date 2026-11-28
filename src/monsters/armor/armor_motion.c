@@ -67,6 +67,41 @@ void ActorController_SetAnimation(struct ArmorActor *s, struct ArmorAnimationReq
     s->flags &= ~0x20;
 }
 
+struct ArmorControlState {
+    u32 unknown0, flags;
+};
+
+struct ArmorMotionVector {
+    s16 x, y, z;
+};
+
+struct ArmorWalkController {
+    u8 pad000[0x48];
+    u8 axisX; // 0x48, 0x80-centered
+    u8 pad049[0x4C - 0x49];
+    u8 axisZ; // 0x4C, 0x80-centered
+    u8 pad04D[0x50 - 0x4D];
+    s16 motionX; // 0x50
+    s16 motionY; // 0x52
+    s16 motionZ; // 0x54
+    u8 pad056[0xC0 - 0x56];
+    u16 stepSoundLock; // 0xC0, nonzero suppresses the surface sound
+    u8 pad0C2[0xC4 - 0xC2];
+    u16 animationDuration; // 0xC4, turnDuration in Armor_UpdatePositiveTurn
+    u8 pad0C6[0xC8 - 0xC6];
+    u16 surfaceType; // 0xC8, 1 and 5 quarter the speed, 2 and 5 play a sound
+    u8 pad0CA[0xB32 - 0xCA];
+    u16 flagsB32; // 0xB32
+    u8 padB34[5];
+    u8 facing; // 0xB39
+    u8 padB3A;
+    u8 moveAngle; // 0xB3B
+    u8 padB3C[4];
+    u8 walkState;    // 0xB40
+    u8 walkComplete; // 0xB41
+    u8 ticks;        // 0xB42
+};
+
 void Armor_SetAnimationFromStart(u32 a, u32 b)
 {
     ActorController_SetAnimation(a, b, 0);
@@ -145,16 +180,14 @@ extern const u32 gUnk_0824EB84[];
 
 void Armor_SetAnimationFromStart(u32, u32);
 
-void Armor_EnterFacingAnimation(struct ArmorFacingActor *actor)
+void Armor_EnterFacingAnimation(struct ArmorWalkController *p)
 {
-    u8 *p = (u8 *)actor;
-    u8 *state = p + 0xb40;
-    if (*state == 0) {
-        Armor_SetAnimationFromStart((u32)p, (u32)&gUnk_0824EB84[((p[0xb39] + 0x60) >> 6) & 3]);
-        *state = 0xff;
-        p[0xb41] = 1;
+    if (p->walkState == 0) {
+        Armor_SetAnimationFromStart((u32)p, (u32)&gUnk_0824EB84[((p->facing + 0x60) >> 6) & 3]);
+        p->walkState = 0xff;
+        p->walkComplete = 1;
         SceneCombatActor_SelectFirstCollider((struct SceneCombatActor *)p);
-        *(u16 *)(p + 0xb32) &= ~0x20;
+        p->flagsB32 &= ~0x20;
     }
 }
 
@@ -170,41 +203,6 @@ void Armor_EnterFacingAnimation(struct ArmorFacingActor *actor)
 
 struct ArmorSpriteState {
     u16 unknown0, unknown2, unknown4, flags;
-};
-
-struct ArmorControlState {
-    u32 unknown0, flags;
-};
-
-struct ArmorMotionVector {
-    s16 x, y, z;
-};
-
-struct ArmorWalkController {
-    u8 pad000[0x48];
-    u8 axisX; // 0x48, 0x80-centered
-    u8 pad049[0x4C - 0x49];
-    u8 axisZ; // 0x4C, 0x80-centered
-    u8 pad04D[0x50 - 0x4D];
-    s16 motionX; // 0x50
-    s16 motionY; // 0x52
-    s16 motionZ; // 0x54
-    u8 pad056[0xC0 - 0x56];
-    u16 stepSoundLock; // 0xC0, nonzero suppresses the surface sound
-    u8 pad0C2[0xC4 - 0xC2];
-    u16 animationDuration; // 0xC4, turnDuration in Armor_UpdatePositiveTurn
-    u8 pad0C6[0xC8 - 0xC6];
-    u16 surfaceType; // 0xC8, 1 and 5 quarter the speed, 2 and 5 play a sound
-    u8 pad0CA[0xB32 - 0xCA];
-    u16 flagsB32; // 0xB32
-    u8 padB34[5];
-    u8 facing; // 0xB39
-    u8 padB3A;
-    u8 moveAngle; // 0xB3B
-    u8 padB3C[4];
-    u8 walkState;    // 0xB40
-    u8 walkComplete; // 0xB41
-    u8 ticks;        // 0xB42
 };
 
 extern const u32 gArmorWalkAnimations[];

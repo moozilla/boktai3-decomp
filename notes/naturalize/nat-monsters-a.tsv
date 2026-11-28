@@ -64,3 +64,4 @@ src/monsters/armor/armor_motion.c	Armor_UpdatePositiveTurn	natural	natural	0
 src/monsters/armor/armor_motion.c	Armor_UpdateNegativeTurn	natural	natural	0	
 src/monsters/armor/armor_motion.c	Armor_UpdateWalkNormalWithScatterEffect	contrived	natural	1	
 src/monsters/armor/armor_motion.c	Armor_UpdateWalkFastWithTrailEffect	contrived	natural	1	
+src/monsters/armor/armor_motion.c	Armor_EnterFacingAnimation	contrived	natural	1	
