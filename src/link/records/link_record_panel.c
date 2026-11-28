@@ -128,8 +128,7 @@ void LinkRecordPanel_DrawTime(struct LinkTimeRecord *record, u8 *text, u32 style
         return;
     }
     if (value > 59999) {
-        fraction = 999;
-        whole = fraction;
+        whole = fraction = 999;
     } else {
         whole = Div(value, 60);
         fraction = Div((value - whole * 60) * 169, 10);

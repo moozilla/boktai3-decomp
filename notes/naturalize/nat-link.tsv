@@ -302,3 +302,7 @@ src/link/player/Player_UpdateLinkCore.c	Player_UpdateLinkCore	minor	natural	1
 src/link/player/Player_OnDestroy.c	Player_OnDestroy	contrived	natural	1	
 src/link/player/Player_OnCreate.c	Player_OnCreate	natural	natural	0	
 src/link/player/sub_08243B0C.c	sub_08243B0C	natural	natural	0	
+src/link/records/LinkPanelSlots_ResetInstance.c	LinkPanelSlots_ResetInstance	natural	natural	0	
+src/link/records/LinkPanelSlots_Close.c	LinkPanelSlots_Close	natural	natural	0	
+src/link/records/link_record_panel.c	LinkRecordPanel_LoadBackground	natural	natural	0	
+src/link/records/link_record_panel.c	LinkRecordPanel_DrawTime	minor	natural	1	
