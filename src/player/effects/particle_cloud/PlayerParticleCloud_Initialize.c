@@ -2,7 +2,6 @@
 #include "engine/ram.h"
 #include "engine/engine_globals.h"
 #include "player/player.h"
-// fix.py best (sweep after the inlined-insn fix)
 #include "player/effects/player_particle_cloud.h"
 
 union CloudPackedPosition {
@@ -77,17 +76,15 @@ s32 PlayerParticleCloud_Initialize(struct CloudTask *p, const union CloudPackedP
     p->sheet = AnimData_FindEntry(sheet);
     p->duration = 4;
     particle = p->particles;
-    for (i = 0; i <= 39; i++, particle++) {
+    for (i = 0; i < 40; i++, particle++) {
         const u16 *table;
-        s32 angle;
-        s32 radius;
         s32 speed;
         struct CloudSprite *sprite;
         void *sheetData;
         particle->kind = 1;
         particle->frame = 0;
         particle->timer = i & 3;
-        table = (const u16 *)0x0203B400;
+        table = gRandomTable;
         particle->duration = (RandomValue(table) & 3) + 4;
         particle->angle = RandomValue(table);
         speed = RandomValue(table) | -128;
@@ -110,7 +107,7 @@ s32 PlayerParticleCloud_Initialize(struct CloudTask *p, const union CloudPackedP
         particle->motionZ = 0;
         particle->origin = sprite->position;
         particle->anchor = &p->anchor;
-        table = (const u16 *)0x0203B400;
+        table = gRandomTable;
     }
 
     return 0;
