@@ -143,3 +143,4 @@ src/effects/bursts/fragment_effect/PursuingActor_RetireAll.c	PursuingActor_Retir
 src/effects/bursts/fragment_effect/PursuingActor_RetireAll.c	PursuingActor_RecoilAll	contrived	natural	1	-
 src/effects/bursts/fragment_effect/PursuingActor_RetireAll.c	PursuingActor_CreateHomingSlashFromScript	minor	minor	0	left: most optional script values spelled out; the helper only matches for the last one
 src/effects/bursts/fragment_effect/FragmentEffect_InitCollider.c	FragmentEffect_InitCollider	contrived	natural	1	-
+src/effects/bursts/fragment_effect/FragmentEffect_UpdateCollider.c	FragmentEffect_UpdateCollider	minor	natural	1	-

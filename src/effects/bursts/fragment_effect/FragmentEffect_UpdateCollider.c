@@ -1,9 +1,7 @@
-#include "global.h"
-void Collider_SetPosition(void *, void *, u32);
-s32 Collider_Refresh(void *);
-void FragmentEffect_UpdateCollider(u8 *p)
+#include "effects/bursts/fragment_effect.h"
+
+void FragmentEffect_UpdateCollider(struct Fragment *fragment)
 {
-    u8 *q = p + 0x3c;
-    Collider_SetPosition(q, p + 0x1c, 0);
-    Collider_Refresh(q);
+    Collider_SetPosition(&fragment->collider, &fragment->sprite.position, 0);
+    Collider_Refresh(&fragment->collider);
 }
