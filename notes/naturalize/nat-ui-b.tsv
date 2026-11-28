@@ -305,3 +305,4 @@ src/ui/title/tutorial_otenko.c	TutorialOtenko_UpdateNotifyingAnimation	contrived
 src/ui/title/tutorial_otenko.c	TutorialOtenko_InitPaletteEffectPose	contrived	natural	1	
 src/ui/title/tutorial_otenko.c	TutorialOtenko_UpdateRotatingAnimation2	contrived	minor	1	take/rotate helpers
 src/ui/title/tutorial_otenko.c	TutorialOtenko_UpdateRotatingAnimation3	contrived	minor	1	take/rotate helpers
+src/ui/title/tutorial_otenko.c	TutorialOtenko_UpdateRotatingAnimation4	contrived	minor	1	take/rotate helpers
