@@ -16,7 +16,8 @@ struct Particle {
     struct ParticleConfig config;
     struct ContactSwarmSprite sprite;
     u32 motionFlags; /* 0x58: bit zero, set the velocity from the config on the next update */
-    s32 fallDistance, fallSpeed;
+    s32 fallDistance;
+    u32 fallSpeed;
     struct DisplaySequenceState sequence;
 };
 

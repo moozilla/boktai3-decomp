@@ -149,3 +149,6 @@ src/bosses/ratatosk/SlotMotion_Initialize.c	SlotMotion_Initialize	contrived	natu
 src/bosses/ratatosk/sub_081FB7D8.c	sub_081FB7D8	contrived	minor	3	Sub256 helper stays (v - (x - 256) reassociates)
 src/bosses/ratatosk/sub_081FB80C.c	sub_081FB80C	contrived	minor	3	bit local stays: mask loaded before the field
 src/bosses/ratatosk/OverlaySlot_Initialize.c	OverlaySlot_Initialize	contrived	minor	3	clear helper stays (CpuFill32 stores the clear word later)
+src/bosses/ratatosk/sub_081FB808.c	sub_081FB808	natural	natural	0	
+src/bosses/ratatosk/sub_081FB828.c	sub_081FB828	natural	natural	0	
+src/bosses/ratatosk/Ratatosk_UpdateParticlePool.c	Ratatosk_UpdateParticlePool	contrived	minor	18	Scale/ClearFlags helpers, two velocity-component pointers and a position pointer stay (register allocation)
