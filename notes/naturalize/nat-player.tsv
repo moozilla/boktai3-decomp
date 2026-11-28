@@ -408,3 +408,15 @@ src/player/cutscene/player_cue_commands.c	PlayerCue_BeginOddDirection	natural	na
 src/player/cutscene/player_cue_commands.c	PlayerCue_Motion7Turn	minor	minor	3	facing pointer around GetSideFacing
 src/player/cutscene/player_cue_commands.c	PlayerCue_Motion7Variant7	natural	natural	0	-
 src/player/cutscene/player_cue_commands.c	PlayerCue_Motion7Variant3	minor	natural	1	-
+src/player/cutscene/player_cue_commands.c	PlayerCue_AimDraw	natural	natural	0	-
+src/player/cutscene/player_cue_commands.c	PlayerCue_AimDrawVariant2	natural	natural	0	-
+src/player/cutscene/player_cue_commands.c	PlayerCue_AimSteady	natural	natural	0	-
+src/player/cutscene/player_cue_commands.c	PlayerCue_AimSteadyVariant2	natural	natural	0	-
+src/player/cutscene/player_cue_commands.c	PlayerCue_SetAimPose	natural	natural	0	-
+src/player/cutscene/player_cue_commands.c	PlayerCue_SetFiringPose	natural	natural	0	-
+src/player/cutscene/player_cue_commands.c	PlayerCue_Aim	natural	natural	0	-
+src/player/cutscene/player_cue_commands.c	PlayerCue_Shoot	natural	natural	0	-
+src/player/cutscene/player_cue_commands.c	PlayerCue_AimHold	natural	natural	0	-
+src/player/cutscene/player_cue_commands.c	PlayerCue_AimEnd	natural	natural	0	-
+src/player/cutscene/player_cue_commands.c	PlayerCue_BeginModeSeven	natural	natural	0	-
+src/player/cutscene/player_cue_commands.c	PlayerCue_RunTo	minor	natural	1	-

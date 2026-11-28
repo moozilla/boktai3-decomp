@@ -641,7 +641,7 @@ void PlayerCue_BeginModeSeven(struct Player *player, s32 mode)
 void PlayerCue_RunTo(struct Player *player, const struct ContactPosition *destination,
                      u32 targetFacing, u32 parameter)
 {
-    (*(struct ContactPosition *)&player->cueDestination) = *destination;
+    *(struct ContactPosition *)&player->cueDestination = *destination;
     player->cueParameter = parameter;
     player->targetFacing = targetFacing;
     Player_EnterKindTwo(player);
