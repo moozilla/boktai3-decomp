@@ -1,16 +1,16 @@
 #include "global.h"
+#include "engine/engine.h"
 #include "engine/ram.h"
-#include "objects/items/small_callback_entry_layout.h"
-#include "objects/items/small_callback_pool_layout.h"
-#define gSmallCallbackPool gCompactParticlePool
+#include "objects/items/sprite_drop.h"
+
 void Sprite_Remove(void *);
-s32 CallbackPool_RemoveSmallSprites(struct SmallCallbackPool *pool)
+
+s32 CallbackPool_RemoveSmallSprites(struct SpriteDropPool *pool)
 {
     s32 i;
-    for (i = 0; i <= 15; i++) {
-        if (pool->entries[i].spriteActive) {
-            Sprite_Remove(pool->entries[i].sprite);
-        }
+    for (i = 0; i < SPRITE_DROP_COUNT; i++) {
+        if (pool->items[i].sprite.unknown4[0])
+            Sprite_Remove(&pool->items[i].sprite);
     }
     return (s32)(gCompactParticlePool = 0);
 }

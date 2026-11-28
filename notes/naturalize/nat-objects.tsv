@@ -445,3 +445,5 @@ src/objects/items/sprite_drop/Collectible_ClearManager.c	Collectible_ClearManage
 src/objects/items/sprite_drop/SpriteDrop_IsNearPlayer.c	SpriteDrop_IsNearPlayer	contrived	minor	1	shared fail label: structured forms emit a second return-0 path
 src/objects/items/sprite_drop/SpriteDrop_OnDeactivate.c	SpriteDrop_OnDeactivate	contrived	natural	1	
 src/objects/items/sprite_drop/SpriteDrop_UpdateEntry.c	SpriteDrop_UpdateEntry	contrived	natural	1	local camera view
+src/objects/items/sprite_drop/CallbackPool_InvokeActiveSmall.c	CallbackPool_InvokeActiveSmall	contrived	contrived	10	hand-built callback and entry addresses: indexed forms compute the entry address first (4-6 insns)
+src/objects/items/sprite_drop/CallbackPool_RemoveSmallSprites.c	CallbackPool_RemoveSmallSprites	minor	natural	1	
