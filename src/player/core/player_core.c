@@ -41,24 +41,17 @@ s32 Player_SetAnimation(struct Player *player, u32 index, u32 rate, u32 mode)
 s32 PlayerAnimation_SelectSecondaryKeyframes(struct Player *player, s32 index, s32 rate)
 {
     struct AnimSprite *anim;
-    void *data;
     u32 flags = 0;
-    if (player->animationIndex == index) {
+    if (player->animationIndex == index)
         flags = 1;
-    }
     player->animationIndex = index;
     anim = &player->secondaryAnimation;
-    data = player->animationData;
-    {
-        s32 selected = index;
-        selected = selected + player->heading;
-        Anim_SetKeyframes(anim, data, (u16)selected, 1, flags);
-    }
-    if (player->side) {
-        (&player->secondaryAnimation)->flags |= 4;
-    } else {
+    Anim_SetKeyframes(&player->secondaryAnimation, player->animationData,
+                      (u16)(player->animationIndex + player->heading), 1, flags);
+    if (player->side)
+        anim->flags |= 4;
+    else
         anim->flags &= ~4;
-    }
     Anim_SetFrameDurationScale(&player->secondaryAnimation, (u16)rate);
     return Anim_Step(&player->secondaryAnimation, player->animationData);
 }
