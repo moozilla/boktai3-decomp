@@ -1,14 +1,11 @@
 #include "global.h"
+#include "effects/orbits/homing_effect.h"
+#include "player/player.h"
 
-void Effect_Remove(u8 *);
-
-void Player_DestroyConvergingParticles(u8 *p)
+void Player_DestroyConvergingParticles(struct Player *p)
 {
-    u8 *q = p + 0x9B0;
     s32 i;
 
-    for (i = 3; i >= 0; i--) {
-        Effect_Remove(q);
-        q += 0x34;
-    }
+    for (i = 0; i < 4; i++)
+        Effect_Remove(&p->convergingEffects.particles[i]);
 }
