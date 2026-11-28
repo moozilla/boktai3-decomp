@@ -140,20 +140,19 @@ u32 ContactActor_InitializeSlot(struct ContactActorPool *pool, struct ContactAct
     offset.y = 120;
     offset.z = 0;
     Collider_Init(collider, 0, 0x4005, 0, 16, &bounds, &offset);
-    position = &slot->position;
-    Collider_SetPosition(collider, (void *)position, 0);
+    Collider_SetPosition(collider, &slot->position, 0);
     Collider_SetCallback(collider, ContactActor_ApplyHealthContact, slot);
     Collider_SetBodyProperties(collider, pool->healthColliderId, 0x82, 1);
     Collider_Refresh(collider);
     collider = &slot->resourceCollider;
-    ((struct ContactPosition *)(&bounds))->x = 32;
-    ((struct ContactPosition *)(&bounds))->y = 240;
-    ((struct ContactPosition *)(&bounds))->z = 32;
-    ((struct ContactPosition *)(&offset))->x = 0;
-    ((struct ContactPosition *)(&offset))->y = 120;
-    ((struct ContactPosition *)(&offset))->z = 0;
+    bounds.x = 32;
+    bounds.y = 240;
+    bounds.z = 32;
+    offset.x = 0;
+    offset.y = 120;
+    offset.z = 0;
     Collider_Init(collider, 0, 0x2001, 0, 16, &bounds, &offset);
-    Collider_SetPosition(collider, (void *)position, 0);
+    Collider_SetPosition(collider, &slot->position, 0);
     Collider_SetCallback(collider, ContactActor_ApplyResourceContact, slot);
     Collider_SetAttackProperties(collider, pool->resourceColliderId, 30, 0x208000, 0x20000, 30);
 }
