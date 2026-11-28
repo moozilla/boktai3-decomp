@@ -643,3 +643,4 @@ src/script/script_virtual_machine.c	Script_ExecutePrint	natural	natural	0
 src/script/script_virtual_machine.c	Script_CallFromOperands	natural	natural	0	
 src/script/script_virtual_machine.c	Script_RegisterBuiltinCommands	natural	natural	0	
 src/script/script_virtual_machine.c	Script_ApplyOperator	natural	natural	0	
+src/script/runtime/SceneLifecycle_LoadFromScript.c	SceneLifecycle_LoadFromScript	contrived	natural	1	
