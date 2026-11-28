@@ -28,13 +28,12 @@ struct A {
 };
 void Armor_UpdatePartBobbing(struct A *p)
 {
-    u16 *c = &p->w1d4;
-    if ((*c & 3) == 0)
+    if ((p->w1d4 & 3) == 0)
         p->wF2 += p->wFA;
-    *c -= 1;
-    if (*c == 0) {
+    p->w1d4 -= 1;
+    if (p->w1d4 == 0) {
         p->wFA = -p->wFA;
-        *c = 0x28;
+        p->w1d4 = 0x28;
     }
     p->w1e += p->wF2;
 }
