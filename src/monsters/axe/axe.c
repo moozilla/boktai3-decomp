@@ -1751,44 +1751,41 @@ void Axe_UpdateAttackFlashFade(struct ChaseActor *actor)
         state->timer = 0;
         state->reset = 0;
     }
-    {
-        if (WordFlags_Has(0x180, flags)) {
-            ((struct AxeFlashDrawable *)actor->base.drawable)->graphics.defaultPalette = 0x13F;
-            ((struct AxeFlashDrawable *)actor->base.drawable)->graphics.palette = state->palette;
-            switch (state->level) {
-                case 0:
-                    state->palette[1] = 0;
-                    break;
-                case 1:
-                    state->palette[1] = 16;
-                    break;
-                case 2:
-                    state->palette[1] = 24;
-                    break;
-                case 3:
-                    state->palette[1] = 31;
-                    break;
-            }
-            if (++state->timer > 9) {
-                if (!WordFlags_Has(0x80, flags)) {
-                    if (--state->level <= 0) {
-                        void *drawable =
-                            &((struct AxeFlashDrawable *)actor->base.drawable)->graphics;
-                        u16 *palette = &actor->base.basePaletteBank;
-                        u16 *offset = &actor->base.paletteOffset;
-                        AnimData_SelectPaletteBank(drawable, *palette + *offset);
-                        {
-                            u32 clr = ~0x100;
-                            *flags &= clr;
-                        }
-                        return;
+    if (WordFlags_Has(0x180, flags)) {
+        ((struct AxeFlashDrawable *)actor->base.drawable)->graphics.defaultPalette = 0x13F;
+        ((struct AxeFlashDrawable *)actor->base.drawable)->graphics.palette = state->palette;
+        switch (state->level) {
+            case 0:
+                state->palette[1] = 0;
+                break;
+            case 1:
+                state->palette[1] = 16;
+                break;
+            case 2:
+                state->palette[1] = 24;
+                break;
+            case 3:
+                state->palette[1] = 31;
+                break;
+        }
+        if (++state->timer > 9) {
+            if (!WordFlags_Has(0x80, flags)) {
+                if (--state->level <= 0) {
+                    void *drawable = &((struct AxeFlashDrawable *)actor->base.drawable)->graphics;
+                    u16 *palette = &actor->base.basePaletteBank;
+                    u16 *offset = &actor->base.paletteOffset;
+                    AnimData_SelectPaletteBank(drawable, *palette + *offset);
+                    {
+                        u32 clr = ~0x100;
+                        *flags &= clr;
                     }
-                } else {
-                    if (state->level < 3)
-                        state->level++;
+                    return;
                 }
-                state->timer = 0;
+            } else {
+                if (state->level < 3)
+                    state->level++;
             }
+            state->timer = 0;
         }
     }
 }
