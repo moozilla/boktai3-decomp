@@ -2,51 +2,38 @@
 #include "scene/motion/scene_actor_charge_offset.h"
 #include "bosses/count/scene_graphics_actor.h"
 
-static inline int choose(u32 mode, int normal, int alternate)
-{
-    int test = mode & 1;
-    int result;
-    result = normal;
-    if (test)
-        result = alternate;
-    return result;
-}
-static inline void decay(s16 *p)
-{
-    if (*p > 23)
-        *p -= 24;
-    else
-        *p = 0;
-}
 void SceneActorGraphics_SelectResource(void *);
-void SceneActors_UpdateKnockbackReaction(struct StateActor *base, int time)
+
+void SceneActors_UpdateKnockbackReaction(struct StateActor *p, int tick)
 {
-    int tick = time;
-    struct StateActor *p = base;
-    u8 *position = (u8 *)&p->bodyId;
+    struct SceneGraphicsActor *actor = (struct SceneGraphicsActor *)p;
+    struct SceneActorBody *body = &actor->body;
     if (p->actionChanged) {
         int sequence;
         p->actionChanged = 0;
-        sequence = choose(((struct SceneGraphicsActor *)p)->graphics.animationFlags, 49, 11);
-        SceneActors_StartDirectionalAnimation(
-            p, &((struct SceneGraphicsActor *)p)->animation,
-            (int)&((struct SceneGraphicsActor *)p)->animationResource, sequence, 2, 1, 4);
+        if (actor->graphics.animationFlags & 1)
+            sequence = 11;
+        else
+            sequence = 49;
+        SceneActors_StartDirectionalAnimation(p, &actor->animation, (int)&actor->animationResource,
+                                              sequence, 2, 1, 4);
     }
-    SceneGraphicsActor_ClearPendingDamage((struct SceneGraphicsActor *)p);
-    SceneActorState_SetFlags(base, 12);
-    if (((struct SceneGraphicsActor *)p)->graphics.scaleMin > 23)
-        ((struct SceneGraphicsActor *)p)->graphics.scaleMin -= 24;
+    SceneGraphicsActor_ClearPendingDamage(actor);
+    SceneActorState_SetFlags(p, 12);
+    if (actor->graphics.scaleMin > 23)
+        actor->graphics.scaleMin -= 24;
     else
-        ((struct SceneGraphicsActor *)p)->graphics.scaleMin = 0;
-    decay(&((struct SceneGraphicsActor *)p)->graphics.scaleMax);
-    if (!base->actionReset(base)) {
-        if (tick <= 9) {
-            struct ContactPosition *velocity = (struct ContactPosition *)(position + 20);
-            SceneActor_SetChargeOffset(((struct SceneGraphicsActor *)p)->hitAngle, velocity, 24);
-        }
+        actor->graphics.scaleMin = 0;
+    if (actor->graphics.scaleMax > 23)
+        actor->graphics.scaleMax -= 24;
+    else
+        actor->graphics.scaleMax = 0;
+    if (!p->actionReset(p)) {
+        if (tick <= 9)
+            SceneActor_SetChargeOffset(actor->hitAngle, &body->motion, 24);
         if (tick > 19) {
-            base->actionFinished = 1;
-            ((struct SceneGraphicsActor *)p)->variant = 0;
+            p->actionFinished = 1;
+            actor->variant = 0;
         }
     }
 }
