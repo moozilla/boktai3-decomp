@@ -222,3 +222,9 @@ src/ui/dialogue/screen_message.c	ScreenMessage_SetParametersFromScript	natural	n
 src/ui/dialogue/screen_message.c	ScreenMessage_Create	natural	natural	0	
 src/ui/dialogue/script_prompt.c	ScriptPrompt_Initialize	contrived	natural	5	
 src/ui/dialogue/script_prompt.c	ScriptPrompt_ResetDisplay	minor	natural	1	
+src/ui/dialogue/script_prompt.c	ScriptPrompt_DrawFooterText	natural	natural	0	
+src/ui/dialogue/script_prompt.c	ScriptPrompt_UpdateSelection	natural	natural	0	
+src/ui/dialogue/script_prompt.c	ScriptPrompt_Update	natural	natural	0	
+src/ui/dialogue/script_prompt.c	ScriptPrompt_Destroy	natural	natural	0	
+src/ui/dialogue/script_prompt.c	ScriptPrompt_SetFromScript	natural	natural	0	
+src/ui/dialogue/script_prompt.c	ScriptPrompt_Create	natural	natural	0	
