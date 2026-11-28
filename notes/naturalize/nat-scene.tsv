@@ -404,3 +404,8 @@ src/scene/actor/placement/SceneActorTerrain_ReadScriptParameters.c	SceneActorTer
 src/scene/actor/placement/SceneActorRegistry_SetObjectContext.c	SceneActorRegistry_SetObjectContext	natural	natural	0	-
 src/scene/actor/placement/SceneActorTerrain_CheckHeightTransition.c	SceneActorTerrain_CheckHeightTransition	contrived	minor	8	mask local in the cell height helper: attributes & 15 reorders the shift
 src/scene/actor/placement/SceneActorTerrain_IsFacingPosition.c	SceneActorTerrain_IsFacingPosition	contrived	contrived	5	failed/success gotos: early returns merge the two exits differently
+src/scene/actor/placement/SceneActorTerrain_ClearCollisionTimers.c	SceneActorTerrain_ClearCollisionTimers	minor	minor	0	collider pointer: direct member store changes one instruction
+src/scene/actor/placement/SceneActorTerrain_DisableCollision.c	SceneActorTerrain_DisableCollision	contrived	contrived	0	parked masks: plain |= and flag tests load the field before the mask
+src/scene/actor/placement/SceneActorTerrain_ResumeDrawable.c	SceneActorTerrain_ResumeDrawable	minor	minor	0	shared mask local for both flag clears: literal masks reload the constant
+src/scene/actor/placement/SceneActorPlacement_ResetActorState.c	SceneActorPlacement_ResetActorState	contrived	contrived	0	parked masks and motion-flag pointer: plain operators load the field before the mask
+src/scene/actor/placement/SceneActorPlacement_ResetToPathPoint.c	SceneActorPlacement_ResetToPathPoint	contrived	minor	4	flag mask helper and flags pointer: plain &= ~4 loads the field before the mask

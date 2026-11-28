@@ -19,7 +19,7 @@ static inline void SceneActorPlacement_ClearColliderFlags(struct ContactCollider
 void SceneActorPlacement_ResetToPathPoint(struct ChaseActor *object, u32 pathId, u32 pointId,
                                           u32 direction)
 {
-    struct ChaseActor *actor = (void *)object;
+    struct ChaseActor *actor = object;
     struct SceneActorRegistryControlGroup *group = &actor->group.common;
     struct SceneActorBody *body = &actor->base.body;
     u32 *flags;
@@ -29,7 +29,7 @@ void SceneActorPlacement_ResetToPathPoint(struct ChaseActor *object, u32 pathId,
         struct ContactPosition *position;
         SceneActorChase_ClearWordFlags(flags, 3);
         actor->group.homeRoute.currentPoint = actor->group.homeRoute.pointId;
-        position = &actor->base.body.position;
+        position = &body->position;
         Path_GetPointPositionById((u16 *)position, pathId, pointId);
         actor->base.terrainCell = SceneActorTerrain_GetCellIndex(position);
         body->position.y =
