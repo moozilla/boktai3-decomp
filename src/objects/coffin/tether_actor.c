@@ -1518,13 +1518,10 @@ void TetherActor_RemoveStatusFlags(u32 m)
 u32 TetherActor_CopyPosition(struct ContactPosition *a)
 {
     struct TetherActor *p = gTetherActor;
-    u32 r;
-    if (p) {
-        *a = p->position;
-        r = 1;
-    } else
-        r = 0;
-    return r;
+    if (!p)
+        return 0;
+    *a = p->position;
+    return 1;
 }
 
 void TetherActor_SetPosition(struct ContactPosition *a)
