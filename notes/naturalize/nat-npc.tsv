@@ -434,3 +434,26 @@ src/npc/kuro/Kuro_OnFrameUpdate.c	Kuro_OnFrameUpdate	contrived	natural	1
 src/npc/kuro/Kuro_DispatchReceiverCallback.c	Kuro_DispatchReceiverCallback	minor	natural	1	
 src/npc/kuro/Kuro_OnVisibilityUpdate.c	Kuro_OnVisibilityUpdate	natural	natural	0	
 src/npc/kuro/Kuro_Create.c	Kuro_Create	contrived	contrived	1	local actor layouts, parked zero/mode/update locals in the state setups, id in one local
+src/npc/kuro/Kuro_CreateTagZeroFromScript.c	Kuro_CreateTagZeroFromScript	natural	natural	0	
+src/npc/kuro/Kuro_CreateTagOneFromScript.c	Kuro_CreateTagOneFromScript	natural	natural	0	
+src/script/demo_manager.c	SceneMessages_FindReceiver	natural	natural	0	
+src/script/demo_manager.c	SceneMessages_LinkReceiver	natural	natural	0	
+src/script/demo_manager.c	SceneMessages_UnlinkReceiver	natural	natural	0	
+src/script/demo_manager.c	SceneMessages_SwapBuffers	natural	natural	0	
+src/script/demo_manager.c	SceneMessages_SetDelay	natural	natural	0	
+src/script/demo_manager.c	SceneMessages_SetSignal	natural	natural	0	
+src/script/demo_manager.c	SceneMessages_Update	natural	natural	0	
+src/script/demo_manager.c	SceneMessages_Destroy	natural	natural	0	
+src/script/demo_manager.c	SceneMessages_Initialize	natural	natural	0	
+src/script/demo_manager.c	SceneMessages_Create	natural	natural	0	
+src/script/demo_manager.c	SceneMessages_RegisterReceiver	natural	natural	0	
+src/script/demo_manager.c	SceneMessages_UnregisterReceiver	natural	natural	0	
+src/script/demo_manager.c	SceneMessages_RequestAdvance	natural	natural	0	
+src/script/demo_manager.c	Trigger_ConsumePending	natural	natural	0	
+src/script/demo_manager.c	SceneMessages_Send	natural	natural	0	
+src/script/demo_manager.c	SceneMessages_Stop	natural	natural	0	
+src/script/demo_manager.c	SceneMessages_ConsumeSignal	natural	natural	0	
+src/script/demo_manager.c	SceneMessages_IsActive	natural	natural	0	
+src/script/demo_manager.c	SceneMessages_Enqueue	natural	natural	0	
+src/script/demo_manager.c	SceneMessages_RunScript	contrived	contrived	22	nested do-while(0) in the argument copy: for-loop and indexed forms change the loop's base pointer or register order
+src/script/demo_manager.c	SceneMessages_FindScript	contrived	natural	3	

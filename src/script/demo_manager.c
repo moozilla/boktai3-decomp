@@ -288,16 +288,11 @@ int SceneMessages_FindScript(int id)
 {
     struct SceneMessages *controller = (struct SceneMessages *)gSceneEventDispatchState;
     int index;
-    if (controller)
-        goto scan;
-    goto missing;
-found:
-    return controller->scripts[index];
-scan:
+    if (!controller)
+        return 0;
     for (index = 0; index < controller->scriptCount; index++)
         if (controller->ids[index] == id)
-            goto found;
-missing:
+            return controller->scripts[index];
     return 0;
 }
 
