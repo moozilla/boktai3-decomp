@@ -131,3 +131,5 @@ src/bosses/count/Count_TryQueueCommand.c	Count_TryQueueCommand	contrived	natural
 src/bosses/count/Count_QueueDefaultCommand.c	Count_QueueDefaultCommand	contrived	natural	1	
 src/bosses/count/Count_Init.c	Count_Init	natural	natural	0	
 src/bosses/count/Count_Destroy.c	Count_Destroy	contrived	natural	1	
+src/bosses/count/Count_Create.c	Count_Create	natural	natural	0	
+src/bosses/count/Count_UpdatePresentation.c	Count_UpdatePresentation	contrived	minor	18	removed the blend read helper; kept flag/camera accessors (plain flag ops reallocate), base/p aliases, zero local in the pulse reset and the duplicated shadow-enable arms

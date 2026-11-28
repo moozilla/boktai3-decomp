@@ -21,11 +21,6 @@ void Palette_InterpolateBanks(void *, void *, void *, s32, s32);
 void SceneActors_SpawnAmbientParticlePair(void *);
 void SceneActors_StopBackgroundFlash(void *);
 
-static inline u8 CountPaletteBlend_ReadAmount(struct CountPaletteBlend *blend)
-{
-    return blend->amount;
-}
-
 void Count_UpdatePresentation(void *arg0)
 {
     struct Count *base = arg0;
@@ -52,7 +47,7 @@ void Count_UpdatePresentation(void *arg0)
     }
     collider = &p->overlayCollider;
     if (SceneActorState_TestFlags((struct StateActor *)base, 4)) {
-        ContactCollider_SetFlags(collider, 4);
+        collider->flags |= 4;
     } else {
         ContactCollider_ClearFlags(collider, 4);
         Collider_SetPosition(collider, &p->animation.position, 0);
@@ -117,9 +112,7 @@ void Count_UpdatePresentation(void *arg0)
                 a = gPaletteBankData + (def << 5);
                 b = gPaletteBankData + (res << 5);
                 dst = p->paletteDefault;
-                Palette_InterpolateBanks(
-                    dst, a, b, (s8)CountPaletteBlend_ReadAmount((struct CountPaletteBlend *)amountByte),
-                    p->blend.shift);
+                Palette_InterpolateBanks(dst, a, b, (s8)*amountByte, p->blend.shift);
                 p->animation.palette = dst;
             }
         } else if (p->blend.mode == 2) {
@@ -132,9 +125,7 @@ void Count_UpdatePresentation(void *arg0)
                 a = gPaletteBankData + (def << 5);
                 b = gPaletteBankData + (res << 5);
                 dst = p->paletteDefault;
-                Palette_InterpolateBanks(
-                    dst, a, b, (s8)CountPaletteBlend_ReadAmount((struct CountPaletteBlend *)amountByte),
-                    p->blend.shift);
+                Palette_InterpolateBanks(dst, a, b, (s8)*amountByte, p->blend.shift);
                 p->animation.palette = dst;
             } else {
                 SceneActorGraphics_SelectResource(p);
