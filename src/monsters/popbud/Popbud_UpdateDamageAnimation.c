@@ -32,7 +32,7 @@ s32 Popbud_UpdateDamageAnimation(struct PinkSpineState *p)
         if (p->f136 <= 0) {
             p->f134 = 1;
             Anim_RestartSequence(&p->sequence, p->f15C, 0xD, 0, 0);
-            AnimData_SelectPaletteBank(p->graphics, 0x1BD);
+            AnimData_SelectPaletteBank(&p->graphics, 0x1BD);
             p->f12C = 0;
             p->update = ProjectileEmitter_EmitAttackFrame;
             Sound_PlaySong(0x522);
@@ -43,10 +43,10 @@ s32 Popbud_UpdateDamageAnimation(struct PinkSpineState *p)
         p->f130 = 0;
     }
     if (p->f12C > 0) {
-        AnimData_SelectPaletteBank(p->graphics, 0x192);
+        AnimData_SelectPaletteBank(&p->graphics, 0x192);
         p->f12C--;
     } else
-        AnimData_SelectPaletteBank(p->graphics, 0x1BD);
+        AnimData_SelectPaletteBank(&p->graphics, 0x1BD);
     if (Popbud_StepAnimation(p) && p->update == ProjectileEmitter_UpdateAttack)
         Sound_PlaySong(0x521);
     p->age++;

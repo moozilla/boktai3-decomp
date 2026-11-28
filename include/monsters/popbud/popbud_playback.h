@@ -4,12 +4,13 @@
 #include "scene/collision/contact_collider.h"
 #include "player/cutscene/player_cue_sequence.h"
 #include "engine/task.h"
+#include "scene/collision/contact_swarm.h"
 struct PinkSpineState {
     struct Task task;
     u32 age;
     struct ContactPosition initialPosition;
-    struct DisplaySequenceSprite sprite;
-    u8 graphics[0x1c];
+    struct ContactSwarmSprite sprite;
+    struct ContactSwarmGraphics graphics;
     struct ContactCollider collider;
     u8 body[0x48];
     void *update;
@@ -53,7 +54,7 @@ static inline void Popbud_ProjectileOrigin(struct ContactPosition *position,
 
 static inline u32 Popbud_StepAnimation(struct PinkSpineState *owner)
 {
-    return PlayerCue_StepSequenceEnded((void *)&owner->sprite, &owner->sequence);
+    return PlayerCue_StepSequenceEnded(&owner->sprite, &owner->sequence);
 }
 
 #endif

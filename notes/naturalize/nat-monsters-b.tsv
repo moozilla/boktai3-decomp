@@ -183,3 +183,7 @@ src/monsters/poison_hand/PoisonHand_UpdateEmergence.c	PoisonHand_UpdateEmergence
 src/monsters/poison_hand/PoisonHand_WaitForPlayerApproach.c	PoisonHand_WaitForPlayerApproach	minor	natural	2	pos/origin pointer locals
 src/monsters/pollen_flowers/PollenFlower_InitializeFromScript.c	PollenFlower_InitializeFromScript	contrived	natural	1	
 src/monsters/pollen_flowers/PollenFlower_UpdateAnimation.c	PollenFlower_UpdateAnimation	minor	natural	1	
+src/monsters/pollen_flowers/PollenFlower_CreateFromScript.c	PollenFlower_CreateFromScript	natural	natural	0	
+src/monsters/pollen_flowers/PollenFlower_ReturnZero.c	PollenFlower_ReturnZero	natural	natural	0	
+src/monsters/pollen_flowers/PollenFlower_Destroy.c	PollenFlower_Destroy	minor	minor	0	raw +0x20: s32 tail return needs Sprite_Remove declared s32
+src/monsters/popbud/Popbud_InitFromScript.c	Popbud_InitFromScript	contrived	natural	3	
