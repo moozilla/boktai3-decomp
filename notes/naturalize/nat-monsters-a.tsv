@@ -522,3 +522,4 @@ src/monsters/centipede/Centipede_ResetOscillation.c	Centipede_ResetOscillation	c
 src/monsters/centipede/Centipede_UpdateOscillation.c	Centipede_UpdateOscillation	contrived	natural	1	
 src/monsters/centipede/Centipede_InitProfile.c	Centipede_InitProfile	contrived	natural	1	
 src/monsters/centipede/Centipede_InitSegmentColliders.c	Centipede_InitSegmentColliders	contrived	natural	5	
+src/monsters/centipede/Centipede_InitCollision.c	Centipede_InitCollision	contrived	natural	2	
