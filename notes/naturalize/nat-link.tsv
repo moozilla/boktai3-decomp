@@ -288,3 +288,5 @@ src/link/player/Player_UpdateActionPhase.c	Player_UpdateActionPhase	contrived	na
 src/link/player/Player_FindMaskedSlot.c	Player_FindMaskedSlot	natural	natural	0	
 src/link/player/sub_08242FAC.c	sub_08242FAC	contrived	natural	2	
 src/link/player/sub_08243020.c	sub_08243020	contrived	natural	2	
+src/link/player/Player_SynchronizeColliderState.c	Player_SynchronizeColliderState	natural	natural	0	
+src/link/player/Player_ApplyContact.c	Player_ApplyContact	minor	natural	3	count local keeps the response test; goto done stays

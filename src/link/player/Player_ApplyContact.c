@@ -42,14 +42,12 @@ u32 Player_ApplyContact(struct Player *p, struct ContactCollider *source,
 {
     u32 amount;
     u32 shift;
+    s32 count = source->unknown3C;
 
-    {
-        s32 count = source->unknown3C;
-        if (count > 0)
-            Collision_CalculateElementalResponse(source, target);
-        else
-            target->cost = 0;
-    }
+    if (count > 0)
+        Collision_CalculateElementalResponse(source, target);
+    else
+        target->cost = 0;
     target->responseValue = source->responseValue;
     shift = 0;
     if (source->responseParameter == 0) {
@@ -117,10 +115,8 @@ u32 Player_ApplyContact(struct Player *p, struct ContactCollider *source,
             sub_08243020(Player_FindMaskedSlot((const struct PlayerSelection *)source), amount);
     }
     p->particleEmissionCount += amount;
-done: {
-    u16 f = source->contactFlags;
-    p->lastContactFlags = f;
-}
+done:
+    p->lastContactFlags = source->contactFlags;
     p->lastContactRewardFlags = source->statRewardFlags;
     return amount;
 }
