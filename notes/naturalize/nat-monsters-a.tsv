@@ -16,3 +16,5 @@ src/monsters/armor/actor_marker.c	ActorMarker_EmitRingEffects	contrived	minor	20
 src/monsters/armor/actor_marker.c	ActorMarker_EmitIndexedEffect	contrived	contrived	0	tried gUnk_0824E778[row][index] and sum forms: table local loaded before the shifts decides operand order
 src/monsters/armor/actor_marker.c	Armor_SpawnRandomDirectionalParticle	contrived	minor	6	*(table + index): plain subscript swaps the add operands
 src/monsters/armor/actor_marker.c	Armor_SpawnDirectionalParticleFan	contrived	natural	1	
+src/monsters/armor/actor_marker.c	ActorMarker_LaunchFragments	contrived	contrived	0	tried row-pointer indexing and plain random draw: position pointers/rowStart arithmetic decide hoist order and induction
+src/monsters/armor/actor_palette.c	Armor_UpdatePaletteRestoreDelay	contrived	natural	2	

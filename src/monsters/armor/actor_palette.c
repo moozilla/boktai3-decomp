@@ -425,14 +425,10 @@ void Armor_CopyScenePalette(void *a)
 
 void Armor_UpdatePaletteRestoreDelay(struct ArmorPaletteController *controller)
 {
-    s32 c = (u16)controller->timer + 1;
-    controller->timer = c;
-    if ((s16)c > 7) {
-        void (*q)(struct ArmorPaletteController *);
+    if (++controller->timer > 7) {
         controller->update = 0;
-        q = controller->finish;
-        if (q) {
-            Callback_InvokeActor(controller, q);
+        if (controller->finish) {
+            Callback_InvokeActor(controller, controller->finish);
             controller->finish = 0;
         }
     }
