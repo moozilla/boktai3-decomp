@@ -1,10 +1,8 @@
-#include "global.h"
+#include "scene/actor/scene_actor_control_phase.h"
 
-void SceneActorAnimation_SelectDirectionalEntry(u8 *, u32);
-
-void SceneActorControl_ResetDirectionalAnimation(u8 *p)
+void SceneActorControl_ResetDirectionalAnimation(struct ChaseActor *actor)
 {
-    if (p[0x2b2] != 0)
-        p[0x2b2] = 0;
-    SceneActorAnimation_SelectDirectionalEntry(p, 0);
+    if (actor->base.field2B2)
+        actor->base.field2B2 = 0;
+    SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)actor, 0);
 }

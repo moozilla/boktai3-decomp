@@ -304,3 +304,4 @@ src/scene/actor/control/SceneActorControl_Update.c	SceneActorControl_Update	mino
 src/scene/actor/control/SceneActorControl_CreateFromPosition.c	SceneActorControl_CreateFromPosition	minor	minor	0	found/p pair and sprite alias of the slot
 src/scene/actor/control/SceneActorControl_CreateFromScript.c	SceneActorControl_CreateFromScript	minor	minor	0	sprite alias of the slot
 src/scene/actor/control/SceneActorControl_UpdateDirectionalAnimation.c	SceneActorControl_UpdateDirectionalAnimation	contrived	minor	1	keeps the take-flag helper and direction local shared with UpdateFacingAnimation
+src/scene/actor/control/SceneActorControl_ResetDirectionalAnimation.c	SceneActorControl_ResetDirectionalAnimation	contrived	natural	1	-
