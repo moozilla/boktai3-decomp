@@ -349,12 +349,10 @@ s32 NidhoggrDuelMinionPool_Update(struct ContactSequenceOwner *owner)
 s32 NidhoggrDuelMinionPool_Destroy(struct ContactSequenceOwner *owner)
 {
     struct ContactSequenceActor *actor = owner->actors;
-    s32 remaining = 7;
-    do {
+    s32 remaining;
+    for (remaining = 0; remaining < 8; remaining++, actor++) {
         NidhoggrDuelMinion_Destroy(owner, actor);
-        --remaining;
-        ++actor;
-    } while (remaining >= 0);
+    }
     return 0;
 }
 
