@@ -163,3 +163,6 @@ src/bosses/count/CountBats_IgnoreResourceContact.c	CountBats_IgnoreResourceConta
 src/bosses/count/CountBats_InitializeSlot.c	CountBats_InitializeSlot	contrived	minor	6	palette helper stays
 src/bosses/count/CountBats_DestroySlot.c	CountBats_DestroySlot	natural	natural	0	
 src/bosses/count/CountBats_HideSlot.c	CountBats_HideSlot	minor	natural	3	
+src/bosses/count/CountBats_SetDirectionalSequence.c	CountBats_SetDirectionalSequence	contrived	contrived	0	unchanged: same out-parameter flip pattern as ContactActor_SetDirectionalSequence
+src/bosses/count/CountBats_UpdateIdle.c	CountBats_UpdateIdle	natural	natural	0	
+src/bosses/count/CountBats_UpdateAdvance.c	CountBats_UpdateAdvance	contrived	minor	6	velocity pointer and position block stay: shared charge offset narrows direction

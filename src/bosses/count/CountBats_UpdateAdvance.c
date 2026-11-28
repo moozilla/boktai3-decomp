@@ -1,41 +1,27 @@
 #include "scene/collision/contact_swarm.h"
+#include "scene/motion/scene_actor_charge_offset.h"
 void CountBats_SetDirectionalSequence(struct ContactSwarm *, struct ContactSwarmSlot *, u32);
-static inline s32 truncateShift12(s32 value)
-{
-    if (value >= 0)
-        return value >> 12;
-    return -((-value) >> 12);
-}
 void CountBats_UpdateAdvance(struct ContactSwarm *pool, struct ContactSwarmSlot *slot, s32 index)
 {
     struct ContactSwarmSprite *sprite = &slot->display.animation.draw.sprite;
     if (slot->enter) {
-        struct ContactCollider *collider;
         struct ContactPosition *velocity;
         u32 direction;
         u32 speed;
         slot->enter = 0;
-        collider = &slot->display.healthCollider;
-        collider->flags |= 4;
+        ContactCollider_SetFlags(&slot->display.healthCollider, 4);
         CountBats_SetDirectionalSequence(pool, slot, 0);
         velocity = &slot->velocity;
         direction = slot->direction;
         speed = slot->advanceSpeed;
-        velocity->x = truncateShift12(gUnk_086149C4[(direction + 64) & 255] * speed);
+        velocity->x = SceneActor_ChargeComponent(gUnk_086149C4[(direction + 64) & 255] * speed);
         velocity->y = 0;
-        {
-            const s16 *table = gUnk_086149C4;
-            const s16 *entry;
-            u32 offset;
-            offset = direction * 2;
-            entry = (const void *)(offset + (u32)table);
-            velocity->z = truncateShift12(*entry * speed);
-        }
+        velocity->z = SceneActor_ChargeComponent(gUnk_086149C4[direction] * speed);
     }
     {
         struct ContactPosition *position = &sprite->position;
         const struct ContactPosition *velocity = &slot->velocity;
-        sprite->position.x += slot->velocity.x;
+        position->x += velocity->x;
         position->y += velocity->y;
         position->z += velocity->z;
     }
