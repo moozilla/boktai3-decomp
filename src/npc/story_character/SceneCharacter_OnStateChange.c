@@ -1,34 +1,20 @@
-#include "global.h"
+#include "npc/story_character/state_actor.h"
 
 extern u32 gUnk_086121C4[];
-struct S {
-    u8 pad[5];
-    u8 b5;
-    u8 b6;
-    u8 pad7[2];
-    u8 b9;
-    u8 pad2[6];
-    u32 f10;
-    u8 pad3[4];
-    u8 b18;
-    u8 pad4[0x2cc - 0x19];
-    u32 f2cc;
-};
 
-s32 SceneCharacter_OnStateChange(struct S *p)
+s32 SceneCharacter_OnStateChange(struct StateActor *p)
 {
-    s32 r;
-    if ((u8)(p->b5 - 1) <= 0x5F) {
-        u32 t = gUnk_086121C4[p->b5];
-        u8 v = p->b5;
-        p->b6 = v;
-        p->f2cc = t;
-        p->f10 = 0;
-        p->b9 = 1;
-        p->b18 = 0;
-        r = 1;
+    s32 result;
+    if (p->nextState >= 1 && p->nextState <= 0x60) {
+        void (*callback)(void) = (void (*)(void))gUnk_086121C4[p->nextState];
+        p->prevState = p->nextState;
+        p->stateCallback = callback;
+        p->stateFrame = 0;
+        p->enter = 1;
+        p->phase = 0;
+        result = 1;
     } else {
-        r = 0;
+        result = 0;
     }
-    return r;
+    return result;
 }

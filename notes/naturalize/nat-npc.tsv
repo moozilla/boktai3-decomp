@@ -222,3 +222,4 @@ src/npc/story_character/StoryCharacter_StartAnimStep.c	StoryCharacter_StartAnimS
 src/npc/story_character/SceneCharacter_UpdateAnimationTen.c	SceneCharacter_UpdateAnimationTen	natural	natural	0	
 src/npc/story_character/SceneCharacter_FaceSceneTarget.c	SceneCharacter_FaceSceneTarget	natural	natural	0	
 src/npc/story_character/SceneCharacter_UpdateParticleDissolve.c	SceneCharacter_UpdateParticleDissolve	contrived	minor	1	the copied orb position is a ContactPosition view of effects.unknown8
+src/npc/story_character/SceneCharacter_OnStateChange.c	SceneCharacter_OnStateChange	contrived	minor	4	callback local loaded before the prevState store; result variable (early returns reorder the epilogue)
