@@ -521,3 +521,4 @@ src/monsters/centipede/tentacle_body.c	CentipedeBody_UpdateChargeSpread	minor	mi
 src/monsters/centipede/Centipede_ResetOscillation.c	Centipede_ResetOscillation	contrived	natural	1	
 src/monsters/centipede/Centipede_UpdateOscillation.c	Centipede_UpdateOscillation	contrived	natural	1	
 src/monsters/centipede/Centipede_InitProfile.c	Centipede_InitProfile	contrived	natural	1	
+src/monsters/centipede/Centipede_InitSegmentColliders.c	Centipede_InitSegmentColliders	contrived	natural	5	
