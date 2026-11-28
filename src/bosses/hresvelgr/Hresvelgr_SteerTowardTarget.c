@@ -22,12 +22,11 @@ static inline s32 Dot(struct SceneVec *a, struct SceneVec *b)
 {
     return a->x * b->x + a->z * b->z;
 }
-void Hresvelgr_SteerTowardTarget(struct HresvelgrTravelActor *input)
+void Hresvelgr_SteerTowardTarget(struct HresvelgrTravelActor *a)
 {
-    struct HresvelgrTravelActor *a = input;
     struct SceneVec delta, left, right;
-    register struct SceneVec *v = &a->delta;
-    register s32 y;
+    struct SceneVec *v = &a->delta;
+    s32 y;
     struct SceneVec *out = &delta;
     struct SceneVec *target = &a->target, *position = &a->position;
     delta.x = target->x - position->x;
@@ -35,10 +34,7 @@ void Hresvelgr_SteerTowardTarget(struct HresvelgrTravelActor *input)
     out->z = target->z - position->z;
     y = out->y;
     if ((u32)(y + 15) <= 30) {
-        s32 value = -16;
-        if (y > 0)
-            value = 16;
-        y = value;
+        y = y > 0 ? 16 : -16;
     }
     y = y >= 0 ? y >> 4 : -(-y >> 4);
     Normalize(&delta);

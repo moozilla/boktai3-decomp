@@ -245,3 +245,6 @@ src/bosses/hresvelgr/Hresvelgr_SetSineScaledVelocity.c	Hresvelgr_SetSineScaledVe
 src/bosses/hresvelgr/Hresvelgr_SetCosineScaledVelocity.c	Hresvelgr_SetCosineScaledVelocity	minor	minor	0	s16 angle and product operand order (see source comment)
 src/bosses/hresvelgr/ColliderActor_SetTargetPosition.c	ColliderActor_SetTargetPosition	contrived	minor	8	delta/position pointers stay
 src/bosses/hresvelgr/Hresvelgr_RefreshTarget.c	Hresvelgr_RefreshTarget	minor	minor	5	obj alias and origin local stay
+src/bosses/hresvelgr/Hresvelgr_UpdateTravel.c	Hresvelgr_UpdateTravel	contrived	contrived	4	unchanged: saved alias, masked facing blocks
+src/bosses/hresvelgr/OffsetActor_StepTowardTarget.c	OffsetActor_StepTowardTarget	minor	minor	3	result locals and output pointer stay
+src/bosses/hresvelgr/Hresvelgr_SteerTowardTarget.c	Hresvelgr_SteerTowardTarget	contrived	minor	8	delta output and target/position pointers, v pointer stay
