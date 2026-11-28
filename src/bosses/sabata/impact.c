@@ -47,7 +47,7 @@ static inline void SetHitAttributes(struct SabataActorImpact *boss, u32 value)
 }
 
 void SabataImpact_CopyContact(struct ContactCollider *attack, struct ContactCollider *defense,
-                             struct SabataActorImpact *actor)
+                              struct SabataActorImpact *actor)
 {
     struct SabataActorImpact *boss = actor;
     u32 rewardMask;
@@ -243,7 +243,8 @@ s32 SceneActors_GetEffectiveTimeStep(struct SabataActorImpact *actor)
     return result;
 }
 
-void SabataImpact_FindNearbyPoint(struct SabataActorImpact *actor, struct ContactPosition *out, u32 start)
+void SabataImpact_FindNearbyPoint(struct SabataActorImpact *actor, struct ContactPosition *out,
+                                  u32 start)
 {
     struct ContactPosition point;
     struct SceneActorBody *body = &actor->body;
