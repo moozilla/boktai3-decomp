@@ -235,3 +235,4 @@ src/link/player/Player_CollectCallbackFlags.c	Player_CollectCallbackFlags	contri
 src/link/player/Player_ApplyContactCosts.c	Player_ApplyContactCosts	minor	natural	2	
 src/link/player/Player_StartContactAttack.c	Player_StartContactAttack	natural	natural	0	
 src/link/player/Player_EmitSweepSpark.c	Player_EmitSweepSpark	minor	natural	10	random table read as *(gRandomTable + index): the indexed form loads the table address first
+src/link/player/Player_UpdateSweepAction.c	Player_UpdateSweepAction	contrived	minor	5	left-side angle keeps a heading pointer local: single expression reorders the loads
