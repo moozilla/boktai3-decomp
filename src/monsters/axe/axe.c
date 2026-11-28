@@ -886,7 +886,7 @@ void Axe_UpdateDefeat(struct ChaseActor *actor, s32 frame)
     struct ContactPosition position;
     struct ScriptUtilityArguments arguments;
     struct Axe *context = actor->base.context;
-    u8 *drawable = actor->base.drawable;
+    struct DisplaySequenceSprite *drawable = actor->base.drawable;
     u16 script;
     if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
         SceneActorAnimation_SelectProfileEntry(actor, 10);
@@ -941,11 +941,11 @@ void Axe_UpdateDefeat(struct ChaseActor *actor, s32 frame)
                 context->sparkStep = 0;
                 break;
         }
-        x = Scale_UpdateDefeat(offset.x * gUnk_086149C4[(drawable[6] + 64) & 255]);
-        z = Scale_UpdateDefeat(offset.z * gUnk_086149C4[drawable[6]]);
+        x = Scale_UpdateDefeat(offset.x * gUnk_086149C4[(drawable->attribute + 64) & 255]);
+        z = Scale_UpdateDefeat(offset.z * gUnk_086149C4[drawable->attribute]);
         position.x = x + z + position.x;
-        x2 = Scale_UpdateDefeat(-(offset.x * gUnk_086149C4[drawable[6]]));
-        z = Scale_UpdateDefeat(offset.z * gUnk_086149C4[(drawable[6] + 64) & 255]);
+        x2 = Scale_UpdateDefeat(-(offset.x * gUnk_086149C4[drawable->attribute]));
+        z = Scale_UpdateDefeat(offset.z * gUnk_086149C4[(drawable->attribute + 64) & 255]);
         position.z = x2 + z + position.z;
         SparkParticle_Spawn(&position, 2, &range, 0, 0, 22, 2, 1);
     }
