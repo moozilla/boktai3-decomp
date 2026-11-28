@@ -251,3 +251,4 @@ src/scene/actor/behavior/SceneActorControl_UpdateSavedControlPhase.c	SceneActorC
 src/scene/actor/behavior/SceneActorControl_HideOffscreen.c	SceneActorControl_HideOffscreen	minor	minor	0	SetFlags inline (plain |= differs); drawable position branch
 src/scene/actor/behavior/SceneActorControl_UpdateTriggerApproach.c	SceneActorControl_UpdateTriggerApproach	minor	minor	0	duration scale pointer assigned in both branches (merged condition differs)
 src/scene/actor/behavior/SceneActorState_InvokeBehaviorCallback.c	SceneActorState_InvokeBehaviorCallback	minor	natural	1	-
+src/scene/actor/behavior/SceneActorState_DispatchTable29CState.c	SceneActorState_DispatchTable29CState	minor	natural	1	-
