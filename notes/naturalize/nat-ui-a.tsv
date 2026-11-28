@@ -158,3 +158,4 @@ src/ui/books/forging_book/sub_0821353C.c	sub_0821353C	minor	natural	1
 src/ui/books/forging_book/ForgingBook_ReleaseGraphics.c	ForgingBook_ReleaseGraphics	contrived	natural	1	
 src/ui/books/forging_book/CollectionBook_UpdateMenu.c	CollectionBook_UpdateMenu	contrived	natural	1	falls off the end of an s32 function (kept)
 src/ui/books/forging_book/sub_08213B50.c	sub_08213B50	minor	natural	1	
+src/ui/books/forging_book/ForgingBook_InitializePageFromScript.c	ForgingBook_InitializePageFromScript	minor	natural	1	
