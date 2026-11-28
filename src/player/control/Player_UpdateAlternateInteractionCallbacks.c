@@ -1,35 +1,33 @@
-#include "player/player_status_flags.h"
 #include "global.h"
-extern u8 *gGameState;
-extern void *gUnk_08610D18[];
-void Player_AccumulateAction(u8 *, s32);
-bool32 Player_CanUseSceneFeature(u8 *);
-void Player_UpdateTimedScriptEvent(u8 *);
-void Player_TickModeParticles(u8 *);
-void Player_UpdateDirectionHistory(u8 *);
-s32 Player_SelectAlternateInteractionMode(u8 *);
-void Player_UpdateCameraInput(u8 *, s32);
-void Callback_InvokeActor(u8 *, void *);
-void Player_SynchronizeInteractionDisplay(u8 *);
-void Player_ClampPositionToStoredTerrainCell(u8 *);
-void Player_RequestNearbyEffectTarget(u8 *);
-void Player_UpdateInteractionHoverDisplay(u8 *);
-void Player_BlendCameraTarget(u8 *);
-void Player_UpdateLockedMovement(u8 *);
-void Player_AddControlFlags(u8 *, u32);
-void PlayerCue_UpdatePeriodicParticles(u8 *);
-struct Vec2 {
-    s32 x, y;
-};
+#include "player/player_status_flags.h"
+#include "system/game_state/game_state.h"
 
-void Player_UpdateAlternateInteractionCallbacks(u8 *p)
+extern void *gUnk_08610D18[];
+void Player_AccumulateAction(struct Player *, s32);
+bool32 Player_CanUseSceneFeature(struct Player *);
+void Player_UpdateTimedScriptEvent(struct Player *);
+void Player_TickModeParticles(struct Player *);
+void Player_UpdateDirectionHistory(struct Player *);
+s32 Player_SelectAlternateInteractionMode(struct Player *);
+void Player_UpdateCameraInput(struct Player *, s32);
+void Callback_InvokeActor(struct Player *, void *);
+void Player_SynchronizeInteractionDisplay(struct Player *);
+void Player_ClampPositionToStoredTerrainCell(struct Player *);
+void Player_RequestNearbyEffectTarget(struct Player *);
+void Player_UpdateInteractionHoverDisplay(struct Player *);
+void Player_BlendCameraTarget(struct Player *);
+void Player_UpdateLockedMovement(struct Player *);
+void Player_AddControlFlags(struct Player *, u32);
+void PlayerCue_UpdatePeriodicParticles(struct Player *);
+
+void Player_UpdateAlternateInteractionCallbacks(struct Player *p)
 {
-    Player_AddStatusFlags((struct Player *)p, 0x54000);
-    switch (*(s32 *)(p + 0x1c)) {
+    Player_AddStatusFlags(p, 0x54000);
+    switch (p->kind) {
         case 1: {
             s32 mode;
-            if (((struct Player *)p)->statusFlags & 0x10)
-                Player_AccumulateAction(p, *(s16 *)(gGameState + 0x876));
+            if (p->statusFlags & 0x10)
+                Player_AccumulateAction(p, gGameState->unk876);
             if (Player_CanUseSceneFeature(p)) {
                 Player_UpdateTimedScriptEvent(p);
                 Player_TickModeParticles(p);
@@ -38,10 +36,10 @@ void Player_UpdateAlternateInteractionCallbacks(u8 *p)
             mode = Player_SelectAlternateInteractionMode(p);
             Player_UpdateCameraInput(p, mode);
             Callback_InvokeActor(p, gUnk_08610D18[mode]);
-            if (p[0x48c])
-                *(struct Vec2 *)(p + 0x38) = *(struct Vec2 *)(p + 0x490);
+            if (p->movementVelocityLocked)
+                *(struct SceneVec *)&p->velocityX = p->lockedVelocity;
             Player_SynchronizeInteractionDisplay(p);
-            if (*(s16 *)(p + 0x4b6))
+            if (p->cameraOffsetActive)
                 Player_BlendCameraTarget(p);
             Player_ClampPositionToStoredTerrainCell(p);
             Player_RequestNearbyEffectTarget(p);
@@ -50,7 +48,7 @@ void Player_UpdateAlternateInteractionCallbacks(u8 *p)
         }
         case 2:
             Player_AddControlFlags(p, 8);
-            Callback_InvokeActor(p, *(void **)(p + 0x58c));
+            Callback_InvokeActor(p, p->triggerAnimationCallback);
             Player_SynchronizeInteractionDisplay(p);
             PlayerCue_UpdatePeriodicParticles(p);
             break;
