@@ -136,3 +136,4 @@ src/monsters/mummy/mummy_entry.c	SceneActor_WaitForControlCompletion	minor	minor
 src/monsters/mummy/mummy_entry.c	Mummy_FireAcceleratingVolley	contrived	contrived	21	velocity temps and bare blocks fix allocation
 src/monsters/mummy/mummy_entry.c	SceneActorPath_FaceAndCheckStraightPath	contrived	contrived	13	coordinate temps fix load order
 src/monsters/mummy/mummy_entry.c	Mummy_RequestStraightRoute	minor	natural	10	
+src/monsters/mummy/mummy_entry.c	SceneActor_EnterMotionPhase	contrived	contrived	36	parked masks and flag accessors fix load order

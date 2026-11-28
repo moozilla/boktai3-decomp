@@ -1887,22 +1887,17 @@ s32 Mummy_CanPassMovementThreshold(struct ChaseActor *s)
 void SceneActor_EnterMotionPhase(struct ChaseActor *actor)
 {
     struct Mummy *parent;
-    u32 started;
     SceneActorChase_ClearWordFlags(&actor->base.statusFlags, 4);
     parent = actor->base.context;
-    SceneActorChase_ClearFlagComponent((void *)&parent->flags6F2, 0x1400);
-    started = SceneActorChase_TrackingFlags(&actor->base.tracking, 8);
-    if (started) {
+    SceneActorChase_ClearFlagComponent(&parent->flags6F2, 0x1400);
+    if (SceneActorChase_TrackingFlags(&actor->base.tracking, 8)) {
         u16 *motionFlags;
         SceneActorChase_GroupSetFlags(&actor->group, 4);
         {
             u32 mask = 0x80;
             motionFlags = &actor->base.motionFlags;
-            {
-                u32 value = *motionFlags;
-                mask |= value;
-                *motionFlags = mask;
-            }
+            mask |= *motionFlags;
+            *motionFlags = mask;
         }
         {
             u32 mask;
@@ -1919,11 +1914,8 @@ void SceneActor_EnterMotionPhase(struct ChaseActor *actor)
     {
         struct SceneActorChaseTracking *tracking = &actor->base.tracking;
         u32 mask = 8;
-        {
-            u32 value = tracking->flags;
-            mask |= value;
-            tracking->flags = mask;
-        }
+        mask |= tracking->flags;
+        tracking->flags = mask;
     }
 }
 
