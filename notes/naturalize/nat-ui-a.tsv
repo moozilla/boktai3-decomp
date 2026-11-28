@@ -112,3 +112,4 @@ src/ui/books/forging_book/ForgingBook_IsCategoryComplete.c	ForgingBook_IsCategor
 src/ui/books/forging_book/ForgingBook_IsComplete.c	ForgingBook_IsComplete	minor	natural	1	
 src/ui/books/forging_book/sub_08211820.c	sub_08211820	contrived	natural	1	
 src/ui/books/forging_book/sub_08211860.c	sub_08211860	contrived	natural	1	
+src/ui/books/forging_book/ForgingBook_IsWeaponDiscovered.c	ForgingBook_IsWeaponDiscovered	contrived	natural	1	
