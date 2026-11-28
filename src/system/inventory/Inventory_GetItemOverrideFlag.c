@@ -1,6 +1,6 @@
-#include "global.h"
-extern u8 *gGameState;
+#include "system/game_state/game_state.h"
+
 u32 Inventory_GetItemOverrideFlag(u32 i)
 {
-    return *(s16 *)(gGameState + i * 2 + 0x100) & 0x8000;
+    return *(i + gGameState->table100) & 0x8000;
 }

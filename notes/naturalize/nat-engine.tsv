@@ -539,3 +539,4 @@ src/system/inventory/Inventory_GetItemStateValue.c	Inventory_GetItemStateValue	c
 src/system/inventory/Inventory_SetItemStateValue.c	Inventory_SetItemStateValue	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
 src/system/inventory/Inventory_SetItemOverrideFlag.c	Inventory_SetItemOverrideFlag	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
 src/system/inventory/Inventory_ClearItemOverrideFlag.c	Inventory_ClearItemOverrideFlag	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
+src/system/inventory/Inventory_GetItemOverrideFlag.c	Inventory_GetItemOverrideFlag	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
