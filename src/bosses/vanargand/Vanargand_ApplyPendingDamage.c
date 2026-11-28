@@ -4,14 +4,12 @@
 void Sound_PlaySong(u32);
 void CpuSet(const void *, void *, u32);
 
-
-
-static inline void setPosition(s16 *dst, s32 x, s32 y, s32 z)
+static inline void setPosition(struct MotionTrackVector *dst, s32 x, s32 y, s32 z)
 {
-    s16 *first = dst;
+    s16 *first = &dst->x;
     *first = x;
-    dst[1] = y;
-    dst[2] = z;
+    dst->y = y;
+    dst->z = z;
 }
 static inline u32 partFlags(struct VanargandPairAttack *p)
 {
@@ -52,12 +50,7 @@ s32 Vanargand_ApplyPendingDamage(struct VanargandPairAttack *p)
         self->flashTimer = 15;
         CpuSet(gPaletteBankData + 0x3240, self->palettes, 0x04000008);
         Vanargand_ResetPaletteTransition(self);
-        {
-            u32 song = 0x13E;
-            if (special)
-                song += 0xD3;
-            Sound_PlaySong(song);
-        }
+        Sound_PlaySong(special ? 0x211 : 0x13E);
         if (p->health <= 0) {
             p->health = 0;
             VanargandPairAttack_SetFlags(p, 2);
@@ -72,7 +65,7 @@ s32 Vanargand_ApplyPendingDamage(struct VanargandPairAttack *p)
                 s32 count = ScenePair_CountPositiveCounters(self->pair);
                 if (count == 0) {
                     mask = 1;
-                    VanargandPairAttack_SetFlags(p, mask);
+                    p->flags |= mask;
                     *hitTotal = count;
                     return 1;
                 } else {
@@ -87,18 +80,18 @@ s32 Vanargand_ApplyPendingDamage(struct VanargandPairAttack *p)
         }
     }
     if (partDamage > 0 || partSpecial) {
-        s16 pos[4];
+        struct MotionTrackVector pos;
         p->health -= partDamage;
-        setPosition(pos, self->part.sprite.position.x + 64, self->part.sprite.position.y,
+        setPosition(&pos, self->part.sprite.position.x + 64, self->part.sprite.position.y,
                     self->part.sprite.position.z + 64);
         DamageNumberDisplay_ShowWithDefaultScale((struct DamageNumberSource *)&self->part.collider,
-                                                partDamage, 0, pos, 1);
+                                                 partDamage, 0, &pos, 1);
         if (p->health <= 0) {
             VanargandPairAttack_SetFlags(p, 2);
         } else if (self->part.flags & 4) {
             Vanargand_StartReaction(p, 20, Vanargand_UpdatePaletteLeap);
             mask = 0x10000;
-            VanargandPairAttack_SetFlags(p, mask);
+            p->flags |= mask;
             return 1;
         }
     }
