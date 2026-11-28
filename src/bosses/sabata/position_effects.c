@@ -47,15 +47,15 @@ void SceneActors_UpdateConvergingParticles(struct SabataActorState *actor)
         struct ConvergingParticle *particle = &actor->convergingParticles.particles[index];
         if (particle->active) {
             struct ConvergingParticle *draw = particle;
-            if (magnitude(draw->dx) <= 15 && magnitude(draw->dy) <= 15) {
-                draw->flags |= 1;
+            if (magnitude(particle->dx) <= 15 && magnitude(particle->dy) <= 15) {
+                particle->flags |= 1;
                 particle->active = 0;
             } else {
                 s32 angle = Math_Atan2(particle->dx, particle->dy);
                 particle->dx -= scale(particle->speed * gUnk_086149C4[(angle + 64) & 255]);
                 particle->dy -= scale(particle->speed * gUnk_086149C4[angle & 255]);
-                draw->position.x = (u16)actor->offsetPoint.x + (u16)particle->dx;
-                draw->position.y = (u16)actor->offsetPoint.z + (u16)particle->dy;
+                draw->position.x = actor->offsetPoint.x + particle->dx;
+                draw->position.y = actor->offsetPoint.z + particle->dy;
                 if (++particle->ticks == 4)
                     SpriteDrawable_SelectTileFrame(draw, actor->convergingParticles.graphics,
                                                    particle->kind + 1);
