@@ -233,3 +233,4 @@ src/effects/healing/HealthRestoreEffect_InitSparkle.c	HealthRestoreEffect_InitSp
 src/effects/healing/HealthRestoreEffect_UpdateParticles.c	HealthRestoreEffect_UpdateParticles	minor	natural	2	
 src/effects/healing/HealthRestoreEffect_UpdateCompletion.c	HealthRestoreEffect_UpdateCompletion	contrived	natural	3	
 src/effects/healing/HealthRestoreEffect_UpdateRestoration.c	HealthRestoreEffect_UpdateRestoration	minor	natural	8	
+src/effects/healing/HealthRestoreEffect_UpdateShake.c	HealthRestoreEffect_UpdateShake	contrived	natural	4	
