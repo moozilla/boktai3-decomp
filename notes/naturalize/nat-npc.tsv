@@ -520,3 +520,4 @@ src/script/script_record.c	ModifierStats_ApplyKind0	contrived	natural	1
 src/script/script_record.c	ModifierStats_ApplyKind12	contrived	natural	1	
 src/script/script_record.c	ModifierStats_ApplyKind15	contrived	natural	1	
 src/script/script_record.c	ModifierStats_ApplyKind7	contrived	natural	1	
+src/script/script_record.c	ModifierStats_ApplyKind11	contrived	natural	1	
