@@ -666,3 +666,7 @@ src/player/motions/Player_UpdateMovementPose.c	Player_UpdateMovementPose	natural
 src/player/motions/Player_UpdateOddDirectionPose.c	Player_UpdateOddDirectionPose	contrived	minor	9	facing pointer, one heading local and a heading slot in the second branch: ROM forms both member addresses before the values
 src/player/motions/Player_UpdatePoseRecovery.c	Player_UpdatePoseRecovery	contrived	natural	1	-
 src/player/motions/Player_UpdateRecoilMotion.c	Player_UpdateRecoilMotion	contrived	natural	1	-
+src/player/motions/Player_UpdateSpiralTrailAction.c	Player_UpdateSpiralTrailAction	natural	natural	0	-
+src/player/motions/Player_UpdateStatBAction.c	Player_UpdateStatBAction	natural	natural	0	-
+src/player/motions/Player_UpdateStatARestoreAction.c	Player_UpdateStatARestoreAction	natural	natural	0	-
+src/player/motions/Player_UpdateStatBEffectAction.c	Player_UpdateStatBEffectAction	natural	natural	0	-
