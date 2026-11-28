@@ -4,18 +4,15 @@ u32 sub_08221548(u8 *data, u32 start, u32 end, u32 poly)
 {
     u32 crc = 0xffff;
     u32 bit;
-    u32 i = start;
-    while (i < end) {
+    u32 i;
+    for (i = start; i < end; i++) {
         crc ^= data[i] << 8;
-        bit = 0;
-        i++;
-
-        do {
+        for (bit = 0; bit < 8; bit++) {
             if (crc & 0x8000)
                 crc = (crc << 1) ^ poly;
             else
                 crc <<= 1;
-        } while (++bit <= 7);
+        }
     }
     return ~crc & 0xffff;
 }
