@@ -352,3 +352,4 @@ src/engine/video/palette/Video_RestoreDisplayControl.c	Video_RestoreDisplayContr
 src/engine/video/palette/Video_SetBlendControl.c	Video_SetBlendControl	minor	natural	1	
 src/engine/video/palette/Video_SetBlendAlpha.c	Video_SetBlendAlpha	minor	natural	1	
 src/engine/video/palette/Video_SetBlendBrightness.c	Video_SetBlendBrightness	minor	natural	1	
+src/engine/video/palette/sub_08217090.c	sub_08217090	minor	natural	1	
