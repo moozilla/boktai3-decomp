@@ -2016,76 +2016,31 @@ void TetherActor_UpdateWorldPosition(struct TetherActor *actor)
 
 u32 TetherActor_TestTerrainTransition(struct TetherActor *actor)
 {
-    s32 k2 = 1;
     struct ContactPosition *position;
-    u8 *properties;
-    s32 height, difference;
-    u32 surface, result;
+    s32 difference;
+    u32 attributes;
     if (!actor->terrainCheckReady) {
         ++actor->terrainCheckReady;
-        goto no;
+        return 0;
     }
-    if (actor->state == 5) {
-        goto no;
-    }
-    if (actor->statusFlags) {
-        goto no;
-    }
-    {
-        struct ContactPosition *first = &actor->position;
-        s32 x = first->x >> 8;
-        s32 z = first->z >> 8;
-        s32 cell;
-        position = first;
-        if ((((x < 0) || (z < 0)) || (((u32)x) >= gTerrainWidth)) || (((u32)z) >= gTerrainHeight)) {
-            cell = 0;
-        } else {
-            cell = gTerrainMap->rows[z] + x;
-        }
-        properties = TerrainModifiers_FindCellOverride(cell, 1);
-        if (properties) {
-            properties += 4;
-        } else {
-            struct EngineMap *map = gTerrainMap;
-            u32 offset = cell * 4 + 12;
-            properties = map->cells + offset;
-        }
-    }
-    {
-        u32 attributes = *(u16 *)(properties + 2);
-        attributes &= 64;
-        if (attributes) {
-            goto yes;
-        }
-    }
-    if (actor->state == k2) {
-        goto no;
-    }
-    properties = propertiesAt_0804B1CC(position);
-    surface = *properties >> 4;
-    height = (*properties & 15) << 8;
-    switch (surface) {
-        case 1:
-            height -= (u8)position->z;
-            break;
-        case 2:
-            height -= (u8)position->x;
-            break;
-    }
-    difference = height - actor->position.y;
-    if (difference < 0) {
+    if (actor->state == 5)
+        return 0;
+    if (actor->statusFlags)
+        return 0;
+    attributes =
+        ((u16 *)SceneActorTerrain_GetCell(SceneActorTerrain_GetCellIndex(&actor->position)))[1];
+    position = &actor->position;
+    if (attributes & 64)
+        return 1;
+    if (actor->state == 1)
+        return 0;
+    difference = SceneActorTerrain_GetHeight(SceneActorTerrain_GetCellIndex(position), position) -
+                 actor->position.y;
+    if (difference < 0)
         difference = -difference;
-    }
-    if (difference <= 255) {
-        goto no;
-    }
-yes:
-    result = 1;
-    goto done;
-no:
-    result = 0;
-done:
-    return result;
+    if (difference <= 255)
+        return 0;
+    return 1;
 }
 
 u32 TetherActor_SelectNextState(struct TetherActor *p)
