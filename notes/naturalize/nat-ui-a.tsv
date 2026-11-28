@@ -312,3 +312,4 @@ src/ui/dialogue/text_interpreter/TextState_Reset.c	TextState_Reset	natural	natur
 src/ui/dialogue/text_interpreter/TextState_Init.c	TextState_Init	natural	natural	0	
 src/ui/dialogue/text_interpreter/TextWindow_ClearSingleton.c	TextWindow_ClearSingleton	natural	natural	0	
 src/ui/dialogue/scrolling_dialogue/scrolling_dialogue.c	ScrollingDialogue_ResetPlayback	minor	natural	1	int function with no return value
+src/ui/dialogue/scrolling_dialogue/scrolling_dialogue.c	ScrollingDialogue_UpdatePlayback	contrived	minor	5	tag loop written as while (1) with continue

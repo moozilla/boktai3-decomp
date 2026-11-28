@@ -32,111 +32,94 @@ int ScrollingDialogue_ResetPlayback(struct ScrollingDialogue *dialogue, int clea
 void ScrollingDialogue_UpdatePlayback(struct ScrollingDialogue *dialogue)
 {
     struct MessagePlaybackState *text = &dialogue->text;
-    int advance;
+    int advance = 0;
     const u8 *cursor;
-    advance = 0;
+
     if (dialogue->scrolling) {
         if (!dialogue->delay) {
-            if (gPadState[0] & 4)
+            if (gPadState[0] & SELECT_BUTTON)
                 dialogue->ticks = (dialogue->ticks & ~3) + 4;
             else
                 dialogue->ticks++;
             advance = 1;
-        } else
+        } else {
             dialogue->delay--;
+        }
     } else {
         dialogue->ticks = (dialogue->ticks & ~7) + 8;
         advance = 1;
     }
-    if (dialogue->ticks & 7)
-        goto done;
-    if (dialogue->scrolling && !dialogue->delay && dialogue->blocked)
-        dialogue->blocked = 0;
-    if (!dialogue->wait && !dialogue->scrolling && dialogue->column == 31 &&
-        (dialogue->ticks & 15) == 8) {
-        {
+    if (!(dialogue->ticks & 7)) {
+        if (dialogue->scrolling && !dialogue->delay && dialogue->blocked)
+            dialogue->blocked = 0;
+        if (!dialogue->wait && !dialogue->scrolling && dialogue->column == 31 &&
+            (dialogue->ticks & 15) == 8) {
             const u8 *next = TextState_GetActiveStream(text);
-            if (next) {
-                int c = (s8)*next;
-                if (c < 0) {
-                    dialogue->ticks -= 8;
-                    dialogue->scrolling = 1;
-                    dialogue->blocked = 1;
-                }
+
+            if (next && (s8)*next < 0) {
+                dialogue->ticks -= 8;
+                dialogue->scrolling = 1;
+                dialogue->blocked = 1;
             }
         }
-    }
-    if (dialogue->blocked)
-        goto done;
-    if (!advance)
-        goto done;
-    TextWindow_BlankRect(dialogue->row, 18, 1, 2);
-    BackgroundMap_ClearTextRect(dialogue->row, 18, 1, 2);
-    dialogue->row++;
-    cursor = TextState_GetActiveStream(text);
-    if (!cursor)
-        goto wrap;
-tags:
-    if (*cursor != '<')
-        goto render;
-    TextState_StepPlayback(text);
-    if (!text->hold)
-        goto render;
-    cursor = TextState_GetActiveStream(text);
-    if (text->stream)
-        goto tags;
-    if (*cursor)
-        goto tags;
-    dialogue->wait = 8;
-    goto tags;
-render:
-    if ((s8)*cursor >= 0) {
-        TextState_SetBounds(&dialogue->text, dialogue->column, 18, 1, 2);
-        dialogue->column++;
-        if (dialogue->wait > 0) {
-            TextState_DrawNarrowGlyph(text, 0);
-            dialogue->wait--;
-            if (dialogue->wait > 0)
-                goto wrap;
-            text->pc = dialogue->script;
-            dialogue->wait = 0;
-            goto wrap;
+        if (!dialogue->blocked && advance) {
+            TextWindow_BlankRect(dialogue->row, 18, 1, 2);
+            BackgroundMap_ClearTextRect(dialogue->row, 18, 1, 2);
+            dialogue->row++;
+            cursor = TextState_GetActiveStream(text);
+            if (cursor) {
+                while (1) {
+                    if (*cursor == '<') {
+                        TextState_StepPlayback(text);
+                        if (text->hold) {
+                            cursor = TextState_GetActiveStream(text);
+                            if (!text->stream && !*cursor)
+                                dialogue->wait = 8;
+                            continue;
+                        }
+                    }
+                    break;
+                }
+                if ((s8)*cursor >= 0) {
+                    TextState_SetBounds(&dialogue->text, dialogue->column, 18, 1, 2);
+                    dialogue->column++;
+                    if (dialogue->wait > 0) {
+                        TextState_DrawNarrowGlyph(text, 0);
+                        dialogue->wait--;
+                        if (dialogue->wait <= 0) {
+                            text->pc = dialogue->script;
+                            dialogue->wait = 0;
+                        }
+                    } else if (TextState_StepPlayback(text)) {
+                        dialogue->wait = 8;
+                    }
+                } else if ((!(dialogue->column & 1) && !(dialogue->ticks & 15)) ||
+                           ((dialogue->column & 1) && (dialogue->ticks & 15) == 8)) {
+                    if (dialogue->wait > 0) {
+                        TextState_DrawNarrowGlyph(text, 0);
+                        dialogue->column++;
+                        dialogue->wait--;
+                        if (dialogue->wait <= 0) {
+                            text->pc = dialogue->script;
+                            dialogue->wait = 0;
+                        }
+                    } else {
+                        TextState_SetBounds(&dialogue->text, dialogue->column, 18, 2, 2);
+                        dialogue->column += 2;
+                        if (TextState_StepPlayback(text))
+                            dialogue->wait = 8;
+                    }
+                }
+            }
+            if (dialogue->column > 31) {
+                if (!dialogue->scrolling)
+                    dialogue->scrolling = 1;
+                dialogue->column -= 32;
+            }
+            if (dialogue->row > 31)
+                dialogue->row -= 32;
         }
-        if (TextState_StepPlayback(text))
-            dialogue->wait = 8;
-        goto wrap;
     }
-    if (!(dialogue->column & 1)) {
-        if ((dialogue->ticks & 15) == 0)
-            goto paintWide;
-        goto wrap;
-    }
-    if ((dialogue->ticks & 15) != 8)
-        goto wrap;
-paintWide:
-    if (dialogue->wait > 0) {
-        TextState_DrawNarrowGlyph(text, 0);
-        dialogue->column++;
-        dialogue->wait--;
-        if (dialogue->wait > 0)
-            goto wrap;
-        text->pc = dialogue->script;
-        dialogue->wait = 0;
-    } else {
-        TextState_SetBounds(&dialogue->text, dialogue->column, 18, 2, 2);
-        dialogue->column += 2;
-        if (TextState_StepPlayback(text))
-            dialogue->wait = 8;
-    }
-wrap:
-    if (dialogue->column > 31) {
-        if (!dialogue->scrolling)
-            dialogue->scrolling = 1;
-        dialogue->column -= 32;
-    }
-    if (dialogue->row > 31)
-        dialogue->row -= 32;
-done:
     if (!dialogue->scrolling)
         ScrollingDialogue_UpdatePlayback(dialogue);
 }
