@@ -1,17 +1,6 @@
 #include "global.h"
+#include "bosses/vanargand/vanargand_pair_attack.h"
 
-struct Vector {
-    s16 x, y, z;
-};
-
-struct VanargandProjectionSource {
-    u8 unk_00[0x54];
-    struct Vector position;
-    u8 unk_5C[0x110 - 0x5C];
-    struct Vector *targetPosition;
-};
-
-s32 __divsi3(s32, s32);
 u16 Sqrt(u32);
 
 static inline s32 Shift(s32 v, s32 n)
@@ -24,7 +13,7 @@ static inline s32 Shift(s32 v, s32 n)
     return r;
 }
 
-static inline void Project(struct Vector *out, struct Vector *p)
+static inline void Project(struct SceneVec *out, struct SceneVec *p)
 {
     s32 x = p->x;
     s32 z = p->z;
@@ -36,35 +25,35 @@ static inline void Project(struct Vector *out, struct Vector *p)
     out->z = sum + y;
 }
 
-static inline void SetVector(struct Vector *out, s32 x, s32 y, s32 z)
+static inline void SetVector(struct SceneVec *out, s32 x, s32 y, s32 z)
 {
     out->x = x;
     out->y = y;
     out->z = z;
 }
 
-static inline void Unproject(struct Vector *out, struct Vector *p, s32 y)
+static inline void Unproject(struct SceneVec *out, struct SceneVec *p, s32 y)
 {
     s32 x = p->x;
     s32 h = p->y;
     s32 v;
-    v = __divsi3((x + h) << 5, 3) + y;
+    v = ((x + h) << 5) / 3 + y;
     out->x = Shift(v, 1);
     out->y = y;
-    v = __divsi3((h - x) << 5, 3) + y;
+    v = ((h - x) << 5) / 3 + y;
     out->z = Shift(v, 1);
 }
 
 // Tentative: measures target separation along the projected horizontal axis.
 
-u32 Vanargand_GetTargetLateralDistance(struct VanargandProjectionSource *s)
+u32 Vanargand_GetTargetLateralDistance(struct VanargandPairAttack *boss)
 {
-    struct Vector origin, target, difference, world;
-    Project(&origin, &s->position);
-    {
-        struct Vector **slot = &s->targetPosition;
-        Project(&target, *slot);
-    }
+    struct SceneVec origin, target, difference, world;
+    struct SceneVec **destination;
+
+    Project(&origin, &boss->position);
+    destination = &boss->destination;
+    Project(&target, *destination);
     SetVector(&difference, target.x - origin.x, 0, 0);
     Unproject(&world, &difference, 0);
     return Sqrt(world.x * world.x + world.z * world.z);
