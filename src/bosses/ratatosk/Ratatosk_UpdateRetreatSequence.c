@@ -8,40 +8,38 @@ void Ratatosk_UpdateRetreatSequence(struct Ratatosk *p)
 {
     struct Ratatosk *actor = p;
     if (Ratatosk_ConsumeActionEntry(actor)) {
-        {
-            struct ContactPosition candidate, best;
-            s32 maximum = 0;
-            s16 i;
-            for (i = -1; i <= 1; i += 2) {
-                s32 dx, dz, distance;
-                struct ContactPosition *v = &candidate;
-                struct ContactPosition *self = &p->anchor;
-                *v = *Player_GetEffectivePosition(0);
-                v->x = v->x + i * 512;
-                dx = (&candidate)->x - self->x;
-                dz = (&candidate)->z - self->z;
-                distance = dx * dx + dz * dz;
-                if (distance >= maximum) {
-                    maximum = distance;
-                    best = candidate;
-                }
+        struct ContactPosition candidate, best;
+        s32 maximum = 0;
+        s16 i;
+        for (i = -1; i <= 1; i += 2) {
+            s32 dx, dz, distance;
+            struct ContactPosition *v = &candidate;
+            struct ContactPosition *self = &p->anchor;
+            *v = *Player_GetEffectivePosition(0);
+            v->x += i * 512;
+            dx = v->x - self->x;
+            dz = v->z - self->z;
+            distance = dx * dx + dz * dz;
+            if (distance >= maximum) {
+                maximum = distance;
+                best = candidate;
             }
-            for (i = -1; i <= 1; i += 2) {
-                s32 dx, dz, distance;
-                struct ContactPosition *v = &candidate;
-                struct ContactPosition *self = &p->anchor;
-                *v = *Player_GetEffectivePosition(0);
-                v->z = v->z + i * 512;
-                dx = (&candidate)->x - self->x;
-                dz = (&candidate)->z - self->z;
-                distance = dx * dx + dz * dz;
-                if (distance >= maximum) {
-                    maximum = distance;
-                    best = candidate;
-                }
-            }
-            p->destination = best;
         }
+        for (i = -1; i <= 1; i += 2) {
+            s32 dx, dz, distance;
+            struct ContactPosition *v = &candidate;
+            struct ContactPosition *self = &p->anchor;
+            *v = *Player_GetEffectivePosition(0);
+            v->z += i * 512;
+            dx = v->x - self->x;
+            dz = v->z - self->z;
+            distance = dx * dx + dz * dz;
+            if (distance >= maximum) {
+                maximum = distance;
+                best = candidate;
+            }
+        }
+        p->destination = best;
         p->duration = 16;
         Ratatosk_SetAnimation(actor, 4);
         p->sequence = 0;
