@@ -70,3 +70,4 @@ src/monsters/ivy/ivy.c	ColorPulse_ApplyContact	contrived	contrived	10	velocity p
 src/monsters/ivy/ivy.c	Ivy_UpdateDefeat	contrived	contrived	14	partial: Flag/SaveFlag/ClearPos helpers, parked mask locals, COUNT macros and spark-table union stay: mask-before-address load order and zero-word CpuSet; needs a shared defeat/tally rewrite across monsters
 src/monsters/ivy/sub_080F2D00.c	sub_080F2D00	minor	natural	1	(u8) cast on the callback result
 src/monsters/ivy/Ivy_WaitForSecondaryActionCompletion.c	Ivy_WaitForSecondaryActionCompletion	minor	natural	1	(u8) cast on the callback result
+src/monsters/ivy/PhaseObject_ApproachTarget.c	PhaseObject_ApproachTarget	minor	natural	1	
