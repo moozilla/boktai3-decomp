@@ -104,28 +104,26 @@ void ActorCollision_InitBounds(struct RegistryActor *actor)
 {
     union RegistryCollisionVector position;
     union RegistryCollisionVector size, offset;
-    s32 y;
-    position.unsignedPacked.x = (u16)actor->model.view.parts[0].x;
-    position.unsignedPacked.y = (u16)actor->model.view.parts[0].y - 96;
-    position.unsignedPacked.z = (u16)actor->model.view.parts[0].y - 96;
+    position.packed.x = actor->model.view.parts[0].x;
+    position.packed.y = actor->model.view.parts[0].y - 96;
+    position.packed.z = actor->model.view.parts[0].y - 96;
     size.packed.x = 24;
     size.packed.y = 32;
     size.packed.z = 2;
     offset.packed.x = 0;
-    offset.packed.y = -(s16)size.packed.y;
+    offset.packed.y = -size.packed.y;
     offset.packed.z = -size.packed.z;
     SpatialIndex_InitEntry(actor->stats.contactHeader, &position, &size, &offset, 20, 5, 1, 0, 12,
                            Actor_ApplyKnockback, actor);
-    position.unsignedPacked.x = (u16)actor->model.view.parts[0].x;
-    y = (u16)actor->model.view.parts[0].y - 96;
-    position.components[1] = y;
-    position.components[2] = y;
-    size.components[0] = 24;
-    size.components[1] = 32;
-    size.components[2] = 2;
-    offset.components[0] = 0;
-    offset.components[1] = -size.unsignedComponents[1];
-    offset.components[2] = -size.unsignedComponents[2];
+    position.packed.x = actor->model.view.parts[0].x;
+    position.packed.y = actor->model.view.parts[0].y - 96;
+    position.packed.z = actor->model.view.parts[0].y - 96;
+    size.packed.x = 24;
+    size.packed.y = 32;
+    size.packed.z = 2;
+    offset.packed.x = 0;
+    offset.packed.y = -size.packed.y;
+    offset.packed.z = -size.packed.z;
     SpatialIndex_InitEntry(actor->stats.collisionBody, &position, &size, &offset, 12, 5, 1, 0, 12,
                            ActorMotion_SetKnockback, actor);
     SpatialIndex_InsertEntry(actor->stats.contactHeader);
