@@ -14,13 +14,12 @@ void SceneActorReaction_RestoreAfterTurns(struct ChaseActor *actor, s32 frame)
         if (frame > 60) {
             /* data holds the entry control, then the random table. */
             const void *data;
-            u32 encoded;
+
             SceneActorTerrain_EnterState(actor, 3, 1, 0);
             data = actor->base.onEntry;
             SceneActorTerrain_InstallControl(actor, (void *)data, 2);
             if (group->turn.turnsRemaining == 1) {
-                encoded = ((group->turn.savedDirection >> 5) + 3) & 7;
-                actor->base.nextDirection = encoded;
+                actor->base.nextDirection = ((group->turn.savedDirection >> 5) + 3) & 7;
             } else {
                 s32 prior = actor->base.body.direction;
                 s32 tries = 0;
@@ -45,18 +44,15 @@ void SceneActorReaction_RestoreAfterTurns(struct ChaseActor *actor, s32 frame)
                         break;
                     }
                 }
-                encoded = ((choice >> 5) + 3) & 7;
-                actor->base.nextDirection = encoded;
+                actor->base.nextDirection = ((choice >> 5) + 3) & 7;
             }
             group->turn.turnsRemaining--;
         }
     } else {
-        group->turn.turnsRemaining |= -1;
+        group->turn.turnsRemaining = -1;
         if (frame > 30) {
             struct SceneActorChaseSavedControl *saved = &group->saved;
-            u8 kind = saved->kind;
-            void *control = saved->control;
-            SceneActorTerrain_InstallControl(actor, control, kind);
+            SceneActorTerrain_InstallControl(actor, saved->control, saved->kind);
             SceneActorTerrain_EnterState(actor, saved->state, saved->phase, saved->behavior);
             {
                 u16 *flags = &actor->base.motionFlags;
