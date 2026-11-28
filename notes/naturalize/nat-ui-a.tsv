@@ -651,3 +651,4 @@ src/ui/modifier_menu/modifier_selection_and_stat_previews.c	ModifierMenu_DrawFou
 src/ui/modifier_menu/modifier_selection_and_stat_previews.c	ModifierMenu_ClearBackground	natural	natural	0	
 src/ui/modifier_menu/modifier_selection_and_stat_previews.c	ModifierMenu_ResetBackground	natural	natural	0	
 src/ui/modifier_menu/modifier_selection_and_stat_previews.c	ModifierMenu_DrawSecondSourceStats	fudged	natural	3	
+src/ui/modifier_menu/ModifierMenu_InitializeGraphics.c	ModifierMenu_InitializeGraphics	fudged	natural	1	

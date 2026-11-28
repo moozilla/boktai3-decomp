@@ -6,9 +6,7 @@ s32 ModifierMenu_InitializeGraphics(struct ModifierMenu *menu)
 {
     struct ModifierGraphicsResource *resource;
     struct SceneVec origin;
-    struct SceneVec *originPointer;
     struct ModifierDisplayObject *object;
-    struct ModifierGraphicsResource *graphics;
     s32 i;
     resource = ScriptProc_Start(0xcb05, 0x530d);
     menu->graphicsA = *resource;
@@ -17,22 +15,16 @@ s32 ModifierMenu_InitializeGraphics(struct ModifierMenu *menu)
     menu->graphicsB = *resource;
     ResourceHeader_Relocate(&menu->graphicsB, resource);
     ZeroFill8(&origin);
-    originPointer = &origin;
     object = menu->displays;
-    i = 17;
-    do {
-        AnimSprite_InitLinked(object, &menu->graphicsB, 0, 0x11, 2, 0, 0x3c, originPointer);
-        i--;
-        object++;
-    } while (i >= 0);
+    for (i = 0; i < 18; i++, object++)
+        AnimSprite_InitLinked(object, &menu->graphicsB, 0, 0x11, 2, 0, 0x3c, &origin);
     object = &menu->displays[5];
-    graphics = &menu->graphicsB;
-    Anim_LoadKeyframe(object, graphics, 0x12, 0);
+    Anim_LoadKeyframe(object, &menu->graphicsB, 0x12, 0);
     object = &menu->displays[6];
-    Anim_LoadKeyframe(object, graphics, 0x10, 0);
+    Anim_LoadKeyframe(object, &menu->graphicsB, 0x10, 0);
     object->attribute1A = 1;
     object = &menu->displays[7];
-    Anim_LoadKeyframe(object, graphics, 0x11, 0);
+    Anim_LoadKeyframe(object, &menu->graphicsB, 0x11, 0);
     object->attribute1A = 1;
     object = &menu->displays[13];
     if (menu->specialHeader)
@@ -41,7 +33,7 @@ s32 ModifierMenu_InitializeGraphics(struct ModifierMenu *menu)
         Anim_LoadKeyframe(object, &menu->graphicsA, 0x7f, 0);
     object->y = 8;
     object = &menu->displays[14];
-    for (i = 0; i <= 3; i++, object++) {
+    for (i = 0; i < 4; i++, object++) {
         Anim_LoadKeyframe(object, &menu->graphicsA, 0x50, 0);
         object->z = 50;
         object->attribute1A = 0;
