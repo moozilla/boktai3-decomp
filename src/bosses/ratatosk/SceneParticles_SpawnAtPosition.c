@@ -1,30 +1,11 @@
 #include "global.h"
+#include "bosses/ratatosk/ratatosk_small_particle.h"
 #include "scene/collision/contact_swarm.h"
 #include "engine/ram.h"
 #include "player/cutscene/player_cue_sequence.h"
-#include "bosses/ratatosk/particle_config_layout.h"
-struct Particle {
-    u32 age;
-    u8 pad4[8];
-    s16 vx, vy, vz, padE;
-    struct ParticleConfig config;
-    struct ContactSwarmSprite sprite;
-    u32 flags;
-    u32 pad5C;
-    u32 lift;
-    struct DisplaySequenceState sequence;
-};
-struct ParticlePool {
-    u8 task[0x18];
-    u32 mask;
-    u8 pad1C[0x1c];
-    struct Particle particles[24];
-    void *sequence;
-    u32 activeCount;
-};
 extern void *const gUnk_08613F60[];
 extern const s16 gUnk_086149C4[];
-void *Ratatosk_CreateParticlePool(void);
+struct ParticlePool *Ratatosk_CreateParticlePool(void);
 struct Particle *Ratatosk_FindFreeParticle(struct ParticlePool *, s32 *);
 void Ratatosk_SetParticleUpdateCallback(void *, void *);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
@@ -47,12 +28,12 @@ s32 SceneParticles_SpawnAtPosition(struct ParticleConfig *config, struct Contact
     if (!e)
         return -1;
     Ratatosk_SetParticleUpdateCallback(config, gUnk_08613F60[config->kind]);
-    Memory_Copy(&e->config, config, 0x18);
+    Memory_Copy(&e->config, config, sizeof(e->config));
     e->age = 0;
-    e->pad5C = 0;
-    e->lift = 0;
+    e->fallDistance = 0;
+    e->fallSpeed = 0;
     {
-        s16 *vel = &e->vx;
+        s16 *vel = &e->velocity.x;
         s32 angle = config->angle;
         s32 speed = config->mode;
         s32 x = Scale(gUnk_086149C4[(angle + 64) & 255] * speed);
@@ -68,19 +49,14 @@ s32 SceneParticles_SpawnAtPosition(struct ParticleConfig *config, struct Contact
     {
         u32 zero = zero2;
         e->sprite.position = *position;
-        {
-            if (e->config.kind != 2)
-                Anim_SetSequence(&e->sequence, pool->sequence, 4, 0, zero);
-            else
-                Anim_RestartSequence(&e->sequence, pool->sequence, 5, 0, zero);
-            PlayerCue_StepSequence(&e->sprite, &e->sequence);
-            e->sprite.flags &= ~1;
-            Sprite_LinkToList(&e->sprite, 0);
-            {
-                u8 *kind = &e->sprite.priority;
-                *kind = 2;
-            }
-        }
+        if (e->config.kind != 2)
+            Anim_SetSequence(&e->sequence, pool->sequenceResource, 4, 0, zero);
+        else
+            Anim_RestartSequence(&e->sequence, pool->sequenceResource, 5, 0, zero);
+        PlayerCue_StepSequence(&e->sprite, &e->sequence);
+        e->sprite.flags &= ~1;
+        Sprite_LinkToList(&e->sprite, 0);
+        e->sprite.priority = 2;
     }
     pool->mask |= 1 << slot;
     pool->activeCount += 1;

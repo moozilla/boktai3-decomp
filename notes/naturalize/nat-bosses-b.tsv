@@ -152,3 +152,4 @@ src/bosses/ratatosk/OverlaySlot_Initialize.c	OverlaySlot_Initialize	contrived	mi
 src/bosses/ratatosk/sub_081FB808.c	sub_081FB808	natural	natural	0	
 src/bosses/ratatosk/sub_081FB828.c	sub_081FB828	natural	natural	0	
 src/bosses/ratatosk/Ratatosk_UpdateParticlePool.c	Ratatosk_UpdateParticlePool	contrived	minor	18	Scale/ClearFlags helpers, two velocity-component pointers and a position pointer stay (register allocation)
+src/bosses/ratatosk/SceneParticles_SpawnAtPosition.c	SceneParticles_SpawnAtPosition	contrived	minor	8	velocity pointer with zero/zero2 locals stays (plain member stores differ)
