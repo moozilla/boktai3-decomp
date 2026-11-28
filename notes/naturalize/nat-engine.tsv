@@ -190,3 +190,9 @@ src/engine/video/interrupts_video.c	InterruptsAndVideo_Initialize	contrived	natu
 src/engine/video/interrupts_video.c	InterruptsAndVideo_WaitFrames	minor	natural	1	
 src/engine/video/interrupts_video.c	InterruptsAndVideo_OnVideoUploadTask	contrived	natural	1	
 src/engine/video/interrupts_video.c	InterruptsAndVideo_OnGraphicsUpdateTask	contrived	natural	2	
+src/engine/video/interrupts_video.c	InterruptsAndVideo_WaitForVBlank	natural	natural	0	
+src/engine/video/interrupts_video.c	InterruptsAndVideo_OnVBlank	natural	natural	0	
+src/engine/video/interrupts_video.c	InterruptsAndVideo_OnVCount	contrived	contrived	12	register address and byte-pointer temps stay: the ROM loads BG0HOFS address then the 0xff mask before the byte
+src/engine/video/interrupts_video.c	InterruptsAndVideo_RunIdleHook	natural	natural	0	
+src/engine/video/interrupts_video.c	InterruptsAndVideo_RunFrameHook	natural	natural	0	
+src/engine/video/interrupts_video.c	InterruptsAndVideo_OnUnusedInterrupt	natural	natural	0	
