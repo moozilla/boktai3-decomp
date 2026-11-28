@@ -120,18 +120,15 @@ u32 MessageWindow_SetDisplayModeFromScript(void)
 int MessageWindow_Clear(void)
 {
     struct MessageWindow *window = (void *)gMessageWindow;
+
     if (!window)
         return 0;
     TextWindow_BlankRect(window->x, window->y, window->width, window->height);
-    {
-        void *fn = MessageWindow_ClearTextCompletion;
-        void **dst;
-        dst = &window->callback;
-        *dst = fn;
-    }
+    MessageWindow_SetPlayback(window, MessageWindow_ClearTextCompletion);
     window->animSprite.flags |= 1;
     {
         struct MessagePlaybackState *state = &window->state;
+
         state->speaker = -1;
     }
     window->portrait.flags |= 1;
