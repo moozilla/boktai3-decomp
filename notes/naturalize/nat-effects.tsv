@@ -173,3 +173,4 @@ src/effects/bursts/linked_effect/FragmentProjectilePool_InitModule.c	FragmentPro
 src/effects/bursts/linked_effect/FragmentProjectilePool_ResetSingleton.c	FragmentProjectilePool_ResetSingleton	natural	natural	0	
 src/effects/bursts/linked_effect/ActorEffect_OrientFromPositions.c	ActorEffect_OrientFromPositions	contrived	minor	10	random byte read through the table's constant address (literal load order)
 src/effects/bursts/linked_effect/ActorEffect_InitColliders.c	ActorEffect_InitColliders	contrived	natural	4	-
+src/effects/bursts/linked_effect/ActorEffect_Spawn.c	ActorEffect_Spawn	minor	natural	2	-
