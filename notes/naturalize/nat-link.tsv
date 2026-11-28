@@ -91,3 +91,4 @@ src/link/panel/sub_0810BB4C.c	sub_0810BB4C	contrived	natural	8
 src/link/panel/sub_0810BB4C.c	sub_0810BB90	contrived	natural	8	
 src/link/panel/LinkSelection_UpdateParticipantScores.c	LinkSelection_UpdateParticipantScores	contrived	minor	30	bonus built in two statements (one expression folds); local score views
 src/link/panel/sub_0810BD34.c	sub_0810BD34	minor	natural	3	
+src/link/panel/SlotState_ResetInactiveMode.c	SlotState_ResetInactiveMode	contrived	minor	3	one-element loop with an i == 0 test stays

@@ -8,10 +8,10 @@ struct SlotState {
 void SlotState_ResetInactiveMode(struct SlotState *p)
 {
     s32 i;
-    for (i = 0; i <= 0; i++) {
+    for (i = 0; i < 1; i++) {
         if (i == 0) {
-            if ((u8)(p->mode[i] - 6) > 4)
-                p->mode[i] = i;
+            if (p->mode[i] < 6 || p->mode[i] > 10)
+                p->mode[i] = 0;
         }
     }
 }
