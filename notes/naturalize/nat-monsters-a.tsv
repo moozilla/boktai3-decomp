@@ -544,3 +544,4 @@ src/monsters/centipede/Tentacle_FireSecondaryAttack.c	Tentacle_FireSecondaryAtta
 src/monsters/centipede/Centipede_OnUpdate.c	Centipede_OnUpdate	contrived	natural	1	
 src/monsters/centipede/SceneActor_TryRequestFacingReaction.c	SceneActor_TryRequestFacingReaction	contrived	contrived	4	second sensor pointer, mask local and halfword views for the delta
 src/monsters/centipede/Centipede_InitStateHandlers.c	Centipede_InitStateHandlers	contrived	natural	1	
+src/monsters/centipede/Centipede_InitPlayerReference.c	Centipede_InitPlayerReference	contrived	natural	2	

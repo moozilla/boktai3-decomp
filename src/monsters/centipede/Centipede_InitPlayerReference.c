@@ -1,11 +1,12 @@
 #include "global.h"
 #include "player/player.h"
+#include "monsters/chase_actor.h"
 
-void SceneActor_UpdateActiveCallbacks(u8 *);
+void SceneActor_UpdateActiveCallbacks(struct ChaseActor *);
 
-u32 Centipede_InitPlayerReference(u8 *p)
+u32 Centipede_InitPlayerReference(struct ChaseActor *actor)
 {
-    *(u8 **)(p + 0xdc) = (*(u8 **)gPlayers) + 0x24;
-    SceneActor_UpdateActiveCallbacks(p);
+    actor->base.tracking.target = (void *)&gPlayers[0]->positionalEffectGroup;
+    SceneActor_UpdateActiveCallbacks(actor);
     return 0;
 }
