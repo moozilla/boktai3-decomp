@@ -206,3 +206,4 @@ src/npc/story_character/StoryCharacter_SpawnRadialEffect.c	StoryCharacter_SpawnR
 src/npc/story_character/SceneCharacter_UpdateAnimationThirteen.c	SceneCharacter_UpdateAnimationThirteen	natural	natural	0	
 src/npc/story_character/SceneCharacter_UpdateAnimationSeven.c	SceneCharacter_UpdateAnimationSeven	natural	natural	0	
 src/npc/story_character/StoryCharacter_UpdateKind29AttackEffect.c	StoryCharacter_UpdateKind29AttackEffect	contrived	minor	20	position out pointer (member stores on the stack struct would rewrite whole words)
+src/npc/story_character/StoryCharacter_UpdateDelayedAttackEffect.c	StoryCharacter_UpdateDelayedAttackEffect	contrived	minor	2	position out pointer (member stores on the stack struct would rewrite whole words)

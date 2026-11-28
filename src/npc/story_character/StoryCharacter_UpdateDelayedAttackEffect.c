@@ -1,14 +1,11 @@
 #include "npc/story_character/scene_character.h"
-#include "npc/story_character/vec081_cbe30_layout.h"
 s32 DisplayAnimation_TestFinished(struct DisplayAnimation *);
-void TimedSpriteEffect_Create(struct Vec081CBE30 *, s32, s32, s32, s32, s32, s32, s32, s32);
+void TimedSpriteEffect_Create(struct ContactPosition *, s32, s32, s32, s32, s32, s32, s32, s32);
 /* Three-phase attack: play the wind-up, spawn an effect above the actor on
  * frame 15, then the follow-through after 0x56 frames. */
-void StoryCharacter_UpdateDelayedAttackEffect(u8 *a, struct SceneNpc *actor, s32 inputFrame)
+void StoryCharacter_UpdateDelayedAttackEffect(u8 *context, struct SceneNpc *actor, s32 frame)
 {
-    s32 frame = inputFrame;
     u32 anim;
-    s32 state;
     if (actor->animationEntered) {
         actor->animationEntered = 0;
         actor->done = 0;
@@ -55,23 +52,21 @@ void StoryCharacter_UpdateDelayedAttackEffect(u8 *a, struct SceneNpc *actor, s32
         actor->animationPhase = 0;
         actor->stateFrame = 0;
     }
-    state = actor->animationPhase;
-    switch (state) {
+    switch (actor->animationPhase) {
         case 0:
             if (frame == 15) {
-                const s16 *coords = (const s16 *)&actor->body.position;
-                s32 x = *coords++;
-                s32 y = *coords++;
-                s32 z = *coords;
-                struct Vec081CBE30 v;
-                s16 *q = (s16 *)&v;
-                s32 vx = x - 0x20;
-                s32 vy = y + 0x180;
-                s32 vz = z + 0x20;
-                v.x = vx;
-                q[1] = vy;
-                q[2] = vz;
-                TimedSpriteEffect_Create(&v, 0xA0, 0x20, 1, 1, state, state, state, state);
+                s32 x = actor->body.position.x;
+                s32 y = actor->body.position.y;
+                s32 z = actor->body.position.z;
+                struct ContactPosition position;
+                struct ContactPosition *out = &position;
+                x -= 0x20;
+                y += 0x180;
+                z += 0x20;
+                out->x = x;
+                out->y = y;
+                out->z = z;
+                TimedSpriteEffect_Create(&position, 0xA0, 0x20, 1, 1, 0, 0, 0, 0);
             }
             if (DisplayAnimation_TestFinished(&actor->display))
                 actor->animationPhase = 1;
