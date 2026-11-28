@@ -61,3 +61,4 @@ src/bosses/ratatosk/Ratatosk_UpdateDecayingShake.c	Ratatosk_UpdateDecayingShake	
 src/bosses/ratatosk/SceneActor_UpdateAnimation15Cycle.c	SceneActor_UpdateAnimation15Cycle	contrived	natural	2	
 src/bosses/ratatosk/Ratatosk_UpdateEightDirectionAnimation.c	Ratatosk_UpdateEightDirectionAnimation	contrived	minor	5	actor alias and flag accessors stay
 src/bosses/ratatosk/Ratatosk_BeginDirectionalReaction.c	Ratatosk_BeginDirectionalReaction	contrived	minor	7	actor alias, facing macro and one flag accessor stay: mask loaded before the field
+src/bosses/ratatosk/Ratatosk_UpdateDirectionalRecovery.c	Ratatosk_UpdateDirectionalRecovery	contrived	minor	8	one flag accessor stays
