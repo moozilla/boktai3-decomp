@@ -197,3 +197,7 @@ src/link/player/Player_InitBodyCollider.c	Player_InitBodyCollider	contrived	natu
 src/link/player/Player_SpawnActionSpark.c	Player_SpawnActionSpark	contrived	natural	1	
 src/link/player/ActorMotion_ApplyHeadingDrift.c	ActorMotion_ApplyHeadingDrift	contrived	minor	100	packed one-byte facing view and mask local stay: a plain store differs by one instruction
 src/link/player/Player_ClearMovementLock.c	Player_ClearMovementLock	contrived	natural	1	
+src/link/player/LinkPlayer_ClampCameraOffsets.c	LinkPlayer_ClampCameraOffsets	natural	natural	0	
+src/link/player/Player_InitFacingDriftOffset.c	Player_InitFacingDriftOffset	natural	natural	0	
+src/link/player/Player_InitOptionalComponents.c	Player_InitOptionalComponents	natural	natural	0	
+src/link/player/Player_SmoothCameraAnchor.c	Player_SmoothCameraAnchor	contrived	minor	24	the y axis keeps a split sum: a single expression folds the 150 bias early
