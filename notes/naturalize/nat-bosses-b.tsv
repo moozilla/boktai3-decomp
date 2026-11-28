@@ -24,3 +24,10 @@ src/bosses/ratatosk/Ratatosk_UpdateDirectionalAnimation.c	Ratatosk_UpdateDirecti
 src/bosses/ratatosk/PaletteEffect_RefreshPalette.c	PaletteEffect_RefreshPalette	contrived	natural	11	
 src/bosses/ratatosk/Ratatosk_GetPlayerOffsetFarthestFromSelf.c	Ratatosk_GetPlayerOffsetFarthestFromSelf	minor	natural	1	
 src/bosses/ratatosk/Ratatosk_GetPlayerOffsetNearestSelf.c	Ratatosk_GetPlayerOffsetNearestSelf	minor	natural	1	
+src/bosses/ratatosk/ActorResource_GetFixedId.c	ActorResource_GetFixedId	natural	natural	0	
+src/bosses/ratatosk/Ratatosk_GetDefaultPaletteIndex.c	Ratatosk_GetDefaultPaletteIndex	natural	natural	0	
+src/bosses/ratatosk/Ratatosk_OscillateScale.c	Ratatosk_OscillateScale	natural	natural	0	
+src/bosses/ratatosk/Ratatosk_FindPointFarthestFromPosition.c	Ratatosk_FindPointFarthestFromPosition	natural	natural	0	
+src/bosses/ratatosk/sub_081F33CC.c	sub_081F33CC	natural	natural	0	
+src/bosses/ratatosk/SceneDistance_ClearLinkedEntry.c	SceneDistance_ClearLinkedEntry	natural	natural	0	
+src/bosses/ratatosk/Ratatosk_GetPosition.c	Ratatosk_GetPosition	natural	natural	0	
