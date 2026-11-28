@@ -163,37 +163,23 @@ void SceneHud_ApplyStatBPercent(struct SceneHudState *s, s32 percent, s32 durati
     }
 }
 
-#define Player_ClearScriptStatus Player_ClearStateTimer
+void Player_ClearStateTimer(struct Player *, s32);
 
-struct PlayerStatusPanel {
-    u8 unknown0[0xA40];
-    struct Player *player;
-    u8 unknownA44[0x3E22];
-    u16 resetState;
-};
-
-void Player_ClearScriptStatus(struct Player *, s32);
-
-void PlayerStatusPanel_ResetScriptCounters(struct PlayerStatusPanel *panel, s32 mask)
+void PlayerStatusPanel_ResetScriptCounters(struct SceneHudState *s, s32 mask)
 {
-    struct Player *player = panel->player;
+    struct Player *player = s->actionOwner;
     s32 i;
+
     if (player) {
-        panel->resetState = 0;
-        for (i = 0; i <= 1; i++) {
+        s->appliedStatB = 0;
+        for (i = 0; i < 2; i++) {
             if ((mask >> i) & 1)
-                Player_ClearScriptStatus(player, i);
+                Player_ClearStateTimer(player, i);
         }
-        if (mask & 8) {
-            u32 index = player->timedEventSlot;
-            struct GameState *state = gGameState;
-            u32 address = index * 4 + (u32)state;
-            *(u32 *)(address + 0x628) = 0;
-        }
+        if (mask & 8)
+            *(player->timedEventSlot + gGameState->counters628) = 0;
     }
 }
-
-#define SceneHud_GetSelectedAction Inventory_GetQuantityByStorage
 
 void SceneHud_ApplyTimedSceneMode(struct SceneHudState *s, s32 mode, s32 duration)
 {

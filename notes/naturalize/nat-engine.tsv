@@ -523,3 +523,4 @@ src/system/inventory/inventory.c	Inventory_SetUsePermissionFlagsFromScript	minor
 src/system/inventory/inventory.c	Inventory_InitializeSelectionGrid	minor	natural	1	
 src/system/inventory/inventory.c	Inventory_RestoreLifePercent	contrived	natural	1	
 src/system/inventory/inventory.c	Inventory_RestoreLifePercentTimed	contrived	natural	1	
+src/system/inventory/inventory.c	PlayerStatusPanel_ResetScriptCounters	contrived	minor	1	counter indexed as *(slot + counters) for the index-first address sum
