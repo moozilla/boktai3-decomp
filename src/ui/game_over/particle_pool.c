@@ -82,28 +82,26 @@ void ParticlePool_UpdateLinearParticle(struct ParticlePool *pool, struct PoolPar
     }
 }
 
-void ParticlePool_SpawnJitteredParticle(struct ParticlePool *inPool, struct SceneVec *position,
+void ParticlePool_SpawnJitteredParticle(struct ParticlePool *pool, struct SceneVec *position,
                                         s32 angle, u32 kind)
 {
     s32 i;
-    struct PoolParticle *p;
     union ParticleRandomTableSource randomSource;
     const u16 *table;
+
     for (i = 0; i < 16; i++) {
-        if (!inPool->particles[i].tail.control.active) {
+        if (!pool->particles[i].tail.control.active)
             break;
-        }
     }
-
     if (i < 16) {
-        {
+        struct PoolParticle *particle = &pool->particles[i];
 
+        particle->flags &= ~1;
+        particle->tail.position.signedAxis = *position;
+        {
             u32 *randomIndex;
             u32 range;
             u32 index;
-            p = &inPool->particles[i];
-            p->flags &= ~1;
-            p->tail.position.signedAxis = *position;
             randomSource.halves[0] = (u16)RANDOM_TABLE_ADDR;
             randomSource.halves[1] = RANDOM_TABLE_ADDR >> 16;
             table = ParticleRandom_GetTable(&randomSource);
@@ -113,49 +111,50 @@ void ParticlePool_SpawnJitteredParticle(struct ParticlePool *inPool, struct Scen
             index &= 0x3FF;
             {
                 u32 random = table[index];
-                s32 x = (u16)p->tail.position.signedAxis.x;
+                s32 x = (u16)particle->tail.position.signedAxis.x;
                 x -= 63;
                 range = 0x7F;
                 random &= range;
-                p->tail.position.signedAxis.x = x + random;
+                particle->tail.position.signedAxis.x = x + random;
             }
             index = (index + 1) & 0x3FF;
             *randomIndex = index;
             {
                 u32 random = ParticleRandom_ReadCursor(table, &index);
-                s32 z = (u16)p->tail.position.signedAxis.z;
+                s32 z = (u16)particle->tail.position.signedAxis.z;
                 z -= 63;
                 random &= range;
-                p->tail.position.signedAxis.z = z + random;
+                particle->tail.position.signedAxis.z = z + random;
             }
         }
-        p->tail.position.signedAxis.y += 128;
+        particle->tail.position.signedAxis.y += 128;
         if (kind != 0) {
             if (kind == 1) {
-                if ((i & kind) == 0)
-                    SpriteDrawable_SelectTileFrame(p, inPool->resource, 4);
+                if ((i & 1) == 0)
+                    SpriteDrawable_SelectTileFrame(particle, pool->resource, 4);
                 else
-                    SpriteDrawable_SelectTileFrame(p, inPool->resource, 5);
+                    SpriteDrawable_SelectTileFrame(particle, pool->resource, 5);
             }
-        } else if ((i & 1) == 0)
-            SpriteDrawable_SelectTileFrame(p, inPool->resource, 2);
-        else
-            SpriteDrawable_SelectTileFrame(p, inPool->resource, 3);
-        p->tail.control.velocityX = TruncatePoolOffset(6 * gUnk_086149C4[(angle + 64) & 255]);
-        p->tail.control.velocityZ = TruncatePoolOffset(6 * gUnk_086149C4[angle & 255]);
-        p->tail.control.animationPhase = 0;
-        p->tail.control.state = 1;
+        } else if ((i & 1) == 0) {
+            SpriteDrawable_SelectTileFrame(particle, pool->resource, 2);
+        } else {
+            SpriteDrawable_SelectTileFrame(particle, pool->resource, 3);
+        }
+        particle->tail.control.velocityX =
+            TruncatePoolOffset(6 * gUnk_086149C4[(angle + 64) & 255]);
+        particle->tail.control.velocityZ = TruncatePoolOffset(6 * gUnk_086149C4[angle & 255]);
+        particle->tail.control.animationPhase = 0;
+        particle->tail.control.state = 1;
         {
             u32 index = (gRandomIndex + 1) & 0x3FF;
             gRandomIndex = index;
             {
                 u32 random = *(u16 *)((index << 1) + RANDOM_TABLE_ADDR);
-                u32 range = 7;
-                p->tail.control.lifetime = (random & range) + 8;
+                particle->tail.control.lifetime = (random & 7) + 8;
             }
         }
-        p->tail.control.active = 1;
-        p->tail.control.kind = kind;
+        particle->tail.control.active = 1;
+        particle->tail.control.kind = kind;
     }
 }
 
