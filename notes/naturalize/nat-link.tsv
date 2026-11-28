@@ -340,3 +340,4 @@ src/link/score_panel/LinkScorePanel_LoadBackground.c	LinkScorePanel_LoadBackgrou
 src/link/score_panel/LinkScorePanel_CreateTextWindows.c	LinkScorePanel_CreateTextWindows	contrived	natural	1	names SaveMenu.nameWindow at 0x1004
 src/link/score_panel/LinkScorePanel_RefreshPlayerName.c	LinkScorePanel_RefreshPlayerName	contrived	minor	3	validSelection goto inline stays
 src/link/score_panel/sub_0810FA0C.c	sub_0810FA0C	contrived	minor	1	pointer spans nameWindow and windows[7]
+src/link/score_panel/LinkScorePanel_InitGlyphFrames.c	LinkScorePanel_InitGlyphFrames	contrived	minor	1	loop writes glyphs[1..18], one past the array into cachedGlyphs[0] (game behavior)
