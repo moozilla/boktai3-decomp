@@ -187,3 +187,5 @@ src/link/player/LinkPlayer_LoadBaseStats.c	LinkPlayer_LoadBaseStats	contrived	na
 src/link/player/LinkPlayer_InitHealth.c	LinkPlayer_InitHealth	minor	natural	1	
 src/link/player/LinkPlayer_InitEnergy.c	LinkPlayer_InitEnergy	minor	natural	1	
 src/link/player/Player_InitializeInputHistory.c	Player_InitializeInputHistory	minor	natural	2	
+src/link/player/LinkPlayer_InitOptionalPlayerState.c	LinkPlayer_InitOptionalPlayerState	natural	natural	0	
+src/link/player/sub_0823ADB4.c	sub_0823ADB4	contrived	minor	4	two game state clears keep unsigned views so the global pointer is reloaded
