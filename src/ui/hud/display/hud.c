@@ -550,40 +550,31 @@ void Hud_UpdateTransientStatGauge(struct SceneHudState *hud)
 
 void Hud_UpdateTimedStatusIcon(struct SceneHudState *hud)
 {
-    /* The shared animation flag write may invalidate the stored owner word. */
-    u32 *ownerWord = (u32 *)&hud->actionOwner;
     u16 *cell;
     s32 value, digit;
-    struct SceneHudControlAnimation *animation;
-    void *resource;
-    if (((struct Player *)*ownerWord)->active) {
+    if (hud->actionOwner->active) {
         hud->controlAnimation.flags &= ~1;
-        animation = &hud->controlAnimation;
-        resource = hud->motionResource;
-        Anim_LoadKeyframe(animation, resource,
-                          (u16)(Selection_GetDisplayFrame(((struct Player *)*ownerWord)->unk536)),
-                          1);
+        Anim_LoadKeyframe(&hud->controlAnimation, hud->motionResource,
+                          (u16)Selection_GetDisplayFrame(hud->actionOwner->unk536), 1);
         cell = Hud_GetTilemapCell(0, 1, 6);
-        value = Div(((struct Player *)*ownerWord)->active + 59, 60);
+        value = Div(hud->actionOwner->active + 59, 60);
         digit = Div(value, 10);
         value -= digit * 10;
-        *cell++ = Hud_GetStyleTileIndex(digit, 0) | -0x3000;
-        *cell = Hud_GetStyleTileIndex(value, 0) | -0x3000;
+        *cell++ = Hud_GetStyleTileIndex(digit, 0) | 0xD000;
+        *cell = Hud_GetStyleTileIndex(value, 0) | 0xD000;
         hud->timedStatusIconVisible = 1;
-    } else if (*(s16 *)&gGameState->unk610) {
+    } else if (gGameState->unk610) {
         hud->controlAnimation.flags &= ~1;
-        animation = &hud->controlAnimation;
-        resource = hud->motionResource;
-        Anim_LoadKeyframe(animation, resource, (u16)(Selection_GetDisplayFrame(0x1b)), 1);
+        Anim_LoadKeyframe(&hud->controlAnimation, hud->motionResource,
+                          (u16)Selection_GetDisplayFrame(0x1b), 1);
         cell = Hud_GetTilemapCell(0, 1, 6);
         cell[0] = 0xd000;
         cell[1] = 0xd000;
         hud->timedStatusIconVisible = 1;
     } else if (gGameState->unk612) {
         hud->controlAnimation.flags &= ~1;
-        animation = &hud->controlAnimation;
-        resource = hud->motionResource;
-        Anim_LoadKeyframe(animation, resource, (u16)(Selection_GetDisplayFrame(0x1c)), 1);
+        Anim_LoadKeyframe(&hud->controlAnimation, hud->motionResource,
+                          (u16)Selection_GetDisplayFrame(0x1c), 1);
         cell = Hud_GetTilemapCell(0, 1, 6);
         cell[0] = 0xd000;
         cell[1] = 0xd000;
