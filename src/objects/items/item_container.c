@@ -756,13 +756,12 @@ s32 Trigger_CreateContainer(struct SceneVec *position, s32 id, s32 kind, s32 fli
     struct TriggerManager *manager = TriggerManager_GetOrCreate();
     struct Trigger *p;
     s32 i;
-    u32 *in, *out;
     if (!manager)
         return -1;
-    p = Heap_Alloc(188);
+    p = Heap_Alloc(sizeof(*p));
     if (!p)
         return -1;
-    Memory_Clear(p, 188);
+    Memory_Clear(p, sizeof(*p));
     p->id = id;
     p->kind = kind;
     p->actor = -1;
@@ -782,27 +781,23 @@ s32 Trigger_CreateContainer(struct SceneVec *position, s32 id, s32 kind, s32 fli
         p->update = Trigger_UpdateIdleAnimation;
     p->startScript = startScript;
     p->script = script;
-    in = arguments;
-    out = p->arguments;
-    i = 2;
-    do {
-        *out++ = *in++;
-    } while (--i >= 0);
-    p->object = Heap_Alloc(44);
+    for (i = 0; i < 3; i++)
+        p->arguments[i] = arguments[i];
+    p->object = Heap_Alloc(sizeof(*p->object));
     if (!p->object) {
         Heap_Free(p);
         return -1;
     }
-    Memory_Clear(p->object, 44);
-    p->other = Heap_Alloc(28);
+    Memory_Clear(p->object, sizeof(*p->object));
+    p->other = Heap_Alloc(sizeof(*p->other));
     if (!p->other) {
         if (p->object)
             Heap_Free(p->object);
         Heap_Free(p);
         return -1;
     }
-    Memory_Clear(p->other, 28);
-    p->animation = Heap_Alloc(16);
+    Memory_Clear(p->other, sizeof(*p->other));
+    p->animation = Heap_Alloc(sizeof(*p->animation));
     if (!p->animation) {
         if (p->object)
             Heap_Free(p->object);
@@ -811,7 +806,7 @@ s32 Trigger_CreateContainer(struct SceneVec *position, s32 id, s32 kind, s32 fli
         Heap_Free(p);
         return -1;
     }
-    Memory_Clear(p->animation, 16);
+    Memory_Clear(p->animation, sizeof(*p->animation));
     if (!AnimData_Load(p->other, manager->kind)) {
         if (p->object)
             Heap_Free(p->object);
@@ -824,42 +819,34 @@ s32 Trigger_CreateContainer(struct SceneVec *position, s32 id, s32 kind, s32 fli
     }
     Sprite_Init(p->object, p->other, 0);
     p->object->position = *position;
-    p->object->position.y = groundHeight((struct SceneVec *)&p->object->position);
+    p->object->position.y = groundHeight(&p->object->position);
     if (p->flip)
         p->object->flags |= 4;
     p->position = &p->object->position;
     p->started = hidden;
     p->condition = condition;
-    if ((u8)condition == 0)
+    if (p->condition == 0)
         AnimData_SelectPaletteBank(p->other, 772);
-    else if ((u8)condition == 1)
+    else if (p->condition == 1)
         AnimData_SelectPaletteBank(p->other, 775);
     else
         AnimData_SelectPaletteBank(p->other, 776);
     if (p->started) {
         s32 available;
         p->object->flags |= 1;
-        if (gEngineFlags & 2048) {
+        if (gEngineFlags & 2048)
             available = stateMode();
-        } else {
-            if (gWeatherCollisionTimer > 0)
-                goto reveal;
-            if (gPlayers[0]) {
-                if (Player_ReadStatusBits(&gPlayers[0]->actionFlags, 16))
-                    goto reveal;
-            }
+        else if (gWeatherCollisionTimer > 0 ||
+                 (gPlayers[0] && Player_ReadStatusBits(&gPlayers[0]->actionFlags, 16)))
+            available = 1;
+        else
             available = globalMode();
-        }
-        if (!available)
-            goto conceal;
-    reveal:
-        p->visible = 0;
-        goto visibilityDone;
-    conceal:
-        p->visible = 1;
+        if (available)
+            p->visible = 0;
+        else
+            p->visible = 1;
     } else
         p->visible = 0;
-visibilityDone:
     Anim_SetSequence(p->animation, manager->resource, 0, 0, 0);
     if (sound)
         p->sound = Region_FindContaining(&p->object->position);
