@@ -428,3 +428,8 @@ src/monsters/armor/Armor_UpdatePartTravelZWave.c	Armor_UpdatePartTravelZWave	min
 src/monsters/armor/armor_actions.c	Armor_SpawnPairedProjectiles	contrived	contrived	4	strength-reduced offsetBytes and pos aliases partly kept: plain indexing changes the induction variables
 src/monsters/armor/armor_actions.c	Armor_UpdateTargetFacing	minor	minor	0	halfword copy of the player position through a u8 game-state pointer
 src/monsters/armor/Armor_UpdateContactBoost.c	Armor_UpdateContactBoost	minor	minor	0	open-coded fixed-point scale kept in nested blocks
+src/monsters/armor/Armor_InitFromScript.c	Armor_InitFromScript	contrived	contrived	7	local actor mirror with letter field names, parked pointers and a one local remain: removing them changes the parameter-block address reuse
+src/monsters/armor/Armor_UpdatePartRebound.c	Armor_UpdatePartRebound	contrived	contrived	3	one/state locals: the shared 1 register serves both flag writes
+src/monsters/armor/Armor_DampPartWaveReturn.c	Armor_DampPartWaveReturn	minor	minor	0	open-coded halve-toward-zero blocks and a byte view of the parent
+src/monsters/armor/Armor_DampPartMovement.c	Armor_DampPartMovement	minor	minor	0	open-coded halve-toward-zero blocks and a byte view of the parent
+src/monsters/armor/SpinningApproach_DampReturnMovement.c	SpinningApproach_DampReturnMovement	minor	minor	0	open-coded halve-toward-zero blocks and a byte view of the parent
