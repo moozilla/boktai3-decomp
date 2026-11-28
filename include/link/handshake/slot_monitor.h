@@ -30,13 +30,14 @@ struct SlotMonitor {
     u16 config;
     u8 restartPending; /* confidence=low */
     u8 mode;           /* confidence=low */
-    u32 f70;           /* confidence=low */
+    u32 checkTimeouts; /* confidence=low */
     u32 f74;
     u32 f78;
     void (*callback)(struct SlotMonitor *obj);
     u32 f80;
 };
 
+void LinkConnection_SetRetryOptions(struct SlotMonitor *obj, u32 options);
 u8 SlotMonitor_CheckTimeout(struct SlotMonitor *obj);
 u8 LinkHandshake_AdvanceTimeout(struct SlotMonitor *obj);
 void LinkHandshake_UpdateRestartState(struct SlotMonitor *obj);

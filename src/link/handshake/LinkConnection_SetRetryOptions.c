@@ -1,14 +1,13 @@
 #include "global.h"
+#include "link/handshake/slot_monitor.h"
 
-void LinkConnection_SetRetryOptions(u8 *p, u32 a)
+void LinkConnection_SetRetryOptions(struct SlotMonitor *obj, u32 options)
 {
-    *(u32 *)(p + 0x70) = 0;
-    if (a & 1) {
-        *(u32 *)(p + 0x70) = 1;
-    }
-    if (a & 4) {
-        *(u16 *)(p + 0x6A) = 0x1E;
-    } else {
-        *(u16 *)(p + 0x6A) = 0x78;
-    }
+    obj->checkTimeouts = FALSE;
+    if (options & 1)
+        obj->checkTimeouts = TRUE;
+    if (options & 4)
+        obj->limit = 30;
+    else
+        obj->limit = 120;
 }

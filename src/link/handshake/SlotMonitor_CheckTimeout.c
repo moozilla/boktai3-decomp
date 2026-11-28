@@ -6,7 +6,7 @@ u8 SlotMonitor_CheckTimeout(struct SlotMonitor *obj)
     s32 count;
     s32 i;
 
-    if (obj->f70 & 1) {
+    if (obj->checkTimeouts & 1) {
         if (obj->ticks58 > 0) {
             count = 0;
             for (i = 0; i < 4; i++) {
