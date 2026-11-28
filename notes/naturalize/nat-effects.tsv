@@ -115,3 +115,4 @@ src/effects/bursts/explosion.c	Explosion_CreateWithCollisionFlags	natural	natura
 src/effects/bursts/charged_burst/ChargedBurst_SetState.c	ChargedBurst_SetState	minor	natural	1	-
 src/effects/bursts/charged_burst/sub_0823350C.c	sub_0823350C	contrived	natural	3	-
 src/effects/bursts/charged_burst/ChargedBurst_EmitSpark.c	ChargedBurst_EmitSpark	contrived	minor	40	delay pointer, byte mask, random table union, seed pointer and mask local: the stack slot layout depends on them
+src/effects/bursts/charged_burst/TimedDisplay_AdvanceIntro.c	TimedDisplay_AdvanceIntro	minor	natural	1	-
