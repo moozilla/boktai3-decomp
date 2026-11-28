@@ -218,20 +218,14 @@ s32 MotionTrack_Update(struct OrbitMotion *motion)
             out->y = ScalarApproach_StepSixteenth(out->y, target->y);
             out->z = ScalarApproach_StepSixteenth(out->z, target->z);
             break;
-        case ORBIT_MOTION_STEP: {
-            s16 value;
+        case ORBIT_MOTION_STEP:
             out->x = Math_StepTowardTarget(out->x, target->x, step->x);
-            value = Math_StepTowardTarget(out->y, target->y, step->y);
-            out->y = value;
+            out->y = Math_StepTowardTarget(out->y, target->y, step->y);
             out->z = Math_StepTowardTarget(out->z, target->z, step->z);
             break;
-        }
-        case ORBIT_MOTION_STEER_XZ: {
-            s32 current;
-            current = out->y;
-            out->y = ScalarApproach_StepEighth(current, target->y);
+        case ORBIT_MOTION_STEER_XZ:
+            out->y = ScalarApproach_StepEighth(out->y, target->y);
             return SceneryMotion_SteerXZ(motion);
-        }
         case ORBIT_MOTION_STEER_XY:
             return SceneryMotion_SteerXY(motion);
         case ORBIT_MOTION_ARC:
@@ -240,14 +234,10 @@ s32 MotionTrack_Update(struct OrbitMotion *motion)
             return SceneryMotion_UpdateCrossedSines(motion);
         case ORBIT_MOTION_WAVE_APPROACH:
             SceneryMotion_UpdateAbsoluteSines(motion);
-            {
-                s16 value;
-                out->x = Math_StepTowardTarget(out->x, target->x, step->x);
-                value = Math_StepTowardTarget(out->y, target->y, step->y);
-                out->y = value;
-                out->z = Math_StepTowardTarget(out->z, target->z, step->z);
-                break;
-            }
+            out->x = Math_StepTowardTarget(out->x, target->x, step->x);
+            out->y = Math_StepTowardTarget(out->y, target->y, step->y);
+            out->z = Math_StepTowardTarget(out->z, target->z, step->z);
+            break;
         case ORBIT_MOTION_INTERPOLATE:
             return SceneryMotion_InterpolatePosition(motion);
     }

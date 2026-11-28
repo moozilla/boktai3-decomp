@@ -353,3 +353,4 @@ src/scene/actor/control/scene_actor_stored_motion.c	SceneActorControl_BindPrimar
 src/scene/actor/motion_track.c	OrbitMotion_BeginDistanceWave	contrived	minor	6	target pointer to the base vector: direct member access reloads the address
 src/scene/actor/motion_track.c	OrbitMotion_BeginVerticalDistanceWave	contrived	minor	6	target pointer to the base vector: direct member access reloads the address
 src/scene/actor/motion_track.c	OrbitMotion_BeginCrossedSines	minor	natural	1	-
+src/scene/actor/motion_track.c	MotionTrack_Update	contrived	minor	8	savedTarget/savedStep copies in the arrival test: direct member reads change register choice
