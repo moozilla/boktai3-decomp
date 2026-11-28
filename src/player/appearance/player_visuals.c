@@ -1403,9 +1403,9 @@ void Player_ConfigureActionCollider(struct Player *p)
     }
 }
 
-void Player_SetWeaponInstance(struct Player *p, u32 v)
+void Player_SetWeaponInstance(struct Player *p, struct PlayerActionEntry *entry)
 {
-    p->statModifierContext.actionEntry = (struct PlayerActionEntry *)v;
+    p->statModifierContext.actionEntry = entry;
 }
 
 #define Player_SetActionEntry Player_SetWeaponInstance
@@ -1414,7 +1414,7 @@ void Player_SetWeaponInstance(struct Player *p, u32 v)
 
 extern const struct PlayerActionDescriptor gUnk_08E6092C[];
 
-void Player_SetWeaponInstance(struct Player *, u32);
+void Player_SetWeaponInstance(struct Player *, struct PlayerActionEntry *);
 
 void ItemDescriptor_Reset(void *);
 
@@ -1430,7 +1430,7 @@ void ActorSequence_Begin(struct Player *, s32, s32);
 
 void VariantSprite_SelectAnimation(void *, u32);
 
-void Player_BeginDescriptorAction(struct Player *p, u32 entry)
+void Player_BeginDescriptorAction(struct Player *p, struct PlayerActionEntry *entry)
 {
     struct PlayerActionDescriptor descriptor;
     if (p->actionMode != 6) {
@@ -1510,50 +1510,43 @@ void Player_SetWeaponMode(struct Player *p, u8 v)
 
 void Hud_BeginModeSixCue(void);
 
-void Player_BeginDescriptorAction(struct Player *, u32);
+void Player_BeginDescriptorAction(struct Player *, struct PlayerActionEntry *);
 
 void Player_ConsumeActionCharge(struct Player *p)
 {
     s32 cost;
     struct PlayerActionEntry *entry;
+    struct ContactCollider *collider;
+    struct ContactCollider *hit;
 
-    if (p->actionMode != 6) {
-        {
-            struct PlayerCollider *drain = &p->statModifierContext.attackCollider;
-            cost = drain->cost;
-        }
-        if (cost > 0) {
-            if (!p->statModifierContext.statBOverrideEnabled) {
-                s32 kind = p->statModifierContext.actionEntry->kind;
-                if (kind == 0x30)
-                    goto clear;
-                if (kind == 0x2F)
-                    goto clear;
-                {
-                    if (HasFlag(p, 0x400))
-                        cost <<= 1;
-                    if (HasFlag(p, 1) || HasFlag(p, 0x200))
-                        cost >>= 1;
-                    if (cost <= 0)
-                        cost = 1;
-                    entry = p->statModifierContext.actionEntry;
-                    if (entry->remainingCharge != 0) {
-                        if (entry->remainingCharge <= cost) {
-                            entry->remainingCharge = 0;
-                            Hud_BeginModeSixCue();
-                            Player_BeginDescriptorAction(p,
-                                                         (u32)p->statModifierContext.actionEntry);
-                        } else
-                            entry->remainingCharge -= cost;
-                    }
-                }
+    if (p->actionMode == 6)
+        return;
+    collider = &p->statModifierContext.attackCollider;
+    cost = collider->cost;
+    if (cost <= 0)
+        return;
+    if (!p->statModifierContext.statBOverrideEnabled &&
+        p->statModifierContext.actionEntry->kind != 0x30 &&
+        p->statModifierContext.actionEntry->kind != 0x2F) {
+        if (HasFlag(p, 0x400))
+            cost *= 2;
+        if (HasFlag(p, 1) || HasFlag(p, 0x200))
+            cost >>= 1;
+        if (cost <= 0)
+            cost = 1;
+        entry = p->statModifierContext.actionEntry;
+        if (entry->remainingCharge != 0) {
+            if (entry->remainingCharge <= cost) {
+                entry->remainingCharge = 0;
+                Hud_BeginModeSixCue();
+                Player_BeginDescriptorAction(p, p->statModifierContext.actionEntry);
+            } else {
+                entry->remainingCharge -= cost;
             }
-        clear: {
-            struct PlayerCollider *drain = &p->statModifierContext.attackCollider;
-            drain->cost = 0;
-        }
         }
     }
+    hit = &p->statModifierContext.attackCollider;
+    hit->cost = 0;
 }
 
 void Player_RefreshEquipmentWithOptions(struct Player *p, s32 unused, s32 flag);

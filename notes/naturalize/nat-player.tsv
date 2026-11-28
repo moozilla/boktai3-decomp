@@ -100,3 +100,5 @@ src/player/appearance/player_visuals.c	Player_ApplyPeriodicStatChanges	minor	min
 src/player/appearance/player_visuals.c	Player_BuildActionModifiers	contrived	minor	6	SetBonusFlag keeps pointer and mask locals: a plain |= changes 22 instructions (field loaded before mask)
 src/player/appearance/player_visuals.c	Player_ConfigureActionCollider	minor	natural	2	
 src/player/appearance/player_visuals.c	Player_BeginIndexedAction	minor	minor	8	identical mode branches stay: one plain assignment drops the ROM's branch
+src/player/appearance/player_visuals.c	Player_SetWeaponMode	natural	natural	0	-
+src/player/appearance/player_visuals.c	Player_ConsumeActionCharge	contrived	minor	9	two collider pointer locals: ROM forms the collider base before the 0x3E access, plain member access folds 0xBCA
