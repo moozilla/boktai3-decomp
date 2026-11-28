@@ -97,3 +97,4 @@ src/engine/sound/Sound_StopSong.c	Sound_StopSong	contrived	minor	1	slots pointer
 src/engine/sound/Sound_StopAllTrackedSongs.c	Sound_StopAllTrackedSongs	minor	natural	1	
 src/engine/sound/Sound_RestartPlayer29And30Songs.c	Sound_RestartPlayer29And30Songs	minor	natural	1	
 src/engine/sound/Sound_RestartPlayer30Song.c	Sound_RestartPlayer30Song	minor	natural	1	
+src/engine/sound/Sound_SuspendPlayer29And30Songs.c	Sound_SuspendPlayer29And30Songs	minor	natural	1	
