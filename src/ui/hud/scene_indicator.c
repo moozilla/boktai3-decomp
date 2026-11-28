@@ -297,14 +297,8 @@ int SceneIndicator_CreateFromScript(void)
         if (p->count & 1)
             return -1;
         p->mode = 0;
-        position = &p->sprite.position;
-        sprite = &p->sprite;
-        collider = &p->collider;
     } else {
         int i;
-        position = &p->sprite.position;
-        sprite = &p->sprite;
-        collider = &p->collider;
         for (i = 0; i < 8; i++)
             p->times[i] = 0xFFFF;
     }
@@ -317,6 +311,9 @@ int SceneIndicator_CreateFromScript(void)
         p->visible = Script_GetValue();
     }
     p->animation = Script_GetKeywordValue('E', 0);
+    position = &p->sprite.position;
+    sprite = &p->sprite;
+    collider = &p->collider;
     Sprite_ApplyAnimation(sprite, &m->animations[p->animation]);
     sprite->frame = p->frame + p->visible;
     Collider_SetPosition(collider, position, 0);

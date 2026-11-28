@@ -404,3 +404,4 @@ src/ui/hud/scene_indicator.c	SceneIndicators_Destroy	fudged	natural	5
 src/ui/hud/scene_indicator.c	SceneIndicators_Initialize	fudged	partial	8	has/first block stays: the indicator base is computed after the keyword call
 src/ui/hud/scene_indicator.c	SceneIndicators_FindFreeSlot	fudged	natural	4	
 src/ui/hud/scene_indicator.c	SceneIndicators_FindById	fudged	natural	2	
+src/ui/hud/scene_indicator.c	SceneIndicator_CreateFromScript	fudged	natural	5	
