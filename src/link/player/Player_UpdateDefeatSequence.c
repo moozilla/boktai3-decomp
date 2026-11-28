@@ -7,17 +7,14 @@ s32 ActorVariant_GetTableValue(u32, s32);
 void Player_SetAnimationIndex(struct Player *, s32, s32);
 void SelectionSlots_ClearValue(void *, u32);
 void Player_RestoreLinkedActionState(struct Player *);
-#define F(T, off) (*(T *)((u8 *)p + (off)))
 void Player_UpdateDefeatSequence(struct Player *p)
 {
-    s32 phase;
     Player_SetSecondaryActionFlags(p, 4);
-    phase = p->tetherPhase;
-    switch (phase) {
+    switch (p->tetherPhase) {
         case 0:
             Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 0x29), 0x40);
-            F(u16, 0x4E8) = phase;
-            F(u32, 0x40) = phase;
+            p->terrainRecoveryCounter = 0;
+            p->followTarget = NULL;
             SelectionSlots_ClearValue(&p->position, p->slot);
             Player_PlayLocalSong(p->slot, 0x1AD);
             Player_SetTetherMode(p, 0x21, 1);
@@ -25,12 +22,12 @@ void Player_UpdateDefeatSequence(struct Player *p)
         case 1:
             p->tetherFrame++;
             if (p->tetherFrame > 5) {
-                F(u16, 0x4E8) = 0;
+                p->terrainRecoveryCounter = 0;
                 Player_PlayLocalSong(p->slot, 0x1AF);
                 Player_SetTetherMode(p, 0x21, 2);
             }
             break;
-        case 2: {
+        case 2:
             Player_SetAnimationIndex(p, 0x2C, 0x40);
             p->terrainRecoveryCounter -= 30;
             if (++p->tetherFrame > 8) {
@@ -40,7 +37,6 @@ void Player_UpdateDefeatSequence(struct Player *p)
                 Player_SetTetherMode(p, 0x21, 3);
             }
             break;
-        }
         case 3:
             Player_SetSecondaryActionFlags(p, 1);
             p->tetherFrame++;

@@ -265,3 +265,4 @@ src/link/player/Player_UpdateTetherRecoil.c	Player_UpdateTetherRecoil	minor	mino
 src/link/player/Player_UpdateKnockback.c	Player_UpdateKnockback	minor	natural	3	
 src/link/player/Player_UpdateRecoil.c	Player_UpdateRecoil	contrived	natural	4	cellProps cast for terrain flags
 src/link/player/Player_UpdateFlinch.c	Player_UpdateFlinch	contrived	natural	2	cellProps cast for terrain flags
+src/link/player/Player_UpdateDefeatSequence.c	Player_UpdateDefeatSequence	contrived	natural	3	
