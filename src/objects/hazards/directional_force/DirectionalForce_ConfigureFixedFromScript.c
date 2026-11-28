@@ -4,24 +4,24 @@ s32 Script_GetValue(void);
 void DirectionalForce_ConfigureFixed(s32, s32, s32, s32, s32);
 void DirectionalForce_ConfigureFixedFromScript(void)
 {
-    s32 a, b, c, d, e;
-    if (Script_SeekToKeyword(0x64))
-        a = Script_GetValue();
+    s32 angle, baseMagnitude, magnitudeRange, baseDelay, delayRange;
+    if (Script_SeekToKeyword('d'))
+        angle = Script_GetValue();
     else
-        a = 0;
-    if (Script_SeekToKeyword(0x70)) {
-        b = Script_GetValue();
-        c = Script_GetValue();
+        angle = 0;
+    if (Script_SeekToKeyword('p')) {
+        baseMagnitude = Script_GetValue();
+        magnitudeRange = Script_GetValue();
     } else {
-        b = 3;
-        c = 3;
+        baseMagnitude = 3;
+        magnitudeRange = 3;
     }
-    if (Script_SeekToKeyword(0x74)) {
-        d = Script_GetValue();
-        e = Script_GetValue();
+    if (Script_SeekToKeyword('t')) {
+        baseDelay = Script_GetValue();
+        delayRange = Script_GetValue();
     } else {
-        d = 0x78;
-        e = 0x78;
+        baseDelay = 120;
+        delayRange = 120;
     }
-    DirectionalForce_ConfigureFixed(a, b, c, d, e);
+    DirectionalForce_ConfigureFixed(angle, baseMagnitude, magnitudeRange, baseDelay, delayRange);
 }
