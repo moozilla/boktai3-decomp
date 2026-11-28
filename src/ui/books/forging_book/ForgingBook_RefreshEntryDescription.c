@@ -1,33 +1,27 @@
 #include "global.h"
-u32 CollectionBook_IsEntryCollected(s32);
-void TextWindow_SetScript(u32, u32);
-void TextWindow_Refresh(u32, s32);
-void TextWindow_StartPlayback(u32);
-u32 ForgingBook_RefreshEntryDescription(u8 *s)
+#include "ui/books/collection_book.h"
+void TextWindow_StartPlayback(s32);
+void ScrollingDialogue_ClearScript(void);
+s32 ScrollingDialogue_SetScript(const u8 *);
+
+u32 ForgingBook_RefreshEntryDescription(struct CollectionBook *book)
 {
-    s16 *index = (s16 *)(s + 0x6FC);
-    s32 offset = *index * 2;
-    s16 *entries = (s16 *)(s + 0x6E0);
-    u32 *handle;
-    u32 ref;
-    if (CollectionBook_IsEntryCollected(*(s16 *)((u8 *)entries + offset))) {
-        handle = (u32 *)(s + 0x708);
-        TextWindow_SetScript(*handle, *(u32 *)(s + 0x70C));
-        TextWindow_Refresh(*handle, *(s16 *)((u8 *)entries + (*index << 1)));
-        TextWindow_StartPlayback(*handle);
+    s32 id;
+
+    if (CollectionBook_IsEntryCollected(book->entryIds[book->selectedEntry])) {
+        TextWindow_SetScript(book->textWindow, book->nameScript);
+        TextWindow_Refresh(book->textWindow, book->entryIds[book->selectedEntry]);
+        TextWindow_StartPlayback(book->textWindow);
         ScrollingDialogue_ClearScript();
-        ref = Script_ParseStringRef(*(u32 *)(s + 0x710));
-        ScrollingDialogue_SetScript(
-            Text_LookupString(ref + *(s16 *)((u8 *)entries + (*index << 1))));
+        id = Script_ParseStringRef(book->descriptionScript);
+        ScrollingDialogue_SetScript(Text_LookupString(id + book->entryIds[book->selectedEntry]));
     } else {
-        handle = (u32 *)(s + 0x708);
-        TextWindow_SetScript(*handle, *(u32 *)(s + 0x70C));
-        TextWindow_Refresh(*handle, 10);
-        TextWindow_StartPlayback(*handle);
+        TextWindow_SetScript(book->textWindow, book->nameScript);
+        TextWindow_Refresh(book->textWindow, 10);
+        TextWindow_StartPlayback(book->textWindow);
         ScrollingDialogue_ClearScript();
-        ref = Script_ParseStringRef(*(u32 *)(s + 0x714));
-        offset = *index * 2;
-        ScrollingDialogue_SetScript(Text_LookupString(ref + *(s16 *)((u32)entries + offset)));
+        id = Script_ParseStringRef(book->lockedDescriptionScript);
+        ScrollingDialogue_SetScript(Text_LookupString(id + book->entryIds[book->selectedEntry]));
     }
     return 0;
 }
