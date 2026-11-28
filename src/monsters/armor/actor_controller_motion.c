@@ -6,29 +6,23 @@ u32 ActorController_SetAnimation(struct SceneCombatActor *, const void *, u32);
 
 void ActorController_UpdateRetreatMotion(struct SceneCombatActor *actor)
 {
-    u8 *phase = &actor->actionPhase;
-    u8 initialPhase = *phase;
-    switch (initialPhase) {
-        case 0: {
+    switch (actor->actionPhase) {
+        case 0:
             ActorController_SetAnimation(actor, &gUnk_0824EED0[((actor->heading + 0x60) >> 6) & 3],
                                          2);
-            (*phase)++;
-            actor->actionReady = initialPhase;
+            actor->actionPhase++;
+            actor->actionReady = 0;
             actor->animationDuration = 12;
             ActorController_SelectDefenseColliders(actor);
-            {
-                ActorController_ClearMotionFlags(&actor->colliderGroup.motion, 1);
-            }
+            ActorController_ClearMotionFlags(&actor->colliderGroup.motion, 1);
             actor->flags |= 0x20;
-        }
-        case 1: {
+        case 1:
             ActorController_SetMotion(&actor->velocity, (actor->heading + 0x80) & 255, 20);
             if (actor->animationComplete) {
                 actor->actionPhase = 0xFF;
                 actor->actionReady = 1;
             }
             break;
-        }
     }
 }
 
