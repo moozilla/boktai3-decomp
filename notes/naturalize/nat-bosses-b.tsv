@@ -219,3 +219,14 @@ src/bosses/sabata/sub_0817B2DC.c	sub_0817B2DC	contrived	partial	7	kept do/while 
 src/bosses/sabata/sub_0817AEC8.c	sub_0817AEC8	machine-shaped	machine-shaped	4	kept split table address, sine pointer masking and offset pointer: plain table forms change the literal loading
 src/bosses/sabata/ActorEffect_UpdateIdleScript.c	ActorEffect_UpdateIdleScript	machine-shaped	machine-shaped	4	kept actor alias and argument/mask temporaries (evaluation order)
 src/bosses/sabata/combat_commands.c	ActorEffect_StepTurn	machine-shaped	natural	14	minor: animation constant local
+src/bosses/sabata/SceneActors_UpdateTransitionToState14.c	SceneActors_UpdateTransitionToState14	natural	natural	0	minor: state constant local needed
+src/bosses/sabata/SceneActors_UpdateTransitionToState15.c	SceneActors_UpdateTransitionToState15	natural	natural	0	minor: state constant local needed
+src/bosses/sabata/SceneActors_UpdateTransitionToState16.c	SceneActors_UpdateTransitionToState16	natural	natural	0	minor: state constant local needed
+src/bosses/sabata/SceneActors_DispatchSubtypeHandler.c	SceneActors_DispatchSubtypeHandler	natural	natural	0	
+src/bosses/sabata/combat_commands.c	Sabata_BeginCombatPhase	natural	natural	0	
+src/bosses/sabata/combat_commands.c	SabataState_BeginDepletedState	natural	natural	0	minor: single-use state/mask locals and goto-shared state store are needed to match
+src/bosses/sabata/combat_commands.c	SabataState_UpdateDepletedState	natural	natural	0	minor: single-use state/mask locals and goto-shared state store are needed to match
+src/bosses/sabata/combat_commands.c	SabataState_UpdateRandomAnimation	natural	natural	0	minor: single-use state/mask locals and goto-shared state store are needed to match
+src/bosses/sabata/combat_commands.c	SabataState_UpdateSelectedAnimation	natural	natural	0	minor: single-use state/mask locals and goto-shared state store are needed to match
+src/bosses/sabata/combat_commands.c	SabataState_BeginReverseAnimation	natural	natural	0	minor: single-use state/mask locals and goto-shared state store are needed to match
+src/bosses/sabata/combat_commands.c	SabataState_UpdateRestartableAnimation	natural	natural	0	minor: single-use state/mask locals and goto-shared state store are needed to match
