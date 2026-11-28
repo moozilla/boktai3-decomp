@@ -29,38 +29,24 @@ void *ScriptProc_Start(u16, u16);
 void NidhoggrEffect_InitPool(struct NidhoggrEffectPool *pool)
 {
     s32 i;
-    u32 *word;
     struct NidhoggrEffectSlot *effect;
     struct NidhoggrCollisionEffect *collision;
     pool->script = ScriptProc_Start(0x922E, 0xBB30);
     pool->resource = 0;
-    i = 0;
-    {
-        u32 zero = 0;
-        word = pool->position;
-        do {
-            *word++ = zero;
-            i++;
-        } while ((u32)i <= 1);
-    }
+    for (i = 0; (u32)i < 2; i++)
+        pool->position[i] = 0;
     effect = pool->effects;
-    i = 24;
-    do {
+    for (i = 24; i > 0; i--, effect++) {
         effect->state = 0;
         effect->flags = 0;
-        i--;
-        effect++;
-    } while (i > 0);
+    }
     collision = pool->collisionEffects;
-    i = 48;
-    do {
+    for (i = 48; i > 0; i--, collision++) {
         collision->state = 0;
         collision->flags = 0;
         Collider_Init(collision->colliderCC, 0, 0x2001, 0, 0x10, gScenePanelEffectColliderShape,
                       gScenePanelEffectColliderShape);
         Collider_Init(collision->collider120, 0, 0x4001, 0, 0x10, gScenePanelEffectColliderShape,
                       gScenePanelEffectColliderShape);
-        i--;
-        collision++;
-    } while (i > 0);
+    }
 }
