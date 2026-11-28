@@ -648,3 +648,4 @@ src/system/save/SaveData_GetPoints.c	SaveData_GetPoints	minor	natural	1
 src/system/save/SaveData_GetCounterA.c	SaveData_GetCounterA	minor	natural	1	
 src/system/save/SaveData_GetCounterB.c	SaveData_GetCounterB	minor	natural	1	
 src/system/save/SaveData_IsHeaderValid.c	SaveData_IsHeaderValid	minor	natural	1	
+src/system/save/SaveData_SetPointsFromScript.c	SaveData_SetPointsFromScript	minor	natural	1	
