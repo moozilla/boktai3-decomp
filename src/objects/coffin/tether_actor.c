@@ -1332,11 +1332,9 @@ void TetherActor_BeginDisplayPositionState(void)
 {
     struct TetherActor *g = gTetherActor;
     if (g != 0) {
-        struct ContactPosition *d;
         TetherActor_SetState(g, 8);
         TetherActor_CreateAuxiliarySprite(g);
-        d = (struct ContactPosition *)(&g->auxiliarySprite.position);
-        *d = *(struct ContactPosition *)g->display.animation.position;
+        g->auxiliarySprite.position = *(struct ContactPosition *)g->display.animation.position;
         g->displayOffsetY = 0x5dc;
         TetherActor_UpdatePendingEffect(g);
     }
