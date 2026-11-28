@@ -2,13 +2,10 @@
 #include "system/game_state/game_state.h"
 void MenuPanel_SwapConsumableSlots(u32 source, u32 destination)
 {
-    struct GameState *game = gGameState;
-    struct GameState *a = (struct GameState *)((source << 1) + (u32)game);
-    s32 old = a->table160[0];
-    struct GameState *b = (struct GameState *)((destination << 1) + (u32)game);
+    s32 old = *(source + gGameState->table160);
     s32 i;
-    a->table160[0] = b->table160[0];
-    b->table160[0] = old;
+    *(source + gGameState->table160) = *(destination + gGameState->table160);
+    *(destination + gGameState->table160) = old;
     for (i = 0; i <= 3; i++) {
         u32 address = i;
         struct GameState *current = gGameState;

@@ -589,3 +589,4 @@ src/ui/town/storage/Storage_UpdateItemTransition.c	Storage_UpdateItemTransition	
 src/ui/town/storage/Storage_UpdateBrowseIntro.c	Storage_UpdateBrowseIntro	minor	natural	1	
 src/ui/town/storage/MenuPanel_IsEntryAvailable.c	MenuPanel_IsEntryAvailable	minor	natural	1	
 src/ui/town/storage/MenuPanel_IsEntryEmpty.c	MenuPanel_IsEntryEmpty	contrived	minor	2	index-first pointer sum into table160
+src/ui/town/storage/MenuPanel_SwapConsumableSlots.c	MenuPanel_SwapConsumableSlots	contrived	minor	8	index-first sums for the swap; address casts remain in the party loop
