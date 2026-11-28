@@ -776,22 +776,21 @@ void ModifierMenu_ResetBackground(struct ModifierMenu *menu)
 void ModifierMenu_DrawBackground(struct ModifierMenu *menu)
 {
     s32 visible;
-    /* do-while(0) only keeps agbcc's block layout */
-    do {
-        switch (menu->state) {
-            case 1:
-                visible = 1;
-                break;
-            case 2:
-                visible = 0;
-                ModifierMenu_ResetBackground(menu);
-                break;
-            case 0:
-            default:
-                visible = 0;
-                break;
-        }
-        Bg_SetLayerMap(2, menu->backgroundResource, visible);
-        BgGfx_LoadTilemapSimple(2, 0, 0, 0, 0);
-    } while (0);
+    switch (menu->state) {
+        case 0:
+            visible = 0;
+            break;
+        case 1:
+            visible = 1;
+            break;
+        case 2:
+            visible = 0;
+            ModifierMenu_ResetBackground(menu);
+            break;
+        default:
+            visible = 0;
+            break;
+    }
+    Bg_SetLayerMap(2, menu->backgroundResource, visible);
+    BgGfx_LoadTilemapSimple(2, 0, 0, 0, 0);
 }
