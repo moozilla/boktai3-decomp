@@ -1,139 +1,59 @@
-#include "global.h"
-#include "scene/collision/contact_actor.h"
-#include "engine/engine.h"
-#include "engine/ram.h"
-#include "engine/video/render.h"
-#include "effects/bursts/fragment_effect_sprite_layout.h"
+#include "effects/bursts/fragment_burst.h"
+#include "scene/motion/scene_actor_terrain.h"
 
-struct FragmentSequence {
-    const u16 *commands;
-    u8 flags, frameCount, frameWeight, duration;
-    u16 index, unk_0A, speed, elapsed;
-};
-struct FragmentBurst {
-    struct FragmentEffectSprite sprites[4];
-    struct FragmentSequence sequences[4];
-    struct ContactPosition origin, position;
-    u8 collider[0x54];
-    u16 age;
-    u8 state;
-    s8 slot;
-    void *completionScript;
-    u16 timer;
-    u8 enter;
-};
-struct FragmentBurstPool {
-    u8 unk_00[0x18];
-    u8 graphics[0x1C];
-    void *sequenceResource;
-};
 struct FragmentBurstPool *FragmentBurst_EnsurePool(void);
 struct FragmentBurst *FragmentBurst_AllocateSpriteGroup(struct FragmentBurstPool *);
-u8 *TerrainModifiers_FindCellOverride(s32, s32);
 void sub_081281D0(struct FragmentBurst *, u32, u32, u32, u32);
 
-static inline s32 ProjectScale(s32 input)
-{
-    s32 value = input * 3;
-    if (value >= 0)
-        value >>= 5;
-    else
-        value = -((-value) >> 5);
-    return value;
-}
-
-static inline u16 GroundHeight(struct ContactPosition *point)
-{
-    s32 x, z;
-    u32 cell;
-    u8 *definition;
-    u32 type;
-    s32 height;
-    x = point->x >> 8;
-    z = point->z >> 8;
-    if (x < 0 || z < 0 || x >= gTerrainWidth || z >= gTerrainHeight)
-        cell = 0;
-    else
-        cell = gTerrainMap->rows[z] + x;
-    definition = TerrainModifiers_FindCellOverride(cell, 1);
-    if (definition)
-        definition += 4;
-    else {
-        struct EngineMap *map = gTerrainMap;
-        u32 offset = cell * 4 + 12;
-        definition = map->cells + offset;
-    }
-    type = *definition >> 4;
-    height = (*definition & 15) << 8;
-    switch (type) {
-        case 1:
-            height -= (u8)point->z;
-            break;
-        case 2:
-            height -= (u8)point->x;
-            break;
-    }
-    return height;
-}
-
-void FragmentBurst_Create(struct ContactPosition *position, u32 amount, u32 kind, u32 parameter, u32 flags,
-                  u32 unused, void *completionScript)
+void FragmentBurst_Create(struct ContactPosition *position, u32 amount, u32 kind, u32 parameter,
+                          u32 flags, u32 unused, u32 completionScript)
 {
     struct ContactPosition screen;
-    struct ContactPosition *out;
     struct FragmentBurstPool *pool = gSpriteGroupPool;
-    struct FragmentBurst *group;
+    struct FragmentBurst *burst;
     s32 i;
-    const u16 *randomTable;
-    s32 x, z, projected, height;
+    const u16 *table;
+
     if (!pool) {
         pool = FragmentBurst_EnsurePool();
         if (!pool)
             return;
     }
-    group = FragmentBurst_AllocateSpriteGroup(pool);
-    if (!group)
+    burst = FragmentBurst_AllocateSpriteGroup(pool);
+    if (!burst)
         return;
-    group->state = 1;
-    group->age = 0;
-    group->timer = 0;
-    group->enter = 1;
-    group->origin = *position;
-    group->completionScript = completionScript;
-    group->position = *position;
-    group->position.y = GroundHeight(position);
-    out = &screen;
-    x = position->x;
-    z = position->z;
-    out->x = ProjectScale(x - z);
-    projected = ProjectScale(x + z);
-    height = ProjectScale(position->y);
-    {
-        s32 y = projected - height, depth = projected + height;
-        out->x = out->x - (*(struct ContactPosition *)gCameraOrigin).x + 120;
-        out->y = y - (*(struct ContactPosition *)gCameraOrigin).y + 80;
-        out->z = depth - (*(struct ContactPosition *)gCameraOrigin).z;
-    }
+    burst->state = 1;
+    burst->age = 0;
+    burst->timer = 0;
+    burst->enter = 1;
+    burst->origin = *position;
+    burst->completionScript = completionScript;
+    burst->position = *position;
+    burst->position.y =
+        SceneActorTerrain_GetHeight(SceneActorTerrain_GetCellIndex(position), position);
+    FragmentBurst_ProjectToScreen(&screen, position);
     for (i = 0; i < 4; i++) {
-        struct FragmentEffectSprite *sprite = &group->sprites[i];
+        struct DisplaySequenceSprite *sprite = &burst->sprites[i];
+
         Sprite_Init(sprite, pool->graphics, 0);
         sprite->flags |= 0x11;
         sprite->priority = 1;
     }
     for (i = 0; i < 3; i++) {
-        struct FragmentEffectSprite *sprite = &group->sprites[i];
-        struct FragmentSequence *sequence = &group->sequences[i];
+        struct DisplaySequenceSprite *sprite = &burst->sprites[i];
+        struct DisplaySequenceState *sequence = &burst->sequences[i];
+
         Anim_SetSequence(sequence, pool->sequenceResource, 15, 0, 0);
         gRandomIndex = (gRandomIndex + 1) & 1023;
-        randomTable = gRandomTable;
+        table = gRandomTable;
         {
-            u32 value = randomTable[gRandomIndex];
+            u32 value = table[gRandomIndex];
             value &= 3;
             sequence->index = value;
         }
-        AnimData_SelectPaletteBank(sprite->graphics, 0x13F);
+        AnimData_SelectPaletteBank((void *)sprite->resource, 0x13F);
         sprite->position = screen;
         sprite->position.y += i << 5;
     }
-    sub_081281D0(group, amount, kind, parameter, flags);
+    sub_081281D0(burst, amount, kind, parameter, flags);
 }
