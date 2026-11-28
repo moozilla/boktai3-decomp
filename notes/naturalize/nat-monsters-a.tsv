@@ -247,3 +247,4 @@ src/monsters/golem/golem_main_2.c	Golem_UpdateChargeSettle	minor	natural	2
 src/monsters/golem/golem_main_2.c	Golem_ChargeOrApproach	contrived	minor	5	remaining: bytep
 src/monsters/golem/golem_main_2.c	Golem_UpdateSettle	contrived	minor	5	remaining: maskhelper
 src/monsters/golem/golem_main_2.c	Golem_ChargeOrReturnHome	contrived	contrived	16	remaining: goto,block,maskhelper
+src/monsters/axe/actor_phase.c	ActorPhase_UpdateAcceleratingTrail	minor	minor	3	remaining: block

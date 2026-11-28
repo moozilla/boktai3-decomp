@@ -39,10 +39,7 @@ void ActorPhase_UpdateAcceleratingTrail(struct ChaseActor *actor, s32 frame)
         axe->flagsCAB = 0;
         axe->trailHeading = 0;
         axe->trailPosition = axe->auxiliarySprite.position;
-        {
-            u32 angle = axe->trailStartAngle;
-            axe->trailAngle = angle;
-        }
+        axe->trailAngle = axe->trailStartAngle;
         axe->trailSpinRate = 4;
         ActorShadow_Disable(axe->auxiliaryShadow);
         axe->auxiliarySprite.flags = 1;
@@ -54,12 +51,12 @@ void ActorPhase_UpdateAcceleratingTrail(struct ChaseActor *actor, s32 frame)
         if (angle < next)
             Sound_PlaySong(0x169);
     }
-    if ((1 & frame) && axe->trailSpinRate <= 19)
+    if (1 & frame && axe->trailSpinRate <= 19)
         axe->trailSpinRate++;
     ActorPhase_EmitTrailSprite(actor, &axe->trailPosition, axe->trailAngle);
     Axe_UpdateTrailColliders(actor);
     Axe_UpdateAttackColliderPositions(actor);
-    if ((axe->auxiliarySprite.flags & 1) && frame > 30) {
+    if (axe->auxiliarySprite.flags & 1 && frame > 30) {
         Axe_ReleaseAuxiliarySprite(actor);
         SceneActorTerrain_InstallControl(actor, SceneActorControl_ResetRotation, 0x34);
     }
