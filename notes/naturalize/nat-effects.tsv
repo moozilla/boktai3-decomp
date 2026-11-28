@@ -8,3 +8,4 @@ src/effects/bat_flock.c	BatFlockBats_StartLaunch	contrived	minor	3	same twin poi
 src/effects/bat_flock.c	BatFlockBats_StartConvergence	contrived	minor	40	twin piece/p pointers, palette local, union table view: the ROM loads the random table base before the index
 src/effects/bat_flock.c	BatFlockBats_StartActorChase	contrived	contrived	30	index/mask pointer locals and RandomTableView union stay: every plain random spelling changes the table/index load order
 src/effects/bat_flock.c	BatFlockBats_DispatchCommands	minor	natural	6	
+src/effects/bat_flock.c	BatFlockBat_Wander	contrived	contrived	35	four nested do/while(0) around the table load: constant-address pseudos get half priority, so table needs the loop-depth weight

@@ -431,12 +431,17 @@ void BatFlockBat_Launch(struct GroupObjects *m, struct GroupPiece *p, int delay)
     p->timer++;
 }
 
+static inline int BatFlock_AngleTo(const struct ContactPosition *from,
+                                   const struct ContactPosition *to)
+{
+    return Math_Atan2(to->x - from->x, to->z - from->z);
+}
+
 void BatFlockBat_Wander(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
     struct ContactPosition delta;
-    struct ContactPosition *moved;
-    struct ContactPosition *origin;
     const u16 *table;
+
     if (p->active) {
         p->active = 0;
         p->heading = p->direction =
@@ -453,25 +458,24 @@ void BatFlockBat_Wander(struct GroupObjects *m, struct GroupPiece *p, int index)
                 } while (0);
             } while (0);
         } while (0);
-        if (randomByte(table) <= 0x7F)
-            p->heading = p->heading + (0x40 - (randomWith(table) & 0x3F));
+        if (randomByte(table) <= 127)
+            p->heading += 64 - (randomWith(table) & 63);
         else
-            p->heading = p->heading + (0x40 + (randomWith(table) & 0x3F));
+            p->heading += 64 + (randomWith(table) & 63);
         p->speed = (randomValue() & 3) + 4;
     }
     if (p->speed != 0) {
         polar(&delta, p->heading, p->duration);
-        moved = addPositionN(&p->position, &delta);
-        origin = &m->origin;
-        p->direction = Math_Atan2(origin->x - p->position.x, origin->z - moved->z);
+        addPosition(&p->position, &delta);
+        p->direction = BatFlock_AngleTo(&p->position, &m->origin);
         p->speed--;
     }
     BatFlockBat_SetFacingAnim(m, p, 0);
-    if (p->timer > 0x5F) {
+    if (p->timer >= 96)
         BatFlockBat_SetState(p, 1);
-    }
     p->timer++;
 }
+
 void BatFlockBat_ApproachTarget(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
     struct ContactPosition delta;
