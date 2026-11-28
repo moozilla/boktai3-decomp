@@ -1384,16 +1384,13 @@ void SceneActorState_PlayVariantAnimation13ThenRecover(struct SceneGraphicsActor
     if (p->actionFinished) {
         if (((struct StateActor *)actor)->actionState == 3) {
             SceneActorState_SetAnimation((struct StateActor *)actor, 13);
-            goto tick;
         } else {
             SceneActorState_StartRecovery(actor, 150);
+            return;
         }
-    } else {
-    tick:
-        p->actionTimer++;
     }
-}
-void ContactActorPool_Start();
+    p->actionTimer++;
+}void ContactActorPool_Start();
 
 void SceneActorState_StartContactPool(struct SceneGraphicsActor *actor)
 {
