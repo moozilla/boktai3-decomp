@@ -254,3 +254,4 @@ src/bosses/sabata/Sabata_ResetAndRunPhaseCallback.c	Sabata_ResetAndRunPhaseCallb
 src/bosses/sabata/ActorAnimation_UpdateDirectional.c	ActorAnimation_UpdateDirectional	natural	natural	0	
 src/bosses/sabata/attacks.c	ActorEffect_UpdateTimedSequence	natural	natural	0	
 src/bosses/sabata/attacks.c	ActorEffect_InitializeOffset	machine-shaped	partial	3	kept origin setter with its zero local and x/z temporaries
+src/bosses/sabata/attacks.c	Sabata_UpdateKnockbackLanding	machine-shaped	partial	4	kept volume alias, terrain-height inline and velocity zero local
