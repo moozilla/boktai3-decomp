@@ -1,10 +1,8 @@
 #include "global.h"
+#include "objects/deck_cannons/deck_cannon_battery.h"
 
-u32 Sprite_Remove(u8 *);
-
-void DeckCannon_DestroyCannon(u8 *p)
+void DeckCannon_DestroyCannon(struct CallbackSlot *cannon)
 {
-    if (*(p + 0x28)) {
-        Sprite_Remove(p + 0x24);
-    }
+    if (cannon->spriteRegistered)
+        Sprite_Remove(&cannon->flags);
 }

@@ -10,7 +10,8 @@ struct CallbackSlot {
     void (*destroy)(struct CallbackSlot *);
     u8 animation[0x1C]; /* confidence=low */
     u32 flags; /* confidence=low */
-    u8 pad28[0x18];
+    u8 spriteRegistered; /* confidence=low */
+    u8 pad29[0x17];
     struct ContactPosition position; /* confidence=low */
     u8 pad48[0x8];
     struct ContactCollider collider;
