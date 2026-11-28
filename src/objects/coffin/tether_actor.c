@@ -2242,9 +2242,9 @@ void TetherActor_UpdateFollowingState(struct TetherActor *actor)
 u32 TetherActor_TestStepPosition(struct ContactPosition *origin, struct ContactPosition *candidate,
                                  u32 mask)
 {
-    u8 *properties = cellProperties(cellIndex_0804B6A4(candidate->x >> 8, candidate->z >> 8));
-    u32 attributes = *(u16 *)(properties + 2);
+    u32 attributes;
     s32 difference;
+    attributes = ((u16 *)SceneActorTerrain_GetCell(SceneActorTerrain_GetCellIndex(candidate)))[1];
     if (mask & attributes)
         return 0;
     if ((attributes & 128) && GameState_TestWorldFlags(16))
