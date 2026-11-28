@@ -2,7 +2,14 @@
 #include "engine/video/display_sequence_inline.h"
 #include "engine/math/monster_particle_random.h"
 
-static inline void BatFlockBat_SelectPalette(void *resource)
+static inline void BatFlockBat_SetState(struct GroupPiece *piece, u32 state)
+{
+    piece->state = state;
+    piece->active = 1;
+    piece->timer = 0;
+}
+
+static inline void BatFlockBat_SelectPalette(struct SpriteRenderResource *resource)
 {
     AnimData_SelectPaletteBank(resource, 0x2D3);
 }
@@ -10,8 +17,8 @@ int BatFlockBat_Initialize(struct GroupObjects *owner, struct GroupPiece *p, int
 {
     struct SpriteRenderResource *resource;
     struct DisplaySequenceSprite *sprite;
-    struct ContactPosition *position;
     u16 initialTimer[] = {0};
+
     p->state = 0;
     p->active = 1;
     p->timer = initialTimer[0];
@@ -23,9 +30,8 @@ int BatFlockBat_Initialize(struct GroupObjects *owner, struct GroupPiece *p, int
     sprite = &p->sprite;
     Sprite_Init(sprite, resource, 1);
     sprite->priority = 2;
-    position = &p->sprite.position;
-    ZeroFill8(position);
-    Shadow_Initialize(p->transform, position, 0);
+    ZeroFill8(&sprite->position);
+    Shadow_Initialize(p->transform, &sprite->position, 0);
     ActorShadow_Disable(p->transform);
 }
 
@@ -443,13 +449,6 @@ static inline struct ContactPosition *addPositionN(struct ContactPosition *d,
     dst->y += src->y;
     dst->z += src->z;
     return dst;
-}
-
-static inline void BatFlockBat_SetState(struct GroupPiece *piece, u32 state)
-{
-    piece->state = state;
-    piece->active = 1;
-    piece->timer = 0;
 }
 
 void BatFlockBat_Launch(struct GroupObjects *m, struct GroupPiece *p, int delay)
