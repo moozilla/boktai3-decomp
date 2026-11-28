@@ -42,3 +42,4 @@ src/link/lobby/SceneTask_UpdateTextDelay.c	SceneTask_UpdateTextDelay	contrived	n
 src/link/lobby/RecordMenu_UpdateSelection.c	RecordMenu_UpdateSelection	contrived	natural	2	
 src/link/lobby/RecordMenu_UpdateRecords.c	RecordMenu_UpdateRecords	contrived	natural	1	
 src/link/lobby/LinkLobbyPanel_OnTaskUpdate.c	LinkLobbyPanel_OnTaskUpdate	contrived	natural	2	
+src/link/lobby/LinkLobbyPanel_OnTaskDestroy.c	LinkLobbyPanel_OnTaskDestroy	contrived	natural	1	gActiveRecordMenu is a u32 in shared ram.h

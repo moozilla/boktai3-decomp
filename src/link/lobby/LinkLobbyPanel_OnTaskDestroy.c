@@ -1,22 +1,19 @@
 #include "global.h"
 #include "engine/ram.h"
-void LinkLobbyPanel_RemoveSprites(void *);
-void LinkLobbyPanel_ClearTextWindows(void *);
+#include "link/lobby/record_menu.h"
+
+void LinkLobbyPanel_RemoveSprites(struct RecordMenu *);
+void LinkLobbyPanel_ClearTextWindows(struct RecordMenu *);
 void CharacterModel_RemoveAnimations(void *);
-s32 LinkLobbyPanel_OnTaskDestroy(u8 *s)
+
+s32 LinkLobbyPanel_OnTaskDestroy(struct RecordMenu *menu)
 {
     s32 i;
-    u8 *p;
-    u32 z;
-    LinkLobbyPanel_RemoveSprites(s);
-    LinkLobbyPanel_ClearTextWindows(s);
-    p = s + 0xa30;
-    i = 1;
-    do {
-        CharacterModel_RemoveAnimations(p);
-        p += 0x850;
-    } while (--i >= 0);
-    z = 0;
-    gActiveRecordMenu = z;
+
+    LinkLobbyPanel_RemoveSprites(menu);
+    LinkLobbyPanel_ClearTextWindows(menu);
+    for (i = 0; i < 2; i++)
+        CharacterModel_RemoveAnimations(&menu->previews[i].model);
+    gActiveRecordMenu = 0;
     return 1;
 }
