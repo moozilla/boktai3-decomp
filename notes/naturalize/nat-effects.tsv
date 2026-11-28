@@ -248,3 +248,4 @@ src/effects/healing/HealthBurstEffect_UpdateFadeOut.c	HealthBurstEffect_UpdateFa
 src/effects/healing/HealthBurstEffect_StartBurst.c	HealthBurstEffect_StartBurst	minor	minor	40	ringX temporary before x (copy after the shift), flags local for the cell test (and operand order)
 src/effects/healing/HealthBurstEffect_UpdateBurstSprites.c	HealthBurstEffect_UpdateBurstSprites	minor	natural	6	
 src/effects/healing/HealthBurstEffect_UpdateBursts.c	HealthBurstEffect_UpdateBursts	contrived	natural	4	
+src/effects/healing/sub_082356E4.c	sub_082356E4	minor	natural	4	
