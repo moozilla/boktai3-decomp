@@ -1,31 +1,31 @@
 #include "global.h"
-struct T {
-    u32 lo : 16;
-    u32 hi : 16;
-    u32 lo2 : 16;
-    u32 hi2 : 16;
+#include "ui/results/stage_results.h"
+
+struct PortraitPosition {
+    u32 x : 16;
+    u32 y : 16;
+    u32 z : 16;
+    u32 unused : 16;
 };
+
 void SceneActorStyle_InitializeFromGameState(void *);
 void ActorSprite_InitPartDrawings(void *, void *, u32);
 void CharacterPreview_PositionParts(void *, void *, void *, s32);
 void CharacterModel_SetAnimationFlags(void *, s32);
 void CharacterModel_SetComponentRenderMode(void *, s32);
 void CharacterModel_InitPalettes(void *, u32);
-void StageResults_InitPortraitDisplay(u8 *s)
+
+void StageResults_InitPortraitDisplay(struct StageResults *results)
 {
-    struct T t;
-    u8 *a;
-    u8 *b;
-    SceneActorStyle_InitializeFromGameState(s + 0x9B0);
-    s[0x11B2] = 0;
-    t.lo = 0x30;
-    t.hi = 0x50;
-    t.lo2 = 0;
-    a = s + 0x968;
-    b = s + 0xF60;
-    ActorSprite_InitPartDrawings(a, b, 0x3D99);
-    CharacterPreview_PositionParts(a, b, &t, 0);
-    CharacterModel_SetAnimationFlags(b, 0);
-    CharacterModel_SetComponentRenderMode(b, 0);
-    CharacterModel_InitPalettes(b, s[0x9B3]);
+    struct PortraitPosition position;
+    SceneActorStyle_InitializeFromGameState(results->portraitStyle);
+    results->unk11B2 = 0;
+    position.x = 0x30;
+    position.y = 0x50;
+    position.z = 0;
+    ActorSprite_InitPartDrawings(results->portrait, results->model, 0x3D99);
+    CharacterPreview_PositionParts(results->portrait, results->model, &position, 0);
+    CharacterModel_SetAnimationFlags(results->model, 0);
+    CharacterModel_SetComponentRenderMode(results->model, 0);
+    CharacterModel_InitPalettes(results->model, results->portraitStyle[3]);
 }
