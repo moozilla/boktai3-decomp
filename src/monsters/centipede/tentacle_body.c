@@ -147,39 +147,37 @@ void ActorTrail_RestoreSavedState(struct ChaseActor *actor)
     }
     if (!CentipedeBody_IsAnimationReady(actor))
         return;
-    {
-        ActorTrail_ResetAtSavedPosition(actor);
-        actor->base.behaviorFlags = actor->base.saved.behaviorFlags;
-        actor->base.statusFlags = actor->base.saved.statusFlags;
-        actor->base.body.direction = actor->base.saved.direction;
-        actor->base.state2A8 = actor->base.saved.state;
-        actor->base.phase2A9 = actor->base.saved.phase;
-        actor->base.behavior2AA = actor->base.saved.behavior;
-        actor->base.target = actor->base.saved.control;
-        actor->base.controlKind = actor->base.saved.kind;
-        actor->base.placementFlags = actor->base.saved.motionFlags;
-        actor->base.heightOffset = actor->base.saved.heightOffset;
-        health = actor->base.defaultHealth;
-        if (health <= 0)
-            health = 0;
-        actor->base.health = health;
-        actor->base.reactionFlags = 0;
-        actor->base.motionFlags = 0;
-        actor->base.stepDone = 0;
-        actor->base.field2B1 = 1;
-        actor->base.field2B2 = 1;
-        actor->base.restart = 0;
-        actor->base.counter304 = 0;
-        actor->base.reactionDirection = 0;
-        actor->base.field2C2 = 64;
-        actor->base.hitAttributes = 0;
-        actor->base.hitReactionFlags = 0;
-        actor->base.hitOwners = 0;
-        actor->base.field2E6 = 0;
-        actor->base.field3CC = 0;
-        actor->base.tracking.target = 0;
-        SceneActorPalette_ClearCompletedTransitions();
-    }
+    ActorTrail_ResetAtSavedPosition(actor);
+    actor->base.behaviorFlags = actor->base.saved.behaviorFlags;
+    actor->base.statusFlags = actor->base.saved.statusFlags;
+    actor->base.body.direction = actor->base.saved.direction;
+    actor->base.state2A8 = actor->base.saved.state;
+    actor->base.phase2A9 = actor->base.saved.phase;
+    actor->base.behavior2AA = actor->base.saved.behavior;
+    actor->base.target = actor->base.saved.control;
+    actor->base.controlKind = actor->base.saved.kind;
+    actor->base.placementFlags = actor->base.saved.motionFlags;
+    actor->base.heightOffset = actor->base.saved.heightOffset;
+    health = actor->base.defaultHealth;
+    if (health <= 0)
+        health = 0;
+    actor->base.health = health;
+    actor->base.reactionFlags = 0;
+    actor->base.motionFlags = 0;
+    actor->base.stepDone = 0;
+    actor->base.field2B1 = 1;
+    actor->base.field2B2 = 1;
+    actor->base.restart = 0;
+    actor->base.counter304 = 0;
+    actor->base.reactionDirection = 0;
+    actor->base.field2C2 = 64;
+    actor->base.hitAttributes = 0;
+    actor->base.hitReactionFlags = 0;
+    actor->base.hitOwners = 0;
+    actor->base.field2E6 = 0;
+    actor->base.field3CC = 0;
+    actor->base.tracking.target = 0;
+    SceneActorPalette_ClearCompletedTransitions();
 }
 
 /* CentipedeBody_UpdateAnimationEleven: Starts directional animation 11 on state entry and completes when the ready flag is set */
