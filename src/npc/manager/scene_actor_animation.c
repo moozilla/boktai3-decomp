@@ -1443,88 +1443,57 @@ void SceneCharacter_UpdateProximityWaitState(struct SceneActorManager *manager,
 
 void SceneCharacter_UpdatePathWaitState(struct SceneActorManager *manager, struct SceneActor *actor)
 {
-    int close;
-    void *path = &actor->route;
-    int nextState;
-    int zero;
+    struct SceneActorRouteCursor *route = &actor->route;
     if (actor->commandEntered) {
         actor->commandEntered = 0;
         actor->finished = 0;
         actor->action = 2;
     }
     if (!(actor->ticks & 15)) {
-        s8 *firstMode = (s8 *)&actor->hasDestination;
-        int flag = *firstMode;
-        s8 *mode = firstMode;
+        s8 *firstRead = (s8 *)&actor->hasDestination;
+        int flag = *firstRead;
+        s8 *hasDestination = firstRead;
         if (flag) {
-            struct ContactPosition *q = TetherActor_GetPosition();
+            struct ContactPosition *tether = TetherActor_GetPosition();
             int nearby = 0;
-            if (q) {
+            if (tether) {
                 struct ContactPosition *pos = &actor->body.position;
-                int dx = pos->x - q->x;
-                int dz = pos->z - q->z;
-                int distance = dx * dx + dz * dz;
-                if (distance <= 159999)
+                int dx = pos->x - tether->x;
+                int dz = pos->z - tether->z;
+                if (dx * dx + dz * dz < 160000)
                     nearby = 1;
             }
-            {
-                if (nearby)
-                    actor->cooldown = 1800;
-                else {
-                    if (!*mode || !manager->weather)
-                        goto checkPhase;
-                    actor->cooldown = 300;
-                }
-                nextState = 12;
-                zero = 0;
-                actor->state = nextState;
-                actor->ticks = zero;
-                actor->commandEntered = 1;
-                goto done;
+            if (nearby)
+                actor->cooldown = 1800;
+            else if (*hasDestination && manager->weather)
+                actor->cooldown = 300;
+            else
+                goto checkSchedule;
+            SceneCharacter_EnterState(actor, 12);
+            return;
+        }
+    checkSchedule:
+        if (actor->hasParameters && manager->minuteChanged) {
+            if ((manager->hour == actor->paramC && manager->minute >= actor->paramD) ||
+                (manager->hour - 1 == actor->paramC && manager->minute <= actor->paramD)) {
+                SceneCharacter_EnterState(actor, 13);
+                return;
             }
         }
-    checkPhase:
-        if (actor->hasParameters && manager->minuteChanged) {
-            u8 *phase = &manager->hour;
-            u8 *last = &actor->paramC;
-            if (*phase == *last && manager->minute >= actor->paramD)
-                goto state13;
-            if (*phase - 1 != *last)
-                goto afterPhase;
-            if (manager->minute > actor->paramD)
-                goto afterPhase;
-        state13:
-            nextState = 13;
-            zero = 0;
-            goto changeState;
-        }
     }
-afterPhase:
-    close = SceneActor_HasNearbyTarget(manager, actor);
-    if (close) {
+    if (SceneActor_HasNearbyTarget(manager, actor)) {
         SceneCharacter_InterruptForTarget(actor);
-        goto done;
+        return;
     }
     if (actor->routeId >= 0) {
-        u16 *timer = &actor->nodeId;
-        s32 ticks = *timer;
-        u16 remaining = ticks;
-        if (!remaining) {
-            Route_AdvancePoint(path);
-            actor->state = SceneCharacter_GetPathNodeState(actor);
-            actor->ticks = remaining;
-            actor->commandEntered = 1;
+        if (!actor->nodeId) {
+            Route_AdvancePoint(route);
+            SceneCharacter_EnterState(actor, SceneCharacter_GetPathNodeState(actor));
         } else {
-            *timer = ticks - 1;
+            actor->nodeId--;
         }
     }
     actor->ticks++;
-    goto done;
-changeState:
-    actor->state = nextState;
-    actor->ticks = zero;
-    actor->commandEntered = 1;
-done:;
 }
 
 void SceneCharacter_UpdatePathTurnState(struct SceneActorManager *manager, struct SceneActor *actor)
