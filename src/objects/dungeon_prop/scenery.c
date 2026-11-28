@@ -249,7 +249,6 @@ void Shadow_Initialize(void *, void *, u32);
 s32 DungeonScenery_Initialize(struct SceneScriptObject *object, u32 caller)
 {
     struct ContactSwarmSprite *sprite = &object->sprite;
-    struct DisplaySequenceState *sequence;
     object->caller = caller;
     if (Script_SeekToKeyword('r'))
         object->reveal = Script_GetValue();
@@ -274,15 +273,9 @@ s32 DungeonScenery_Initialize(struct SceneScriptObject *object, u32 caller)
         object->parameter = Script_GetValue();
     else
         object->parameter = -1;
-    {
-        s32 ok;
-        if (object->state == 14)
-            ok = AnimData_Load(&object->resource, 0x6BEA);
-        else
-            ok = AnimData_Load(&object->resource, 0xB07C);
-        if (!ok)
-            return -1;
-    }
+    if (!(object->state == 14 ? AnimData_Load(&object->resource, 0x6BEA)
+                              : AnimData_Load(&object->resource, 0xB07C)))
+        return -1;
     Sprite_Init(sprite, &object->resource, 0);
     object->proc = ScriptProc_Start(0x922E, 0xB5F1);
     sprite->priority = 2;
@@ -291,9 +284,9 @@ s32 DungeonScenery_Initialize(struct SceneScriptObject *object, u32 caller)
         if (object->reveal)
             sprite->flags |= 4;
     } else {
-        sequence = &object->resource.frames;
-        Anim_SetSequence(sequence, object->proc, (u16)object->state, 0, (u8)object->reveal);
-        PlayerCue_StepSequence((void *)sprite, sequence);
+        Anim_SetSequence(&object->resource.frames, object->proc, (u16)object->state, 0,
+                         (u8)object->reveal);
+        PlayerCue_StepSequence(sprite, &object->resource.frames);
     }
     object->resource.paletteIndex = PaletteIndex(object->state, object->parameter);
     object->resource.paletteData = object->resource.palette;
