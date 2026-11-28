@@ -130,3 +130,4 @@ src/ui/books/forging_book/ForgingBook_RefreshSelectedEntryText.c	ForgingBook_Ref
 src/ui/books/forging_book/ForgingBook_RefreshSelection.c	ForgingBook_RefreshSelection	minor	natural	1	
 src/ui/books/forging_book/ForgingBook_RemoveDisplayObjects.c	ForgingBook_RemoveDisplayObjects	contrived	natural	1	
 src/ui/books/forging_book/ForgingBook_InitializeFromScript.c	ForgingBook_InitializeFromScript	contrived	natural	1	
+src/ui/books/forging_book/ForgingBook_Create.c	ForgingBook_Create	natural	natural	1	

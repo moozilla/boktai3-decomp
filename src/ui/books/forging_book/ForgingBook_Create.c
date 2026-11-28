@@ -1,21 +1,20 @@
 #include "global.h"
-#include "engine/ram.h"
-void *Task_Create(u32, u32);
-void Task_SetCallbacks(void *, void (*)(void), void (*)(void));
-void Task_Kill(void *);
-s32 ForgingBook_InitializeFromScript(void *, u32);
-void sub_0821290C(void);
-void ForgingBook_OnTaskDestroy(void);
-void *ForgingBook_Create(u32 a)
+#include "ui/books/forging_book.h"
+s32 ForgingBook_InitializeFromScript(struct ForgingBook *, u32);
+s32 sub_0821290C(struct ForgingBook *);
+void ForgingBook_OnTaskDestroy(struct ForgingBook *);
+
+void *ForgingBook_Create(u32 arg)
 {
-    void *p = Task_Create(8, 0xbf0);
-    if (p) {
-        Task_SetCallbacks(p, sub_0821290C, ForgingBook_OnTaskDestroy);
-        if (ForgingBook_InitializeFromScript(p, a) < 0) {
-            Task_Kill(p);
+    struct ForgingBook *book = Task_Create(8, sizeof(struct ForgingBook));
+
+    if (book) {
+        Task_SetCallbacks(book, sub_0821290C, ForgingBook_OnTaskDestroy);
+        if (ForgingBook_InitializeFromScript(book, arg) < 0) {
+            Task_Kill(book);
             return 0;
         }
     }
-    gForgingBook = p;
-    return p;
+    gForgingBook = (u32)book;
+    return book;
 }
