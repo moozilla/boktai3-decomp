@@ -311,3 +311,4 @@ src/ui/dialogue/text_interpreter/TextState_MeasureStringLine.c	TextState_Measure
 src/ui/dialogue/text_interpreter/TextState_Reset.c	TextState_Reset	natural	natural	0	
 src/ui/dialogue/text_interpreter/TextState_Init.c	TextState_Init	natural	natural	0	
 src/ui/dialogue/text_interpreter/TextWindow_ClearSingleton.c	TextWindow_ClearSingleton	natural	natural	0	
+src/ui/dialogue/scrolling_dialogue/scrolling_dialogue.c	ScrollingDialogue_ResetPlayback	minor	natural	1	int function with no return value

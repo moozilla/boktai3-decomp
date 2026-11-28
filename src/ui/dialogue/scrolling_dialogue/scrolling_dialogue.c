@@ -1,5 +1,6 @@
 #include "ui/dialogue/scrolling_dialogue.h"
 #include "engine/input.h"
+#include "gba/io_reg.h"
 
 void ScrollingDialogue_ClearTextArea(struct ScrollingDialogue *dialogue)
 {
@@ -12,11 +13,10 @@ void ScrollingDialogue_ClearTextArea(struct ScrollingDialogue *dialogue)
 int ScrollingDialogue_ResetPlayback(struct ScrollingDialogue *dialogue, int clear)
 {
     struct MessagePlaybackState *text = &dialogue->text;
-    s32 *row;
+
     if (clear)
         ScrollingDialogue_ClearTextArea(dialogue);
-    row = &dialogue->row;
-    *row = 0;
+    dialogue->row = 0;
     dialogue->column = 0;
     dialogue->ticks = 0;
     dialogue->scrolling = 0;
