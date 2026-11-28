@@ -146,3 +146,7 @@ src/ui/status_screen/status_screen_fade.c	NumericOverlay_ClearActive	natural	nat
 src/ui/status_screen/numeric_overlay.c	NumericOverlay_GetTileMapPtr	minor	natural	2	-
 src/ui/status_screen/numeric_overlay.c	sub_0800F4EC	contrived	natural	2	-
 src/ui/status_screen/numeric_overlay.c	sub_0800F6F8	contrived	minor	5	if/do-while column loop stays: a for loop caches the map width differently (33 insns)
+src/ui/status_screen/numeric_overlay.c	NumericOverlay_RefreshDisplay	natural	natural	0	-
+src/ui/status_screen/numeric_overlay.c	NumericOverlay_Update	natural	natural	0	-
+src/ui/status_screen/numeric_overlay.c	NumericOverlay_Destroy	natural	natural	0	-
+src/ui/status_screen/numeric_overlay.c	NumericOverlay_Create	natural	natural	0	-
