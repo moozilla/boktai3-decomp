@@ -1,20 +1,17 @@
 #include "scene/actor/scene_actor_effects.h"
 #include "scene/motion/scene_actor_route.h"
 #include "scene/terrain/terrain_sampling.h"
-u32 Nav_IsPositionInMesh(void *, const struct ContactPosition *,
-                         struct ContactPosition *);
-u32 Terrain_ApplyBlocked(void *, const struct ContactPosition *,
-                         struct ContactPosition *);
+u32 Nav_IsPositionInMesh(void *, const struct ContactPosition *, struct ContactPosition *);
+u32 Terrain_ApplyBlocked(void *, const struct ContactPosition *, struct ContactPosition *);
 void SceneActorMovement_ResolveRoutePosition(struct ChaseActor *actor)
 {
     struct ContactPosition target;
     struct ChaseActor *owner = actor;
-    struct ChaseActor *base = owner;
-    struct SceneActorChaseGroup *group = &owner->group;
+    struct SceneActorChaseGroup *group = &actor->group;
     void *context;
     {
         struct ContactPosition *p = &target;
-        struct SceneActorRegistryRoute *route = &owner->group.homeRoute;
+        struct SceneActorRegistryRoute *route = &actor->group.homeRoute;
         s32 cell;
         {
             struct SceneActorChaseRoutePoint *point = route->point;
@@ -24,12 +21,12 @@ void SceneActorMovement_ResolveRoutePosition(struct ChaseActor *actor)
         cell = Terrain_GetCellIndex(p);
         p->y = SceneActorTerrain_GetHeight(cell, p);
     }
-    target.y = base->base.body.position.y;
+    target.y = actor->base.body.position.y;
     context = group->route;
-    if (!Nav_IsPositionInMesh(context, &base->base.body.position, &target))
+    if (!Nav_IsPositionInMesh(context, &actor->base.body.position, &target))
         goto failed;
     {
-        u32 result = Terrain_ApplyBlocked(context, &base->base.body.position, &target);
+        u32 result = Terrain_ApplyBlocked(context, &actor->base.body.position, &target);
         if (!result)
             goto failed;
         if (result != 2)
