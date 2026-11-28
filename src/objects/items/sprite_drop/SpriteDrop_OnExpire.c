@@ -1,7 +1,11 @@
 #include "global.h"
-void SpriteDrop_OnDeactivate(void);
-void SpriteDrop_OnExpire(u8 *p)
+#include "engine/engine.h"
+#include "engine/ram.h"
+#include "objects/items/sprite_drop.h"
+
+void SpriteDrop_OnExpire(void *owner, struct SpatialEntry *other)
 {
-    *(void (**)(void))(p + 0xb4) = SpriteDrop_OnDeactivate;
-    p[0xb1] = 1;
+    struct SpriteDrop *item = owner;
+    item->update = SpriteDrop_OnDeactivate;
+    item->entered = 1;
 }

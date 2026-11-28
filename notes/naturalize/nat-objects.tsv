@@ -449,3 +449,4 @@ src/objects/items/sprite_drop/CallbackPool_InvokeActiveSmall.c	CallbackPool_Invo
 src/objects/items/sprite_drop/CallbackPool_RemoveSmallSprites.c	CallbackPool_RemoveSmallSprites	minor	natural	1	
 src/objects/items/sprite_drop/ActorParticles_InitCompactPool.c	ActorParticles_InitCompactPool	minor	natural	1	
 src/objects/items/sprite_drop/SpriteDrop_CreateManager.c	SpriteDrop_CreateManager	minor	natural	1	
+src/objects/items/sprite_drop/SpriteDrop_OnExpire.c	SpriteDrop_OnExpire	contrived	natural	1	
