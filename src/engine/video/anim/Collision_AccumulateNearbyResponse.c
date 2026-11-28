@@ -1,23 +1,16 @@
 #include "global.h"
-struct CollisionEntry {
-    u8 unknown0[6];
-    u16 flags;
-    u8 unknown8[0x36];
-    u16 response;
-    u16 unknown40;
-    u8 layer;
-    u8 responseFlags;
-};
-void Collision_AccumulateNearbyResponse(struct CollisionEntry *a, struct CollisionEntry *b,
-                                        s32 amount)
+#include "scene/collision/contact_collider.h"
+
+void Collision_AccumulateNearbyResponse(struct ContactCollider *source,
+                                        struct ContactCollider *target, s32 amount)
 {
-    if ((b->flags & 0x100) && (a->flags & 0x100)) {
-        s32 delta = b->layer - a->layer;
+    if ((target->flags & 0x100) && (source->flags & 0x100)) {
+        s32 delta = target->direction - source->direction;
         if (delta < 0)
             delta = -delta;
         if (delta <= 32) {
-            b->response += (amount << 4) >> 6;
-            b->responseFlags |= 8;
+            target->cost += (amount << 4) >> 6;
+            target->costFlags |= 8;
         }
     }
 }
