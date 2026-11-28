@@ -1908,9 +1908,6 @@ static inline void rotate_v2(struct ActorAnimController *p)
 
 void TutorialOtenko_UpdateRotatingAnimation6(struct ActorAnimController *p)
 {
-    struct DisplaySequenceSprite *o;
-    struct DisplaySequenceState *a;
-    u8 done;
     if (take(p)) {
         p->state = 6;
         Anim_SetSequence(&p->anim, p->arg, 6, 0, p->last);
@@ -1920,10 +1917,7 @@ void TutorialOtenko_UpdateRotatingAnimation6(struct ActorAnimController *p)
     if (p->fn)
         p->fn(p);
     rotate_v2(p);
-    o = &p->obj;
-    a = &p->anim;
-    done = DisplaySequence_StepSprite(o, a);
-    p->done = done;
+    p->done = DisplaySequence_StepSprite(&p->obj, &p->anim);
 }
 
 /* Tentative role: initialize and advance a rotating animated effect.
