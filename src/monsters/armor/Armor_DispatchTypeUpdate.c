@@ -1,12 +1,10 @@
 #include "global.h"
+#include "monsters/armor/scene_combat_actor.h"
 
-extern const u8 gUnk_0824F0CC[];
-void Callback_InvokeActor(u8 *, u32);
+extern void *const gUnk_0824F0CC[];
 
-void Armor_DispatchTypeUpdate(u8 *p)
+void Armor_DispatchTypeUpdate(struct SceneCombatActor *actor)
 {
-    if ((*(u16 *)(p + 0xB32) & 0x80) == 0) {
-        const u32 *tbl = (const u32 *)gUnk_0824F0CC;
-        Callback_InvokeActor(p, tbl[*(p + 0xB38)]);
-    }
+    if (!(actor->flags & 0x80))
+        Callback_InvokeActor(actor, gUnk_0824F0CC[actor->kind]);
 }

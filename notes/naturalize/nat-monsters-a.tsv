@@ -417,3 +417,4 @@ src/monsters/golem/golem_main_2.c	Golem_OnSharedActorUpdate	natural	natural	0
 src/monsters/golem/golem_main_2.c	Golem_Create	natural	natural	0	
 src/monsters/golem/golem_2.c	Golem_UpdateHitReaction	minor	minor	1	void *object alias of actor for the route calls: passing actor itself changes register allocation across the function
 src/monsters/golem/golem_main_2.c	Golem_OnUpdate	minor	minor	1	mask local: literal 0x2000 is loaded after the flags
+src/monsters/armor/Armor_DispatchTypeUpdate.c	Armor_DispatchTypeUpdate	contrived	natural	5	
