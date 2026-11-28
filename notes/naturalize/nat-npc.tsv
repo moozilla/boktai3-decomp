@@ -358,3 +358,4 @@ src/npc/otenko/Otenko_UpdateBlinkPhase.c	Otenko_UpdateBlinkPhase	minor	minor	0	u
 src/npc/otenko/Otenko_UpdateBlinkWithCallback.c	Otenko_UpdateBlinkWithCallback	minor	minor	0	u32 mask parked before the display flag OR
 src/npc/otenko/Otenko_PlayAnimation12.c	Otenko_PlayAnimation12	contrived	minor	1	u32 mask parked before the display flag OR
 src/npc/otenko/Otenko_UpdateRisingToTerrain.c	Otenko_UpdateRisingToTerrain	contrived	minor	1	u32 mask parked before the display flag OR
+src/npc/otenko/Otenko_UpdateDescendingDash.c	Otenko_UpdateDescendingDash	minor	minor	1	u32 mask parked before the display flag OR

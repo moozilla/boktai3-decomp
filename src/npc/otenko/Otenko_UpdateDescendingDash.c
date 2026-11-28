@@ -1,17 +1,14 @@
 #include "npc/otenko/otenko_actor.h"
 #include "scene/motion/scene_actor_terrain.h"
+#include "engine/math/math_shift.h"
 // confidence=low: animation 9-12 dash with decreasing speed and height above terrain.
 s32 DisplayAnimation_TestFinished(struct DisplayAnimation *);
-static inline s32 trunc12(s32 x)
-{
-    return x >= 0 ? x >> 12 : -((-x) >> 12);
-}
 static inline void polar(struct ContactPosition *v, u32 angle, s32 speed)
 {
-    s32 x = trunc12(gUnk_086149C4[(angle + 64) & 255] * speed);
+    s32 x = Math_ShiftTowardZero(gUnk_086149C4[(angle + 64) & 255] * speed, 12);
     v->x = x;
     v->y = 0;
-    v->z = trunc12(gUnk_086149C4[angle] * speed);
+    v->z = Math_ShiftTowardZero(gUnk_086149C4[angle] * speed, 12);
 }
 void Otenko_UpdateDescendingDash(void *ctx, struct OtenkoActor *npc, s32 tick)
 {
