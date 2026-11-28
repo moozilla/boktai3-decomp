@@ -134,7 +134,7 @@ void Ratatosk_UpdateRadialSummonAttack(struct Ratatosk *p, s32 tick)
                 variant &= 1;
                 spawnPtr = deltaPtr + 1;
                 Ratatosk_CopyPositionWords(&positions[1], Player_GetEffectivePosition(0));
-                polar(deltaPtr, (u8)angle, 512);
+                polar(deltaPtr, angle, 512);
                 sum(spawnPtr, spawnPtr, deltaPtr);
                 HomingProjectile_InitParams(&projectile);
                 HomingProjectile_SetMotionParams(&projectile, 60, 0, angle + 128, variant);
@@ -177,8 +177,6 @@ void Ratatosk_UpdateRadialSummonAttack(struct Ratatosk *p, s32 tick)
                             angle += 96;
                         break;
                 }
-
-                angle = (u8)angle;
             }
 
         } else {
