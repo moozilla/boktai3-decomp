@@ -1,4 +1,4 @@
-#define gRatatoskPlayerOffsets gUnk_0824FDD0
+#define gUnk_0824FDD0 gUnk_0824FDD0
 // Checker ELF predates promotion of these two names.
 #include "global.h"
 #include "engine/math/scene_vec.h"
@@ -21,12 +21,11 @@ static inline void AddPosition(struct SceneVec *out, const struct SceneVec *a,
 void Ratatosk_GetPlayerOffsetFarthestFromSelf(void *unused, struct SceneVec *out)
 {
     s32 selected = -1;
-    struct RatatoskPlayerOffsets offsets = gRatatoskPlayerOffsets;
+    struct RatatoskPlayerOffsets offsets = gUnk_0824FDD0;
     struct SceneVec candidate;
     struct SceneVec result;
     s32 maximum = 0;
     s32 i;
-    struct SceneVec *player;
     struct SceneVec *self;
     for (i = 0; i < 4; i++) {
         s32 dx, dz, distance;
