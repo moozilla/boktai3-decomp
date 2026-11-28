@@ -1,20 +1,18 @@
-#include "global.h"
-#include "npc/story_character/state_actor.h"
+#include "npc/otenko/otenko_actor.h"
 
-s32 Actor_PlayAnimationEntry(void *, s32, s32, s32, s32);
-void Otenko_PlayAnimation12(void *unused, struct StateActor *p)
+void Otenko_PlayAnimation12(void *context, struct OtenkoActor *npc)
 {
-    struct StateActorTag *tag = &p->tag;
-    if (p->enter) {
-        p->enter = 0;
-        p->done = 0;
-        Actor_PlayAnimationEntry(p, 12, 0, 0, 4);
-        tag->state.halves.fieldA = 0;
+    struct OtenkoEffectState *effect = &npc->effect;
+    if (npc->animationEntered) {
+        npc->animationEntered = 0;
+        npc->done = 0;
+        Actor_PlayAnimationEntry(npc, 12, 0, 0, 4);
+        effect->bobOffset = 0;
     }
     {
         u32 mask = 0x409;
-        p->displayFlags |= mask;
+        npc->displayFlags |= mask;
     }
-    if ((u8)p->animationCallback(p) != 1)
-        p->done = 1;
+    if ((u8)npc->animationCallback(npc) != 1)
+        npc->done = 1;
 }

@@ -354,3 +354,6 @@ src/npc/otenko/Otenko_UpdateBlinkOut.c	Otenko_UpdateBlinkOut	contrived	minor	3	e
 src/npc/otenko/sub_081CEE50.c	sub_081CEE50	contrived	contrived	7	parked one/zero/two/three/mask locals and the callback local: each changes allocation when written as a constant
 src/npc/otenko/Otenko_UpdateStopped.c	Otenko_UpdateStopped	contrived	minor	2	two/m mask locals and the callback local
 src/npc/otenko/Otenko_FollowSceneTarget.c	Otenko_FollowSceneTarget	contrived	minor	6	snapDistance/snapPosition locals and block-local offset/target pointers; u32 mask parked before the display flag ORs
+src/npc/otenko/Otenko_UpdateBlinkPhase.c	Otenko_UpdateBlinkPhase	minor	minor	0	u32 mask parked before the display flag OR
+src/npc/otenko/Otenko_UpdateBlinkWithCallback.c	Otenko_UpdateBlinkWithCallback	minor	minor	0	u32 mask parked before the display flag OR
+src/npc/otenko/Otenko_PlayAnimation12.c	Otenko_PlayAnimation12	contrived	minor	1	u32 mask parked before the display flag OR
