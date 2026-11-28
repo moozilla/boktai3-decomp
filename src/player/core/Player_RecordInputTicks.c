@@ -11,13 +11,7 @@ void Player_RecordInputTicks(struct Player *p)
             if (gGameState->modeOneInputTicks < 0x7fffffff)
                 gGameState->modeOneInputTicks++;
         }
-        {
-            s32 *counter;
-            s32 index = p->statModifierContext.statBOverrideEnabled;
-            u8 *base = (u8 *)gGameState;
-            counter = (s32 *)((index << 2) + (u32)base + 0x640);
-            if (*counter < 0x7fffffff)
-                ++*counter;
-        }
+        if (*(gGameState->counters640 + p->statModifierContext.statBOverrideEnabled) < 0x7fffffff)
+            ++*(gGameState->counters640 + p->statModifierContext.statBOverrideEnabled);
     }
 }

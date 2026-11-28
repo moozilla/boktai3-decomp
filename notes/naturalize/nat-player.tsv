@@ -273,3 +273,5 @@ src/player/core/PlayerContact_ApplySyntheticContact.c	PlayerContact_ApplySynthet
 src/player/core/Player_EnterKindFour.c	Player_EnterKindFour	minor	natural	1	
 src/player/core/PlayerContact_ApplyTerrainDamage.c	PlayerContact_ApplyTerrainDamage	contrived	minor	5	flag helper takes a field offset: plain tests and a pointer parameter change the branch layout
 src/player/core/Player_UpdateResetBlink.c	Player_UpdateResetBlink	contrived	minor	11	player alias q before the countdown fixes register allocation
+src/player/core/Player_SaveStateSnapshot.c	Player_SaveStateSnapshot	contrived	contrived	2	unchanged: struct member stores let agbcc keep gGameState cached; the ROM reloads it between every store (byte-pointer view)
+src/player/core/Player_RecordInputTicks.c	Player_RecordInputTicks	contrived	natural	5	
