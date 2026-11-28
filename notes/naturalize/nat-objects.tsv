@@ -407,3 +407,4 @@ src/objects/items/item_container.c	TriggerManager_InitManager	minor	natural	1
 src/objects/items/item_container.c	Trigger_CreateDropFromScript	minor	natural	2	
 src/objects/items/item_container.c	Trigger_CreateContainerFromScript	minor	natural	2	
 src/objects/items/item_container.c	Trigger_MoveDropsByItemFromScript	contrived	natural	2	
+src/objects/items/item_container.c	Trigger_RunScript	contrived	natural	6	

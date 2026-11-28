@@ -112,15 +112,12 @@ static inline u8 sameRegion(struct Trigger *p)
     return 0;
 }
 
-s32 Trigger_RunScript(struct Trigger *p, u32 scriptInput, s32 event)
+s32 Trigger_RunScript(struct Trigger *p, u16 script, s32 event)
 {
-    u16 script = scriptInput;
     s32 values[10];
     struct TriggerScriptArgs args;
-    s32 actor, i;
-    u32 busy;
-    if (!script || p->actor == -1 ||
-        (busy = PlayerSlot_ReadStatus(p->actor, 12), actor = p->actor, busy))
+    s32 i;
+    if (!script || p->actor == -1 || PlayerSlot_ReadStatus(p->actor, 12))
         return -1;
     if (p->type == 1) {
         values[0] = p->position->x;
@@ -135,7 +132,7 @@ s32 Trigger_RunScript(struct Trigger *p, u32 scriptInput, s32 event)
     values[4] = p->kind;
     for (i = 0; i < 3; i++)
         values[5 + i] = p->arguments[i];
-    values[8] = actor;
+    values[8] = p->actor;
     values[9] = event;
     args.count = 10;
     args.values = values;
