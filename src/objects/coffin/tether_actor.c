@@ -2368,29 +2368,27 @@ void TetherActor_UpdateWanderingState(struct TetherActor *actor)
     actor->glowMode = 1;
     if (actor->roamFrame == 90) {
         if (actor->turnAfterBlock) {
-            gRandomIndex = (gRandomIndex + 1) & 1023;
             actor->heading =
-                (actor->heading + Mod(((u16 *)RANDOM_TABLE_ADDR)[gRandomIndex], 5) + 2) & 7;
+                (actor->heading +
+                 Mod(ParticleRandom_ReadDirectSample((const u16 *)RANDOM_TABLE_ADDR), 5) + 2) &
+                7;
             actor->turnAfterBlock = 0;
         } else {
-            gRandomIndex = (gRandomIndex + 1) & 1023;
             actor->heading =
-                (actor->heading + Mod(((u16 *)RANDOM_TABLE_ADDR)[gRandomIndex], 3) + 7) & 7;
+                (actor->heading +
+                 Mod(ParticleRandom_ReadDirectSample((const u16 *)RANDOM_TABLE_ADDR), 3) + 7) &
+                7;
         }
     } else if (actor->roamFrame > 90) {
         u32 angle;
         struct ContactPackedVector delta;
-        struct ContactPosition *position;
-        {
-            u32 value = (actor->heading + 5) & 7;
-            angle = value << 5;
-        }
+        angle = ((actor->heading + 5) & 7) << 5;
         delta.x = scale(gUnk_086149C4[(angle + 64) & 255] * 3);
         delta.y = 0;
         delta.z = scale(gUnk_086149C4[angle] * 3);
-        position = &actor->position;
-        if (TetherActor_TestStepDelta((struct ContactPackedVector *)position, &delta, 0x843)) {
-            position->x += delta.x;
+        if (TetherActor_TestStepDelta((struct ContactPackedVector *)&actor->position, &delta,
+                                      0x843)) {
+            actor->position.x += delta.x;
             actor->position.z += delta.z;
             actor->moving = 1;
         } else {
@@ -2403,12 +2401,9 @@ void TetherActor_UpdateWanderingState(struct TetherActor *actor)
     } else {
         TetherActor_SetEntry(actor, 0);
     }
-    {
-        u16 *frame = &actor->roamFrame;
-        if (++*frame > 119) {
-            TetherActor_SelectInteractionState(actor);
-            *frame = 0;
-        }
+    if (++actor->roamFrame > 119) {
+        TetherActor_SelectInteractionState(actor);
+        actor->roamFrame = 0;
     }
 }
 

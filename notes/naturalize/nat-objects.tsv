@@ -135,3 +135,5 @@ src/objects/coffin/tether_actor.c	TetherActor_UpdateFollowingState	minor	natural
 src/objects/coffin/tether_actor.c	TetherActor_UpdateSecondaryLock	natural	natural	0	
 src/objects/coffin/tether_actor.c	TetherActor_TestStepDelta	contrived	natural	2	
 src/objects/coffin/tether_actor.c	TetherActor_TestStepPosition	minor	minor	9	local surfaceHeight helper stays for the second lookup: writing the terrain helpers there swaps candidate/mask registers (global alloc priority)
+src/objects/coffin/tether_actor.c	TetherActor_TestNearDelta	natural	natural	0	
+src/objects/coffin/tether_actor.c	TetherActor_UpdateWanderingState	minor	natural	3	
