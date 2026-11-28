@@ -1,6 +1,4 @@
 #include "global.h"
-#define SessionMenu_SetState          LinkSession_SetState
-#define SessionMenu_ResetWithCallback LinkSession_BeginShutdown
 #include "scene/areas/area_effect_link.h"
 s32 LinkSession_CheckSessionReady(void *);
 void LinkSession_BeginShutdown(void *, void (*)(void));
