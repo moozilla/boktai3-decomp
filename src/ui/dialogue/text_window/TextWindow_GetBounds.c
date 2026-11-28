@@ -1,18 +1,23 @@
 #include "global.h"
+#include "engine/ram.h"
+#include "ui/dialogue/text_window.h"
+#include "ui/dialogue/text_window_manager.h"
 /* TextWindow_GetBounds: Returns the embedded text bounds as left top width and height */
 
-u8 *TextWindow_Find(u32);
+struct TextWindow *TextWindow_Find(int);
 
-s32 TextWindow_GetBounds(u32 id, u32 *out)
+int TextWindow_GetBounds(int id, int *bounds)
 {
-    u8 *w = TextWindow_Find(id);
-    u8 *q;
-    if (w == NULL)
+    struct TextWindow *window = TextWindow_Find(id);
+
+    struct TextState *text;
+
+    if (!window)
         return -1;
-    q = w + 0x60;
-    out[0] = q[2];
-    out[1] = q[3];
-    out[2] = q[4];
-    out[3] = q[5];
+    text = &window->text;
+    bounds[0] = text->left;
+    bounds[1] = text->top;
+    bounds[2] = text->width;
+    bounds[3] = text->height;
     return 0;
 }
