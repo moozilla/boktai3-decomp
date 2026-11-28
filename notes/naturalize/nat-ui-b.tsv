@@ -587,3 +587,4 @@ src/ui/town/storage/Storage_BeginSelectedItemTransition.c	Storage_BeginSelectedI
 src/ui/town/storage/Storage_BeginCategoryBrowse.c	Storage_BeginCategoryBrowse	minor	natural	2	
 src/ui/town/storage/Storage_UpdateItemTransition.c	Storage_UpdateItemTransition	contrived	natural	1	
 src/ui/town/storage/Storage_UpdateBrowseIntro.c	Storage_UpdateBrowseIntro	minor	natural	1	
+src/ui/town/storage/MenuPanel_IsEntryAvailable.c	MenuPanel_IsEntryAvailable	minor	natural	1	
