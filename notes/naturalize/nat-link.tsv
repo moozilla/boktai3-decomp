@@ -349,3 +349,4 @@ src/link/score_panel/LinkScorePanel_RemoveSprites.c	LinkScorePanel_RemoveSprites
 src/link/score_panel/LinkScorePanel_SetNumber.c	LinkScorePanel_SetNumber	minor	natural	3	local prototype keeps AnimSprite_SelectGlyph taking u16
 src/link/score_panel/LinkMenu_DrawRandomizedFourDigitNumber.c	LinkMenu_DrawRandomizedFourDigitNumber	minor	minor	1	random draw blocks stay
 src/link/score_panel/LinkScorePanel_UpdateRollingNumber.c	LinkScorePanel_UpdateRollingNumber	minor	natural	2	
+src/link/score_panel/LinkScorePanel_UpdateNumberReveal.c	LinkScorePanel_UpdateNumberReveal	contrived	natural	2	
