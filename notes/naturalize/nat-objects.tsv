@@ -483,3 +483,4 @@ src/objects/loot_deposits/sub_081047B4.c	sub_081047B4	minor	natural	1
 src/objects/loot_deposits/LootDeposit_UpdateMemberProximity.c	LootDeposit_UpdateMemberProximity	contrived	minor	4	local clear, scale and flag helpers kept
 src/objects/loot_deposits/LootDeposit_UpdateMemberSway.c	LootDeposit_UpdateMemberSway	contrived	minor	1	local scale helpers kept
 src/objects/loot_deposits/LootDeposit_UpdateMemberRemoval.c	LootDeposit_UpdateMemberRemoval	contrived	natural	3	
+src/objects/loot_deposits/LootDepositPool_InitManager.c	LootDepositPool_InitManager	contrived	natural	2	

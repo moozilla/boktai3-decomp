@@ -1,11 +1,11 @@
 #include "global.h"
+#include "engine/engine.h"
 #include "engine/ram.h"
+#include "objects/loot_deposits/callback_pool.h"
 
-u32 ScriptProc_Start(u32, u32);
-
-u32 LootDepositPool_InitManager(u8 *p)
+s32 LootDepositPool_InitManager(struct CallbackPool *pool)
 {
-    *(u32 *)(p + 0x18) = ScriptProc_Start(0x922E, 0x74C9);
-    gActorGroupPool = p;
-    return *(u32 *)(p + 0x62C) = 0;
+    pool->sequenceResource = ScriptProc_Start(0x922E, 0x74C9);
+    gActorGroupPool = pool;
+    return pool->activeMask = 0;
 }
