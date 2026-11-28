@@ -998,9 +998,8 @@ void TutorialOtenko_OnInteractionChildUpdate(struct ActorAnimController *input,
 /* Tentative role: Wait through a child-triggered delay, then enter mode 2 / phase 4. */
 
 void TutorialOtenko_OnInteractionChildDelay(struct ActorAnimController *input,
-                                            struct ActorChildSlot *child)
+                                            struct ActorChildSlot *c)
 {
-    struct ActorChildSlot *c = child;
     struct ActorAnimController *p = input;
     if (child_take(c)) {
         p->timer = 10;
@@ -1008,10 +1007,7 @@ void TutorialOtenko_OnInteractionChildDelay(struct ActorAnimController *input,
             p->growFlag = 1;
         else
             p->growFlag = 0;
-        {
-            u8 *variant = &c->variant;
-            p->variant8 = *variant;
-        }
+        p->variant8 = c->variant;
     }
     if (--p->timer == -1) {
         TutorialOtenko_SetState(p, 2, 4);
