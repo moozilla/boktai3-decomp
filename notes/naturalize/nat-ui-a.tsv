@@ -4,3 +4,4 @@ src/ui/books/monster_book/PlayerParticleCloud_ShutdownModule.c	PlayerParticleClo
 src/ui/books/monster_book/SceneDisplay_Idle.c	SceneDisplay_Idle	natural	natural	0	
 src/ui/books/monster_book/sub_081D3750.c	sub_081D3750	contrived	contrived	75	stays: if (p) with identical arms (keeps &p->angle in a register through cse), double store to *angle and magnitude local (allocation order actor over angle)
 src/ui/books/monster_book/Particle_UpdateHoming.c	Particle_UpdateHoming	contrived	natural	2	
+src/ui/books/monster_book/PaletteTransition_UpdateBlink.c	PaletteTransition_UpdateBlink	contrived	natural	2	

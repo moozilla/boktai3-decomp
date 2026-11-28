@@ -24,19 +24,16 @@ int DisplayAnimation_TestFinished(void *);
 s32 Mod(s32, s32);
 void PaletteTransition_UpdateBlink(struct PaletteTransition *p)
 {
-    s32 t = p->timer;
-    if (t == 0) {
-        u16 *index = &p->index;
-        s32 one = 1;
-        *index = one;
+    if (p->timer == 0) {
+        p->index = 1;
         Dir_Decompose(p->target->direction, &p->dirX, &p->dirY, p->scale);
-        DisplayAnimation_SetEntry(p->anim, *index, p->dirX, p->dirY, one, t, 5);
+        DisplayAnimation_SetEntry(p->anim, p->index, p->dirX, p->dirY, 1, 0, 5);
         DisplayAnimation_UpdatePlayback(p->anim);
         if (DisplayAnimation_TestFinished(p->anim)) {
             gRandomIndex = (gRandomIndex + 1) & 1023;
-            p->timer = Mod(*(u16 *)(RANDOM_TABLE_ADDR + (gRandomIndex << 1)), 0x20) + 0x3c;
+            p->timer = Mod(((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex], 0x20) + 0x3c;
         }
     } else {
-        p->timer = t - 1;
+        p->timer--;
     }
 }
