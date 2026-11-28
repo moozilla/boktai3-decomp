@@ -92,19 +92,14 @@ void SceneAnimation_UpdateSlotAnimation3(struct Nidhoggr *p, s32 i)
 
 void SceneAnimation_UpdateSlotAnimation12(struct Nidhoggr *p, s32 i)
 {
-    u8 *s;
-    u8 *t = p->rowInitFlag;
-    u8 z;
-    s = t + i;
-    z = *s;
-    if (z == 0) {
+    if (p->rowInitFlag[i] == 0) {
         p->rows[i].flags &= ~1;
         Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0xc, 2, 4);
-        (*s)++;
-        p->rowDoneFlag[i] = z;
+        p->rowInitFlag[i]++;
+        p->rowDoneFlag[i] = 0;
     }
     if (Anim_Step(&p->rows[i], &p->animHdr) != 0) {
-        *s = 0xff;
+        p->rowInitFlag[i] = 0xff;
         p->rowDoneFlag[i] = 1;
     }
 }
