@@ -1,33 +1,14 @@
 #include "global.h"
-#include "system/game_state/game_state.h"
-struct G {
-    u8 pad[0x720];
-    u32 a720;
-    u32 a724;
-    u32 a728;
-    u32 a72c;
-    u32 a730;
-};
-s32 Script_SeekToKeyword(s32);
-u32 Script_GetValue(void);
+#include "ui/books/forging_book.h"
+
 void ForgingBook_RecordItemDiscoveryFromScript(void)
 {
-    u32 n;
-    u32 *p;
-    if (Script_SeekToKeyword(0x69)) {
-        n = Script_GetValue();
-        if (n <= 0x1f) {
-            u32 m;
-            p = (u32 *)gGameState;
-            p += 0x720 / 4;
-            m = 1 << n;
-            *p |= m;
-        } else {
-            u32 m;
-            p = (u32 *)gGameState;
-            p += 0x724 / 4;
-            m = 1 << (n - 0x20);
-            *p |= m;
-        }
+    if (Script_SeekToKeyword('i')) {
+        u32 index = Script_GetValue();
+
+        if (index <= 31)
+            gGameState->flags720 |= 1 << index;
+        else
+            gGameState->flags724 |= 1 << (index - 32);
     }
 }
