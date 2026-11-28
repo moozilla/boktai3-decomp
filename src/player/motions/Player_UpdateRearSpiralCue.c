@@ -1,5 +1,6 @@
 #include "scene/collision/contact_swarm.h"
 #include "player/player.h"
+#include "player/cues/player_cue.h"
 #include "player/cutscene/player_cue_sequence.h"
 u32 Player_ConsumeStateEntry(struct Player *);
 void Player_EmitQueuedEffects(struct Player *);
@@ -31,8 +32,7 @@ void Player_UpdateRearSpiralCue(struct Player *p)
         Player_PlayPositionEffect(p, &p->position, 1, 1, &pos, 0, 0x3A1);
     }
     Anim_SetSequence(&p->cueCollider.sequence, p->cueCollider.sideResource, 0, p->heading, p->side);
-    PlayerCue_StepSequence((struct ContactSwarmSprite *)&p->secondaryDrawFlags,
-                           &p->cueCollider.sequence);
+    PlayerCue_StepSequence(&PlayerCue_Graphics(p)->sprite, &p->cueCollider.sequence);
     if (++p->tetherFrame > 15)
         ActorSequence_Begin(p, 0, 0);
 }
