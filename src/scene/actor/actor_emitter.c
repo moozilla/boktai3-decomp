@@ -137,27 +137,25 @@ s32 ActorEmitter_TryEmitLow(struct ActorEmitter *emitter)
     struct EmitterVector velocity;
     s32 height;
     if (!Modifier_IsFirstSourceReady(emitter))
-        goto fail;
+        return 0;
     owner = emitter->owner;
     actor = &owner->actor;
     cost = CallbackList_RunMatchingState(actor, emitter->id, 9);
     if (owner->actor.energy < cost)
-        goto fail;
+        return 0;
     velocity.x = owner->velocity;
     velocity.y = 0;
     velocity.z = 0;
     height = actor->height - 0x12000;
     if (ProjectileEffect_CreateFromProfile(&owner->actor.position, height, &velocity,
                                            owner->actor.profile.data, owner->kind + 1, 0, 1,
-                                           0) >= 0)
-        goto success;
-fail:
+                                           0) >= 0) {
+        CallbackList_SubtractClampedValue(actor, emitter, cost);
+        owner->actor.profile.low.emissionTimer = 0;
+        emitter->timer = emitter->duration;
+        return 1;
+    }
     return 0;
-success:
-    CallbackList_SubtractClampedValue(actor, emitter, cost);
-    owner->actor.profile.low.emissionTimer = 0;
-    emitter->timer = emitter->duration;
-    return 1;
 }
 
 u8 Modifier_IsFirstSourceReady();
