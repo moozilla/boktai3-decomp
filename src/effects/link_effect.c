@@ -210,16 +210,14 @@ u32 SunOrb_GetOrCreateManager(u32);
 
 s32 SceneBurstEmitter_Init(struct LinkEffect *effect)
 {
-    u32 r = SceneProjectile_CreatePool(effect);
-    effect->projectileManager = (void *)r;
-    if (r != 0) {
-        r = SunOrb_GetOrCreateManager(r);
-        effect->manager = (struct OrbitEffectManager *)r;
-        if (r != 0) {
-            return 0;
-        }
-    }
-    return -1;
+    effect->projectileManager = (void *)SceneProjectile_CreatePool(effect);
+    if (effect->projectileManager == 0)
+        return -1;
+    effect->manager = (struct OrbitEffectManager *)SunOrb_GetOrCreateManager(
+        (u32)effect->projectileManager);
+    if (effect->manager == 0)
+        return -1;
+    return 0;
 }
 
 struct LinkEffect *SceneEffect_CreateEntryTask(u32 resourceId,
