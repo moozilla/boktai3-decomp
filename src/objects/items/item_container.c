@@ -4,6 +4,7 @@
 #include "engine/video/display_sequence_inline.h"
 #include "player/cutscene/player_cue_sequence.h"
 #include "player/player_slot_status.h"
+#include "scene/collision/packed_contact_vector.h"
 #include "engine/math/monster_particle_random.h"
 
 void ScaledShadow_Destroy(void *);
@@ -928,17 +929,13 @@ s32 Trigger_MoveDropsByItem(struct SceneVec *position, s32 id, s32 kind)
 
 u32 Trigger_MoveDropsByItemFromScript(void)
 {
-    struct {
-        u32 a : 16;
-        u32 b : 16;
-        u32 c : 16;
-    } bf;
-    u32 x = Script_GetKeywordValue(0x6b, 0);
-    u32 y = Script_GetKeywordValue(0x69, 0);
-    if (Script_SeekToKeyword(0x70)) {
-        bf.a = Script_GetValue();
-        bf.b = Script_GetValue();
-        bf.c = Script_GetValue();
+    struct PackedContactVector position;
+    u32 kind = Script_GetKeywordValue('k', 0);
+    u32 id = Script_GetKeywordValue('i', 0);
+    if (Script_SeekToKeyword('p')) {
+        position.x = Script_GetValue();
+        position.y = Script_GetValue();
+        position.z = Script_GetValue();
     }
-    return Trigger_MoveDropsByItem((struct SceneVec *)&bf, x, y);
+    return Trigger_MoveDropsByItem((struct SceneVec *)&position, kind, id);
 }
