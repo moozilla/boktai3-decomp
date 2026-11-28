@@ -163,3 +163,4 @@ src/monsters/armor/ActorController_UpdateLayeredMidNoSound.c	ActorController_Upd
 src/monsters/armor/ActorController_UpdateLayeredMidWithRestoreDelay.c	ActorController_UpdateLayeredMidWithRestoreDelay	contrived	contrived	0	field rewrite tried: actor->flags address is kept across calls where the ROM recomputes it; parked masks
 src/monsters/armor/Armor_UpdateDefeatSequence.c	Armor_UpdateDefeatSequence	contrived	contrived	0	field rewrite tried: actor->flags address is kept across calls where the ROM recomputes it; parked masks
 src/monsters/armor/ActorController_UpdateBreakApartTransition.c	ActorController_UpdateBreakApartTransition	contrived	contrived	84	raw pointer, constant locals and layer helper remain
+src/monsters/armor/ActorController_UpdateChargeAttackTransition.c	ActorController_UpdateChargeAttackTransition	contrived	contrived	33	raw pointer, parked masks remain
