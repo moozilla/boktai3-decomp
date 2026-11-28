@@ -92,9 +92,11 @@ int SceneIndicators_Update(struct SceneIndicators *m)
 {
     int i;
     struct SceneIndicator *p = m->indicators;
-    for (i = 15; i >= 0; i--, p++)
+
+    for (i = 0; i < 16; i++, p++) {
         if (p->active)
             SceneIndicator_Update(m, p);
+    }
     {
         int x = gPlayers[0]->position.x >> 8, y = gPlayers[0]->position.z >> 8, tile;
         if (x < 0 || y < 0 || x >= gTerrainWidth || y >= gTerrainHeight)
