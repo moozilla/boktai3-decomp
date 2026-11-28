@@ -77,3 +77,4 @@ src/bosses/count/actor_graphics_and_basic_states.c	SceneActorState_StartContactP
 src/bosses/count/actor_graphics_and_basic_states.c	SceneActorState_AdvanceToState01	contrived	natural	1	
 src/bosses/count/actor_graphics_and_basic_states.c	SceneActorState_PlayVariantAnimation12ThenRecover	contrived	minor	4	actor re-cast to StateActor for the state check and animation (those uses stay on the parameter register)
 src/bosses/count/actor_graphics_and_basic_states.c	SceneActorState_PlayVariantAnimation13ThenRecover	contrived	minor	4	actor re-cast to StateActor for the state check and animation (those uses stay on the parameter register)
+src/bosses/count/actor_graphics_and_basic_states.c	SceneActorState_UpdateAction20Recovery	contrived	minor	4	actor re-cast to StateActor for the state check and animation (those uses stay on the parameter register)
