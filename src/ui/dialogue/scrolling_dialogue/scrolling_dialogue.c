@@ -302,14 +302,11 @@ s32 ScrollingDialogue_RequestShow(void)
 int ScrollingDialogue_RequestHide(void)
 {
     struct ScrollingDialogue *dialogue = (void *)gScrollingDialogue;
-    int result;
-    if (dialogue) {
-        dialogue->hideRequest = 1;
-        result = 0;
-    } else {
-        result = -1;
-    }
-    return result;
+
+    if (!dialogue)
+        return -1;
+    dialogue->hideRequest = 1;
+    return 0;
 }
 
 s32 ScrollingDialogue_HideImmediately(void)
