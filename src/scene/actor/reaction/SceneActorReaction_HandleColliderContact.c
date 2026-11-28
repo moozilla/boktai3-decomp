@@ -9,6 +9,7 @@
 #include "scene/motion/scene_actor_chase_shared.h"
 s32 Math_Atan2(s32, s32);
 s32 Div(s32, s32);
+int abs(int);
 void Collision_CalculateElementalResponse(struct ContactCollider *, struct ContactCollider *);
 void SceneActor_SetContactReactionDirection(void *, void *, void *);
 void PlayerStats_AddContactHundredths(struct ContactCollider *, struct ContactCollider *, s32);
@@ -115,8 +116,8 @@ static inline void SpawnContactParts(struct ChaseActor *actor)
         position.x = origin->x;
         position.y = origin->y + 128;
         position.z = origin->z;
-        EffectGroup_SpawnPart((void *)actor->group.effectConfig, 3, &position,
-                              &velocity, &bounds, 40, 40);
+        EffectGroup_SpawnPart((void *)actor->group.effectConfig, 3, &position, &velocity, &bounds,
+                              40, 40);
     }
     actor->base.attachmentTimer = 0;
     actor->base.hitLockTimer = 0;
@@ -175,9 +176,7 @@ void SceneActorReaction_HandleColliderContact(struct ContactCollider *source,
                 u32 mask = 0x100;
                 if ((destination->flags & mask) && (sourceFlags & mask)) {
                     s32 d = destination->direction - source->direction;
-                    if (d < 0)
-                        d = -d;
-                    if (d <= 0x20) {
+                    if (abs(d) <= 0x20) {
                         actor->base.hitLockTimer = source->unknown3C;
                         actor->base.field2E6 = 1;
                         actor->group.hitBurstInterval = Div(actor->base.hitLockTimer, 3);

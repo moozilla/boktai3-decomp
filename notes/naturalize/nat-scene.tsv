@@ -448,3 +448,5 @@ src/scene/actor/reaction/SceneActorContacts_Destroy.c	SceneActorContacts_Destroy
 src/scene/actor/reaction/SceneActorContacts_SetOwner.c	SceneActorContacts_SetOwner	minor	minor	0	returns the void reset call's leftover r0; the shared header declares both void, so struct fields need a header signature change
 src/scene/actor/reaction/SceneActorContacts_Create.c	SceneActorContacts_Create	minor	minor	0	size and callbacks use local prototypes that conflict with the header's signatures
 src/scene/actor/reaction/SceneActorContacts_EvaluateCandidate.c	SceneActorContacts_EvaluateCandidate	contrived	contrived	17	partial: base/self copy, delta/own pointers, PlayerMask, PlayerSlot, SquareDistance and the plain/gate gotos stay; replacing them moves registers or the shared threshold block
+src/scene/actor/reaction/Memory_ClearWordPair.c	Memory_ClearWordPair	natural	natural	0	-
+src/scene/actor/reaction/SceneActorReaction_HandleColliderContact.c	SceneActorReaction_HandleColliderContact	contrived	contrived	14	partial: Test, ReadReactionFlags, IsPrimary, SetContactResult and the mask blocks stay; each plain operator form changes load/mask order or register choice
