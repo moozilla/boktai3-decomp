@@ -1,40 +1,30 @@
 #include "global.h"
-#include "engine/engine.h"
-struct CannonBatteryProjectile {
-    void *update, *destroy;
-    u8 unk8[0x38];
-    s16 x, y, z, unk46;
-    u8 unk48[0x18];
-    u8 collider[0x54];
-    u16 startCoordinate;
-    u8 direction;
-};
-void DeckCannon_UpdateProjectile(struct CannonBatteryProjectile *p)
+#include "objects/deck_cannons/deck_cannon_battery.h"
+
+void DeckCannon_UpdateProjectile(struct DeckCannonShot *shot)
 {
-    s16 *position;
-    switch (p->direction) {
+    switch (shot->direction) {
         case 0:
-            p->z -= 0x18;
-            if (p->startCoordinate - p->z > 0x1000) {
-                p->update = NULL;
-                if (p->destroy) {
-                    Callback_InvokeActor(p, p->destroy);
-                    p->destroy = NULL;
+            shot->sprite.position.z -= 0x18;
+            if (shot->startCoordinate - shot->sprite.position.z > 0x1000) {
+                shot->update = NULL;
+                if (shot->destroy) {
+                    Callback_InvokeActor(shot, shot->destroy);
+                    shot->destroy = NULL;
                 }
             }
             break;
         case 0x10:
-            p->x -= 0x18;
-            if (p->startCoordinate - p->x > 0x1000) {
-                p->update = NULL;
-                if (p->destroy) {
-                    Callback_InvokeActor(p, p->destroy);
-                    p->destroy = NULL;
+            shot->sprite.position.x -= 0x18;
+            if (shot->startCoordinate - shot->sprite.position.x > 0x1000) {
+                shot->update = NULL;
+                if (shot->destroy) {
+                    Callback_InvokeActor(shot, shot->destroy);
+                    shot->destroy = NULL;
                 }
             }
             break;
     }
-    position = &p->x;
-    Collider_Refresh(p->collider);
-    Collider_SetPosition(p->collider, position, 0);
+    Collider_Refresh(&shot->collider);
+    Collider_SetPosition(&shot->collider, &shot->sprite.position, 0);
 }
