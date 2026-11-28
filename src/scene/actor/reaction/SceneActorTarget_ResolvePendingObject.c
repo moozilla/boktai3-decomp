@@ -40,11 +40,10 @@ s32 SceneActorTarget_ResolvePendingObject(struct ChaseActor *actor)
             x = object->position.x >> 8;
             z = object->position.z >> 8;
         }
-        if ((((x < 0) || (z < 0)) || (((u32)x) >= gTerrainWidth)) || (((u32)z) >= gTerrainHeight)) {
+        if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
             cell = 0;
-        } else {
+        else
             cell = gTerrainMap->rows[z] + x;
-        }
         SceneActorContact_SaveTargetCell(owner, cell);
         {
             struct ContactPosition *out = &delta;
@@ -53,14 +52,7 @@ s32 SceneActorTarget_ResolvePendingObject(struct ChaseActor *actor)
             out->x = target->x - source->x;
             out->y = target->y - source->y;
             out->z = target->z - source->z;
-            {
-                struct ContactPosition *first = &delta;
-                u32 direction;
-                u8 *field;
-                direction = Math_Atan2(first->x, out->z);
-                field = &owner->base.body.direction;
-                *field = direction;
-            }
+            owner->base.body.direction = Math_Atan2(delta.x, delta.z);
         }
         return 1;
     } else {
