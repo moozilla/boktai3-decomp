@@ -1,11 +1,7 @@
 #include "global.h"
+#include "player/player.h"
 
-struct S08238460 {
-    u8 filler[0x41A];
-    u16 v;
-};
-
-u16 Player_GetSecondaryActionFlags(struct S08238460 *p, u16 m)
+u16 Player_GetSecondaryActionFlags(struct Player *p, u16 mask)
 {
-    return p->v & m;
+    return p->resetValue41A & mask;
 }
