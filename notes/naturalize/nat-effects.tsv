@@ -28,3 +28,11 @@ src/effects/floating_item_effect.c	FloatingEffect_RiseAndSettle	contrived	minor	
 src/effects/floating_item_effect.c	FloatingItemEffect_UpdateFlight	contrived	minor	12	(s16) cast on x - 8: keeps the load ahead of the scale term
 src/effects/floating_item_effect.c	FloatingEffectManager_Destroy	contrived	natural	1	
 src/effects/floating_item_effect.c	FloatingEffectManager_Update	contrived	natural	1	
+src/effects/floating_item_effect.c	FloatingEffect_Init	natural	natural	0	
+src/effects/floating_item_effect.c	FloatingEffect_Project	natural	natural	0	
+src/effects/floating_item_effect.c	FloatingEffect_Bob	natural	natural	0	
+src/effects/floating_item_effect.c	LinkedWidgetSet_Init	natural	natural	0	
+src/effects/floating_item_effect.c	FloatingEffectManager_Create	natural	natural	0	
+src/effects/floating_item_effect.c	FloatingEffectManager_GetOrCreate	natural	natural	0	
+src/effects/floating_item_effect.c	ScanlineWave_Reset	natural	natural	0	
+src/effects/floating_item_effect.c	FloatingItemEffect_Spawn	minor	minor	2	do/while slot search and idx temp: a for loop reallocates the whole function
