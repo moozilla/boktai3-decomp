@@ -195,3 +195,4 @@ src/player/control/Player_UpdateLinkModeMovement.c	Player_UpdateLinkModeMovement
 src/player/control/Player_SelectInteractionMode.c	Player_SelectInteractionMode	minor	natural	1	
 src/player/control/Player_TestMovementPosition.c	Player_TestMovementPosition	natural	natural	0	
 src/player/control/Player_ClampInteractionVelocity.c	Player_ClampInteractionVelocity	minor	natural	1	
+src/player/control/Player_UpdateInteractionHoverDisplay.c	Player_UpdateInteractionHoverDisplay	minor	natural	5	
