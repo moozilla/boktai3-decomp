@@ -29,12 +29,8 @@ void SceneActorSequence_UpdateFadeIn(struct SceneActorSequence *p)
     p->layer3X = Fixed8_Interpolate(320, 192, 160, p->timer);
     p->layer1X = Fixed8_Interpolate(224, 32, 160, p->timer);
 
-    {
-        s32 n = p->timer + 1;
-        p->timer = n;
-        if (n > 159)
-            SceneActorSequence_BeginDownwardMotion(p);
-    }
+    if (++p->timer > 159)
+        SceneActorSequence_BeginDownwardMotion(p);
 }
 
 void SceneTarget_BeginMove(void *, void *, void *, int, int, int, int);

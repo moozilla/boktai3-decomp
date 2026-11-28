@@ -105,3 +105,6 @@ src/npc/sabata_rider/manager.c	SabataRider_EnsureManager	natural	natural	0
 src/npc/sabata_rider/SabataRider_ClearManager.c	SabataRider_ClearManager	natural	natural	0	
 src/npc/sabata_rider/script.c	SabataRider_CreateFromScript	natural	natural	0	
 src/npc/sabata_rider/script.c	SabataRider_ResetFromScript	contrived	minor	5	entry alias of actor stays: ROM keeps a second copy of the pointer for the contact removal
+src/npc/actor_sequence.c	SceneActorSequence_UpdateBackgroundScroll	natural	natural	0	
+src/npc/actor_sequence.c	SceneActorSequence_BeginFadeIn	natural	natural	0	
+src/npc/actor_sequence.c	SceneActorSequence_UpdateFadeIn	minor	natural	1	
