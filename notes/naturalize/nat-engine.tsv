@@ -265,3 +265,4 @@ src/engine/video/sprite_oam.c	SpriteOam_QueueFlaggedProjectedSprites	contrived	c
 src/engine/video/sprite_oam.c	SpriteOam_QueueOverlayProjectedSprites	contrived	contrived	12	goto/continue-with-advance, parked matrix pointer and flag copies: see the next commits
 src/engine/video/sprite_oam.c	SpriteOam_QueueProjectedSprites	contrived	contrived	8	goto next and manual advance
 src/engine/video/sprite_oam.c	SpriteOam_QueueFlaggedProjectedSprites	contrived	contrived	8	goto next and manual advance
+src/engine/video/sprite_oam.c	SpriteOam_QueueOverlayProjectedSprites	contrived	contrived	8	goto next and manual advance

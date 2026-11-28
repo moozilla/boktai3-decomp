@@ -376,7 +376,6 @@ void SpriteOam_QueueOverlayProjectedSprites(void)
         u32 attr;
         s32 depth;
         s32 ox, oy;
-        s32 tmp;
         if (sprite->flags & skip) {
             sprite = sprite->next;
             continue;
@@ -415,14 +414,12 @@ void SpriteOam_QueueOverlayProjectedSprites(void)
         y &= 255;
         attr |= y;
         if (flags & 2) {
-            u32 matrix;
             if (!(flags & 0x20000) && (UnsignedScale(sprite->scaleX) > 60 ||
                                        UnsignedScale(sprite->scaleY) > 60 || sprite->angle != 0))
                 attr |= 0x300;
             else
                 attr |= 0x100;
-            matrix = SpriteOam_AllocateAffineMatrix(sprite->angle, sprite->scaleX, sprite->scaleY, &gAffineRequestCount);
-            attr |= matrix << 25;
+            attr |= SpriteOam_AllocateAffineMatrix(sprite->angle, sprite->scaleX, sprite->scaleY, &gAffineRequestCount) << 25;
             flags = sprite->flags;
         }
         if (flags & 4)
@@ -446,8 +443,7 @@ void SpriteOam_QueueOverlayProjectedSprites(void)
         } else {
             s32 tile, n;
             u32 priority;
-            tmp = depth >= 0 ? depth >> 1 : -((-depth) >> 1);
-            depth = tmp;
+            depth = divide2(depth);
             if (depth < -128)
                 depth = -128;
             else if (depth > 127)
