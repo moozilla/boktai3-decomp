@@ -684,3 +684,4 @@ src/system/save/SavedVariables_RunFromScript.c	SavedVariables_RunFromScript	cont
 src/system/save/Save_WriteContinuation.c	Save_WriteContinuation	contrived	natural	1	
 src/system/save/Save_ReadContinuation.c	Save_ReadContinuation	contrived	natural	1	
 src/system/save/sub_0822BD58.c	sub_0822BD58	contrived	natural	1	
+src/system/save/Save_LoadSelectedSlot.c	Save_LoadSelectedSlot	minor	natural	1	

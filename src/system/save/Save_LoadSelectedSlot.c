@@ -1,16 +1,12 @@
 #include "global.h"
-#include "engine/runtime.h"
-struct S {
-    u8 p[8];
-    u8 b;
-};
+#include "link/session/session_save.h"
 u8 Save_ReadMainState(u32);
 u8 Save_ReadContinuation(u32);
 u32 Save_LoadSelectedSlot(void)
 {
-    u32 b = ((struct S *)gSessionState)->b;
-    if (Save_ReadMainState(b)) {
-        if (Save_ReadContinuation(b))
+    u32 slot = ((struct SessionSave *)gSessionState)->selectedSlot;
+    if (Save_ReadMainState(slot)) {
+        if (Save_ReadContinuation(slot))
             return 1;
     }
     return 0;
