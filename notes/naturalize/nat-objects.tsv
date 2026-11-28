@@ -398,3 +398,4 @@ src/objects/interaction_prompts.c	InteractionPrompt_DestroyManager	natural	natur
 src/objects/interaction_prompts.c	InteractionPrompt_CreateManagerTask	natural	natural	0	
 src/objects/interaction_prompts.c	InteractionPrompt_ScriptRelease	natural	natural	0	
 src/objects/items/item_container.c	TriggerManager_Update	contrived	minor	40	projection keeps the i*8+p+60 form (the array index strength-reduces into an induction register); shown/object pointer pair (one pointer moves the flag clears, 47 insns)
+src/objects/items/item_container.c	TriggerManager_InsertTrigger	minor	natural	1	

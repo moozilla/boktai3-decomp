@@ -142,13 +142,10 @@ s32 Trigger_RunScript(struct Trigger *p, u32 scriptInput, s32 event)
 
 u32 TriggerManager_InsertTrigger(struct Trigger *p)
 {
-    struct Trigger *t;
     p->previous = 0;
     p->next = gTriggerManager->head;
-    t = p->next;
-    if (t) {
-        t->previous = p;
-    }
+    if (p->next)
+        p->next->previous = p;
     gTriggerManager->head = p;
     return 0;
 }
