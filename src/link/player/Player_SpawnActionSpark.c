@@ -1,25 +1,26 @@
 #include "global.h"
-struct SparkVector {
-    s32 x : 16, y : 16, z : 16, pad : 16;
-};
+#include "player/player.h"
+
 void SparkParticle_Spawn(void *, u32, const void *, u32, u32, u32, u32, u32);
+
 // confidence=low: chooses a raised position or stored interaction position for the action spark.
-void Player_SpawnActionSpark(u8 *p)
+void Player_SpawnActionSpark(struct Player *p)
 {
-    struct SparkVector position;
-    struct SparkVector size;
-    if ((u8)(*(u8 *)(p + 0x418) - 3) <= 1) {
-        position = *(struct SparkVector *)(p + 0x168);
+    struct SceneVec position;
+    struct SceneVec size;
+
+    if (p->actionMode == 3 || p->actionMode == 4) {
+        position = p->colliderPosition;
         size.x = 32;
         size.y = 32;
         size.z = 32;
     } else {
-        position = *(struct SparkVector *)(p + 0x30);
+        position = p->position;
         position.y += 80;
         size.x = 64;
         size.y = 60;
         size.z = 64;
     }
     SparkParticle_Spawn(&position, 1, &size, 0, 0, 12, 2, 2);
-    ++*(u16 *)(p + 0x442);
+    ++p->particleEmissionCount;
 }

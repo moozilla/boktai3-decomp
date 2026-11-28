@@ -194,3 +194,4 @@ src/link/player/keyframe_actor.c	KeyframeActor_InitAuxiliarySprite	contrived	min
 src/link/player/keyframe_actor.c	KeyframeActor_InitBodyFromScript	contrived	natural	22	
 src/link/player/Player_InitConfiguredAction.c	Player_InitConfiguredAction	contrived	minor	1	second config entry is reached by byte offset
 src/link/player/Player_InitBodyCollider.c	Player_InitBodyCollider	contrived	natural	1	
+src/link/player/Player_SpawnActionSpark.c	Player_SpawnActionSpark	contrived	natural	1	
