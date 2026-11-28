@@ -312,3 +312,4 @@ src/objects/hazards/falling_object_effects/PaletteLevels_ClearController.c	Palet
 src/objects/hazards/falling_objects.c	FallingObject_ReceiveHit	minor	minor	6	object alias keeps the health reloads on a second register
 src/objects/hazards/falling_objects.c	FallingObjectManager_AddObject	contrived	natural	1	
 src/objects/hazards/falling_objects.c	FallingObject_CreateFromScript	minor	natural	1	
+src/objects/hazards/falling_objects.c	FallingObjectManager_Create	minor	natural	1	

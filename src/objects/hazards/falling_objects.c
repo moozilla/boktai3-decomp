@@ -539,7 +539,7 @@ void *FallingObjectManager_Create(void *a, u32 unused)
     struct FallingObjectManager *p;
     if (gFallingObjectManager != 0)
         return gFallingObjectManager;
-    p = Task_Create(8, 0x20);
+    p = Task_Create(8, sizeof(*p));
     if (p != 0) {
         Task_SetCallbacks(p, (void *)FallingObjectManager_Update,
                           (void *)FallingObjectManager_Destroy);
