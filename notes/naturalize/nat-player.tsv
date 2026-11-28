@@ -259,3 +259,4 @@ src/player/core/player_core.c	Player_SetActionPhase	natural	natural	0
 src/player/core/sub_08140244.c	sub_08140244	minor	natural	1	
 src/player/core/Player_RefreshActionEquipment.c	Player_RefreshActionEquipment	contrived	minor	20	inventory entry address computed from the state base: array indexing folds the member offset differently
 src/player/core/Player_InitActionMode.c	Player_InitActionMode	minor	natural	3	
+src/player/core/Player_InitBodyFromScript.c	Player_InitBodyFromScript	contrived	minor	3	id halfword written to positionTracker through casts; body pointer kept in two locals; inline terrain height lookup

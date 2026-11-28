@@ -1,8 +1,9 @@
 #include "global.h"
 #include "engine/ram.h"
+#include "player/player.h"
 #include "engine/engine.h"
 #include "scene/collision/contact_actor.h"
-void sub_0813FE30(void *);
+void sub_0813FE30(struct Player *);
 void CellObject_Init(void *, void *);
 void SceneBody_SetKeyframeDisplay(void *, void *);
 void SceneBody_SetMovementProbe(void *, void *, s32, s32);
@@ -10,12 +11,12 @@ void SceneBody_SetPositionOffset(void *, void *);
 u32 SceneActorContacts_RegisterNode(void *, void *, u32);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 void SceneBody_Init(void *, u32, struct ContactPackedVector *, u32, u32, void *);
-u32 Player_InitBodyFromScript(u8 *owner, s32 entry)
+u32 Player_InitBodyFromScript(struct Player *p, s32 entry)
 {
     struct ContactPackedVector position;
     struct ContactPackedVector offset;
-    u8 *body;
-    u8 *initialBody;
+    void *body;
+    void *initialBody;
     u16 *point;
     s32 x, z;
     u32 cell;
@@ -60,29 +61,29 @@ u32 Player_InitBodyFromScript(u8 *owner, s32 entry)
             break;
     }
     ((u16 *)&position)[1] = height;
-    initialBody = owner + 0x24;
-    SceneBody_Init(initialBody, entry, &position, 0, owner[0x18], owner);
-    sub_0813FE30(owner);
-    mode = owner[0x418];
+    initialBody = &p->positionalEffectGroup;
+    SceneBody_Init(initialBody, entry, &position, 0, (u8)p->slot, p);
+    sub_0813FE30(p);
+    mode = p->actionMode;
     body = initialBody;
     switch (mode) {
         case 0:
         case 1:
         case 2:
         case 6:
-            owner[0x419] = 0;
-            SceneBody_SetKeyframeDisplay(body, owner + 0x8c);
+            p->unk419 = 0;
+            SceneBody_SetKeyframeDisplay(body, &p->animation);
             break;
     }
-    CellObject_Init(owner + 0x284, &position);
-    SceneBody_SetMovementProbe(body, owner + 0x284, 30, 30);
+    CellObject_Init(&p->movementContactFlags, &position);
+    SceneBody_SetMovementProbe(body, &p->movementContactFlags, 30, 30);
     offset.x = 0;
     offset.y = 300;
     offset.z = 0;
     SceneBody_SetPositionOffset(body, &offset);
-    id = *(u32 *)(owner + 0x24);
-    *(u16 *)(owner + 0x294) = id;
-    result = SceneActorContacts_RegisterNode(owner + 0x2e8, body, 2);
-    gTrackedPlayerId[owner[0x2c]] = *(u32 *)(owner + 0x24);
+    id = *(u32 *)&p->positionalEffectGroup;
+    *(u16 *)p->positionTracker = id;
+    result = SceneActorContacts_RegisterNode(p->contactListNode, body, 2);
+    gTrackedPlayerId[p->movementRequestBlocked] = *(u32 *)&p->positionalEffectGroup;
     return result;
 }
