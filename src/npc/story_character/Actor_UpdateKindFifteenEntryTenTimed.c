@@ -1,12 +1,11 @@
-#include "global.h"
-void Actor_PlayAnimationEntry(void *, s32, s32, s32, s32);
-void Actor_UpdateKindFifteenEntryTenTimed(void *unused, u8 *p, s32 n)
+#include "npc/manager/scene_actor_lifecycle.h"
+void Actor_UpdateKindFifteenEntryTenTimed(void *unused, struct SceneActor *p, s32 n)
 {
-    if (p[9]) {
+    if (p->animationEntered) {
         s32 r;
-        p[9] = 0;
-        p[7] = 0;
-        switch (p[1]) {
+        p->animationEntered = 0;
+        p->finished = 0;
+        switch (p->variant) {
             case 4:
                 r = 0;
                 break;
@@ -92,5 +91,5 @@ void Actor_UpdateKindFifteenEntryTenTimed(void *unused, u8 *p, s32 n)
         Actor_PlayAnimationEntry(p, r, 2, 0, 4);
     }
     if (n > 15)
-        p[7] = 1;
+        p->finished = 1;
 }
