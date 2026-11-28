@@ -352,3 +352,4 @@ src/scene/actor/control/scene_actor_stored_motion.c	Bat_OnUpdate	minor	minor	0	v
 src/scene/actor/control/scene_actor_stored_motion.c	SceneActorControl_BindPrimaryPlayer	minor	minor	0	player-view-cast-to-reach-target
 src/scene/actor/motion_track.c	OrbitMotion_BeginDistanceWave	contrived	minor	6	target pointer to the base vector: direct member access reloads the address
 src/scene/actor/motion_track.c	OrbitMotion_BeginVerticalDistanceWave	contrived	minor	6	target pointer to the base vector: direct member access reloads the address
+src/scene/actor/motion_track.c	OrbitMotion_BeginCrossedSines	minor	natural	1	-

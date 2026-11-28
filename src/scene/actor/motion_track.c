@@ -25,8 +25,6 @@ void MotionTrack_Initialize(struct MotionTrack *track, const void *data,
 
 u16 Sqrt(u32);
 
-s32 __divsi3(s32, s32);
-
 static inline void difference(struct OrbitVector *out, struct OrbitVector *a, struct OrbitVector *b)
 {
     out->x = a->x - b->x;
@@ -131,7 +129,7 @@ void OrbitMotion_BeginCrossedSines(struct OrbitMotion *motion, struct OrbitVecto
         motion->base = *position;
         motion->radius = radius;
         motion->radius2 = radius2;
-        motion->speed = __divsi3(0x200, duration);
+        motion->speed = 0x200 / duration;
         motion->mode = ORBIT_MOTION_CROSSED_SINES;
         motion->state = 1;
         motion->timer = 0;
