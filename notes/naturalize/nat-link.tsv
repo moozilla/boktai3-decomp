@@ -259,3 +259,4 @@ src/link/player/Player_UpdateChargedTetherStrike.c	Player_UpdateChargedTetherStr
 src/link/player/Player_UpdateChargedDashAttack.c	Player_UpdateChargedDashAttack	contrived	natural	25	
 src/link/player/Player_UpdateChargedSpinAttack.c	Player_UpdateChargedSpinAttack	contrived	natural	4	
 src/link/player/Player_RunConfiguredActionHandler.c	Player_RunConfiguredActionHandler	contrived	natural	1	
+src/link/player/Player_UpdateSolarBombCharge.c	Player_UpdateSolarBombCharge	minor	natural	3	

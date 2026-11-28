@@ -11,31 +11,28 @@ void Player_UpdateSolarBombCharge(struct Player *p)
         if (p->tetherStatusFlags != 0) {
             p->actionEighteenEnabled = 0;
         } else {
-            u32 ready = LinkPlayer_HasSlotValueAtLeast(p, 3);
-            if (ready) {
+            if (LinkPlayer_HasSlotValueAtLeast(p, 3)) {
                 p->actionEighteenEnabled = 1;
                 SolarBomb_Create(p, &p->position, 0);
             } else {
-                p->actionEighteenEnabled = ready;
+                p->actionEighteenEnabled = 0;
             }
         }
         Player_SetTetherMode(p, 0x12, 0);
     }
     switch (p->tetherPhase) {
-        case 0: {
-            u8 *enabled = &p->actionEighteenEnabled;
-            if (*enabled != 0) {
+        case 0:
+            if (p->actionEighteenEnabled != 0) {
                 p->actionEighteenParameter = 0x170;
                 p->actionEighteenDuration = 0x20;
             }
             if (Player_SetAnimationIndex(p, 0x8B, 0x40) != 0) {
-                if (*enabled != 0)
+                if (p->actionEighteenEnabled != 0)
                     Player_SetTetherMode(p, 0x12, 1);
                 else
                     Player_SetTetherMode(p, 0x12, 2);
             }
             break;
-        }
         case 1:
             if (p->actionEighteenEnabled != 0) {
                 p->actionEighteenParameter = 0x170;
@@ -45,16 +42,14 @@ void Player_UpdateSolarBombCharge(struct Player *p)
             if (p->tetherFrame > 0xB)
                 Player_SetTetherMode(p, 0x12, 3);
             break;
-        case 2: {
-            u16 *frame = &p->tetherFrame;
-            if (*frame == 0)
+        case 2:
+            if (p->tetherFrame == 0)
                 Player_PlayLocalSong(p->slot, 0x192);
             Player_SetAnimationIndex(p, 0x95, 0x40);
-            (*frame)++;
-            if (*frame > 0xB)
+            p->tetherFrame++;
+            if (p->tetherFrame > 0xB)
                 Player_SetTetherMode(p, 0x12, 3);
             break;
-        }
         case 3:
             if (Player_SetAnimationIndex(p, 0x90, 0x40) != 0)
                 Player_SetTetherMode(p, 0, 1);
