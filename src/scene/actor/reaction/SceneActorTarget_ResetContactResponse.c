@@ -12,24 +12,13 @@ static inline u16 *CounterAddress(u32 inputOffset)
     u32 offset = inputOffset;
     return (void *)(base + offset);
 }
-static inline void IncrementFirst(u16 *input)
+static inline void IncrementCounter(u16 *counter)
 {
-    u16 *counter = input;
     u32 value = *counter;
-    if (*(s16 *)counter <= 9998) {
+    if (*(s16 *)counter <= 9998)
         *counter = value + 1;
-    } else
+    else
         *counter = 9999;
-}
-static inline void SetControl(struct ChaseActor *a, void *p, u32 kind, u32 zero, u8 byteZero)
-{
-    a->base.field2B2 = 1;
-    a->base.stepDone = byteZero;
-    a->base.controlKind = kind;
-    a->base.target = p;
-    a->base.field2C8 = zero;
-    SceneActorChase_AndWordFlags(&a->base.pendingControlFlags, ~1);
-    a->base.pendingControl = zero;
 }
 void SceneActorTarget_ResetContactResponse(struct RoomActor *inputActor)
 {
@@ -39,12 +28,9 @@ void SceneActorTarget_ResetContactResponse(struct RoomActor *inputActor)
     u32 slot;
     u32 zero;
     u8 byteZero;
-    {
-        struct SceneActorChaseTracking *gate = &a->base.tracking;
-        zero = SceneActorChase_TrackingFlags(gate, 8);
-        if (zero)
-            return;
-    }
+    zero = SceneActorChase_TrackingFlags(&a->base.tracking, 8);
+    if (zero)
+        return;
     {
         u32 mask = 0x1000;
         u32 bits = a->base.motionFlags;
@@ -57,7 +43,7 @@ void SceneActorTarget_ResetContactResponse(struct RoomActor *inputActor)
     }
     {
         struct SceneActorRegistryControl *control = &group->common.control;
-        SceneActorChase_AndWordFlags(&a->base.behaviorFlags, 0xFFFEBE3F);
+        SceneActorChase_AndWordFlags(&a->base.behaviorFlags, ~0x141C0);
         control->counter = zero;
         byteZero = 0;
         control->field14 = zero;
@@ -104,7 +90,7 @@ void SceneActorTarget_ResetContactResponse(struct RoomActor *inputActor)
         }
     }
     group->turn.turnsRemaining = -1;
-    actor = (void *)a;
+    actor = &a->base;
     SceneActorAttachment_ReplaceResponseSlot(actor, 0, 0, actor->category);
     if (SceneActorChase_Test(gEngineFlags, 0x4800))
         return;
@@ -113,50 +99,15 @@ void SceneActorTarget_ResetContactResponse(struct RoomActor *inputActor)
         if (actor->statusFlags & mask)
             return;
     }
-    {
-        struct SceneActorChaseTracking *gate = &actor->tracking;
-        slot = gate->target->playerIndex;
-    }
-    {
-        u16 *counter;
-        u32 value;
-        u32 result;
-        if (slot == 0) {
-            IncrementFirst(CounterAddress(0x884));
-            counter = CounterAddress(0x530);
-            value = *counter;
-            if (*(s16 *)counter > 9998)
-                goto capped;
-            result = value + 1;
-            *counter = result;
-            return;
-        } else if (slot == 1) {
-            counter = CounterAddress(0x886);
-            value = *counter;
-            if (*(s16 *)counter > 9998)
-                goto capped;
-            result = value + 1;
-            *counter = result;
-            return;
-        } else if (slot == 2) {
-            counter = CounterAddress(0x888);
-            value = *counter;
-            if (*(s16 *)counter > 9998)
-                goto capped;
-            result = value + 1;
-            *counter = result;
-            return;
-        } else if (slot == 3) {
-            counter = CounterAddress(0x88A);
-            value = *counter;
-            if (*(s16 *)counter > 9998)
-                goto capped;
-            result = value + 1;
-            *counter = result;
-            return;
-        }
-        return;
-    capped:
-        *counter = 9999;
+    slot = actor->tracking.target->playerIndex;
+    if (slot == 0) {
+        IncrementCounter(&gGameState->actorDefeatsByPlayer[0]);
+        IncrementCounter(CounterAddress(0x530));
+    } else if (slot == 1) {
+        IncrementCounter(&gGameState->actorDefeatsByPlayer[1]);
+    } else if (slot == 2) {
+        IncrementCounter(&gGameState->actorDefeatsByPlayer[2]);
+    } else if (slot == 3) {
+        IncrementCounter(&gGameState->actorDefeatsByPlayer[3]);
     }
 }

@@ -451,3 +451,4 @@ src/scene/actor/reaction/SceneActorContacts_EvaluateCandidate.c	SceneActorContac
 src/scene/actor/reaction/Memory_ClearWordPair.c	Memory_ClearWordPair	natural	natural	0	-
 src/scene/actor/reaction/SceneActorReaction_HandleColliderContact.c	SceneActorReaction_HandleColliderContact	contrived	contrived	14	partial: Test, ReadReactionFlags, IsPrimary, SetContactResult and the mask blocks stay; each plain operator form changes load/mask order or register choice
 src/scene/actor/reaction/SceneActorTarget_TryStimulusRoute.c	SceneActorTarget_TryStimulusRoute	contrived	contrived	15	partial: parked masks, actor/object pair, started flag gotos stay; plain operators load the field before the mask
+src/scene/actor/reaction/SceneActorTarget_ResetContactResponse.c	SceneActorTarget_ResetContactResponse	contrived	contrived	22	partial: defeat counters now use the named array; parked mask locals in the control setup stay (plain operators reorder loads) and counter 0x530 has no field
