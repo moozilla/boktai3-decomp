@@ -1,14 +1,10 @@
 #include "global.h"
 #include "engine/engine_globals.h"
-#include "engine/ram.h"
+#include "link/wireless/random.h"
 s32 Mod(s32, s32);
 u32 Inventory_RollIcePopStick(void)
 {
-    s32 m;
-    u32 i = (gRandomIndex + 1) & 0x3ff;
-    gRandomIndex = i;
-    m = Mod(*(u16 *)((u8 *)(i * 2) + (u32)gRandomTable), 100);
-    if (m <= 1)
+    if (Mod(RANDOM_NEXT(), 100) < 2)
         return 0x1f;
     return 0x1e;
 }
