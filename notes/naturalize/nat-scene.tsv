@@ -316,3 +316,4 @@ src/scene/actor/control/SceneActorControl_UpdateShadowReturnPhase.c	SceneActorCo
 src/scene/actor/control/SceneActorControl_SetDefaultPreset.c	SceneActorControl_SetDefaultPreset	contrived	natural	1	-
 src/scene/actor/control/SceneActorControl_RestoreMotion.c	SceneActorControl_RestoreMotion	contrived	minor	5	drawable kind branch casts to the two drawable layouts
 src/scene/actor/control/SceneActorControl_TickRandomMotion.c	SceneActorControl_TickRandomMotion	contrived	minor	18	ClearMotionVector CpuSet wrapper: ZeroFill8 uses a different stack slot pattern
+src/scene/actor/control/SceneActorControl_TickGroundBob.c	SceneActorControl_TickGroundBob	contrived	contrived	16	flag tests through a pointer and the ground-delta block: plain tests load the field before the mask and reorder the ground load

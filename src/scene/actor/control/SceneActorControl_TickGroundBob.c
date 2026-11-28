@@ -1,6 +1,7 @@
+#include "engine/math/math_shift.h"
 #include "scene/motion/scene_actor_availability.h"
 #include "scene/actor/scene_actor_control_motion.h"
-#include "bosses/vanargand/vanargand_parts.h"
+extern const s16 gUnk_086149C4[];
 static inline u8 Test(u32 value, u32 mask)
 {
     if (value & mask)
@@ -9,15 +10,11 @@ static inline u8 Test(u32 value, u32 mask)
 }
 void SceneActorControl_TickGroundBob(struct ChaseActor *actor)
 {
-    s32 delta, absolute;
+    s32 delta;
     struct SceneActorControlMotionState *state;
-    {
-        struct SceneActorControlMotionState *raw = SceneActorControl_GetMotionState(actor);
-        state = raw;
-    }
-    if (SceneActor_ActionsBlocked(actor)) {
+    state = SceneActorControl_GetMotionState(actor);
+    if (SceneActor_ActionsBlocked(actor))
         return;
-    }
     {
         u32 *stateFlags;
         u32 firstValue;
@@ -36,12 +33,11 @@ void SceneActorControl_TickGroundBob(struct ChaseActor *actor)
             {
                 u32 mask = 1;
                 if (Test(*stateFlags, mask)) {
-                    actor->base.body.position.y =
-                        actor->base.groundHeight;
+                    actor->base.body.position.y = actor->base.groundHeight;
                     return;
                 }
             }
-            actor->base.heightOffset += Vanargand_TruncateShift(gUnk_086149C4[state->phase], 9);
+            actor->base.heightOffset += Math_ShiftTowardZero(gUnk_086149C4[state->phase], 9);
             if (state->phase <= 63) {
                 state->phase++;
             }
@@ -52,30 +48,19 @@ void SceneActorControl_TickGroundBob(struct ChaseActor *actor)
         s32 raisedY = actor->base.body.position.y - 260;
         delta = currentGround - raisedY;
     }
-    absolute = delta >= 0 ? delta : -delta;
-    if (absolute > 16) {
+    if (abs(delta) > 16) {
         if (delta < 0) {
             actor->base.heightOffset -= 2;
         } else {
             actor->base.heightOffset += 2;
         }
     }
-    if (actor->base.groundHeight != state->previousGround) {
-        actor->base.heightOffset -=
-            actor->base.groundHeight - state->previousGround;
-    }
-    do {
-        {
-            u32 offset = actor->base.heightOffset;
-            {
-                u32 ground = actor->base.groundHeight;
-                actor->base.body.position.y = actor->base.heightOffset + ground;
-            }
-        }
-    } while (0);
+    if (actor->base.groundHeight != state->previousGround)
+        actor->base.heightOffset -= actor->base.groundHeight - state->previousGround;
+    actor->base.body.position.y = actor->base.groundHeight + actor->base.heightOffset;
     {
         struct SceneActorRegistrySequenceDrawable *drawable = actor->base.drawable;
-        drawable->position.y -= Vanargand_TruncateShift(gUnk_086149C4[state->phase], 5);
+        drawable->position.y -= Math_ShiftTowardZero(gUnk_086149C4[state->phase], 5);
     }
     if (state->phase > 64) {
         state->phase = 0;
