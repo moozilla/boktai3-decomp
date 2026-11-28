@@ -369,12 +369,9 @@ s32 NidhoggrDuelMinionPool_Initialize(struct ContactSequenceOwner *owner, s32 in
     owner->reactionValue = reactionValue;
     owner->sequenceResource = ScriptProc_Start(0x922E, 0xC5E2);
     actor = owner->actors;
-    remaining = 7;
-    do {
+    for (remaining = 0; remaining < 8; remaining++, actor++) {
         NidhoggrDuelMinion_Initialize(owner, actor);
-        --remaining;
-        ++actor;
-    } while (remaining >= 0);
+    }
     CpuSet(gPaletteBankData + 0x2C00, owner->palette, 0x04000008);
     return 0;
 }
