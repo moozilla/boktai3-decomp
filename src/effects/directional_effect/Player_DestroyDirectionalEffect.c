@@ -1,8 +1,7 @@
-#include "global.h"
+#include "player/player.h"
+#include "engine/engine.h"
 
-void Sprite_Remove(u8 *);
-
-void Player_DestroyDirectionalEffect(u8 *p)
+void Player_DestroyDirectionalEffect(struct Player *player)
 {
-    Sprite_Remove(p + 0x7FC);
+    Sprite_Remove(&player->directionalEffect[0].sprite);
 }
