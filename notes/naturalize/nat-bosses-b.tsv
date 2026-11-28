@@ -167,3 +167,4 @@ src/bosses/ratatosk/Ratatosk_SetAnimatedParticleUpdateCallback.c	Ratatosk_SetAni
 src/bosses/ratatosk/Ratatosk_InitAnimatedParticleParams.c	Ratatosk_InitAnimatedParticleParams	natural	natural	0	
 src/bosses/ratatosk/Ratatosk_ConfigureAnimatedParticle.c	Ratatosk_ConfigureAnimatedParticle	natural	natural	0	
 src/bosses/ratatosk/SceneDistance_UpdateActor.c	SceneDistance_UpdateActor	contrived	natural	1	
+src/bosses/ratatosk/Ratatosk_Destroy.c	Ratatosk_Destroy	contrived	natural	1	
