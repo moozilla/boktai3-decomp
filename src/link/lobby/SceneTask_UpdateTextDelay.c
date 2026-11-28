@@ -1,34 +1,29 @@
 #include "global.h"
-void Task_Kill(void *);
-s32 TextWindow_Refresh(s32, s32);
+#include "engine/engine.h"
+#include "link/lobby/record_menu.h"
+
 void LinkSession_SetCancelRequest(u32);
 s32 LinkSession_GetSessionState(void);
-void LinkLobbyPanel_HideSprites(void *);
-struct SceneTextTask {
-    u8 unknown0[0x14F0];
-    s32 window;
-    u8 unknown14F4[8];
-    u8 reset;
-    u8 unknown14FD;
-    u16 timer;
-};
-void SceneTask_UpdateTextDelay(struct SceneTextTask *s)
+void LinkLobbyPanel_HideSprites(struct RecordMenu *menu);
+
+void SceneTask_UpdateTextDelay(struct RecordMenu *menu)
 {
     u32 state;
-    if (s->reset) {
+
+    if (menu->redraw) {
         LinkSession_SetCancelRequest(1);
-        s->timer = 0;
-        s->reset = 0;
+        menu->inputDelay = 0;
+        menu->redraw = 0;
     }
-    if (s->timer <= 9) {
-        s->timer++;
-    } else if (s->timer == 10) {
-        TextWindow_Refresh(s->window, 8);
-        s->timer++;
+    if (menu->inputDelay <= 9) {
+        menu->inputDelay++;
+    } else if (menu->inputDelay == 10) {
+        TextWindow_Refresh(menu->nameWindows[0], 8);
+        menu->inputDelay++;
     }
     state = LinkSession_GetSessionState();
     if (state == 0x15 || state == 0x17) {
-        LinkLobbyPanel_HideSprites(s);
-        Task_Kill(s);
+        LinkLobbyPanel_HideSprites(menu);
+        Task_Kill(menu);
     }
 }
