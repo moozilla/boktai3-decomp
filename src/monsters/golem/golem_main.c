@@ -72,7 +72,7 @@ s32 Golem_AlignChargeTarget(void *context)
         struct Unk080C47DCObject **goalTarget;
         if (Cell((*target)->position.x >> 8, (*target)->position.z >> 8) !=
             Cell(body->position.x >> 8, body->position.z >> 8)) {
-            if (((dx < 0) ? (-dx) : (dx)) < ((dz < 0) ? (-dz) : (dz)))
+            if ((dx < 0 ? (-dx) : (dx)) < (dz < 0 ? (-dz) : (dz)))
                 link->target->position.x = (body->position.x & (~0xFF)) + 0x80;
             else {
                 struct ContactPosition *position = &body->position;
@@ -93,10 +93,7 @@ s32 Golem_AlignChargeTarget(void *context)
             struct ContactPosition *from = (struct ContactPosition *)(owner + 0x5C);
             struct ContactPosition *goal = &(*goalTarget)->position;
             s32 quadrant;
-            {
-                struct ContactPosition *first = &delta;
-                first->x = ((u16)goal->x) - ((u16)from->x);
-            }
+            delta.x = ((u16)goal->x) - ((u16)from->x);
             out->y = ((u16)goal->y) - ((u16)from->y);
             out->z = ((u16)goal->z) - ((u16)from->z);
             quadrant = Math_Atan2(delta.x, out->z);
@@ -119,7 +116,8 @@ static inline void SceneActor_SetHalfFlags(u16 mask, u16 *flags)
     *flags |= mask;
 }
 
-static inline void SceneActorChase_SetTrackingFlags(struct SceneActorChaseTracking *tracking, u8 mask)
+static inline void SceneActorChase_SetTrackingFlags(struct SceneActorChaseTracking *tracking,
+                                                    u8 mask)
 {
     tracking->flags |= mask;
 }
@@ -406,8 +404,6 @@ void Skeleton_ClearPendingFlag(struct ChaseActor *actor)
     }
 }
 
-
-
 struct Z {
     struct PackedCentipedeHalfwords a;
     struct PackedCentipedeHalfwords b;
@@ -449,7 +445,6 @@ static inline u32 Flag(struct ChaseActor *a, u32 m, u32 off)
 {
     return off == 0x2D4 ? *(u16 *)((u8 *)a + off) & m : *(u32 *)((u8 *)a + off) & m;
 }
-
 
 static inline void Golem_MarkContactPlacement(struct SceneActorChasePlacement *placement, u32 flags)
 {

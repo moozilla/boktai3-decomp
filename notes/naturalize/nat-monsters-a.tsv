@@ -231,3 +231,4 @@ src/monsters/centipede/SpritePool_ConsumeStateFlag.c	SpritePool_ConsumeStateFlag
 src/monsters/centipede/Centipede_InitSegmentUpdateState.c	Centipede_InitSegmentUpdateState	contrived	contrived	1	remaining: rawoff,bytep
 src/monsters/centipede/Centipede_AdvanceMotionPhase.c	Centipede_AdvanceMotionPhase	contrived	contrived	1	remaining: rawoff,bytep
 src/monsters/centipede/Centipede_ResolveBlockedMovement.c	Centipede_ResolveBlockedMovement	contrived	contrived	9	remaining: rawoff,u8cast,block,constlocal,mask
+src/monsters/golem/golem_main.c	Golem_AlignChargeTarget	contrived	contrived	10	remaining: bytep,block,structcast
