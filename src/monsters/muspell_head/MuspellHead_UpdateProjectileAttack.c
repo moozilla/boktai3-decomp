@@ -1,8 +1,8 @@
 #include "monsters/muspell_head.h"
 #include "engine/engine.h"
-#include "ui/hud/scene_indicator.h"
+#include "engine/math/monster_particle_random.h"
 
-struct Vec *Player_GetEffectivePosition(u32);
+struct ContactPosition *Player_GetEffectivePosition(u32);
 s32 Mod(s32, s32);
 s32 Math_Atan2(s32, s32);
 void ProjectileConfig_Init(void *);
@@ -14,43 +14,40 @@ void ProjectileConfig_SetAnimation(void *, u32, u32, u32);
 void Projectile_SpawnFromConfig(void *, void *);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 u32 MuspellHead_TryProjectileAttack(void *);
+
 static inline s32 RandomValue(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
     return *(const u16 *)(RANDOM_TABLE_ADDR + gRandomIndex * 2);
 }
-static inline s32 distanceSquared(struct Vec *a, struct Vec *b)
+
+static inline s32 distanceSquared(struct ContactPosition *a, struct ContactPosition *b)
 {
     s32 x = a->x - b->x, z = a->z - b->z;
     return x * x + z * z;
 }
-static inline void CopyPosition(struct Vec *out, struct Vec *in)
-{
-    *out = *in;
-}
-static inline void raisePosition(struct Vec *p)
-{
-    p->y += 128;
-}
-u32 MuspellHead_UpdateProjectileAttack(struct MuspellHead *p)
+u32 MuspellHead_UpdateProjectileAttack(struct MuspellHead *head)
 {
     u8 config[0x5c];
-    struct Vec position;
+    struct ContactPosition position;
+    u32 sample;
+    s32 x;
+    s32 z;
     s32 velocity;
     s32 distance;
     u32 angle;
     s8 aim;
-    struct Vec *pos;
-    struct Vec *target;
-    struct Vec *origin;
-    if (Mod((s16)p->timer, 10) == 0 && (s16)p->timer > (s16)p->duration - 30) {
+    struct ContactPosition *pos;
+    struct ContactPosition *target;
+    struct ContactPosition *origin;
+    if (Mod((s16)head->timer, 10) == 0 && (s16)head->timer > (s16)head->duration - 30) {
         velocity = 0x1400;
-        distance = distanceSquared(Player_GetEffectivePosition(0), (struct Vec *)&p->sprite.position);
-        origin = (struct Vec *)&p->sprite.position;
+        distance = distanceSquared(Player_GetEffectivePosition(0), &head->sprite.position);
+        origin = &head->sprite.position;
         ProjectileConfig_Init(config);
         pos = &position;
-        CopyPosition(pos, (struct Vec *)&p->sprite.position);
-        raisePosition(pos);
+        *pos = head->sprite.position;
+        pos->y += 128;
         target = Player_GetEffectivePosition(0);
         aim = Math_Atan2(target->x - origin->x, target->z - origin->z);
         angle = (u8)(aim + ((RandomValue() & 31) - 16));
@@ -59,7 +56,8 @@ u32 MuspellHead_UpdateProjectileAttack(struct MuspellHead *p)
         else if (distance > 0x40000)
             velocity = 0x1000;
         ProjectileConfig_SetAppearance(config, 0x7e7c, 0, -1);
-        ProjectileConfig_SetCollision(config, 0, 0x200000, p->attackA, p->attackB, p->attackC);
+        ProjectileConfig_SetCollision(config, 0, 0x200000, head->attackA, head->attackB,
+                                      head->attackC);
         ProjectileConfig_SetMovement(config, 0, 120, angle, 12);
         ProjectileConfig_SetVerticalMotion(config, velocity, 0x18000);
         if (RandomValue() & 1)
@@ -68,40 +66,18 @@ u32 MuspellHead_UpdateProjectileAttack(struct MuspellHead *p)
             ProjectileConfig_SetAnimation(config, 0xa6cf, 1, 0);
         Projectile_SpawnFromConfig(config, pos);
     }
-    {
-        const u16 *table;
-        u32 *cursor;
-        u32 range;
-        u32 index;
-        table = (const u16 *)RANDOM_TABLE_ADDR;
-        cursor = &gRandomIndex;
-        index = *cursor;
-        index++;
-        index &= 1023;
-        {
-            u32 sample = table[*(&index)];
-            s32 x = (u16)p->origin.x;
-            x -= 8;
-            range = 15;
-            sample &= range;
-            p->sprite.position.x = x + sample;
-        }
-        p->sprite.position.y = p->origin.y;
-        index = (index + 1) & 1023;
-        *cursor = index;
-        {
-            u32 sample = table[index];
-            s32 z = (u16)p->origin.z;
-            z -= 8;
-            sample &= range;
-            p->sprite.position.z = z + sample;
-        }
-    }
-    if ((s16)p->timer > 0)
-        p->timer--;
+    sample = ParticleRandom_ReadDirectSample(gRandomTable);
+    x = (u16)head->origin.x - 8;
+    head->sprite.position.x = x + (sample & 15);
+    head->sprite.position.y = head->origin.y;
+    sample = ParticleRandom_ReadDirectSample(gRandomTable);
+    z = (u16)head->origin.z - 8;
+    head->sprite.position.z = z + (sample & 15);
+    if ((s16)head->timer > 0)
+        head->timer--;
     else {
-        Anim_RestartSequence(&p->playback, p->sequence, 0, 0, 0);
-        p->action = (void (*)(void))MuspellHead_TryProjectileAttack;
+        Anim_RestartSequence(&head->playback, head->sequence, 0, 0, 0);
+        head->action = (void (*)(void))MuspellHead_TryProjectileAttack;
     }
     return 0;
 }
