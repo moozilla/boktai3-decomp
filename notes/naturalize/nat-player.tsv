@@ -51,3 +51,7 @@ src/player/appearance/player_visuals.c	Player_LoadVisualParameters	contrived	nat
 src/player/appearance/player_visuals.c	sub_0813C9B4	contrived	contrived	35	unchanged: gcse puts &p->animation.palette after the base/brightness pointers unless it is a named pointer; counted-up second loop needs while(1)/break (loop.c reverses a for loop)
 src/player/appearance/player_visuals.c	Player_UpdateVisualPalette	contrived	minor	6	inner 'source' shadows the outer one (a single variable swaps the p and requestedMode registers)
 src/player/appearance/player_visuals.c	Player_UpdateAlternateVisualPalette	contrived	minor	1	-
+src/player/appearance/player_visuals.c	Player_SelectSpriteResource	natural	natural	0	-
+src/player/appearance/player_visuals.c	Player_InitVisualState	natural	natural	0	-
+src/player/appearance/player_visuals.c	SceneActor_StartRandomizedEffect	natural	natural	0	-
+src/player/appearance/player_visuals.c	Player_EmitQueuedEffects	minor	natural	6	-
