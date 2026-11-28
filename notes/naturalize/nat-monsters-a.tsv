@@ -575,3 +575,4 @@ src/monsters/centipede/Centipede_UpdateRetraction.c	Centipede_UpdateRetraction	c
 src/monsters/golem/golem_main.c	SceneActor_AccelerateForTerrain	minor	minor	0	terrain entry byte arithmetic and motion alias
 src/monsters/golem/golem_main_2.c	Golem_OnDestroy	natural	natural	0	
 src/monsters/golem/golem_main_2.c	Golem_Init	minor	minor	1	instance alias removed; duplicated routeDelay store and drawable byte pointer remain
+src/monsters/centipede/Centipede_Init.c	Centipede_Init	minor	minor	0	shared initializer accessors and repeated drawable byte-pointer blocks
