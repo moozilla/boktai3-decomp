@@ -1,27 +1,21 @@
-#define ColliderSprite_Unlink TimedHazard_UnlinkInstance
 #include "global.h"
 #include "engine/ram.h"
-struct ColliderSprite {
-    u8 unknown0[0x18];
-    void *collider;
-    void *resource;
-    u8 unknown20[0x1c];
-    u8 sprite[1];
-};
-void Sprite_Remove(void *);
-void Collider_Remove(void *);
-s32 Heap_Free(void *);
-u32 TimedHazard_UnlinkInstance(void *, struct ColliderSprite *);
-s32 ColliderSprite_Destroy(struct ColliderSprite *object)
+#include "objects/hazards/timed_hazard.h"
+
+s32 ColliderSprite_Destroy(struct TimedHazard *hazard)
 {
-    Sprite_Remove(object->sprite);
+    Sprite_Remove(&hazard->sprite);
     if (gColliderSpritePool)
-        TimedHazard_UnlinkInstance(gColliderSpritePool, object);
-    if (object->collider) {
-        Collider_Remove(object->collider);
-        Heap_Free(object->collider);
+        TimedHazard_UnlinkInstance((struct TimedHazardPool *)gColliderSpritePool, hazard);
+    if (hazard->collider) {
+        Collider_Remove(hazard->collider);
+        Heap_Free(hazard->collider);
     }
-    if (object->resource)
-        Heap_Free(object->resource);
-    return Heap_Free(object);
+    if (hazard->attack)
+        Heap_Free(hazard->attack);
+    Heap_Free(hazard);
+#ifdef UBFIX
+    // falls off the end with Heap_Free's leftover in r0; no caller reads it
+    return 0;
+#endif
 }
