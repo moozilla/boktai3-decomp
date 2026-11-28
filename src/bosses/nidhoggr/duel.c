@@ -1501,7 +1501,6 @@ void NidhoggrDuel_UpdateCollidersAndPalette(struct GridAttackActor *p)
 
 int NidhoggrDuel_Update(struct GridAttackActor *p)
 {
-    u16 *t;
     NidhoggrDuel_UpdateAnimationAndTargets(p);
     NidhoggrDuel_UpdateActionController(p);
     NidhoggrDuel_RunStateIfUnpaused((u32)p);
@@ -1510,10 +1509,9 @@ int NidhoggrDuel_Update(struct GridAttackActor *p)
         NidhoggrDuel_RequestLinkedActorState(p);
     else
         NidhoggrDuel_NotifyLinkedActorLatePhase(p);
-    t = (u16 *)&p->phaseTimer;
-    (*t)++;
-    if (*t > 0x12b)
-        *t = 0;
+    p->phaseTimer++;
+    if (p->phaseTimer > 0x12b)
+        p->phaseTimer = 0;
     return 0;
 }
 
