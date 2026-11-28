@@ -1,59 +1,43 @@
 #include "global.h"
 #include "scene/areas/area_effect_link.h"
-
-#define LinkMenu_SetState       LinkSession_SetState
-#define LinkMenu_CheckSelection LinkSession_CheckSessionReady
-#define LinkMenu_ResetSelection LinkSession_BeginShutdown
-u8 LinkSession_ConsumeStateEntry(void *);
+#include "link/selection/link_selection_mode.h"
 s32 LinkSession_CheckSessionReady(void *);
 void LinkSession_BeginShutdown(void *, void (*)(void));
 void LinkSession_SetState(void *, u32, void (*)(void));
-void Script_Call(u32, void *);
-void Sound_FadeOutChannel10(u32);
 void ScriptPanel_OpenTextWindow(void);
 void LinkMenu_ExchangeChoices(void);
 void LinkMenu_WaitForReadyPeers(void);
-static inline u8 IsMode9(u16 value)
-{
-    value &= 0x3c00;
-    if (value == 0x1000)
-        return 1;
-    return 0;
-}
-static inline u8 IsMode4(u16 value)
+void LinkPanelSlots_Close(void);
+static inline u8 IsWaitForPeersMode(u16 value)
 {
     value &= 0x3c00;
     if (value == 0x400)
         return 1;
     return 0;
 }
-void LinkPanelSlots_Close(void);
+/* Reading through the session handle keeps the second test from reusing this load. */
+static inline u8 IsExchangeChoicesMode(struct AreaEffectLinkState **session)
+{
+    u16 value = *(*session)->selection;
+    value &= 0x3c00;
+    if (value == 0x1000)
+        return 1;
+    return 0;
+}
 s32 LinkMenu_WaitSelectionMode(struct AreaEffectLinkState *p)
 {
-    void (*next)(void);
-    u32 mode;
-    struct AreaEffectLinkState **address = &p;
-    struct AreaEffectLinkState *pp;
     if (LinkSession_CheckSessionReady(p) < 0) {
         LinkSession_BeginShutdown(p, ScriptPanel_OpenTextWindow);
         return -1;
     }
-    if (IsMode9(*(*address)->selection)) {
+    if (IsExchangeChoicesMode(&p)) {
         LinkPanelSlots_Close();
-        next = LinkMenu_ExchangeChoices;
-        pp = p;
-        mode = 9;
-        goto call;
+        LinkSession_SetState(p, 9, LinkMenu_ExchangeChoices);
+        return 0;
     }
-    if (IsMode4(*p->selection)) {
-        next = LinkMenu_WaitForReadyPeers;
-        {
-            struct AreaEffectLinkState **slot = &pp;
-            *slot = p;
-        }
-        mode = 4;
-    call:
-        LinkSession_SetState(pp, mode, next);
+    if (IsWaitForPeersMode(*p->selection)) {
+        LinkSession_SetState(p, 4, LinkMenu_WaitForReadyPeers);
+        return 0;
     }
     return 0;
 }
