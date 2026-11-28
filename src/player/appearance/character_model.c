@@ -644,10 +644,10 @@ void Video_DrawBackgroundRowMarkers(u32 x, u32 y)
 void CharacterModel_LoadActorAppearance(struct ScenePoolActor *actor)
 {
     struct GameState *state = gGameState;
-    actor->bodyAnimation = *(u8 *)&state->unk7A0[2] + 12;
+    actor->bodyAnimation = (u8)state->unk7A0[2] + 12;
     actor->paletteMode = state->styleParameterE;
-    actor->accessoryAnimation = *(u8 *)&state->unk7A0[1] + 18;
-    actor->faceAnimation = *(u8 *)&state->unk7A0[0] + 6;
+    actor->accessoryAnimation = (u8)state->unk7A0[1] + 18;
+    actor->faceAnimation = (u8)state->unk7A0[0] + 6;
 }
 
 s32 ModifierMenu_CountAppearanceModifiers(struct SceneActorStyle *style)

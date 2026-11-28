@@ -37,3 +37,5 @@ src/player/appearance/character_model.c	GameState_EnableAlternateHud	natural	nat
 src/player/appearance/character_model.c	GameState_RequestPaletteRefresh	natural	natural	0	-
 src/player/appearance/character_model.c	Video_GetWrappedBackgroundMapEntry	natural	natural	0	-
 src/player/appearance/character_model.c	PanelText_DrawDigits	contrived	minor	19	do/while(0) around the remainder: without it 'cell' outranks 'value' in register allocation (priority 7368 vs 4375)
+src/player/appearance/character_model.c	Video_DrawBackgroundRowMarkers	natural	natural	0	-
+src/player/appearance/character_model.c	CharacterModel_LoadActorAppearance	minor	natural	1	-
