@@ -212,3 +212,4 @@ src/scene/actor/attachment/SceneActorEffect_SortCandidates.c	SceneActorEffect_So
 src/scene/actor/attachment/SceneActorAttachment_FindReachableNeighbor.c	SceneActorAttachment_FindReachableNeighbor	contrived	minor	8	flags local for the terrain mask test (plain & writes the other operand register)
 src/scene/actor/attachment/SceneActorPosition_ResolveTaggedPosition.c	SceneActorPosition_ResolveTaggedPosition	natural	natural	0	-
 src/scene/actor/attachment/SceneActorAttachment_RetargetNearestPlayer.c	SceneActorAttachment_RetargetNearestPlayer	contrived	minor	24	delta/position pointer locals and a count local keep the loop shape; mask local for the motion flag test; player address as gPlayers[i] + 0x24
+src/scene/actor/attachment/SceneActorReaction_ApplyHitResponse.c	SceneActorReaction_ApplyHitResponse	contrived	contrived	40	remaining parked masks, motion-flag block, spark table union and tracking mask: plain operators and accessors change load order or block layout
