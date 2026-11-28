@@ -2881,6 +2881,8 @@ extern void (*const gUnk_08605A10[])(struct TetherActor *);
 
 s32 TetherActor_Tick(struct TetherActor *actor)
 {
+    u32 state;
+
     actor->blendHold = 0;
     actor->requestStatus = 0;
     if (segmentsOnly()) {
@@ -2901,10 +2903,8 @@ s32 TetherActor_Tick(struct TetherActor *actor)
     actor->shakeX = 0;
     actor->shakeZ = 0;
     actor->moving = 0;
-    {
-        u32 state = TetherActor_SelectNextState(actor);
-        Callback_InvokeActor(actor, gUnk_08605A10[state]);
-    }
+    state = TetherActor_SelectNextState(actor);
+    Callback_InvokeActor(actor, gUnk_08605A10[state]);
     TetherActor_AdjustSlopeMovement(actor);
     TetherActor_UpdateWorldPosition(actor);
     TetherActor_UpdateChargeAndCooldown(actor);
