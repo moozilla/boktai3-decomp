@@ -191,3 +191,4 @@ src/npc/story_character/SceneCharacter_UpdateAnimationFiveSixFive.c	SceneCharact
 src/npc/story_character/SceneCharacter_StartSlowAnimationSeven.c	SceneCharacter_StartSlowAnimationSeven	contrived	natural	1	
 src/npc/story_character/SceneCharacter_StartAnimationSeven.c	SceneCharacter_StartAnimationSeven	contrived	natural	1	
 src/npc/story_character/SceneCharacter_UpdateAnimationSevenSixFive.c	SceneCharacter_UpdateAnimationSevenSixFive	contrived	natural	1	
+src/npc/story_character/SceneCharacter_StartAnimationEleven.c	SceneCharacter_StartAnimationEleven	contrived	natural	1	
