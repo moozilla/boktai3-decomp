@@ -202,3 +202,10 @@ src/bosses/hresvelgr/Math_StepAngleTowardTarget.c	Math_StepAngleTowardTarget	con
 src/bosses/hresvelgr/Math_BlendAngleWithTableFactor.c	Math_BlendAngleWithTableFactor	minor	natural	1	
 src/bosses/hresvelgr/Math_WrapAngleArrayNearTargets.c	Math_WrapAngleArrayNearTargets	minor	natural	1	
 src/bosses/hresvelgr/ScalarApproach_HalfArray.c	ScalarApproach_HalfArray	contrived	natural	2	
+src/bosses/hresvelgr/Math_ApproachShortArrayByQuarter.c	Math_ApproachShortArrayByQuarter	natural	natural	0	
+src/bosses/hresvelgr/Math_ApproachShortArrayByEighth.c	Math_ApproachShortArrayByEighth	natural	natural	0	
+src/bosses/hresvelgr/Math_ApproachShortArrayBySixteenth.c	Math_ApproachShortArrayBySixteenth	natural	natural	0	
+src/bosses/hresvelgr/sub_0819B410.c	sub_0819B410	contrived	contrived	40	goto clamp and pointer copies stay: structured clamps reorder registers (the ROM reads centers twice)
+src/bosses/hresvelgr/Math_StepShortArrayTowardTargets.c	Math_StepShortArrayTowardTargets	contrived	contrived	0	same goto step-toward form as Math_StepTowardTarget; structured spellings differ
+src/bosses/hresvelgr/Math_StepTowardTarget.c	Math_StepTowardTarget	contrived	contrived	9	goto into the second branch stays: structured forms drop the shared assignment
+src/bosses/hresvelgr/ScalarApproach_ApplyProfileArray.c	ScalarApproach_ApplyProfileArray	contrived	minor	3	index pointer copies stay

@@ -1,6 +1,5 @@
-/* Hresvelgr-local copy: same code, its own profile table. */
-#define gUnk_08614D4C gUnk_08611D24
 #include "engine/math/scalar_approach.h"
+extern const s16 gUnk_08611D24[];
 /* ScalarApproach_ApplyProfileArray: Applies one indexed scalar coefficient profile to each value and target pair */
 void ScalarApproach_ApplyProfileArray(s16 *values, const s16 *targets, s32 profile, s32 count)
 {
@@ -8,10 +7,10 @@ void ScalarApproach_ApplyProfileArray(s16 *values, const s16 *targets, s32 profi
     const s16 *target;
     if (profile > 15)
         profile = 15;
-    profile = ScalarApproach_ProfileCoefficient(profile);
+    profile = gUnk_08611D24[profile];
     current = values;
     target = targets;
-    while ((count = (s32)((u32)count - 1)) >= 0) {
+    while (--count >= 0) {
         *current = ScalarApproach_Profile(*current, *target, profile);
         ++current;
         ++target;
