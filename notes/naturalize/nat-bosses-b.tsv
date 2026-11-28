@@ -386,3 +386,4 @@ src/bosses/vanargand/Vanargand_UpdateMotionReturn.c	Vanargand_UpdateMotionReturn
 src/bosses/vanargand/Vanargand_UpdatePartDebugControls.c	Vanargand_UpdatePartDebugControls	contrived	near-natural	3	constant locals and second aliases kept where present
 src/bosses/vanargand/Vanargand_UpdateStateCallback.c	Vanargand_UpdateStateCallback	contrived	near-natural	3	constant locals and second aliases kept where present
 src/bosses/vanargand/Vanargand_UpdateRepeatedPairAttack.c	Vanargand_UpdateRepeatedPairAttack	contrived	near-natural	3	constant locals and second aliases kept where present
+src/bosses/vanargand/Vanargand_WaitForActionRelease.c	Vanargand_WaitForActionRelease	contrived	near-natural	3	constant locals and second aliases kept where present
