@@ -141,9 +141,9 @@ src/link/player/Player_InitOrbitingAuraEffect.c	Player_InitOrbitingAuraEffect	mi
 src/link/player/Player_DestroySixParticleEffects.c	Player_DestroySixParticleEffects	minor	natural	5	
 src/link/player/Player_InitSixParticleEffects.c	Player_InitSixParticleEffects	minor	minor	0	local particle views
 src/link/player/Player_UpdateConvergingParticles.c	Player_UpdateConvergingParticles	minor	minor	1	draw alias of the effect pointer stays: the ROM keeps both registers
-src/link/player/sub_082392E8.c	sub_082392E8	contrived	contrived	9	do/while(0) around the radius draw and two random getters stay: both change register allocation
 src/link/player/Player_EmitConvergingParticle.c	Player_EmitConvergingParticle	minor	minor	0	draw alias and u16 radius sample
 src/link/player/Player_DestroyConvergingParticles.c	Player_DestroyConvergingParticles	contrived	natural	1	
 src/link/player/Player_InitConvergingParticles.c	Player_InitConvergingParticles	contrived	natural	2	
 src/link/player/Player_UpdateConvergingParticles.c	Player_UpdateConvergingParticles	minor	natural	1	draw alias stays: the ROM keeps both registers
 src/link/player/Player_EmitConvergingParticle.c	Player_EmitConvergingParticle	minor	minor	1	draw alias and u16 radius sample stay
+src/link/player/sub_082392E8.c	sub_082392E8	contrived	minor	40	do/while(0) around the radius draw and draw alias stay: without the loop the random table and cursor swap reload registers
