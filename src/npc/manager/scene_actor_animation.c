@@ -735,6 +735,13 @@ void Actor_OnIdleUpdate(void *unused, struct SceneActor *actor)
     actor->query(actor);
 }
 
+static inline void SceneActorAnimation_SetAngle(struct SceneActor *actor, int angle)
+{
+    actor->body.direction = angle;
+    actor->facing8 = SceneFacing_EightWay(angle);
+    actor->facing4 = SceneFacing_FourWay(angle);
+}
+
 // confidence=low: advances toward the scripted position using the current movement angle.
 
 void Actor_UpdateWalkToPosition(void *unused, struct SceneActor *actor)
@@ -757,25 +764,14 @@ void Actor_UpdateWalkToPosition(void *unused, struct SceneActor *actor)
             actor->body.position = actor->target;
             actor->finished = 1;
         } else {
-            int angle;
             SceneActor_OffsetAlongHeading(&actor->body.motion, actor->body.direction,
                                           actor->distance);
             actor->direction = Math_Atan2(to->x - from->x, to->z - from->z);
-            angle = actor->direction;
-            actor->body.direction = angle;
-            actor->facing8 = SceneFacing_EightWay(angle);
-            actor->facing4 = SceneFacing_FourWay(angle);
+            SceneActorAnimation_SetAngle(actor, actor->direction);
             Actor_PlayAnimationEntry(actor, 1, 1, 0, 1);
         }
         Actor_PlayFootstepSound(actor, 1);
     }
-}
-
-static inline void SceneActorAnimation_SetAngle(struct SceneActor *actor, int angle)
-{
-    actor->body.direction = angle;
-    actor->facing8 = SceneFacing_EightWay(angle);
-    actor->facing4 = SceneFacing_FourWay(angle);
 }
 
 // confidence=low: turns toward a scripted angle and signals completion when aligned.
