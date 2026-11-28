@@ -9,7 +9,7 @@ static inline s32 trunc12(s32 v)
 {
     return v >= 0 ? v >> 12 : -((-v) >> 12);
 }
-static inline void polar(struct ContactPosition *v, s32 angle, s32 radius)
+static inline void polar(s32 angle, s32 radius, struct ContactPosition *v)
 {
     s32 x = trunc12(gUnk_086149C4[(angle + 64) & 255] * radius);
     v->x = x;
@@ -36,34 +36,22 @@ void Ratatosk_UpdateOrbitingParticlePose(struct Ratatosk *p)
 {
     u8 params[0x18];
     struct ContactPosition delta, spawn;
-    u32 *timer;
-    u32 *savedTimer;
     if (p->actionChanged) {
         p->actionChanged = 0;
         SceneActors_StartUnmirroredAnimation(p, p->animationData, p->animation, 31, 1, 4);
         Sound_PlaySong(0x56b);
     }
     spawn = p->anchor;
-    timer = &p->callbackFrame;
-    {
-        s32 angle = (u8)(Mod(*timer, 31) << 3);
-        s32 radius = 160;
-        struct ContactPosition *out = &delta;
-        s32 product = gUnk_086149C4[(angle + 64) & 255] * radius;
-        savedTimer = timer;
-        out->x = trunc12(product);
-        out->y = 0;
-        out->z = trunc12(gUnk_086149C4[angle] * radius);
-    }
+    polar((u8)(Mod(p->callbackFrame, 31) << 3), 160, &delta);
     sum(&spawn, &spawn, &delta);
     spawn.y += 256;
     SlotMotion_Initialize(params);
     Ratatosk_ConfigureParticle(params, 20, 0, 0, 2, 0);
     SceneParticles_SpawnAtPosition(params, &spawn);
-    if (*savedTimer > 5) {
+    if (p->callbackFrame > 5) {
         Ratatosk_SetFlags(p, 0x800000);
     }
-    if (*savedTimer > 120) {
+    if (p->callbackFrame > 120) {
         Sound_StopSong(0x56b);
         p->actionFinished = 1;
     }
