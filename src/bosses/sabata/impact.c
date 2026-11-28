@@ -36,35 +36,23 @@ void Collision_CalculateDamageResponse(struct ContactCollider *, struct ContactC
 
 void PlayerStats_AddContactHundredths(struct ContactCollider *, struct ContactCollider *, s32);
 
-static inline void SetRewardMask(struct SabataActorImpact *boss, u32 value)
-{
-    boss->rewardMask = value;
-}
-
-static inline void SetHitAttributes(struct SabataActorImpact *boss, u32 value)
-{
-    boss->contactAttributes = value;
-}
-
 void SabataImpact_CopyContact(struct ContactCollider *attack, struct ContactCollider *defense,
                               struct SabataActorImpact *actor)
 {
     struct SabataActorImpact *boss = actor;
     u32 rewardMask;
     u32 attributes;
-    u16 angleFlag;
     Collision_CalculateDamageResponse(attack, defense);
     actor->damage = defense->cost;
-    angleFlag = 0x100;
-    if (attack->flags & angleFlag)
+    if (TestColliderFlags(attack, 0x100))
         actor->hitDirection = attack->direction;
     else
         actor->hitDirection = Math_Atan2(defense->x - attack->x, defense->z - attack->z);
     actor->hitParameter = attack->responseParameter;
     rewardMask = attack->statRewardFlags;
-    SetRewardMask(boss, rewardMask);
+    boss->rewardMask = rewardMask;
     attributes = attack->reactionFlags;
-    SetHitAttributes(boss, attributes);
+    boss->contactAttributes = attributes;
     PlayerStats_AddContactHundredths(attack, defense, boss->damageBonus);
     {
         u32 one = 1;
