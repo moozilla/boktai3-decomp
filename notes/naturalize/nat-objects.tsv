@@ -191,3 +191,4 @@ src/objects/deck_cannons/DeckCannon_SpawnProjectile.c	DeckCannon_SpawnProjectile
 src/objects/deck_cannons/DeckCannon_InitMuzzleFlash.c	DeckCannon_InitMuzzleFlash	minor	minor	3	local update/destroy pair loads both addresses before either store
 src/objects/deck_cannons/DeckCannon_SpawnMuzzleFlash.c	DeckCannon_SpawnMuzzleFlash	contrived	natural	1	
 src/objects/deck_cannons/DeckCannon_ReadOptions.c	DeckCannon_ReadOptions	contrived	natural	3	
+src/objects/deck_cannons/DeckCannon_Create.c	DeckCannon_Create	contrived	natural	2	

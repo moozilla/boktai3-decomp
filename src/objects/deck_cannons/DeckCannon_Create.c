@@ -1,20 +1,22 @@
 #include "global.h"
-void *Task_Create(u32, u32);
-void Task_SetCallbacks(void *, void (*)(void), void (*)(void));
-s32 DeckCannon_ReadOptions(void *);
-void Task_Kill(void *);
-void DeckCannon_Update(void);
-void sub_0819A414(void);
-void *DeckCannon_Create(u16 a)
+#include "objects/deck_cannons/deck_cannon_battery.h"
+
+s32 DeckCannon_Update(struct DeckCannonBattery *);
+s32 sub_0819A414(struct DeckCannonBattery *);
+s32 DeckCannon_ReadOptions(struct DeckCannonBattery *);
+
+struct DeckCannonBattery *DeckCannon_Create(u16 messageId)
 {
-    u32 *p = Task_Create(8, 0x1328);
-    if (p) {
-        p[6] = a;
-        Task_SetCallbacks(p, DeckCannon_Update, sub_0819A414);
-        if (DeckCannon_ReadOptions(p) < 0) {
-            Task_Kill(p);
+    struct DeckCannonBattery *battery = Task_Create(8, sizeof(*battery));
+
+    if (battery) {
+        battery->messageId = messageId;
+        Task_SetCallbacks(battery, (void (*)(void *))DeckCannon_Update,
+                          (void (*)(void *))sub_0819A414);
+        if (DeckCannon_ReadOptions(battery) < 0) {
+            Task_Kill(battery);
             return 0;
         }
     }
-    return p;
+    return battery;
 }
