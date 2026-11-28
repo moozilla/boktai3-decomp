@@ -410,17 +410,6 @@ int BatFlockBats_DispatchCommands(struct GroupObjects *manager)
     return 0;
 }
 
-static inline struct ContactPosition *addPositionN(struct ContactPosition *d,
-                                                   struct ContactPosition *s)
-{
-    struct ContactPosition *src = s;
-    struct ContactPosition *dst = d;
-    d->x += s->x;
-    dst->y += src->y;
-    dst->z += src->z;
-    return dst;
-}
-
 void BatFlockBat_Launch(struct GroupObjects *m, struct GroupPiece *p, int delay)
 {
     struct ContactPosition delta;
