@@ -351,7 +351,8 @@ struct Player {
     u8 contactCueDuration;     /* 0x53D: threshold cue duration */
     u8 unk53E[2];
     struct SceneVec savedLinkPosition; /* 0x540: set by the linked-player initialization script */
-    u8 savedLinkFacing, unk549;
+    u8 savedLinkFacing;
+    s8 unk549; /* 0x549: slot whose position script runs, negative when none (tentative) */
     u8 catalogSavedOption; /* 0x54A: menu option copied when scriptStatus[1] is zero (tentative) */
     u8 linkPositionRestored; /* 0x54B: set after restoring the linked player */
     u8 unk54C[2];

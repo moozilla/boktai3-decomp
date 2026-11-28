@@ -292,3 +292,7 @@ src/link/player/Player_SynchronizeColliderState.c	Player_SynchronizeColliderStat
 src/link/player/Player_ApplyContact.c	Player_ApplyContact	minor	natural	3	count local keeps the response test; goto done stays
 src/link/player/Player_ApplyGatedContact.c	Player_ApplyGatedContact	natural	natural	0	
 src/link/player/Player_ApplyTerrainDamage.c	Player_ApplyTerrainDamage	contrived	minor	6	goto one shares the return; cellProps cast for terrain flags
+src/link/player/Player_TickDamageBlink.c	Player_TickDamageBlink	contrived	contrived	8	unchanged: the q = p copy decides which register holds the timer
+src/link/player/Script_GetOptionalIValue.c	Script_GetOptionalIValue	natural	natural	0	
+src/link/player/sub_08243704.c	sub_08243704	natural	natural	0	
+src/link/player/sub_0824372C.c	sub_0824372C	contrived	natural	4	slot local keeps the reread after the store

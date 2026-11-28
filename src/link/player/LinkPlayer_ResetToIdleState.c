@@ -49,9 +49,9 @@ void LinkPlayer_ResetToIdleState(struct Player *p)
         p->scriptStatus[i] = 0;
     p->catalogSavedOption = p->actionConfig->catalogOption;
     if (p->actionMode != 6) {
-        if ((s8)p->unk549 >= 0)
-            LinkSession_CallPositionScript(&p->position, (s8)p->unk549);
-        p->unk549 = 0xff;
+        if (p->unk549 >= 0)
+            LinkSession_CallPositionScript(&p->position, p->unk549);
+        p->unk549 = -1;
     }
     LinkSession_IncrementAlternateCounter(p->slot);
     if (p->lastContactFlags & 0xf) {
