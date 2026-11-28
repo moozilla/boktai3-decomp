@@ -457,3 +457,4 @@ src/ui/hud/field_hud.c	MeterDisplay_UpdateOwnerMeters	natural	natural	0
 src/ui/hud/field_hud.c	FieldHud_UpdateWidgets	natural	natural	0	
 src/ui/hud/field_hud.c	FieldHud_InitializeWidgets	natural	natural	0	
 src/ui/hud/damage_numbers/damage_number_display.c	DamageNumberDisplay_FindSource	fudged	natural	7	
+src/ui/hud/damage_numbers/damage_number_display.c	DamageNumberDisplay_FindAvailableGroup	fudged	natural	7	

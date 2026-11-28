@@ -54,27 +54,18 @@ s32 DamageNumberDisplay_FindSource(struct DamageNumberDisplay *display, u32 key)
 s32 DamageNumberDisplay_FindAvailableGroup(struct DamageNumberDisplay *display, s32 priority)
 {
     struct DamageNumberGroup *group;
-    s32 index = 0, result;
-    do {
-        if (!DamageNumberDisplay_GetActiveBit(display, index)) {
-            result = index;
-            goto done;
-        }
-        ++index;
-    } while (index <= 3);
+    s32 i;
+
+    for (i = 0; i < 4; i++) {
+        if (!DamageNumberDisplay_GetActiveBit(display, i))
+            return i;
+    }
     group = display->groups;
-    index = 0;
-    do {
-        if (group->priority <= priority) {
-            result = index;
-            goto done;
-        }
-        ++index;
-        ++group;
-    } while (index <= 3);
-    result = -1;
-done:
-    return result;
+    for (i = 0; i < 4; i++, group++) {
+        if (group->priority <= priority)
+            return i;
+    }
+    return -1;
 }
 
 void SpriteDrawable_SelectTileFrame(void *, void *, u32);
