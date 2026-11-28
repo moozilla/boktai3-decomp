@@ -281,9 +281,8 @@ void ActorSprite_InitPartDrawings(struct ScenePoolActor *actor, struct Character
 void CharacterPreview_PositionParts(void *resource, struct ModifierDisplayObject *parts,
                                     struct ModifierPreviewOrigin *origin, u32 flags)
 {
-    s32 i = 0;
-    u32 flip = flags & 4;
-    for (; i <= 4; i++) {
+    s32 i;
+    for (i = 0; i < 5; i++) {
         s32 x = 0;
         s32 y = 0;
         switch (i) {
@@ -296,7 +295,7 @@ void CharacterPreview_PositionParts(void *resource, struct ModifierDisplayObject
                 y = -2;
                 break;
         }
-        if (flip)
+        if (flags & 4)
             x = -x;
         parts[i].x = origin->x + x;
         parts[i].y = origin->y + y;
