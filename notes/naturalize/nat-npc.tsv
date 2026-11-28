@@ -93,3 +93,10 @@ src/npc/sabata_rider/motion.c	SceneActor_UpdateFallState	contrived	contrived	0	a
 src/npc/sabata_rider/motion.c	SceneActor_UpdateKnockbackFall	contrived	contrived	0	actor alias (motion) and field pointer temps stay: ROM keeps a second actor copy and forms the field addresses before the speed test; looks like a shared inline that did not reproduce
 src/npc/sabata_rider/motion.c	ActorPhysics_UpdateFallMotion	contrived	contrived	8	actor alias (motion) and field pointer temps stay: ROM keeps a second actor copy and forms the field addresses before the speed test; looks like a shared inline that did not reproduce
 src/npc/sabata_rider/SceneActor_DispatchCommands.c	SceneActor_DispatchCommands	contrived	contrived	36	guarded do-while and block-local dispatch state: a for loop rotates reload's spill registers; p/self actor alias; mask-first flag helpers
+src/npc/sabata_rider/manager.c	SabataRider_FindOwnedEntry	natural	natural	0	
+src/npc/sabata_rider/manager.c	SabataRider_StartFallFromScript	minor	minor	1	RegistryActor_SetMotionFlags stays: mask materialized before the load
+src/npc/sabata_rider/manager.c	SabataRider_DisableCommandsFromScript	minor	minor	1	ClearDrawFlags stays: complement mask materialized before the load
+src/npc/sabata_rider/manager.c	SabataRider_UpdateAnimation	minor	minor	1	flags assigned inside the condition: moves two instructions without it
+src/npc/sabata_rider/manager.c	SabataRider_ResetUpdateState	natural	natural	0	
+src/npc/sabata_rider/manager.c	ActorAction_RunActiveCallbacks	natural	natural	0	
+src/npc/sabata_rider/manager.c	ActorManager_Destroy	contrived	natural	6	

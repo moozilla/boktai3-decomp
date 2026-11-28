@@ -75,36 +75,21 @@ s32 ActorAction_RunActiveCallbacks(RegistryActorManager *manager)
     }
     return 0;
 }
-static inline void DestroyActors(RegistryActorManager *manager, s32 i, u32 mask)
-{
-    do {
-        if (manager->actors[i].control.active == 1) {
-            struct ModifierDisplayObject *anim =
-                (void *)((u8 *)manager->actors[0].model.view.parts +
-                         i * sizeof(struct RegistryActor));
-            s32 j = 4;
-            struct RegistryActor *actor;
-            do {
-                Anim_Remove(anim);
-                anim++;
-            } while (--j >= 0);
-            actor = &manager->actors[i];
-            SpatialIndex_RemoveEntry(actor->stats.contactHeader);
-            if (!((gEngineFlags | gScenePauseFlags) & mask))
-                SceneMessages_UnregisterReceiver(actor->control.messages);
-        }
-    } while (++i <= 0);
-}
-
-static inline void ClearManager(u32 zero)
-{
-    gActorManager = (void *)zero;
-}
-
 u8 ActorManager_Destroy(RegistryActorManager *manager)
 {
-    DestroyActors(manager, 0, REGISTRY_ACTOR_MESSAGES_PAUSED);
-    ClearManager(0);
+    s32 i, j;
+    for (i = 0; i < REGISTRY_ACTOR_SLOT_COUNT; i++) {
+        if (manager->actors[i].control.active == 1) {
+            struct RegistryActor *actor;
+            for (j = 0; j < 5; j++)
+                Anim_Remove((void *)&manager->actors[i].model.view.parts[j]);
+            actor = &manager->actors[i];
+            SpatialIndex_RemoveEntry(actor->stats.contactHeader);
+            if (!RegistryActor_MessagePauseBits(REGISTRY_ACTOR_MESSAGES_PAUSED))
+                SceneMessages_UnregisterReceiver(actor->control.messages);
+        }
+    }
+    gActorManager = 0;
     return 0;
 }
 
