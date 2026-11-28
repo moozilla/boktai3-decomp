@@ -2136,7 +2136,7 @@ void Player_ClearDirectionHistory(struct Player *p)
 {
     s32 i;
     for (i = 0; i < 10; i++)
-        p->directionHistory[i] |= 0xFFFF;
+        p->directionHistory[i] = 0xFFFF;
 }
 
 void Player_InitEventProcedureFromScript(struct Player *p)
