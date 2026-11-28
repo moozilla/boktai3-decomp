@@ -1081,123 +1081,55 @@ void Actor_OnTimedIdleUpdate(void *unused, struct SceneActor *actor, int ticks)
 
 s32 DisplayAnimation_GetFrameBoundary(void *, u32 *);
 
-static inline u8 *TerrainResponse(struct SceneActor *actor)
-{
-    return (u8 *)&actor->destination;
-}
-
-static inline void ClearCounter(struct SceneActor *actor, s32 value)
-{
-    actor->probeReady = value;
-}
-
-static inline s32 Callback(struct SceneActor *actor)
-{
-    {
-        int (**slot)(struct SceneActor *) = &actor->query;
-        return (*slot)(actor);
-    }
-}
-
-static inline struct ContactPosition *ProbePosition(struct SceneActor *actor)
-{
-    {
-        struct ContactPosition *result = &actor->probe.current;
-        return result;
-    }
-}
-
-static inline s32 CurrentX(struct SceneActorNavigationProbe *p)
-{
-    struct SceneActorNavigationProbe *raw = p;
-    return raw->current.x;
-}
-
-static inline s32 TargetX(struct SceneActorNavigationProbe *p)
-{
-    struct SceneActorNavigationProbe *raw = p;
-    return raw->target.x;
-}
-
-static inline s32 TargetZ(struct SceneActorNavigationProbe *p)
-{
-    struct SceneActorNavigationProbe *raw = p;
-    return raw->target.z;
-}
-
-static inline s32 PositionZ(struct ContactPosition *p)
-{
-    struct ContactPosition *raw = p;
-    return raw->z;
-}
-
-static inline s32 Scale(s32 value)
-{
-    if (value >= 0)
-        return value >> 12;
-    return -((-value) >> 12);
-}
-
 // confidence=low: advances a navigation probe toward its target at animation frame boundaries.
 
 void Actor_UpdateNavigationWalk(void *unused, struct SceneActor *actor)
 {
-    struct SceneActorBody *motion = (void *)&actor->body;
-    struct SceneActorNavigationProbe *probe = (void *)&actor->probe;
-    u32 *anim = (void *)&actor->drawable.common.kind;
+    struct SceneActorBody *body = &actor->body;
+    struct SceneActorNavigationProbe *probe = &actor->probe;
+    union SceneActorDisplay *drawable = &actor->drawable;
     if (actor->animationEntered) {
         struct ContactPosition *pos;
         actor->animationEntered = 0;
         actor->finished = 0;
         Actor_PlayAnimationEntry(actor, 3, 1, 0, 4);
         actor->routeProgress = 1;
-        pos = (void *)&actor->body.position;
+        pos = &actor->body.position;
         ProximityVolume_TranslateBounds(probe, pos);
-        Terrain_ApplyBlocked(probe, pos, TerrainResponse(actor));
-        ClearCounter(actor, 0);
+        Terrain_ApplyBlocked(probe, pos, &actor->destination);
+        actor->probeReady = 0;
         Actor_SetAttachmentEffect(actor, 0, 0, 0);
     }
     SceneActor_SetFlags(actor, 0x1000);
-    if ((u8)Callback(actor) != 1) {
-        struct ContactPosition *pos = (void *)&actor->body.position;
-        struct ContactPosition *probePos = ProbePosition(actor);
-        s32 x = CurrentX(probe) - motion->position.x;
-        s32 z = probePos->z - pos->z;
-        s32 distance = (s32)((u32)x * x + (u32)z * z);
+    if ((u8)actor->query(actor) != 1) {
+        struct ContactPosition *pos = &actor->body.position;
+        struct ContactPosition *current = &actor->probe.current;
+        s32 x = probe->current.x - body->position.x;
+        s32 z = current->z - pos->z;
+        s32 distance = x * x + z * z;
         s32 limit = 0x1103;
-        struct ContactPosition *savedPos = pos;
+        struct ContactPosition *from = pos;
         if (distance <= limit) {
-            struct SceneActorNavigationProbe *read = probe;
-            motion->position.x = read->target.x;
-            motion->position.z = read->target.z;
+            body->position.x = probe->target.x;
+            body->position.z = probe->target.z;
             actor->finished = 1;
         } else {
-            u32 flags;
-            if (DisplayAnimation_GetFrameBoundary(anim, &flags)) {
-                u32 *reader = anim;
+            u32 frame;
+            if (DisplayAnimation_GetFrameBoundary(drawable, &frame)) {
                 s32 speed;
-                s32 targetX;
-                s32 angle;
                 struct ContactPosition step;
-                if (*reader == 2) {
-                    s32 flag = flags & 1;
-                    speed = 64;
-                    if (flag)
-                        speed = 32;
-                } else
+                if (drawable->common.kind == 2)
+                    speed = (frame & 1) ? 32 : 64;
+                else
                     speed = 16;
-                targetX = TargetX(probe);
-                targetX -= motion->position.x;
-                angle = Math_Atan2(targetX, TargetZ(probe) - PositionZ(savedPos));
-                actor->body.direction = angle;
-                actor->facing8 = SceneFacing_EightWay(angle);
-                actor->facing4 = SceneFacing_FourWay(angle);
-                SceneActor_SetChargeOffset(motion->direction, &step, speed);
-                motion->position.x += step.x;
-                motion->position.z += step.z;
+                SceneActorAnimation_SetAngle(actor, Math_Atan2(probe->target.x - body->position.x,
+                                                               probe->target.z - from->z));
+                SceneActor_SetChargeOffset(body->direction, &step, speed);
+                body->position.x += step.x;
+                body->position.z += step.z;
             }
         }
-        NavMesh_UpdateProbe(probe, savedPos);
+        NavMesh_UpdateProbe(probe, from);
         Actor_PlayFootstepSound(actor, 3);
         Actor_PlayAnimationEntry(actor, 3, 1, 0, 1);
     }
