@@ -526,3 +526,10 @@ src/system/inventory/inventory.c	Inventory_RestoreLifePercentTimed	contrived	nat
 src/system/inventory/inventory.c	PlayerStatusPanel_ResetScriptCounters	contrived	minor	1	counter indexed as *(slot + counters) for the index-first address sum
 src/system/inventory/inventory.c	SceneHud_SelectUpgradeableStat	contrived	minor	1	stat fields are u16 and read as signed through a cast
 src/system/inventory/inventory.c	SceneHud_IncreaseStatBonus	contrived	minor	1	stat fields read as signed through a cast; bonus updated as *(index + field)
+src/system/inventory/inventory.c	Inventory_GetUsePermissionFlag	natural	natural	0	
+src/system/inventory/inventory.c	Inventory_GetItemCategory	minor	minor	0	item definition table is u16 with an 8-halfword stride
+src/system/inventory/inventory.c	Inventory_GetItemUseCondition	minor	minor	0	same table; existing UBFIX branch
+src/system/inventory/inventory.c	Inventory_GetQuantityByStorage	natural	natural	0	
+src/system/inventory/inventory.c	SceneHud_ApplyStatBPercent	natural	natural	0	
+src/system/inventory/inventory.c	SceneHud_ApplyTimedSceneMode	natural	natural	0	
+src/system/inventory/inventory.c	Inventory_BeginItemEffect	contrived	contrived	0	fake whole-object structs: naming the HUD fields at 0x4870..0x4872 needs the ui header scene_hud_display.h, which is not this area
