@@ -310,3 +310,4 @@ src/objects/hazards/falling_object_effects/FadingParticleGroup_Spawn.c	FadingPar
 src/objects/hazards/falling_object_effects/FadingParticleGroup_Update.c	FadingParticleGroup_Update	contrived	contrived	80	hand-walked field pointers, expanded sequence step and a raw/compare/time lifetime countdown remain: index form changes induction variables (91 insns); plain countdown loses the ROM's clamp-to-zero compare
 src/objects/hazards/falling_object_effects/PaletteLevels_ClearController.c	PaletteLevels_ClearController	natural	natural	0	
 src/objects/hazards/falling_objects.c	FallingObject_ReceiveHit	minor	minor	6	object alias keeps the health reloads on a second register
+src/objects/hazards/falling_objects.c	FallingObjectManager_AddObject	contrived	natural	1	

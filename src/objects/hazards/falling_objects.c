@@ -26,18 +26,14 @@ void FallingObject_ReceiveAttackHit(void)
 {
 }
 
-u32 FallingObjectManager_AddObject(struct FallingObjectManager *head, struct FallingObject *n)
+u32 FallingObjectManager_AddObject(struct FallingObjectManager *manager,
+                                   struct FallingObject *object)
 {
-    struct FallingObject **slot;
-    struct FallingObject *t;
-    n->previous = 0;
-    slot = &n->next;
-    *slot = head->head;
-    t = *slot;
-    if (t) {
-        t->previous = n;
-    }
-    head->head = n;
+    object->previous = 0;
+    object->next = manager->head;
+    if (object->next)
+        object->next->previous = object;
+    manager->head = object;
     return 0;
 }
 
