@@ -27,13 +27,12 @@ int SpritePool_Update(struct SpritePool *pool)
 u32 SpritePool_Destroy(struct SpritePool *pool)
 {
     struct SpritePoolSlot *slot = pool->slots;
-    s32 index = 0xf;
-    do {
+    s32 index;
+
+    for (index = 0; index < 16; index++, slot++) {
         if (slot->sprite.unknown4[0] != 0)
             Sprite_Remove(&slot->sprite);
-        index--;
-        slot++;
-    } while (index >= 0);
+    }
     gSpritePoolManager = 0;
     return 0;
 }

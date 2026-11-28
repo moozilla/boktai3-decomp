@@ -152,3 +152,4 @@ src/engine/video/tile_animation.c	TileAnimation_Initialize	natural	natural	0
 src/engine/video/tile_animation.c	TileAnimation_Create	natural	natural	0	
 src/engine/video/tile_animation.c	TileAnimation_Stop	natural	natural	0	
 src/engine/video/sprite_pool.c	SpritePool_Update	minor	natural	1	
+src/engine/video/sprite_pool.c	SpritePool_Destroy	minor	natural	1	
