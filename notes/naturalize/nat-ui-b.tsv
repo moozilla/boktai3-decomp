@@ -204,3 +204,5 @@ src/ui/title/password_menu.c	PasswordMenu_RedrawSelection	contrived	natural	1	-
 src/ui/title/password_menu.c	PasswordMenu_AppendSelection	minor	natural	1	-
 src/ui/title/password_menu.c	PasswordMenu_EraseSelection	contrived	natural	1	-
 src/ui/title/password_menu.c	PasswordMenu_Update	minor	natural	4	-
+src/ui/title/password_menu.c	PasswordMenu_BuildLabels	natural	natural	0	-
+src/ui/title/password_menu.c	PasswordMenu_UpdateEntryCursor	natural	natural	0	-
