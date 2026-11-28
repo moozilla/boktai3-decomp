@@ -22,13 +22,11 @@ s32 DragonPuppy_UpdateCombat(struct DragonPuppy *p)
     struct ContactPackedVector size;
     struct ContactCollider *collider;
     if (Engine_PauseBits(0x400))
-        goto paused;
+        return 0;
     {
         u32 mask = 4;
-        if (gPlayerSlotStatus[0] & mask) {
-        paused:
+        if (gPlayerSlotStatus[0] & mask)
             return 0;
-        }
     }
     Callback_InvokeActor(p, p->update);
     p->sprite.flags &= ~1;

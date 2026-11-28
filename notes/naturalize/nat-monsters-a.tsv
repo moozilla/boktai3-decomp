@@ -547,3 +547,4 @@ src/monsters/centipede/Centipede_InitStateHandlers.c	Centipede_InitStateHandlers
 src/monsters/centipede/Centipede_InitPlayerReference.c	Centipede_InitPlayerReference	contrived	natural	2	
 src/monsters/centipede/CentipedeBody_Destroy.c	CentipedeBody_Destroy	contrived	minor	2	mask and value locals before the overlay removal
 src/monsters/centipede/Centipede_UpdateSegmentColliders.c	Centipede_UpdateSegmentColliders	contrived	contrived	0	parallel segment pointers in a do-while: an indexed for loop is strength-reduced differently
+src/monsters/dragon_puppy/DragonPuppy_UpdateCombat.c	DragonPuppy_UpdateCombat	contrived	minor	12	pause mask local, per-branch collider alias and position pointer block
