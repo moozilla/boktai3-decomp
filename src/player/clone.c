@@ -368,49 +368,34 @@ s32 PlayerClone_UpdateBehavior(struct PlayerCloneSlot *clone, s32 index)
     return 0;
 }
 
-static inline u32 Clone_DisableColliderFlags(u32 value)
-{
-    u32 mask = 4;
-    mask |= value;
-    return mask;
-}
-
 void PlayerClone_InitSlot(void *unused, struct PlayerCloneSlot *s, u32 arg)
 {
     struct PlayerCloneConfiguration *context = &s->configuration;
     u32 fill;
     void *res;
     struct ContactCollider *p;
-    u32 value;
     struct ContactPosition v, w;
 
     PlayerClone_InitConfig(context);
     s->timer = 0;
     {
         u8 *dest = &s->velocity;
-        u32 *source;
+
         fill = 0;
-        source = &fill;
-        Clone_ClearVector(source, dest, CPU_SET_SRC_FIXED | CPU_SET_32BIT | 2);
+        Clone_ClearVector(&fill, dest, CPU_SET_SRC_FIXED | CPU_SET_32BIT | 2);
     }
     res = ScriptProc_Start(0xcb05, 0xde23);
+    ResourceHeader_Relocate(&s->resource, res);
     {
-        struct AnimSpriteResource *obj = &s->resource;
-        ResourceHeader_Relocate(obj, res);
-        {
-            struct AnimSprite *p = &s->animation;
-            AnimSprite_InitLinked(p, obj, 0, 0, 2, 1, 0, 0);
-            s->animation.flags |= 1;
-            value = ActorDebris_Create(p, &s->foldedFacing, &s->mirrored);
-            s->debris = value;
-            PlayerEffect_SetPaletteSource(value, 0xe001, 0);
-        }
+        struct AnimSprite *animation = &s->animation;
+
+        AnimSprite_InitLinked(animation, &s->resource, 0, 0, 2, 1, 0, 0);
+        s->animation.flags |= 1;
+        s->debris = ActorDebris_Create(animation, &s->foldedFacing, &s->mirrored);
+        PlayerEffect_SetPaletteSource(s->debris, 0xe001, 0);
     }
-    {
-        u8 *obj = s->shadow;
-        ScaledShadow_InitializeDefault(obj, &s->animation.position);
-        ScaledShadow_Disable(obj);
-    }
+    ScaledShadow_InitializeDefault(s->shadow, &s->animation.position);
+    ScaledShadow_Disable(s->shadow);
     s->index = arg;
     p = &s->collider;
     v.x = 40;
@@ -423,7 +408,7 @@ void PlayerClone_InitSlot(void *unused, struct PlayerCloneSlot *s, u32 arg)
     Collider_SetCallback(p, PlayerClone_OnBodyColliderContact, s);
     Collider_SetBodyProperties(p, (s16)context->unknown16, 0x402, 1);
     Collider_Refresh(p);
-    p->flags = Clone_DisableColliderFlags(p->flags);
+    p->flags |= 4;
     p = &s->contact;
     v.x = 64;
     v.y = 128;

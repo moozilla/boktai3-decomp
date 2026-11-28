@@ -175,3 +175,4 @@ src/player/clone.c	PlayerClone_SetLifetimeAndBehavior	natural	natural	0	-
 src/player/clone.c	PlayerClone_SetColliderExtents	natural	natural	0	-
 src/player/clone.c	PlayerClone_CreatePool	natural	natural	0	-
 src/player/clone.c	PlayerClone_BeginActiveReactions	contrived	natural	3	-
+src/player/clone.c	PlayerClone_InitSlot	contrived	minor	20	velocity clear, sprite pointer and shared collider pointer stay: direct forms change register allocation
