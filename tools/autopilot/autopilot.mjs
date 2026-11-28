@@ -181,6 +181,8 @@ const GOALS = {
       routeGoal = use ? beat.scene : -1;
       milestone = use ? beat.value : -1;
     };
+    const reachedScene = () => destination >= 0 && L.where().scene === destination;
+    const reached = () => reachedScene() || (storyGoal >= 0 && L.story() >= storyGoal);
     const arrivalForGoal = () => routeGoal >= 0 && milestone > L.story() ?
       storyEntrances(stageOf(routeGoal), milestone, L.conditionsAllow) : undefined;
     if (from?.landingDetour?.goal === fixedGoal) landingDetour = from.landingDetour;
