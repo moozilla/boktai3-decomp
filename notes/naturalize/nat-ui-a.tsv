@@ -490,3 +490,4 @@ src/ui/hud/stage_icon/StageIconDisplay_NotifyCompletion.c	StageIconDisplay_Notif
 src/ui/hud/stage_icon/StageIconDisplay_Tick.c	StageIconDisplay_Tick	natural	natural	0	
 src/ui/hud/stage_icon/StageIconDisplay_Destroy.c	StageIconDisplay_Destroy	natural	natural	0	
 src/ui/hud/stage_icon/StageIconDisplay_SelectUpdate.c	StageIconDisplay_SelectUpdate	natural	natural	0	
+src/ui/hud/level_advance/LevelAdvanceDisplay_UpdateAnimation.c	LevelAdvanceDisplay_UpdateAnimation	fudged	partial	2	sprite pointer block for the first frame store and the Shake inline stay

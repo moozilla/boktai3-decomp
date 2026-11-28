@@ -26,16 +26,9 @@ static inline void LevelAdvanceDisplay_Shake(struct LevelAdvanceManager *manager
 }
 void LevelAdvanceDisplay_UpdateAnimation(struct LevelAdvanceManager *manager)
 {
-    u16 *active = &manager->active;
-    u16 *kind;
-    u16 *kindCache;
-    u32 kindValue;
-    if (!*active)
+    if (!manager->active)
         return;
-    kind = &manager->kind;
-    kindValue = *kind;
-    kindCache = kind;
-    if (kindValue == 1) {
+    if (manager->kind == 1) {
         s32 i;
         for (i = 0; i < 8; i++) {
             struct LevelAdvanceParticle *particle = &manager->particles[i];
@@ -44,10 +37,7 @@ void LevelAdvanceDisplay_UpdateAnimation(struct LevelAdvanceManager *manager)
         }
         if (manager->frame < 64 && !(manager->frame & 3))
             LevelAdvanceDisplay_StartParticle(&manager->particles[(manager->frame >> 2) & 7]);
-        {
-            u32 next = manager->frame + 1;
-            manager->frame = next;
-        }
+        manager->frame++;
         manager->sprite.position.world = gPlayers[0]->position;
         if (manager->frame < 120) {
             {
@@ -70,9 +60,9 @@ void LevelAdvanceDisplay_UpdateAnimation(struct LevelAdvanceManager *manager)
         } else {
             manager->sprite.flags |= 1;
             manager->active = 0;
-            *kindCache = 0;
+            manager->kind = 0;
         }
-    } else if (kindValue == 2) {
+    } else if (manager->kind == 2) {
         manager->frame++;
         manager->sprite.position.world = gPlayers[0]->position;
         if (manager->frame < 120) {
@@ -92,12 +82,12 @@ void LevelAdvanceDisplay_UpdateAnimation(struct LevelAdvanceManager *manager)
             manager->sprite.frame = 2;
         } else {
             manager->sprite.flags |= 1;
-            *active = 0;
-            *kind = 0;
+            manager->active = 0;
+            manager->kind = 0;
         }
     } else {
         manager->sprite.flags |= 1;
-        *active = 0;
-        *kind = 0;
+        manager->active = 0;
+        manager->kind = 0;
     }
 }
