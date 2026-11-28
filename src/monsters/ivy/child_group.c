@@ -9,11 +9,6 @@
 
 s32 Callback_InvokeActor(void *, void *);
 
-static inline u8 ChildGroup_InvokeActorByte(void *actor, void *callback)
-{
-    return Callback_InvokeActor(actor, callback);
-}
-
 struct SwordGroup;
 void ChildGroup_LaunchNextInactiveMember(struct SwordGroup *);
 
@@ -177,13 +172,11 @@ void Ivy_InitPaletteBuffers(struct IvyPaletteBuffers *p)
 
 void Ivy_SetSegmentFlags(u8 *p, u32 v)
 {
-    s32 i = 3;
-    u32 *q = (u32 *)(p + 0x1b8);
-    do {
-        *q = v;
-        q -= 7;
-        i--;
-    } while (i >= 0);
+    struct PhaseObject *object = (struct PhaseObject *)p;
+    s32 i;
+
+    for (i = 3; i >= 0; i--)
+        object->segments[i].property = v;
 }
 
 struct IvySegmentHalfwordView {

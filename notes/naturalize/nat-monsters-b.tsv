@@ -87,3 +87,4 @@ src/monsters/ivy/child_group.c	ChildGroup_AdvanceLaunchCycle	minor	natural	1	(u8
 src/monsters/ivy/child_group.c	ChildGroup_WaitForInactiveMembers	contrived	natural	1	
 src/monsters/ivy/child_group.c	ChildGroup_UpdateTrailingMembers	contrived	natural	1	
 src/monsters/ivy/child_group.c	ChildGroup_UpdateLandingState	minor	natural	1	
+src/monsters/ivy/child_group.c	Ivy_SetSegmentFlags	contrived	natural	1	u8* parameter kept for callers

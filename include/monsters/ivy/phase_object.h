@@ -25,6 +25,15 @@ struct PhaseEntry {
     struct PhaseEntryPresentation presentation;
 };
 
+/* The four per-segment records; only the two properties set in bulk are known. */
+struct PhaseSegment {
+    u8 unknown0[6];
+    u16 halfword;
+    u8 unknown8[4];
+    u32 property;
+    u8 unknown10[0xC];
+};
+
 struct PhaseObjectMode {
     u8 flags;
     u8 unknown8E[4];
@@ -51,7 +60,7 @@ struct PhaseObject {
     u8 entryReset;
     u8 unknownA3[5];
     struct PhaseEntry entries[4];
-    u8 unknown158[0x70];
+    struct PhaseSegment segments[4];
     struct ContactCollider memberCollidersA[4], memberCollidersB[4];
     struct ContactPosition saved[4], goal, delta, start;
     s32 orbitAngles[4];
