@@ -11,11 +11,10 @@
 
 void Actor_ClampMovementSpeed(struct ActorStats *actor)
 {
-    s32 *p = &actor->movementOffset;
-    if (*p > 0xc8000)
-        *p = 0xc8000;
-    if (*p <= 0x1ffff)
-        *p = 0x20000;
+    if (actor->movementOffset > 0xc8000)
+        actor->movementOffset = 0xc8000;
+    if (actor->movementOffset <= 0x1ffff)
+        actor->movementOffset = 0x20000;
 }
 
 extern s8 gUnk_086106C0[];
