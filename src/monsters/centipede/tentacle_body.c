@@ -100,7 +100,7 @@ void CentipedeBody_UpdateHiddenTransition(struct ChaseActor *actor, s32 frame, u
         SceneActorAnimation_SelectDirectionalEntry(actor, 9);
         SceneActorChase_SetControl(actor, ActorTrail_RestoreSavedState, 13);
     } else {
-        actor->base.restart = queued;
+        actor->base.restart = 0;
     }
 }
 
