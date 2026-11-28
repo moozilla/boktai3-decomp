@@ -1,19 +1,21 @@
 #include "global.h"
-void *Task_Create(s32, s32);
-void Task_SetCallbacks(void *, void *, void *);
-void Task_Kill(void *);
-void Ratatosk_UpdateParticlePool(void);
-void RatatoskParticle_Destroy(void);
-s32 RatatoskParticle_Init(void *);
-void *Ratatosk_CreateParticlePool(void)
+#include "bosses/ratatosk/ratatosk_small_particle.h"
+#include "engine/ram.h"
+
+s32 Ratatosk_UpdateParticlePool(struct ParticlePool *);
+u32 RatatoskParticle_Destroy(struct ParticlePool *);
+s32 RatatoskParticle_Init(struct ParticlePool *);
+
+struct ParticlePool *Ratatosk_CreateParticlePool(void)
 {
-    void *r = Task_Create(8, 0xb20);
-    if (r) {
-        Task_SetCallbacks(r, Ratatosk_UpdateParticlePool, RatatoskParticle_Destroy);
-        if (RatatoskParticle_Init(r) < 0) {
-            Task_Kill(r);
+    struct ParticlePool *pool = (void *)Task_Create(8, sizeof(struct ParticlePool));
+    if (pool) {
+        Task_SetCallbacks(&pool->task, (void *)Ratatosk_UpdateParticlePool,
+                          (void *)RatatoskParticle_Destroy);
+        if (RatatoskParticle_Init(pool) < 0) {
+            Task_Kill(&pool->task);
             return 0;
         }
-        return r;
+        return pool;
     }
 }
