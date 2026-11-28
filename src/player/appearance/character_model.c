@@ -619,15 +619,13 @@ void PanelText_DrawDigits(s32 value, s32 divisor, u32 x, u32 y, s32 style)
     if (!style)
         base = 0x11;
     cell = (u16 *)Video_GetWrappedBackgroundMapEntry(3, x, y);
-    if (divisor > 0) {
+    while (divisor > 0) {
+        s32 digit = Div(value, divisor);
+        *cell++ = digit + base;
         do {
-            s32 digit = Div(value, divisor);
-            *cell++ = digit + base;
-            do {
-                value -= digit * divisor;
-            } while (0);
-            divisor = Div(divisor, 10);
-        } while (divisor > 0);
+            value -= digit * divisor;
+        } while (0);
+        divisor = Div(divisor, 10);
     }
 }
 

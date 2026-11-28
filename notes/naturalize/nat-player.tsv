@@ -31,3 +31,9 @@ src/player/appearance/character_model.c	ActorStats_ApplyPendingDamage	contrived	
 src/player/appearance/character_model.c	Character_OnActionSoundCue	natural	natural	0	-
 src/player/appearance/character_model.c	ModifierMenu_InitSelectionSnapshot	natural	natural	0	-
 src/player/appearance/character_model.c	PaletteFade_CycleMenuColors	contrived	natural	1	-
+src/player/appearance/character_model.c	GameState_GetBikeName	natural	natural	0	-
+src/player/appearance/character_model.c	GameState_SetNameFromScript	natural	natural	8	do/while with break is plain C; for/while forms rotate the loop differently
+src/player/appearance/character_model.c	GameState_EnableAlternateHud	natural	natural	0	-
+src/player/appearance/character_model.c	GameState_RequestPaletteRefresh	natural	natural	0	-
+src/player/appearance/character_model.c	Video_GetWrappedBackgroundMapEntry	natural	natural	0	-
+src/player/appearance/character_model.c	PanelText_DrawDigits	contrived	minor	19	do/while(0) around the remainder: without it 'cell' outranks 'value' in register allocation (priority 7368 vs 4375)
