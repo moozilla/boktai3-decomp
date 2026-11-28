@@ -191,3 +191,4 @@ src/monsters/popbud/Popbud_UpdateDamageAnimation.c	Popbud_UpdateDamageAnimation	
 src/monsters/popbud/Popbud_InitCollider.c	Popbud_InitCollider	contrived	natural	1	
 src/monsters/popbud/Popbud_RecordDefeat.c	Popbud_RecordDefeat	contrived	minor	2	(u16 *) on unk56E: game_state.h has no counter56E field
 src/monsters/popbud/Combat_ApplyHitReaction.c	Combat_ApplyHitReaction	contrived	natural	2	
+src/monsters/popbud/ProjectileEmitter_UpdateAttack.c	ProjectileEmitter_UpdateAttack	minor	natural	2	pos/origin pointer locals
