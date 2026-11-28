@@ -1,6 +1,5 @@
 #include "effects/sprites/sprite_effect_controller.h"
 #include "engine/video/sprite_drawable_api.h"
-#define gSpriteShapeDimensions gUnk_086140EC
 extern const u16 gUnk_086140EC[];
 void SpriteDrawable_SelectTileFrame(struct SpriteDrawable *sprite,
                                     const struct SpriteEffectTileResource *resource, u32 frame)

@@ -375,3 +375,4 @@ src/engine/video/palette/Effect_Initialize.c	Effect_Initialize	contrived	natural
 src/engine/video/palette/Effect_Remove.c	Effect_Remove	contrived	natural	1	
 src/engine/video/palette/ParticleSprite_Initialize.c	ParticleSprite_Initialize	contrived	natural	1	
 src/engine/video/palette/sub_08217E40.c	sub_08217E40	contrived	natural	1	
+src/engine/video/palette/SpriteDrawable_SelectTileFrame.c	SpriteDrawable_SelectTileFrame	minor	natural	1	
