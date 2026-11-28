@@ -2795,21 +2795,14 @@ void TetherActor_UpdateDirectedMovement(struct TetherActor *actor)
         actor->moving = 1;
     } else if (actor->directedTimer <= 29) {
         u32 angle;
-        {
-            u32 value = (actor->directedHeading + 5) & 7;
-            angle = value << 5;
-        }
+        angle = ((actor->directedHeading + 5) & 7) << 5;
         actor->position.x += scale(gUnk_086149C4[(angle + 64) & 255] * 5);
         actor->position.z += scale(gUnk_086149C4[angle] * 5);
         actor->heading = actor->directedHeading;
     }
     if (--actor->directedTimer == 0) {
-        gRandomIndex = (gRandomIndex + 1) & 1023;
-        {
-            u32 sample = ((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
-            sample &= 63;
-            actor->directedTimer = sample + 45;
-        }
+        actor->directedTimer =
+            (ParticleRandom_ReadDirectSample((const u16 *)RANDOM_TABLE_ADDR) & 63) + 45;
     }
 }
 
