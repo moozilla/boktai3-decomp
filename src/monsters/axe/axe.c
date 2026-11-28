@@ -2318,25 +2318,15 @@ void ActorPhase_EmitTrailSprite(struct ChaseActor *actor, const struct ContactPo
 
 void Axe_TickAuxiliarySpriteTimers(struct ChaseActor *actor)
 {
-    u32 *flags = &((struct Axe *)actor->base.context)->trail[0].sprite.flags;
-    u8 *p = actor->base.context;
-    u32 off = (u32) & ((struct Axe *)0)->trail[0].lifetime;
-    s32 i = 3;
-    u32 one = 1;
-    do {
-        u16 *timer = (u16 *)(p + off);
-        if (*timer != 0) {
-            if (--*timer == 0) {
-                {
-                    u32 f = *flags;
-                    one = 1;
-                    *flags = f | one;
-                }
-            }
+    struct Axe *axe = actor->base.context;
+    s32 i;
+
+    for (i = 0; i < 4; i++) {
+        if (axe->trail[i].lifetime != 0) {
+            if (--axe->trail[i].lifetime == 0)
+                axe->trail[i].sprite.flags |= 1;
         }
-        flags = (u32 *)((u8 *)flags + sizeof(struct AxeTrailSlot));
-        p += sizeof(struct AxeTrailSlot);
-    } while (--i >= 0);
+    }
 }
 
 void Sprite_Remove(void *);

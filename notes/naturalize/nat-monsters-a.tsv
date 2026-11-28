@@ -287,3 +287,64 @@ src/monsters/dragon_puppy/DragonPuppy_UpdateAttackTiming.c	DragonPuppy_UpdateAtt
 src/monsters/dragon_puppy/DragonPuppy_InitializeFromScript.c	DragonPuppy_InitializeFromScript	contrived	contrived	1	remaining: mask,structcast
 src/monsters/cannons/plasma/PlasmaCannon_InitializeFromScript.c	PlasmaCannon_InitializeFromScript	contrived	contrived	6	remaining: mask,structcast
 src/monsters/golem/golem_main_2.c	Golem_UpdateChargePursuit	contrived	contrived	55	remaining: bytep,goto,block,constlocal,mask,ptrtemp,maskhelper
+src/monsters/axe/axe_contact.c	Axe_OnSecondaryColliderContact	natural	natural	0	
+src/monsters/axe/axe_contact.c	Axe_OnAttackColliderContact	natural	natural	0	
+src/monsters/axe/axe_contact.c	SceneActor_AdvanceOffsetApproach	natural	natural	0	
+src/monsters/axe/axe_contact.c	ActorPhase_UpdateTimedFlicker	natural	natural	0	
+src/monsters/axe/actor_phase.c	ActorPhase_UpdateReverseFlickerExit	natural	natural	0	
+src/monsters/axe/actor_phase.c	ActorPhase_UpdateSpriteCollapse	natural	natural	0	
+src/monsters/axe/actor_phase.c	ActorPhase_UpdateSpriteRestore	natural	natural	0	
+src/monsters/axe/axe.c	Axe_OnAnimationReset	natural	natural	0	
+src/monsters/axe/axe.c	Axe_BeginProfileEntry	natural	natural	0	
+src/monsters/axe/axe.c	Axe_ReleaseAndIdle	natural	natural	0	
+src/monsters/axe/axe.c	Axe_InitMotionTable	natural	natural	0	
+src/monsters/axe/axe.c	Axe_GetActorCategory	natural	natural	0	
+src/monsters/axe/axe.c	Axe_SetMovementEndpoints	natural	natural	0	
+src/monsters/axe/axe.c	Axe_StepCurveMotion	natural	natural	0	
+src/monsters/axe/axe.c	Axe_InitProfile	natural	natural	0	
+src/monsters/axe/axe.c	Axe_GetDirectionalFrame	natural	natural	0	
+src/monsters/axe/axe.c	Axe_TickCooldowns	natural	natural	0	
+src/monsters/axe/axe.c	Axe_PickAttack	natural	natural	0	
+src/monsters/axe/axe.c	Axe_RecordRoutePoint	natural	natural	0	
+src/monsters/axe/axe.c	Axe_IsRoutePointRecent	natural	natural	0	
+src/monsters/axe/axe.c	Axe_OnReaction	natural	natural	0	
+src/monsters/axe/axe.c	Axe_SetAuxiliarySpriteResource	natural	natural	0	
+src/monsters/axe/axe.c	Axe_UpdateReturningTrail	minor	minor	0	typed drawable casts / small flag and getter wrappers remain
+src/monsters/axe/axe.c	Axe_UpdateFadeOut	minor	minor	0	typed drawable casts / small flag and getter wrappers remain
+src/monsters/axe/axe.c	Axe_UpdateWaitingAnimation	minor	minor	0	typed drawable casts / small flag and getter wrappers remain
+src/monsters/axe/axe.c	SceneActorControl_ApplyDampedMotion	minor	minor	0	typed drawable casts / small flag and getter wrappers remain
+src/monsters/axe/axe.c	Axe_UpdateHealthPacedMotion	minor	minor	0	typed drawable casts / small flag and getter wrappers remain
+src/monsters/axe/axe.c	Axe_InitRoutePointHistory	minor	minor	0	|= 0xff on the history bytes: plain store drops the read the ROM does
+src/monsters/axe/axe.c	Axe_UpdateRouteWander	contrived	contrived	2	targetStorage plus a target pointer: one local changes the address register reuse around CellIndex/CellHeight
+src/monsters/axe/axe.c	Axe_UpdatePaletteTransition	contrived	contrived	3	red/deltaRed/flags pointers fetched through out-parameter helpers: p->red[i] and a direct behaviorFlags test let gcc form the induction pointers and flag address differently
+src/monsters/axe/axe.c	Axe_SetAuxiliarySpriteRenderState	natural	natural	0	
+src/monsters/axe/axe.c	Axe_RemoveAuxiliarySprites	natural	natural	0	
+src/monsters/axe/axe.c	Axe_ReleaseAuxiliarySprite	natural	natural	0	
+src/monsters/axe/axe.c	Axe_CopyAuxiliaryVector	natural	natural	0	
+src/monsters/axe/axe.c	Axe_SetAuxiliarySpriteParameters	natural	natural	0	
+src/monsters/axe/axe.c	Axe_UpdateTrailColliders	natural	natural	0	
+src/monsters/axe/axe.c	Axe_RemoveSecondaryColliders	natural	natural	0	
+src/monsters/axe/axe.c	ActorGroup_ReadScriptOptions	natural	natural	0	
+src/monsters/axe/axe.c	Axe_PrepareUpdate	natural	natural	0	
+src/monsters/axe/axe.c	Axe_UpdateEffects	natural	natural	0	
+src/monsters/axe/axe.c	Axe_InitEventCallbacks	natural	natural	0	
+src/monsters/axe/axe.c	Axe_ReleaseResources	natural	natural	0	
+src/monsters/axe/axe.c	Axe_Create	natural	natural	0	
+src/monsters/axe_armor/AxeArmor_InitCollider.c	AxeArmor_InitCollider	natural	natural	0	
+src/monsters/axe_armor/AxeArmor_FireProjectile.c	AxeArmor_FireProjectile	natural	natural	0	
+src/monsters/axe_armor/AxeArmor_UpdateCountdown.c	AxeArmor_UpdateCountdown	natural	natural	0	
+src/monsters/axe_armor/AxeArmor_Create.c	AxeArmor_Create	natural	natural	0	
+src/monsters/cannons/vulcan/VulcanCannon_UpdateFiringBurst.c	VulcanCannon_UpdateFiringBurst	natural	natural	0	
+src/monsters/cannons/vulcan/VulcanCannon_Create.c	VulcanCannon_Create	natural	natural	0	
+src/monsters/cannons/wind/WindCannonManager_InitSlot.c	WindCannonManager_InitSlot	natural	natural	0	
+src/monsters/cannons/wind/WindCannonManager_DestroySlot.c	WindCannonManager_DestroySlot	natural	natural	0	
+src/monsters/cannons/wind/WindCannon_ToggleActiveState.c	WindCannon_ToggleActiveState	natural	natural	0	
+src/monsters/cannons/wind/WindCannon_Activate.c	WindCannon_Activate	natural	natural	0	
+src/monsters/cannons/wind/WindCannon_UpdateInactive.c	WindCannon_UpdateInactive	natural	natural	0	
+src/monsters/axe/axe.c	Axe_SpawnHeadingBurst	minor	minor	0	casts, paired x/z temps or one-line flag wrappers remain
+src/monsters/axe/axe.c	SceneActorControl_UpdateControl35Phase	minor	minor	0	casts, paired x/z temps or one-line flag wrappers remain
+src/monsters/axe/axe.c	SceneActorControl_UpdateControl2APhase	minor	minor	0	casts, paired x/z temps or one-line flag wrappers remain
+src/monsters/axe/axe.c	Axe_InitActionCallbacks	minor	minor	0	casts, paired x/z temps or one-line flag wrappers remain
+src/monsters/axe/axe.c	Axe_UpdatePlayerDestinationPhase	minor	minor	0	casts, paired x/z temps or one-line flag wrappers remain
+src/monsters/axe/axe.c	Axe_OnUpdate	minor	minor	0	casts, paired x/z temps or one-line flag wrappers remain
+src/monsters/axe/axe.c	Axe_OnRender	minor	minor	0	casts, paired x/z temps or one-line flag wrappers remain
