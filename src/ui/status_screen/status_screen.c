@@ -1,5 +1,6 @@
 #include "ui/status_screen/status_screen.h"
 #include "engine/video/render.h"
+#include "gba/io_reg.h"
 
 u16 *StatusScreen_GetTilePtr(u32 bg, u32 x, s32 y)
 {
@@ -171,20 +172,9 @@ void StatusScreen_Close(struct StatusScreen *p)
     if (p->timer == p->times[5]) {
         Script_Call(p->script, &p->args);
         Task_Kill(p);
-        {
-            u16 *flags = &gDispCntShadow;
-            s32 mask;
-            mask = ~256;
-            mask &= *flags;
-            *flags = mask;
-        }
+        Bg_DisableDisplay(DISPCNT_BG0_ON);
     }
-    {
-        u32 flags = p->dirty;
-        u32 result = 4;
-        result |= flags;
-        result &= 0xFFFC;
-        p->dirty = result;
-    }
+    p->dirty |= 4;
+    p->dirty &= ~3;
     p->timer++;
 }

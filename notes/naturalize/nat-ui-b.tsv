@@ -122,3 +122,4 @@ src/ui/status_screen/status_screen.c	NumericDisplay_DrawStatusValues	contrived	n
 src/ui/status_screen/status_screen.c	NumericDisplay_DrawPair	contrived	natural	12	-
 src/ui/status_screen/status_screen.c	StatusScreen_DrawClock	contrived	natural	5	-
 src/ui/status_screen/status_screen.c	StatusScreen_GetTilePtr	minor	natural	14	-
+src/ui/status_screen/status_screen.c	StatusScreen_Close	contrived	natural	3	-
