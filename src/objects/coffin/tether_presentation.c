@@ -1,5 +1,6 @@
 #include "objects/coffin/tether_presentation.h"
 #include "scene/motion/scene_actor_terrain.h"
+#include "engine/video/render.h"
 
 /* Tentative: caller derives quadrant from x/y, then selects a sprite animation. */
 
@@ -312,22 +313,19 @@ void ScenePaletteFade_Destroy(void *unused)
 
 s32 ScenePaletteFade_InitFromScript(struct ScenePaletteFade *fade, void *unused)
 {
-    s32 v;
-    {
-        u16 *g = &gDispCntShadow;
-        u32 m = 0xFFFFF0FF;
-        *g = *g & m;
-    }
+    s32 blendShift, delay;
+
+    Bg_DisableDisplay(0xF00);
     PaletteScreen_LoadResources(fade);
-    if (Script_SeekToKeyword(0x66))
-        v = Script_GetValue();
+    if (Script_SeekToKeyword('f'))
+        blendShift = Script_GetValue();
     else
-        v = 6;
-    fade->blendShift = v;
-    v = Script_SeekToKeyword(0x73);
-    if (v)
-        v = Script_GetValue();
-    fade->delay = v;
+        blendShift = 6;
+    fade->blendShift = blendShift;
+    delay = Script_SeekToKeyword('s');
+    if (delay)
+        delay = Script_GetValue();
+    fade->delay = delay;
     fade->frame = 0;
     ScenePaletteFade_BeginDelay(fade);
     return 0;
