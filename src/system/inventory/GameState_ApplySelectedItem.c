@@ -9,8 +9,7 @@ void SceneHud_RefreshControls(void);
    at +0x68) and refreshes the player and the HUD (tentative). */
 void GameState_ApplySelectedItem(void)
 {
-    u8 *gs = gGameState;
-    Inventory_RemoveEquipmentEntry(*(s16 *)(*(s16 *)(gs + 0x50) * 2 + gs + 0x68));
+    Inventory_RemoveEquipmentEntry(*((s16)gGameState->unk50 + gGameState->inventory));
     if (gPlayers[0]) {
         Player_BeginDescriptorAction(gPlayers[0], 0);
         SceneHud_RefreshControls();
