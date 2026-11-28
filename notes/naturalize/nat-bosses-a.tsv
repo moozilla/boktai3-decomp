@@ -75,3 +75,4 @@ src/bosses/count/actor_graphics_and_basic_states.c	SceneActorState_WaitForFlagRe
 src/bosses/count/actor_graphics_and_basic_states.c	SceneActorState_UpdateActionController	minor	minor	0	
 src/bosses/count/actor_graphics_and_basic_states.c	SceneActorState_StartContactPool	contrived	minor	6	pointers to both stack positions (plain struct accesses become register pairs); health read through a local (value loaded before the field address)
 src/bosses/count/actor_graphics_and_basic_states.c	SceneActorState_AdvanceToState01	contrived	natural	1	
+src/bosses/count/actor_graphics_and_basic_states.c	SceneActorState_PlayVariantAnimation12ThenRecover	contrived	minor	4	actor re-cast to StateActor for the state check and animation (those uses stay on the parameter register)
