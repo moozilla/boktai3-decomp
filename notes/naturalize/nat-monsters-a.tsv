@@ -275,3 +275,4 @@ src/monsters/armor/Armor_InitPartStretch.c	Armor_InitPartStretch	contrived	contr
 src/monsters/armor/Armor_UpdatePartFlash.c	Armor_UpdatePartFlash	contrived	contrived	10	remaining: u8cast,zeroone
 src/monsters/armor/Armor_UpdatePart.c	Armor_UpdatePart	contrived	contrived	5	remaining: constlocal,mask
 src/monsters/axe_armor/AxeArmor_ApplyHitReaction.c	AxeArmor_ApplyHitReaction	contrived	contrived	8	remaining: goto,block
+src/monsters/axe_armor/AxeArmor_UpdateAttackTiming.c	AxeArmor_UpdateAttackTiming	minor	natural	1	
