@@ -188,3 +188,4 @@ src/effects/bursts/radial_burst/sub_082364A4.c	sub_082364A4	contrived	natural	2	
 src/effects/bursts/radial_burst/CallbackGroup_UpdateActive.c	CallbackGroup_UpdateActive	contrived	natural	12	-
 src/effects/bursts/radial_burst/RadialBurstEffect_BlendSpritePalette.c	RadialBurstEffect_BlendSpritePalette	contrived	minor	40	shared channel mask local and shift-pair extraction: register order of the extraction
 src/effects/bursts/radial_burst/CallbackGroup_EmitAtPosition.c	CallbackGroup_EmitAtPosition	contrived	natural	8	-
+src/effects/bursts/radial_burst/RadialBurstEffect_EmitOrbitParticle.c	RadialBurstEffect_EmitOrbitParticle	contrived	natural	8	-
