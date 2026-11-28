@@ -106,38 +106,29 @@ u32 ActorController_StartAlternateTurn(struct ArmorActor *, u32);
 
 void Armor_UpdateFacingActionSequence(struct ArmorActor *p)
 {
-    u8 *q = &p->phase;
-    u8 r;
-    switch (*q) {
+    switch (p->phase) {
         case 0: {
             struct ArmorTarget *g = gGameState;
             s32 a = Math_Atan2(g->x - p->x, g->y - p->y);
             a = (a + 0x20) & 0xc0;
             if (p->facing != a) {
-                if (ActorController_StartAlternateTurn(p, a)) {
-                    r = 1;
-                    goto st;
-                }
+                if (ActorController_StartAlternateTurn(p, a))
+                    p->phase = 1;
                 break;
             }
-            *q = 1;
+            p->phase = 1;
         }
         case 1:
             if (DirectionalActor_TryBeginState(p, 0x19))
                 p->phase = 2;
             break;
         case 2:
-            if (p->timer > 9 && DirectionalActor_TryBeginState(p, 0x2b)) {
-                r = 3;
-                goto st;
-            }
+            if (p->timer > 9 && DirectionalActor_TryBeginState(p, 0x2b))
+                p->phase = 3;
             break;
         case 3:
-            r = p->actionStatus;
-            if (r == 0xff) {
-            st:
-                *q = r;
-            }
+            if (p->actionStatus == 0xff)
+                p->phase = 0xff;
             break;
     }
 }

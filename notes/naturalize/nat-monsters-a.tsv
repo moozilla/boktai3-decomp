@@ -170,3 +170,4 @@ src/monsters/armor/ActorController_UpdateArmorAnimationTransition.c	ActorControl
 src/monsters/armor/armor_actions.c	Armor_UpdateFacingAction9	contrived	minor	1	player position copied through gGameState halfword reads
 src/monsters/armor/armor_actions.c	Armor_UpdateFacingAction29	contrived	minor	1	player position copied through gGameState halfword reads
 src/monsters/armor/armor_actions.c	Armor_UpdateFacingAction6	contrived	natural	1	
+src/monsters/armor/armor_behavior.c	Armor_UpdateFacingActionSequence	contrived	natural	1	
