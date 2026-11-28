@@ -1,20 +1,20 @@
-#include "global.h"
-#include "effects/bursts/pair33_a_layout.h"
-u8 *Task_Create(u32, u32);
-void Task_SetCallbacks(u8 *, void (*)(u8 *), void (*)(u8 *));
-void Task_Kill(u8 *);
-void ChargedBurst_OnTaskUpdate(u8 *);
-void ChargedBurst_OnTaskDestroy(u8 *);
-s32 ChargedBurst_Init(u8 *, struct Pair33A *, u32, u32, u32, u32);
-u8 *ChargedBurst_Create(struct Pair33A *p, u32 a, u32 b, u32 c, u32 d)
+#include "effects/bursts/charged_burst.h"
+
+u32 ChargedBurst_OnTaskUpdate(struct ChargedBurst *);
+u32 ChargedBurst_OnTaskDestroy(struct ChargedBurst *);
+s32 ChargedBurst_Init(struct ChargedBurst *, struct ContactPosition *, u32, u32, u32, u32);
+
+struct ChargedBurst *ChargedBurst_Create(struct ContactPosition *position, u32 contactFlags,
+                                         u32 power, u32 b, u32 d)
 {
-    u8 *obj = Task_Create(8, 0x210);
-    if (obj) {
-        Task_SetCallbacks(obj, ChargedBurst_OnTaskUpdate, ChargedBurst_OnTaskDestroy);
-        if (ChargedBurst_Init(obj, p, a, b, c, d) < 0) {
-            Task_Kill(obj);
+    struct ChargedBurst *burst = Task_Create(8, sizeof(struct ChargedBurst));
+
+    if (burst) {
+        Task_SetCallbacks(burst, ChargedBurst_OnTaskUpdate, ChargedBurst_OnTaskDestroy);
+        if (ChargedBurst_Init(burst, position, contactFlags, power, b, d) < 0) {
+            Task_Kill(burst);
             return 0;
         }
     }
-    return obj;
+    return burst;
 }

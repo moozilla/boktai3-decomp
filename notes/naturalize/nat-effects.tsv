@@ -123,3 +123,4 @@ src/effects/bursts/charged_burst/ChargedBurst_InitCollider.c	ChargedBurst_InitCo
 src/effects/bursts/charged_burst/ChargedBurst_InitCoreEffect.c	ChargedBurst_InitCoreEffect	contrived	natural	3	-
 src/effects/bursts/charged_burst/ChargedBurst_InitParticles.c	ChargedBurst_InitParticles	contrived	natural	2	-
 src/effects/bursts/charged_burst/ChargedBurst_Init.c	ChargedBurst_Init	contrived	natural	1	-
+src/effects/bursts/charged_burst/ChargedBurst_Create.c	ChargedBurst_Create	minor	natural	1	-
