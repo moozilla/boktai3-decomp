@@ -1,10 +1,10 @@
 #include "global.h"
 #include "engine/ram.h"
-/* Hud_ReapplyCurrentMode: Reads the current HUD mode and applies it again through Hud_SetMode */
+#include "ui/pause/scene_hud_display.h"
 void Hud_SetMode(u32);
-/* Re-applies the current HUD mode (+0xA5E). */
+/* Re-applies the current HUD control mode. */
 void Hud_ReapplyCurrentMode(void)
 {
     if (gFieldHud)
-        Hud_SetMode(gFieldHud[0xA5E]);
+        Hud_SetMode(((struct SceneHudState *)gFieldHud)->controlMode);
 }
