@@ -1,8 +1,9 @@
 #include "global.h"
+#include "ui/books/forging_book.h"
 
 extern u32 gUnk_08613FC0[];
 
-u32 ForgingBook_GetCategoryEntryCount(u32 i)
+s32 ForgingBook_GetCategoryEntryCount(s32 category)
 {
-    return gUnk_08613FC0[i];
+    return gUnk_08613FC0[category];
 }

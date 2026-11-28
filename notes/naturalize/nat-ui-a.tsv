@@ -104,3 +104,4 @@ src/ui/books/collection/CollectionMenu_IsValidGridPosition.c	CollectionMenu_IsVa
 src/ui/books/collection/CollectionMenu_FinalizeState.c	CollectionMenu_FinalizeState	natural	natural	0	empty
 src/ui/books/collection/CollectionMenu_OnTaskDestroy.c	CollectionMenu_OnTaskDestroy	minor	minor	0	u32 parameter passed through
 src/ui/books/collection/CollectionMenu_Create.c	CollectionMenu_Create	natural	natural	0	
+src/ui/books/forging_book/ForgingBook_GetCategoryEntryCount.c	ForgingBook_GetCategoryEntryCount	natural	natural	1	
