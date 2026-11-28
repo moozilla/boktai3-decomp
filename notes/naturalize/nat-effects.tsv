@@ -134,3 +134,4 @@ src/effects/bursts/fragment_burst/FragmentBurst_AllocateSpriteGroup.c	FragmentBu
 src/effects/bursts/fragment_burst/SpritePool4_UpdateActive.c	SpritePool4_UpdateActive	contrived	minor	3	u8 occupancy test
 src/effects/bursts/fragment_burst/SpriteGroupPool_Destroy.c	SpriteGroupPool_Destroy	minor	minor	3	u8 occupancy test
 src/effects/bursts/fragment_burst/FragmentBurst_InitPool.c	FragmentBurst_InitPool	minor	natural	2	-
+src/effects/bursts/fragment_burst/FragmentBurst_EnsurePool.c	FragmentBurst_EnsurePool	minor	natural	1	-

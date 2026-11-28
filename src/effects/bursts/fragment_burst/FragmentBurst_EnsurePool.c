@@ -1,25 +1,22 @@
-#include "global.h"
-#include "engine/ram.h"
+#include "effects/bursts/fragment_burst.h"
 
-u8 *Task_Create(u32, u32);
-void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
-s32 FragmentBurst_InitPool(u8 *);
-void Task_Kill(u8 *);
-void SpritePool4_UpdateActive(void);
-void SpriteGroupPool_Destroy(void);
+s32 FragmentBurst_InitPool(struct FragmentBurstPool *);
+s32 SpritePool4_UpdateActive(struct FragmentBurstPool *);
+struct FragmentBurstPool *SpriteGroupPool_Destroy(struct FragmentBurstPool *);
 
-u8 *FragmentBurst_EnsurePool(void)
+struct FragmentBurstPool *FragmentBurst_EnsurePool(void)
 {
-    u8 *p;
-    if (gSpriteGroupPool != 0)
+    struct FragmentBurstPool *pool;
+
+    if (gSpriteGroupPool)
         return gSpriteGroupPool;
-    p = Task_Create(0xa, 0x5bc);
-    if (p != 0) {
-        Task_SetCallbacks(p, SpritePool4_UpdateActive, SpriteGroupPool_Destroy);
-        if (FragmentBurst_InitPool(p) < 0) {
-            Task_Kill(p);
+    pool = Task_Create(0xa, sizeof(*pool));
+    if (pool) {
+        Task_SetCallbacks(pool, SpritePool4_UpdateActive, SpriteGroupPool_Destroy);
+        if (FragmentBurst_InitPool(pool) < 0) {
+            Task_Kill(pool);
             return 0;
         }
     }
-    return p;
+    return pool;
 }
