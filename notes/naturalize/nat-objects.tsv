@@ -294,3 +294,4 @@ src/objects/hazards/directional_force/DirectionalForce_Tick.c	DirectionalForce_T
 src/objects/hazards/directional_force/DirectionalForce_InitializeFromScript.c	DirectionalForce_InitializeFromScript	contrived	natural	52	
 src/objects/hazards/directional_force/DirectionalForce_ConfigureFixedFromScript.c	DirectionalForce_ConfigureFixedFromScript	minor	natural	1	
 src/objects/hazards/directional_force/DirectionalForce_ConfigureRandomFromScript.c	DirectionalForce_ConfigureRandomFromScript	minor	natural	1	
+src/objects/hazards/directional_force/DirectionalForce_CreateFromScript.c	DirectionalForce_CreateFromScript	minor	natural	1	

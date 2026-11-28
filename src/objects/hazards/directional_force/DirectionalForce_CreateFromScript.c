@@ -7,7 +7,7 @@ struct DirectionalForce *DirectionalForce_CreateFromScript(u32 id)
     struct DirectionalForce *force;
     if (gDirectionalForce)
         return gDirectionalForce;
-    force = Task_Create(9, 0x30);
+    force = Task_Create(9, sizeof(*force));
     if (force) {
         Task_SetCallbacks(force, (void (*)(void *))DirectionalForce_Tick,
                           (void (*)(void *))DirectionalForce_Destroy);
