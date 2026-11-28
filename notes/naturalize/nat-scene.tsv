@@ -321,3 +321,5 @@ src/scene/actor/control/SceneActorControl_ConsumeLiftFlag.c	SceneActorControl_Co
 src/scene/actor/control/SceneActorControl_InitContactColliders.c	SceneActorControl_InitContactColliders	contrived	minor	2	contact callbacks passed as void *: their prototypes differ from the init parameters
 src/scene/actor/control/SceneActorControl_SetDefaultProfile.c	SceneActorControl_SetDefaultProfile	contrived	natural	2	-
 src/scene/actor/control/SceneActorControl_InitPositionCurveEndpoints.c	SceneActorControl_InitPositionCurveEndpoints	contrived	natural	1	-
+src/scene/actor/control/SceneActorControl_TickSway.c	SceneActorControl_TickSway	natural	natural	0	-
+src/scene/actor/control/SceneActorControl_GetTravelProfile.c	SceneActorControl_GetTravelProfile	contrived	minor	12	TestFlags predicate with a parked mask: a plain test loses the materialized 0/1
