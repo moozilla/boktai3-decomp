@@ -151,7 +151,7 @@ void StatusScreen_UpdateScanlineNoise(struct StatusScreen *p)
     for (i = p->bottom; i < 160; i++)
         p->rows[p->active][i] = 0;
     gScanlineDmaSource = p->rows[p->active];
-    gScanlineDmaTarget = (void *)0x0400004C;
+    gScanlineDmaTarget = (void *)REG_ADDR_MOSAIC;
     gScanlineDmaCount = 1;
     gScanlineDmaMode = 1;
     StatusScreen_AdvanceNoiseAmplitude(p);
