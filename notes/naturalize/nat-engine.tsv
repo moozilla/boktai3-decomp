@@ -621,3 +621,4 @@ src/system/save/Background_ClearVisibilityFlagFromScript.c	Background_ClearVisib
 src/system/save/Background_SetVisibilityFlagFromScript.c	Background_SetVisibilityFlagFromScript	contrived	natural	1	
 src/system/save/Power_EnterSleep.c	Power_EnterSleep	minor	natural	1	
 src/system/save/Palette_SetGrayscaleDurationFromScript.c	Palette_SetGrayscaleDurationFromScript	minor	natural	1	
+src/system/save/sub_08227E2C.c	sub_08227E2C	contrived	natural	1	
