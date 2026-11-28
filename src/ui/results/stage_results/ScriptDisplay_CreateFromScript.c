@@ -1,19 +1,21 @@
 #include "global.h"
-u8 *Task_Create(u32, u32);
-void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
-s32 MessagePanel_ConfigureFromScript(u8 *);
-void Task_Kill(u8 *);
-void ScriptDisplay_Update(void);
-void ScriptDisplay_Destroy(void);
-u8 *ScriptDisplay_CreateFromScript(void)
+#include "ui/results/stage_results.h"
+#include "engine/engine.h"
+
+s32 MessagePanel_ConfigureFromScript(struct StageResults *);
+u32 ScriptDisplay_Update(struct StageResults *);
+u32 ScriptDisplay_Destroy(struct StageResults *);
+
+struct StageResults *ScriptDisplay_CreateFromScript(void)
 {
-    u8 *p = Task_Create(0xb, 0x1214);
-    if (p != 0) {
-        Task_SetCallbacks(p, ScriptDisplay_Update, ScriptDisplay_Destroy);
-        if (MessagePanel_ConfigureFromScript(p) < 0) {
-            Task_Kill(p);
+    struct StageResults *results = Task_Create(0xb, sizeof(struct StageResults));
+    if (results != 0) {
+        Task_SetCallbacks(results, (void (*)(void *))ScriptDisplay_Update,
+                          (void (*)(void *))ScriptDisplay_Destroy);
+        if (MessagePanel_ConfigureFromScript(results) < 0) {
+            Task_Kill(results);
             return 0;
         }
     }
-    return p;
+    return results;
 }
