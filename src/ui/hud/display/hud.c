@@ -32,13 +32,11 @@ void Hud_DrawHealthMeterCells(struct SceneHudState *hud, s32 mode, s32 x, s32 y,
         } else if (units > 19) {
             color = 0x29f;
         } else {
-            u16 *timer = &hud->healthMeterBlinkTimer;
-            u16 t = *timer;
-            s32 bit = (t >> 2) & 1;
-            color = 0x12;
-            if (bit)
+            if ((hud->healthMeterBlinkTimer >> 2) & 1)
                 color = 0x109f;
-            *timer = t + 1;
+            else
+                color = 0x12;
+            hud->healthMeterBlinkTimer++;
         }
         if (cap == 0)
             cell = Hud_GetTilemapCell(0, x, y);
@@ -48,12 +46,12 @@ void Hud_DrawHealthMeterCells(struct SceneHudState *hud, s32 mode, s32 x, s32 y,
         fullTile = 0x63;
         emptyTile = 0x6b;
         endTile = 0x6c;
-        color = 0x3e0;
-        if (units <= 39) {
+        if (units > 39)
+            color = 0x3e0;
+        else if (units > 19)
+            color = 0x29f;
+        else
             color = 0x109f;
-            if (units > 19)
-                color = 0x29f;
-        }
         if (cap != 0)
             cell = Hud_GetTilemapCell(0, x - 2, y);
         else
@@ -66,8 +64,7 @@ void Hud_DrawHealthMeterCells(struct SceneHudState *hud, s32 mode, s32 x, s32 y,
     for (n = 0; n < full; n++)
         *cell++ = fullTile | 0xd000;
     if (partial) {
-        s32 r = partial - 8;
-        *cell++ = (fullTile - r) | 0xd000;
+        *cell++ = (fullTile + (8 - partial)) | 0xd000;
         n++;
     }
     for (; n < 10; n++)

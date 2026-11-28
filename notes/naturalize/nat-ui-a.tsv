@@ -515,3 +515,6 @@ src/ui/hud/display/hud_stat_display.c	Hud_GetStyleTileIndex	natural	natural	0
 src/ui/hud/display/hud_stat_display.c	Hud_InitSelectionBounds	natural	natural	0	
 src/ui/hud/display/hud_stat_display.c	Hud_DrawHealthRatio	natural	natural	0	
 src/ui/hud/display/hud_stat_display.c	Hud_DrawEnergyRatio	natural	natural	0	
+src/ui/hud/display/hud.c	Hud_DrawHealthMeterCells	fudged	natural	20	
+src/ui/hud/display/hud.c	Hud_DrawHealthMeter	natural	natural	0	
+src/ui/hud/display/hud.c	Hud_DrawDefaultHealthMeter	natural	natural	0	
