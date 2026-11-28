@@ -323,7 +323,8 @@ struct Player {
     u16 terrainDamageTimer;      /* 0x4C6: frames accumulated under a terrain modifier. */
     u16 actionAccumulator;       /* 0x4C8: wraps by 100 and triggers Player_EmitPeriodicEffect */
     u16 particleIntervalCounter; /* 0x4CA: periodic particle emission */
-    u8 unk4CC[4];
+    u8 unk4CC[2];
+    u16 unk4CE; /* 0x4CE: frames until the next point of periodic damage (tentative) */
     u16 particleCadenceCounter;                   /* 0x4D0: emits a particle after fifteen ticks */
     u16 contactMagnitude, contactDirection;       /* 0x4D2: deferred collision response */
     u16 positionResetRequested;                   /* 0x4D6: request flag, tentative */

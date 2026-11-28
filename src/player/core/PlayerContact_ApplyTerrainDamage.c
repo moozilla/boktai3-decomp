@@ -12,7 +12,6 @@ void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
 s32 Inventory_HasItem(s32);
 void Inventory_RemoveItem(s32);
 void HealthRestoreEffect_Create(struct Player *);
-#define H(off) (*(u16 *)((u8 *)p + (off)))
 static inline u32 specialState(struct Player *p)
 {
     u32 active = p->active;
@@ -71,17 +70,15 @@ s32 PlayerContact_ApplyTerrainDamage(struct Player *p)
     if (!p->positionResetValue) {
         if (p->movementModifierKind == 1 && p->movementModifierActive) {
             Player_AddStatusFlags(p, 0x200);
-            if (++H(0x4C6) >= Div(60, p->movementModifierActive)) {
+            if (++p->terrainDamageTimer >= Div(60, p->movementModifierActive)) {
                 p->particleEmissionCount += 10;
-                H(0x4C6) = 0;
+                p->terrainDamageTimer = 0;
             }
         }
         if (playerFlag(p, 0x444, 0x08000000)) {
-            u16 *timer = (u16 *)((u8 *)p + 0x4CE);
-            if (++*timer > 14) {
-                u16 *pending = &p->particleEmissionCount;
-                ++*pending;
-                *timer = 0;
+            if (++p->unk4CE > 14) {
+                ++p->particleEmissionCount;
+                p->unk4CE = 0;
             }
         }
     }
@@ -103,9 +100,9 @@ s32 PlayerContact_ApplyTerrainDamage(struct Player *p)
         if (!Inventory_HasItem(0x26))
             return 1;
         p->contactActionTag = 0;
-        if (!H(0x270)) {
+        if (!p->directionFrame) {
             p->facing |= 1;
-            H(0x270) = 1;
+            p->directionFrame = 1;
         }
         Inventory_RemoveItem(0x26);
         HealthRestoreEffect_Create(p);
