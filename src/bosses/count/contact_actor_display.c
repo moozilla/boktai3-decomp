@@ -172,9 +172,8 @@ u32 ContactActor_DestroySlot(struct ContactActorPool *unused, struct ContactActo
 s32 ContactActor_HideSlot(struct ContactActorPool *unused, struct ContactActor *slot,
                           s32 unusedIndex)
 {
-    u32 *flags = &slot->sprite.flags;
     struct ContactCollider *collider;
-    *flags |= 1;
+    slot->sprite.flags |= 1;
     collider = &slot->healthCollider;
     collider->flags |= 4;
     ActorShadow_Disable(slot->shadow);
