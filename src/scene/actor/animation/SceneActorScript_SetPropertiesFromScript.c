@@ -101,10 +101,8 @@ void SceneActorScript_SetPropertiesFromScript(void)
         struct SceneActorScriptControlView *control = &actor->control;
         value = ReadOrMinusOne();
         if (value >= 0) {
-            u32 square;
             control->radius = value;
-            square = (u32)control->radius * control->radius;
-            control->radiusSquared = square;
+            control->radiusSquared = control->radius * control->radius;
         }
         value = ReadOrMinusOne();
         if (value >= 0)

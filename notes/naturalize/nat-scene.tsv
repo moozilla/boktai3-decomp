@@ -147,3 +147,4 @@ src/scene/actor/animation/SceneActorScript_SetManagerModeFromScript.c	SceneActor
 src/scene/actor/animation/SceneActorScript_SetControlBytesFromScript.c	SceneActorScript_SetControlBytesFromScript	contrived	natural	1	
 src/scene/actor/animation/SceneActorScript_SetFlagFromScript.c	SceneActorScript_SetFlagFromScript	minor	minor	3	WordFlags_And via a flags pointer: plain &= loads the mask after the field
 src/scene/actor/animation/SceneActorScript_SetPositionFromScript.c	SceneActorScript_SetPositionFromScript	contrived	minor	12	terrain slope switch replaces goto chain; y-pointer assigned between GetPc and GetValue stays (CSE keeps &position.y in r7)
+src/scene/actor/animation/SceneActorScript_SetPropertiesFromScript.c	SceneActorScript_SetPropertiesFromScript	minor	minor	6	keyword/type helper inlines and a pointer to rangeSquared (store order)
