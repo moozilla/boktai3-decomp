@@ -16,12 +16,10 @@ void SceneCharacter_UpdateAlternatePalettePulse(void *context, struct StateActor
     }
     t = Mod(actor->stateFrame, 128);
     if (t <= 64) {
-        u8 *bank = gPaletteBankData;
-        u8 *from = bank + 0x680, *to = bank + 0x2de0;
+        u8 *from = gPaletteBankData + 0x680, *to = gPaletteBankData + 0x2de0;
         Palette_InterpolateBanks(actor->overlayDrawable[0].palette, from, to, t, 6);
     } else {
-        u8 *bank = gPaletteBankData;
-        u8 *from = bank + 0x2de0, *to = bank + 0x680;
+        u8 *from = gPaletteBankData + 0x2de0, *to = gPaletteBankData + 0x680;
         Palette_InterpolateBanks(actor->overlayDrawable[0].palette, from, to, t - 64, 6);
     }
 }
