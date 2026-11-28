@@ -6,12 +6,9 @@ s32 Shop_TickModeMenu(struct ShopControlView *panel)
         SceneInput_SetGlyphPair(&panel->prompt, 0, 4);
     else
         SceneInput_SetGlyphPair(&panel->prompt, 0, -1);
-    SceneInputPanel_HighlightMode((void *)panel,
-                                  ((struct ShopHighlightView *)panel)->colors);
-    if (Shop_HandleClockShortcut(panel))
-        goto handled;
-    if (Shop_HandlePageKeys(panel))
-        goto handled;
+    SceneInputPanel_HighlightMode((void *)panel, ((struct ShopHighlightView *)panel)->colors);
+    if (Shop_HandleClockShortcut(panel) || Shop_HandlePageKeys(panel))
+        return 0;
     if (gPadState[1] & 2)
         return 1;
     if (gPadState[1] & 1) {
@@ -19,19 +16,19 @@ s32 Shop_TickModeMenu(struct ShopControlView *panel)
             case 4:
                 Sound_PlaySong(0x107);
                 Shop_BeginMoveSelection(panel);
-                goto handled;
+                return 0;
             case 1:
                 Sound_PlaySong(0x107);
                 Shop_BeginItemSelection(panel);
-                goto handled;
+                return 0;
             case 3:
                 Sound_PlaySong(0x107);
                 Shop_BeginExitConfirmation(panel);
-                goto handled;
+                return 0;
             case 2:
                 Sound_PlaySong(0x107);
                 Shop_BeginConsumableSelection(panel);
-                goto handled;
+                return 0;
         }
     }
     switch (gPadState[1] & 0xC0) {
@@ -50,6 +47,5 @@ s32 Shop_TickModeMenu(struct ShopControlView *panel)
             Sound_PlaySong(0xDC);
             break;
     }
-handled:
     return 0;
 }
