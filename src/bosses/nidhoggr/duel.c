@@ -289,15 +289,11 @@ int NidhoggrDuel_SelectAttackAnimation(struct GridAttackActor *p)
         index = i & 3;
         if (!((p->attackAnimationHistory >> index) & 1)) {
             p->attackAnimationHistory |= 1 << index;
-            goto done;
+            return index + 4;
         }
     }
     index = start;
-    {
-        int mask = 1 << index;
-        p->attackAnimationHistory = mask;
-    }
-done:
+    p->attackAnimationHistory = 1 << index;
     return index + 4;
 }
 
