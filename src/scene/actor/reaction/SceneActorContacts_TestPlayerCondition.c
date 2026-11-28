@@ -8,7 +8,7 @@ static inline u8 TestCondition(struct Player *input, u32 condition)
 {
     struct Player *player = input;
     u32 result;
-    if (input->active && input->sceneMode == condition) {
+    if (player->active && player->sceneMode == condition) {
         result = 1;
         goto done;
     }
@@ -64,9 +64,7 @@ u8 SceneActorContacts_TestPlayerCondition(struct SceneActorContactObjectView *ob
             return 0;
         return 1;
     }
-    if (mode != 1 || !(player->statusFlags & condition))
-        goto failure;
-    return 1;
-failure:
+    if (mode == 1 && (player->statusFlags & condition))
+        return 1;
     return 0;
 }
