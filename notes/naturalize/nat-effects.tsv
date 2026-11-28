@@ -211,3 +211,5 @@ src/effects/directional_effect/Player_DestroyDirectionalEffect.c	Player_DestroyD
 src/effects/directional_effect/DirectionalEffect_Init.c	DirectionalEffect_Init	contrived	natural	8	-
 src/effects/directional_effect/sub_08238FE0.c	sub_08238FE0	contrived	natural	5	drawable alias pointer (ROM keeps a second copy of the spark pointer)
 src/effects/directional_effect/DirectionalEffect_AddParticle.c	DirectionalEffect_AddParticle	contrived	natural	2	-
+src/effects/feathers/sub_08128B48.c	sub_08128B48	natural	natural	0	-
+src/effects/feathers/FeatherEffectPool_AllocEntry.c	FeatherEffectPool_AllocEntry	contrived	natural	2	-
