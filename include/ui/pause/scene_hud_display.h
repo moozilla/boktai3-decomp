@@ -70,9 +70,10 @@ struct SceneHudState {
     u32 panelResource; /* 0x18: passed to panel initialization */
     u8 unknown1C[8];
     void *accountLayerMap; /* 0x24: selection/detail background map */
-    u8 unknown28[4];
-    u32 panelConfig; /* 0x2C: passed to panel initialization */
-    u8 unknown30[0xC];
+    u32 largePanelResource; /* 0x28: background used in HUD mode eight */
+    u32 panelConfig;        /* 0x2C: passed to panel initialization */
+    u8 unknown30[8];
+    u32 largePanelConfig; /* 0x38 */
     const void *actionTextScript;        /* 0x3C */
     const u8 *timedMessageScript;        /* 0x40 */
     const void *optionAScript;           /* 0x44: -a script pointer, meaning tentative */
