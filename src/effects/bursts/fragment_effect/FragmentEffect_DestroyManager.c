@@ -1,35 +1,13 @@
-#include "global.h"
-#include "engine/ram.h"
+#include "effects/bursts/fragment_effect.h"
 
-void Sprite_Remove(void *);
-
-static inline u8 Tst(u32 *m, s32 i)
+u32 FragmentEffect_DestroyManager(struct FragmentEffectPool *pool)
 {
-    if (*m & (1 << i))
-        return TRUE;
-    return FALSE;
-}
+    s32 i;
 
-struct E {
-    u8 a[0xC0];
-};
-struct S {
-    u8 pad[0x38];
-    u32 mask;
-    struct E e[8];
-};
-
-u32 FragmentEffect_DestroyManager(struct S *b)
-{
-    s32 i = 0;
-    struct E *e = b->e;
-    for (; i < 8; e++, i++) {
-        if (Tst(&b->mask, i))
-            Sprite_Remove(e);
+    for (i = 0; i < 8; i++) {
+        if (FragmentEffectPool_IsOccupied(pool, i))
+            Sprite_Remove(&pool->fragments[i]);
     }
-    {
-        u32 z = 0;
-        gFragmentEffectManager = z;
-    }
+    gFragmentEffectManager = 0;
     return 0;
 }
