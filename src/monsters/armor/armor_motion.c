@@ -302,10 +302,10 @@ void Armor_UpdateWalkNormalWithScatterEffect(struct ArmorWalkController *p)
         Armor_SpawnScatterEffect(p);
 }
 
-void Armor_UpdateWalkFastWithTrailEffect(u8 *p)
+void Armor_UpdateWalkFastWithTrailEffect(struct ArmorWalkController *p)
 {
     Armor_UpdateWalk(p, 15, 0x2A);
-    if ((p[0xB42] & 0xF) == 0)
+    if ((p->ticks & 0xF) == 0)
         SceneActor_SpawnSpriteEffect(p);
 }
 
