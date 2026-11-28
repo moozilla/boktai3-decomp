@@ -357,15 +357,15 @@ void Mummy_ResumeRouteAfterRecovery(struct ChaseActor *actor, s32 frame)
             return;
         }
         if (SceneActorChase_QueryMotionFlags(actor, 0x80)) {
-            SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
+            SceneActorAnimation_SelectDirectionalEntry(actor, 0);
             SceneActorChase_SetBehavior(actor, 14);
             SceneActorChase_SetControl(actor, group->common.gate.control, 0x25);
             return;
         }
-        SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
+        SceneActorAnimation_SelectDirectionalEntry(actor, 0);
         SceneActorChase_SetState(actor, 3, 1, 0);
         SceneActorChase_SetControl(actor, (void *)SceneActorReaction_RestoreAfterDelay, 0xE);
-        SceneActorDelay_Prepare((void *)&group->saved, actor->base.onAlternateEntry, 7, 0x28);
+        SceneActorDelay_Prepare(&group->saved, actor->base.onAlternateEntry, 7, 0x28);
         SceneActorChase_SetActorFlags(actor, 0x10);
         Mummy_SnapToRoute(actor->group.destination, &actor->group.homeRoute);
         if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,
