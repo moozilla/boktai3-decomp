@@ -104,3 +104,4 @@ src/effects/bursts/explosion.c	Explosion_Update	contrived	natural	1	-
 src/effects/bursts/explosion.c	Explosion_InitSprite	contrived	natural	1	-
 src/effects/bursts/explosion.c	Explosion_InitCollider	contrived	natural	1	-
 src/effects/bursts/explosion.c	Explosion_InitColliderWithFlags	contrived	natural	1	-
+src/effects/bursts/explosion.c	Explosion_Init	contrived	natural	1	-
