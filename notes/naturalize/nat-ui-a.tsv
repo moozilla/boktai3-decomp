@@ -482,3 +482,11 @@ src/ui/hud/stage_icon/StageIconDisplay_Initialize.c	StageIconDisplay_Initialize	
 src/ui/hud/stage_icon/StageIconDisplay_Create.c	StageIconDisplay_Create	fudged	natural	1	
 src/ui/hud/stage_icon/StageIconDisplay_InitFromScript.c	StageIconDisplay_InitFromScript	fudged	natural	1	
 src/ui/hud/stage_icon/StageIconDisplay_CreateFromScript.c	StageIconDisplay_CreateFromScript	fudged	natural	1	
+src/ui/hud/stage_icon/StageIconDisplay_RequestKill.c	StageIconDisplay_RequestKill	natural	natural	0	
+src/ui/hud/stage_icon/StageIconDisplay_SetUpdate.c	StageIconDisplay_SetUpdate	natural	natural	0	
+src/ui/hud/stage_icon/StageIconDisplay_NotifyNative.c	StageIconDisplay_NotifyNative	natural	natural	0	
+src/ui/hud/stage_icon/StageIconDisplay_CallCompletionScript.c	StageIconDisplay_CallCompletionScript	natural	natural	0	
+src/ui/hud/stage_icon/StageIconDisplay_NotifyCompletion.c	StageIconDisplay_NotifyCompletion	natural	natural	0	
+src/ui/hud/stage_icon/StageIconDisplay_Tick.c	StageIconDisplay_Tick	natural	natural	0	
+src/ui/hud/stage_icon/StageIconDisplay_Destroy.c	StageIconDisplay_Destroy	natural	natural	0	
+src/ui/hud/stage_icon/StageIconDisplay_SelectUpdate.c	StageIconDisplay_SelectUpdate	natural	natural	0	
