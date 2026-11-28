@@ -632,7 +632,7 @@ s32 TriggerManager_Initialize(struct TriggerManager *p, void *unused)
 
 void *TriggerManager_InitManager(void *a, void *b)
 {
-    void *p = Task_Create(9, 0x5c);
+    void *p = Task_Create(9, sizeof(struct TriggerManager));
     if (p != 0) {
         Task_SetCallbacks(p, TriggerManager_Update, TriggerManager_DestroyManager);
         if (TriggerManager_Initialize(p, a) < 0) {
