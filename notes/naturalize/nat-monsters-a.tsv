@@ -96,3 +96,4 @@ src/monsters/armor/Armor_Create.c	Armor_Create	contrived	natural	1
 src/monsters/armor/Armor_OnPartDamageCollision.c	Armor_OnPartDamageCollision	contrived	minor	2	
 src/monsters/armor/Armor_UpdatePartBobbing.c	Armor_UpdatePartBobbing	contrived	natural	1	
 src/monsters/armor/armor_behavior.c	DirectionalActor_UpdateVisibilityDelay	contrived	minor	1	display flags read through a view cast
+src/monsters/armor/armor_behavior.c	Armor_DispatchBehaviorUpdate	contrived	natural	1	

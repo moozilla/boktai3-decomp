@@ -414,10 +414,8 @@ extern const u32 gUnk_0824F014[];
 
 void Armor_DispatchBehaviorUpdate(struct S *p)
 {
-    const u32 *t = gUnk_0824F014;
-    u8 *q = &p->b3c;
-    Callback_InvokeActor(p, t[*q]);
-    switch (*q) {
+    Callback_InvokeActor(p, gUnk_0824F014[p->b3c]);
+    switch (p->b3c) {
         case 0x20:
         case 0x1b:
         case 0x1c:
