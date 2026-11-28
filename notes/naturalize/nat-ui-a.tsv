@@ -341,3 +341,4 @@ src/ui/dialogue/text_window/TextWindow_Destroy.c	TextWindow_Destroy	fudged	natur
 src/ui/dialogue/text_window/TextWindow_StartPlayback.c	TextWindow_StartPlayback	fudged	natural	1	
 src/ui/dialogue/text_window/TextWindow_Clear.c	TextWindow_Clear	fudged	natural	1	
 src/ui/dialogue/text_window/TextWindow_StopPlayback.c	TextWindow_StopPlayback	fudged	natural	1	
+src/ui/dialogue/text_window/TextWindow_SetScript.c	TextWindow_SetScript	fudged	natural	1	
