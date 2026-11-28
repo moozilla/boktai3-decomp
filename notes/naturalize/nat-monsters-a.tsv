@@ -243,3 +243,4 @@ src/monsters/golem/golem_main.c	Golem_ResumeSavedTarget	contrived	minor	4	remain
 src/monsters/golem/golem_2.c	Golem_UpdateDefeat	contrived	contrived	11	remaining: block,maskhelper
 src/monsters/golem/golem_2.c	Golem_UpdateScriptedAction	contrived	contrived	3	remaining: u8cast,block,constlocal
 src/monsters/golem/golem_main_2.c	Golem_ReturnHome	minor	natural	3	
+src/monsters/golem/golem_main_2.c	Golem_UpdateChargeSettle	minor	natural	2	
