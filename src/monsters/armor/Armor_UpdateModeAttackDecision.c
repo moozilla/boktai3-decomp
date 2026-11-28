@@ -173,12 +173,11 @@ void Armor_UpdateModeAttackDecision(struct ArmorDecisionActor *p)
                 break;
         }
     } else {
-        u8 *decision = &p->decision;
-        switch (*decision) {
+        switch (p->decision) {
             case 0:
                 if (absX + absZ <= 4) {
                     ActorController_SetBehavior(p, 37);
-                    *decision = 1;
+                    p->decision = 1;
                     p->attackCooldown = 360;
                 } else
                     ActorController_SetBehavior(p, 2);
@@ -195,7 +194,7 @@ void Armor_UpdateModeAttackDecision(struct ArmorDecisionActor *p)
                     s32 alignedDistance = absX + absZ;
                     if (alignedDistance > 5) {
                         ActorController_SetBehavior(p, 7);
-                        *decision = mode;
+                        p->decision = mode;
                         break;
                     }
                     if (alignedDistance <= 1) {
@@ -218,7 +217,7 @@ void Armor_UpdateModeAttackDecision(struct ArmorDecisionActor *p)
                 break;
             case 2:
                 ActorController_SetBehavior(p, 3);
-                *decision = 1;
+                p->decision = 1;
                 p->attackCooldown = 360;
                 break;
         }
