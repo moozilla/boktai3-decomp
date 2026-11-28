@@ -1,6 +1,9 @@
 #include "global.h"
-void Callback_InvokeActor(void *, u32);
-void Player_InvokeStoredCallback(u8 *p)
+#include "player/player.h"
+
+void Callback_InvokeActor(struct Player *, void (*)(void));
+
+void Player_InvokeStoredCallback(struct Player *p)
 {
-    Callback_InvokeActor(p, *(u32 *)(p + 0xc88));
+    Callback_InvokeActor(p, p->actionCallback);
 }
