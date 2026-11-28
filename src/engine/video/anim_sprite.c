@@ -195,42 +195,39 @@ s32 AnimSprite_InitLinked(struct AnimSprite *animSprite, void *resource, u16 gly
 s32 AnimSprite_InitCleared(struct AnimSprite *animSprite, void *resource, u16 glyph, u32 flags,
                        u8 attributeA, u8 mode, u8 duration, void *position)
 {
-    u32 zero = animSprite->active;
-    if (zero != 0)
+    if (animSprite->active != 0)
         return -1;
-    else {
-        animSprite->glyphKind = zero;
-        animSprite->value6 = zero;
-        animSprite->sequenceId = zero;
-        animSprite->frameIndex = zero;
-        animSprite->frameCount = zero;
-        animSprite->playbackFlags = zero;
-        animSprite->status = 0;
-        animSprite->width = zero;
-        animSprite->height = zero;
-        animSprite->originX = zero;
-        animSprite->originY = zero;
-        animSprite->centerX = zero;
-        animSprite->centerY = zero;
-        animSprite->scaleX = 0;
-        animSprite->scaleY = 0;
-        animSprite->rotation = zero;
-        animSprite->value3C = zero;
-        animSprite->frames = NULL;
-        animSprite->palette = zero;
-        animSprite->tileData = zero;
-        animSprite->extraData = zero;
-        AnimSprite_InitAtPosition(animSprite, resource, glyph, flags, attributeA, mode,
-                                  duration, position);
-        gDefaultAnimFlags++;
-        if (gDefaultAnimFlags == 0xFFFF)
-            gDefaultAnimFlags = zero;
-        animSprite->cachedFrame = -1;
-        animSprite->cachedPalette = -1;
-        animSprite->previous = 0;
-        animSprite->next = 0;
-        return 0;
-    }
+    animSprite->glyphKind = 0;
+    animSprite->value6 = 0;
+    animSprite->sequenceId = 0;
+    animSprite->frameIndex = 0;
+    animSprite->frameCount = 0;
+    animSprite->playbackFlags = 0;
+    animSprite->status = 0;
+    animSprite->width = 0;
+    animSprite->height = 0;
+    animSprite->originX = 0;
+    animSprite->originY = 0;
+    animSprite->centerX = 0;
+    animSprite->centerY = 0;
+    animSprite->scaleX = 0;
+    animSprite->scaleY = 0;
+    animSprite->rotation = 0;
+    animSprite->value3C = 0;
+    animSprite->frames = NULL;
+    animSprite->palette = 0;
+    animSprite->tileData = 0;
+    animSprite->extraData = 0;
+    AnimSprite_InitAtPosition(animSprite, resource, glyph, flags, attributeA, mode,
+                              duration, position);
+    gDefaultAnimFlags++;
+    if (gDefaultAnimFlags == 0xFFFF)
+        gDefaultAnimFlags = 0;
+    animSprite->cachedFrame = -1;
+    animSprite->cachedPalette = -1;
+    animSprite->previous = 0;
+    animSprite->next = 0;
+    return 0;
 }
 
 void Sprite_OnRenderPhase(void)
