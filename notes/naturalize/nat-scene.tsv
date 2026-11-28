@@ -69,3 +69,25 @@ src/scene/actor/actor_pool/pooled_actor_controller.c	Actor_UpdateDrawable	minor	
 src/scene/actor/actor_pool/pooled_actor_controller.c	Actor_TryStartPendingAction	contrived	minor	9	actions table pointer (ROM loads the table before copying the id) and started flag
 src/scene/actor/actor_pool/pooled_actor_controller.c	Actor_InitializeControllerFromScript	contrived	minor	10	SetSelectionCallback/SetDamageCallback accessors: plain store shifts the callback address load order
 src/scene/actor/actor_pool/pooled_actor_controller.c	Actor_OnTrackingAction	minor	minor	6	low byte of the u16 random table through a u8 cast
+src/scene/actor/actor_pool/pooled_actor_controller.c	Actor_InitializeSequenceDrawable	natural	natural	0	
+src/scene/actor/actor_pool/pooled_actor_controller.c	Actor_InitializeKeyframeDrawable	natural	natural	0	
+src/scene/actor/actor_pool/pooled_actor_controller.c	Actor_PrepareStateUpdate	natural	natural	0	
+src/scene/actor/actor_pool/pooled_actor_controller.c	Actor_DispatchActionCallback	natural	natural	0	
+src/scene/actor/actor_pool/pooled_actor_controller.c	Actor_RequestAction	natural	natural	0	
+src/scene/actor/actor_pool/pooled_actor_controller.c	Actor_ShowDamageNumber	natural	natural	0	
+src/scene/actor/actor_pool/pooled_actor_controller.c	Actor_StartDamageFlash	natural	natural	0	
+src/scene/actor/actor_pool/pooled_actor_controller.c	Actor_SetAnimationEntry	natural	natural	0	
+src/scene/actor/actor_pool/pooled_actor_controller.c	Actor_OnHitboxContact	natural	natural	0	
+src/scene/actor/actor_pool/pooled_actor_controller.c	Actor_OnColliderContact	natural	natural	0	
+src/scene/actor/actor_pool/pooled_actor_controller.c	Actor_ClearStateChanged	natural	natural	0	
+src/scene/actor/actor_pool/pooled_actor_controller.c	Actor_DispatchStateHandler	natural	natural	0	
+src/scene/actor/actor_pool/pooled_actor_controller.c	Actor_OnDamage	natural	natural	0	
+src/scene/actor/actor_pool/pooled_actor_controller.c	Actor_UpdateAction	natural	natural	0	
+src/scene/actor/actor_pool/pooled_actor_controller.c	Actor_UpdateDrawableAndTarget	natural	natural	0	
+src/scene/actor/actor_pool/pooled_actor_controller.c	Actor_UpdateControllerCollisionAndTimers	natural	natural	0	
+src/scene/actor/actor_pool/pooled_actor_controller.c	Actor_OnControllerUpdate	natural	natural	0	
+src/scene/actor/actor_pool/pooled_actor_controller.c	Actor_OnControllerDestroy	natural	natural	0	
+src/scene/actor/actor_pool/pooled_actor_controller.c	Actor_SetFacingAnimationEntry	minor	minor	0	duplicated facing branches (both ROM arms present)
+src/scene/actor/actor_pool/pooled_actor_controller.c	Actor_SetFourDirectionAnimationEntry	minor	minor	0	duplicated facing branches (both ROM arms present)
+src/scene/actor/actor_pool/pooled_actor_controller.c	Actor_SetMirroredAnimationEntry	minor	minor	0	dead facing temp kept in the else arm: removing it changes register allocation
+src/scene/actor/actor_pool/pooled_actor_controller.c	Actor_CreateControllerFromScript	minor	minor	0	allocated alias keeps a second register
