@@ -4,3 +4,4 @@ src/monsters/ivy/ivy.c	Ivy_OnSecondaryContact	natural	natural	0
 src/monsters/ivy/ivy.c	SceneActorReaction_PlayHiddenCue	contrived	natural	5	
 src/monsters/ivy/ivy.c	Ivy_UpdateActiveState	contrived	minor	3	HalfwordFlags_Clear kept:  the ROM loads a 32-bit mask for the u16 field (a plain &= narrows it to 0xF7FF)
 src/monsters/ivy/ivy.c	Ivy_EnterDisabledState	contrived	minor	5	HalfwordFlags_Set kept:  the constant is loaded before the field address
+src/monsters/ivy/ivy.c	SceneActorReaction_FinishAnimation17	contrived	minor	3	HalfwordFlags_Clear kept:  32-bit mask on a u16 field

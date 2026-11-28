@@ -133,7 +133,7 @@ s32 Ivy_FindAdjacentTarget(struct ChaseActor *, s32);
 
 void Ivy_UpdateHold(struct ChaseActor *actor, s32 frame);
 
-void SceneActorReaction_FinishAnimation17(struct ChaseActor *);
+void SceneActorReaction_FinishAnimation17(struct ChaseActor *actor);
 
 struct IvyOffset {
     u16 x, y, z, pad;
@@ -248,20 +248,13 @@ void Ivy_UpdateGrabAttack(struct ChaseActor *actor)
 
 void Ivy_UpdateActiveState(struct ChaseActor *actor);
 
+// scope: put SceneActorReaction_FinishAnimation17 begin
 void SceneActorReaction_FinishAnimation17(struct ChaseActor *actor)
 {
     if (SceneActorReaction_TakePrepared(actor)) {
-        u16 *destination = &actor->base.colliderA.flags;
-        u32 flags = *destination;
-        u32 mask = 0xFFFB;
-        mask &= flags;
-        mask |= 8;
-        *destination = mask;
-        {
-            u16 *p = &actor->base.placementFlags;
-            u32 mask = 0xFFFFF7FF;
-            *p = mask & *p;
-        }
+        actor->base.colliderA.flags &= ~4;
+        actor->base.colliderA.flags |= 8;
+        HalfwordFlags_Clear(&actor->base.placementFlags, 0x800);
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 17);
     }
     if (actor->base.restart) {
@@ -269,6 +262,7 @@ void SceneActorReaction_FinishAnimation17(struct ChaseActor *actor)
         SceneActorChase_SetBehavior(actor, 2);
     }
 }
+// scope: put SceneActorReaction_FinishAnimation17 end
 
 s32 Div(s32, s32);
 
