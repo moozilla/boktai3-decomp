@@ -197,3 +197,4 @@ src/player/control/Player_TestMovementPosition.c	Player_TestMovementPosition	nat
 src/player/control/Player_ClampInteractionVelocity.c	Player_ClampInteractionVelocity	minor	natural	1	
 src/player/control/Player_UpdateInteractionHoverDisplay.c	Player_UpdateInteractionHoverDisplay	minor	natural	5	
 src/player/control/Player_UpdateInteractionCallbacks.c	Player_UpdateInteractionCallbacks	contrived	natural	1	
+src/player/control/Player_SelectAlternateInteractionMode.c	Player_SelectAlternateInteractionMode	minor	natural	1	
