@@ -212,3 +212,4 @@ src/link/player/Player_IsFlaggedWithGlobalModifier08.c	Player_IsFlaggedWithGloba
 src/link/player/Player_IsTerrainStepBlocked.c	Player_IsTerrainStepBlocked	contrived	natural	8	
 src/link/player/Actor_ProbeDiagonalTurnDir.c	Actor_ProbeDiagonalTurnDir	minor	natural	2	
 src/link/player/Player_UpdateModifier08Drift.c	Player_UpdateModifier08Drift	contrived	minor	4	table pointer reused for the Z result stays: a direct store changes register allocation; drift bytes are the unnamed player bytes at 0x48D
+src/link/player/LinkPlayer_ResetToIdleState.c	LinkPlayer_ResetToIdleState	contrived	natural	2	
