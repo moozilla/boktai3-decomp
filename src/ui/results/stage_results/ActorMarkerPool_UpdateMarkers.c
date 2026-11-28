@@ -3,20 +3,7 @@
 #include "scene/actor/actor_attachment_state.h"
 #include "effects/screen/background_controller.h"
 #include "effects/sprites/native_effect.h"
-struct FixedPosition {
-    s32 x, y, z;
-};
-struct MarkerSlot {
-    u8 resource[0x1c];
-    struct ContactSwarmSprite sprite;
-    struct DisplaySequenceState sequence;
-    const struct FixedPosition *anchor;
-    u32 active;
-};
-struct MarkerPool {
-    u8 task[0x18];
-    struct MarkerSlot slots[8];
-};
+#include "ui/results/actor_marker_pool.h"
 s32 ActorMarkerPool_UpdateMarkers(struct MarkerPool *pool)
 {
     s32 i;
