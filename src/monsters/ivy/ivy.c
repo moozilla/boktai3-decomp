@@ -1860,14 +1860,12 @@ s32 ColorPulse_FinishRedFade(struct PhaseObject *p);
 
 s32 ColorPulse_FadeRed(struct PhaseObject *p)
 {
-    s32 value = Div((u32)p->pulseTimer * 8, p->pulseDuration) + 16;
-    s8 *red = &p->red;
-    *red = value;
+    p->red = Div(p->pulseTimer * 8, p->pulseDuration) + 16;
     if (--p->pulseTimer == -1) {
         p->phaseUpdate = (void *)ColorPulse_FinishRedFade;
         p->pulseTimer = p->pulseDuration;
     }
-    p->color = ((u32)p->blue << 10) | ((u32)p->green << 5) | (u32)*red;
+    p->color = (p->blue << 10) | (p->green << 5) | p->red;
     return 0;
 }
 
