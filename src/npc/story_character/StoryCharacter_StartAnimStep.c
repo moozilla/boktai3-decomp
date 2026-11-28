@@ -2,10 +2,9 @@
 #include "npc/manager/scene_actor_lifecycle.h"
 s32 Callback_InvokeActor(void *, void *);
 s32 sub_081C8FB0(void *, void *, s32);
-void StoryCharacter_StartAnimStep(void *a, struct SceneActor *p)
+void StoryCharacter_StartAnimStep(void *context, struct SceneActor *p)
 {
-    u32 r;
-    u8 hit;
+    u32 animation;
     if (p->animationEntered != 0) {
         p->animationEntered = 0;
         p->finished = 0;
@@ -23,7 +22,7 @@ void StoryCharacter_StartAnimStep(void *a, struct SceneActor *p)
             case 14:
             case 15:
             case 16:
-                r = 0;
+                animation = 0;
                 break;
             case 17:
             case 18:
@@ -37,21 +36,19 @@ void StoryCharacter_StartAnimStep(void *a, struct SceneActor *p)
             case 26:
             case 27:
             case 28:
-                r = 0;
+                animation = 0;
                 break;
             case 29:
-                r = 0xb;
+                animation = 0xb;
                 break;
             default:
-                r = 0;
+                animation = 0;
                 break;
         }
-        Actor_PlayAnimationEntry(p, r, 1, 0, 4);
+        Actor_PlayAnimationEntry(p, animation, 1, 0, 4);
     }
     SceneActor_SetFlags(p, 0x1000);
-    hit = 0;
-    if ((u8)Callback_InvokeActor(p, p->query) != 1 && sub_081C8FB0(a, p, 0)) {
-        hit = 1;
+    if ((u8)Callback_InvokeActor(p, p->query) != 1 && sub_081C8FB0(context, p, 0)) {
         SceneActor_SetFlags(p, 0x800);
     }
 }
