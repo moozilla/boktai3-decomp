@@ -272,3 +272,4 @@ src/monsters/armor/Armor_ApplySceneCommands.c	Armor_ApplySceneCommands	contrived
 src/monsters/armor/Armor_BeginPartTravelToPlayer.c	Armor_BeginPartTravelToPlayer	contrived	natural	1	
 src/monsters/armor/Armor_InitPartLunge.c	Armor_InitPartLunge	contrived	contrived	2	remaining: rawoff,u8cast,bytep
 src/monsters/armor/Armor_InitPartStretch.c	Armor_InitPartStretch	contrived	contrived	2	remaining: u8cast,zeroone
+src/monsters/armor/Armor_UpdatePartFlash.c	Armor_UpdatePartFlash	contrived	contrived	10	remaining: u8cast,zeroone

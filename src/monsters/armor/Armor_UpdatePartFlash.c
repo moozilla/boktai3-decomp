@@ -58,31 +58,28 @@ void Armor_UpdatePartFlash(struct FlashPart *p)
         p->byte12D = 0x14;
         p->callback = 0;
     }
-    {
-        u8 *counter = &p->counter12C;
-        if (Sprite_BlinkUntilExpired(p, (*counter)++, 10, 30)) {
-            u8 five;
-            u8 one;
-            AnimData_SelectPaletteBank(p->sprite, parent->palette);
-            five = 5;
-            p->byte11E = 0;
-            p->byte11F = five;
-            one = 1;
-            *((u8 *)p + 0x119) = one | *((u8 *)p + 0x119);
-            parent->count--;
-        }
-        if ((*counter & 7) == 0) {
-            struct PackedContactVector a;
-            struct PackedContactVector b;
-            a = p->pos;
-            a.x += 100;
-            a.y += 100;
-            a.z += 100;
-            b.x = 0x50;
-            b.y = 0x3C;
-            b.z = 0x28;
-            SparkParticle_Spawn(&a, 1, &b, 0, 0, 14, 2, 2);
-            Sound_PlaySongChecked(0x16E);
-        }
+    if (Sprite_BlinkUntilExpired(p, p->counter12C++, 10, 30)) {
+        u8 five;
+        u8 one;
+        AnimData_SelectPaletteBank(p->sprite, parent->palette);
+        five = 5;
+        p->byte11E = 0;
+        p->byte11F = five;
+        one = 1;
+        *((u8 *)p + 0x119) = one | *((u8 *)p + 0x119);
+        parent->count--;
+    }
+    if ((p->counter12C & 7) == 0) {
+        struct PackedContactVector a;
+        struct PackedContactVector b;
+        a = p->pos;
+        a.x += 100;
+        a.y += 100;
+        a.z += 100;
+        b.x = 0x50;
+        b.y = 0x3C;
+        b.z = 0x28;
+        SparkParticle_Spawn(&a, 1, &b, 0, 0, 14, 2, 2);
+        Sound_PlaySongChecked(0x16E);
     }
 }
