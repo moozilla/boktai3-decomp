@@ -1918,31 +1918,16 @@ void TetherActor_UpdateSampledPosition(struct TetherActor *p)
 
 void TetherActor_HandleFlaggedCell(struct TetherActor *actor)
 {
-    struct ContactPosition *position = &actor->position;
-    s32 x = position->x >> 8;
-    s32 z = position->z >> 8;
-    s32 cell;
-    u8 *properties;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        cell = 0;
-    else
-        cell = gTerrainMap->rows[z] + x;
-    properties = TerrainModifiers_FindCellOverride(cell, 1);
-    if (properties)
-        properties += 4;
-    else
-        properties = gTerrainMap->cells + (cell * 4 + 12);
-    {
-        u32 attributes = *(u16 *)(properties + 2);
-        attributes &= 128;
-        if (!attributes)
-            return;
-    }
+    u32 attributes;
+    attributes =
+        ((u16 *)SceneActorTerrain_GetCell(SceneActorTerrain_GetCellIndex(&actor->position)))[1];
+    if (!(attributes & 128))
+        return;
     if (!GameState_TestWorldFlags(0x2000))
         return;
     {
-        s32 column = Mod(actor->movementProbeStorage.previousCell, ((s16 *)gTerrainMap->cells)[2]);
-        s32 row = Div(actor->movementProbeStorage.previousCell, ((s16 *)gTerrainMap->cells)[2]);
+        s32 column = Mod(actor->movementProbeStorage.previousCell, SceneActorTerrain_Width());
+        s32 row = Div(actor->movementProbeStorage.previousCell, SceneActorTerrain_Width());
         s32 cellX = column << 8;
         s32 minX = cellX + 1;
         s32 maxX = cellX + 255;
