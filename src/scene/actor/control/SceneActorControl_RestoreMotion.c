@@ -3,16 +3,12 @@
 #include "player/cutscene/player_cue_sequence.h"
 #include "scene/motion/scene_actor_terrain.h"
 void SceneActorAnimation_SelectDirectionalEntry(struct RoomActor *, s32);
-static inline u32 StepDrawable(struct SceneActorControlMotionDrawable *owner)
+
+void SceneActorControl_RestoreMotion(struct ChaseActor *actor)
 {
-    return PlayerCue_StepSequenceEnded(owner, &owner->sequence);
-}
-void SceneActorControl_RestoreMotion(struct ChaseActor *input)
-{
-    struct ChaseActor *actor = input;
     struct SceneActorControlMotionState *state = SceneActorControl_GetMotionState(actor);
     struct SceneActorControlMotionDrawable *drawable = actor->base.drawable;
-    u32 height;
+    s32 height;
     state->field3DB = 0;
     state->field3E0 = 0;
     state->phase = 0;
@@ -36,6 +32,6 @@ void SceneActorControl_RestoreMotion(struct ChaseActor *input)
     ZeroFill8(&state->vectors[0]);
     ZeroFill8(&state->vectors[1]);
     ZeroFill8(&state->vectors[2]);
-    SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
-    StepDrawable(drawable);
+    SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)actor, 0);
+    PlayerCue_StepSequenceEnded(drawable, &drawable->sequence);
 }
