@@ -188,8 +188,10 @@ void SceneActorGraphics_InitBodyNoOp(void);
 
 void SceneActorGraphics_InitializeBody(struct StateActor *p)
 {
+    struct SceneGraphicsActor *actor = (struct SceneGraphicsActor *)p;
     Vec scale, rotation;
     void *drawable = p->bodyDrawable;
+    int flags;
     scale.x = 0x40;
     scale.y = 0x80;
     scale.z = 0x40;
@@ -199,19 +201,14 @@ void SceneActorGraphics_InitializeBody(struct StateActor *p)
     Collider_Init(drawable, 0, 0x2001, 0, 16, &scale, &rotation);
     Collider_SetPosition(drawable, &p->worldPosition, 0);
     Collider_SetCallback(drawable, SceneActorGraphics_InitBodyNoOp, p);
-    {
-        int test = gEngineFlags & 0x1000;
-        int flags;
+    if (gEngineFlags & 0x1000)
+        flags = 0x40800;
+    else
         flags = 0;
-        if (test)
-            flags = 0x40800;
-        Collider_SetAttackProperties(
-            drawable, ((struct SceneGraphicsActor *)p)->graphics.attackWidth0,
-            ((struct SceneGraphicsActor *)p)->graphics.attackHeight0, 0, flags,
-            ((struct SceneGraphicsActor *)p)->graphics.attackDepth0);
-    }
+    Collider_SetAttackProperties(drawable, actor->graphics.attackWidth0,
+                                 actor->graphics.attackHeight0, 0, flags,
+                                 actor->graphics.attackDepth0);
 }
-
 void SceneActorGraphics_OnDamageContact(struct ContactCollider *, struct ContactCollider *,
                                         void *);
 
