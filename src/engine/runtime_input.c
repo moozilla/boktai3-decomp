@@ -38,6 +38,8 @@ void Task_LinkToPriorityList(struct RuntimeTask *);
 void TaskSystem_Initialize(void)
 {
     struct RuntimeTask *task;
+    s32 i;
+
     Heap_Initialize();
     TaskSystem_InitLists();
     ResourceRegistry_Initialize();
@@ -52,16 +54,8 @@ void TaskSystem_Initialize(void)
     gEnginePauseFlags = 0;
     gNextTaskId = 1;
     gLinkMenuActive = 0;
-    {
-        u16 *start = gSceneSelectionDisplaySlots;
-        u32 value = 0x3FF;
-        u16 *p = start;
-        p += 3;
-        do {
-            *p = value;
-            p--;
-        } while ((s32)p >= (s32)start);
-    }
+    for (i = 0; i < 4; i++)
+        gSceneSelectionDisplaySlots[i] = 0x3FF;
 }
 
 #define PAD_UPDATE(i, k)                                                                           \
