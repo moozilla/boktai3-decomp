@@ -606,3 +606,4 @@ src/ui/hud/display/Hud_CreateAlternateLayout.c	Hud_CreateAlternateLayout	fudged	
 src/ui/hud/display/FieldHud_RefreshModeEight.c	FieldHud_RefreshModeEight	natural	natural	0	
 src/ui/hud/display/Hud_Create.c	Hud_Create	fudged	fudged	0	testFlag 0/1 predicate (existing pattern); otherwise natural
 src/ui/hud/display/Hud_InitAlternateLayout.c	Hud_InitAlternateLayout	fudged	natural	1	player local before storing the action owner
+src/ui/dialogue/text_window/TextWindow_Destroy.c	TextWindow_Destroy	fudged	partial	10	supersedes the earlier row: new unlink helper removed; link-pointer temporaries kept (compiler keeps the two link addresses live); names and unused prototypes cleaned
