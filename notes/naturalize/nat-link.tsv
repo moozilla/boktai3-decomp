@@ -164,3 +164,4 @@ src/link/player/LinkPlayer_RemoveAuxiliaryResources.c	LinkPlayer_RemoveAuxiliary
 src/link/player/LinkPlayer_InitializeActor.c	LinkPlayer_InitializeActor	minor	minor	2	effect position is copied through a ContactPosition cast
 src/link/player/LinkPlayer_BlendPalette.c	LinkPlayer_BlendPalette	contrived	contrived	9	hoisted palette and brightness pointers stay: indexed loops compile very differently
 src/link/player/sub_0823A518.c	sub_0823A518	contrived	natural	1	
+src/link/player/ActorEffect_TestStatusFlags.c	ActorEffect_TestStatusFlags	contrived	minor	14	mask local stays: the ROM loads the first mask before the flags
