@@ -125,3 +125,4 @@ src/objects/coffin/tether_actor.c	TetherActor_UpdateSampledPosition	contrived	na
 src/objects/coffin/tether_actor.c	TetherActor_HandleFlaggedCell	contrived	natural	12	
 src/objects/coffin/tether_actor.c	TetherActor_UpdateWorldPosition	contrived	minor	3	block-local display pointer for x stays: plain cast store reorders the position load
 src/objects/coffin/tether_actor.c	TetherActor_TestTerrainTransition	contrived	natural	7	
+src/objects/coffin/tether_actor.c	TetherActor_UpdateInteractionValue	minor	natural	1	

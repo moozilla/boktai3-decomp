@@ -2115,16 +2115,11 @@ void TetherActor_UpdateLockedShake(struct TetherActor *actor)
 void TetherActor_UpdateInteractionValue(struct TetherActor *p)
 {
     if (!(gEngineFlags & 0x200)) {
-        if (p->interactionEnabled != 0) {
-            if (p->interactionReset == 0) {
-                if (p->statusFlags == 0) {
-                    u16 *q = &p->currentValue;
-                    if (*q != 0)
-                        *q = *q - 1;
-                    else
-                        TetherActor_SelectInteractionState(p);
-                }
-            }
+        if (p->interactionEnabled != 0 && p->interactionReset == 0 && p->statusFlags == 0) {
+            if (p->currentValue != 0)
+                p->currentValue--;
+            else
+                TetherActor_SelectInteractionState(p);
         }
     }
 }
