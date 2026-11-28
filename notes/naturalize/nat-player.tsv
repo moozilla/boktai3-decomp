@@ -154,3 +154,6 @@ src/player/attack/Player_IsActionCueReady.c	Player_IsActionCueReady	contrived	mi
 src/player/attack/Player_InitializeActionContact.c	Player_InitializeActionContact	natural	natural	0	-
 src/player/attack/Player_UpdateWeaponCueCombo.c	Player_UpdateWeaponCueCombo	minor	minor	6	InvalidatePreviousAnimation keeps a typed -1 local: a plain store changes 15 instructions
 src/player/attack/Player_GetSpecialAttackDescriptor.c	Player_GetSpecialAttackDescriptor	contrived	natural	3	-
+src/player/attack/Player_GetAttackEffectType.c	Player_GetAttackEffectType	natural	natural	0	-
+src/player/attack/Player_GetAttackAttributeFlags.c	Player_GetAttackAttributeFlags	natural	natural	0	-
+src/player/attack/Player_GetAttackElementType.c	Player_GetAttackElementType	natural	natural	0	-
