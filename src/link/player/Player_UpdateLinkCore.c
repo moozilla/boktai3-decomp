@@ -14,7 +14,6 @@ void Player_PlayLocalSong(s32, u32);
 s32 Callback_InvokeActor(void *, void *);
 void sub_0823A2E4(struct Player *);
 void Trap_UpdateProbeContacts(void *);
-#define F(T, off) (*(T *)((u8 *)p + (off)))
 s32 Player_UpdateLinkCore(struct Player *p)
 {
     Player_ResetActionState(p);
@@ -38,8 +37,8 @@ s32 Player_UpdateLinkCore(struct Player *p)
     p->lastContactFlags = 0;
     p->lastContactRewardFlags = 0;
     if (p->kind != 8) {
-        F(u32, 0x298) = (u32)p + 0x30;
-        Trap_UpdateProbeContacts(&F(u8, 0x294));
+        p->trackedPosition = &p->position;
+        Trap_UpdateProbeContacts(p->positionTracker);
     }
     return 0;
 }
