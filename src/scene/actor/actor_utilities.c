@@ -246,6 +246,7 @@ u8 SceneActorTerrain_CanTraverseCell(s32 startCell, s32 cell, s32 startHeight, u
     u32 shape;
     s32 height;
     s32 allowHeightStep;
+    u32 flags;
 
     /* The original query samples slopes before the position is filled. */
     shape = CellProperties(cell)->height >> 4;
@@ -261,17 +262,13 @@ u8 SceneActorTerrain_CanTraverseCell(s32 startCell, s32 cell, s32 startHeight, u
     } else if ((shape == 1 && startShape == 1) || (shape == 2 && startShape == 2))
         allowHeightStep = 1;
 
-    {
-        u32 flags = CellProperties(cell)->flags;
-        if (flags & 0x43)
-            return 0;
-    }
+    flags = CellProperties(cell)->flags;
+    if (flags & 0x43)
+        return 0;
     if (allowHeightStep) {
-        s32 difference;
         height >>= 8;
         startHeight >>= 8;
-        difference = Absolute(height - startHeight);
-        if (difference > 1)
+        if (Absolute(height - startHeight) > 1)
             return 0;
     } else if (height != startHeight)
         return 0;
