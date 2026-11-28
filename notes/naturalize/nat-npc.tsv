@@ -645,3 +645,4 @@ src/script/script_virtual_machine.c	Script_RegisterBuiltinCommands	natural	natur
 src/script/script_virtual_machine.c	Script_ApplyOperator	natural	natural	0	
 src/script/runtime/SceneLifecycle_LoadFromScript.c	SceneLifecycle_LoadFromScript	contrived	natural	1	
 src/script/runtime/Script_CreateActorFromRegistry.c	Script_CreateActorFromRegistry	minor	natural	2	
+src/script/runtime/Script_RestartScene.c	Script_RestartScene	minor	natural	1	
