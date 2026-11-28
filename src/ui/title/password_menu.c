@@ -24,19 +24,15 @@ void PasswordMenu_LoadSelections(struct PasswordMenu *p)
 
 void PasswordMenu_ResetSelections(struct PasswordMenu *p)
 {
-    s32 i = 0;
-    u8 *saved = gAnimPanelSavedSelections;
-    u32 empty = 0x41;
-    u8 *out = saved;
-    u32 *values = p->selections;
-    do {
-        *values++ = empty;
-        *(u8 *)(i + (u32)out) = empty;
-    } while (++i <= 23);
+    s32 i;
+    for (i = 0; i < 24; i++) {
+        p->selections[i] = 0x41;
+        gAnimPanelSavedSelections[i] = 0x41;
+    }
     p->position = 0;
     p->selection = 0;
-    saved[24] = 0;
-    saved[25] = 0;
+    gAnimPanelSavedSelections[24] = 0;
+    gAnimPanelSavedSelections[25] = 0;
 }
 
 void PasswordMenu_JoinTextRows(struct PasswordRows *text, u8 *out)
