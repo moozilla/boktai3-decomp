@@ -86,15 +86,13 @@ void ChildGroup_LaunchNextInactiveMember(struct SwordGroup *p)
                 address += (u32)p;
                 address += (u32) & ((struct SwordGroup *)0)->children;
                 child = (struct SwordChild *)address;
-                {
-                    SwordChild_Activate(child, 1);
-                    offset = i * stride;
-                    callback = &p->children[0].update;
-                    callback = (void *)((u8 *)callback + offset);
-                    *callback = Sword_BeginRestOrbit;
-                    p->delay = p->launchDelay;
-                    return;
-                }
+                SwordChild_Activate(child, 1);
+                offset = i * stride;
+                callback = &p->children[0].update;
+                callback = (void *)((u8 *)callback + offset);
+                *callback = Sword_BeginRestOrbit;
+                p->delay = p->launchDelay;
+                return;
             }
         }
     }
