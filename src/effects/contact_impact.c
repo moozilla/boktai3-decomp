@@ -336,15 +336,13 @@ void SpriteController_UpdateStopped(struct ContactImpactEffect *controller)
 
 void SpriteController_AnimateGrowing(struct ContactImpactEffect *p)
 {
-    s32 duration;
-    s32 value = Fixed8_Interpolate(0x26, 0x40, 8, p->timer);
+    s32 duration = 8;
+    s32 scale = Fixed8_Interpolate(38, 64, duration, p->timer);
 
-    p->sprite.scaleX = value;
-    p->sprite.scaleY = value;
-
-    duration = 8;
-    if ((s32)p->timer >= duration) {
-        p->sprite.flags &= -2;
+    p->sprite.scaleX = scale;
+    p->sprite.scaleY = scale;
+    if (p->timer >= duration) {
+        p->sprite.flags &= ~1;
         ContactImpactEffect_EnterUpdate(p, PopInSprite_UpdateVisibleIdle);
     } else {
         p->timer++;
