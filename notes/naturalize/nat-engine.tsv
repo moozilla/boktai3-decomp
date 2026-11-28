@@ -55,9 +55,6 @@ src/engine/math/ScalarApproach_SixteenthAngle.c	ScalarApproach_SixteenthAngle	co
 src/engine/math/ScalarApproach_QuarterAngleArray.c	ScalarApproach_QuarterAngleArray	contrived	natural	1	
 src/engine/math/ScalarApproach_EighthAngleArray.c	ScalarApproach_EighthAngleArray	contrived	natural	1	
 src/engine/math/ScalarApproach_SixteenthAngleArray.c	ScalarApproach_SixteenthAngleArray	contrived	natural	1	
-src/engine/math/ScalarApproach_QuarterAngle.c	ScalarApproach_QuarterAngle	natural	natural	1	
-src/engine/math/ScalarApproach_EighthAngle.c	ScalarApproach_EighthAngle	natural	natural	1	
-src/engine/math/ScalarApproach_SixteenthAngle.c	ScalarApproach_SixteenthAngle	natural	natural	1	
 src/engine/math/ScalarApproach_ApplyAngleProfile.c	ScalarApproach_ApplyAngleProfile	minor	natural	1	
 src/engine/math/ScalarApproach_StepHalfArray.c	ScalarApproach_StepHalfArray	contrived	natural	1	
 src/engine/math/ScalarApproach_QuarterArray.c	ScalarApproach_QuarterArray	minor	natural	1	
@@ -259,13 +256,10 @@ src/engine/video/background_layers.c	Text_DrawNumber	minor	minor	0	DIGIT macro p
 src/engine/video/background_tilemap.c	BgGfx_LoadTilemap	minor	minor	5	screenX reused for the exposed row: a separate local swaps registers (18 insns); metatile column macro
 src/engine/video/background_tilemap.c	BgGfx_LoadTilemapAtPosition	natural	natural		
 src/engine/video/background_tilemap.c	BgGfx_LoadTilemapSimple	natural	natural		
-src/engine/video/sprite_oam.c	SpriteOam_QueueProjectedSprites	contrived	contrived	12	goto/continue-with-advance, parked matrix pointer and flag copies: see the next commits
+src/engine/video/sprite_oam.c	SpriteOam_QueueProjectedSprites	contrived	contrived	20	goto next and manual advance
 src/engine/video/sprite_oam.c	SpriteOam_QueueCameraRelativeSprites	contrived	contrived	12	goto/continue-with-advance, parked matrix pointer and flag copies: see the next commits
-src/engine/video/sprite_oam.c	SpriteOam_QueueFlaggedProjectedSprites	contrived	contrived	12	goto/continue-with-advance, parked matrix pointer and flag copies: see the next commits
-src/engine/video/sprite_oam.c	SpriteOam_QueueOverlayProjectedSprites	contrived	contrived	12	goto/continue-with-advance, parked matrix pointer and flag copies: see the next commits
-src/engine/video/sprite_oam.c	SpriteOam_QueueProjectedSprites	contrived	contrived	8	goto next and manual advance
-src/engine/video/sprite_oam.c	SpriteOam_QueueFlaggedProjectedSprites	contrived	contrived	8	goto next and manual advance
-src/engine/video/sprite_oam.c	SpriteOam_QueueOverlayProjectedSprites	contrived	contrived	8	goto next and manual advance
+src/engine/video/sprite_oam.c	SpriteOam_QueueFlaggedProjectedSprites	contrived	contrived	20	goto next and manual advance
+src/engine/video/sprite_oam.c	SpriteOam_QueueOverlayProjectedSprites	contrived	contrived	20	goto next and manual advance
 src/engine/video/text_graphics.c	Text_FlushTileUploads	contrived	natural	4	
 src/engine/video/text_graphics.c	Text_FindCachedGlyph	minor	natural	4	
 src/engine/video/text_graphics.c	Text_DrawGlyph	contrived	minor	12	cache entry address built by integer sum (operand order); nibble masks held in locals
@@ -551,19 +545,19 @@ src/system/inventory/Inventory_HasItemFromScript.c	Inventory_HasItemFromScript	m
 src/system/inventory/Inventory_RemoveAllItemsOfKindFromScript.c	Inventory_RemoveAllItemsOfKindFromScript	contrived	natural	1	
 src/system/inventory/sub_0822D080.c	sub_0822D080	contrived	minor	1	array indexed as *(i + field) for the index-first address sum; one local carries the id and then the state
 src/system/inventory/Inventory_SortConsumables.c	Inventory_SortConsumables	contrived	natural	1	
-src/system/inventory/Inventory_ClearItemSlot.c	Inventory_ClearItemSlot	natural		0	natural
-src/system/inventory/Inventory_ClearKeyItemSlot.c	Inventory_ClearKeyItemSlot	natural		0	natural
-src/system/inventory/Inventory_AddKeyItem.c	Inventory_AddKeyItem	natural		0	natural
-src/system/inventory/Inventory_AddItem.c	Inventory_AddItem	natural		0	natural
-src/system/inventory/Inventory_RemoveConsumable.c	Inventory_RemoveConsumable	natural		0	natural
-src/system/inventory/Inventory_RemoveValuable.c	Inventory_RemoveValuable	natural		0	natural
-src/system/inventory/Inventory_RemoveItem.c	Inventory_RemoveItem	natural		0	natural
-src/system/inventory/Inventory_HasConsumable.c	Inventory_HasConsumable	natural		0	natural
-src/system/inventory/Inventory_HasValuable.c	Inventory_HasValuable	natural		0	natural
-src/system/inventory/Inventory_HasItem.c	Inventory_HasItem	natural		0	natural
-src/system/inventory/Inventory_SwapValuableSlots.c	Inventory_SwapValuableSlots	natural		0	natural
-src/system/inventory/Inventory_SortValuables.c	Inventory_SortValuables	natural		0	natural
-src/system/inventory/Inventory_IsKeyItemId.c	Inventory_IsKeyItemId	minor	3	u8-returning inline: the plain boolean forms compile branchless or without the byte normalization	minor
+src/system/inventory/Inventory_ClearItemSlot.c	Inventory_ClearItemSlot	natural	natural	0	
+src/system/inventory/Inventory_ClearKeyItemSlot.c	Inventory_ClearKeyItemSlot	natural	natural	0	
+src/system/inventory/Inventory_AddKeyItem.c	Inventory_AddKeyItem	natural	natural	0	
+src/system/inventory/Inventory_AddItem.c	Inventory_AddItem	natural	natural	0	
+src/system/inventory/Inventory_RemoveConsumable.c	Inventory_RemoveConsumable	natural	natural	0	
+src/system/inventory/Inventory_RemoveValuable.c	Inventory_RemoveValuable	natural	natural	0	
+src/system/inventory/Inventory_RemoveItem.c	Inventory_RemoveItem	natural	natural	0	
+src/system/inventory/Inventory_HasConsumable.c	Inventory_HasConsumable	natural	natural	0	
+src/system/inventory/Inventory_HasValuable.c	Inventory_HasValuable	natural	natural	0	
+src/system/inventory/Inventory_HasItem.c	Inventory_HasItem	natural	natural	0	
+src/system/inventory/Inventory_SwapValuableSlots.c	Inventory_SwapValuableSlots	natural	natural	0	
+src/system/inventory/Inventory_SortValuables.c	Inventory_SortValuables	natural	natural	0	
+src/system/inventory/Inventory_IsKeyItemId.c	Inventory_IsKeyItemId	minor	minor	3	u8-returning inline: the plain boolean forms compile branchless or without the byte normalization
 src/system/inventory/Inventory_RollIcePopStick.c	Inventory_RollIcePopStick	contrived	natural	1	
 src/system/inventory/sub_0822D2E0.c	sub_0822D2E0	minor	natural	1	
 src/system/inventory/Inventory_ResetConsumables.c	Inventory_ResetConsumables	minor	natural	1	
