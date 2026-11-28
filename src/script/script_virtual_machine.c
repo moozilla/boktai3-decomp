@@ -375,12 +375,10 @@ s32 Script_ReadVector32(u8 *p, s32 *destination)
 s32 Script_ReadVector16(u8 *p, s16 *destination)
 {
     s32 type, value;
-    s16 *vector;
-    s32 count;
-    vector = destination;
-    for (count = 0; count < 3; count++) {
+    s32 i;
+    for (i = 0; i < 3; i++) {
         p = Script_DecodeOperand(p, &type, &value);
-        vector[count] = value;
+        destination[i] = value;
     }
     gScriptVm.pc = p;
     return 0;
