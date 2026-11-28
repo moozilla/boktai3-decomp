@@ -68,3 +68,4 @@ src/scene/actor/actor_pool/pooled_actor_controller.c	Actor_UpdateCollisionAndEff
 src/scene/actor/actor_pool/pooled_actor_controller.c	Actor_UpdateDrawable	minor	minor	1	PooledActor_TestFlags accessor
 src/scene/actor/actor_pool/pooled_actor_controller.c	Actor_TryStartPendingAction	contrived	minor	9	actions table pointer (ROM loads the table before copying the id) and started flag
 src/scene/actor/actor_pool/pooled_actor_controller.c	Actor_InitializeControllerFromScript	contrived	minor	10	SetSelectionCallback/SetDamageCallback accessors: plain store shifts the callback address load order
+src/scene/actor/actor_pool/pooled_actor_controller.c	Actor_OnTrackingAction	minor	minor	6	low byte of the u16 random table through a u8 cast

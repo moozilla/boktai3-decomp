@@ -258,23 +258,21 @@ void Actor_OnTrackingAction(struct PooledActor *actor, u32 tick)
     Actor_StepFacingAngle(actor);
     Actor_SetFacingAnimationEntry(actor, 1, 0, 1, 0, 0);
     if ((tick & 3) == 0) {
+        s32 random;
         gRandomIndex = (gRandomIndex + 1) & 0x3ff;
-        {
-            s32 random = *(u8 *)((gRandomIndex << 1) + (u32)gRandomTable);
-            if (random <= 63) {
-                MotionPool_InitializeParams(&params);
-                MotionPool_SetLifetimeAndVelocity(&params, 0, 0xf0, actor->body.direction + 0x80,
-                                                  12);
-                MotionPool_SetTracking(
-                    &params, 0xb4,
-                    ((struct SceneActorBody *)&gPlayers[0]->positionalEffectGroup)->id, 1);
-                MotionPool_SetContact(&params, 0, 0x200004, 0x64, 0x32, 0x28);
-                MotionPool_SetBounds(&params, 0x10, 0x10, 0x10);
-                MotionPool_SetGraphics(&params, 0x61f9, 0x29, 0x29f);
-                position = actor->body.position;
-                position.y += 0x80;
-                MotionPool_Spawn(&params, &position);
-            }
+        random = *(u8 *)&gRandomTable[gRandomIndex];
+        if (random <= 63) {
+            MotionPool_InitializeParams(&params);
+            MotionPool_SetLifetimeAndVelocity(&params, 0, 0xf0, actor->body.direction + 0x80, 12);
+            MotionPool_SetTracking(
+                &params, 0xb4, ((struct SceneActorBody *)&gPlayers[0]->positionalEffectGroup)->id,
+                1);
+            MotionPool_SetContact(&params, 0, 0x200004, 0x64, 0x32, 0x28);
+            MotionPool_SetBounds(&params, 0x10, 0x10, 0x10);
+            MotionPool_SetGraphics(&params, 0x61f9, 0x29, 0x29f);
+            position = actor->body.position;
+            position.y += 0x80;
+            MotionPool_Spawn(&params, &position);
         }
     }
 }
