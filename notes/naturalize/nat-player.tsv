@@ -188,3 +188,4 @@ src/player/control/Player_TestTetherActionInput.c	Player_TestTetherActionInput	n
 src/player/control/Player_CheckFacingTerrainClearance.c	Player_CheckFacingTerrainClearance	contrived	minor	6	packed-vector copy of the position and pointer cast back to SceneVec
 src/player/control/Player_EmitPeriodicParticles.c	Player_EmitPeriodicParticles	minor	natural	1	
 src/player/control/Player_SelectActionSequence.c	Player_SelectActionSequence	contrived	minor	60	one goto cancel (goto-free forms duplicate the cancel block differently); both notification branches identical in the ROM; ReloadInput/HasActionFlag/IsSceneFive helpers: plain tests reorder loads
+src/player/control/Player_ApplyControlPresentation.c	Player_ApplyControlPresentation	minor	minor	5	table address read through RANDOM_TABLE_ADDR: array subscript forms the address in another order

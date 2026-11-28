@@ -16,10 +16,9 @@ void PlayerEffect_SetPaletteSource(void *, u32, u32);
 
 void Player_ApplyControlPresentation(struct Player *p)
 {
-    u32 value = p->tetherStatusFlags;
-    if (value == 0) {
+    if (!p->tetherStatusFlags) {
         if (Player_GetControlFlags(p, 16))
-            p->followTarget = (void *)value;
+            p->followTarget = NULL;
         else if (!p->followTarget) {
             void *position = &p->movementContactFlags;
             CellObject_Init(position, &p->position);
@@ -65,7 +64,7 @@ void Player_ApplyControlPresentation(struct Player *p)
         s32 jitter;
         u32 random;
         gRandomIndex = (gRandomIndex + 1) & 1023;
-        random = *(const u16 *)((gRandomIndex << 1) + (u32)gRandomTable);
+        random = *(const u16 *)(gRandomIndex * 2 + RANDOM_TABLE_ADDR);
         jitter = (random & 15) - 7;
         p->animation.position.x += jitter;
         p->animation.position.z -= jitter;
