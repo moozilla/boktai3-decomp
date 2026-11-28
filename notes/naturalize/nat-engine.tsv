@@ -486,3 +486,4 @@ src/system/game_state/GameState_AddEquipment.c	GameState_AddEquipment	contrived	
 src/system/game_state/GameState_ResetSlotsFromScript.c	GameState_ResetSlotsFromScript	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
 src/system/game_state/GameState_GetUnlockDescriptor.c	GameState_GetUnlockDescriptor	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
 src/system/game_state/GameState_GetUnlockEntry.c	GameState_GetUnlockEntry	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
+src/system/game_state/GameState_SetUnlockSlot.c	GameState_SetUnlockSlot	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
