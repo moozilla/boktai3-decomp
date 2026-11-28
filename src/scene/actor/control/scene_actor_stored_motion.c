@@ -246,55 +246,53 @@ void SceneActorControl_RequestVisibility(struct ChaseActor *actor, const u16 *re
     if (!SceneActor_MaskedHalfword(0x4000, &actor->base.motionFlags))
         return;
     SceneActorPlacement_SetFlags(0x800, &actor->base);
-    {
-        if (request[1] == 0) {
-            u32 mask = 0x20;
-            u32 *flags;
-            u32 active;
-            u32 *savedFlags;
-            flags = &state->flags3D4;
-            active = *flags & mask;
-            savedFlags = flags;
-            active = SceneActorControl_TestFlags(active, ~0);
-            if (!active) {
-                if (SceneActorVisibility_IsHidden(actor)) {
-                    state->visibilityFrame = 0;
+    if (request[1] == 0) {
+        u32 mask = 0x20;
+        u32 *flags;
+        u32 active;
+        u32 *savedFlags;
+        flags = &state->flags3D4;
+        active = *flags & mask;
+        savedFlags = flags;
+        active = SceneActorControl_TestFlags(active, ~0);
+        if (!active) {
+            if (SceneActorVisibility_IsHidden(actor)) {
+                state->visibilityFrame = 0;
+                {
+                    u32 mask = ~0x50;
                     {
-                        u32 mask = ~0x50;
-                        {
-                            u32 old = *savedFlags & mask;
-                            *savedFlags = old | 0x20;
-                        }
+                        u32 old = *savedFlags & mask;
+                        *savedFlags = old | 0x20;
                     }
-                    Sound_PlaySong(0x21E);
                 }
+                Sound_PlaySong(0x21E);
             }
-        } else if (request[1] == 1) {
-            u32 mask = 0x40;
-            u32 *flags;
-            u32 active;
-            u32 *savedFlags;
-            flags = &state->flags3D4;
-            active = *flags & mask;
-            savedFlags = flags;
-            active = SceneActorControl_TestFlags(active, ~0);
-            if (!active) {
-                if (!SceneActorVisibility_IsHidden(actor)) {
-                    state->visibilityFrame = 0;
-                    {
-                        u32 mask = ~0x30;
-                        {
-                            u32 old = *savedFlags & mask;
-                            *savedFlags = old | 0x40;
-                        }
-                    }
-                    Sound_PlaySong(0x21E);
-                }
-            }
-        } else {
-            ActorStatus_SetDrawableFlags(actor, 1);
-            ActorShadow_Disable(actor->base.shadow);
         }
+    } else if (request[1] == 1) {
+        u32 mask = 0x40;
+        u32 *flags;
+        u32 active;
+        u32 *savedFlags;
+        flags = &state->flags3D4;
+        active = *flags & mask;
+        savedFlags = flags;
+        active = SceneActorControl_TestFlags(active, ~0);
+        if (!active) {
+            if (!SceneActorVisibility_IsHidden(actor)) {
+                state->visibilityFrame = 0;
+                {
+                    u32 mask = ~0x30;
+                    {
+                        u32 old = *savedFlags & mask;
+                        *savedFlags = old | 0x40;
+                    }
+                }
+                Sound_PlaySong(0x21E);
+            }
+        }
+    } else {
+        ActorStatus_SetDrawableFlags(actor, 1);
+        ActorShadow_Disable(actor->base.shadow);
     }
 }
 
@@ -398,11 +396,8 @@ u32 Bat_Destroy(struct RoomActor *s)
     m = 0x100;
     if (SceneActorChase_TestField(&s->placementFlags, m))
         SceneMessages_UnregisterReceiver(s->receiver);
-    {
-        u8 *r = s->shadow;
-        if (*r == 1)
-            Shadow_Destroy(r);
-    }
+    if (s->shadow[0] == 1)
+        Shadow_Destroy(s->shadow);
     m = 0x2000000;
     v = s->statusFlags & m;
     q = &s->body;

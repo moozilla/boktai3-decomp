@@ -341,3 +341,4 @@ src/scene/actor/control/scene_actor_stored_motion.c	SceneActorControl_WanderArou
 src/scene/actor/control/scene_actor_stored_motion.c	SceneActorControl_UpdateStoredMotion	contrived	minor	6	flag helper calls and the StoredCurve view: plain flags3D4 operators change the load order
 src/scene/actor/control/scene_actor_stored_motion.c	SceneActorControl_TickVisibility	contrived	minor	4	materialized flag predicate and clear helper: plain tests lose the 0/1 value
 src/scene/actor/control/scene_actor_stored_motion.c	SceneActorControl_RequestVisibility	contrived	contrived	12	masked flag blocks with saved pointers: plain tests and stores load the field before the mask
+src/scene/actor/control/scene_actor_stored_motion.c	Bat_Destroy	contrived	contrived	6	parked flag mask and body pointer: plain tests load the field before the mask and drop the saved pointer
