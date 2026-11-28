@@ -58,13 +58,12 @@ void StatusScreen_FadeInPalette(struct StatusScreen *p)
 {
     int factor = p->fade, red, green, blue, base, bank, i;
     int other;
-    if (factor > 256) {
+    if (factor > 256)
         factor = 256;
-    }
     other = 256 - factor;
-    PALETTE_EXTRACT_CHANNEL(red, p->blend, 31);
-    PALETTE_EXTRACT_CHANNEL(green, p->blend, 992);
-    PALETTE_EXTRACT_CHANNEL(blue, p->blend, 31744);
+    red = p->blend & 31;
+    green = p->blend & 992;
+    blue = p->blend & 31744;
     for (base = 0, bank = 0; bank < 2;) {
         i = p->start;
         {
@@ -74,15 +73,11 @@ void StatusScreen_FadeInPalette(struct StatusScreen *p)
             for (; i < *end; i++) {
                 u16 *source = &p->source[base + i], *dest = &p->buffer[base + i];
                 int color = *source;
-                int r;
-                int g;
-                int b;
-                int sourceRed, sourceGreen;
-                PALETTE_EXTRACT_CHANNEL(sourceRed, color, 31);
-                r = (sourceRed * factor + other * red) & 0x1F00;
-                PALETTE_EXTRACT_CHANNEL(sourceGreen, color, 992);
-                g = (sourceGreen * factor + other * green) & 0x3E000;
-                PALETTE_EXTRACT_CHANNEL(b, color, 31744);
+                int r, g, b;
+                r = ((color & 31) * factor + other * red) & 0x1F00;
+                g = ((color & 992) * factor + other * green) & 0x3E000;
+                b = 31744;
+                b &= color;
                 b = (b * factor + other * blue) & 0x7C0000;
                 *dest = (r | g | b) >> 8;
             }
