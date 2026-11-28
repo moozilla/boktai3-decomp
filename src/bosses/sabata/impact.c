@@ -122,7 +122,7 @@ void SabataImpact_InitCollider(struct SabataActorImpact *actor)
     offset.y = 0;
     offset.z = 0;
     Collider_Init(collider, 0, 0x4002, 0, 16, &size, &offset);
-    Collider_SetPosition(collider, (u8 *)&actor->colliderPosition, 0);
+    Collider_SetPosition(collider, &actor->colliderPosition, 0);
     Collider_SetCallback(collider, CollisionReaction_RecordImpact, actor);
     Collider_SetBodyProperties(collider, 0, 0x802, 1);
     Collider_Refresh(collider);
