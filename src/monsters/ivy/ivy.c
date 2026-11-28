@@ -1556,11 +1556,6 @@ s32 Anim_Step(void *, void *);
 
 u8 SceneActorRegistry_LinkActor(void *);
 
-static inline void IvyInit_ResetState(struct ChaseActor *actor, u32 behavior)
-{
-    MonsterInit_SetState(actor, 0, 0, behavior);
-}
-
 static inline void IvyInit_InitializeBody(void *object, u32 *fill)
 {
     struct ChaseActor *arg0 = object;
@@ -1687,29 +1682,29 @@ s32 Ivy_Init(void *object)
     struct SceneActorChaseGroup *group = &arg0->group;
     // concession-ok(const-local): Both CpuSet fills read the same fixed source word.
     u32 zero;
-    struct ContactPosition tmp;
-    u32 flag;
+    struct ContactPosition origin;
+    u32 startsHidden;
 
     IvyInit_ResetCapture(arg0);
     SceneActorRegistry_SetObjectContext(actor, actor, 0, 1);
     MonsterInit_SetCategory(actor, MONSTER_CATEGORY_IVY);
     Ivy_InitProfileId(actor);
     if (MonsterInit_GetDrawableKind(actor) == 0) {
-        u8 *heap;
+        u8 *drawable;
         actor->base.drawable = Heap_Alloc(0x5C);
         Memory_Clear(actor->base.drawable, 0x5C);
-        heap = MonsterInit_Drawable(actor);
-        MonsterInit_InitializeSprite(heap, 0xD638, 0x99DD);
+        drawable = MonsterInit_Drawable(actor);
+        MonsterInit_InitializeSprite(drawable, 0xD638, 0x99DD);
         if (MonsterInit_GetCategory(actor) == 0x11 || MonsterInit_GetCategory(actor) == 0x17)
-            heap[7] = 1;
+            drawable[7] = 1;
         actor->base.body.direction = 0;
     } else {
-        u8 *heap;
+        u8 *drawable;
         actor->base.drawable = Heap_Alloc(0x80);
         Memory_Clear(actor->base.drawable, 0x80);
-        heap = MonsterInit_Drawable(actor);
-        MonsterInit_ClearPosition(&zero, &tmp);
-        MonsterInit_InitializeWidget(heap, 0xCB05, 0xD638, &tmp);
+        drawable = MonsterInit_Drawable(actor);
+        MonsterInit_ClearPosition(&zero, &origin);
+        MonsterInit_InitializeWidget(drawable, 0xCB05, 0xD638, &origin);
         actor->base.animationIndex = 0xFF;
     }
     IvyInit_InitializeBody(actor, &zero);
@@ -1735,13 +1730,13 @@ s32 Ivy_Init(void *object)
     if (Script_GetKeywordValue('E', 0))
         MonsterInit_SetStatusFlags(actor, 0x2000000);
     SceneActorTerrain_ReadScriptParameters(actor);
-    flag = 0;
+    startsHidden = 0;
     if (MonsterInit_TestMotionFlags(actor, 4)) {
         MonsterInit_SetStatusFlags(actor, 0x2000);
-        flag = 1;
+        startsHidden = 1;
     }
-    if (flag != 1) {
-        IvyInit_ResetState(actor, 0);
+    if (startsHidden != 1) {
+        MonsterInit_SetState(actor, 0, 0, 0);
         MonsterInit_SetControl(actor, MonsterInit_GetStandingControl(actor), 0);
     }
     MonsterInit_InitializeRegion(actor);
@@ -1750,7 +1745,7 @@ s32 Ivy_Init(void *object)
     if (Script_GetKeywordValue('S', 0) != 0 || !MonsterInit_IsInCurrentRegion(actor))
         SceneActorPlacement_HideActor(actor, 0);
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);
-    if (MonsterInit_GetDrawableKind(actor) == 0)
+    if (actor->base.drawableKind == 0)
         DisplaySequence_Step(actor->base.drawable);
     else
         Anim_Step(actor->base.drawable + 0x20, actor->base.drawable);
@@ -1759,7 +1754,7 @@ s32 Ivy_Init(void *object)
     Ivy_InitControlPresets(actor);
     SceneActor_BeginReaction22(actor);
     if (MonsterInit_TestWorldFlags(0x400)) {
-        IvyInit_ResetState(actor, 1);
+        SceneActorTerrain_EnterState(actor, 0, 0, 1);
         MonsterInit_SetControl(actor, SceneActorReaction_PlayHiddenCue, 0x2A);
         IvyInit_EnableColliderContact(&actor->base.colliderA);
         IvyInit_ClearMotionFlags(actor, ~0x800);
