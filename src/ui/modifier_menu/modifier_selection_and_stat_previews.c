@@ -477,7 +477,7 @@ s32 ModifierMenu_ApplyPendingSource(struct ModifierMenu *menu)
         case 1: {
             s32 category = menu->choice.cursor.category;
             s32 index = menu->choice.cursor.index;
-            if (!StateFlags_GetCategoryBit(4, category * 3 * 2 + index))
+            if (!StateFlags_GetCategoryBit(4, category * 6 + index))
                 break;
             result = ModifierMenu_ToggleSelection(menu);
             ModifierMenu_ReconcileSelection(menu);
@@ -486,7 +486,7 @@ s32 ModifierMenu_ApplyPendingSource(struct ModifierMenu *menu)
         case 2: {
             s32 category = menu->choice.cursor.category;
             s32 index = menu->choice.cursor.index;
-            if (StateFlags_GetCategoryBit(5, category * 3 * 2 + index))
+            if (StateFlags_GetCategoryBit(5, category * 6 + index))
                 result = ModifierMenu_CommitSecondarySource(menu);
             break;
         }
