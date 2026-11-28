@@ -396,3 +396,4 @@ src/bosses/vanargand/Vanargand_UpdatePlayerDrain.c	Vanargand_UpdatePlayerDrain	n
 src/bosses/vanargand/Vanargand_UpdateFacingPairAttack.c	Vanargand_UpdateFacingPairAttack	contrived	near-natural	6	flag mask locals, self alias and random draw helper kept
 src/bosses/vanargand/Vanargand_RunDefeatSequence.c	Vanargand_RunDefeatSequence	contrived	partial	14	uses struct VanargandPairAttack/ContactPosition; kept: zero local, mask locals, vector alias locals, animation+0x60 (compiler: address reuse and constant-before-address order)
 src/bosses/vanargand/Vanargand_UpdateSequencedPairAttack.c	Vanargand_UpdateSequencedPairAttack	contrived	natural	40	self alias kept (compiler keeps a second register copy of the boss)
+src/bosses/vanargand/Vanargand_UpdateSynchronizedPairAttack.c	Vanargand_UpdateSynchronizedPairAttack	contrived	natural	40	self alias kept (compiler keeps a second register copy of the boss)
