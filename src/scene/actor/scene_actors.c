@@ -184,20 +184,14 @@ void SceneActors_StartEightDirectionAnimation(struct StateActor *actor,
                                               struct AnimSprite *animation, int resource,
                                               int sequence, int speed, int offset, int flags)
 {
-    {
-        int direction = actor->animationFacing8;
-        if (((u8)(direction - 5)) <= 2) {
-            actor->animationOffset = 8 - direction;
-            actor->animationMirrored = 1;
-        } else {
-            actor->animationOffset = direction;
-            actor->animationMirrored = 0;
-        }
+    if (actor->animationFacing8 >= 5 && actor->animationFacing8 <= 7) {
+        actor->animationOffset = 8 - actor->animationFacing8;
+        actor->animationMirrored = 1;
+    } else {
+        actor->animationOffset = actor->animationFacing8;
+        actor->animationMirrored = 0;
     }
-    {
-        int selected = actor->animationOffset + sequence;
-        actor->animationSequence = selected;
-    }
+    actor->animationSequence = actor->animationOffset + sequence;
     Anim_SetKeyframes(animation, (void *)resource, actor->animationSequence, (u16)speed,
                       (u16)flags);
     flags &= 1;
