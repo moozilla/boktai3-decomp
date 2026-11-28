@@ -44,7 +44,9 @@ struct PlayerActionDescriptor {
     struct {
         u8 kind, unknown1[3];
     } modifiers[2]; /* 0x0C: applied by Player_BuildActionModifiers (tentative) */
-    u32 unknown14[3];
+    u8 unknown14;
+    u8 comboRecord; /* 0x15: record of the weapon combo table (tentative) */
+    u8 unknown16[0xA];
 };
 
 struct PlayerActionConfig {

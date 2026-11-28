@@ -1,59 +1,53 @@
 #include "global.h"
 #include "player/player.h"
 #define gPlayerActionCueTable gUnk_08E5FA6C
-struct PlayerActionCueInfo {
-    u8 unknown0[0x15];
-    u8 cueIndex;
-    u8 unknown16[0xA];
-};
-extern const u8 gUnk_08E5FA6C[];
+#define gPlayerActionCueTable gUnk_08E5FA6C
+/* 64-byte records: a cue type every 12 bytes, starting at byte 4 (tentative) */
+extern const u8 gUnk_08E5FA6C[][64];
 void ActionRecord_CopyFromEntry(void *, void *);
 s32 ActorVariant_GetTableValue(u32, s32);
 s32 Player_SelectActionCue(struct Player *p)
 {
-    struct PlayerActionCueInfo info;
-    u32 entry;
+    struct PlayerActionDescriptor descriptor;
+    const u8 *record;
+    s32 offset;
+    const u8 *type;
     s32 cue, result;
-    u32 offset;
-    ActionRecord_CopyFromEntry(p->statModifierContext.actionEntry, &info);
-    entry = info.cueIndex;
-    entry <<= 6;
-    entry += (u32)gUnk_08E5FA6C;
+
+    ActionRecord_CopyFromEntry(p->statModifierContext.actionEntry, &descriptor);
+    record = gUnk_08E5FA6C[descriptor.comboRecord];
     offset = p->actionResetCounter * 12 + 4;
-    entry += offset;
+    type = &record[offset];
     cue = -1;
     switch (p->tetherPhase) {
         case 0:
-            entry = *(const u8 *)entry;
-            if (entry == 1)
+            if (*type == 1)
                 cue = 0x15;
-            else if (entry == 2)
+            else if (*type == 2)
                 cue = 0x18;
-            else if (entry == 3)
+            else if (*type == 3)
                 cue = 0x1D;
             break;
         case 1:
         case 2:
         case 4:
         case 5:
-            entry = *(const u8 *)entry;
-            if (entry == 1) {
-                u32 phase = p->tetherPhase;
-                cue = 0x16;
-                if (phase == 4)
+            if (*type == 1) {
+                if (p->tetherPhase == 4)
                     cue = 0x17;
-            } else if (entry == 2)
+                else
+                    cue = 0x16;
+            } else if (*type == 2)
                 cue = 0x18;
-            else if (entry == 3)
+            else if (*type == 3)
                 cue = 0x1E;
             break;
         case 3:
-            entry = *(const u8 *)entry;
-            if (entry == 1)
+            if (*type == 1)
                 cue = 0x17;
-            else if (entry == 2)
+            else if (*type == 2)
                 cue = 0x1C;
-            else if (entry == 3)
+            else if (*type == 3)
                 cue = 0x1F;
             break;
     }

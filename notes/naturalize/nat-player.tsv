@@ -145,3 +145,7 @@ src/player/attack/Player_FindNearestVisibleTarget.c	Player_FindNearestVisibleTar
 src/player/attack/Player_OnGrabMotionExit.c	Player_OnGrabMotionExit	contrived	natural	1	-
 src/player/attack/Player_UpdateGrabMotion.c	Player_UpdateGrabMotion	contrived	contrived	13	gPlayerPendingActor casts, pending-clear locals, heading pointer, link-damage local, frame accessor: each plain form changes codegen
 src/player/attack/Player_ComputeActionScale.c	Player_ComputeActionScale	contrived	contrived	14	FlagAt takes a byte offset and parks the mask: typed helpers differ in register choice; SignedActionFlags and ReadBonus accessors stay
+src/player/attack/sub_0814CF2C.c	sub_0814CF2C	natural	natural	0	-
+src/player/attack/Player_UpdateStatThreshold.c	Player_UpdateStatThreshold	natural	natural	0	-
+src/player/attack/Player_SelectActionVariant.c	Player_SelectActionVariant	natural	natural	0	-
+src/player/attack/Player_SelectActionCue.c	Player_SelectActionCue	contrived	minor	30	record pointer plus separate offset local (member access folds the +4 into the load)
