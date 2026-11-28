@@ -578,3 +578,11 @@ src/system/inventory/ItemDescriptor_Reset.c	ItemDescriptor_Reset	contrived	natur
 src/system/inventory/Inventory_GetEquippedDescriptor.c	Inventory_GetEquippedDescriptor	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
 src/system/inventory/Inventory_InitEquipmentEntryFromDescriptor.c	Inventory_InitEquipmentEntryFromDescriptor	contrived	minor	1	values copied by walking word pointers: indexed array copies fold the offset into the induction variable
 src/system/inventory/Inventory_CountEquipmentEffectEntries.c	Inventory_CountEquipmentEffectEntries	contrived	minor	1	do loop with a walked entry pointer for the initialization order
+src/system/inventory/Inventory_GetAgedItemReplacement.c	Inventory_GetAgedItemReplacement	natural	natural	0	
+src/system/inventory/Selection_GetDisplayFrame.c	Selection_GetDisplayFrame	contrived	contrived	8	gotos: jump2 cross-jumps the two selection+constant returns the ROM keeps separate
+src/system/inventory/ActionRecord_CopyFromEntry.c	ActionRecord_CopyFromEntry	contrived	contrived	3	values copied by walking both struct pointers in 4-byte steps: an indexed loop is strength-reduced differently
+src/system/inventory/Inventory_GetEquipmentDescriptor.c	Inventory_GetEquipmentDescriptor	natural	natural	0	
+src/system/inventory/Inventory_GetEquipmentValueStub.c	Inventory_GetEquipmentValueStub	natural	natural	0	
+src/system/inventory/Inventory_GetEquipmentEntry.c	Inventory_GetEquipmentEntry	minor	minor	0	unit-local view of the 16-byte entries at gGameState+0x1C0: naming them needs table160 re-split in the shared game state header
+src/system/inventory/Inventory_GetEquipmentId.c	Inventory_GetEquipmentId	natural	natural	0	
+src/system/inventory/sub_0822D6EC.c	sub_0822D6EC	natural	natural	0	
