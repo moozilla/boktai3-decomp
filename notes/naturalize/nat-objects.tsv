@@ -40,3 +40,8 @@ src/objects/bouncing_bombs/BouncingBomb_IsActive.c	BouncingBomb_IsActive	contriv
 src/objects/bouncing_bombs/BouncingBomb_InitializeColliders.c	BouncingBomb_InitializeColliders	natural	natural	0	
 src/objects/bouncing_bombs/BouncingBomb_Spawn.c	BouncingBomb_Spawn	contrived	minor	3	second object view for the sprite writes: ROM copies the pointer
 src/objects/bouncing_bombs/BouncingBomb_SpawnFromScript.c	BouncingBomb_SpawnFromScript	minor	natural	2	
+src/objects/bouncing_bombs/BouncingBomb_TickRemoval.c	BouncingBomb_TickRemoval	natural	natural	0	
+src/objects/bouncing_bombs/BouncingBomb_InitializePool.c	BouncingBomb_InitializePool	natural	natural	0	
+src/objects/bouncing_bombs/BouncingBomb_EnsurePool.c	BouncingBomb_EnsurePool	natural	natural	0	
+src/objects/bouncing_bombs/BouncingBomb_ResetPool.c	BouncingBomb_ResetPool	natural	natural	0	
+src/objects/bouncing_bombs/BouncingBomb_TickActive.c	BouncingBomb_TickActive	contrived	minor	18	sprite/pos/velocity/cellPtr pointer locals kept: direct fields reallocate the whole physics step

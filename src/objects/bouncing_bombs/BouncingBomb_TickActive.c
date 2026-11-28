@@ -59,18 +59,17 @@ static inline s32 SumVelocity(const struct ContactPosition *velocity)
     s32 x = velocity->x, z = velocity->z, y = velocity->y;
     return x + z + y;
 }
-void BouncingBomb_TickActive(struct BouncingPool *pool, struct BouncingObject *input)
+void BouncingBomb_TickActive(struct BouncingPool *pool, struct BouncingObject *obj)
 {
-    struct BouncingObject *obj = input;
-    struct ContactSwarmSprite *sprite = &input->sprite;
+    struct ContactSwarmSprite *sprite = &obj->sprite;
     u16 *cellPtr;
-    u16 currentCell;
-    s32 currentGround;
+    u16 cell;
+    s32 ground;
     struct ContactPosition rel;
-    struct ContactPosition candidate;
+    struct ContactPosition next;
     struct ContactPosition *pos;
     struct ContactPosition *velocity;
-    s32 cell, ground, nextGround, speed, dist2;
+    s32 nextCell, nextGround, speed;
     u32 cellFlags;
 
     if (obj->enter) {
@@ -80,19 +79,14 @@ void BouncingBomb_TickActive(struct BouncingPool *pool, struct BouncingObject *i
     }
     obj->mapCell = SceneActorTerrain_GetCellIndex(&obj->sprite.position);
     if (obj->flags & 1) {
-        s32 height = sprite->position.y;
-        s32 oldCell = obj->mapCell;
-        struct ContactPosition *here = &sprite->position;
-        ground = SceneActorTerrain_GetHeight(oldCell, here);
-        if ((u32)height > (u32)ground)
+        if ((u32)sprite->position.y >
+            (u32)SceneActorTerrain_GetHeight(obj->mapCell, &sprite->position))
             obj->velocity.y -= 4;
     } else {
         struct ContactPosition *delta = &rel;
         struct ContactPosition *here = &sprite->position;
-        struct ContactPosition *origin = &obj->origin;
-        SceneActorTerrain_Subtract(delta, origin, here);
-        dist2 = delta->x * delta->x + delta->z * delta->z;
-        if (dist2 <= 0x3ffff || obj->stateFrame > 8) {
+        SceneActorTerrain_Subtract(delta, &obj->origin, here);
+        if (delta->x * delta->x + delta->z * delta->z < 0x40000 || obj->stateFrame > 8) {
             obj->flags |= 1;
             obj->velocity.y -= 4;
         }
@@ -101,11 +95,11 @@ void BouncingBomb_TickActive(struct BouncingPool *pool, struct BouncingObject *i
     cellPtr = &obj->mapCell;
     pos = &sprite->position;
     velocity = &obj->velocity;
-    currentCell = *cellPtr;
+    cell = *cellPtr;
     Math_Atan2(velocity->x, velocity->z);
-    currentGround = SceneActorTerrain_GetHeight(currentCell, pos);
+    ground = SceneActorTerrain_GetHeight(cell, pos);
     if (velocity->x + velocity->z + velocity->y != 0) {
-        if (pos->y <= currentGround) {
+        if (pos->y <= ground) {
             velocity->x = Div(6 * velocity->x, 10);
             velocity->y = -Div(4 * velocity->y, 10);
             velocity->z = Div(6 * velocity->z, 10);
@@ -119,22 +113,22 @@ void BouncingBomb_TickActive(struct BouncingPool *pool, struct BouncingObject *i
             } else {
                 Sound_PlaySong(0x166);
             }
-            pos->y = currentGround;
+            pos->y = ground;
         }
-        candidate.x = pos->x + velocity->x;
-        candidate.y = pos->y + velocity->y;
-        candidate.z = pos->z + velocity->z;
-        cell = SceneActorTerrain_GetCellIndex(&candidate);
-        nextGround = SceneActorTerrain_GetHeight(cell, &candidate);
-        cellFlags = ((u16 *)SceneActorTerrain_GetCell(cell))[1];
-        if (currentCell != cell) {
-            if (currentGround < nextGround || TerrainBlockingFlags(cell) != 0) {
+        next.x = pos->x + velocity->x;
+        next.y = pos->y + velocity->y;
+        next.z = pos->z + velocity->z;
+        nextCell = SceneActorTerrain_GetCellIndex(&next);
+        nextGround = SceneActorTerrain_GetHeight(nextCell, &next);
+        cellFlags = ((u16 *)SceneActorTerrain_GetCell(nextCell))[1];
+        if (cell != nextCell) {
+            if (ground < nextGround || TerrainBlockingFlags(nextCell) != 0) {
                 velocity->x = -Div(5 * velocity->x, 10);
                 velocity->z = -Div(5 * velocity->z, 10);
                 Sound_PlaySong(0x166);
             }
         }
-        if ((nextGround <= 0 || (cellFlags & 0x40)) && candidate.y <= nextGround) {
+        if ((nextGround <= 0 || (cellFlags & 0x40)) && next.y <= nextGround) {
             BouncingBomb_ReleaseSlot(obj);
         } else {
             pos->x += velocity->x;
