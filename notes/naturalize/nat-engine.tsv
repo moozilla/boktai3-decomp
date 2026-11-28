@@ -145,3 +145,10 @@ src/engine/video/tile_animation.c	TileAnimation_FindFreeChannel	minor	natural	1
 src/engine/video/tile_animation.c	TileAnimation_FindChannel	minor	natural	1	
 src/engine/video/tile_animation.c	TileAnimation_Upload	contrived	natural	6	
 src/engine/video/tile_animation.c	TileAnimation_Configure	contrived	natural	9	
+src/engine/video/tile_animation.c	TileAnimation_GetTask	natural	natural	0	
+src/engine/video/tile_animation.c	TileAnimation_Advance	natural	natural	0	
+src/engine/video/tile_animation.c	TileAnimation_Update	natural	natural	0	
+src/engine/video/tile_animation.c	TileAnimation_Initialize	natural	natural	0	
+src/engine/video/tile_animation.c	TileAnimation_Create	natural	natural	0	
+src/engine/video/tile_animation.c	TileAnimation_Stop	natural	natural	0	
+src/engine/video/sprite_pool.c	SpritePool_Update	minor	natural	1	

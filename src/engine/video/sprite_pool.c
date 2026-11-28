@@ -3,8 +3,9 @@
 int SpritePool_Update(struct SpritePool *pool)
 {
     struct SpritePoolSlot *slot = pool->slots;
-    int index = 15;
-    do {
+    int index;
+
+    for (index = 0; index < 16; index++, slot++) {
         if (slot->active) {
             if (slot->callback) {
                 if (slot->callback(pool, slot)) {
@@ -19,9 +20,7 @@ int SpritePool_Update(struct SpritePool *pool)
                 slot->id = 0;
             }
         }
-        index--;
-        slot++;
-    } while (index >= 0);
+    }
     return 0;
 }
 
