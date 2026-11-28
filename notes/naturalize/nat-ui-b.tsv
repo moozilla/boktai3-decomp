@@ -423,3 +423,11 @@ src/ui/town/shop/SceneInputPanel_InitBackground.c	SceneInputPanel_InitBackground
 src/ui/town/shop/SceneInputPanel_InitWidgets.c	SceneInputPanel_InitWidgets	contrived	minor	3	parameter copied into a local (copy order); zero priority read back from a playback struct
 src/ui/town/shop/SceneInputPanel_SetMeterGlyph.c	SceneInputPanel_SetMeterGlyph	natural	natural	0	
 src/ui/town/shop/SceneInputPanel_PositionModeCursor.c	SceneInputPanel_PositionModeCursor	contrived	minor	6	second local copy of the panel pointer used by every case but the default
+src/ui/town/shop/SceneInputPanel_InitHighlight.c	SceneInputPanel_InitHighlight	natural	natural	0	
+src/ui/town/shop/SceneInputPanel_TickHighlight.c	SceneInputPanel_TickHighlight	natural	natural	0	
+src/ui/town/shop/SceneInputPanel_HighlightMode.c	SceneInputPanel_HighlightMode	natural	natural	0	
+src/ui/town/shop/SceneInputPanel_HighlightCompare.c	SceneInputPanel_HighlightCompare	natural	natural	0	
+src/ui/town/shop/SceneInputPanel_HighlightPrompt.c	SceneInputPanel_HighlightPrompt	natural	natural	0	
+src/ui/town/shop/SceneInputPanel_ResetHighlights.c	SceneInputPanel_ResetHighlights	natural	natural	0	
+src/ui/town/shop/SceneInputPanel_SplitThreeDigits.c	SceneInputPanel_SplitThreeDigits	natural	natural	0	
+src/ui/town/shop/SceneInputPanel_GetEquippedValues.c	SceneInputPanel_GetEquippedValues	contrived	minor	7	index-first pointer sums and a reloaded equipment pointer (address operand order)
