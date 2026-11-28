@@ -237,3 +237,9 @@ src/engine/video/background_layers.c	Bg_ClearAllTilemaps	minor	natural	1
 src/engine/video/background_layers.c	Bg_ResetDisplay	contrived	natural	3	
 src/engine/video/background_layers.c	Bg_UpdateScrollShadow	contrived	natural	12	
 src/engine/video/background_layers.c	Bg_UploadMapsAndTiles	minor	natural	1	
+src/engine/video/background_layers.c	Video_GetBackgroundMap	natural	natural		
+src/engine/video/background_layers.c	Bg_ClearTilemap	natural	natural		
+src/engine/video/background_layers.c	Bg_Initialize	minor	minor	6	masked clear kept in a local: a plain ~0xE00 (or the existing Bg_DisableDisplay) folds to a 16-bit constant, the ROM loads the 32-bit mask
+src/engine/video/background_layers.c	Bg_SetTileUpload	natural	natural		
+src/engine/video/background_layers.c	Bg_SetPriority	natural	natural		
+src/engine/video/background_layers.c	Bg_SetCharacterBase	minor	minor	1	u16 temp per case: storing the expression directly drops the ROM's halfword narrowing

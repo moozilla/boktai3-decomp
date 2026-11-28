@@ -204,19 +204,13 @@ extern s16 gUnk_03004BE8;
 
 extern const s16 gUnk_086149C4[];
 
-s32 __divsi3(s32, s32);
-
 /* The 8.8 reciprocal is narrowed before multiplication by the wave sample. */
 
 static inline s16 FixedDivide(s32 numerator, s16 scale)
 {
-    union {
-        s32 dividend;
-        s32 reciprocal;
-    } value;
-    value.dividend = numerator << 8;
-    value.reciprocal = __divsi3(value.dividend, scale);
-    return value.reciprocal;
+    s32 value = numerator << 8;
+    value /= scale;
+    return value;
 }
 
 /* Division by 256 rounds negative products toward zero. */
