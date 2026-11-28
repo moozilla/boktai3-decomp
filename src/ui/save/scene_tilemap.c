@@ -261,6 +261,7 @@ void SceneTilemap_LoadLayoutFromScript(struct TilemapPanel *panel)
 void TilemapPanel_LoadScriptTileList(struct TilemapPanel *panel)
 {
     s32 *values;
+    s32 index;
     if (Script_SeekToKeyword('g')) {
         values = Heap_Alloc(0x400);
         panel->tileListScript = (u8 *)Script_GetValueSafe();
@@ -274,11 +275,8 @@ void TilemapPanel_LoadScriptTileList(struct TilemapPanel *panel)
         }
         panel->tiles = Heap_Alloc(panel->tileCount * 2);
         Memory_Clear(panel->tiles, panel->tileCount * 2);
-        {
-            s32 index;
-            for (index = 0; index < panel->tileCount; index++)
-                panel->tiles[index] = values[index];
-        }
+        for (index = 0; index < panel->tileCount; index++)
+            panel->tiles[index] = values[index];
         Heap_Free(values);
     }
 }
