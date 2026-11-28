@@ -267,3 +267,4 @@ src/effects/orbits/homing_effect.c	EffectManager_UpdateParticles	minor	natural	2
 src/effects/orbits/homing_effect.c	EffectManager_DestroyManager	contrived	natural	2	effect pointer local: address computation order
 src/effects/orbits/homing_effect.c	EffectManager_Init	contrived	natural	4	actor local: the player load precedes the field address
 src/effects/orbits/homing_effect.c	EffectManager_Create	minor	natural	1	
+src/effects/orbits/homing_effect.c	EffectManager_UpdateAll	contrived	minor	190	walking slot copied to the effect pointer plus an indexed argument (two ROM pointers); pause mask local (loaded first); row copy in the projection; halfword view of the packed world position

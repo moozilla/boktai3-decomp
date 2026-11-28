@@ -1,6 +1,7 @@
 #include "player/player_slot_status.h"
 #include "effects/orbits/homing_effect.h"
 #include "engine/video/display_sequence_inline.h"
+#include "engine/math/math_shift.h"
 static inline void EffectManager_SetGlobal(struct EffectManager *manager)
 {
     gEffectManager = manager;
@@ -52,118 +53,79 @@ s32 EffectManager_UpdateParticles(struct EffectManager *manager, struct Effect *
     }
 }
 
-static inline s32 projectScale(s32 input)
+/* The isometric screen projection of a world position. */
+static inline void projectToScreen(struct EffectVec *screen, const struct EffectVec *world)
 {
-    s32 value = input * 3;
-    if (value >= 0)
-        value >>= 5;
-    else
-        value = -((-value) >> 5);
-    return value;
+    s32 x = world->x, z = world->z, sum, row, height;
+
+    screen->x = Math_ShiftTowardZero(3 * (x - z), 5);
+    sum = Math_ShiftTowardZero(3 * (x + z), 5);
+    row = sum;
+    height = Math_ShiftTowardZero(3 * world->y, 5);
+    screen->y = row - height;
+    screen->z = row + height;
 }
-static inline s32 projectScaleHeight(s32 input)
-{
-    s32 value = input * 3;
-    if (value >= 0)
-        return value >> 5;
-    return -((-value) >> 5);
-}
-static inline void projectToScreen(struct EffectVec *out, struct EffectVec *in)
-{
-    s32 x, z, h, y;
-    x = in->x;
-    z = in->z;
-    out->x = projectScale(x - z);
-    h = projectScale(x + z);
-    y = projectScaleHeight(in->y);
-    out->y = h - y;
-    out->z = h + y;
-}
-static inline void projectActorToScreen(struct EffectVec *out, struct EffectVec *in)
-{
-    s32 x;
-    s32 z, h, y;
-    x = in->x;
-    z = in->z;
-    out->x = projectScale(x - z);
-    {
-        s32 sum = x + z;
-        h = projectScale(sum);
-    }
-    y = projectScaleHeight(in->y);
-    out->y = h - y;
-    out->z = h + y;
-}
+
 s32 EffectManager_UpdateAll(struct EffectManager *manager)
 {
     struct EffectContext context;
-    struct EffectContext *ctx;
     struct EffectPackedVec actorWorld;
     struct EffectVec actorScreen;
-    struct Effect *p, *view;
+    struct Effect *effect, *slot;
     s32 i;
-    u32 mask = 512;
-    u32 flags;
-    flags = gEngineFlags | gScenePauseFlags;
-    mask &= flags;
-    if (mask) {
-        flags &= 256;
-        if (!flags)
-            goto done;
-    }
+    u32 paused = 0x200;
+    u32 flags = gEngineFlags | gScenePauseFlags;
+
+    paused &= flags;
+    if (paused && !(flags & 0x100))
+        return 0;
     actorWorld.x = manager->actor->position.x;
     actorWorld.y = manager->actor->position.y + 128;
     actorWorld.z = manager->actor->position.z;
-    projectActorToScreen(&actorScreen, (struct EffectVec *)&actorWorld);
-    ctx = &context;
-    p = manager->effects;
-    i = 0;
-    do {
-        view = p;
-        if (view->active) {
-            if (view->type == 2) {
-                ctx->world.x = ((struct EffectVec *)&actorWorld)->x;
-                ctx->world.y = ((struct EffectVec *)&actorWorld)->y;
-                ctx->world.z = ((struct EffectVec *)&actorWorld)->z;
+    projectToScreen(&actorScreen, (struct EffectVec *)&actorWorld);
+    slot = manager->effects;
+    for (i = 0; i < 6; slot++, i++) {
+        effect = slot;
+        if (effect->active) {
+            if (effect->type == 2) {
+                context.world.x = ((struct EffectVec *)&actorWorld)->x;
+                context.world.y = ((struct EffectVec *)&actorWorld)->y;
+                context.world.z = ((struct EffectVec *)&actorWorld)->z;
             } else if (manager->actor->facing == 0) {
-                ctx->world.x = manager->actor->position.x + 24;
-                ctx->world.y = manager->actor->position.y + 350;
-                ctx->world.z = manager->actor->position.z - 24;
+                context.world.x = manager->actor->position.x + 24;
+                context.world.y = manager->actor->position.y + 350;
+                context.world.z = manager->actor->position.z - 24;
             } else {
-                ctx->world.x = manager->actor->position.x - 32;
-                ctx->world.y = manager->actor->position.y + 320;
-                ctx->world.z = manager->actor->position.z + 32;
+                context.world.x = manager->actor->position.x - 32;
+                context.world.y = manager->actor->position.y + 320;
+                context.world.z = manager->actor->position.z + 32;
             }
             projectToScreen(&context.lower, &context.world);
             context.upper = context.lower;
-            ctx->lower.x -= 5;
-            ctx->lower.y -= 5;
-            ctx->upper.x += 5;
-            ctx->upper.y += 5;
+            context.lower.x -= 5;
+            context.lower.y -= 5;
+            context.upper.x += 5;
+            context.upper.y += 5;
             context.actorLower = actorScreen;
             context.actorUpper = actorScreen;
-            ctx->actorLower.x -= 8;
-            ctx->actorLower.y -= 20;
-            ctx->actorUpper.x += 8;
-            ctx->actorUpper.y += 20;
+            context.actorLower.x -= 8;
+            context.actorLower.y -= 20;
+            context.actorUpper.x += 8;
+            context.actorUpper.y += 20;
             EffectManager_UpdateParticles(manager, &manager->effects[i], &context);
-            if (view->soundDelay) {
-                view->soundDelay--;
-                if (!view->soundDelay) {
-                    u32 type = view->type;
+            if (effect->soundDelay) {
+                effect->soundDelay--;
+                if (!effect->soundDelay) {
+                    u32 type = effect->type;
+
                     Sound_PlaySongChecked(gUnk_08604A6C[type]);
                 }
             }
-            if (view->timer)
-                view->timer--;
+            if (effect->timer)
+                effect->timer--;
         }
-        p++;
-    } while (++i < 6);
-    {
-        struct EffectManager *end = manager;
-        end->counter++;
     }
-done:
+    manager->counter++;
     return 0;
 }
 
