@@ -39,6 +39,12 @@
 #include "scene/actor/scene_actor_placement.h"
 #include "engine/math/movement_curve.h"
 
+/* The drawable's byte at +7; a bitfield, as its stores expand through a mask. */
+struct IvyDrawable {
+    u8 unknown0[7];
+    u8 mode : 8;
+};
+
 void SceneActorBehavior_ApplyContactReaction(void *, void *, void *);
 
 static inline u8 Ivy_TestCaptureFlags(struct Ivy *context, u32 flags)
@@ -79,13 +85,12 @@ void Ivy_UpdateActiveState(struct ChaseActor *actor)
 
 void Sound_PlaySong(u32);
 
+// scope: put SceneActorReaction_PlayHiddenCue begin
 void SceneActorReaction_PlayHiddenCue(struct ChaseActor *actor)
 {
     if (SceneActorReaction_TakePrepared(actor)) {
-        u8 *drawable = actor->base.drawable;
-        u32 zero = 0;
-        drawable[7] = 2;
-        actor->base.colliderA.responseValue = zero;
+        ((struct IvyDrawable *)actor->base.drawable)->mode = 2;
+        actor->base.colliderA.responseValue = 0;
         ActorStatus_SetBodyBit(actor, 0);
         SceneActorAnimation_SelectDirectionalFlags(actor, 15);
         Sound_PlaySong(475);
@@ -93,6 +98,7 @@ void SceneActorReaction_PlayHiddenCue(struct ChaseActor *actor)
     if (actor->base.restart)
         actor->base.stepDone = 1;
 }
+// scope: put SceneActorReaction_PlayHiddenCue end
 
 /* Ivy_UpdateInactiveState: Empty Ivy state handler; inactive role is tentative */
 
@@ -278,11 +284,6 @@ void DamageNumberDisplay_Show(void *, u32, s32, void *, void *, u32);
 u32 Ivy_GetAnimationStatus(struct ChaseActor *);
 
 extern s16 *gLinkSession;
-
-struct IvyDrawable {
-    u8 unknown0[7];
-    u8 mode : 8;
-};
 
 static inline void CellCenter(struct SceneVec *out, u32 cell)
 {
