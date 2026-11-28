@@ -691,3 +691,4 @@ src/minigames/result_game/ResultGame_HideTargetMarker.c	ResultGame_HideTargetMar
 src/minigames/result_game/ResultGame_SetTrackingVisibility.c	ResultGame_SetTrackingVisibility	contrived	natural	3	reused sprite pointer: two helper calls swap registers
 src/minigames/result_game/ResultGame_SetPressVisibility.c	ResultGame_SetPressVisibility	contrived	natural	3	reused sprite pointer: two helper calls add address instructions
 src/minigames/result_game/ResultMenu_DestroyGraphics.c	ResultMenu_DestroyGraphics	contrived	natural	1	no return value, as in the original
+src/minigames/result_game/ResultMenu_Countdown.c	ResultMenu_Countdown	contrived	natural	1	

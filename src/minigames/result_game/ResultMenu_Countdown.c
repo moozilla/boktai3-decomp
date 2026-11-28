@@ -1,18 +1,18 @@
-#include "global.h"
+#include "minigames/result_game/result_tutorial.h"
 int ResultMenu_IsPhaseStart(void *);
 void ResultMenu_SendCommand(void *, int, int, void *);
 void ResultMenu_SetPhase(void *, void *);
 void ResultGame_Update(void *);
-void Sound_PlaySong(int);
-void ResultMenu_Countdown(u8 *p)
+
+void ResultMenu_Countdown(struct ResultMenu *menu)
 {
-    if (ResultMenu_IsPhaseStart(p))
-        ResultMenu_SendCommand(p, 0x31, 0, 0);
-    if (*(u32 *)(p + 0x3c) > 239)
-        ResultMenu_SetPhase(p, ResultGame_Update);
+    if (ResultMenu_IsPhaseStart(menu))
+        ResultMenu_SendCommand(menu, 0x31, 0, 0);
+    if (menu->phaseFrame > 239)
+        ResultMenu_SetPhase(menu, ResultGame_Update);
     else {
-        if (Mod(*(u32 *)(p + 0x3c), 61) == 60)
+        if (Mod(menu->phaseFrame, 61) == 60)
             Sound_PlaySong(0x21c);
-        ++*(u32 *)(p + 0x3c);
+        menu->phaseFrame++;
     }
 }
