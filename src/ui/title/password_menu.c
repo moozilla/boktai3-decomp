@@ -37,19 +37,11 @@ void PasswordMenu_ResetSelections(struct PasswordMenu *p)
 
 void PasswordMenu_JoinTextRows(struct PasswordRows *text, u8 *out)
 {
-    s32 row = 0;
-    for (row = 0; row <= 3; row++) {
-        u8 *in = text->rows[row];
-        s32 count = 0;
-        u8 c = *in;
-        if (c != 0) {
-            do {
-                *out = c;
-                in++;
-                out++;
-                count++;
-            } while (count <= 255 && (c = *in) != 0);
-        }
+    s32 row, count;
+    for (row = 0; row < 4; row++) {
+        const u8 *in = text->rows[row];
+        for (count = 0; count < 256 && *in; count++)
+            *out++ = *in++;
     }
     *out = 0;
 }
