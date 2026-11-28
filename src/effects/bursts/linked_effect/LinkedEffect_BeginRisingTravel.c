@@ -1,101 +1,48 @@
-#include "global.h"
-#include "engine/engine_globals.h"
-#include "engine/ram.h"
-#include "player/cutscene/player_cue_sequence.h"
-#include "ui/hud/scene_indicator.h"
+#include "effects/bursts/linked_effect.h"
 #include "effects/bursts/spiral_burst.h"
-struct Sprite {
-    u32 flags;
-    u8 visible, unknown5, palette, unknown7;
-    s8 scaleX, scaleY;
-    u8 padA[6];
-    u16 frame;
-    u8 pad12[10];
-    struct Vec position;
-    u8 pad24[0x24];
-};
+#include "engine/math/monster_particle_random.h"
+#include "player/cutscene/player_cue_sequence.h"
 
-struct Effect {
-    struct Sprite sprite;
-    struct DisplaySequenceState anim;
-    u8 pad58[0xA8];
-    struct Vec *target;
-    u8 pad104[0x68];
-    struct Vec velocity;
-    u16 unknown174;
-    u8 state;
-    s8 slot;
-    u16 frame;
-    u8 entered, speed, ended, heading;
-    u16 unknown17E, lifetime, riseTimer, delay, turnTimer, maxSpeed;
-};
-struct Pool {
-    u8 pad[0x18];
-    void *resource;
-    u32 allocated;
-};
-extern const s16 gUnk_086149C4[];
-s32 Math_Atan2(s32, s32);
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
-void LinkedEffect_UpdateColliders(struct Effect *);
-static inline const u16 *RandomEntry(void)
-{
-    u32 index = (gRandomIndex + 1) & 1023;
-    gRandomIndex = index;
-    return (const u16 *)((index << 1) + (u32)gRandomTable);
-}
-static inline void LinkedEffect_SetTravelOffset(struct Vec *velocity, u8 heading, s32 radius)
-{
-    velocity->x = SpiralBurst_ScaleOffset(radius * gUnk_086149C4[(heading + 64) & 255]);
-    velocity->y = 0;
-    velocity->z = SpiralBurst_ScaleOffset(radius * gUnk_086149C4[heading]);
-}
 void LinkedEffect_SetVariant(void *, u32);
+
 // confidence=low: expands the linked effect while preparing an elevated travel target.
-void LinkedEffect_BeginRisingTravel(struct Pool *pool, struct Effect *p)
+void LinkedEffect_BeginRisingTravel(struct LinkedEffectPool *pool, struct LinkedEffect *effect)
 {
-    if (p->entered) {
+    if (effect->entered) {
         u32 heading;
-        u32 value;
-        const u16 *random;
-        u32 distance;
-        struct Vec *velocity;
-        p->sprite.flags = (p->sprite.flags & ~1) | 2;
-        p->ended = 0;
-        heading = p->heading;
-        random = RandomEntry();
-        value = *random & 255;
-        velocity = &p->velocity;
-        distance = value + 64;
-        LinkedEffect_SetTravelOffset(velocity, heading, distance);
-        {
-            struct Vec *destination = (void *)&p->velocity;
-            struct Vec *source = (void *)&p->sprite.position;
-            destination->x = source->x + destination->x;
-            destination->y = source->y + destination->y;
-            destination->z = source->z + destination->z;
-        }
-        p->velocity.y = p->sprite.position.y + 512;
-        p->riseTimer = 15;
-        p->frame = 0;
-        p->entered = 0;
-        p->sprite.scaleX = 1;
-        p->sprite.scaleY = 1;
+        u32 index;
+        s32 distance;
+
+        effect->sprite.flags = (effect->sprite.flags & ~1) | 2;
+        effect->animationEnded = 0;
+        heading = effect->heading;
+        index = (gRandomIndex + 1) & 1023;
+        gRandomIndex = index;
+        distance = *(const u16 *)(index * 2 + RANDOM_TABLE_ADDR) & 255;
+        LinkedEffect_SetPlanarVector(&effect->velocity, heading, distance + 64);
+        LinkedEffect_AddPosition(&effect->velocity, &effect->sprite.position);
+        effect->velocity.y = effect->sprite.position.y + 512;
+        effect->riseTimer = 15;
+        effect->frame = 0;
+        effect->entered = 0;
+        effect->sprite.scaleX = 1;
+        effect->sprite.scaleY = 1;
     }
-    if (!Mod(p->frame, 8))
-        LinkedEffect_SetVariant(&p->sprite.position, (u8)(p->heading + 128));
-    if (p->riseTimer) {
-        p->sprite.scaleX += Div(64 - p->sprite.scaleX, p->riseTimer);
-        p->sprite.scaleY += Div(64 - p->sprite.scaleY, p->riseTimer);
-        p->riseTimer--;
+    if (!Mod(effect->frame, 8))
+        LinkedEffect_SetVariant(&effect->sprite.position, (u8)(effect->heading + 128));
+    if (effect->riseTimer) {
+        effect->sprite.scaleX += Div(64 - effect->sprite.scaleX, effect->riseTimer);
+        effect->sprite.scaleY += Div(64 - effect->sprite.scaleY, effect->riseTimer);
+        effect->riseTimer--;
     }
-    p->ended = PlayerCue_StepSequenceEnded((struct ContactSwarmSprite *)&p->sprite,
-                                           &p->anim);
-    if (p->ended && !p->riseTimer) {
-        p->state = 2;
-        p->sprite.flags &= ~2;
-        p->entered = 1;
+    effect->animationEnded = PlayerCue_StepSequenceEnded(
+        (struct ContactSwarmSprite *)&effect->sprite, &effect->animation);
+    if (effect->animationEnded && !effect->riseTimer) {
+        effect->state = 2;
+        effect->sprite.flags &= ~2;
+        effect->entered = 1;
     } else
-        p->frame++;
+        effect->frame++;
 }

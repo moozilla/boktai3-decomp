@@ -6,6 +6,7 @@
 #include "engine/ram.h"
 #include "engine/video/display_sequence.h"
 #include "effects/bursts/fragment_effect_sprite_layout.h"
+#include "effects/bursts/spiral_burst.h"
 #include "scene/collision/contact_collider.h"
 
 struct LinkedEffect {
@@ -45,6 +46,24 @@ static inline void LinkedEffect_Subtract(struct ContactPosition *out,
     out->x = to->x - from->x;
     out->y = to->y - from->y;
     out->z = to->z - from->z;
+}
+
+extern const s16 gUnk_086149C4[];
+
+/* Horizontal vector of the given length along a 0..255 heading. */
+static inline void LinkedEffect_SetPlanarVector(struct ContactPosition *out, u8 heading, s32 length)
+{
+    out->x = SpiralBurst_ScaleOffset(length * gUnk_086149C4[(heading + 64) & 255]);
+    out->y = 0;
+    out->z = SpiralBurst_ScaleOffset(length * gUnk_086149C4[heading]);
+}
+
+static inline void LinkedEffect_AddPosition(struct ContactPosition *out,
+                                            const struct ContactPosition *origin)
+{
+    out->x = origin->x + out->x;
+    out->y = origin->y + out->y;
+    out->z = origin->z + out->z;
 }
 
 #endif
