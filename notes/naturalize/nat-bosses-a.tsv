@@ -96,3 +96,4 @@ src/bosses/count/SceneActorAnimation_UpdateImpactHazard.c	SceneActorAnimation_Up
 src/bosses/count/SceneActorAnimation_UpdateImpactFinish.c	SceneActorAnimation_UpdateImpactFinish	contrived	natural	1	shared effect setter, plain sequence branch
 src/bosses/count/SceneActorAnimation_ResetActionState.c	SceneActorAnimation_ResetActionState	natural	natural	0	
 src/bosses/count/SceneActorAnimation_UpdateImpactRelease.c	SceneActorAnimation_UpdateImpactRelease	contrived	natural	1	shared effect setter, plain sequence branch
+src/bosses/count/SceneActorAnimation_UpdateFlashWindup.c	SceneActorAnimation_UpdateFlashWindup	contrived	natural	1	shared effect setter and named shake/windup fields; random table address arithmetic kept

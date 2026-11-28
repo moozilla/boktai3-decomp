@@ -31,7 +31,9 @@ struct SceneActorGraphics {
     s16 grabHealthAmount; /* 0x368: taken from the grabbed player (tentative). */
     s16 impactHazardResource; /* 0x36A: passed to AnimatedHazard_Create. */
     s16 chargeShotPower;
-    u8 unk36E[0x378 - 0x36E];
+    u8 unk36E[0x374 - 0x36E];
+    s16 flashWindupFrames; /* 0x374 */
+    u8 unk376[0x378 - 0x376];
     s16 routeProjectileAmount, routeProjectileKind;
     s16 travelColliderA, travelColliderB;
     s16 contactStatHundredths; /* 0x380 */
@@ -48,14 +50,14 @@ struct SceneActorGraphics {
     s8 trackedPlayer; /* 0x395: player slot selected by the contact box. */
     u8 grabStartFacing; /* 0x396: the grabbed player's facing cue when seized. */
     u8 grabLastFacing;
-    u8 grabInputAngle; /* 0x398 */
-    u8 grabInputFrames;
+    u8 shakeAngle; /* 0x398: the struggle direction, or random during a flash windup. */
+    u8 shakeStrength;
     u8 grabFacingChanges; /* 0x39A */
     u8 reactionDelay; /* 0x39B: set by the anchored and death reactions. */
     s32 resourceCostAccumulator; /* 0x39C: SceneActors_AddResourceCost. */
     s32 healthCostAccumulator;   /* 0x3A0: SceneActors_AddHealthCost. */
     s32 healthCostBaseline;      /* 0x3A4: snapshot of health at contact-pool start. */
-    u8 unk3A8[4];
+    u32 unk3A8; /* cleared when a flash windup starts. */
     u32 animationFlags; /* 0x3AC: bit 0 selects alternate animation sequences. */
     u8 stepTableRow;                     /* 0x3B0 */
     u8 stepTableCol;                     /* 0x3B1 */

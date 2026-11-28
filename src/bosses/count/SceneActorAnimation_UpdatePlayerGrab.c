@@ -110,7 +110,7 @@ void SceneActorAnimation_UpdatePlayerGrab(struct StateActor *p, int tick)
             actor->graphics.grabStartFacing = facing;
             actor->graphics.grabLastFacing = facing;
         }
-        actor->graphics.grabInputFrames = 0;
+        actor->graphics.shakeStrength = 0;
         actor->graphics.grabFacingChanges = 0;
     }
 
@@ -150,9 +150,9 @@ void SceneActorAnimation_UpdatePlayerGrab(struct StateActor *p, int tick)
             actor->graphics.grabFacingChanges++;
         }
         if (actor->graphics.grabFacingChanges > 3) {
-            actor->graphics.grabInputAngle =
+            actor->graphics.shakeAngle =
                 SceneGraphicsActor_DirectionToAngle(Player_GetInputDirection(player));
-            actor->graphics.grabInputFrames = 16;
+            actor->graphics.shakeStrength = 16;
             actor->graphics.grabFacingChanges = reset;
         }
         if (actor->animation.frameIndex == 3 && actor->animation.elapsed == 0) {
