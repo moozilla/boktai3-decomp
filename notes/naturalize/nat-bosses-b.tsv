@@ -295,3 +295,4 @@ src/bosses/vanargand/positioned_effect.c	ScreenPalette_ProjectPosition	natural	n
 src/bosses/vanargand/positioned_effect.c	ScreenPalette_ProjectPositionAt88	natural	natural	0	
 src/bosses/vanargand/positioned_effect.c	PositionedEffect_SetHalfScaleCoordinates	natural	natural	0	
 src/bosses/vanargand/positioned_effect.c	PositionedEffect_UpdateOscillatingCoordinates	natural	natural	0	
+src/bosses/vanargand/Vanargand_UpdatePaletteTransition.c	Vanargand_UpdatePaletteTransition	near-natural	natural	6	source/target locals and the variant temporary kept: removing them changes argument evaluation order

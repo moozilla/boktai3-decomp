@@ -1,52 +1,8 @@
 #include "global.h"
-#include "engine/video/render.h"
-#include "bosses/vanargand/vanargand_stage_colors.h"
+#include "bosses/vanargand/vanargand_pair_attack.h"
 
-// Tentative: palette ownership follows adjacent Vanargand transition routines.
-struct PaletteTransition {
-    u8 pad0[0x718];
-    u8 output[0x200];
-    u8 first[0x200];
-    u8 second[0x200];
-    u8 third[0x200];
-    s32 frame;
-    u32 selector;
-    u16 mode;
-    u16 shift;
-    u32 alternate;
-    u8 padF28[0xc];
-    s32 stage;
-};
 void Vanargand_BlendPaletteBanks(void *, void *, void *, s32, s32, s32);
-void Vanargand_ResetPaletteTransition(struct PaletteTransition *);
 void CpuSet(const void *, void *, u32);
-
-static inline void RestorePalette(struct PaletteTransition *p)
-{
-    s32 selector = 0x6f;
-    u32 alternate = p->alternate;
-    if (!alternate)
-        selector = 0x7f;
-    switch (selector) {
-        case 0x6f:
-            CpuSet(gPaletteBankData + 0xde0, p->output, 0x4000020);
-            CpuSet(p->first, gBgPaletteBuffer, 0x4000068);
-            Vanargand_SetStageColors(p->stage);
-            break;
-        case 0x82:
-            CpuSet(gPaletteBankData + 0x1040, p->output, 0x4000020);
-            CpuSet(p->second, gBgPaletteBuffer, 0x4000068);
-            break;
-        case 0x7f:
-            CpuSet(gPaletteBankData + 0xfe0, p->output, 0x4000018);
-            CpuSet(p->third, gBgPaletteBuffer, 0x4000068);
-            break;
-        default:
-            CpuSet(gPaletteBankData + 0x3240, p->output, 0x4000008);
-            break;
-    }
-    Vanargand_ResetPaletteTransition(p);
-}
 
 static inline void BlendStageColors(s32 frame, s32 stage, s32 duration)
 {
@@ -87,88 +43,93 @@ static inline void BlendStageColors(s32 frame, s32 stage, s32 duration)
     gBgPaletteBuffer[0x10e / 2] = color;
 }
 
-void Vanargand_UpdatePaletteTransition(struct PaletteTransition *p)
+void Vanargand_UpdatePaletteTransition(struct VanargandPairAttack *p)
 {
-    u32 alternate = p->alternate;
+    u32 alternate = p->variant;
     s32 selector = 0x6f;
     if (!alternate)
         selector = 0x7f;
-    switch (p->mode) {
+    switch (p->paletteMode) {
         case 1:
-            if (p->frame < (1 << p->shift)) {
+            if (p->paletteFrame < (1 << p->paletteShift)) {
                 u8 *source;
                 u8 *target;
-                p->frame++;
+                p->paletteFrame++;
                 source = gPaletteBankData + (selector * 32);
                 target = gPaletteBankData + 0x1040;
-                Vanargand_BlendPaletteBanks(p->output, source, target, p->frame, p->shift, 4);
-                Vanargand_BlendPaletteBanks(gBgPaletteBuffer, p->first, p->second, p->frame,
-                                            p->shift, 13);
+                Vanargand_BlendPaletteBanks(p->palettes, source, target, p->paletteFrame,
+                                            p->paletteShift, 4);
+                Vanargand_BlendPaletteBanks(gBgPaletteBuffer, p->fadeA, p->fadeB, p->paletteFrame,
+                                            p->paletteShift, 13);
             } else {
                 Vanargand_ResetPaletteTransition(p);
             }
             break;
 
         case 2:
-            if (p->frame < (1 << p->shift)) {
+            if (p->paletteFrame < (1 << p->paletteShift)) {
                 u8 *source;
                 u8 *target;
-                p->frame++;
+                p->paletteFrame++;
                 source = gPaletteBankData + (selector * 32);
                 target = gPaletteBankData + 0xf60;
-                Vanargand_BlendPaletteBanks(p->output, source, target, p->frame, p->shift, 1);
+                Vanargand_BlendPaletteBanks(p->palettes, source, target, p->paletteFrame,
+                                            p->paletteShift, 1);
             } else {
                 Vanargand_ResetPaletteTransition(p);
             }
             break;
 
         case 3:
-            if (p->frame < (1 << p->shift)) {
+            if (p->paletteFrame < (1 << p->paletteShift)) {
                 u8 *source;
                 u8 *target;
-                p->frame++;
+                p->paletteFrame++;
                 source = gPaletteBankData + (selector * 32);
                 target = gPaletteBankData + 0xf80;
-                Vanargand_BlendPaletteBanks(p->output, source, target, p->frame, p->shift, 1);
+                Vanargand_BlendPaletteBanks(p->palettes, source, target, p->paletteFrame,
+                                            p->paletteShift, 1);
             } else {
                 Vanargand_ResetPaletteTransition(p);
             }
             break;
 
         case 4:
-            if (p->frame < (1 << p->shift)) {
+            if (p->paletteFrame < (1 << p->paletteShift)) {
                 u8 *source;
                 u8 *target;
-                p->frame++;
+                p->paletteFrame++;
                 source = gPaletteBankData + 0xf60;
                 target = gPaletteBankData + (selector * 32);
-                Vanargand_BlendPaletteBanks(p->output, source, target, p->frame, p->shift, 1);
+                Vanargand_BlendPaletteBanks(p->palettes, source, target, p->paletteFrame,
+                                            p->paletteShift, 1);
             } else {
-                RestorePalette(p);
+                Vanargand_LoadStagePalette(p, p);
                 Vanargand_ResetPaletteTransition(p);
             }
             break;
 
         case 5:
-            if (p->frame < (1 << p->shift)) {
+            if (p->paletteFrame < (1 << p->paletteShift)) {
                 u8 *source;
                 u8 *target;
-                p->frame++;
+                p->paletteFrame++;
                 source = gPaletteBankData + 0xf80;
                 target = gPaletteBankData + (selector * 32);
-                Vanargand_BlendPaletteBanks(p->output, source, target, p->frame, p->shift, 1);
+                Vanargand_BlendPaletteBanks(p->palettes, source, target, p->paletteFrame,
+                                            p->paletteShift, 1);
             } else {
-                RestorePalette(p);
+                Vanargand_LoadStagePalette(p, p);
                 Vanargand_ResetPaletteTransition(p);
             }
             break;
 
         case 6:
-            if (p->frame < (1 << p->shift)) {
-                p->frame++;
-                BlendStageColors(p->frame, p->stage, 1 << p->shift);
+            if (p->paletteFrame < (1 << p->paletteShift)) {
+                p->paletteFrame++;
+                BlendStageColors(p->paletteFrame, p->transition, 1 << p->paletteShift);
             } else {
-                Vanargand_SetStageColors(p->stage + 1);
+                Vanargand_SetStageColors(p->transition + 1);
                 Vanargand_ResetPaletteTransition(p);
             }
             break;
