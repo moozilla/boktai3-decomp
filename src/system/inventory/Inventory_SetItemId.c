@@ -1,6 +1,6 @@
-#include "global.h"
-extern u8 *gGameState;
-void Inventory_SetItemId(u32 i, u16 v)
+#include "system/game_state/game_state.h"
+
+void Inventory_SetItemId(u32 i, u16 id)
 {
-    *(u16 *)(gGameState + i * 2 + 0xa0) = v;
+    *(i + gGameState->table0A0) = id;
 }
