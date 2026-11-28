@@ -91,3 +91,4 @@ src/player/appearance/player_visuals.c	Player_OnWeaponHitApplyFrost	natural	natu
 src/player/appearance/player_visuals.c	Player_OnWeaponHitApplyCloud	natural	natural	0	-
 src/player/appearance/player_visuals.c	Player_OnWeaponHitApplyEarth	natural	natural	0	-
 src/player/appearance/player_visuals.c	Player_RollModifierBonus	natural	natural	4	
+src/player/appearance/player_visuals.c	Player_RollWeaponHitElementEffect	minor	natural	4	
