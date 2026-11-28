@@ -1,8 +1,6 @@
 #include "player/cues/player_cue.h"
 #include "player/player.h"
 #include "player/cutscene/player_cue_sequence.h"
-// confidence=low: provisional action interpretation from retained C and assembly.
-// Remaining differences: instruction selection and register allocation.
 u32 Player_ConsumeStateEntry(struct Player *);
 void Player_EmitQueuedEffects(struct Player *);
 void Player_NotifyActionCategories(struct Player *);
@@ -20,13 +18,12 @@ void Player_UpdateOddDirectionPose(struct Player *p)
     if ((s16)p->directionHistory[0] >= 0) {
         u8 *facing = &p->facing;
         *facing = (p->directionHistory[0] & 254) + 1;
-        if (p->facing > 4) {
-            s32 heading = (8 - p->facing) >> 1;
-            u8 *slot = &p->heading;
-            *slot = heading;
+        if (*facing > 4) {
+            s32 heading = (8 - *facing) >> 1;
+            p->heading = heading;
             p->side = 1;
         } else {
-            u32 heading = p->facing >> 1;
+            u32 heading = *facing >> 1;
             u8 *slot = &p->heading;
             *slot = heading;
             p->side = 0;
