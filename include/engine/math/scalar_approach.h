@@ -1,45 +1,38 @@
 #ifndef GUARD_SCALAR_APPROACH_H
 #define GUARD_SCALAR_APPROACH_H
 #include "global.h"
-/* Period-256 angles; the +128 tie remains positive. Arithmetic wraps in
- * u32 before signed interpretation, including the ROM's INT_MIN negation. */
+/* Period-256 angles; the +128 tie remains positive. */
 extern const s16 gUnk_08614D4C[];
-/* The original only clamps the upper bound. Integer address arithmetic
- * retains its access to preceding mapped ROM for a negative profile index. */
+/* Callers only clamp the upper bound: a negative profile index reads the ROM before the table. */
 static inline s32 ScalarApproach_ProfileCoefficient(s32 profile)
 {
-    u32 address = (u32)gUnk_08614D4C;
-    {
-        u32 offset = (u32)profile * 2u;
-        const s16 *entry = (const s16 *)(offset + address);
-        return *entry;
-    }
+    return gUnk_08614D4C[profile];
 }
 static inline s32 ScalarApproach_Unwrap(s32 value, s32 center)
 {
-    s16 delta = ((u32)value - (u32)center) & 255;
+    s16 delta = (value - center) & 255;
     if (delta > 128)
-        delta = delta - 256;
-    return (s32)((u32)center + (s16)delta);
+        delta -= 256;
+    return center + delta;
 }
 static inline s32 ScalarApproach_Half(s32 current, s32 target)
 {
-    s32 delta = (s32)((u32)target - (u32)current);
+    s32 delta = target - current;
     s32 step;
-    if (((u32)delta + 1u) <= 2)
+    if ((u32)delta + 1 <= 2)
         return target;
     if (delta >= 0)
         step = delta >> 1;
     else
-        step = (s32)(0u - (u32)((s32)(0u - (u32)delta) >> 1));
-    return (s32)((u32)current + (u32)step);
+        step = -(-delta >> 1);
+    return current + step;
 }
 static inline s32 ScalarApproach_ApplyDelta(s32 current, s32 target, s32 delta, u32 shift)
 {
     s32 step;
     u32 threshold = (1u << shift) - 1;
     if (delta != 0) {
-        if ((u32)delta + threshold <= 2 * threshold) {
+        if (delta + threshold <= 2 * threshold) {
             s32 minimum = -(1 << shift);
             if (delta > 0)
                 minimum = 1 << shift;
@@ -48,43 +41,28 @@ static inline s32 ScalarApproach_ApplyDelta(s32 current, s32 target, s32 delta, 
         if (delta >= 0)
             step = delta >> shift;
         else
-            step = (s32)(0u - (u32)((s32)(0u - (u32)delta) >> shift));
-        target = (s32)((u32)current + (u32)step);
+            step = -(-delta >> shift);
+        target = current + step;
     }
     return target;
 }
 static inline s32 ScalarApproach_Shift2(s32 current, s32 target)
 {
-    return ScalarApproach_ApplyDelta(current, target, (s32)((u32)target - (u32)current), 2);
+    return ScalarApproach_ApplyDelta(current, target, target - current, 2);
 }
 static inline s32 ScalarApproach_Shift3(s32 current, s32 target)
 {
-    return ScalarApproach_ApplyDelta(current, target, (s32)((u32)target - (u32)current), 3);
+    return ScalarApproach_ApplyDelta(current, target, target - current, 3);
 }
 static inline s32 ScalarApproach_Shift4(s32 current, s32 target)
 {
-    return ScalarApproach_ApplyDelta(current, target, (s32)((u32)target - (u32)current), 4);
+    return ScalarApproach_ApplyDelta(current, target, target - current, 4);
 }
 static inline void ScalarApproach_AdvanceValue(s16 *value, const s16 *to, u32 shift)
 {
     s32 target = *to;
     s32 current = *value;
     *value = ScalarApproach_ApplyDelta(current, target, target - current, shift);
-}
-static inline s32 ScalarApproach_Linear(s32 current, s32 target, s32 step)
-{
-    if (current < target) {
-        step = (s32)((u32)current + (u32)step);
-        if (step < target)
-            goto useStep;
-        return target;
-    } else {
-        step = (s32)((u32)current - (u32)step);
-        if (step <= target)
-            return target;
-    }
-useStep:
-    return step;
 }
 static inline s32 ScalarApproach_Profile(s32 current, s32 target, s32 coefficient)
 {
@@ -94,25 +72,22 @@ static inline s32 ScalarApproach_Profile(s32 current, s32 target, s32 coefficien
     if (coefficient >= 0)
         factor = coefficient >> 8;
     else
-        factor = (s32)(0u - (u32)((s32)(0u - (u32)coefficient) >> 8));
-    return (s32)(((u32)target - (u32)current) * (u32)factor + (u32)current);
+        factor = -(-coefficient >> 8);
+    return (target - current) * factor + current;
 }
-/* Same result as ScalarApproach_Linear; this layout matches the hidden entries. */
+/* Move current toward target by at most step. */
 static inline s32 ScalarApproach_Step(s32 current, s32 target, s32 step)
 {
-    s32 n, r;
+    s32 next;
     if (current < target) {
-        n = current + step;
-        if (n < target)
-            goto set;
-        r = target;
+        next = current + step;
+        if (next >= target)
+            return target;
     } else {
-        n = current - step;
-        r = target;
-        if (n > r)
-        set:
-            r = n;
+        next = current - step;
+        if (next <= target)
+            return target;
     }
-    return r;
+    return next;
 }
 #endif
