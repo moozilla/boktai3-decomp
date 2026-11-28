@@ -376,3 +376,4 @@ src/bosses/vanargand/Vanargand_UpdateMovingPairAttack.c	Vanargand_UpdateMovingPa
 src/bosses/vanargand/ActorSoundPhase_StartAnimation15.c	ActorSoundPhase_StartAnimation15	contrived	near-natural	3	constant locals and second aliases kept where present
 src/bosses/vanargand/ActorSoundPhase_StartTimedAnimation.c	ActorSoundPhase_StartTimedAnimation	contrived	near-natural	3	constant locals and second aliases kept where present
 src/bosses/vanargand/ActorSoundPhase_StartAnimation4.c	ActorSoundPhase_StartAnimation4	contrived	near-natural	3	constant locals and second aliases kept where present
+src/bosses/vanargand/Vanargand_OnAlternateStopState.c	Vanargand_OnAlternateStopState	contrived	near-natural	3	constant locals and second aliases kept where present

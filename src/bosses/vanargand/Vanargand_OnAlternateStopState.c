@@ -1,24 +1,16 @@
 #include "global.h"
+#include "bosses/vanargand/vanargand_pair_attack.h"
 
-struct A {
-    u8 f[0x9c];
-    u32 fl;
-    u8 g[0x11];
-    u8 b1;
-    u8 h[0x506];
-    u16 x;
-    u16 y;
-};
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, s32, s32, s32);
 
-void Vanargand_OnAlternateStopState(struct A *p)
+void Vanargand_OnAlternateStopState(struct VanargandPairAttack *p)
 {
     u32 m = 4;
-    p->fl |= m;
-    if (p->b1 != 0) {
-        p->b1 = 0;
-        p->x = 0;
-        p->y = 0;
+    p->flags |= m;
+    if (p->pending != 0) {
+        p->pending = 0;
+        p->attackParameter5B8 = 0;
+        p->attackParameter5BA = 0;
         SceneActors_StartUnmirroredAnimation(p, (u8 *)p + 0x18c, (u8 *)p + 0x1ec, 0xf, 0, 4);
     }
 }
