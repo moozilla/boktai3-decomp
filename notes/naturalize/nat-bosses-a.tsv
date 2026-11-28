@@ -168,3 +168,4 @@ src/bosses/count/CountBats_UpdateIdle.c	CountBats_UpdateIdle	natural	natural	0
 src/bosses/count/CountBats_UpdateAdvance.c	CountBats_UpdateAdvance	contrived	minor	6	velocity pointer and position block stay: shared charge offset narrows direction
 src/bosses/count/CountBats_UpdateTracking.c	CountBats_UpdateTracking	contrived	minor	24	frame local and the duplicated Collider_SetPosition stay (ROM reloads stateFrame in both arms)
 src/bosses/count/CountBats_UpdateCharge.c	CountBats_UpdateCharge	contrived	contrived	18	parked 255 mask and velocity/position pointer blocks stay: shared charge offset narrows direction and literal mask differs
+src/bosses/count/CountBats_UpdateReaction.c	CountBats_UpdateReaction	contrived	contrived	16	product/raw speed/read pointer temporaries stay (store order and register choice)

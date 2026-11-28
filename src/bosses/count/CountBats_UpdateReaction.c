@@ -1,14 +1,8 @@
 #include "scene/collision/contact_swarm.h"
+#include "scene/motion/scene_actor_charge_offset.h"
 void CountBats_SetDirectionalSequence(struct ContactSwarm *, struct ContactSwarmSlot *, u32);
 u32 CountBats_HideSlot(struct ContactSwarm *, struct ContactSwarmSlot *, s32);
-static inline s32 truncateShift12(s32 value)
-{
-    if (value >= 0)
-        return value >> 12;
-    return -((-value) >> 12);
-}
-void CountBats_UpdateReaction(struct ContactSwarm *pool, struct ContactSwarmSlot *slot,
-                                 s32 index)
+void CountBats_UpdateReaction(struct ContactSwarm *pool, struct ContactSwarmSlot *slot, s32 index)
 {
     struct ContactSwarmSprite *sprite = &slot->display.animation.draw.sprite;
     struct ContactPosition *velocity;
@@ -18,10 +12,8 @@ void CountBats_UpdateReaction(struct ContactSwarm *pool, struct ContactSwarmSlot
     u32 direction;
     u32 speed;
     if (slot->enter) {
-        struct ContactCollider *collider;
         slot->enter = 0;
-        collider = &slot->display.healthCollider;
-        collider->flags |= 4;
+        ContactCollider_SetFlags(&slot->display.healthCollider, 4);
         AnimData_SelectPaletteBank(&slot->display.animation.draw.graphics, 0x192);
         CountBats_SetDirectionalSequence(pool, slot, 1);
         Sound_PlaySong(0xE8);
@@ -32,25 +24,14 @@ void CountBats_UpdateReaction(struct ContactSwarm *pool, struct ContactSwarmSlot
     speed = rawSpeed * 2;
     product = gUnk_086149C4[(direction + 64) & 255] * speed;
     read = velocity;
-    velocity->x = truncateShift12(product);
+    velocity->x = SceneActor_ChargeComponent(product);
     velocity->y = 0;
-    {
-        const s16 *table = gUnk_086149C4;
-        u32 offset = direction * 2;
-        const s16 *entry = (const void *)(offset + (u32)table);
-        velocity->z = truncateShift12(*entry * speed);
-    }
+    velocity->z = SceneActor_ChargeComponent(gUnk_086149C4[direction] * speed);
     {
         struct ContactPosition *position = &sprite->position;
         sprite->position.x += slot->velocity.x;
-        {
-            const struct ContactPosition *current = read;
-            position->y += current->y;
-        }
-        {
-            const struct ContactPosition *current = read;
-            position->z += current->z;
-        }
+        position->y += read->y;
+        position->z += read->z;
     }
     if (slot->stateFrame > 19)
         CountBats_HideSlot(pool, slot, index);
