@@ -132,3 +132,4 @@ src/effects/bursts/fragment_burst/FragmentBurst_UpdateImpactAnimation.c	Fragment
 src/effects/bursts/fragment_burst/FragmentBurst_AllocateSlot.c	FragmentBurst_AllocateSlot	minor	minor	3	u8 occupancy test
 src/effects/bursts/fragment_burst/FragmentBurst_AllocateSpriteGroup.c	FragmentBurst_AllocateSpriteGroup	minor	minor	1	null test before returning the same pointer is in the ROM
 src/effects/bursts/fragment_burst/SpritePool4_UpdateActive.c	SpritePool4_UpdateActive	contrived	minor	3	u8 occupancy test
+src/effects/bursts/fragment_burst/SpriteGroupPool_Destroy.c	SpriteGroupPool_Destroy	minor	minor	3	u8 occupancy test
