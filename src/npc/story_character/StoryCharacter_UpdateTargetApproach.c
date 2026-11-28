@@ -119,9 +119,8 @@ static inline u32 walkAnimation(struct Actor *p)
 }
 // confidence=low: turns toward a target and stops inside its squared-distance threshold;
 // Actor_UpdateRunToPosition without the callback test, choosing animation 9 for kind 27.
-void StoryCharacter_UpdateTargetApproach(void *unused, struct Actor *arg)
+void StoryCharacter_UpdateTargetApproach(void *unused, struct Actor *p)
 {
-    struct Actor *p = arg;
     if (p->entered) {
         p->entered = 0;
         p->done = 0;
@@ -135,8 +134,8 @@ void StoryCharacter_UpdateTargetApproach(void *unused, struct Actor *arg)
         int dz = target->z - pos->z;
         u32 distance = dx * dx + dz * dz;
         u32 limit = p->speedSquared;
-        struct Vec *savedPos = pos;
-        struct Vec *savedTarget = target;
+        struct Vec *from = pos;
+        struct Vec *to = target;
 
         if (distance <= limit) {
             p->pos = p->target;
@@ -153,20 +152,7 @@ void StoryCharacter_UpdateTargetApproach(void *unused, struct Actor *arg)
             vel->x = scale(product);
             vel->y = 0;
             vel->z = scale(speed * gUnk_086149C4[angle]);
-            {
-                struct Vec *target = savedTarget;
-                s32 x;
-                struct Vec *pos;
-                s32 z;
-
-                x = target->x;
-                pos = savedPos;
-
-                x -= pos->x;
-
-                z = target->z - pos->z;
-                p->targetAngle = Math_Atan2(x, z);
-            }
+            p->targetAngle = Math_Atan2(to->x - from->x, to->z - from->z);
             {
                 int value = p->targetAngle;
                 u8 *out = savedAngle;
