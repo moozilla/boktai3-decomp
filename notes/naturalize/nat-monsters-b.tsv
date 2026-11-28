@@ -115,3 +115,4 @@ src/monsters/mummy/mummy_entry.c	Mummy_UpdateRevival	minor	minor	3	flag peek hel
 src/monsters/mummy/mummy_entry.c	Mummy_UpdateHiddenRecovery	minor	natural	0	
 src/monsters/mummy/mummy.c	SceneActor_UpdateAnimationCheckpoint	contrived	minor	1	SceneActorChase_SetMotionFlags: mask loaded before the field
 src/monsters/mummy/mummy.c	SceneActor_UpdateDirectionalAnimation	contrived	minor	1	motion flag accessors: mask loaded before the field address
+src/monsters/mummy/mummy.c	Mummy_UpdateRecoveryWait	contrived	contrived	9	StoreHalf and flag setters stay: mask/value loaded before the field address

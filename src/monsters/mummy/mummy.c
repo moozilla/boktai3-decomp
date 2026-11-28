@@ -294,20 +294,16 @@ void Mummy_UpdateRecoveryWait(struct ChaseActor *a)
         SceneActorAttachment_ReplaceResponseSlot(a, 3, 127, 0);
         SceneActorChase_SetMotionFlags(a, 16);
     }
-    SceneActorAnimation_SelectDirectionalEntry((void *)a, 1);
+    SceneActorAnimation_SelectDirectionalEntry(a, 1);
     a->base.field2C2 = Div(64, 6);
     if (!group->field5C4) {
         a->base.stepDone = 1;
-        SceneActorAnimation_SelectDirectionalEntry((void *)a, 6);
+        SceneActorAnimation_SelectDirectionalEntry(a, 6);
         Mummy_ResetMotionState(a);
         StoreHalf(a, 64);
         Chase_SetState(a, 3, 0, 0);
         Chase_SetCtl(a, (void *)Mummy_ResumeSavedRouteAfterAnimation, 0x13);
-        {
-            u16 *p = &a->base.motionFlags;
-            s32 mask = ~0x30;
-            *p &= mask;
-        }
+        SceneActorChase_ClearMotionFlagComponent(a, 0x30);
         SceneActorChase_SetActorFlags(a, 16);
         a->base.field2C2 = 64;
     }
