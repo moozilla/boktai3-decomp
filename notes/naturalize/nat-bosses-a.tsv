@@ -224,3 +224,7 @@ src/bosses/hresvelgr/Hresvelgr_GetEnvironmentalLevel.c	Hresvelgr_GetEnvironmenta
 src/bosses/hresvelgr/Hresvelgr_SetAnimation.c	Hresvelgr_SetAnimation	minor	natural	1	
 src/bosses/hresvelgr/Hresvelgr_HasCellOverride.c	Hresvelgr_HasCellOverride	minor	natural	1	
 src/bosses/hresvelgr/Hresvelgr_HasAdjacentOverride.c	Hresvelgr_HasAdjacentOverride	minor	natural	1	
+src/bosses/hresvelgr/Hresvelgr_EmitFacingMotionBurst.c	Hresvelgr_EmitFacingMotionBurst	contrived	contrived	10	unchanged: BurstWord unions and read helpers rebuild the table pointer each draw; bank-sample helpers drop 7 instructions
+src/bosses/hresvelgr/Hresvelgr_EmitFacingMotion.c	Hresvelgr_EmitFacingMotion	contrived	contrived	0	unchanged: relative-sample origin address and cloned polar/random helpers carry the register flow
+src/bosses/hresvelgr/Hresvelgr_SetPartApproachMotion.c	Hresvelgr_SetPartApproachMotion	minor	minor	0	local vector helpers stay
+src/bosses/hresvelgr/Hresvelgr_SelectPlayerAnimation.c	Hresvelgr_SelectPlayerAnimation	minor	natural	1	

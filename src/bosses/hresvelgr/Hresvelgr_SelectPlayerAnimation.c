@@ -1,4 +1,3 @@
-#define gHresvelgrAnimationPresets gUnk_0824F700
 #include "global.h"
 #include "player/player.h"
 struct Hresvelgr {
