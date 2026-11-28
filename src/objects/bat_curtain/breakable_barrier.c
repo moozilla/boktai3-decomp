@@ -271,13 +271,11 @@ u32 BreakableBarrier_UpdateSprite(void *, struct BreakableBarrier *);
 
 u32 BreakableBarriers_Update(struct BreakableBarrierManager *p)
 {
-    struct BreakableBarrier *q = p->barriers;
-    s32 i = 3;
-    do {
-        BreakableBarrier_UpdateSprite(p, q);
-        i--;
-        q++;
-    } while (i >= 0);
+    struct BreakableBarrier *barrier = p->barriers;
+    s32 i;
+
+    for (i = 0; i < 4; i++, barrier++)
+        BreakableBarrier_UpdateSprite(p, barrier);
     return 0;
 }
 
