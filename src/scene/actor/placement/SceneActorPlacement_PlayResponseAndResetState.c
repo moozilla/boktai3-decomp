@@ -48,11 +48,9 @@ s32 SceneActorPlacement_PlayResponseAndResetState(struct RoomActor *s)
             }
             break;
     }
-    {
-        SceneActorTerrain_InstallControl((struct ChaseActor *)s, s->onReaction, 0x12);
-        SceneActorTerrain_EnterState((struct ChaseActor *)s, 3, 0, 0);
-        SceneActorPlacement_ClearFlags(&s->reactionFlags, 0xFFFFF636);
-        SceneActorChase_AndWordFlags(&s->statusFlags, 0xFEFFFFFF);
-    }
+    SceneActorTerrain_InstallControl((struct ChaseActor *)s, s->onReaction, 0x12);
+    SceneActorTerrain_EnterState((struct ChaseActor *)s, 3, 0, 0);
+    SceneActorPlacement_ClearFlags(&s->reactionFlags, 0xFFFFF636);
+    SceneActorChase_AndWordFlags(&s->statusFlags, 0xFEFFFFFF);
     return 1;
 }
