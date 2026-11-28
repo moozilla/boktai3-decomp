@@ -284,3 +284,4 @@ src/bosses/vanargand/Vanargand_BlendPaletteBanks.c	Vanargand_BlendPaletteBanks	c
 src/bosses/vanargand/positioned_effect.c	PositionedEffect_InitAttackCollider	machine-shaped	natural	1	
 src/bosses/vanargand/positioned_effect.c	PositionedEffect_InitContactCollider	machine-shaped	natural	4	u8 direction local: ROM loads the constant before forming the field address
 src/bosses/vanargand/positioned_effect.c	PositionedEffect_InitRadialAttackColliders	near-natural	natural	3	
+src/bosses/vanargand/positioned_effect.c	PositionedEffect_InterpolateArcNodes	contrived	natural	7	

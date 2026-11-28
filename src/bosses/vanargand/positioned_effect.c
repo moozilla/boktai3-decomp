@@ -236,33 +236,19 @@ s32 __divsi3(s32, s32);
 void PositionedEffect_InterpolateArcNodes(struct PositionedArc *effect)
 {
     struct ContactPosition diff;
-    s32 i, dx, dy, dz, z, x;
     struct ContactSwarmSprite *node;
-    struct ContactPosition *d;
+    s32 i;
+
     Vanargand_Difference(&diff, effect->end, effect->start);
-    i = 0;
-    *(&d) = &diff;
-    dx = d->x;
-    dy = d->y;
-    dz = d->z;
-    z = 0;
-    x = 0;
     node = effect->nodes;
-    do {
-        struct ContactPosition *start = effect->start;
-        s32 px = start->x;
-        s32 ox = (x / 5);
-        s32 py = start->y;
-        s32 angle = ((i << 6) / 5);
-        s32 oy = (dy * gUnk_086149C4[angle & 255]) >> 12;
-        s32 pz = start->z;
-        s32 oz = (z / 5);
-        Vanargand_SetVector(&node->position, px + ox, py + oy, pz + oz);
+    for (i = 0; i <= 5; i++) {
+        Vanargand_SetVector(&node->position, effect->start->x + diff.x * i / 5,
+                            effect->start->y +
+                                ((diff.y * gUnk_086149C4[((i << 6) / 5) & 255]) >> 12),
+                            effect->start->z + diff.z * i / 5);
         node->flags &= ~1;
         node++;
-        z += dz;
-        x += dx;
-    } while (++i <= 5);
+    }
 }
 
 void PositionedEffect_SetHalfScaleCoordinates(struct PositionedEffectCoordinates *out,
