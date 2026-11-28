@@ -1,8 +1,9 @@
 #include "global.h"
+#include "monsters/chase_actor.h"
 
 u32 SceneActorProfiles_FindOrAdd(u32, u32);
 
-void SceneActorControl_SetDefaultProfile(u8 *p)
+void SceneActorControl_SetDefaultProfile(struct ChaseActor *actor)
 {
-    *(u32 *)(p + 0x308) = SceneActorProfiles_FindOrAdd(0x12, 0);
+    actor->base.profileId = SceneActorProfiles_FindOrAdd(0x12, 0);
 }
