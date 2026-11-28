@@ -1,13 +1,11 @@
 #include "global.h"
+#include "bosses/count/scene_graphics_actor.h"
 
-struct S {
-    u8 f[0x384];
-    u8 a;
-};
-struct S *SceneActors_GetBySlot(u32);
+struct SceneGraphicsActor *SceneActors_GetBySlot(u32);
+
 void Count_DecrementBarrierCount(void)
 {
-    struct S *p = SceneActors_GetBySlot(0);
-    if (p && p->a != 0)
-        p->a--;
+    struct SceneGraphicsActor *actor = SceneActors_GetBySlot(0);
+    if (actor && actor->graphics.barrierCount)
+        actor->graphics.barrierCount--;
 }

@@ -111,7 +111,7 @@ struct SceneGraphicsActor {
     struct ContactCollider overlayCollider;      /* 0x1CC */
     struct AnimSpriteResource animationResource; /* 0x220: keyframe resource. */
     struct AnimSprite animation;                 /* 0x240: body animation playback. */
-    u8 unk2A0[0x30C - 0x2A0];
+    u8 shadow[0x30C - 0x2A0]; /* 0x2A0: scaled ground shadow. */
     u8 approachMotion[0x32C - 0x30C]; /* 0x30C: polar interpolation state of the charge approach. */
     struct ContactPosition retreatTarget; /* 0x32C: the dying actor slides back toward this. */
     u8 unk334[0x33C - 0x334];
