@@ -276,3 +276,6 @@ src/bosses/sabata/Sabata_UpdatePresentation.c	Sabata_UpdatePresentation	machine-
 src/bosses/sabata/SceneActor_UpdateUnlessPaused.c	SceneActor_UpdateUnlessPaused	machine-shaped	natural	2	
 src/bosses/sabata/SceneActor_DestroyComponents.c	SceneActor_DestroyComponents	machine-shaped	natural	2	
 src/bosses/sabata/sub_0817FDE0.c	sub_0817FDE0	machine-shaped	partial	11	kept actor/boss alias, callback setters, tile-copy loops, facing expression and duplicate summon arms
+src/bosses/sabata/Sabata_InitStateDispatch.c	Sabata_InitStateDispatch	natural	natural	0	minor: local struct with offset field names
+src/bosses/sabata/Sabata_CreateFromScript.c	Sabata_CreateFromScript	natural	natural	0	
+src/bosses/sabata/Sabata_AdvanceStepFromScript.c	Sabata_AdvanceStepFromScript	natural	natural	0	minor: step setter and cleared local
