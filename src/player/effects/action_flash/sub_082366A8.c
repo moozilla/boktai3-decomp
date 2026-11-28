@@ -16,7 +16,9 @@ struct GlowSprite {
     u16 f10;
     u8 pad12[0xA];
     struct ContactPosition position;
-    u8 pad24[0x24];
+    u8 pad24[8];
+    struct GlowAnim anim;
+    u8 pad3C[0xC];
     u8 *palette;
     u16 colors[16];
     u8 f6C;
@@ -50,7 +52,7 @@ void sub_082366A8(struct GlowUnit *p, struct ContactPosition *pos)
         variant = 1;
         id = 0xA1;
     }
-    anim = (struct GlowAnim *)((u8 *)sprite + 0x2C);
+    anim = &sprite->anim;
     AnimData_Load(anim, 0xBA8);
     Sprite_Init(sprite, anim, 0);
     sprite->f10 = variant;

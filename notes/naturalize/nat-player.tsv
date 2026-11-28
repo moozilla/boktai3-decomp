@@ -500,3 +500,8 @@ src/player/effects/action_flash/ActionFlashBurst_RemoveGlowSprite.c	ActionFlashB
 src/player/effects/action_flash/ActionFlashBurst_RemovePrimarySprites.c	ActionFlashBurst_RemovePrimarySprites	contrived	natural	1	-
 src/player/effects/action_flash/ActionFlash_Destroy.c	ActionFlash_Destroy	minor	natural	1	-
 src/player/effects/action_flash/TimedSprite_UpdateFrames.c	TimedSprite_UpdateFrames	contrived	minor	4	sprite pointer local
+src/player/effects/action_flash/PlayerEffect_UpdatePhaseCallback.c	PlayerEffect_UpdatePhaseCallback	minor	minor	2	unchanged: callback member address taken before the argument
+src/player/effects/action_flash/ActionFlash_Update.c	ActionFlash_Update	natural	natural	0	-
+src/player/effects/action_flash/ActionFlash_Initialize.c	ActionFlash_Initialize	natural	natural	0	-
+src/player/effects/action_flash/ActionFlashBurst_Create.c	ActionFlashBurst_Create	natural	natural	0	-
+src/player/effects/action_flash/sub_082366A8.c	sub_082366A8	contrived	minor	7	descending pointer fill loop and flag pointer
