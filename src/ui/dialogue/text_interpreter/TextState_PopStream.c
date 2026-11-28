@@ -1,10 +1,9 @@
 #include "global.h"
 #include "ui/dialogue/text_state.h"
-void TextState_PopStream(struct TextState *p)
+void TextState_PopStream(struct TextState *state)
 {
-    u8 *depth = &p->depth;
-    if (*depth) {
-        (*depth)--;
-        p->style = p->styles[*depth];
+    if (state->depth) {
+        state->depth--;
+        state->style = state->styles[state->depth];
     }
 }
