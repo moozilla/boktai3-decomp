@@ -59,11 +59,11 @@ void DarkLoan_ShowPrompt(struct DarkLoanScreen *panel)
 
 void DarkLoan_ResetBackground(struct DarkLoanScreen *panel)
 {
-    u32 zero = 0;
-    Bg_SetupLayers(0, 0, panel->map, 0, 0, 1, &zero);
+    u32 layer = 0;
+    Bg_SetupLayers(0, 0, panel->map, 0, 0, 1, &layer);
     Bg_SetLayerMap(0, panel->map, 0);
     BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0);
-    CpuSet(panel->procedureData, gBgPaletteBank13, 0x04000018);
+    CpuCopy32(panel->procedureData, gBgPaletteBank13, 0x60);
 }
 
 void DarkLoan_UpdateBalanceDigits(struct DarkLoanScreen *panel)
@@ -619,23 +619,23 @@ void DarkLoan_BuildDisplay(struct DarkLoanScreen *panel, s32 alternate)
     if (alternate)
         flags = 0x90;
     AnimSprite_InitLinked(&panel->widgets[DARK_LOAN_BACKGROUND], &panel->resource, 4, flags,
-                      backgroundDefault, backgroundDefault, 0x3C, &pos);
+                          backgroundDefault, backgroundDefault, 0x3C, &pos);
     AnimSprite_InitLinked(&panel->widgets[DARK_LOAN_RATE], &panel->resource, (u16)(panel->rate + 7),
-                      flags, 0, 0, 0x3C, &pos);
+                          flags, 0, 0, 0x3C, &pos);
     pos.x += 8;
-    AnimSprite_InitLinked(&panel->widgets[DARK_LOAN_DECIMAL_DIGITS], &panel->resource, 8, flags, 0, 0,
-                      0x3C, &pos);
+    AnimSprite_InitLinked(&panel->widgets[DARK_LOAN_DECIMAL_DIGITS], &panel->resource, 8, flags, 0,
+                          0, 0x3C, &pos);
     pos.x += 8;
     AnimSprite_InitLinked(&panel->widgets[4], &panel->resource, 8, flags, 0, 0, 0x3C, &pos);
     pos.x = -8;
     pos.y = -8;
-    AnimSprite_InitLinked(&panel->widgets[DARK_LOAN_CURSOR], savedSecondary, 0x4B, flags, 0, 0, 0x3C,
-                      &pos);
+    AnimSprite_InitLinked(&panel->widgets[DARK_LOAN_CURSOR], savedSecondary, 0x4B, flags, 0, 0,
+                          0x3C, &pos);
     panel->widgets[DARK_LOAN_CURSOR].palette = (u16 *)panel->snapshot;
     pos.x = 0x10;
     pos.y = -4;
-    AnimSprite_InitLinked(&panel->widgets[DARK_LOAN_PERCENT], &panel->resource, 0x12, flags, 0, 0, 0x3C,
-                      &pos);
+    AnimSprite_InitLinked(&panel->widgets[DARK_LOAN_PERCENT], &panel->resource, 0x12, flags, 0, 0,
+                          0x3C, &pos);
     pos.x = 0x90;
     pos.y = 0x28;
     primary = &panel->resource;
@@ -656,13 +656,13 @@ void DarkLoan_BuildDisplay(struct DarkLoanScreen *panel, s32 alternate)
     }
     AnimSprite_InitLinked(&panel->widgets[DARK_LOAN_LABEL], primary, 0x22, flags, 0, 0, 0x3C, 0);
     Vanargand_SetVector(&pos, -0x85, -0x18, 0);
-    AnimSprite_InitLinked(&panel->widgets[DARK_LOAN_DECORATIONS], secondary, 0x7E, flags, 0, 0, 0x3C,
-                      &pos);
+    AnimSprite_InitLinked(&panel->widgets[DARK_LOAN_DECORATIONS], secondary, 0x7E, flags, 0, 0,
+                          0x3C, &pos);
     AnimSprite_InitLinked(&panel->widgets[21], secondary, 0x7F, flags, 0, 0, 0x3C, &pos);
     pos.x = 0x58;
     pos.y = 0x38;
-    AnimSprite_InitLinked(&panel->widgets[DARK_LOAN_LOWER_RATE], primary, (u16)(panel->rate + 7), flags,
-                      0, 0, 0x3C, &pos);
+    AnimSprite_InitLinked(&panel->widgets[DARK_LOAN_LOWER_RATE], primary, (u16)(panel->rate + 7),
+                          flags, 0, 0, 0x3C, &pos);
     pos.x = -0x30;
     pos.y = 0x48;
     for (i = 0; i < 4; i++) {

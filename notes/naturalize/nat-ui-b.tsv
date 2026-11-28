@@ -356,3 +356,7 @@ src/ui/title/mode_menu.c	ResultScreen_Destroy	natural	natural	0
 src/ui/title/mode_menu.c	ResultScreen_Initialize	contrived	natural	8	
 src/ui/title/mode_menu.c	ResultScreen_SetParametersFromScript	natural	natural	0	
 src/ui/title/mode_menu.c	ResultScreen_Create	natural	natural	0	
+src/ui/town/dark_loan.c	DarkLoan_RelocateMapHeaderCopy	natural	natural	0	
+src/ui/town/dark_loan.c	DarkLoan_EnableAlternateRenderMode	contrived	contrived	10	struct pointer walked by sprite stride: every indexed loop makes the giv &widgets[0].flags, ROM keeps the owner base with offset 0x60
+src/ui/town/dark_loan.c	DarkLoan_ShowPrompt	natural	natural	0	
+src/ui/town/dark_loan.c	DarkLoan_ResetBackground	minor	natural	1	
