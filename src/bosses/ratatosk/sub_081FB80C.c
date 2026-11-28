@@ -1,10 +1,12 @@
 #include "global.h"
-s32 sub_081FB80C(u8 *p)
+#include "bosses/ratatosk/ratatosk_small_particle.h"
+
+s32 sub_081FB80C(struct Particle *e)
 {
     u32 bit;
-    *(s32 *)(p + 0x60) += *(s32 *)(p + 0x20);
-    *(s32 *)(p + 0x5c) += *(s32 *)(p + 0x60);
+    e->fallSpeed += e->config.scale;
+    e->fallDistance += e->fallSpeed;
     bit = 1;
-    *(u32 *)(p + 0x58) |= bit;
+    e->motionFlags |= bit;
     return 0;
 }
