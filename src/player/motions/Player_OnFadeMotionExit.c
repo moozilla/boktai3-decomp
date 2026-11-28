@@ -1,6 +1,9 @@
 #include "global.h"
-void Player_OnFadeMotionExit(u8 *p)
+#include "player/player.h"
+
+void Player_OnFadeMotionExit(struct Player *p)
 {
-    u32 *q = (u32 *)(p + 0x8c);
-    q[2] &= ~2;
+    struct AnimSprite *animation = &p->animation;
+
+    animation->flags &= ~2;
 }

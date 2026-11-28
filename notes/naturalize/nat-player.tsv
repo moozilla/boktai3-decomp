@@ -633,3 +633,4 @@ src/player/motions/Player_UpdateCountdownAnimation.c	Player_UpdateCountdownAnima
 src/player/motions/sub_08144F40.c	sub_08144F40	minor	natural	2	-
 src/player/motions/Player_UpdateFallPose.c	Player_UpdateFallPose	minor	minor	1	Player_SetStatusBits: ROM loads the mask before the status word
 src/player/motions/Player_UpdateInterpolatedMotion.c	Player_UpdateInterpolatedMotion	contrived	contrived	6	duration/elapsed pointer temps, ScaleStep wrapper and separate z step fix the register allocation
+src/player/motions/Player_OnFadeMotionExit.c	Player_OnFadeMotionExit	contrived	minor	2	animation pointer: the member access folds the offset
