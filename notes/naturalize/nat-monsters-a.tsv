@@ -168,3 +168,4 @@ src/monsters/armor/ActorController_FinishDelayedTransition.c	ActorController_Fin
 src/monsters/armor/ActorController_CompleteMotionTransition.c	ActorController_CompleteMotionTransition	contrived	minor	6	phase pointer kept: flags address reuse
 src/monsters/armor/ActorController_UpdateArmorAnimationTransition.c	ActorController_UpdateArmorAnimationTransition	contrived	minor	34	goto shares the sound tail between cases
 src/monsters/armor/armor_actions.c	Armor_UpdateFacingAction9	contrived	minor	1	player position copied through gGameState halfword reads
+src/monsters/armor/armor_actions.c	Armor_UpdateFacingAction29	contrived	minor	1	player position copied through gGameState halfword reads
