@@ -1,13 +1,7 @@
 #include "global.h"
+#include "bosses/vanargand/vanargand_pair_attack.h"
 
 // confidence=low: compares projected horizontal positions within a fixed margin.
-
-struct VanargandProjectionSource {
-    u8 pad0[0x54];
-    s16 position[3];
-    u8 pad5A[0xB6];
-    s16 *targetPosition;
-};
 
 static inline s32 Scale(s32 v)
 {
@@ -20,27 +14,27 @@ static inline s32 Scale(s32 v)
     return r;
 }
 
-static inline void Project(s16 *out, s16 *p)
+static inline void Project(struct SceneVec *out, struct SceneVec *p)
 {
-    s32 x = p[0];
-    s32 z = p[2];
+    s32 x = p->x;
+    s32 z = p->z;
     s32 sum, y;
-    out[0] = Scale(x - z);
+    out->x = Scale(x - z);
     sum = Scale(x + z);
-    y = Scale(p[1]);
-    out[1] = sum - y;
-    out[2] = sum + y;
+    y = Scale(p->y);
+    out->y = sum - y;
+    out->z = sum + y;
 }
 
-u32 Vanargand_TestProjectedHorizontalRange(struct VanargandProjectionSource *s)
+u32 Vanargand_TestProjectedHorizontalRange(struct VanargandPairAttack *boss)
 {
-    s16 origin[3], target[3];
-    Project(origin, s->position);
-    {
-        s16 **slot = &s->targetPosition;
-        Project(target, *slot);
-    }
-    if (target[0] > origin[0] - 96 && target[0] < origin[0] + 96)
+    struct SceneVec origin, target;
+    struct SceneVec **destination;
+
+    Project(&origin, &boss->position);
+    destination = &boss->destination;
+    Project(&target, *destination);
+    if (target.x > origin.x - 96 && target.x < origin.x + 96)
         return 1;
     return 0;
 }

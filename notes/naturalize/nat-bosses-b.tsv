@@ -300,3 +300,8 @@ src/bosses/vanargand/Vanargand_StartActionSequence.c	Vanargand_StartActionSequen
 src/bosses/vanargand/Vanargand_AdvanceEffectStageOne.c	Vanargand_AdvanceEffectStageOne	contrived	natural	1	
 src/bosses/vanargand/Vanargand_AdvanceEffectStageThree.c	Vanargand_AdvanceEffectStageThree	contrived	natural	1	
 src/bosses/vanargand/Vanargand_OnPartTrigger.c	Vanargand_OnPartTrigger	contrived	natural	1	
+src/bosses/vanargand/ScreenPalette_UpdateTransition.c	ScreenPalette_UpdateTransition	natural	natural	0	
+src/bosses/vanargand/Vanargand_StopActionSequence.c	Vanargand_StopActionSequence	natural	natural	0	
+src/bosses/vanargand/Vanargand_OnPartContact.c	Vanargand_OnPartContact	natural	natural	0	
+src/bosses/vanargand/Camera_BlendOffset.c	Camera_BlendOffset	natural	natural	0	
+src/bosses/vanargand/Vanargand_TestProjectedHorizontalRange.c	Vanargand_TestProjectedHorizontalRange	near-natural	near-natural	6	destination slot pointer kept: ROM forms &boss->destination before &target
