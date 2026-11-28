@@ -622,17 +622,16 @@ void Golem_OnBodyCollision(void *source, void *destination, void *actor)
 
 void SceneActorAnimation_SelectDirectionalEntry(struct RoomActor *, s32);
 
-void Golem_UpdateIdleState(u8 *p)
+void Golem_UpdateIdleState(struct ChaseActor *actor)
 {
-    SceneActorControl_TakeFlag(&((struct ChaseActor *)p)->base.field2B2);
-    SceneActorAnimation_SelectDirectionalEntry(p, 1);
+    SceneActorControl_TakeFlag(&actor->base.field2B2);
+    SceneActorAnimation_SelectDirectionalEntry(&actor->base, 1);
 }
 
-void Golem_UpdateIdle(u8 *p)
+void Golem_UpdateIdle(struct ChaseActor *actor)
 {
-    if (p[0x2b2] != 0)
-        p[0x2b2] = 0;
-    SceneActorAnimation_SelectDirectionalEntry(p, 0);
+    SceneActorControl_TakeFlag(&actor->base.field2B2);
+    SceneActorAnimation_SelectDirectionalEntry(&actor->base, 0);
 }
 
 u32 Route_GetCurrentPointFacing(void *);

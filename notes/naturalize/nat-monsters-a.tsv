@@ -555,3 +555,4 @@ src/monsters/golem/golem_main.c	Golem_ResetCombatState	minor	minor	1	drawable bl
 src/monsters/golem/golem_main.c	Golem_UpdateAttackProperties	contrived	minor	2	attack parameter locals and collider alias per branch
 src/monsters/golem/golem_main.c	Skeleton_TryTriggerAction	minor	minor	3	mask local reused: literal masks load before each field
 src/monsters/golem/golem_main.c	Skeleton_ClearPendingFlag	minor	minor	1	word view of the state bytes; context block stays
+src/monsters/golem/golem_main.c	Golem_UpdateIdle	contrived	natural	1	
