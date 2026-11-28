@@ -5,7 +5,6 @@
 #include "engine/video/sprite.h"
 #include "scene/collision/contact_position.h"
 
-void CpuSet(const void *src, void *dst, u32 control);
 s32 AnimSprite_InitLinked(void *, void *, u16, u32, u32, u32, u32, const void *);
 s32 Anim_LoadKeyframe(void *, void *, u16, u8);
 void Anim_SetKeyframes(void *, void *, u16, u16, u16);
@@ -39,11 +38,6 @@ struct HudLayout {
     u8 unknown4364[0x50];
     u16 palette[16];
 };
-static inline s32 HudLayout_InitWidget(struct HudLayout *p, s32 index, void *par, u32 id, u32 type,
-                                       u32 a, u32 b, const void *pos)
-{
-    return AnimSprite_InitLinked(&p->widgets[index], par, id, type, a, b, 60, pos);
-}
 
 static inline void ClearPosition(u32 value, struct ContactPosition *position)
 {
@@ -55,7 +49,6 @@ void sub_08176F70(struct HudLayout *p)
     struct ContactPosition v;
     u8 *w;
     s32 i;
-    struct DisplaySequenceState *anim;
 
     {
         u8 *w;
@@ -126,9 +119,8 @@ void sub_08176F70(struct HudLayout *p)
     AnimData_Load(p->spriteResource, 0x593A);
     Sprite_Init(&p->sprite, p->spriteResource, 0xD1);
     p->sprite.priority = 0;
-    anim = &p->animation;
-    Anim_SetSequence(anim, p->script, 0, 0, 0);
-    DisplaySequence_StepSprite(&p->sprite, anim);
+    Anim_SetSequence(&p->animation, p->script, 0, 0, 0);
+    DisplaySequence_StepSprite(&p->sprite, &p->animation);
 
     p->sprite.position.x = 0;
     p->sprite.position.y = 0;
@@ -155,7 +147,7 @@ void sub_08176F70(struct HudLayout *p)
     v.y = 0;
     for (i = 0; i <= 2; i++) {
         v.z = 0;
-        HudLayout_InitWidget(p, 85 + i, &p->resources[0], 0x79, 0x91, 1, 0, &v);
+        WI(&p->widgets[85 + i], &p->resources[0], 0x79, 0x91, 1, 0, &v);
         p->widgets[85 + i].attribute1A = 3;
         v.z -= 8;
         WI((&p->widgets[88 + i]), &p->resources[0], 0x7A, 0x91, 1, 0, &v);
@@ -214,19 +206,14 @@ void sub_08176F70(struct HudLayout *p)
         WI((&p->widgets[118 + i]), &p->resources[3], 0, 0xB0, 0, 0, &v);
         v.x += 8;
     }
-    w = p->comparisonSpriteResource;
-    AnimData_Load(w, 0xA47C);
-    Sprite_Init(&p->comparisonSprite, w, 0x91);
-    AnimData_SelectPaletteBank(w, 0x1B4);
+    AnimData_Load(p->comparisonSpriteResource, 0xA47C);
+    Sprite_Init(&p->comparisonSprite, p->comparisonSpriteResource, 0x91);
+    AnimData_SelectPaletteBank(p->comparisonSpriteResource, 0x1B4);
     p->comparisonSprite.priority = 0;
     p->comparisonSprite.position.x = 0xA0;
     p->comparisonSprite.position.y = 0x58;
     p->comparisonSprite.position.z = 0;
-    {
-        struct AnimSprite *unlock = &p->compareUnlock;
-        struct AnimSpriteResource *resource = &p->comparisonResource;
-        AnimSprite_InitLinked(unlock, resource, 2, 0x91, 0, 0, 0, 0);
-        AnimSprite_InitLinked(&p->compareAction, resource, 0, 0x91, 0, 0, 0, 0);
-    }
-    CpuSet(gPaletteBankData + 0x7540, p->palette, 0x04000008);
+    AnimSprite_InitLinked(&p->compareUnlock, &p->comparisonResource, 2, 0x91, 0, 0, 0, 0);
+    AnimSprite_InitLinked(&p->compareAction, &p->comparisonResource, 0, 0x91, 0, 0, 0, 0);
+    CpuCopy32(gPaletteBankData + 0x7540, p->palette, 0x20);
 }
