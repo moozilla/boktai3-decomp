@@ -12,20 +12,18 @@ s32 Save_VerifyBlock(u16 start, s32 length)
     for (i = 0; i < blocks; address++, i++) {
         s32 k;
         if (Eeprom_ReadBlock(address, buf))
-            goto fail;
+            return -1;
         for (k = 0; k <= 3; k++) {
             calc[0] ^= buf[k];
             calc[1] += buf[k];
         }
     }
     {
-        u16 r = Eeprom_ReadBlock(address, header);
+        u16 error = Eeprom_ReadBlock(address, header);
+
         calc[0] ^= header[0];
-        if (r == 0 && calc[0] == 0 && calc[1] == header[1] && length == header[2])
-            goto ok;
+        if (error || calc[0] || calc[1] != header[1] || length != header[2])
+            return -1;
     }
-fail:
-    return -1;
-ok:
     return 0;
 }
