@@ -300,3 +300,5 @@ src/link/player/Player_SetTimedEffect.c	Player_SetTimedEffect	contrived	natural	
 src/link/player/Player_InitActionCallback.c	Player_InitActionCallback	contrived	natural	1	visualState is a u32 field so the sprite pointer is cast
 src/link/player/Player_UpdateLinkCore.c	Player_UpdateLinkCore	minor	natural	1	
 src/link/player/Player_OnDestroy.c	Player_OnDestroy	contrived	natural	1	
+src/link/player/Player_OnCreate.c	Player_OnCreate	natural	natural	0	
+src/link/player/sub_08243B0C.c	sub_08243B0C	natural	natural	0	
