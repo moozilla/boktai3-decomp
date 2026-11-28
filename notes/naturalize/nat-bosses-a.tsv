@@ -99,3 +99,4 @@ src/bosses/count/SceneActorAnimation_UpdateImpactRelease.c	SceneActorAnimation_U
 src/bosses/count/SceneActorAnimation_UpdateFlashWindup.c	SceneActorAnimation_UpdateFlashWindup	contrived	natural	1	shared effect setter and named shake/windup fields; random table address arithmetic kept
 src/bosses/count/SceneActorAnimation_UpdateFlashPulse.c	SceneActorAnimation_UpdateFlashPulse	contrived	natural	1	shared effect setter, no parameter copies
 src/bosses/count/SceneActorAnimation_UpdateFlashAlternating.c	SceneActorAnimation_UpdateFlashAlternating	contrived	natural	1	shared effect setter, plain branches
+src/bosses/count/SceneActorAnimation_UpdateFlashAlternatingRepeat.c	SceneActorAnimation_UpdateFlashAlternatingRepeat	contrived	minor	2	shared effect setter; kept cleared-flag local (register reuse)
