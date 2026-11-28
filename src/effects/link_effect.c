@@ -96,11 +96,13 @@ void LinkEffect_UpdateProjectileBurst(struct LinkEffect *effect)
             break;
         case 1:
             if (effect->emitted <= 5 && Mod(effect->timer, 15) == 0) {
-                u32 random;
+                struct OrbitEffectPosition *spawn;
+                u32 angle;
+
                 Projectile_InitParameters(&projectile);
                 gRandomIndex = (gRandomIndex + 1) & 1023;
-                random = *(u8 *)(RANDOM_TABLE_ADDR + gRandomIndex * 2);
-                Projectile_SetLaunchParameters(&projectile, 0, 180, random, 8);
+                angle = *(u8 *)(RANDOM_TABLE_ADDR + gRandomIndex * 2);
+                Projectile_SetLaunchParameters(&projectile, 0, 180, angle, 8);
                 Projectile_SetHomingParameters(
                     &projectile, 120,
                     (u32)SunOrb_GetPositionFromManager(effect->manager, effect->orb), 4);
@@ -108,12 +110,10 @@ void LinkEffect_UpdateProjectileBurst(struct LinkEffect *effect)
                 Projectile_SetScriptProcedure(&projectile, 0x3F72, 2);
                 Projectile_SetCollisionParameters(&projectile, 0, 0, effect->collision, 15, 30);
                 Projectile_SetBehaviorMode(&projectile, 2);
-                {
-                    struct OrbitEffectPosition *v = &position;
-                    *v = *effect->target;
-                    v->y += 128;
-                    Projectile_SpawnAtPosition(&projectile, v);
-                }
+                spawn = &position;
+                *spawn = *effect->target;
+                spawn->y += 128;
+                Projectile_SpawnAtPosition(&projectile, spawn);
                 effect->emitted++;
             }
             if (Mod(effect->timer, 300) == 180)
