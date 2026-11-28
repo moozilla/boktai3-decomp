@@ -325,19 +325,11 @@ void SceneActors_RequestContactPoolClear(void)
 }
 void SceneActors_RequestContactPoolClear(void);
 
-static inline s32 SceneActors_AbsoluteDifference(s32 a, s32 b)
-{
-    s32 diff = a - b;
-    if (diff < 0)
-        diff = -diff;
-    return diff;
-}
-
 void SceneActors_AddHealthCost(int amount)
 {
     struct StateActor *p;
     struct SceneGraphicsActor *actor;
-    int remaining;
+    int remaining, diff;
     if (amount <= 0)
         return;
     p = SceneActors_GetBySlot(0);
@@ -346,10 +338,15 @@ void SceneActors_AddHealthCost(int amount)
     actor = (struct SceneGraphicsActor *)p;
     actor->graphics.healthCostAccumulator += amount;
     remaining = p->health - actor->graphics.healthCostAccumulator;
-    if (remaining <= 1 || SceneActors_AbsoluteDifference(remaining, actor->graphics.healthCostBaseline) >= 50)
-        SceneActors_RequestContactPoolClear();
-}
-void SceneActors_AddResourceCost(int amount)
+    if (remaining > 1) {
+        diff = remaining - actor->graphics.healthCostBaseline;
+        if (diff < 0)
+            diff = -diff;
+        if (diff < 50)
+            return;
+    }
+    SceneActors_RequestContactPoolClear();
+}void SceneActors_AddResourceCost(int amount)
 {
     struct SceneGraphicsActor *actor;
     if (amount > 0) {

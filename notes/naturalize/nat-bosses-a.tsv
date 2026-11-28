@@ -16,3 +16,4 @@ src/bosses/count/actor_graphics_and_basic_states.c	SceneActors_RequestContactPoo
 src/bosses/count/actor_graphics_and_basic_states.c	SceneActors_AddHealthCost	contrived	natural	3	
 src/bosses/count/actor_graphics_and_basic_states.c	SceneActors_AddResourceCost	minor	natural	1	
 src/bosses/count/actor_graphics_and_basic_states.c	sub_08022624	contrived	natural	24	
+src/bosses/count/actor_graphics_and_basic_states.c	SceneActors_AddHealthCost	natural	natural	5	second pass: helper removed
