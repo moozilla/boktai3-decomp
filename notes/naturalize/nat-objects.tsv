@@ -306,3 +306,4 @@ src/objects/hazards/falling_object_effects/FadingParticleManager_Update.c	Fading
 src/objects/hazards/falling_object_effects/FadingParticleManager_Destroy.c	FadingParticleManager_Destroy	contrived	natural	2	
 src/objects/hazards/falling_object_effects/FadingParticleManager_Initialize.c	FadingParticleManager_Initialize	contrived	natural	2	
 src/objects/hazards/falling_object_effects/FadingParticleManager_Create.c	FadingParticleManager_Create	contrived	natural	2	
+src/objects/hazards/falling_object_effects/FadingParticleGroup_Spawn.c	FadingParticleGroup_Spawn	contrived	contrived	120	constant-built table pointer, hand-walked sprite/anim pointers and a local sampler remain: index form with ParticleRandom_ReadSample is 15 instructions off (cursor address must be hoisted to the outer loop preheader)

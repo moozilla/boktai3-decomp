@@ -21,7 +21,7 @@ s32 FadingParticleGroup_Spawn(u32 count, struct ContactPosition *position, s32 l
     s32 i, j;
     u32 *rng;
     const u16 *table;
-    const s16 *sine;
+    const s16 *sine = gUnk_086149C4;
     if (gFadingParticleManager == NULL && FadingParticleManager_Create(0, 0) == NULL)
         return -1;
     for (i = 0; i < 6; i++) {
@@ -49,7 +49,6 @@ s32 FadingParticleGroup_Spawn(u32 count, struct ContactPosition *position, s32 l
                 anim = &g->particles[0].motion.anim;
                 sprite = &g->particles[0].motion.sprite;
                 p = &g->particles[0];
-                sine = gUnk_086149C4;
                 do {
                     s32 a;
                     p->active = 1;
