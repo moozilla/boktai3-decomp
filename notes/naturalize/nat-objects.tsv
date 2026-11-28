@@ -441,3 +441,5 @@ src/objects/items/collectible/Collectible_ApplyPickupReward.c	Collectible_ApplyP
 src/objects/items/collectible/Collectible_OnPickup.c	Collectible_OnPickup	contrived	minor	6	body pointer and mask locals fix the constant-before-load order
 src/objects/items/collectible/Collectible_OnContact.c	Collectible_OnContact	contrived	minor	4	mask local: constant loaded before the flag word
 src/objects/items/collectible/sub_08115AC8.c	sub_08115AC8	contrived	minor	6	(u8) casts on the sequence arguments
+src/objects/items/sprite_drop/Collectible_ClearManager.c	Collectible_ClearManager	natural	natural	0	
+src/objects/items/sprite_drop/SpriteDrop_IsNearPlayer.c	SpriteDrop_IsNearPlayer	contrived	minor	1	shared fail label: structured forms emit a second return-0 path
