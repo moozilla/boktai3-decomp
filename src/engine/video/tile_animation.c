@@ -116,13 +116,11 @@ void TileAnimation_Upload(void)
 struct TileAnimationChannel *TileAnimation_FindFreeChannel(struct TileAnimation *animation)
 {
     struct TileAnimationChannel *channel = animation->channels;
-    s32 index = 0;
-    while (index <= 7) {
-        if (channel->active == 0) {
+    s32 index;
+
+    for (index = 0; index < 8; index++, channel++) {
+        if (channel->active == 0)
             return channel;
-        }
-        index++;
-        channel++;
     }
     return 0;
 }
