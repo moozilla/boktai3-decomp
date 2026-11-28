@@ -18,3 +18,4 @@ src/ui/results/stage_results/StageResults_CreateTextWindows.c	StageResults_Creat
 src/ui/results/stage_results/StageResults_ShowSummaryText.c	StageResults_ShowSummaryText	natural	natural	1	
 src/ui/results/stage_results/StageResults_DestroyTextWindows.c	StageResults_DestroyTextWindows	natural	natural	1	
 src/ui/results/stage_results/StageResults_InitAnimationIds.c	StageResults_InitAnimationIds	minor	natural	1	
+src/ui/results/stage_results/MessagePanel_InitSprites.c	MessagePanel_InitSprites	natural	natural	1	
