@@ -181,19 +181,19 @@ void Axe_UpdateReturningTrail(struct ChaseActor *p, s32 frame)
 
 void SceneActorControl_SettleRotation(struct RoomActor *actor, s32 elapsed)
 {
-    u8 *state = (u8 *)actor->context;
+    struct Axe *axe = actor->context;
     struct RotatingDrawable *drawable = actor->drawable;
     s32 angle;
     u32 previous;
     if (SceneActorControl_TakeFlag(&actor->field2B2)) {
         drawable->flags |= 2;
-        state[0xA36] = 12;
-        state[0xEAF] = 30;
+        axe->trailSpinRate = 12;
+        axe->unknownEAF = 30;
     }
     angle = NormalizeAngle(drawable->angle);
     Axe_EmitMotionTrail(actor);
     previous = drawable->angle;
-    drawable->angle = previous - state[0xA36];
+    drawable->angle = previous - axe->trailSpinRate;
     if ((s32)previous < ((struct RotatingDrawable *)actor->drawable)->angle)
         Sound_PlaySong(0x169);
     if (elapsed > 29) {
