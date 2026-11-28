@@ -151,3 +151,4 @@ src/link/player/PaletteFade_ApplySelectiveBrightness.c	PaletteFade_ApplySelectiv
 src/link/player/sub_08239A20.c	sub_08239A20	contrived	natural	30	
 src/link/player/LinkPlayer_InitAnimationSlots.c	LinkPlayer_InitAnimationSlots	minor	natural	1	
 src/link/player/LinkPlayer_InitAnimationState.c	LinkPlayer_InitAnimationState	contrived	natural	1	
+src/link/player/sub_08239D38.c	sub_08239D38	contrived	natural	3	
