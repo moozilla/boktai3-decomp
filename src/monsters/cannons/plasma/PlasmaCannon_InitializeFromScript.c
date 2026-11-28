@@ -113,22 +113,21 @@ s32 PlasmaCannon_InitializeFromScript(struct OrangeSpineActor *p, void *parent)
     } else {
         p->update = PlasmaCannon_UpdateDefeatEffect;
         p->defeated = 1;
-        Anim_SetSequence(&p->sequence, p->resource, 0x10,
-                         p->facing, 0);
+        Anim_SetSequence(&p->sequence, p->resource, 0x10, p->facing, 0);
     }
     PlayerCue_StepSequence((struct ContactSwarmSprite *)(&p->sprite.display),
                            (struct DisplaySequenceState *)(&p->sequence));
     if (!p->defeatDelay)
         PlasmaCannon_InitCollider(p);
     if (p->registerTerrain && !p->defeatDelay) {
-        s32 cell = PlasmaCannon_CellIndex(&p->sprite.coordinates.position);
-        TerrainModifiers_RegisterCell(p->terrainRegistration, cell, 0, p->sprite.display.position.y >> 8, 0, 1);
+        TerrainModifiers_RegisterCell(p->terrainRegistration,
+                                      (PlasmaCannon_CellIndex(&p->sprite.coordinates.position)), 0,
+                                      p->sprite.display.position.y >> 8, 0, 1);
     }
     if (p->showTerrainBody) {
-        u8 *body = p->unknownC0;
-        SceneBody_Init(body, p->hud, &p->sprite.coordinates.position, 0, 4, p);
-        SceneBody_SetSprite(body, &p->sprite.display);
-        TerrainOverlay_QueueAddActor(body);
+        SceneBody_Init(p->unknownC0, p->hud, &p->sprite.coordinates.position, 0, 4, p);
+        SceneBody_SetSprite(p->unknownC0, &p->sprite.display);
+        TerrainOverlay_QueueAddActor(p->unknownC0);
     }
 #ifdef UBFIX
     // falls off the end with r0 left over from its last statement; the creator only tests
