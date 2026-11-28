@@ -110,3 +110,4 @@ src/scene/actor/actor_pool/pooled_motion.c	MotionPool_SetBounds	natural	natural	
 src/scene/actor/actor_pool/pooled_motion.c	MotionPool_SetOffset	natural	natural	0	
 src/scene/actor/actor_pool/pooled_motion.c	MotionPool_SetGraphics	natural	natural	0	
 src/scene/actor/actor_pool/pooled_motion.c	MotionPool_SetCallback	natural	natural	0	
+src/scene/actor/actor_utilities.c	SceneActorRoute_ClampTargetToAnchor	minor	minor	1	repeated route-cursor cast (void * currentRoute)

@@ -164,8 +164,6 @@ void SceneActorRoute_ClampTargetToAnchor(struct ChaseActor *actor, struct Contac
     s32 dx = (u16)((struct SceneActorRouteCursor *)body->currentRoute)->point->x - body->position.x;
     s32 dz = (u16)((struct SceneActorRouteCursor *)body->currentRoute)->point->z - body->position.z;
     s32 len = (s16)Math_GetVectorLength((s16)dx, (s16)dz);
-    void *mesh;
-    struct ContactPosition *pos;
     dx = target->x - body->position.x;
     dz = target->z - body->position.z;
     if (len <= (s16)Math_GetVectorLength((s16)dx, (s16)dz)) {
@@ -173,9 +171,7 @@ void SceneActorRoute_ClampTargetToAnchor(struct ChaseActor *actor, struct Contac
         target->y = 0;
         target->z = (u16)((struct SceneActorRouteCursor *)body->currentRoute)->point->z;
     }
-    mesh = actor->group.route;
-    pos = &actor->base.body.position;
-    SceneActorChase_TryRoute(actor, mesh, pos, target);
+    SceneActorChase_TryRoute(actor, actor->group.route, &actor->base.body.position, target);
 }
 
 static inline s32 FacingDelta(s16 target, u16 current)
@@ -373,7 +369,8 @@ void ActorParticles_SpawnDirectionalBurst(struct ChaseActor *actor, s32 amount)
         spread.z = (ActorParticles_NextRandom() & 7) + 3;
         count = (ActorParticles_NextRandom() & 1) + 2;
         ImpactParticleGroup_SpawnBouncing(count, ActorMode_SelectOddStateVariant(actor),
-                     (struct SceneExtent *)&actor->base.body.position, &velocity, &spread, 45, 31);
+                                          (struct SceneExtent *)&actor->base.body.position,
+                                          &velocity, &spread, 45, 31);
     }
 }
 
@@ -405,7 +402,8 @@ void ActorParticles_SpawnBurst(struct ChaseActor *actor)
     spread.z = (ParticleRandom_ReadRelativeSample(sampleOrigin, gRandomTable) & 3) + 15;
     count = (ParticleRandom_ReadRelativeSample(sampleOrigin, gRandomTable) & 3) + 4;
     ImpactParticleGroup_SpawnBouncing(count, ActorMode_SelectOddStateVariant(actor),
-                 (struct SceneExtent *)&actor->base.body.position, &velocity, &spread, 45, 31);
+                                      (struct SceneExtent *)&actor->base.body.position, &velocity,
+                                      &spread, 45, 31);
 }
 
 u32 ActorMode_SelectOddStateVariant(struct ChaseActor *actor)
@@ -437,5 +435,6 @@ void ActorParticles_SpawnWideBurst(struct ChaseActor *actor)
     spread.z = 24;
     count = (ActorParticles_NextRandom() & 3) + 4;
     ImpactParticleGroup_SpawnBouncing(count, ActorMode_SelectOddStateVariant(actor),
-                 (struct SceneExtent *)&actor->base.body.position, &velocity, &spread, 60, 63);
+                                      (struct SceneExtent *)&actor->base.body.position, &velocity,
+                                      &spread, 60, 63);
 }
