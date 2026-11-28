@@ -1,13 +1,13 @@
 #include "global.h"
-#include "scene/areas/area_effect_link.h"
-u8 *LinkPlayer_GetSessionPlayerData(u8 *s)
+#include "player/player.h"
+#include "link/session/link_session_state.h"
+
+u8 *LinkPlayer_GetSessionPlayerData(struct Player *p)
 {
-    s32 i = *(s32 *)(s + 0x18);
-    u8 *g = gLinkSession;
-    u8 *r;
-    if (g == 0 || g[0x53] != 0 || i < 0)
-        r = 0;
-    else
-        r = g + (i * 68 + 0x1c0);
-    return r;
+    s32 slot = p->slot;
+    u8 *session = (u8 *)gLinkSession;
+
+    if (session == NULL || ((struct AreaEffectLinkState *)session)->unavailable || slot < 0)
+        return NULL;
+    return session + (slot * 68 + 0x1C0);
 }
