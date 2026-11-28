@@ -231,3 +231,8 @@ src/objects/floor_switch/SpriteSlots_UpdateActive.c	SpriteSlots_UpdateActive	con
 src/objects/floor_switch/FloorSwitch_OnManagerDestroy.c	FloorSwitch_OnManagerDestroy	contrived	natural	1	Tst() helper kept
 src/objects/floor_switch/FloorSwitch_InitManager.c	FloorSwitch_InitManager	contrived	natural	1	
 src/objects/floor_switch/FloorSwitch_GetOrCreateManager.c	FloorSwitch_GetOrCreateManager	minor	natural	1	
+src/objects/floor_switch/FloorSwitch_RunStateScript.c	FloorSwitch_RunStateScript	natural	natural	0	
+src/objects/floor_switch/FloorSwitch_SetOccupant.c	FloorSwitch_SetOccupant	natural	natural	0	
+src/objects/floor_switch/FloorSwitch_ResetManager.c	FloorSwitch_ResetManager	natural	natural	0	
+src/objects/floor_switch/FloorSwitch_InitHooks.c	FloorSwitch_InitHooks	natural	natural	0	
+src/objects/floor_switch/FloorSwitch_UpdateOccupancy.c	FloorSwitch_UpdateOccupancy	contrived	natural	10	found flag is never set but gives the original tail
