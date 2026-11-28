@@ -431,3 +431,4 @@ src/ui/hud/countdown_timer.c	CountdownTimer_Destroy	natural	natural	0
 src/ui/hud/countdown_timer.c	CountdownTimer_AddFromScript	natural	natural	0	
 src/ui/hud/hud_tilemaps.c	SceneHud_FillDigitBacking	fudged	natural	1	
 src/ui/hud/hud_tilemaps.c	SceneHud_FillEmptyDigitRow	fudged	natural	1	
+src/ui/hud/hud_tilemaps.c	SceneHud_DrawDecimal	fudged	partial	4	inline helper and the u16 glyph local stay: written in the function body only the registers differ
