@@ -382,16 +382,14 @@ s32 ModifierMenu_CommitThirdSource(struct ModifierMenu *menu)
     return 0;
 }
 
-s32 ModifierMenu_CommitFourthSource(struct ModifierMenu *p)
+s32 ModifierMenu_CommitFourthSource(struct ModifierMenu *menu)
 {
-    struct ModifierSelection *s = &p->pending;
-    struct ModifierSelection *d = &p->current;
-    u16 v;
-    d->valuesE[3] = s->valuesE[3];
-    d->valuesE[4] = s->valuesE[4];
-    v = s->sourceIds[3];
-    d->sourceIds[3] = v;
-    gGameState->unk7A0[3] = v;
+    struct ModifierSelection *pending = &menu->pending;
+    struct ModifierSelection *current = &menu->current;
+    current->valuesE[3] = pending->valuesE[3];
+    current->valuesE[4] = pending->valuesE[4];
+    current->sourceIds[3] = pending->sourceIds[3];
+    gGameState->unk7A0[3] = current->sourceIds[3];
     return 0;
 }
 
