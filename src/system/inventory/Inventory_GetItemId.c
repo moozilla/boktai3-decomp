@@ -1,12 +1,13 @@
-#include "global.h"
-extern u8 *gGameState;
+#include "system/game_state/game_state.h"
+
 u32 Inventory_GetItemOverrideFlag(u32);
 s32 Inventory_GetItemId(u32 i)
 {
-    s32 r;
+    s32 id;
+
     if (Inventory_GetItemOverrideFlag(i) == 0)
-        r = *(s16 *)(gGameState + i * 2 + 0xa0);
+        id = *(i + gGameState->table0A0);
     else
-        r = 9;
-    return r;
+        id = 9;
+    return id;
 }
