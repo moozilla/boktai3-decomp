@@ -169,3 +169,4 @@ src/engine/video/sprite_pool.c	SpritePool_Activate	natural	natural	0
 src/engine/video/sprite_pool.c	SpritePool_Remove	natural	natural	0	
 src/engine/video/display_animation.c	DisplayAnimation_InitializeSequence	contrived	natural	1	
 src/engine/video/display_animation.c	DisplayAnimation_SetFlags	minor	natural	1	
+src/engine/video/display_animation.c	DisplayAnimation_ClearFlags	minor	natural	1	

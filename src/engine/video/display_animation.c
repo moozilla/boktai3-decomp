@@ -173,12 +173,9 @@ s32 DisplayAnimation_SetFlags(struct DisplayAnimation *display, u32 mask)
 
 s32 DisplayAnimation_ClearFlags(struct DisplayAnimation *display, u32 mask)
 {
-    u32 *flags;
-    if (display->kind == 0) {
+    if (display->kind == 0)
         return -1;
-    }
-    flags = display->displayFlags;
-    *flags &= ~mask;
+    *display->displayFlags &= ~mask;
     return 0;
 }
 
