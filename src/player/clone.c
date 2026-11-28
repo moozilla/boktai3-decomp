@@ -695,30 +695,17 @@ u32 PlayerClone_DestroyPool(struct PlayerCloneManager *a)
 
 s32 PlayerClone_InitializePool(struct PlayerCloneManager *pool)
 {
-    struct PlayerCloneSlot *entry;
+    struct PlayerCloneSlot *slot;
     s32 i;
-    s16 *value;
+
     gDirectionalSpritePool = pool;
     pool->activeSlots = 0;
-    entry = pool->slots;
-    i = 0;
-    do {
-        PlayerClone_InitSlot(pool, entry, i);
-        i++;
-        entry++;
-    } while (i <= 2);
-    {
-        u8 **palettes = &gPaletteBankData;
-        u16 blank = 0x7FFF;
-        i = 15;
-        value = &pool->palette1[15];
-        do {
-            *value = blank;
-            value--;
-            i--;
-        } while (i >= 0);
-        CpuSet(*palettes + 0x3E80, pool->palette2, 0x04000008);
-    }
+    slot = pool->slots;
+    for (i = 0; i < 3; i++, slot++)
+        PlayerClone_InitSlot(pool, slot, i);
+    for (i = 0; i < 16; i++)
+        pool->palette1[i] = 0x7FFF;
+    CpuSet(gPaletteBankData + 0x3E80, pool->palette2, 0x04000008);
     return 0;
 }
 

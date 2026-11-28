@@ -166,3 +166,4 @@ src/player/clone.c	PlayerClone_OnBodyColliderContact	contrived	natural	2	-
 src/player/clone.c	PlayerClone_OnPassiveColliderContact	natural	natural	0	-
 src/player/clone.c	PlayerClone_ReleaseSlot	contrived	natural	3	-
 src/player/clone.c	PlayerClone_DestroyPool	minor	natural	1	-
+src/player/clone.c	PlayerClone_InitializePool	contrived	natural	4	-
