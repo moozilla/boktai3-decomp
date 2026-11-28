@@ -252,3 +252,20 @@ src/ui/dialogue/message_window/message_window.c	MessageWindow_UpdatePageAdvance	
 src/ui/dialogue/message_window/message_window.c	MessageWindow_UpdateFastPlayback	contrived	natural	1	
 src/ui/dialogue/message_window/message_window.c	MessageWindow_UpdateNormalPlayback	minor	natural	1	
 src/ui/dialogue/message_window/message_window.c	MessageWindow_OnDestroy	minor	natural	1	
+src/ui/dialogue/message_window/message_window.c	MessageWindow_SetDisplayModeFromScript	natural	natural	0	
+src/ui/dialogue/message_window/message_window.c	MessageWindow_ClearFromScript	natural	natural	0	
+src/ui/dialogue/message_window/message_window.c	MessageWindow_SetMessageTable	natural	natural	0	
+src/ui/dialogue/message_window/message_window.c	MessageWindow_SetTimedMessageTable	natural	natural	0	
+src/ui/dialogue/message_window/message_window.c	MessageWindow_SetWaitFromScript	natural	natural	0	
+src/ui/dialogue/message_window/message_window.c	MessageWindow_SetTextCursor	natural	natural	0	
+src/ui/dialogue/message_window/message_window.c	MessageWindow_SetBoundsFromScript	natural	natural	0	
+src/ui/dialogue/message_window/message_window.c	MessageWindow_SetNumberArgumentFromScript	natural	natural	0	
+src/ui/dialogue/message_window/message_window.c	MessageWindow_SetStringReferenceFromScript	natural	natural	0	
+src/ui/dialogue/message_window/message_window.c	MessageWindow_SetArgumentFromScript	natural	natural	0	
+src/ui/dialogue/message_window/message_window.c	MessageWindow_SetPaletteFromScript	natural	natural	0	
+src/ui/dialogue/message_window/message_window.c	MessageWindow_SetPageAdvanceDelayFromScript	natural	natural	0	
+src/ui/dialogue/message_window/message_window.c	MessageWindow_CheckExists	natural	natural	0	
+src/ui/dialogue/message_window/message_window.c	MessageWindow_GetStringAtOffset	natural	natural	0	
+src/ui/dialogue/message_window/message_window.c	MessageWindow_UpdateIdle	natural	natural	0	
+src/ui/dialogue/message_window/message_window.c	MessageWindow_Update	natural	natural	0	
+src/ui/dialogue/message_window/message_window.c	MessageWindow_SetAutoAdvance	natural	natural	0	int function with no return value on the success path
