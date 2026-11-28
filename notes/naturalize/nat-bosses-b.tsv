@@ -380,3 +380,4 @@ src/bosses/vanargand/Vanargand_OnAlternateStopState.c	Vanargand_OnAlternateStopS
 src/bosses/vanargand/Vanargand_OnDamage.c	Vanargand_OnDamage	contrived	near-natural	3	constant locals and second aliases kept where present
 src/bosses/vanargand/Vanargand_OnPrimaryStopState.c	Vanargand_OnPrimaryStopState	contrived	near-natural	3	constant locals and second aliases kept where present
 src/bosses/vanargand/Vanargand_UpdateAlternatingPairAttack.c	Vanargand_UpdateAlternatingPairAttack	contrived	near-natural	3	constant locals and second aliases kept where present
+src/bosses/vanargand/Vanargand_UpdateAnimationGate.c	Vanargand_UpdateAnimationGate	contrived	near-natural	3	constant locals and second aliases kept where present
