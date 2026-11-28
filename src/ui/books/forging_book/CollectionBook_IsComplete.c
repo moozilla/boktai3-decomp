@@ -1,10 +1,7 @@
 #include "global.h"
-s32 CollectionBook_CountCollectedEntries(void);
+#include "ui/books/collection_book.h"
+
 u32 CollectionBook_IsComplete(void)
 {
-    s32 v = CollectionBook_CountCollectedEntries();
-    u32 r = 0;
-    if (v > 9)
-        r = 1;
-    return r;
+    return CollectionBook_CountCollectedEntries() > 9;
 }
