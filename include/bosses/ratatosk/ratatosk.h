@@ -16,8 +16,8 @@
 struct RatatoskSlot {
     s32 active;
     struct ContactPosition position;
-    u8 unknownC[4];
-    u32 distance; /* 0x10: tested against 0x3FFF by the sun-orb player transfer. */
+    u32 anchorDistance; /* 0xC: squared distance to the boss's anchor. */
+    u32 distance; /* 0x10: squared distance to the player, tested against 0x3FFF by the sun-orb player transfer. */
     u8 unknown14[4];
 };
 
