@@ -2774,17 +2774,10 @@ void TetherActor_UpdateSpecialEntryState(struct TetherActor *actor)
 
 void TetherActor_UpdateDirectedEntryTransition(struct TetherActor *p)
 {
-    u16 *q;
-    u32 z, v, m;
     if (p->state != 0xF)
         TetherActor_SetState(p, 0xF);
-    q = &p->chargeCollider.flags;
-    v = *q;
-    m = 4;
-    z = 0;
-    m |= v;
-    *q = m;
-    p->heading = z;
+    p->chargeCollider.flags |= 4;
+    p->heading = 0;
     if (TetherActor_SetEntry(p, 0x12))
         TetherActor_SetState(p, p->directedStep);
 }

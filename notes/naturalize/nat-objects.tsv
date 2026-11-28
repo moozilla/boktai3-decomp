@@ -146,3 +146,4 @@ src/objects/coffin/tether_actor.c	TetherActor_UpdateDescendingState	natural	natu
 src/objects/coffin/tether_actor.c	TetherActor_UpdateRapidDescendingState	natural	natural	0	
 src/objects/coffin/tether_actor.c	TetherActor_UpdatePassiveState	natural	natural	0	
 src/objects/coffin/tether_actor.c	TetherActor_UpdateSpecialEntryTransition	contrived	natural	1	
+src/objects/coffin/tether_actor.c	TetherActor_UpdateDirectedEntryTransition	contrived	natural	1	
