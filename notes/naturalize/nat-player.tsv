@@ -526,3 +526,11 @@ src/player/effects/burst/PlayerTransition_StepReveal.c	PlayerTransition_StepReve
 src/player/effects/burst/PlayerBurst_UpdateShutdown.c	PlayerBurst_UpdateShutdown	contrived	minor	2	andm helper (mask loaded before the pause flags)
 src/player/effects/burst/PlayerBurst_Update.c	PlayerBurst_Update	contrived	natural	1	-
 src/player/effects/burst/PlayerBurst_Destroy.c	PlayerBurst_Destroy	contrived	natural	2	-
+src/player/effects/burst/PlayerTransition_LoadAnimation.c	PlayerTransition_LoadAnimation	natural	natural	0	-
+src/player/effects/burst/PlayerTransition_InitCollider.c	PlayerTransition_InitCollider	natural	natural	0	-
+src/player/effects/burst/PlayerStatEffect_Initialize.c	PlayerStatEffect_Initialize	natural	natural	0	-
+src/player/effects/burst/PlayerBurst_Create.c	PlayerBurst_Create	natural	natural	0	-
+src/player/effects/burst/FrameDisplay_GetCompactFrameIndex.c	FrameDisplay_GetCompactFrameIndex	natural	natural	0	-
+src/player/effects/burst/FrameDisplay_UpdateSprite.c	FrameDisplay_UpdateSprite	minor	minor	1	unchanged: SetFrame helper orders the store
+src/player/effects/burst/ActorDebris_Update.c	ActorDebris_Update	natural	natural	0	-
+src/player/effects/burst/ActorDebris_Destroy.c	ActorDebris_Destroy	contrived	natural	1	-

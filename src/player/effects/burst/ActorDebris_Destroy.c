@@ -1,8 +1,8 @@
-#include "global.h"
+#include "player/effects/frame_display.h"
 
-s32 Sprite_Remove(u8 *);
+s32 Sprite_Remove(struct ContactSwarmSprite *);
 
-s32 ActorDebris_Destroy(u8 *p)
+s32 ActorDebris_Destroy(struct FrameDisplay *display)
 {
-    return Sprite_Remove(p + 0x34);
+    return Sprite_Remove(&display->sprite);
 }
