@@ -476,47 +476,32 @@ void Ivy_UpdateHold(struct ChaseActor *actor, s32 frame)
  * animation 0x15 and puts a held player back on the centre of the actor's terrain cell; then
  * clears context flag 2. */
 
+// scope: put Ivy_BeginRelease begin
 void Ivy_BeginRelease(struct ChaseActor *actor)
 {
     struct Ivy *context = actor->base.context;
+
     if (SceneActorReaction_TakePrepared(actor)) {
-        {
-            u16 *destination = &actor->base.colliderA.flags;
-            u32 flags = *destination;
-            u32 mask = 4;
-            mask |= flags;
-            mask &= 0xFFF7;
-            *destination = mask;
-        }
-        {
-            u32 mask = 0x800;
-            mask |= actor->base.placementFlags;
-            actor->base.placementFlags = mask;
-        }
+        struct SceneActorBody *target;
+        struct SceneVec position;
+        u8 angle;
+
+        actor->base.colliderA.flags |= 4;
+        actor->base.colliderA.flags &= ~8;
+        MonsterInit_SetMotionFlags(actor, 0x800);
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0x15);
-        {
-            struct SceneActorBody *target = (void *)actor->base.tracking.target;
-            struct SceneVec position;
-            u8 angle;
-            CellCenter(&position, actor->base.terrainCell);
-            {
-                s32 turn = (actor->base.body.direction + 0x20) & 0xFF;
-                s32 quadrant = turn >= 0 ? turn >> 6 : -(-turn >> 6);
-                angle = quadrant << 6;
-            }
-            if (target->mode <= 3)
-                Player_ApplyPositionRequest(target->owner, &position, 0x40, angle, 0x3C, 0, 0, 0);
-        }
-        ((u8 *)actor->base.drawable)[7] = 2;
-        {
-            u32 *flags = &context->captureFlags;
-            u32 mask = ~2;
-            *flags &= mask;
-        }
+        target = (void *)actor->base.tracking.target;
+        CellCenter(&position, actor->base.terrainCell);
+        angle = Math_ShiftTowardZero((actor->base.body.direction + 0x20) & 0xFF, 6) << 6;
+        if (target->mode <= 3)
+            Player_ApplyPositionRequest(target->owner, &position, 0x40, angle, 0x3C, 0, 0, 0);
+        ((struct IvyDrawable *)actor->base.drawable)->mode = 2;
+        ClearHeld(context);
     }
     if (actor->base.restart)
         actor->base.stepDone = 1;
 }
+// scope: put Ivy_BeginRelease end
 
 struct IvyTransitionActor {
     u8 unknown0[0x59];
