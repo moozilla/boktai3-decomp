@@ -7,7 +7,6 @@ void Time_CalculateSolarRiseTransitSet(struct SolarTimeContext *, s32, double, s
 void SunClock_SetSunrise(s32, s32);
 void SunClock_SetSunset(s32, s32);
 void SunClock_SetMoonAge(s32, s32);
-s32 __gtdf2(double, double);
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
 static inline double transform(double date, double offset)
@@ -19,25 +18,28 @@ u32 Time_CalculateSunriseSunsetCore(u32 year, s32 month, s32 day, double latitud
 {
     struct SolarTimeContext c;
     double middle, rise, set, offset;
+    double midpoint;
+    double transit;
+    double old;
+    double intermediate;
+    double offset2;
+    double fraction;
     offset = longitude / 360.0;
     c.d[6] = Time_CalculateModifiedJulianDate((s32)&c, year, month, day) - 0.375;
     c.d[9] = transform(c.d[6], offset);
     c.d[7] = Time_CalculateModifiedJulianDate((s32)&c, year, month, day + 1) - 0.375;
     c.d[10] = transform(c.d[7], offset);
-    {
-        double midpoint = c.d[6] + 0.5;
-        double transit;
-        c.d[8] = midpoint;
-        c.d[11] = transform(midpoint, offset);
-        c.n[0] = 0;
-        c.n[1] = 0;
-        c.n[2] = 0;
-        c.n[3] = 0;
-        Time_CalculateSolarRiseTransitSet(&c, 1, midpoint, (s32)c.d[11], longitude, latitude);
-        transit = c.d[1];
-        Time_CalculateSolarRiseTransitSet(&c, 0, transit, (s32)transform(transit, offset),
-                                          longitude, latitude);
-    }
+    midpoint = c.d[6] + 0.5;
+    c.d[8] = midpoint;
+    c.d[11] = transform(midpoint, offset);
+    c.n[0] = 0;
+    c.n[1] = 0;
+    c.n[2] = 0;
+    c.n[3] = 0;
+    Time_CalculateSolarRiseTransitSet(&c, 1, midpoint, (s32)c.d[11], longitude, latitude);
+    transit = c.d[1];
+    Time_CalculateSolarRiseTransitSet(&c, 0, transit, (s32)transform(transit, offset), longitude,
+                                      latitude);
     {
         double old = c.d[0], current;
         middle = c.d[2];
@@ -52,65 +54,56 @@ u32 Time_CalculateSunriseSunsetCore(u32 year, s32 month, s32 day, double latitud
                 difference = current - result;
             else
                 difference = result - current;
-            {
-                s32 comparison = __gtdf2(difference, 0.7);
+            if (difference > 0.7)
+                rise = -1.0;
+            else
                 rise = result;
-                if (comparison > 0)
-                    rise = -1.0;
-            }
         }
     }
+    intermediate = (middle - 40000.0) * 1.002737909 + 0.671262;
+    offset2 = longitude / 360.0;
+    Time_CalculateSolarRiseTransitSet(&c, 3, middle, (s32)(intermediate + offset2), longitude,
+                                      latitude);
+    old = c.d[2];
+    Time_CalculateSolarRiseTransitSet(&c, 3, old, (s32)transform(old, offset2), longitude,
+                                      latitude);
     {
-        double old;
-        double intermediate = (middle - 40000.0) * 1.002737909 + 0.671262;
-        double offset2 = longitude / 360.0;
-        Time_CalculateSolarRiseTransitSet(&c, 3, middle, (s32)(intermediate + offset2), longitude,
-                                          latitude);
-        old = c.d[2];
-        Time_CalculateSolarRiseTransitSet(&c, 3, old, (s32)transform(old, offset2), longitude,
-                                          latitude);
-        {
-            double result = c.d[2], difference;
-            if (old > result)
-                difference = old - result;
-            else
-                difference = result - old;
-            {
-                s32 comparison = __gtdf2(difference, 0.7);
-                set = result;
-                if (comparison > 0)
-                    set = -1.0;
-            }
-        }
+        double result = c.d[2], difference;
+        if (old > result)
+            difference = old - result;
+        else
+            difference = result - old;
+        if (difference > 0.7)
+            set = -1.0;
+        else
+            set = result;
     }
-    {
-        double fraction = rise - (double)(s32)rise + 0.375;
-        if (fraction >= 1.0)
-            fraction -= 1.0;
-        if (rise >= c.d[6] && rise < c.d[6] + 1.0) {
-            double hours = fraction * 24.0;
-            s32 hour = (s32)hours;
-            double minutes = (hours - (double)hour) * 60.0;
-            s32 minute = (s32)minutes, rounded;
-            if (minutes - (double)minute < 0.5)
-                rounded = (s32)minutes;
-            else
-                rounded = minute + 1;
-            if (rounded == 60) {
-                rounded = 0;
-                hour++;
-                if (hour == 24) {
-                    hour = 23;
-                    rounded = 59;
-                }
+    fraction = rise - (double)(s32)rise + 0.375;
+    if (fraction >= 1.0)
+        fraction -= 1.0;
+    if (rise >= c.d[6] && rise < c.d[6] + 1.0) {
+        double hours = fraction * 24.0;
+        s32 hour = (s32)hours;
+        double minutes = (hours - (double)hour) * 60.0;
+        s32 minute = (s32)minutes, rounded;
+        if (minutes - (double)minute < 0.5)
+            rounded = (s32)minutes;
+        else
+            rounded = minute + 1;
+        if (rounded == 60) {
+            rounded = 0;
+            hour++;
+            if (hour == 24) {
+                hour = 23;
+                rounded = 59;
             }
-            hour += zone;
-            if (hour < 0)
-                hour += 24;
-            else if (hour > 23)
-                hour -= 24;
-            SunClock_SetSunrise(hour, rounded);
         }
+        hour += zone;
+        if (hour < 0)
+            hour += 24;
+        else if (hour > 23)
+            hour -= 24;
+        SunClock_SetSunrise(hour, rounded);
     }
     {
         double fraction = set - (double)(s32)set + 0.375;

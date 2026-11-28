@@ -462,3 +462,4 @@ src/system/clock/SunClock_RunReservedMoonHook.c	SunClock_RunReservedMoonHook	nat
 src/system/clock/SunClock_GetPhase.c	SunClock_GetPhase	contrived	contrived	0	window macros and do/while(0) presets raise the result variable priority; left as is
 src/system/clock/Time_CalculateSolarRiseTransitSet.c	Time_CalculateSolarRiseTransitSet	contrived	minor	1	one block around the transit values keeps the double stack slots in order
 src/system/clock/Time_CalculateSunriseSunset.c	Time_CalculateSunriseSunset	minor	natural	1	
+src/system/clock/Time_CalculateSunriseSunsetCore.c	Time_CalculateSunriseSunsetCore	contrived	minor	1	blocks left around the refinement passes order the double stack slots
