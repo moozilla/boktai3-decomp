@@ -66,3 +66,15 @@ src/monsters/armor/armor_motion.c	Armor_UpdateWalkNormalWithScatterEffect	contri
 src/monsters/armor/armor_motion.c	Armor_UpdateWalkFastWithTrailEffect	contrived	natural	1	
 src/monsters/armor/armor_motion.c	Armor_EnterFacingAnimation	contrived	natural	1	
 src/monsters/armor/actor_controller_transitions.c	ActorController_UpdateResetMotionTransition	contrived	natural	3	existing ActorController_ClearMotionFlags kept (field address stays based on motion)
+src/monsters/armor/armor_motion.c	Armor_UpdateNegativeTurnNormal	natural	natural	0	wrapper; integer parameter types
+src/monsters/armor/armor_motion.c	Armor_UpdatePositiveTurnFast	natural	natural	0	wrapper; integer parameter types
+src/monsters/armor/armor_motion.c	Armor_UpdateNegativeTurnFast	natural	natural	0	wrapper; integer parameter types
+src/monsters/armor/armor_motion.c	Armor_UpdatePositiveTurnFaster	natural	natural	0	wrapper; integer parameter types
+src/monsters/armor/armor_motion.c	Armor_UpdateNegativeTurnFaster	natural	natural	0	wrapper; integer parameter types
+src/monsters/armor/armor_motion.c	Armor_UpdatePositiveTurnSlow	natural	natural	0	wrapper; integer parameter types
+src/monsters/armor/actor_controller_transitions.c	ActorController_UpdateNegativeTurnSpeed91	natural	natural	0	wrapper; integer parameter types
+src/monsters/armor/actor_controller_transitions.c	ActorController_UpdatePositiveTurnSpeed32	natural	natural	0	wrapper; integer parameter types
+src/monsters/armor/actor_controller_transitions.c	ActorController_UpdateNegativeTurnSpeed32	natural	natural	0	wrapper; integer parameter types
+src/monsters/armor/actor_controller_transitions.c	ActorController_UpdateResetMotion	natural	natural	0	wrapper; integer parameter types
+src/monsters/armor/actor_controller_transitions.c	ActorController_UpdateFastMotionReset	natural	natural	0	wrapper; integer parameter types
+src/monsters/armor/actor_controller_transitions.c	ActorController_UpdateAttackCollider	contrived	minor	28	collider pointers, 0x60000 mask local and cast table reads fix register choices
