@@ -281,3 +281,6 @@ src/effects/orbits/homing_effect.c	EffectParticle_UpdateFinish	contrived	contriv
 src/effects/orbits/homing_effect.c	EffectParticle_UpdateDissipating	contrived	contrived	48	inline copy of the frame step, sprite alias and angle temporaries: register allocation; angle clamp and alias removal change the output
 src/effects/orbits/orbiting_particles.c	OrbitingParticles_HasActiveOrb	contrived	natural	1	
 src/effects/orbits/orbiting_particles.c	OrbitingParticles_SpawnOrb	minor	natural	8	
+src/effects/orbits/orbiting_particles.c	OrbitingParticles_Advance	natural	natural	0	
+src/effects/orbits/orbiting_particles.c	OrbitingParticles_Update	contrived	contrived	0	unchanged: natural indexed loops leave the pointer induction order (call argument, field pointer copy and position pointer); about 400 spellings
+src/effects/orbits/orbiting_particles.c	OrbitingParticles_Destroy	contrived	natural	1	

@@ -89,15 +89,12 @@ int OrbitingParticles_Update(struct OrbitingParticles *m)
     return 0;
 }
 
-u32 OrbitingParticles_Destroy(struct OrbitingParticles *p)
+u32 OrbitingParticles_Destroy(struct OrbitingParticles *particles)
 {
     s32 i;
-    struct OrbitingParticleSprite *q = &p->orbs[0].sprite;
-    for (i = 7; i >= 0; i--) {
-        Effect_Remove(q);
-        /* Embedded sprites are spaced by a whole orb, not a sprite. */
-        q = (void *)((u8 *)q + sizeof(struct OrbitingParticle));
-    }
+
+    for (i = 0; i < 8; i++)
+        Effect_Remove(&particles->orbs[i].sprite);
     return 0;
 }
 
