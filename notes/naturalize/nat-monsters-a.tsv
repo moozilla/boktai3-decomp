@@ -534,3 +534,6 @@ src/monsters/centipede/Centipede_ReactToContact.c	Centipede_ReactToContact	contr
 src/monsters/centipede/Centipede_HasVisitedRoute.c	Centipede_HasVisitedRoute	contrived	natural	1	
 src/monsters/centipede/ActorTrail_ResetAtSavedPosition.c	ActorTrail_ResetAtSavedPosition	contrived	minor	6	random index block and drawable position casts stay
 src/monsters/centipede/Centipede_EnterHitReaction.c	Centipede_EnterHitReaction	contrived	minor	5	predicate mask, flag pointer and reused mode value: loads order before the stores
+src/monsters/centipede/Centipede_AlignSegmentsToTerrain.c	Centipede_AlignSegmentsToTerrain	contrived	contrived	0	offsetof position local and duplicated branch: direct segment members change address strength reduction
+src/monsters/centipede/Centipede_ApplyPendingRadialVelocity.c	Centipede_ApplyPendingRadialVelocity	contrived	contrived	3	pointer temps and zero local: all three addresses are computed before the first load; only a projection helper with unused parameters matched
+src/monsters/centipede/Centipede_SpawnSparkBurst.c	Centipede_SpawnSparkBurst	contrived	contrived	0	table address assembled through a union: a plain table pointer changes constant materialization
