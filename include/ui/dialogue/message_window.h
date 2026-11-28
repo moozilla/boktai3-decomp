@@ -61,7 +61,7 @@ struct MessageWindow {
 
 void *Script_GetTextSourcePc(void);
 u32 TextState_SetString(void *, u32, u32);
-void TextState_SetNumber(void *, int, int);
+u32 TextState_SetNumber(void *, int, int);
 int TextState_StepPlayback(void *);
 void TextState_ClearSelectedChoices(void *);
 void TextState_RunSelectedProcedures(void *);
