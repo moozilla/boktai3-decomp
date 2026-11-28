@@ -28,3 +28,4 @@ src/link/lobby/LinkLobbyPanel_DrawActorValues.c	LinkLobbyPanel_DrawActorValues	c
 src/link/lobby/LinkLobbyPanel_RefreshPlayerNames.c	LinkLobbyPanel_RefreshPlayerNames	contrived	natural	2	
 src/link/lobby/LinkLobbyPanel_CreateTextWindows.c	LinkLobbyPanel_CreateTextWindows	contrived	natural	1	
 src/link/lobby/LinkLobbyPanel_ClearTextWindows.c	LinkLobbyPanel_ClearTextWindows	contrived	natural	1	
+src/link/lobby/LinkLobbyPanel_InitGlyphFrames.c	LinkLobbyPanel_InitGlyphFrames	minor	natural	1	
