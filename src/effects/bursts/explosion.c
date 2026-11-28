@@ -58,8 +58,9 @@ void Explosion_InitCollider(struct Explosion *explosion, struct ContactCollider 
     size.x = 120;
     size.y = 120;
     size.z = 120;
-    *(u32 *)&offset = 0;
-    ((u32 *)&offset)[1] &= 0xFFFF0000;
+    offset.x = 0;
+    offset.y = 0;
+    offset.z = 0;
     Collider_Init(collider, 0, 0x2001, 0, (u16)contactFlags, &size, &offset);
     Collider_SetAttackProperties(collider, power, force, 0x210, reactionFlags, hitDuration);
     Collider_SetCallback(collider, 0, explosion);
