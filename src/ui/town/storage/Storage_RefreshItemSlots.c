@@ -1,28 +1,17 @@
 #include "global.h"
 #include "engine/video/anim_sprite.h"
-struct StorageItems {
-    u8 unknown0[0x318];
-    struct AnimSprite carried[16], stored[16];
-    u8 unknownF18[0x1E0];
-    struct AnimSprite markers[8];
-    u8 unknown13F8[0x35E];
-    u8 emptyCarried;
-    s8 emptyStored;
-    u8 unknown1758[0x38];
-    u8 slots[32];
-};
+#include "ui/town/storage_screen.h"
 s32 Inventory_GetItemId(u32);
 u32 Selection_GetDisplayFrame(s32);
-void Anim_LoadKeyframe(void *, void *, u16, u32);
 void SceneHud_SetKeyframePaletteBank(void *, u32);
-void Storage_RefreshItemSlots(struct StorageItems *p)
+void Storage_RefreshItemSlots(struct StorageScreen *screen)
 {
     s32 row;
     s32 col;
     u32 rowBytes;
     s32 rowSlot;
-    p->emptyCarried = 0xFF;
-    p->emptyStored = -1;
+    screen->emptyCarried = 0xFF;
+    screen->emptyStored = -1;
     row = 0;
     rowBytes = 0;
     for (; row < 4; row++) {
@@ -30,18 +19,19 @@ void Storage_RefreshItemSlots(struct StorageItems *p)
         col = 0;
         rowSlot = row * 4;
         {
-            struct AnimSprite *base = p->carried;
+            struct AnimSprite *base = screen->firstSlots;
             widget = (void *)(rowBytes + (u32)base);
         }
         do {
             s32 index = rowSlot + col;
-            s32 id = Inventory_GetItemId(p->slots[index]);
+            s32 id = Inventory_GetItemId(screen->slots[index]);
             if (id >= 0) {
                 widget->flags &= ~1;
-                Anim_LoadKeyframe(widget, (u8 *)p + 0x1538, Selection_GetDisplayFrame(id), 1);
+                Anim_LoadKeyframe(widget, &screen->storageResource,
+                                  (u16)Selection_GetDisplayFrame(id), 1);
             } else {
-                if ((s8)p->emptyCarried < 0)
-                    p->emptyCarried = index;
+                if ((s8)screen->emptyCarried < 0)
+                    screen->emptyCarried = index;
                 widget->flags |= 1;
             }
             SceneHud_SetKeyframePaletteBank(widget, 0x373);
@@ -59,18 +49,19 @@ void Storage_RefreshItemSlots(struct StorageItems *p)
         nextRow = row + 1;
         {
             u32 offset = ((row << 3) + rowSlot) << 5;
-            struct AnimSprite *base = p->stored;
+            struct AnimSprite *base = screen->secondSlots;
             widget = (void *)(offset + (u32)base);
         }
         index = rowSlot + 16;
         do {
-            s32 id = Inventory_GetItemId(p->slots[index]);
+            s32 id = Inventory_GetItemId(screen->slots[index]);
             if (id >= 0) {
                 widget->flags &= ~1;
-                Anim_LoadKeyframe(widget, (u8 *)p + 0x1538, Selection_GetDisplayFrame(id), 1);
+                Anim_LoadKeyframe(widget, &screen->storageResource,
+                                  (u16)Selection_GetDisplayFrame(id), 1);
             } else {
-                if (p->emptyStored < 0)
-                    p->emptyStored = index;
+                if (screen->emptyStored < 0)
+                    screen->emptyStored = index;
                 widget->flags |= 1;
             }
             widget++;
@@ -85,6 +76,6 @@ void Storage_RefreshItemSlots(struct StorageItems *p)
     {
         s32 i;
         for (i = 0; i < 8; i++)
-            p->markers[i].flags |= 1;
+            screen->categorySlots[i].flags |= 1;
     }
 }
