@@ -76,3 +76,11 @@ src/monsters/ivy/PhaseObject_EndApproachPause.c	PhaseObject_EndApproachPause	min
 src/monsters/ivy/Ivy_UpdatePositionTransition.c	Ivy_UpdatePositionTransition	contrived	natural	1	
 src/monsters/ivy/PhaseObject_TickCountdown.c	PhaseObject_TickCountdown	contrived	contrived	3	callback assigned inside the loop (loop.c hoist order); remaining local for the clamp (reload from the field)
 src/monsters/ivy/PhaseObject_UpdateEntryScatter.c	PhaseObject_UpdateEntryScatter	contrived	natural	1	
+src/monsters/ivy/ColorPulse_AlignTargetHeading.c	ColorPulse_AlignTargetHeading	natural	natural	0	
+src/monsters/ivy/ColorPulse_BeginNearApproach.c	ColorPulse_BeginNearApproach	natural	natural	0	
+src/monsters/ivy/ColorPulse_PrepareTargetDash.c	ColorPulse_PrepareTargetDash	natural	natural	0	
+src/monsters/ivy/sub_080F2BE4.c	sub_080F2BE4	natural	natural	0	
+src/monsters/ivy/sub_080F2F24.c	sub_080F2F24	natural	natural	0	
+src/monsters/ivy/PhaseObject_ConvergeEntries.c	PhaseObject_ConvergeEntries	natural	natural	0	
+src/monsters/ivy/PhaseObject_TickEntryReset.c	PhaseObject_TickEntryReset	natural	natural	0	
+src/monsters/ivy/child_group.c	ChildGroup_AdvanceLaunchCycle	minor	natural	1	(u8) on the callback result

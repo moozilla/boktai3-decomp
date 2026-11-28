@@ -22,7 +22,7 @@ void ChildGroup_LaunchNextInactiveMember(struct SwordGroup *);
 
 void ChildGroup_AdvanceLaunchCycle(struct PhaseObject *p)
 {
-    if (p->phaseUpdate && ChildGroup_InvokeActorByte(p, p->phaseUpdate))
+    if (p->phaseUpdate && (u8)Callback_InvokeActor(p, p->phaseUpdate))
         p->actionCompletions++;
     if (p->actionCompletions > 1) {
         p->actionCompletions = 0;
