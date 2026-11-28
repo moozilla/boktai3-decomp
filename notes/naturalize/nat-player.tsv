@@ -42,3 +42,7 @@ src/player/appearance/character_model.c	CharacterModel_LoadActorAppearance	minor
 src/player/appearance/character_model.c	ModifierMenu_CountAppearanceModifiers	natural	natural	4	plain do/while with break; for form rotates differently
 src/player/appearance/character_model.c	GameState_ClearSlots7A8FromScript	minor	minor	0	s16 view of modifierIdsBytes: shared header types it u8[8]
 src/player/appearance/character_model.c	SceneActorStyle_InitializeFromGameState	contrived	minor	22	halfword read through the reused state pointer: a local or member read lets cse derive the address from the earlier offset
+src/player/appearance/character_model.c	SceneActorStyle_Initialize	natural	natural	0	-
+src/player/appearance/actor_stat_config.c	ActorStats_SetChoices	natural	natural	0	-
+src/player/appearance/actor_stat_config.c	ActorStats_ConfigureScaledParameters	natural	natural	0	-
+src/player/appearance/PaletteFade_ApplyBrightenedPalette.c	PaletteFade_ApplyBrightenedPalette	contrived	minor	40	(u16)color shifts and a second *src read: other color types change the extraction shifts or register choice

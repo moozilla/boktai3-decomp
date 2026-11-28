@@ -23,59 +23,45 @@ void PaletteFade_ApplyBrightenedPalette(struct PalFadeObj *p)
     src = (u16 *)(gPaletteBankData + p->paletteBanks[p->bankIndex] * 32);
     if (p->brighten == 0) {
         if (p->copyAll == 0) {
-            u8 *mode;
-            u16 *dst;
-            i = 0;
-            mode = &p->mode;
-            dst = p->palette;
-            for (; i < 16; i++) {
-                if (*mode == 2 || !((u32)(i - 5) <= 1 || i == 13))
-                    *dst = *src;
+            for (i = 0; i < 16; i++) {
+                if (p->mode == 2 || !(i == 5 || i == 6 || i == 13))
+                    p->palette[i] = *src;
                 src++;
-                dst++;
             }
         } else {
-            u16 *dst = p->palette;
-            for (i = 15; i >= 0; i--)
-                *dst++ = *src++;
+            for (i = 0; i < 16; i++)
+                p->palette[i] = *src++;
         }
     } else {
         if (p->copyAll == 0) {
-            u8 *add;
-            u16 *dst;
-            i = 0;
-            add = &p->brighten;
-            dst = p->palette;
-            for (; i < 16; i++) {
-                if (!((u32)(i - 5) <= 1 || i == 13)) {
-                    u16 c = *src;
-                    s32 r, g, b;
-                    r = (c & 0x1F) + *add;
+            for (i = 0; i < 16; i++) {
+                if (!(i == 5 || i == 6 || i == 13)) {
+                    s32 color = *src;
+                    s32 r = (*src & 0x1F) + p->brighten;
+                    s32 g, b;
                     if (r > 0x1F)
                         r = 0x1F;
-                    g = (s16)(((u32)(c << 16) >> 21) & 0x1F) + *add;
+                    g = (((u16)color >> 5) & 0x1F) + p->brighten;
                     if (g > 0x1F)
                         g = 0x1F;
-                    b = (s16)(((u32)(c << 16) >> 26) & 0x1F) + *add;
+                    b = (((u16)color >> 10) & 0x1F) + p->brighten;
                     if (b > 0x1F)
                         b = 0x1F;
-                    *dst = (b << 10) | (g << 5) | r;
+                    p->palette[i] = (b << 10) | (g << 5) | r;
                 }
                 src++;
-                dst++;
             }
         } else {
             for (i = 0; i < 16; i++) {
-                s32 r, g, b, red, brightness;
-                red = *src & 0x1F;
-                brightness = p->brighten;
-                r = red + brightness;
+                s32 color = *src;
+                s32 r = (*src & 0x1F) + p->brighten;
+                s32 g, b;
                 if (r > 0x1F)
                     r = 0x1F;
-                g = ((*src >> 5) & 0x1F) + brightness;
+                g = (((u16)color >> 5) & 0x1F) + p->brighten;
                 if (g > 0x1F)
                     g = 0x1F;
-                b = ((*src >> 10) & 0x1F) + brightness;
+                b = (((u16)color >> 10) & 0x1F) + p->brighten;
                 if (b > 0x1F)
                     b = 0x1F;
                 p->palette[i] = (b << 10) | (g << 5) | r;
