@@ -1,10 +1,9 @@
 #include "global.h"
-#include "engine/engine.h"
-#include "engine/ram.h"
+#include "engine/engine_pause.h"
 void Sound_PlaySong(u32);
-void Sound_PlaySongChecked(u32 n)
+
+void Sound_PlaySongChecked(u32 song)
 {
-    u32 m = 0x400;
-    if (((gEngineFlags | gScenePauseFlags) & m) == 0)
-        Sound_PlaySong(n);
+    if (!Engine_PauseBits(0x400))
+        Sound_PlaySong(song);
 }
