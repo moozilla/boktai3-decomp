@@ -1,4 +1,5 @@
 #include "ui/town/town_map.h"
+#include "engine/video/render.h"
 #include "gba/io_reg.h"
 
 void Palette_InterpolateBanks(void *, void *, void *, int, int);
@@ -137,21 +138,12 @@ void TownMap_InitBackground(struct RegistryChoiceMenu *menu)
 {
     u8 *resource;
     s32 layers[2];
-    {
-        u16 *control = &gDispCntShadow;
-        u32 mask = ~0xF00;
-        u32 flags = *control;
-        mask &= flags;
-        *control = mask;
-    }
+
+    Bg_DisableDisplay(0xF00);
     Bg_ResetDisplay();
     Hud_SetMode(7);
-    {
-        u32 flags = 0xC00;
-        flags |= gDispCntShadow;
-        flags |= 0x100;
-        gDispCntShadow = flags;
-    }
+    Bg_EnableDisplay(DISPCNT_BG2_ON | DISPCNT_BG3_ON);
+    Bg_EnableDisplay(DISPCNT_BG0_ON);
     menu->background = sub_08216E54(0xDC87);
     layers[0] = 1;
     layers[1] = 0;
@@ -161,7 +153,7 @@ void TownMap_InitBackground(struct RegistryChoiceMenu *menu)
     resource = ScriptProc_Start(0x92B3, 0x771E);
     menu->palettes = (u16 *)(resource + 0x14);
     TownMap_ApplyPaletteStep(menu, SunClock_GetPhase());
-    CpuSet(resource + 0x74, gBgPaletteBank3, 0x04000008);
+    CpuCopy32(resource + 0x74, gBgPaletteBank3, 0x20);
 }
 
 void TownMap_ConfigureDisplay(void)

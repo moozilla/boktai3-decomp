@@ -399,3 +399,4 @@ src/ui/town/town_map.c	TownMap_ApplyPaletteStep	minor	natural	1
 src/ui/town/town_map.c	TownMap_UpdateAnimations	minor	natural	4	
 src/ui/town/town_map.c	TownMap_InitAnimations	minor	natural	3	
 src/ui/town/town_map.c	TownMap_ConfirmSelection	minor	natural	1	
+src/ui/town/town_map.c	TownMap_InitBackground	contrived	natural	4	
