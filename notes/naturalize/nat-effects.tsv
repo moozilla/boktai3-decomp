@@ -22,3 +22,4 @@ src/effects/bat_flock.c	BatFlockBat_Deactivate	natural	natural	0
 src/effects/bat_flock.c	BatFlock_Destroy	natural	natural	0	
 src/effects/bat_flock.c	BatFlock_CreateTask	natural	natural	0	
 src/effects/floating_item_effect.c	FloatingEffect_Wait	contrived	natural	5	
+src/effects/floating_item_effect.c	FloatingEffect_ShrinkAway	minor	natural	2	

@@ -110,28 +110,28 @@ void FloatingEffect_ShrinkAway(struct LinkedWidgetSet *manager, struct FloatingE
                                int index)
 {
     struct AnimSprite *sprite = &effect->sprite;
-    u8 *scale;
+
     if (effect->entered) {
         effect->entered = 0;
         sprite->flags |= 2;
         sprite->rotation = 0;
-        effect->sprite.scaleX = 64;
-        effect->sprite.scaleY = 64;
+        sprite->scaleX = 64;
+        sprite->scaleY = 64;
     }
-    scale = &effect->sprite.scaleX;
-    if (*scale > 8)
-        *scale -= 8;
-    effect->sprite.scaleY = *scale;
+    if (sprite->scaleX > 8)
+        sprite->scaleX -= 8;
+    sprite->scaleY = sprite->scaleX;
     sprite->rotation += 16;
     effect->position.x += 8;
     effect->position.z += 8;
     FloatingEffect_Project(effect);
-    sprite->position.x += (64 - *scale) >> 3;
+    sprite->position.x += (64 - sprite->scaleX) >> 3;
     if (effect->timer > 7) {
         FloatingEffect_Init(effect);
         manager->active &= ~(1 << index);
-    } else
+    } else {
         effect->timer++;
+    }
 }
 
 static inline u32 FloatingEffect_RandomAt(const u16 *table, u16 index)
