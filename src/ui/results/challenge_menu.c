@@ -199,20 +199,19 @@ void ChallengeMenu_UpdateSelection(struct ChallengeMenu *menu)
 
 s32 ChallengeMenu_UpdateWidgets(struct ChallengeMenu *menu)
 {
-    s32 *selection = &menu->selection;
     struct ContactPosition *position;
     s32 rank;
 
-    if (*selection == 0) {
+    if (menu->selection == 0) {
         Anim_LoadKeyframe(&menu->widgets[1], &menu->resources[1], 0x55, 0);
         position = &menu->widgets[1].position;
         position->x = 0;
         position->y = 0;
-    } else if (*selection <= 3) {
+    } else if (menu->selection <= 3) {
         Anim_LoadKeyframe(&menu->widgets[1], &menu->resources[1], 0x56, 0);
         position = &menu->widgets[1].position;
         position->x = 0;
-        position->y = (*selection - 1) << 4;
+        position->y = (menu->selection - 1) << 4;
     }
     Palette_UpdateHighlightPulse(menu->highlightPalette, &menu->highlightPhase);
     AnimSprite_Show(&menu->widgets[3]);
