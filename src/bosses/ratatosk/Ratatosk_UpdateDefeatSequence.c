@@ -1,46 +1,11 @@
 #include "global.h"
+#include "bosses/ratatosk/ratatosk.h"
 #include "bosses/ratatosk/ratatosk_particle.h"
 #include "engine/ram.h"
 #include "scene/collision/contact_position.h"
 #include "engine/engine_globals.h"
 #include "scene/actor/scene_actor_components.h"
 
-struct Actor {
-    u8 pad0[0x48];
-    struct SceneActorBody body;
-    u32 timer;
-    s16 health;
-    u8 pad96[6];
-    u32 flags;
-    u8 padA0[2];
-    u8 mode, padA3;
-    u32 modeTime;
-    u8 facing, facing8, padAA, animationId, state, nextState, active, finished, padB0, changed,
-        padB2, locked;
-    u8 padB4[0x18];
-    u8 requestedAngle;
-    u8 padCD[0x33];
-    void (*update)(void);
-    void *callback;
-    u8 pad108[0xc];
-    s8 savedAngle;
-    u8 pad115[0x67];
-    u32 phase;
-    u8 pad180[0x1ac];
-    u8 animation[0x20];
-    u8 animationData[0x20];
-    struct ContactPosition anchor;
-    u8 pad374[0x58];
-    struct ContactPosition home;
-    u8 pad3D4[0xa78];
-    s16 selectedPoint, selectedTarget;
-    u16 padE50;
-    u16 scaleX, scaleZ, padE56, scaleStep;
-    u8 padE5A[0x14];
-    u16 motion;
-    u8 motionFlag, padE71, targetAngle, phaseTimer;
-    s16 hitTimer, terrainTimer;
-};
 extern const u16 gUnk_086141BC[];
 extern const s16 gUnk_086149C4[];
 void SceneActors_StartDirectionalAnimation(void *, void *, void *, s32, s32, s32, s32);
@@ -52,20 +17,6 @@ static inline u32 randomA(void)
 {
     gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 1023;
     return gUnk_086141BC[gEffectRandomTableIndex];
-}
-static inline void facing(struct Actor *p, s32 angle)
-{
-    u32 v;
-    s32 shift;
-    p->body.direction = angle;
-    shift = (p->body.direction + 0x60) >> 6;
-    v = 3;
-    v &= shift;
-    p->facing = v;
-    shift = (p->body.direction + 0x70) >> 5;
-    v = 7;
-    v &= shift;
-    p->facing8 = v;
 }
 static inline s32 trunc12(s32 v)
 {
@@ -128,27 +79,27 @@ static inline void increment(u16 *v)
     else
         *v = 9999;
 }
-static inline u32 Arg1(u32 k_, struct Actor *p)
+static inline u32 Ratatosk_AddFlags(const struct Ratatosk *actor, u32 flags)
 {
-    return p->flags | k_;
+    return actor->flags | flags;
 }
 
-void Ratatosk_UpdateDefeatSequence(struct Actor *p, s32 tick)
+void Ratatosk_UpdateDefeatSequence(struct Ratatosk *p, s32 tick)
 {
     struct RatatoskParticleConfig params;
     struct ContactPosition spawn;
-    struct Actor *p2 = p;
+    struct Ratatosk *p2 = p;
     s32 i;
     s32 value;
     u8 angle;
     u16 radius;
-    if (p->changed) {
-        p->changed = 0;
+    if (p->actionChanged) {
+        p->actionChanged = 0;
         if (p->locked) {
             angle = p->savedAngle;
-            facing(p, (s8)angle);
+            Ratatosk_SetFacing(p, (s8)angle);
         } else {
-            Task_Kill(*((void **)(((u8 *)p2) + 0xf20)));
+            Task_Kill(p2->particles);
             SceneActors_RunFirstEventScript(p, &p2->anchor);
         }
         clearFade((void *)p2->animationData);
@@ -156,9 +107,9 @@ void Ratatosk_UpdateDefeatSequence(struct Actor *p, s32 tick)
         Sound_PlaySong(0x560);
         p2->scaleX = 0;
         p2->scaleZ = 0;
-        p2->scaleStep = 0;
+        p2->scaleMode = 0;
         PlayerClone_BeginActiveReactions();
-        SunOrb_FadeOutAll(*((void **)(((u8 *)p2) + 0xf2c)));
+        SunOrb_FadeOutAll(p2->sunOrbs);
         Sound_StopSong(0x56b);
         Sound_StopSong(0x569);
         Sound_StopSong(0x570);
@@ -168,16 +119,14 @@ void Ratatosk_UpdateDefeatSequence(struct Actor *p, s32 tick)
     if (p2->terrainTimer > 0) {
         p2->terrainTimer--;
         {
-            struct ContactPosition *home = &p2->home;
+            struct ContactPosition *home = &p2->motionPath.position;
             struct ContactPosition *pos = &p->body.position;
             s32 x = home->x - pos->x;
             s32 z = home->z - pos->z;
-            {
-                s32 angle = Math_Atan2(x, z);
-                struct ContactPosition *velocity = &p->body.motion;
-                radius = 20;
-                polar(velocity, angle, radius);
-            }
+            s32 angle = Math_Atan2(x, z);
+            struct ContactPosition *velocity = &p->body.motion;
+            radius = 20;
+            polar(velocity, angle, radius);
         }
     }
     if (tick == 140) {
@@ -202,10 +151,8 @@ void Ratatosk_UpdateDefeatSequence(struct Actor *p, s32 tick)
             variant <<= 12;
             radius <<= 12;
             Ratatosk_InitAnimatedParticleParams(&params);
-            {
-                Ratatosk_ConfigureAnimatedParticle(&params, (randomA() & 31) + 292, value, angle, 1,
-                                                   variant, radius);
-            }
+            Ratatosk_ConfigureAnimatedParticle(&params, (randomA() & 31) + 292, value, angle, 1,
+                                               variant, radius);
             Ratatosk_SpawnAnimatedParticle(&params, spawnAt);
         }
     }
@@ -213,7 +160,7 @@ void Ratatosk_UpdateDefeatSequence(struct Actor *p, s32 tick)
         if (!p->locked) {
             s32 count;
             SceneActors_RunSecondEventScript(p, &p2->anchor);
-            Player_AddExperience(*((u16 *)(((u8 *)p2) + 0xed2)));
+            Player_AddExperience(p2->parameterED2);
             Bestiary_UnlockEntry(0x51);
             increment((u16 *)(gGameState + 0x87c));
             increment((u16 *)(gGameState + 0x538));
@@ -225,10 +172,8 @@ void Ratatosk_UpdateDefeatSequence(struct Actor *p, s32 tick)
                 count = 0;
             *((u16 *)(gGameState + 0x592)) = count;
         }
-        p->finished = 1;
+        p->actionFinished = 1;
     }
-    {
-        value = Arg1(15, p);
-        p->flags = value & (~16);
-    }
+    value = Ratatosk_AddFlags(p, 15);
+    p->flags = value & ~16;
 }

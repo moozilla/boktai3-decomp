@@ -39,3 +39,4 @@ src/bosses/ratatosk/Ratatosk_UpdateTimedAttack.c	Ratatosk_UpdateTimedAttack	mino
 src/bosses/ratatosk/Ratatosk_UpdateFadeIn.c	Ratatosk_UpdateFadeIn	minor	minor	6	two mask-parameter flag accessors stay (mask loaded before field)
 src/bosses/ratatosk/Ratatosk_UpdateSunOrbSummon.c	Ratatosk_UpdateSunOrbSummon	contrived	minor	3	second actor alias stays (allocation); one position pointer cast
 src/bosses/ratatosk/Ratatosk_UpdateRadialSummonAttack.c	Ratatosk_UpdateRadialSummonAttack	contrived	contrived	7	clamp helpers returning their pointer, ReadPositionZ, word-copy helper and the particle random macro stay: plain forms change spawn-pointer allocation
+src/bosses/ratatosk/Ratatosk_UpdateDefeatSequence.c	Ratatosk_UpdateDefeatSequence	contrived	minor	12	add-flags helper plus value temp stays: mask loaded before the field and the result register reused; raw save-counter offsets; spawnAt pointer
