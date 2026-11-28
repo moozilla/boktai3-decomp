@@ -228,3 +228,5 @@ src/bosses/hresvelgr/Hresvelgr_EmitFacingMotionBurst.c	Hresvelgr_EmitFacingMotio
 src/bosses/hresvelgr/Hresvelgr_EmitFacingMotion.c	Hresvelgr_EmitFacingMotion	contrived	contrived	0	unchanged: relative-sample origin address and cloned polar/random helpers carry the register flow
 src/bosses/hresvelgr/Hresvelgr_SetPartApproachMotion.c	Hresvelgr_SetPartApproachMotion	minor	minor	0	local vector helpers stay
 src/bosses/hresvelgr/Hresvelgr_SelectPlayerAnimation.c	Hresvelgr_SelectPlayerAnimation	minor	natural	1	
+src/bosses/hresvelgr/Collider_IgnoreCallback.c	Collider_IgnoreCallback	natural	natural	0	
+src/bosses/hresvelgr/Hresvelgr_InitializeCollider.c	Hresvelgr_InitializeCollider	minor	natural	1	

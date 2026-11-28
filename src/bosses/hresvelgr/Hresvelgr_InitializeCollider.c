@@ -10,12 +10,11 @@ struct Hresvelgr {
     u8 unknown234[0x124];
     s16 attackPower, attackForce, attackParameter;
 };
-typedef struct ContactPosition HresvelgrColliderVector;
 void Collider_IgnoreCallback(void);
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 void Hresvelgr_InitializeCollider(struct Hresvelgr *actor, u16 id)
 {
-    HresvelgrColliderVector scale, rotation;
+    struct ContactPosition scale, rotation;
     void *collider = actor->collider;
     scale.x = 0x40;
     scale.y = 0x80;
