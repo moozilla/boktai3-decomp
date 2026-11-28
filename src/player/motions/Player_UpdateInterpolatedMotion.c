@@ -14,15 +14,11 @@ static inline s32 ScaleStep(s32 value)
     s32 result = scale8(value);
     return result;
 }
-static inline void SetMotionSize(struct Player *p)
-{
-    p->actionEighteenParameter = 500;
-}
 void Player_UpdateInterpolatedMotion(struct Player *p)
 {
     if (Player_ConsumeStateEntry(p))
         p->movementStart = p->position;
-    SetMotionSize(p);
+    p->actionEighteenParameter = 500;
     p->actionEighteenDuration = 32;
     Player_SetStatusBits(&p->statusFlags, 0x1100);
     Player_AddControlFlags(p, 8);

@@ -631,3 +631,5 @@ src/player/motions/Player_OnChargeMotionExit.c	Player_OnChargeMotionExit	natural
 src/player/motions/Player_UpdateChargeMotion.c	Player_UpdateChargeMotion	natural	natural	0	-
 src/player/motions/Player_UpdateCountdownAnimation.c	Player_UpdateCountdownAnimation	natural	natural	0	-
 src/player/motions/sub_08144F40.c	sub_08144F40	minor	natural	2	-
+src/player/motions/Player_UpdateFallPose.c	Player_UpdateFallPose	minor	minor	1	Player_SetStatusBits: ROM loads the mask before the status word
+src/player/motions/Player_UpdateInterpolatedMotion.c	Player_UpdateInterpolatedMotion	contrived	contrived	6	duration/elapsed pointer temps, ScaleStep wrapper and separate z step fix the register allocation
