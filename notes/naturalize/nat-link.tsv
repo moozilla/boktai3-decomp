@@ -317,3 +317,9 @@ src/link/records/link_record_panel.c	LinkRecordPanel_InitializePreviews	minor	mi
 src/link/records/link_record_panel.c	LinkRecordPanel_HideDisplay	natural	natural	0	
 src/link/records/link_record_panel.c	LinkRecordPanel_RemoveWidgets	minor	natural	1	
 src/link/records/link_record_panel.c	LinkRecordPanel_UpdateDelay	contrived	natural	5	
+src/link/records/link_record_panel.c	LinkRecordPanel_ShowDialogue	natural	natural	0	
+src/link/records/link_record_panel.c	LinkRecordPanel_OnIdle	natural	natural	0	
+src/link/records/link_record_panel.c	LinkRecordPanel_RunExitScript	natural	natural	0	
+src/link/records/link_record_panel.c	LinkRecordPanel_RunCompletionScript	natural	natural	0	
+src/link/records/link_record_panel.c	LinkRecordPanel_UpdateExit	natural	natural	0	
+src/link/records/link_record_panel.c	LinkRecordPanel_InitializeFromScript	minor	minor	6	SetUpdate and clamp inlines stay: plain stores reorder the constants

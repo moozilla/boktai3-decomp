@@ -394,7 +394,6 @@ s32 LinkRecordPanel_Destroy(struct LinkRecordPanel *owner)
 s32 LinkRecordPanel_InitializeFromScript(struct LinkRecordPanel *owner)
 {
     u8 *count;
-    s32 selection;
 
     if (Script_SeekToKeyword('s')) {
         owner->sourceScript = (u32)Script_GetTextSourcePc();
@@ -416,10 +415,7 @@ s32 LinkRecordPanel_InitializeFromScript(struct LinkRecordPanel *owner)
     if (!count)
         return -1;
     owner->selection = *count;
-    selection = PanelSequence_ClampSelectionCount(owner->selection, 0, 10);
-    {
-        owner->selection = selection;
-    }
+    owner->selection = PanelSequence_ClampSelectionCount(owner->selection, 0, 10);
     Bg_ClearTilemap(3);
     Bg_ClearTilemap(2);
     Bg_ClearTilemap(1);
