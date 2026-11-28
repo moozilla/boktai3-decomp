@@ -1,24 +1,12 @@
 #include "ui/town/shop_actions.h"
 #include "system/game_state/game_state.h"
-struct ShopOwnedConsumables {
-    u8 unknown0[0x160];
-    s16 id;
-};
 s32 Shop_FindConsumableAssignment(u32);
 void Shop_BeginConsumableSwapPair(struct ShopActionView *panel)
 {
     struct SceneInputPosition starts[2], targets[2];
     u32 enabled[2], frames[2], attributes[2];
-    s32 i = 0;
-    struct SceneInputPosition *targetBase;
-    u32 *enabledBase;
-    u32 *frameBase;
-    u32 *attributeBase;
-    enabledBase = enabled;
-    frameBase = frames;
-    attributeBase = attributes;
-    targetBase = targets;
-    for (; i < 2; i++) {
+    s32 i;
+    for (i = 0; i < 2; i++) {
         u32 slot;
         s32 id, assigned;
         if (i == 0)
@@ -28,14 +16,8 @@ void Shop_BeginConsumableSwapPair(struct ShopActionView *panel)
         ((struct ShopActionFlagsView *)panel)->widgets[slot + 5].flags |= 1;
         assigned = Shop_FindConsumableAssignment(slot);
         if (assigned >= 0)
-            ((struct ShopActionFlagsView *)panel)->widgets[assigned + 0x29].flags |= 1;
-        {
-            u32 address = slot;
-            struct GameState *game = gGameState;
-            address <<= 1;
-            address += (u32)game;
-            id = ((struct ShopOwnedConsumables *)address)->id;
-        }
+            ((struct ShopActionFlagsView *)panel)->widgets[assigned + 41].flags |= 1;
+        id = *(slot + gGameState->table160);
         if (id >= 0) {
             enabled[i] = 1;
             frames[i] = id + 0x121;
@@ -47,8 +29,8 @@ void Shop_BeginConsumableSwapPair(struct ShopActionView *panel)
         SceneInput_GetGridPosition(&starts[i], slot);
     }
     for (i = 0; i < 2; i++)
-        targetBase[i] = starts[1 - i];
-    SceneInput_BeginPairTransition(&((struct ShopTransitionView *)panel)->pair,
-                                   enabledBase, starts, targetBase, frameBase, attributeBase, 12);
+        targets[i] = starts[1 - i];
+    SceneInput_BeginPairTransition(&((struct ShopTransitionView *)panel)->pair, enabled, starts,
+                                   targets, frames, attributes, 12);
     Sound_PlaySong(0x38A);
 }
