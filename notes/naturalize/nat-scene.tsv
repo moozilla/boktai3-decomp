@@ -312,3 +312,4 @@ src/scene/actor/control/SceneActorControl_ConvergeSavedMotion.c	SceneActorContro
 src/scene/actor/control/SceneActorControl_CompleteScriptedResponse.c	SceneActorControl_CompleteScriptedResponse	contrived	contrived	0	parked masks and collider pointer blocks: plain |= and & tests load the field before the mask
 src/scene/actor/control/SceneActorControl_BeginSavedHeadingPhase.c	SceneActorControl_BeginSavedHeadingPhase	minor	minor	0	take-state-entry accessor then plain stores
 src/scene/actor/control/SceneActorControl_UpdatePersistentPhase.c	SceneActorControl_UpdatePersistentPhase	contrived	minor	2	contactQuery.opaque cast to a predicate: the field has no function type
+src/scene/actor/control/SceneActorControl_UpdateShadowReturnPhase.c	SceneActorControl_UpdateShadowReturnPhase	contrived	minor	3	status flag pointer block: plain &= loads the field before the mask

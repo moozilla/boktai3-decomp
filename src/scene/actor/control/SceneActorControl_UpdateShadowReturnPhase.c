@@ -1,3 +1,4 @@
+#include "engine/math/math_shift.h"
 #include "scene/motion/scene_actor_terrain_reaction.h"
 #include "scene/actor/scene_actor_control_phase.h"
 #include "scene/actor/scene_actor_reaction.h"
@@ -5,18 +6,11 @@ extern const s16 gUnk_086149C4[];
 void SceneActorControl_UpdateShadowReturn(struct ChaseActor *);
 void SceneActorControl_RestartPositionCurve(struct ChaseActor *);
 
-static inline s32 ScaleMotionComponent(s32 n)
-{
-    if (n >= 0)
-        return n >> 12;
-    return -((-n) >> 12);
-}
-
 static inline void SetPolarMotion(struct ContactPosition *m, u32 angle, s32 radius)
 {
-    m->x = ScaleMotionComponent(gUnk_086149C4[(angle + 0x40) & 0xFF] * radius);
+    m->x = Math_ShiftTowardZero(gUnk_086149C4[(angle + 0x40) & 0xFF] * radius, 12);
     m->y = 0;
-    m->z = ScaleMotionComponent(gUnk_086149C4[angle] * radius);
+    m->z = Math_ShiftTowardZero(gUnk_086149C4[angle] * radius, 12);
 }
 
 void SceneActorControl_UpdateShadowReturnPhase(struct ChaseActor *actor)
