@@ -24,38 +24,8 @@ static inline void setState(struct SceneNpc *npc, u32 sub)
 static inline void setFacing(struct SceneNpc *npc, u32 a)
 {
     npc->body.direction = a;
-    {
-        s32 t = (s32)(a + 0x70) >> 5;
-        u32 m = 7;
-        m &= t;
-        npc->facing8 = m;
-    }
-    {
-        s32 t = (s32)(a + 0x60) >> 6;
-        u32 m = 3;
-        m &= t;
-        npc->facing4 = m;
-    }
-}
-
-static inline u32 setInitialFacing(struct SceneNpc *npc, u32 input)
-{
-    u8 angle = input;
-    u8 *dest;
-    u32 zero;
-    dest = &npc->body.direction;
-    zero = 0;
-    *dest = angle;
-    npc->facing8 = SceneFacing_EightWay(input);
-    npc->facing4 = SceneFacing_FourWay(input);
-    return zero;
-}
-static inline void setInitialState(struct SceneNpc *npc, u32 state, u32 zero)
-{
-    npc->stage = zero;
-    npc->stageEntered = zero;
-    npc->state = state;
-    npc->timer = zero;
+    npc->facing8 = SceneFacing_EightWay(a);
+    npc->facing4 = SceneFacing_FourWay(a);
 }
 
 static inline void aim(struct SceneNpc *npc, s16 *m)
@@ -101,17 +71,17 @@ void SceneNpc_DispatchCutsceneCommands(struct SceneNpc *npc)
                     npc->commandEntered = 1;
                 } break;
                 case 1: {
-                    u32 zero = setInitialFacing(npc, (u8)((((u8 *)m)[8] + 5) << 5));
+                    setFacing(npc, (u8)((((u8 *)m)[8] + 5) << 5));
                     if (npc->kind == 29) {
                         if (npc->effects.tag == 1) {
-                            setInitialState(npc, 93, zero);
+                            setState(npc, 93);
                             npc->commandEntered = 1;
                         } else {
-                            setInitialState(npc, 1, zero);
+                            setState(npc, 1);
                             npc->commandEntered = 1;
                         }
                     } else {
-                        setInitialState(npc, 1, zero);
+                        setState(npc, 1);
                         npc->commandEntered = 1;
                     }
                 } break;
@@ -366,8 +336,8 @@ void SceneNpc_DispatchCutsceneCommands(struct SceneNpc *npc)
                     npc->commandEntered = 1;
                 } break;
                 case 93: {
-                    u32 zero = setInitialFacing(npc, (u8)((((u8 *)m)[8] + 5) << 5));
-                    setInitialState(npc, 83, zero);
+                    setFacing(npc, (u8)((((u8 *)m)[8] + 5) << 5));
+                    setState(npc, 83);
                     npc->commandEntered = 1;
                 } break;
                 case 94: {
@@ -379,8 +349,8 @@ void SceneNpc_DispatchCutsceneCommands(struct SceneNpc *npc)
                     npc->commandEntered = 1;
                 } break;
                 case 96: {
-                    u32 zero = setInitialFacing(npc, (u8)((((u8 *)m)[8] + 5) << 5));
-                    setInitialState(npc, 86, zero);
+                    setFacing(npc, (u8)((((u8 *)m)[8] + 5) << 5));
+                    setState(npc, 86);
                     npc->commandEntered = 1;
                 } break;
                 case 97: {
