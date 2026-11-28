@@ -671,3 +671,4 @@ src/script/runtime/sub_082254C8.c	sub_082254C8	minor	minor	1	id tested twice: if
 src/minigames/result_game/ResultMenu_SetPhase.c	ResultMenu_SetPhase	contrived	natural	1	
 src/minigames/result_game/ResultMenu_IsPhaseStart.c	ResultMenu_IsPhaseStart	contrived	natural	2	
 src/minigames/result_game/TransformMarker_SetTypeFromTable.c	TransformMarker_SetTypeFromTable	minor	natural	1	
+src/minigames/result_game/TransformMarker_ClearVector.c	TransformMarker_ClearVector	minor	natural	1	

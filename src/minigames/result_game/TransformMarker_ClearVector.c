@@ -1,12 +1,13 @@
-#include "global.h"
-void TransformMarker_ClearVector(u8 *p)
+#include "scene/scene_value_equipment.h"
+
+void TransformMarker_ClearVector(struct SceneValueEquipment *entry)
 {
-    p[4] = 0;
-    p[5] = 0;
-    p[6] = 0;
-    p[7] = 0;
-    p[8] = 0;
-    p[9] = 0;
-    p[10] = 0;
-    p[11] = 0;
+    entry->modifierA = 0;
+    entry->unknown5[0] = 0;
+    entry->unknown5[1] = 0;
+    entry->unknown5[2] = 0;
+    entry->modifierB = 0;
+    entry->unknown9[0] = 0;
+    entry->unknown9[1] = 0;
+    entry->unknown9[2] = 0;
 }
