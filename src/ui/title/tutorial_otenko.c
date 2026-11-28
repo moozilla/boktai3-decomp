@@ -1620,9 +1620,6 @@ void TutorialOtenko_UpdateFadeAnimation(struct ActorAnimController *p)
 
 void TutorialOtenko_UpdateReverseFadeAnimation(struct ActorAnimController *p)
 {
-    struct DisplaySequenceSprite *o;
-    struct DisplaySequenceState *a;
-    u8 done;
     if (take(p)) {
         p->state = 19;
         Anim_SetSequence(&p->anim, p->arg, 19, 0, 0);
@@ -1631,10 +1628,7 @@ void TutorialOtenko_UpdateReverseFadeAnimation(struct ActorAnimController *p)
     }
     if (p->previous)
         p->previous(p);
-    o = &p->obj;
-    a = &p->anim;
-    done = DisplaySequence_StepSprite(o, a);
-    p->done = done;
+    p->done = DisplaySequence_StepSprite(&p->obj, &p->anim);
 }
 
 /* Tentative role: initialize and advance an animation with a previous-state callback.
