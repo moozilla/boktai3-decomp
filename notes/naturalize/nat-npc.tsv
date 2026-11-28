@@ -179,3 +179,4 @@ src/npc/story_character/StoryCharacter_SpawnRaisedEffect.c	StoryCharacter_SpawnR
 src/npc/story_character/StoryCharacter_RunPaletteFlashSequence.c	StoryCharacter_RunPaletteFlashSequence	contrived	natural	2	
 src/npc/story_character/StoryCharacter_StartAndMaybeFinishAnim.c	StoryCharacter_StartAndMaybeFinishAnim	contrived	natural	2	
 src/npc/story_character/StoryCharacter_UpdateDescendingDash.c	StoryCharacter_UpdateDescendingDash	contrived	contrived	3	parked flags mask and ground-position pointer stay: ROM materializes the mask first and keeps the address; local Npc view
+src/npc/story_character/sub_081C8FB0.c	sub_081C8FB0	contrived	natural	3	
