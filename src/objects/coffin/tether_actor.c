@@ -136,27 +136,6 @@ static inline s32 truncateShift(s32 value, u32 shift)
     return -(-value >> shift);
 }
 
-static inline s32 cosine(s32 angle, s32 radius)
-{
-    s32 sample = gUnk_086149C4[(angle + 64) & 255];
-    s32 product;
-    product = radius;
-    product *= sample;
-    {
-        s32 result = truncateShift(product, 12);
-        return result;
-    }
-}
-
-static inline s32 sine(s32 angle, s32 radius)
-{
-    s32 sample = gUnk_086149C4[angle & 255];
-    s32 product;
-    product = radius;
-    product *= sample;
-    return truncateShift(product, 12);
-}
-
 static inline s32 absolute_0804BB30(s32 value)
 {
     if (value < 0)
@@ -2183,37 +2162,19 @@ void TetherActor_BlockPlayerAcrossTerrain(struct TetherActor *actor)
     }
 }
 
-static inline s32 TetherActor_Cosine70(s32 angle)
-{
-    s32 result = truncateShift(gUnk_086149C4[(angle + 64) & 255] * 70, 12);
-    return result;
-}
-
-static inline s32 TetherActor_Sine70(s32 angle)
-{
-    s32 result = truncateShift(gUnk_086149C4[angle & 255] * 70, 12);
-    return result;
-}
-
-static inline s32 TetherActor_Cosine150(s32 angle)
-{
-    s32 result = truncateShift(gUnk_086149C4[(angle + 64) & 255] * 150, 12);
-    return result;
-}
-
 void TetherActor_LimitPlayerDistance(struct TetherActor *actor)
 {
     s32 angle = (((*gPlayers)->facing + 1) & 7) << 5;
-    s32 offsetX = TetherActor_Cosine70(angle);
-    s32 offsetZ = TetherActor_Sine70(angle);
+    s32 offsetX = scaleOffsetR(gUnk_086149C4[(angle + 64) & 255] * 70);
+    s32 offsetZ = scaleOffsetR(gUnk_086149C4[angle & 255] * 70);
     s32 dx = (*gPlayers)->position.x + offsetX - actor->position.x;
     s32 dz = (*gPlayers)->position.z + offsetZ - actor->position.z;
     if (dx * dx + dz * dz > 22500) {
         s32 radialZ, targetX, targetZ;
         angle = Math_Atan2(dx, dz);
         /* The radial X offset reuses dx's register. */
-        dx = TetherActor_Cosine150(angle);
-        radialZ = truncateShift(gUnk_086149C4[angle & 255] * 150, 12);
+        dx = scaleOffsetR(gUnk_086149C4[(angle + 64) & 255] * 150);
+        radialZ = scaleOffsetR(gUnk_086149C4[angle & 255] * 150);
         targetX = actor->position.x - offsetX + dx;
         targetZ = actor->position.z - offsetZ + radialZ;
         (*gPlayers)->position.x = truncateShift((*gPlayers)->position.x * 3 + targetX, 2);
