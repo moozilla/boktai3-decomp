@@ -159,3 +159,4 @@ src/bosses/ratatosk/OverlaySlot_InitializeExtended.c	OverlaySlot_InitializeExten
 src/bosses/ratatosk/Ratatosk_ReleaseAnimatedParticle.c	Ratatosk_ReleaseAnimatedParticle	natural	natural	0	
 src/bosses/ratatosk/Ratatosk_UpdateAnimatedParticlePool.c	Ratatosk_UpdateAnimatedParticlePool	contrived	minor	2	Scale/ClearFlags helpers, position pointers and two-step negate stay (register allocation)
 src/bosses/ratatosk/Ratatosk_OnAnimatedParticlePoolDestroy.c	Ratatosk_OnAnimatedParticlePoolDestroy	contrived	natural	2	
+src/bosses/ratatosk/Ratatosk_InitAnimatedParticlePool.c	Ratatosk_InitAnimatedParticlePool	contrived	natural	2	
