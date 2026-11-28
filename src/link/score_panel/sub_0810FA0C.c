@@ -1,10 +1,11 @@
 #include "global.h"
+#include "ui/save/save_menu.h"
 void TextWindow_Clear(u32);
 
-void sub_0810FA0C(u8 *p)
+void sub_0810FA0C(struct SaveMenu *menu)
 {
-    u32 *windows = (u32 *)(p + 0x1004);
+    s32 *windows = &menu->nameWindow;
     s32 i;
-    for (i = 7; i >= 0; i--)
-        TextWindow_Clear(*windows++);
+    for (i = 0; i < 8; i++)
+        TextWindow_Clear(windows[i]);
 }

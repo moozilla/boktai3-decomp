@@ -339,3 +339,4 @@ src/link/records/sub_0810D760.c	sub_0810D760	contrived	contrived	10	q = p copy s
 src/link/score_panel/LinkScorePanel_LoadBackground.c	LinkScorePanel_LoadBackground	contrived	natural	1	
 src/link/score_panel/LinkScorePanel_CreateTextWindows.c	LinkScorePanel_CreateTextWindows	contrived	natural	1	names SaveMenu.nameWindow at 0x1004
 src/link/score_panel/LinkScorePanel_RefreshPlayerName.c	LinkScorePanel_RefreshPlayerName	contrived	minor	3	validSelection goto inline stays
+src/link/score_panel/sub_0810FA0C.c	sub_0810FA0C	contrived	minor	1	pointer spans nameWindow and windows[7]
