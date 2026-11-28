@@ -1,7 +1,5 @@
 #include "global.h"
 #include "engine/ram.h"
-#define ActionFlash_RemoveSprites ActionFlashBurst_RemovePrimarySprites
-#define ActionFlash_RemoveEffects RadialBurstEffect_RemoveParticles
 /* Tentative family name; fields are named by their observed use. */
 struct ParticleEffect {
     u8 pad[0x19];

@@ -498,3 +498,4 @@ src/player/cutscene/player_cue_dispatch.c	Player_UpdateColliderRefreshCountdown	
 src/player/cutscene/player_cue_dispatch.c	PlayerCue_ApplyColliderScale	minor	minor	0	unchanged: flag accessor helpers (mask loaded before the flag word)
 src/player/effects/action_flash/ActionFlashBurst_RemoveGlowSprite.c	ActionFlashBurst_RemoveGlowSprite	contrived	natural	1	-
 src/player/effects/action_flash/ActionFlashBurst_RemovePrimarySprites.c	ActionFlashBurst_RemovePrimarySprites	contrived	natural	1	-
+src/player/effects/action_flash/ActionFlash_Destroy.c	ActionFlash_Destroy	minor	natural	1	-
