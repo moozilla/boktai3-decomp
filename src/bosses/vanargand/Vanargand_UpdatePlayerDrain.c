@@ -31,8 +31,7 @@ static inline void SetPosition(struct SceneVec *out, s32 x, s32 y, s32 z)
     out->y = y;
     out->z = z;
 }
-static inline void AddPosition(struct SceneVec *out, struct SceneVec *a,
-                               struct SceneVec *b)
+static inline void AddPosition(struct SceneVec *out, struct SceneVec *a, struct SceneVec *b)
 {
     out->x = b->x + a->x;
     out->y = b->y + a->y;
@@ -44,7 +43,6 @@ void Vanargand_UpdatePlayerDrain(struct VanargandPairAttack *p)
     struct VanargandPairAttack *self = p;
     struct SceneVec initial;
     struct SceneVec position;
-    struct SceneVec *initialBase;
     VanargandPairAttack_SetFlags(p, 12);
     Vanargand_SetPendingCue(p, 1);
     if (p->pending) {
@@ -52,8 +50,7 @@ void Vanargand_UpdatePlayerDrain(struct VanargandPairAttack *p)
         struct Player *target;
         p->pending = 0;
         SetPosition(&initial, 128, 0, 128);
-        initialBase = &initial;
-        AddPosition(&initial, &p->position, initialBase);
+        AddPosition(&initial, &p->position, &initial);
         target = gPlayers[0];
         one = 1;
         if (!TestFlags(&target->statusFlags, 0x40000)) {
