@@ -399,7 +399,7 @@ void ScriptUtility_SetControlFlag(u8);
 
 void TutorialOtenko_SetInteractionControlFlag(u8 *p)
 {
-    ScriptUtility_SetControlFlag(*(u8 *)(p + 0xF6A));
+    ScriptUtility_SetControlFlag(((struct ActorAnimController *)p)->option);
 }
 
 void TutorialOtenko_RestoreSavedAnimationPlayback(u8 *p)

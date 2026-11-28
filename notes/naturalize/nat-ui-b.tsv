@@ -248,3 +248,4 @@ src/ui/title/tutorial_otenko.c	TutorialOtenkoPalette_UpdateReverseFade	natural	n
 src/ui/title/tutorial_otenko.c	TutorialOtenko_ProjectAndClampToScreen	natural	natural	0	
 src/ui/title/tutorial_otenko.c	TutorialOtenko_TryInteraction	contrived	minor	22	fn local per callback assignment (constant loaded before the field address); u8 one for the child flag (shared constant register)
 src/ui/title/tutorial_otenko.c	TutorialOtenko_SelectNearestInteraction	contrived	minor	15	offset arithmetic for the best-distance compare (address base added before the scaled index); timer pointer and old-timer local (register allocation)
+src/ui/title/tutorial_otenko.c	TutorialOtenko_SetInteractionControlFlag	contrived	minor	1	u8 * parameter kept (callers pass bytes)
