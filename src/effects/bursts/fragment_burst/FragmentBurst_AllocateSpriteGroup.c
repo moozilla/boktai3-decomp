@@ -1,16 +1,12 @@
-#include "global.h"
+#include "effects/bursts/fragment_burst.h"
 
-struct Unk0812876C {
-    u32 unk0;
-};
+struct FragmentBurst *FragmentBurst_AllocateSlot(struct FragmentBurstPool *);
 
-struct Unk0812876C *FragmentBurst_AllocateSlot(void *);
-
-// &p->unk0 == p, but agbcc keeps the null test for the address expression
-u32 *FragmentBurst_AllocateSpriteGroup(void *pool)
+struct FragmentBurst *FragmentBurst_AllocateSpriteGroup(struct FragmentBurstPool *pool)
 {
-    struct Unk0812876C *p = FragmentBurst_AllocateSlot(pool);
-    if (!p)
+    struct FragmentBurst *burst = FragmentBurst_AllocateSlot(pool);
+
+    if (!burst)
         return NULL;
-    return &p->unk0;
+    return burst;
 }
