@@ -139,6 +139,12 @@ static inline void addPosition(struct ContactPosition *d, struct ContactPosition
     d->z = d->z + s->z;
 }
 
+static inline int BatFlock_AngleTo(const struct ContactPosition *from,
+                                   const struct ContactPosition *to)
+{
+    return Math_Atan2(to->x - from->x, to->z - from->z);
+}
+
 static inline void BatFlock_BlendPalette(struct GroupObjects *m, int weight)
 {
     u8 *from = gPaletteBankData + 0x5A60;
@@ -431,12 +437,6 @@ void BatFlockBat_Launch(struct GroupObjects *m, struct GroupPiece *p, int delay)
     p->timer++;
 }
 
-static inline int BatFlock_AngleTo(const struct ContactPosition *from,
-                                   const struct ContactPosition *to)
-{
-    return Math_Atan2(to->x - from->x, to->z - from->z);
-}
-
 void BatFlockBat_Wander(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
     struct ContactPosition delta;
@@ -666,11 +666,12 @@ void BatFlockBat_HomeToTarget(struct GroupObjects *m, struct GroupPiece *p, int 
     struct ContactPosition delta;
     struct ContactPosition *position;
     int dx, dz;
-    int active = p->active;
-    if (active) {
+
+    if (p->active) {
         const u16 *table;
+
         p->active = 0;
-        p->direction = Math_Atan2(p->target.x - p->position.x, p->target.z - p->position.z);
+        p->direction = BatFlock_AngleTo(&p->position, &p->target);
         table = gRandomTable;
         p->direction += (randomWith(table) & 31) - 16;
         p->speed = (randomWith(table) & 15) + 16;
@@ -678,22 +679,24 @@ void BatFlockBat_HomeToTarget(struct GroupObjects *m, struct GroupPiece *p, int 
     position = &p->position;
     dx = p->target.x - p->position.x;
     dz = p->target.z - position->z;
-    if (dx * dx + dz * dz <= 0x9C3F) {
+    if (dx * dx + dz * dz < 200 * 200) {
         BatFlockBat_SetState(p, 2);
-    } else {
-        if (p->speed == 0) {
-            const u16 *table;
-            p->direction = Math_Atan2(dx, dz);
-            table = gRandomTable;
-            p->direction += (randomWith(table) & 31) - 16;
-            p->speed = (randomWith(table) & 31) + 32;
-        } else
-            p->speed--;
-        polar(&delta, p->direction, p->duration);
-        addPositionN(&p->position, &delta);
-        BatFlockBat_SetFacingAnim(m, p, 0);
-        p->timer++;
+        return;
     }
+    if (p->speed == 0) {
+        const u16 *table;
+
+        p->direction = Math_Atan2(dx, dz);
+        table = gRandomTable;
+        p->direction += (randomWith(table) & 31) - 16;
+        p->speed = (randomWith(table) & 31) + 32;
+    } else {
+        p->speed--;
+    }
+    polar(&delta, p->direction, p->duration);
+    addPosition(&p->position, &delta);
+    BatFlockBat_SetFacingAnim(m, p, 0);
+    p->timer++;
 }
 
 int BatFlock_Update(struct GroupObjects *m)

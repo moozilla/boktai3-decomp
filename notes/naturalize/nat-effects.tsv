@@ -11,3 +11,4 @@ src/effects/bat_flock.c	BatFlockBats_DispatchCommands	minor	natural	6
 src/effects/bat_flock.c	BatFlockBat_Wander	contrived	contrived	35	four nested do/while(0) around the table load: constant-address pseudos get half priority, so table needs the loop-depth weight
 src/effects/bat_flock.c	BatFlockBat_ApproachTarget	contrived	minor	6	one position pointer for the dz read (ROM keeps &p->position in r7)
 src/effects/bat_flock.c	BatFlockBat_ConvergeOnTarget	contrived	minor	1	one position pointer for the dz read
+src/effects/bat_flock.c	BatFlockBat_HomeToTarget	contrived	minor	2	one position pointer for the dz read
