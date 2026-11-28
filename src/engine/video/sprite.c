@@ -673,10 +673,7 @@ void Sprite_RenderUnflippedList(void)
 {
     struct ContactPosition pos;
     struct DisplaySequenceSprite *p;
-    u32 parity = gSceneEffectPalettePhase & 1;
-    u32 skip = 0x401;
-    if (parity)
-        skip = 0x201;
+    u32 skip = (gSceneEffectPalettePhase & 1) ? 0x201 : 0x401;
     p = gSpriteListHeads[gRenderListIndex];
     if (!p)
         return;
