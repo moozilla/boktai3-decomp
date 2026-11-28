@@ -550,3 +550,4 @@ src/system/inventory/Inventory_RemoveItemFromScript.c	Inventory_RemoveItemFromSc
 src/system/inventory/Inventory_HasItemFromScript.c	Inventory_HasItemFromScript	minor	natural	1	
 src/system/inventory/Inventory_RemoveAllItemsOfKindFromScript.c	Inventory_RemoveAllItemsOfKindFromScript	contrived	natural	1	
 src/system/inventory/sub_0822D080.c	sub_0822D080	contrived	minor	1	array indexed as *(i + field) for the index-first address sum; one local carries the id and then the state
+src/system/inventory/Inventory_SortConsumables.c	Inventory_SortConsumables	contrived	natural	1	
