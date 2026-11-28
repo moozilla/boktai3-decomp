@@ -253,13 +253,12 @@ extern void (*const gUnk_086059D4[])(struct DamageNumberDisplay *, struct Damage
 s32 DamageNumberDisplay_Update(struct DamageNumberDisplay *display)
 {
     struct DamageNumberGroup *group = display->groups;
-    s32 index = 0;
-    do {
-        if (DamageNumberDisplay_GetActiveBit(display, index))
-            sub_08249244(display, group, index, (void *)gUnk_086059D4[group->phase]);
-        ++index;
-        ++group;
-    } while (index <= 3);
+    s32 i;
+
+    for (i = 0; i < 4; i++, group++) {
+        if (DamageNumberDisplay_GetActiveBit(display, i))
+            sub_08249244(display, group, i, (void *)gUnk_086059D4[group->phase]);
+    }
     return 0;
 }
 
