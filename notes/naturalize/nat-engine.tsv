@@ -725,3 +725,4 @@ src/system/solar/Solar_CaptureBaseline.c	Solar_CaptureBaseline	contrived	natural
 src/system/solar/Solar_PauseMeasurement.c	Solar_PauseMeasurement	contrived	natural	1	
 src/system/solar/Solar_ResumeMeasurement.c	Solar_ResumeMeasurement	contrived	natural	1	
 src/system/solar/Solar_GetLevel.c	Solar_GetLevel	contrived	natural	1	
+src/system/solar/Solar_ApplyIntensityModifiers.c	Solar_ApplyIntensityModifiers	contrived	minor	1	mode test stays a local inline

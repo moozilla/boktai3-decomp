@@ -1,8 +1,9 @@
 #include "global.h"
+#include "system/game_state/game_state.h"
 #include "engine/ram.h"
 #include "engine/engine_globals.h"
 #include "player/player.h"
-extern u8 *gGameState;
+#include "player/player_slot_status.h"
 s32 Solar_GetLevelForIntensity(s32);
 s32 Solar_GetLevelUpperBound(s32);
 s32 Solar_GetLevelLowerBound(s32);
@@ -18,20 +19,18 @@ s32 Solar_ApplyIntensityModifiers(s32 v)
 {
     if (gEngineFlags & 0x800)
         return v;
-    if ((*(u8 **)gPlayers)) {
-        u32 *flags = (u32 *)((*(u8 **)gPlayers) + 0x444);
-        u32 bit = 0x40000;
-        if (*flags & bit) {
+    if (gPlayers[0]) {
+        if (Player_ReadStatusBits(&gPlayers[0]->statBonusFlags, 0x40000)) {
             s32 band = Solar_GetLevelForIntensity(v) * 2;
             if (band > 10)
                 band = 10;
             v = Solar_GetLevelUpperBound(band);
         }
     }
-    if (*(s16 *)(gGameState + 0x610)) {
+    if (gGameState->unk610) {
         if (Solar_GetLevelForIntensity(v) <= 1)
             v = Solar_GetLevelLowerBound(2);
-    } else if (*(s16 *)(gGameState + 0x612)) {
+    } else if (gGameState->unk612) {
         if (Solar_GetLevelForIntensity(v) > 2)
             v = Solar_GetLevelUpperBound(2);
     }
