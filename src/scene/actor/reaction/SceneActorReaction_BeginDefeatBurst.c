@@ -1,3 +1,4 @@
+#include "scene/motion/scene_actor_terrain_reaction.h"
 #include "scene/collision/scene_actor_damage_visibility.h"
 #include "global.h"
 // confidence=low: emits a defeat burst, runs the optional script and restores idle control.
@@ -98,14 +99,9 @@ void SceneActorReaction_BeginDefeatBurst(struct ChaseActor *actor)
     {
         SceneActorReaction_ResetRouteControl(actor, &group->control);
         {
-            struct ContactCollider *collider;
-
-            collider = &actor->base.colliderA;
+            struct ContactCollider *collider = &actor->base.colliderA;
             collider->flags = 4 | collider->flags;
-            {
-                u16 *field = &collider->responseValue;
-                *field = 0;
-            }
+            collider->responseValue = 0;
             actor->base.attachmentTimer = 0;
         }
     }
