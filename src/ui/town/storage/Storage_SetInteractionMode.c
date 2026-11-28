@@ -1,6 +1,7 @@
 #include "global.h"
+#include "ui/town/storage_screen.h"
 
-void Storage_SetInteractionMode(u8 *p, u8 v)
+void Storage_SetInteractionMode(struct StorageScreen *screen, u8 interactionMode)
 {
-    p[0x174c] = v;
+    screen->interactionMode = interactionMode;
 }
