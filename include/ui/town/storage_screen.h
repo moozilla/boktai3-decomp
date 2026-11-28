@@ -14,7 +14,7 @@ struct StorageScreen {
     struct SceneInputPair markers, glyphs;
     const void *text; /* message table */
     u8 unknown1744[8];
-    u8 interactionMode, unknown174D;
+    u8 interactionMode, choiceState;
     u16 timer;
     u32 mode;
     u8 category, categoryCount, emptyCarried;
@@ -23,16 +23,21 @@ struct StorageScreen {
     u8 gridKind, cursorX, cursorY, selection, savedX, savedY, savedSelection;
     u8 unknown1767[0x29];
     u8 slots[32];
-    u8 unknown17B0[0x18];
+    u8 unknown17B0[0x14];
+    u8 choiceRepeat;
+    u8 unknown17C5[3];
     u16 cursorPalette[16];
-    u8 unknown17E8[8];
+    u8 paletteFrame;
+    u8 unknown17E9[3];
+    u32 completionScript;
     u32 updateCallback;
     u32 state;
 };
 
-/* The message tables overlap the end of the glyph pair. */
+/* The background, palette and message table pointers overlap the end of the glyph pair. */
 struct StorageTextView {
-    u8 unknown0[0x1734];
+    u8 unknown0[0x172C];
+    void *background, *paletteResource;
     const void *itemText, *equipmentText, *consumableText;
 };
 

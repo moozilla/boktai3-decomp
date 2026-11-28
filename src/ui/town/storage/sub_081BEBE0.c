@@ -21,7 +21,7 @@ void sub_081BEBE0(struct StorageScreen *screen)
         screen->indicators[4].flags |= 1;
         Sound_PlaySong(0x107);
         MenuPanel_ShowDescription(screen, 2, ((struct StorageTextView *)screen)->itemText, -1);
-        SceneInput_BeginChoice(&screen->controls[6], &screen->commonResource, &screen->unknown174D,
+        SceneInput_BeginChoice(&screen->controls[6], &screen->commonResource, &screen->choiceState,
                                0, 0);
         Storage_SetState(screen, Storage_UpdateCategoryConfirmation, 0);
     }
