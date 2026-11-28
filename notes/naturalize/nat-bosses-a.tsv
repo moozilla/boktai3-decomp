@@ -119,3 +119,4 @@ src/bosses/count/SceneActors_UpdateSpecialPose.c	SceneActors_UpdateSpecialPose	m
 src/bosses/count/SceneActors_UpdateAnchoredReaction.c	SceneActors_UpdateAnchoredReaction	contrived	natural	1	
 src/bosses/count/SceneActors_UpdateUnmirroredReaction.c	SceneActors_UpdateUnmirroredReaction	contrived	natural	1	
 src/bosses/count/SceneActors_UpdateSwarmAttack.c	SceneActors_UpdateSwarmAttack	minor	natural	1	
+src/bosses/count/SceneActors_UpdateBlinkReaction.c	SceneActors_UpdateBlinkReaction	contrived	minor	3	two identical flag-setting branches (agbcc does not merge them; || shares one)
