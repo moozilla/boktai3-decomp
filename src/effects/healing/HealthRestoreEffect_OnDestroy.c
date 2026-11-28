@@ -1,24 +1,12 @@
-#include "global.h"
+#include "effects/healing/healing_effect.h"
+#include "engine/engine.h"
 
-struct E {
-    u8 pad[0x3C];
-};
-struct S {
-    u8 pad[0x8C];
-    struct E e[8];
-};
-void Anim_Remove(u8 *);
-void Effect_Remove(struct E *);
-
-s32 HealthRestoreEffect_OnDestroy(struct S *p)
+s32 HealthRestoreEffect_OnDestroy(struct HealthRestoreEffect *effect)
 {
-    struct E *e;
     s32 i;
-    Anim_Remove((u8 *)p + 0x1C);
-    e = p->e;
-    for (i = 7; i >= 0; i--) {
-        Effect_Remove(e);
-        e++;
-    }
+
+    Anim_Remove(&effect->icon);
+    for (i = 0; i < 8; i++)
+        Effect_Remove(&effect->particles[i]);
     return 0;
 }

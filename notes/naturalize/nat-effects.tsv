@@ -236,3 +236,4 @@ src/effects/healing/HealthRestoreEffect_UpdateRestoration.c	HealthRestoreEffect_
 src/effects/healing/HealthRestoreEffect_UpdateShake.c	HealthRestoreEffect_UpdateShake	contrived	natural	4	
 src/effects/healing/sub_08234DC8.c	sub_08234DC8	contrived	natural	8	
 src/effects/healing/HealthRestoreEffect_OnUpdate.c	HealthRestoreEffect_OnUpdate	minor	natural	2	
+src/effects/healing/HealthRestoreEffect_OnDestroy.c	HealthRestoreEffect_OnDestroy	minor	natural	2	
