@@ -590,10 +590,7 @@ void Golem_OnAttackCollision(struct ContactCollider *self, struct ContactCollide
                 RecordContact(a, other);
                 AddImpact(state);
                 other->responseFlags |= 1;
-                {
-                    u16 id = other->collisionId;
-                    state->pendingEvent = id;
-                }
+                state->pendingEvent = other->collisionId;
             } else {
                 struct Player *player;
                 if (Coop()) {

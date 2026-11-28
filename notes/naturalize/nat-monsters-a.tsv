@@ -235,3 +235,4 @@ src/monsters/golem/golem_main.c	Golem_AlignChargeTarget	contrived	contrived	10	r
 src/monsters/golem/golem_main.c	Golem_RestoreRoute	contrived	minor	3	remaining: maskhelper
 src/monsters/golem/golem_main.c	SceneActorRoute_CommitReachableDestination	minor	natural	4	
 src/monsters/golem/golem_main.c	SceneActorRoute_SetReachableDestination	minor	minor	7	remaining: maskhelper
+src/monsters/golem/golem_main.c	Golem_OnAttackCollision	contrived	contrived	4	remaining: structcast,maskhelper
