@@ -2,10 +2,8 @@
 
 void TextSequence_SetState(struct TextSequence *p, u8 v)
 {
-    u8 *q = &p->phase;
-    u32 z = 0;
-    *q = v;
-    *(u16 *)&p->timer = z;
+    p->phase = v;
+    p->timer = 0;
 }
 
 void TextSequence_UpdateFadeIn(struct TextSequence *p, struct TextSequenceStep *e)
