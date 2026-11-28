@@ -617,3 +617,14 @@ src/ui/town/storage/Storage_ShowConsumableDescription.c	Storage_ShowConsumableDe
 src/ui/town/storage/Storage_ShowEquipmentDescription.c	Storage_ShowEquipmentDescription	contrived	minor	2	banner and resource pointer locals; private panel view
 src/ui/town/storage/Storage_ShowItemDescription.c	Storage_ShowItemDescription	minor	minor	0	private panel view
 src/ui/town/storage/Storage_UpdateCategoryBrowse.c	Storage_UpdateCategoryBrowse	contrived	contrived	6	allowed/error gotos and index-first pointer sum into table160 force the shared error branch; private browse struct
+src/ui/town/storage/Storage_UpdateCategoryConfirmation.c	Storage_UpdateCategoryConfirmation	natural	natural	0	
+src/ui/town/storage/Storage_UpdateSortConfirmation.c	Storage_UpdateSortConfirmation	natural	natural	0	
+src/ui/town/storage/Storage_UpdateSwapSelection.c	Storage_UpdateSwapSelection	contrived	contrived	9	sourceSlot/destinationSlot pointer locals in a bare block and the u8 distinct-slots inline: plain reads change register allocation (8 insns)
+src/ui/town/storage/Storage_InitWidgetPalette.c	Storage_InitWidgetPalette	natural	natural	0	
+src/ui/town/storage/Storage_InitBackground.c	Storage_InitBackground	natural	natural	0	
+src/ui/town/storage/Storage_InitWidgets.c	Storage_InitWidgets	minor	minor	6	playback struct zeroed then read through a u8 priority local: plain zeros move the movs r1,#0 of the next call
+src/ui/town/storage/Storage_InitTextOptions.c	Storage_InitTextOptions	natural	natural	0	
+src/ui/town/storage/Storage_UpdateModeSelection.c	Storage_UpdateModeSelection	natural	natural	0	
+src/ui/town/storage/Storage_BeginModeSelection.c	Storage_BeginModeSelection	natural	natural	0	
+src/ui/town/storage/Storage_UpdateBrowse.c	Storage_UpdateBrowse	natural	natural	0	
+src/ui/town/storage/Storage_Create.c	Storage_Create	natural	natural	0	
