@@ -145,3 +145,4 @@ src/ui/books/forging_book/CollectionBook_IsEntryCollected.c	CollectionBook_IsEnt
 src/ui/books/forging_book/CollectionBook_SetEntryCollectedFromScript.c	CollectionBook_SetEntryCollectedFromScript	minor	natural	1	
 src/ui/books/forging_book/CollectionBook_CountCollectedEntries.c	CollectionBook_CountCollectedEntries	minor	natural	1	
 src/ui/books/forging_book/CollectionBook_IsComplete.c	CollectionBook_IsComplete	minor	natural	1	
+src/ui/books/forging_book/CollectionBook_RefreshCollectedEntryVisibility.c	CollectionBook_RefreshCollectedEntryVisibility	natural	natural	1	
