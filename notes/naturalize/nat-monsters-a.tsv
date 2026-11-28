@@ -225,3 +225,4 @@ src/monsters/centipede/CentipedeBody_UpdatePursuit.c	CentipedeBody_UpdatePursuit
 src/monsters/centipede/CentipedeBody_ReturnToCellCenter.c	CentipedeBody_ReturnToCellCenter	minor	minor	4	remaining: block
 src/monsters/centipede/Centipede_UpdateKnockbackSlide.c	Centipede_UpdateKnockbackSlide	contrived	minor	3	remaining: bytep
 src/monsters/centipede/Centipede_UpdateKnockback.c	Centipede_UpdateKnockback	contrived	contrived	6	remaining: bytep,constlocal
+src/monsters/centipede/CentipedeBody_InitSegmentAnimations.c	CentipedeBody_InitSegmentAnimations	contrived	contrived	3	remaining: rawoff,bytep,block,constlocal

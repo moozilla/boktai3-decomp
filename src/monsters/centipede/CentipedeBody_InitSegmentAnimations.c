@@ -51,9 +51,8 @@ void CentipedeBody_InitSegmentAnimations(u8 *p, s32 animId, u32 scriptKey, u32 d
     phase = 0;
     for (i = 0; i < g->count; i++) {
         struct Seg080A8D50 *segment = &g->segs[i];
-        void *animData = segment->animData;
-        AnimData_Load(animData, animId);
-        Sprite_Init(segment->sprite, animData, 0);
+        AnimData_Load(segment->animData, animId);
+        Sprite_Init(segment->sprite, segment->animData, 0);
         segment->anim.direction = direction;
         segment->anim.script = ScriptProc_Start(0x922e, scriptKey);
         if (i == g->count - 1) {
