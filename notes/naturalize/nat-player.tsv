@@ -560,3 +560,11 @@ src/player/effects/particle_cloud/PlayerParticleCloud_ScatterAnchors.c	PlayerPar
 src/player/effects/particle_cloud/PlayerParticleCloud_Create.c	PlayerParticleCloud_Create	contrived	natural	1	-
 src/player/effects/particle_cloud/PlayerParticleCloud_Initialize.c	PlayerParticleCloud_Initialize	contrived	contrived	18	table local reloaded inside the loop and sheet/sprite aliases fix the register order
 src/player/effects/recoil_puffs/RecoilPuffPool_DestroyTask.c	RecoilPuffPool_DestroyTask	contrived	natural	2	-
+src/player/effects/recoil_puffs/RecoilPuffPool_ClearInstance.c	RecoilPuffPool_ClearInstance	natural	natural	0	-
+src/player/effects/recoil_puffs/RecoilPuff_Update.c	RecoilPuff_Update	natural	natural	0	-
+src/player/effects/recoil_puffs/RecoilPuffPool_UpdateTask.c	RecoilPuffPool_UpdateTask	natural	natural	0	-
+src/player/effects/recoil_puffs/sub_08237280.c	sub_08237280	natural	natural	0	-
+src/player/effects/recoil_puffs/RecoilPuffPool_Init.c	RecoilPuffPool_Init	natural	natural	0	-
+src/player/effects/recoil_puffs/RecoilPuffPool_GetOrCreate.c	RecoilPuffPool_GetOrCreate	natural	natural	0	-
+src/player/effects/recoil_puffs/RecoilPuff_Spawn.c	RecoilPuff_Spawn	natural	natural	0	-
+src/player/effects/spiral_trail/sub_08236F48.c	sub_08236F48	contrived	natural	6	-

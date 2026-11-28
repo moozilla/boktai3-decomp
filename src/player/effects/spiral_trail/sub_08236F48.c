@@ -1,17 +1,12 @@
 #include "player/effects/spiral_trail.h"
 #include "player/player.h"
 
-
 void sub_08236F48(struct SpiralTrailTask *p)
 {
     if (p->sprite.active) {
-        u32 limit = p->fadeLimit;
-        u32 frame = p->timer;
-        u16 storedLimit = limit;
-        if (frame < limit && p->parentMode != p->parent->tetherMode)
-            p->timer = storedLimit;
-        frame = ++p->timer;
-        if ((frame << 16) < ((u32)storedLimit << 16)) {
+        if (p->timer < p->fadeLimit && p->parentMode != p->parent->tetherMode)
+            p->timer = p->fadeLimit;
+        if (++p->timer < p->fadeLimit) {
             SpiralTrail_AdvanceFrame(&p->sprite);
             p->sprite.drawable.position = *(const struct ContactPosition *)&p->parent->position;
             p->sprite.drawable.position.x += p->offset.x;
