@@ -1,13 +1,9 @@
 #include "global.h"
-#include "engine/runtime.h"
-struct S {
-    u8 p[8];
-    u8 b;
-};
+#include "link/session/session_save.h"
 u8 Save_WriteHeader(void);
 u8 Save_ToggleSelectedSlot(void)
 {
-    struct S *s = gSessionState;
-    s->b = 1 - s->b;
+    struct SessionSave *session = (void *)gSessionState;
+    session->selectedSlot = 1 - session->selectedSlot;
     return Save_WriteHeader();
 }
