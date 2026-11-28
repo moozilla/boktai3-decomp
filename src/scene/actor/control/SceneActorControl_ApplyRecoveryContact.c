@@ -66,12 +66,6 @@ static inline u8 Unavailable(struct ChaseActor *a)
     }
     return 0;
 }
-static inline void Fill(u32 *zero, void *dst)
-{
-    *zero = 0;
-    CpuSet(zero, dst, 0x05000002);
-}
-
 void SceneActorControl_ApplyRecoveryContact(struct SceneActorBehaviorContactView *source,
                                             struct SceneActorBehaviorContactView *inputHit,
                                             struct ChaseActor *input)
@@ -81,10 +75,9 @@ void SceneActorControl_ApplyRecoveryContact(struct SceneActorBehaviorContactView
         u32 amount;
     } contact;
     struct ChaseActor *a;
-    u32 zero;
     struct SceneActorChaseTracking *motion;
     contact.collider = inputHit;
-    if (contact.collider->kind != 1)
+    if (inputHit->kind != 1)
         return;
     a = input;
     if (Unavailable(a))
@@ -96,26 +89,24 @@ void SceneActorControl_ApplyRecoveryContact(struct SceneActorBehaviorContactView
     Collision_CalculateDamageResponse(source, contact.collider);
     {
         u32 type = a->base.paletteOffset;
-        if (((type == 1) || ((type - 12) <= 3)) && contact.collider->remaining) {
+        if ((type == 1 || (type >= 12 && type <= 15)) && contact.collider->remaining) {
             s16 *healthPtr = &a->base.health;
-            union {
-                s32 health;
-                struct ContactCollider *collider;
-            } recovery;
+            s32 health;
+            struct ContactCollider *recovery;
             u16 amount;
             s32 healed;
             u16 *maximum;
-            recovery.health = *healthPtr;
+            health = *healthPtr;
             amount = contact.collider->remaining;
-            healed = recovery.health + amount;
+            healed = health + amount;
             maximum = (u16 *)&a->base.defaultHealth;
 
             if (healed > (*maximum)) {
                 struct ContactCollider *local = &a->base.colliderA;
-                local->cost = *maximum - recovery.health;
+                local->cost = *maximum - health;
                 {
                     s32 cap = *((s16 *)maximum);
-                    recovery.collider = local;
+                    recovery = local;
                     if (cap <= 0)
                         cap = 0;
                     *healthPtr = cap;
@@ -129,9 +120,9 @@ void SceneActorControl_ApplyRecoveryContact(struct SceneActorBehaviorContactView
                     contact.amount = contact.collider->remaining;
                     *output = oldHealth + contact.amount;
                 }
-                recovery.collider = local;
+                recovery = local;
             }
-            a->base.reactionSoundVariant = recovery.collider->cost;
+            a->base.reactionSoundVariant = recovery->cost;
             if (a->base.reactionSoundVariant && SceneActorDamage_ShouldShow(a)) {
                 u32 zero;
                 u32 buffer[2];
@@ -140,9 +131,9 @@ void SceneActorControl_ApplyRecoveryContact(struct SceneActorBehaviorContactView
                 s32 kind = ((struct RecoveryHealthView *)a)->kind;
                 s32 param = ((struct RecoveryHealthView *)a)->parameter;
                 SceneHud_SetTimedState(a->base.body.id, hp, max, kind, 0, param);
-                Fill(&zero, buffer);
+                ZeroFill8(buffer);
                 if (a->base.reactionSoundVariant || (!(a->base.hitAttributes & 0x20000)))
-                    DamageNumberDisplay_Show(recovery.collider, a->base.reactionSoundVariant, 1,
+                    DamageNumberDisplay_Show(recovery, a->base.reactionSoundVariant, 1,
                                              &a->base.body.position, buffer, 1);
             }
         }
@@ -151,17 +142,12 @@ void SceneActorControl_ApplyRecoveryContact(struct SceneActorBehaviorContactView
         struct ContactCollider *c = &a->base.colliderB;
         c->flags |= 4;
     }
-    {
-        struct SceneActorControlState *control = LocalState(a);
-        SceneActorChase_AndWordFlags(ControlFlags(control), ~8);
-        zero = TestFlags(LocalState(a), 4);
-        if (zero)
-            return;
-    }
+    SceneActorChase_AndWordFlags(&LocalState(a)->flags3D4, ~8);
+    if (TestFlags(LocalState(a), 4))
+        return;
     SceneActorTerrain_InstallControl(a, SceneActorControl_OnIdle, 16);
     motion = &a->base.tracking;
-    zero = SceneActorChase_TrackingFlags(motion, 8);
-    if (zero) {
+    if (SceneActorChase_TrackingFlags(motion, 8)) {
         SceneActorTerrain_EnterState(a, 0, 2, 1);
         Set32((struct SceneActorControlState *)((struct RecoveryContextView *)a)->controlAddress,
               4);
