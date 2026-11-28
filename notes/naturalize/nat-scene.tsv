@@ -25,3 +25,4 @@ src/scene/actor/actor_emitter.c	Modifier_IsFirstSourceReady	natural	natural	0
 src/scene/actor/actor_emitter.c	CallbackList_SubtractClampedValue	natural	natural	0	
 src/scene/actor/actor_emitter.c	ActorEffect_EmitOffsetPair	minor	minor	0	bitfield halfword extents
 src/scene/actor/actor_particles.c	Actor_ClampMovementSpeed	minor	natural	1	
+src/scene/actor/actor_particles.c	ActorParticles_EmitOffsetBurst	minor	natural	1	

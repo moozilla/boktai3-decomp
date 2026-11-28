@@ -146,15 +146,15 @@ static inline u16 NextOffsetRandom(void)
 
 void ActorParticles_EmitOffsetBurst(void *actor)
 {
-    s32 i = 0;
+    s32 i;
     struct SceneExtent offset;
-    do {
+    for (i = 0; i < 4; i++) {
         offset.x = (NextOffsetRandom() & 31) - 7;
         offset.y = -(NextOffsetRandom() & 31);
         offset.z = 0;
         ActorParticles_CreateAtOffset(actor, &offset, 0, 0x8639, 0x75f6, 0, 0, 0, 0, 0x153, 30, 0,
                                       0, 1, 0);
-    } while (++i < 4);
+    }
 }
 
 /* tentative: spawns a jittered pair of particles moving left and right */
