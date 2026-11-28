@@ -39,3 +39,21 @@ src/ui/results/stage_results/ActorMarkerPool_Destroy.c	ActorMarkerPool_Destroy	m
 src/ui/results/stage_results/ActorMarkerPool_ResetSingleton.c	ActorMarkerPool_ResetSingleton	natural	natural	0	
 src/ui/results/challenge_menu.c	ChallengeMenu_SetGroupIcon	contrived	natural	3	
 src/ui/results/challenge_menu.c	ChallengeMenu_ScriptOpen	contrived	natural	3	
+src/ui/results/challenge_menu.c	ChallengeMenu_GetStoredRank	minor	minor	0	the odd negative shift looks like an original signed-divide macro
+src/ui/results/challenge_menu.c	ChallengeMenu_SetStoredRank	natural	natural	0	
+src/ui/results/challenge_menu.c	ChallengeMenu_SetState	natural	natural	0	
+src/ui/results/challenge_menu.c	ChallengeMenu_StartFadeIn	natural	natural	0	
+src/ui/results/challenge_menu.c	ChallengeMenu_StartFadeOut	natural	natural	0	
+src/ui/results/challenge_menu.c	ChallengeMenu_HideWidgets	natural	natural	0	
+src/ui/results/challenge_menu.c	ChallengeMenu_HandleInput	contrived	contrived	25	goto into the other branch plus pendingKeys/repeatMask locals: the plain form is 2 insns off (the ROM loads the zero before storing the key word)
+src/ui/results/challenge_menu.c	ChallengeMenu_UpdateFadeIn	natural	natural	0	
+src/ui/results/challenge_menu.c	ChallengeMenu_UpdateFadeOut	natural	natural	0	
+src/ui/results/challenge_menu.c	ChallengeMenu_DispatchSelection	natural	natural	0	
+src/ui/results/challenge_menu.c	ChallengeMenu_UpdateSelection	natural	natural	0	
+src/ui/results/challenge_menu.c	ChallengeMenu_EnableBackground	natural	natural	0	
+src/ui/results/challenge_menu.c	ChallengeMenu_Update	natural	natural	0	
+src/ui/results/challenge_menu.c	ChallengeMenu_InitializeKeyframes	natural	natural	0	
+src/ui/results/challenge_menu.c	ChallengeMenu_InitAnimations	natural	natural	0	
+src/ui/results/challenge_menu.c	ChallengeMenu_CreateFromScript	natural	natural	0	
+src/ui/results/challenge_menu.c	ChallengeMenu_ResetStoredRanks	minor	minor	0	raw offsets into gGameState->unk654
+src/ui/results/challenge_menu.c	ChallengeMenu_GetRankKeyframe	natural	natural	0	
