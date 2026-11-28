@@ -209,3 +209,6 @@ src/bosses/hresvelgr/sub_0819B410.c	sub_0819B410	contrived	contrived	40	goto cla
 src/bosses/hresvelgr/Math_StepShortArrayTowardTargets.c	Math_StepShortArrayTowardTargets	contrived	contrived	0	same goto step-toward form as Math_StepTowardTarget; structured spellings differ
 src/bosses/hresvelgr/Math_StepTowardTarget.c	Math_StepTowardTarget	contrived	contrived	9	goto into the second branch stays: structured forms drop the shared assignment
 src/bosses/hresvelgr/ScalarApproach_ApplyProfileArray.c	ScalarApproach_ApplyProfileArray	contrived	minor	3	index pointer copies stay
+src/bosses/hresvelgr/sub_0819B69C.c	sub_0819B69C	minor	minor	6	res/near reuse stays
+src/bosses/hresvelgr/sub_0819B734.c	sub_0819B734	minor	minor	2	pointer copies stay
+src/bosses/hresvelgr/Math_ApproachAngleArrayByHalf.c	Math_ApproachAngleArrayByHalf	minor	minor	1	array helper stays
