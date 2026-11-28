@@ -475,3 +475,11 @@ src/ui/town/shop/Shop_ClassifyConsumableMove.c	Shop_ClassifyConsumableMove	contr
 src/ui/town/shop/Shop_ClassifyEquipmentAction.c	Shop_ClassifyEquipmentAction	contrived	minor	8	catalog byte read as u8 then sign-extended (keeps the 255 test alive); catalog view cast
 src/ui/town/shop/Shop_ClassifyItemAction.c	Shop_ClassifyItemAction	minor	minor	0	catalog view cast
 src/ui/town/shop/Shop_ClassifyConsumableAction.c	Shop_ClassifyConsumableAction	contrived	minor	1	index-first pointer sum into table160; catalog view cast
+src/ui/town/shop/Shop_ClassifySelectedAction.c	Shop_ClassifySelectedAction	natural	natural	0	
+src/ui/town/shop/Shop_SetControllerCallback.c	Shop_SetControllerCallback	minor	minor	0	callback view cast
+src/ui/town/shop/Shop_UpdateActionPrompt.c	Shop_UpdateActionPrompt	natural	natural	0	
+src/ui/town/shop/Shop_UpdateModePrompt.c	Shop_UpdateModePrompt	natural	natural	0	
+src/ui/town/shop/Shop_FindActionDestination.c	Shop_FindActionDestination	natural	natural	0	
+src/ui/town/shop/Shop_SelectActionDestination.c	Shop_SelectActionDestination	minor	minor	10	u16 read narrowed to short and a mask-first column: plain reads swap registers
+src/ui/town/shop/Shop_BeginActionSelection.c	Shop_BeginActionSelection	natural	natural	0	
+src/ui/town/shop/Shop_BeginPurchaseConfirmation.c	Shop_BeginPurchaseConfirmation	contrived	minor	4	catalog view cast

@@ -9,26 +9,23 @@ void Shop_BeginPurchaseConfirmation(struct ShopControlView *panel)
             break;
         case 1: {
             const void *message = panel->itemText;
-            u8 *saved = &panel->grid.savedSelection;
-            s32 index = panel->page * 8 - 16;
-            index += *saved;
             SceneInputPanel_ShowDescription(
-                panel, 0, message, ((struct ShopCatalogView *)panel)->entries[index]);
+                panel, 0, message,
+                ((struct ShopCatalogView *)panel)
+                    ->entries[panel->grid.savedSelection - 16 + panel->page * 8]);
             break;
         }
         case 2: {
             const void *message = panel->consumableText;
-            u8 *saved = &panel->grid.savedSelection;
-            s32 index = panel->page * 8 - 16;
-            index += *saved;
             SceneInputPanel_ShowDescription(
-                panel, 0, message, ((struct ShopCatalogView *)panel)->entries[index]);
+                panel, 0, message,
+                ((struct ShopCatalogView *)panel)
+                    ->entries[panel->grid.savedSelection - 16 + panel->page * 8]);
             break;
         }
     }
     Shop_UpdateModePrompt(panel, 2);
     SceneInput_BeginChoice(&panel->display.prompt, &panel->display.widgetResource,
                            &panel->choiceValue, 1, &panel->choiceBlink);
-    Shop_SetControllerCallback(
-        panel, (ShopCallback)Shop_TickPurchaseConfirmation);
+    Shop_SetControllerCallback(panel, (ShopCallback)Shop_TickPurchaseConfirmation);
 }
