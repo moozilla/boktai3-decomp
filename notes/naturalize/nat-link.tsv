@@ -201,3 +201,4 @@ src/link/player/LinkPlayer_ClampCameraOffsets.c	LinkPlayer_ClampCameraOffsets	na
 src/link/player/Player_InitFacingDriftOffset.c	Player_InitFacingDriftOffset	natural	natural	0	
 src/link/player/Player_InitOptionalComponents.c	Player_InitOptionalComponents	natural	natural	0	
 src/link/player/Player_SmoothCameraAnchor.c	Player_SmoothCameraAnchor	contrived	minor	24	the y axis keeps a split sum: a single expression folds the 150 bias early
+src/link/player/Player_CanUseAction.c	Player_CanUseAction	contrived	natural	10	

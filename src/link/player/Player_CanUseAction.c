@@ -1,23 +1,14 @@
 #include "global.h"
 #include "player/player.h"
-u32 Player_CanUseAction(struct Player *s, s32 action)
+
+u32 Player_CanUseAction(struct Player *p, s32 action)
 {
-    u32 result;
-    if (s->actionMode <= 1 || s->actionMode == 6) {
-        if (action == 0 || action == 3 || action == 6)
-            goto allowed;
-        if (action == 4 && s->actionFourEnabled)
-            goto allowed;
-    } else {
-        if (action == 0 || action == 4)
-            goto allowed;
+    if (p->actionMode <= 1 || p->actionMode == 6) {
+        if (action == 0 || action == 3 || action == 6 || (action == 4 && p->actionFourEnabled))
+            return 1;
+        return 0;
     }
-    goto denied;
-allowed:
-    result = 1;
-    goto done;
-denied:
-    result = 0;
-done:
-    return result;
+    if (action == 0 || action == 4)
+        return 1;
+    return 0;
 }
