@@ -20,12 +20,10 @@ void Transformation_Charge(struct ResultMenu *p)
         Sound_PlaySong(0x2e1);
     }
     if (p->phaseFrame - 30 <= 69 && !(p->phaseFrame & 3)) {
-        {
-            struct SceneVec *out = &pos;
-            pos = positionActor->position;
-            out->x += 200;
-            ImpactBurst_EmitChargeSparkle(2, 0, 0x2000, 64, out);
-        }
+        struct SceneVec *out = &pos;
+        *out = positionActor->position;
+        out->x += 200;
+        ImpactBurst_EmitChargeSparkle(2, 0, 0x2000, 64, out);
         Sound_PlaySong(0x1c5);
     }
     if (p->phaseFrame > 99)
