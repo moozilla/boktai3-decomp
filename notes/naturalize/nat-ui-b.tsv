@@ -412,3 +412,10 @@ src/ui/town/town_map.c	TownMap_OnDestroy	contrived	natural	1
 src/ui/town/town_map.c	TownMap_CreateSelectionCursor	minor	natural	1	
 src/ui/town/town_map.c	TownMap_InitFromScript	contrived	natural	1	
 src/ui/town/town_map.c	TownMap_Create	natural	natural	0	
+src/ui/town/town_map.c	TownMap_InitBackground	contrived	contrived	2	display control write: plain &=/
+src/ui/title/sound_test.c	SoundTest_Destroy	contrived	contrived	2	display control write: plain &=/
+src/ui/title/name_entry.c	NameEntry_Destroy	contrived	contrived	2	display control write: plain &=/
+src/ui/title/password_menu.c	PasswordMenu_Destroy	contrived	contrived	2	display control write: plain &=/
+src/ui/title/game_start.c	GameStart_Destroy	contrived	contrived	2	display control write: plain &=/
+src/ui/status_screen/status_screen.c	StatusScreen_Close	contrived	contrived	2	display control write: plain &=/
+src/ui/results/time_result.c	TimeResult_InitializeBackground	contrived	contrived	2	display control write: plain &=/

@@ -172,7 +172,13 @@ void StatusScreen_Close(struct StatusScreen *p)
     if (p->timer == p->times[5]) {
         Script_Call(p->script, &p->args);
         Task_Kill(p);
-        Bg_DisableDisplay(DISPCNT_BG0_ON);
+        {
+            u16 *flags = &gDispCntShadow;
+            s32 mask;
+            mask = ~256;
+            mask &= *flags;
+            *flags = mask;
+        }
     }
     p->dirty |= 4;
     p->dirty &= ~3;

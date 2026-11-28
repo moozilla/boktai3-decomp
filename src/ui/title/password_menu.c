@@ -573,7 +573,11 @@ void PasswordMenu_Update(struct PasswordMenu *p)
 
 void PasswordMenu_Destroy(struct PasswordMenu *p)
 {
-    Bg_DisableDisplay(3);
+    u16 *q;
+    u32 m;
+    q = &gDispCntShadow;
+    m = ~3;
+    *q = m & *q;
     Anim_Remove(&p->widgets[5].sprite);
     Anim_Remove(&p->widgets[4].sprite);
     Anim_Remove(&p->widgets[2].sprite);

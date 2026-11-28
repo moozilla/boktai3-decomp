@@ -139,11 +139,21 @@ void TownMap_InitBackground(struct RegistryChoiceMenu *menu)
     u8 *resource;
     s32 layers[2];
 
-    Bg_DisableDisplay(0xF00);
+    {
+        u16 *control = &gDispCntShadow;
+        u32 mask = ~0xF00;
+        u32 flags = *control;
+        mask &= flags;
+        *control = mask;
+    }
     Bg_ResetDisplay();
     Hud_SetMode(7);
-    Bg_EnableDisplay(DISPCNT_BG2_ON | DISPCNT_BG3_ON);
-    Bg_EnableDisplay(DISPCNT_BG0_ON);
+    {
+        u32 flags = 0xC00;
+        flags |= gDispCntShadow;
+        flags |= 0x100;
+        gDispCntShadow = flags;
+    }
     menu->background = sub_08216E54(0xDC87);
     layers[0] = 1;
     layers[1] = 0;

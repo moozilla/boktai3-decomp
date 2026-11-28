@@ -301,7 +301,10 @@ void SoundTest_Update(struct SoundTest *p)
 void SoundTest_Destroy(struct SoundTest *p)
 {
     s32 i;
-    Bg_DisableDisplay(3);
+    {
+        s32 mask = 3;
+        gDispCntShadow = ~mask & gDispCntShadow;
+    }
     p->cursor.flags |= 1;
     p->panel.flags |= 1;
     p->background.flags |= 1;

@@ -268,8 +268,10 @@ void GameStart_Update(struct GameStart *p)
 
 void GameStart_Destroy(struct GameStart *p)
 {
+    u16 *r = &gDispCntShadow;
+    s32 m = 4;
     s32 i;
-    Bg_DisableDisplay(3);
+    *r = *r & -m;
     for (i = 0; i < 2; i++)
         Anim_Remove(&p->levelDigits[i]);
     for (i = 0; i < 5; i++)
