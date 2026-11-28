@@ -1,45 +1,39 @@
-#include "global.h"
-#include "engine/engine_globals.h"
-#include "engine/ram.h"
+#include "effects/healing/healing_effect.h"
+#include "engine/math/monster_particle_random.h"
+#include "engine/engine.h"
+
+s32 Mod(s32, s32);
+void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 
 // confidence=low: the health burst's shake, as in HealthRestoreEffect_UpdateShake: jitters for
 // 8 frames, starts the burst at frame 30 (sound 0x285), fades the screen at frame 29 in mode 1,
 // then after frame 44 moves on to the bursts (mode 0) or sub_082356E4.
-s32 Mod(s32, s32);
-void Sound_PlaySong(u32);
-void FlickerParticle_StartSecondaryBurst(u8 *);
-void HealthBurstEffect_UpdateBursts(u8 *);
-void sub_082356E4(u8 *);
-void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
-#define H(o) (*(u16 *)(p + (o)))
-static inline s32 rnd(u16 *table)
+void sub_08235794(struct HealthBurstEffect *effect)
 {
-    s32 v;
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    v = table[gRandomIndex];
-    return v >> 3;
-}
-void sub_08235794(u8 *p)
-{
-    H(0x34e)++;
-    if (H(0x34e) < 8) {
-        s32 range = 8 - H(0x34e);
-        u16 *table = gRandomTable;
-        H(0x3c) = H(0x7c) + Mod(rnd(table), range) - (range >> 1);
-        H(0x3e) = H(0x7e) + Mod(rnd(table), range) - (range >> 1);
+    effect->timer++;
+    if (effect->timer < 8) {
+        s32 range = 8 - effect->timer;
+        const u16 *table = gRandomTable;
+
+        effect->icon.position.x =
+            effect->targetPosition.x + Mod(HealingEffect_Random(table), range) - (range >> 1);
+        effect->icon.position.y =
+            effect->targetPosition.y + Mod(HealingEffect_Random(table), range) - (range >> 1);
     }
-    if (H(0x34e) == 30) {
-        FlickerParticle_StartSecondaryBurst(p);
+    if (effect->timer == 30) {
+        FlickerParticle_StartSecondaryBurst(effect);
         Sound_PlaySong(0x285);
-        *(u32 *)(p + 0x24) |= 1;
+        effect->icon.flags |= 1;
     }
-    if (H(0x34c) == 1 && H(0x34e) == 29)
-        ScreenTransition_SendCommand(3, 5, 4, 4, 4, 0x1fff, 1);
-    if (H(0x34e) > 44) {
-        if (H(0x34c) == 0)
-            *(void (**)(u8 *))(p + 0x350) = HealthBurstEffect_UpdateBursts;
+    if (effect->mode == 1) {
+        if (effect->timer == 29)
+            ScreenTransition_SendCommand(3, 5, 4, 4, 4, 0x1FFF, 1);
+    }
+    if (effect->timer > 44) {
+        if (effect->mode == 0)
+            effect->state = HealthBurstEffect_UpdateBursts;
         else
-            *(void (**)(u8 *))(p + 0x350) = sub_082356E4;
-        H(0x34e) = 0;
+            effect->state = sub_082356E4;
+        effect->timer = 0;
     }
 }
