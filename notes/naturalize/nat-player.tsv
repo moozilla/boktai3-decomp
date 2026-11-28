@@ -365,3 +365,13 @@ src/player/cutscene/player_script_stats.c	ScriptActor_ClearSlotFromScript	natura
 src/player/cutscene/player_script_stats.c	ScriptActor_ClearSlotsFromScript	minor	natural	1	-
 src/player/cutscene/player_script_stats.c	ScriptActor_TestTimedEventCounter	contrived	natural	8	-
 src/player/cutscene/player_script_stats.c	ScriptActor_ClearTimedEventCounter	contrived	natural	2	-
+src/player/cutscene/ScriptActor_ResetCountersFromScript.c	ScriptActor_ResetCountersFromScript	natural	natural	0	-
+src/player/cutscene/player_script_actions.c	ScriptActor_BlockActionAccumulatorFromScript	natural	natural	0	-
+src/player/cutscene/player_script_actions.c	ScriptActor_SetField4A2FromScript	natural	natural	0	-
+src/player/cutscene/player_script_actions.c	ScriptActor_BlockActionRequestsFromScript	natural	natural	0	-
+src/player/cutscene/player_script_actions.c	ScriptActor_AllowActionRequestsFromScript	natural	natural	0	-
+src/player/cutscene/player_script_actions.c	ScriptActor_HasEnergyOverrideFromScript	natural	natural	0	-
+src/player/cutscene/player_script_actions.c	ScriptActor_EnterKindFourFromScript	natural	natural	0	-
+src/player/cutscene/player_script_actions.c	ScriptActor_PlayKindFourSequenceFromScript	minor	minor	1	unchanged: actor/player alias pair
+src/player/cutscene/player_script_actions.c	ScriptActor_TestFlagBit20FromScript	natural	natural	0	-
+src/player/cutscene/player_script_actions.c	ScriptActor_TestFacingPointFromScript	contrived	contrived	8	unchanged: dead actor = NULL and actor/player alias pair steer register reuse
