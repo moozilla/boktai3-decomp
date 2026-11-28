@@ -35,8 +35,7 @@ static inline u32 TestFlags(struct MenuCursor *cursor, u32 mask)
     return cursor->stateFlags & mask;
 }
 
-void TownMap_SetState(struct RegistryChoiceMenu *menu,
-                           void (*update)(struct RegistryChoiceMenu *))
+void TownMap_SetState(struct RegistryChoiceMenu *menu, void (*update)(struct RegistryChoiceMenu *))
 {
     menu->update = update;
     menu->timer = 0;
@@ -53,7 +52,7 @@ void TownMap_ApplyPaletteStep(struct RegistryChoiceMenu *transition, u32 step)
             Palette_InterpolateBanks(gBgPaletteBuffer, palettes, palettes + 32, 16, 6);
             break;
         case 2:
-            CpuSet(palettes, gBgPaletteBuffer, 0x04000008);
+            CpuCopy32(palettes, gBgPaletteBuffer, 0x20);
             break;
         case 3:
             Palette_InterpolateBanks(gBgPaletteBuffer, palettes, palettes + 16, 16, 6);
@@ -62,7 +61,7 @@ void TownMap_ApplyPaletteStep(struct RegistryChoiceMenu *transition, u32 step)
             Palette_InterpolateBanks(gBgPaletteBuffer, palettes + 16, palettes + 32, 48, 6);
             break;
         case 5:
-            CpuSet(palettes + 32, gBgPaletteBuffer, 0x04000008);
+            CpuCopy32(palettes + 32, gBgPaletteBuffer, 0x20);
             break;
     }
 }
