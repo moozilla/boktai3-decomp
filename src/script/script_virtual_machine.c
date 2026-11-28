@@ -615,7 +615,6 @@ void *sub_0821AD98(void *table, u32 key, s32 count)
     struct ScriptArchiveEntry *tbl = table;
     s32 lo = 0, hi = count - 1;
     s32 mid;
-    struct ScriptArchiveEntry *e;
     while (lo < hi) {
         mid = (lo + hi) >> 1;
         if (tbl[mid].key < key)
@@ -623,9 +622,8 @@ void *sub_0821AD98(void *table, u32 key, s32 count)
         else
             hi = mid;
     }
-    e = (struct ScriptArchiveEntry *)((lo << 3) + (u32)tbl);
-    if (e->key == key)
-        return e;
+    if (tbl[lo].key == key)
+        return &tbl[lo];
     return 0;
 }
 
