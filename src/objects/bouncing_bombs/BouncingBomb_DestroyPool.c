@@ -1,28 +1,22 @@
 #include "objects/bouncing_bombs/bouncing_object.h"
-static inline u8 Occupied(const u32 *mask, u32 bit)
+static inline u8 Occupied(struct BouncingPool *pool, s32 i)
 {
-    if (*mask & bit)
+    if (pool->used & (1 << i))
         return TRUE;
     return FALSE;
 }
-s32 BouncingBomb_DestroyPool(struct BouncingPool *input)
+
+s32 BouncingBomb_DestroyPool(struct BouncingPool *pool)
 {
-    struct BouncingPool *pool = input;
-    s32 i = 0;
-    u32 *used;
-    used = &pool->used;
-    do {
-        if (Occupied(used, 1 << i)) {
-            u32 slotOffset = i;
-            struct BouncingObject *slot;
-            slotOffset *= sizeof(*slot);
-            slotOffset += (u32) & ((struct BouncingPool *)0)->slots;
-            slot = (void *)((u32)pool + slotOffset);
+    s32 i;
+
+    for (i = 0; i < 12; i++) {
+        if (Occupied(pool, i)) {
+            struct BouncingObject *slot = &pool->slots[i];
             Sprite_Remove(slot);
             Shadow_Destroy(slot->registration);
         }
-        i++;
-    } while (i < 12);
+    }
     gBouncingPool = NULL;
     return 0;
 }

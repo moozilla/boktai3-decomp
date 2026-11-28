@@ -32,3 +32,4 @@ src/objects/bat_curtain/breakable_barrier.c	BreakableBarrier_UpdateBroken	contri
 src/objects/bat_curtain/breakable_barrier.c	BreakableBarrier_SetPosition	minor	minor	1	non-void function without return: ROM never writes r0; kept
 src/objects/bouncing_bombs/BouncingBomb_Allocate.c	BouncingBomb_Allocate	minor	natural	3	u8 slot predicate: ROM keeps a 0/1 flag
 src/objects/bouncing_bombs/BouncingBomb_UpdatePool.c	BouncingBomb_UpdatePool	contrived	minor	12	mask = 4 local kept: the ROM loads the mask before the flag word
+src/objects/bouncing_bombs/BouncingBomb_DestroyPool.c	BouncingBomb_DestroyPool	contrived	natural	1	
