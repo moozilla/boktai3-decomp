@@ -15,3 +15,4 @@ src/player/appearance/character_model.c	CharacterModel_SetComponentKeyframes	min
 src/player/appearance/character_model.c	CharacterModel_UpdateAccessoryAnimations	contrived	natural	1	-
 src/player/appearance/character_model.c	CharacterModel_UpdatePairedAnimations	contrived	natural	1	-
 src/player/appearance/character_model.c	CharacterModel_RemoveAnimations	minor	natural	1	-
+src/player/appearance/character_model.c	CharacterModel_SetAnimationFlags	contrived	natural	1	-
