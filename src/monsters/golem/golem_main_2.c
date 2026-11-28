@@ -569,8 +569,7 @@ void Golem_UpdateSettle(struct ChaseActor *actor)
     struct Golem *body = actor->base.context;
     u8 busy;
     if (Chase_TakeArrived(actor)) {
-        void *target = Golem_UpdateRecoil;
-        SceneActorChase_SetTypedControl(actor, target, 0x2A);
+        SceneActorChase_SetTypedControl(actor, Golem_UpdateRecoil, 0x2A);
         actor->base.stepDone = 0;
         SceneActorChase_SetActorFlags(actor, 0x2000);
     }
@@ -580,10 +579,7 @@ void Golem_UpdateSettle(struct ChaseActor *actor)
     if (actor->base.stepDone) {
         body->target69C = body->home694;
         Golem_AlignChargeTarget(body);
-        {
-            void *target = Golem_UpdateRouteMotion;
-            SceneActorChase_SetTypedControl(actor, target, 0x23);
-        }
+        SceneActorChase_SetTypedControl(actor, Golem_UpdateRouteMotion, 0x23);
         SceneActorChase_SetPhase(actor, 2, 1);
     } else
         actor->base.counter2AC++;

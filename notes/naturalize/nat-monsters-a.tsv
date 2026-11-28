@@ -245,3 +245,4 @@ src/monsters/golem/golem_2.c	Golem_UpdateScriptedAction	contrived	contrived	3	re
 src/monsters/golem/golem_main_2.c	Golem_ReturnHome	minor	natural	3	
 src/monsters/golem/golem_main_2.c	Golem_UpdateChargeSettle	minor	natural	2	
 src/monsters/golem/golem_main_2.c	Golem_ChargeOrApproach	contrived	minor	5	remaining: bytep
+src/monsters/golem/golem_main_2.c	Golem_UpdateSettle	contrived	minor	5	remaining: maskhelper
