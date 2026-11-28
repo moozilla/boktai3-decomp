@@ -1,80 +1,60 @@
 #include "global.h"
-#include "engine/engine.h"
-#include "scene/collision/contact_position.h"
+#include "objects/deck_cannons/deck_cannon_battery.h"
 
-#define gCannonBatteryProjectileSize   gUnk_0824F6E8
-#define gCannonBatteryProjectileOffset gUnk_0824F6F0
-struct CannonBatteryCollider {
-    u8 unk0[0x14];
-    struct ContactPosition size, offset;
-    u8 unk24[0x1E];
-    u8 direction;
-    u8 unk43[0x11];
-};
-struct CannonBatteryProjectile {
-    u32 update, destroy;
-    u8 animation[0x1C], sprite[0x1C];
-    struct ContactPosition position;
-    u8 unk48[8], sequence[0x10];
-    struct CannonBatteryCollider collider;
-    u16 startCoordinate;
-    u8 direction, unkB7;
-};
-struct CannonBatteryPool {
-    u8 unk0[0x20];
-    u16 attack, attackFlags;
-};
-u32 DeckCannon_LoadAnimation(void);
+void *DeckCannon_LoadAnimation(void);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
-void DeckCannon_OnProjectileCollision(void);
-void DeckCannon_DestroyProjectile(void);
-void DeckCannon_UpdateProjectile(void);
+void DeckCannon_OnProjectileCollision(struct ContactCollider *, struct ContactCollider *, void *);
+void DeckCannon_DestroyProjectile(struct DeckCannonShot *);
+void DeckCannon_UpdateProjectile(struct DeckCannonShot *);
 extern struct ContactPosition gUnk_0824F6E8, gUnk_0824F6F0;
-void DeckCannon_InitProjectile(struct CannonBatteryPool *pool, struct CannonBatteryProjectile *p,
-                                  struct ContactPosition *origin, s32 horizontal)
+
+void DeckCannon_InitProjectile(struct DeckCannonBattery *battery, struct DeckCannonShot *shot,
+                               struct ContactPosition *origin, s32 horizontal)
 {
-    void *resource = (void *)DeckCannon_LoadAnimation();
-    struct CannonBatteryCollider *collider;
-    AnimData_Load(p->animation, 0x8D95);
-    AnimData_SelectPaletteBank(p->animation, 0x8F);
-    Sprite_Init(p->sprite, p->animation, 0);
-    Anim_RestartSequence(p->sequence, resource, 1, 0, 8);
+    void *resource = DeckCannon_LoadAnimation();
+    struct ContactCollider *collider;
+
+    AnimData_Load(shot->animation, 0x8D95);
+    AnimData_SelectPaletteBank(shot->animation, 0x8F);
+    Sprite_Init(&shot->sprite, shot->animation, 0);
+    Anim_RestartSequence(&shot->sequence, resource, 1, 0, 8);
     if (horizontal) {
-        p->position.x = origin->x - 0xC0;
-        p->position.y = origin->y + 0x80;
-        p->position.z = origin->z;
+        shot->sprite.position.x = origin->x - 0xC0;
+        shot->sprite.position.y = origin->y + 0x80;
+        shot->sprite.position.z = origin->z;
     } else {
-        p->position.x = origin->x;
-        p->position.y = origin->y + 0x80;
-        p->position.z = origin->z - 0xC0;
+        shot->sprite.position.x = origin->x;
+        shot->sprite.position.y = origin->y + 0x80;
+        shot->sprite.position.z = origin->z - 0xC0;
     }
-    p->unkB7 = 0;
-    collider = &p->collider;
+    shot->finished = 0;
+    collider = &shot->collider;
     Collider_Init(collider, 0, 0x2103, 0, 1, &gUnk_0824F6E8, &gUnk_0824F6E8);
-    Collider_SetAttackProperties(collider, pool->attack, pool->attackFlags, 0x10, 0x40000, 0xA);
-    collider->size = gUnk_0824F6E8;
-    collider->offset = gUnk_0824F6F0;
+    Collider_SetAttackProperties(collider, battery->attack, battery->attackFlags, 0x10, 0x40000,
+                                 0xA);
+    collider->offset = gUnk_0824F6E8;
+    collider->bounds = gUnk_0824F6F0;
     if (horizontal) {
-        p->direction = 0x10;
+        shot->direction = 0x10;
         {
             u32 direction = 0x80;
-            p->collider.direction = direction;
+            shot->collider.direction = direction;
         }
-        p->startCoordinate = p->position.x;
+        shot->startCoordinate = shot->sprite.position.x;
     } else {
-        p->direction = 0;
+        shot->direction = 0;
         {
             u32 direction = 0xC0;
-            p->collider.direction = direction;
+            shot->collider.direction = direction;
         }
-        p->startCoordinate = p->position.z;
+        shot->startCoordinate = shot->sprite.position.z;
     }
-    Collider_SetCallback(&p->collider, DeckCannon_OnProjectileCollision, p);
+    Collider_SetCallback(&shot->collider, DeckCannon_OnProjectileCollision, shot);
     {
-        u32 update = (u32)DeckCannon_UpdateProjectile;
-        u32 destroy = (u32)DeckCannon_DestroyProjectile;
-        p->update = update;
-        p->destroy = destroy;
+        void (*update)(struct DeckCannonShot *) = DeckCannon_UpdateProjectile;
+        void (*destroy)(struct DeckCannonShot *) = DeckCannon_DestroyProjectile;
+        shot->update = update;
+        shot->destroy = destroy;
     }
 }
