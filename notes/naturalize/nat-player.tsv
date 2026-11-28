@@ -300,3 +300,6 @@ src/player/cutscene/player_cue_actions.c	Player_UpdateTriggerAnimation	natural	n
 src/player/cutscene/player_cue_actions.c	Player_TurnTowardTargetFacing	natural	natural	0	
 src/player/cutscene/player_cue_actions.c	Player_AdvanceScriptDestination	contrived	minor	6	facing mask temporaries, rate-scale call with ignored result, reference union forcing a reload
 src/player/cutscene/player_cue_actions.c	Player_UpdateTimedDirectionAction	contrived	natural	4	
+src/player/cutscene/player_cue_actions.c	Player_UpdateTimedCueAnimation	natural	natural	0	
+src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateDeparture	natural	natural	0	
+src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateScaleTransition	contrived	natural	6	

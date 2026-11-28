@@ -465,14 +465,8 @@ void Player_UpdateSongCueAnimation(struct Player *player)
 
 // confidence=low: cue callbacks select departure and arrival phases with scale changes.
 
-static inline void SetCueVerticalScale(struct Player *player, u32 value)
-{
-    player->terrainRecoveryCounter = value;
-}
-
 void PlayerCue_UpdateScaleTransition(struct Player *player)
 {
-    u16 *t;
     switch (player->tetherPhase) {
         case 0:
             player->resetValue6FC = 15;
@@ -491,23 +485,19 @@ void PlayerCue_UpdateScaleTransition(struct Player *player)
                 Sound_PlaySong(0x327);
             player->resetValue6FC = 30;
             player->animation.flags |= 2;
-            t = &player->tetherFrame;
-            player->animation.scaleX = 64 - ((u8)*t << 2);
-            if (*t > 8) {
-                player->animation.scaleY = *t << 3;
-                {
-                    s32 frame = *t - 8;
-                    SetCueVerticalScale(player, ((frame << 2) + frame) << 2);
-                }
+            player->animation.scaleX = 64 - ((u8)player->tetherFrame << 2);
+            if (player->tetherFrame > 8) {
+                player->animation.scaleY = player->tetherFrame << 3;
+                player->terrainRecoveryCounter = (player->tetherFrame - 8) * 20;
                 Player_AddControlFlags(player, 4);
             }
-            if (++*t > 15)
+            if (++player->tetherFrame > 15)
                 ActorSequence_Begin(player, 7, 3);
             break;
 
         case 3:
             Player_AddControlFlags(player, 4);
-            SetCueVerticalScale(player, player->tetherFrame * 200 + 160);
+            player->terrainRecoveryCounter = player->tetherFrame * 200 + 160;
             if (++player->tetherFrame > 7) {
                 Player_AddControlFlags(player, 1);
                 ActorSequence_Begin(player, 0, 0);
@@ -523,7 +513,7 @@ void PlayerCue_UpdateScaleTransition(struct Player *player)
             player->animation.flags |= 2;
             player->animation.scaleX = 4;
             player->animation.scaleY = 120;
-            SetCueVerticalScale(player, (8 - player->tetherFrame) * 200 + 160);
+            player->terrainRecoveryCounter = (8 - player->tetherFrame) * 200 + 160;
             if (++player->tetherFrame > 7)
                 ActorSequence_Begin(player, 7, 5);
             break;
@@ -533,10 +523,10 @@ void PlayerCue_UpdateScaleTransition(struct Player *player)
             player->animation.scaleX = 64 - ((15 - (u8)player->tetherFrame) << 2);
             if (player->tetherFrame <= 7) {
                 player->animation.scaleY = (15 - player->tetherFrame) << 3;
-                SetCueVerticalScale(player, (8 - player->tetherFrame) * 20);
+                player->terrainRecoveryCounter = (8 - player->tetherFrame) * 20;
             } else {
                 player->animation.scaleY = 64;
-                SetCueVerticalScale(player, 0);
+                player->terrainRecoveryCounter = 0;
                 Player_AddControlFlags(player, 4);
             }
             if (++player->tetherFrame > 15)
@@ -556,23 +546,19 @@ void PlayerCue_UpdateScaleTransition(struct Player *player)
                 Sound_PlaySong(0x327);
             Player_SetAnimation(player, ActorVariant_GetTableValue(player->actionMode, 0), 64, 1);
             player->animation.flags |= 2;
-            t = &player->tetherFrame;
-            player->animation.scaleX = 64 - ((u8)*t << 2);
-            if (*t > 8) {
-                player->animation.scaleY = *t << 3;
-                {
-                    s32 frame = *t - 8;
-                    SetCueVerticalScale(player, ((frame << 2) + frame) << 2);
-                }
+            player->animation.scaleX = 64 - ((u8)player->tetherFrame << 2);
+            if (player->tetherFrame > 8) {
+                player->animation.scaleY = player->tetherFrame << 3;
+                player->terrainRecoveryCounter = (player->tetherFrame - 8) * 20;
                 Player_AddControlFlags(player, 4);
             }
-            if (++*t > 15)
+            if (++player->tetherFrame > 15)
                 ActorSequence_Begin(player, 7, 3);
             break;
         case 8:
             Player_AddControlFlags(player, 4);
             Player_SetAnimation(player, ActorVariant_GetTableValue(player->actionMode, 0), 64, 1);
-            SetCueVerticalScale(player, player->tetherFrame * 200 + 160);
+            player->terrainRecoveryCounter = player->tetherFrame * 200 + 160;
             if (++player->tetherFrame > 7) {
                 Player_AddControlFlags(player, 1);
                 ActorSequence_Begin(player, 0, 0);
