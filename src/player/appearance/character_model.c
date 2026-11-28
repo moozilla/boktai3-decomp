@@ -493,16 +493,14 @@ void Position_GetHeightAdjustedCoordinates(s32 *coordinates, s32 height, s16 *po
 
 void Character_UpdateLoopingSound(struct ScenePoolActor *actor)
 {
-    u16 *playing = &actor->playingSound;
-    u16 *requested = &actor->requestedSound;
-    if (*playing != *requested) {
+    if (actor->playingSound != actor->requestedSound) {
         Sound_StopSong(0x87);
         Sound_StopSong(0x88);
         Sound_StopSong(0x89);
         Sound_StopSong(0x8a);
         Sound_StopSong(0x8b);
-        Sound_PlaySong(*requested);
-        *playing = *requested;
+        Sound_PlaySong(actor->requestedSound);
+        actor->playingSound = actor->requestedSound;
     }
 }
 
