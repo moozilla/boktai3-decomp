@@ -175,3 +175,4 @@ src/link/player/Player_ConsumeActionResource.c	Player_ConsumeActionResource	mino
 src/link/player/sub_0823ABA8.c	sub_0823ABA8	contrived	natural	2	
 src/link/player/LinkPlayer_HasSlotValueAtLeast.c	LinkPlayer_HasSlotValueAtLeast	contrived	natural	1	
 src/link/player/LinkPlayer_GetSessionPlayerData.c	LinkPlayer_GetSessionPlayerData	contrived	minor	2	per-slot data starts inside the exchange buffer fields, so a byte offset stays
+src/link/player/Player_GetActionIndex.c	Player_GetActionIndex	contrived	natural	2	
