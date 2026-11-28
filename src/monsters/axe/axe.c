@@ -2257,38 +2257,27 @@ void ActorPhase_EmitTrailSprite(struct ChaseActor *actor, const struct ContactPo
                                 u32 angle)
 {
     struct Axe *context = actor->base.context;
-    struct DisplaySequenceSprite *sprite;
-    struct DisplaySequenceState *state;
     u32 spriteOffset;
     if (((struct DisplaySequenceSprite *)actor->base.drawable)->flags & 1)
         return;
     {
-        s32 zero = Mod(actor->base.frameCounter, context->trailSpacing);
-        if (zero)
+        s32 remainder = Mod(actor->base.frameCounter, context->trailSpacing);
+        if (remainder)
             return;
         {
             struct DisplaySequenceState *source =
                 &((struct SceneActorControlMotionDrawable *)actor->base.drawable)->sequence;
             u16 selection = source->sequenceId;
-            u32 indexOffset = context->nextTrail * sizeof(struct AxeTrailSlot);
-            struct AxeTrailSlot *slot;
-            struct DisplaySequenceState *destination;
+            struct AxeTrailSlot *slot = &context->trail[context->nextTrail];
+            struct DisplaySequenceState *destination = &slot->sequence;
             const void *resource;
-            spriteOffset = (u32) & ((struct Axe *)0)->trail[0];
-            slot = (struct AxeTrailSlot *)((u8 *)context + (indexOffset + spriteOffset));
-            destination = &slot->sequence;
+
             resource = Axe_TrailResource(context, context->nextTrail);
-            Anim_SetSequence(destination, resource, selection, context->variant, zero);
+            Anim_SetSequence(destination, resource, selection, context->variant, remainder);
         }
     }
-    sprite = (struct DisplaySequenceSprite *)(context->nextTrail * sizeof(struct AxeTrailSlot) +
-                                              (u32)context);
-    sprite = (struct DisplaySequenceSprite *)((u8 *)sprite + spriteOffset);
-    state = (struct DisplaySequenceState *)(context->nextTrail * sizeof(struct AxeTrailSlot) +
-                                            (u32)context);
-    state =
-        (struct DisplaySequenceState *)((u8 *)state + (u32) & ((struct Axe *)0)->trail[0].sequence);
-    Axe_StepSequence(sprite, state);
+    Axe_StepSequence(&context->trail[context->nextTrail].sprite,
+                     &context->trail[context->nextTrail].sequence);
     context->trail[context->nextTrail].sprite.position = *position;
     context->trail[context->nextTrail].sprite.flags &= ~1;
     context->trail[context->nextTrail].sprite.flags |= 2;
