@@ -1,5 +1,3 @@
-#define gTerrainMapWidth  gTerrainWidth
-#define gTerrainMapHeight gTerrainHeight
 #include "global.h"
 #include "engine/engine.h"
 #include "engine/math/scene_vec.h"

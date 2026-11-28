@@ -223,3 +223,4 @@ src/bosses/hresvelgr/ScalarApproach_ApplyAngleProfileArray.c	ScalarApproach_Appl
 src/bosses/hresvelgr/Hresvelgr_GetEnvironmentalLevel.c	Hresvelgr_GetEnvironmentalLevel	contrived	natural	1	
 src/bosses/hresvelgr/Hresvelgr_SetAnimation.c	Hresvelgr_SetAnimation	minor	natural	1	
 src/bosses/hresvelgr/Hresvelgr_HasCellOverride.c	Hresvelgr_HasCellOverride	minor	natural	1	
+src/bosses/hresvelgr/Hresvelgr_HasAdjacentOverride.c	Hresvelgr_HasAdjacentOverride	minor	natural	1	
