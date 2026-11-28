@@ -28,10 +28,8 @@ static inline u8 HasPendingHit(struct ChaseActor *actor)
 static inline u8 IsDownAtHealth(struct ChaseActor *actor, u16 flags, const s16 *health)
 {
     if (actor) {
-        {
-            if (0x40 & flags)
-                return 1;
-        }
+        if (0x40 & flags)
+            return 1;
         {
             u32 mask = 0x20000;
             if (actor->base.statusFlags & mask)
