@@ -1,6 +1,7 @@
 #include "global.h"
+#include "bosses/ratatosk/ratatosk.h"
 
-void Ratatosk_OnFrontCollision(u32 a, u32 b, u8 *q)
+void Ratatosk_OnFrontCollision(u32 a, u32 b, struct Ratatosk *owner)
 {
-    *(u32 *)(q + 0xCC0) = 1;
+    owner->unknownCC0 = 1;
 }
