@@ -192,3 +192,8 @@ src/npc/story_character/SceneCharacter_StartSlowAnimationSeven.c	SceneCharacter_
 src/npc/story_character/SceneCharacter_StartAnimationSeven.c	SceneCharacter_StartAnimationSeven	contrived	natural	1	
 src/npc/story_character/SceneCharacter_UpdateAnimationSevenSixFive.c	SceneCharacter_UpdateAnimationSevenSixFive	contrived	natural	1	
 src/npc/story_character/SceneCharacter_StartAnimationEleven.c	SceneCharacter_StartAnimationEleven	contrived	natural	1	
+src/npc/story_character/StoryCharacter_UpdateTwoStageAnimationB.c	StoryCharacter_UpdateTwoStageAnimationB	natural	natural	0	
+src/npc/story_character/Actor_UpdateKindFiveEntryEight.c	Actor_UpdateKindFiveEntryEight	natural	natural	0	
+src/npc/story_character/Actor_UpdateKindFiveEntryTen.c	Actor_UpdateKindFiveEntryTen	natural	natural	0	
+src/npc/story_character/SceneCharacter_UpdateAnimationFiveToIdle.c	SceneCharacter_UpdateAnimationFiveToIdle	natural	natural	0	
+src/npc/story_character/StoryCharacter_UpdateDashAnimation13.c	StoryCharacter_UpdateDashAnimation13	contrived	minor	3	unsigned casts on distance (used as dash speed); ground position pointer
