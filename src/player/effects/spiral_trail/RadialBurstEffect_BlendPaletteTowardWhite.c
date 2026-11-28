@@ -3,21 +3,20 @@
 /* RadialBurstEffect_BlendPaletteTowardWhite: same code as RadialBurstEffect_BlendSpritePalette at another address (ported by relatives.py; provisional name) */
 void RadialBurstEffect_BlendPaletteTowardWhite(struct SpiralTrailSprite *s)
 {
-    const u16 *p = s->sourcePalette;
+    const u16 *source = s->sourcePalette;
     int bias = (16 - s->alpha) * 15;
-    int i = 0;
+    s32 i = 0;
     u32 mask = 31;
-    do {
-        u32 c = *p;
-        int r = c & 31;
-        int g = ((c << 16) >> 21) & mask;
-        int b = ((c << 16) >> 26) & mask;
-        int a = s->alpha;
-        r = (bias + r * a) >> 4;
-        g = (bias + g * a) >> 4;
-        b = (bias + b * a) >> 4;
+
+    for (; i < 16; source++, i++) {
+        u32 color = *source;
+        int r = color & 31;
+        int g = ((color << 16) >> 21) & mask;
+        int b = ((color << 16) >> 26) & mask;
+
+        r = (bias + r * s->alpha) >> 4;
+        g = (bias + g * s->alpha) >> 4;
+        b = (bias + b * s->alpha) >> 4;
         s->colors[i] = (b << 10) | (g << 5) | r;
-        p++;
-        i++;
-    } while (i <= 15);
+    }
 }
