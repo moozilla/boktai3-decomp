@@ -150,3 +150,4 @@ src/player/attack/Player_UpdateStatThreshold.c	Player_UpdateStatThreshold	natura
 src/player/attack/Player_SelectActionVariant.c	Player_SelectActionVariant	natural	natural	0	-
 src/player/attack/Player_SelectActionCue.c	Player_SelectActionCue	contrived	minor	30	record pointer plus separate offset local (member access folds the +4 into the load)
 src/player/attack/Player_HasWeaponComboEntry.c	Player_HasWeaponComboEntry	contrived	minor	12	record pointer plus separate offset local
+src/player/attack/Player_IsActionCueReady.c	Player_IsActionCueReady	contrived	minor	10	record pointer plus separate offset local
