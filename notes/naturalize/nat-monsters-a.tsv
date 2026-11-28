@@ -457,3 +457,14 @@ src/monsters/axe/axe.c	SceneActorControl_InitializeHoverState	minor	minor	0	shar
 src/monsters/axe/axe.c	Axe_BeginMoveToPosition	contrived	contrived	1	one stack array holds both the fill word and the delta: two locals swap their stack slots
 src/monsters/axe/axe.c	Axe_ClearForcedMovement	contrived	contrived	4	every mask and address parked in a local: direct updates load each mask after the value
 src/monsters/axe/axe.c	Axe_InitAttackCooldowns	contrived	contrived	1	open loop with exit inside and a health pointer: a counted for changes the strength reduction
+src/monsters/axe/axe.c	Axe_InitEffectPalettes	contrived	contrived	4	goto loop with parked color constants and four walking pointers: a for loop over the members changes the induction variables
+src/monsters/axe/axe.c	ActorPhase_EmitTrailSprite	contrived	minor	3	row casts for the scale copies
+src/monsters/axe/axe.c	Axe_SpawnSparks	contrived	minor	2	one z component scaled in place, x2 and a fill word shared with the stack
+src/monsters/axe/axe.c	ActorPhase_UpdateReverseFlickerTimer	natural	natural	0	
+src/monsters/axe/axe.c	ActorPhase_UpdateFlicker	natural	natural	0	
+src/monsters/axe/axe.c	Axe_FireAttack	minor	minor	0	flag helpers and per-call block temps
+src/monsters/axe/axe.c	Axe_UpdateFadeOutPhase	contrived	contrived	2	flag constant parked in a local: direct updates load the mask after the field
+src/monsters/axe/axe.c	ActorGroup_BeginMotionPhase	contrived	contrived	2	flag constant parked in a local: direct updates load the mask after the field
+src/monsters/axe/axe.c	Axe_UpdateRecoverTimer	contrived	contrived	1	flag constant parked in a local: direct updates load the mask after the field
+src/monsters/axe/axe.c	Axe_UpdateRecoverTimer2	contrived	contrived	1	flag constant parked in a local: direct updates load the mask after the field
+src/monsters/axe/axe.c	ActorGroup_ResetActivePhase	contrived	contrived	3	mask and address blocks for the two flag clears: direct updates change load order
