@@ -219,3 +219,4 @@ src/effects/feathers/FeatherEffectPool_SpawnGroundScatter.c	FeatherEffectPool_Sp
 src/effects/feathers/FeatherEffectPool_UpdateScatterAnimation.c	FeatherEffectPool_UpdateScatterAnimation	contrived	natural	2	-
 src/effects/feathers/FadingSprite_UpdateExpiry.c	FadingSprite_UpdateExpiry	minor	natural	1	-
 src/effects/feathers/FeatherEffectPool_CreateDirectional.c	FeatherEffectPool_CreateDirectional	contrived	natural	30	-
+src/effects/feathers/FeatherEffectPool_UpdateTask.c	FeatherEffectPool_UpdateTask	contrived	natural	4	-
