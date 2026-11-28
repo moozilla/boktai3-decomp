@@ -258,7 +258,7 @@ void ChallengeMenu_Destroy(struct ChallengeMenu *menu)
 void ChallengeMenu_InitBackgrounds(struct ChallengeMenu *menu)
 {
     s32 value;
-    s32 i;
+    s32 row, column;
     void *res;
     Bg_DisableDisplay(DISPCNT_BG0_ON | DISPCNT_BG1_ON | DISPCNT_BG2_ON | DISPCNT_BG3_ON);
     Bg_ResetDisplay();
@@ -269,16 +269,11 @@ void ChallengeMenu_InitBackgrounds(struct ChallengeMenu *menu)
     Bg_SetupLayers(3, 0, res, 0, 0, 1, &value);
     Bg_SetupLayers(2, 0, res, 0, 0, 1, &value);
     ChallengeMenu_EnableBackground(menu);
-    i = 1;
-    do {
-        u16 *e = Video_GetWrappedBackgroundMapEntry(3, 1, i);
-        s32 next = i + 1;
-        s32 n = 4;
-        do {
-            *e++ = 0x2002;
-        } while (--n >= 0);
-        i = next;
-    } while (i <= 4);
+    for (row = 1; row <= 4; row++) {
+        u16 *entry = Video_GetWrappedBackgroundMapEntry(3, 1, row);
+        for (column = 0; column < 5; column++)
+            *entry++ = 0x2002;
+    }
 }
 
 void ChallengeMenu_LoadPalette(struct ChallengeMenu *menu)
