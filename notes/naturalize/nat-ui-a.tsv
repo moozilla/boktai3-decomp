@@ -1,0 +1,2 @@
+path	function	verdict_before	verdict_after	compiles	notes
+src/ui/books/monster_book/Dir_Decompose.c	Dir_Decompose	contrived	natural	1	
