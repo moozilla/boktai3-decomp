@@ -1,37 +1,15 @@
 #include "global.h"
+#include "bosses/vanargand/vanargand_pair_attack.h"
 
 // confidence=low: starts a target-directed motion track and emits afterimages.
 struct Vector {
     s16 x, y, z, pad;
-};
-struct DashActor {
-    u8 pad0[0x54];
-    s16 position[4];
-    u8 pad5C[0x9C - 0x5C];
-    u32 flags;
-    u8 padA0[2];
-    u8 phase, frame;
-    u32 timer;
-    u8 padA8[7];
-    u8 finished, pending, pendingAnimation;
-    u8 padB2[0x104 - 0xB2];
-    void *callback;
-    u8 pad108[8];
-    s16 *target;
-    u8 pad114[0x18C - 0x114];
-    u8 animation[0x60];
-    u8 drawable[0x534 - 0x1EC];
-    u8 track[0x29];
-    u8 trackState;
-    u8 pad55E[0xF44 - 0x55E];
-    void *afterimages;
 };
 extern const s16 gUnk_086149C4[];
 void Vanargand_SetPendingCue(void *, u16);
 u8 Callback_InvokeActor(void *, void *);
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, s32, s32, s32);
 void Sound_PlaySong(u32);
-void MotionTrack_Initialize(void *, const void *, const void *, const void *, u32);
 void MotionTrack_Update(void *);
 void VanargandAfterimagePool_Spawn(void *, void *);
 s32 Math_Atan2(s32, s32);
@@ -59,10 +37,10 @@ static inline void AddVectorInPlace(struct Vector *v, struct Vector *a)
     v->z += a->z;
 }
 
-static inline u8 IsComplete(struct DashActor *p)
+static inline u8 IsComplete(struct VanargandPairAttack *p)
 {
     u8 result = 0;
-    if (p->trackState == 2)
+    if (p->track.active == 2)
         result = 1;
     return result;
 }
@@ -74,9 +52,9 @@ static inline void SetPolar(struct Vector *v, s32 angle, s32 radius)
     v->z = Scale(gUnk_086149C4[angle & 255] * radius);
 }
 
-void Vanargand_UpdateTargetDash(struct DashActor *p)
+void Vanargand_UpdateTargetDash(struct VanargandPairAttack *p)
 {
-    struct DashActor *self = p;
+    struct VanargandPairAttack *self = p;
     u32 mask = 0x48;
     u8 result;
     p->flags |= mask;
@@ -85,19 +63,19 @@ void Vanargand_UpdateTargetDash(struct DashActor *p)
     if (result)
         return;
 
-    if (p->pendingAnimation) {
-        p->pendingAnimation = result;
+    if (p->pending) {
+        p->pending = result;
         p->phase = result;
         p->timer = result;
     }
     switch (p->phase) {
         case 0:
             if (p->timer == 0) {
-                SceneActors_StartUnmirroredAnimation(p, p->animation, p->drawable, 4, 1, 0);
+                SceneActors_StartUnmirroredAnimation(p, &p->animation, p->drawable, 4, 1, 0);
                 Sound_PlaySong(0x586);
                 p->timer++;
             }
-            if (p->frame > 10) {
+            if (p->action > 10) {
                 p->phase = 1;
                 p->timer = 0;
             }
@@ -105,8 +83,8 @@ void Vanargand_UpdateTargetDash(struct DashActor *p)
 
         case 1:
             if (p->timer == 0) {
-                void *track = p->track;
-                s16 *target = p->target;
+                void *track = &p->track;
+                s16 *target = p->destination;
                 struct Vector center;
                 struct Vector destination;
                 s32 dx;
@@ -118,22 +96,22 @@ void Vanargand_UpdateTargetDash(struct DashActor *p)
                 dx = first[0] - target[0];
                 dz = 640 - target[2];
                 if (((dx * dx) + (dz * dz)) <= 0x100000) {
-                    MotionTrack_Initialize(track, p->position, target, 0, 3);
+                    MotionTrack_Initialize(track, &p->position, target, 0, 3);
                 } else {
                     SetPolar(&destination, Math_Atan2(target[0] - first[0], target[2] - 640), 1024);
                     AddVectorInPlace(&destination, &center);
                     destination.y = target[1];
-                    MotionTrack_Initialize(track, p->position, &destination, 0, 3);
+                    MotionTrack_Initialize(track, &p->position, &destination, 0, 3);
                 }
                 p->timer++;
             }
-            MotionTrack_Update(self->track);
+            MotionTrack_Update(&self->track);
             if (IsComplete(self)) {
                 u8 next = 2;
                 p->phase = next;
                 p->timer = 0;
             } else {
-                VanargandAfterimagePool_Spawn(self->afterimages, p->position);
+                VanargandAfterimagePool_Spawn(self->afterimages, &p->position);
             }
             break;
 
