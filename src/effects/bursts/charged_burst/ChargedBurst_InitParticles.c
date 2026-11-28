@@ -1,34 +1,25 @@
-#include "global.h"
-struct Entry33A {
-    u8 pad[15];
-    u8 a, b;
-    u8 gap[23];
-    u8 c, d;
-    u8 tail[2];
-};
-struct State33A {
-    u8 pad[0xa0];
-    u32 handle;
-    struct Entry33A entries[8];
-};
-u32 AnimData_FindEntry(u32);
-void ParticleSprite_Initialize(struct Entry33A *, u32, s32);
-void Effect_SetOrigin(struct Entry33A *, s32, s32);
-void SpriteDrawable_SelectTileFrame(struct Entry33A *, u32, s32);
-void Effect_SetPalette(struct Entry33A *, s32);
-void ChargedBurst_InitParticles(struct State33A *p)
+#include "effects/bursts/charged_burst.h"
+
+void ParticleSprite_Initialize(struct ChargedBurstSprite *, void *, s32);
+void Effect_SetOrigin(struct ChargedBurstSprite *, s32, s32);
+void SpriteDrawable_SelectTileFrame(struct ChargedBurstSprite *, void *, s32);
+void Effect_SetPalette(struct ChargedBurstSprite *, s32);
+
+void ChargedBurst_InitParticles(struct ChargedBurst *burst)
 {
     s32 i;
-    p->handle = AnimData_FindEntry(0x1c1e);
+
+    burst->sparkResource = AnimData_FindEntry(0x1c1e);
     for (i = 0; i < 8; i++) {
-        struct Entry33A *e = &p->entries[i];
-        ParticleSprite_Initialize(e, p->handle, 1);
-        Effect_SetOrigin(e, -4, -4);
-        SpriteDrawable_SelectTileFrame(e, p->handle, 8);
-        Effect_SetPalette(e, 1);
-        e->a = 2;
-        e->b = 236;
-        p->entries[i].c = 0;
-        p->entries[i].d = 0;
+        struct ChargedBurstSprite *sprite = &burst->sparks[i].sprite;
+
+        ParticleSprite_Initialize(sprite, burst->sparkResource, 1);
+        Effect_SetOrigin(sprite, -4, -4);
+        SpriteDrawable_SelectTileFrame(sprite, burst->sparkResource, 8);
+        Effect_SetPalette(sprite, 1);
+        sprite->unk_0F = 2;
+        sprite->unk_10 = 236;
+        burst->sparks[i].active = 0;
+        burst->sparks[i].timer = 0;
     }
 }
