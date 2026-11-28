@@ -608,3 +608,4 @@ src/player/gun/Player_UpdateAttachedAttackCharge.c	Player_UpdateAttachedAttackCh
 src/player/interaction/Player_UpdateObjectPushRecovery.c	Player_UpdateObjectPushRecovery	contrived	minor	2	IsTwo link-mode helper: the u8 result computed from a saved halfword fixes the double test
 src/player/interaction/Player_UpdateObjectPush.c	Player_UpdateObjectPush	contrived	contrived	22	probe pointer blocks for the height lookup, CellHasFlag/isTwo/status-bit helpers (mask loaded before the field) and the angle alias fix the register allocation
 src/player/interaction/Player_UpdateFlaggedResourceRecovery.c	Player_UpdateFlaggedResourceRecovery	contrived	minor	6	Player_SetStatusBits: ROM loads the mask before the status word
+src/player/interaction/Player_UpdateUnflaggedResourceRecovery.c	Player_UpdateUnflaggedResourceRecovery	contrived	minor	6	Player_SetStatusBits: ROM loads the mask before the status word

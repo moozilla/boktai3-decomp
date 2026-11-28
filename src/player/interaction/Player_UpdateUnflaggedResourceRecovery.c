@@ -13,7 +13,6 @@ void Sound_StopSong(u32);
 void ConvergingEffects_EmitFarParticle(void *, struct SceneVec *);
 void Player_UpdateUnflaggedResourceRecovery(struct Player *p)
 {
-    s16 k2 = 0;
     if (Player_ConsumeStateEntry(p)) {
         Player_SetActionPhase(p, 0);
     }
@@ -42,7 +41,8 @@ void Player_UpdateUnflaggedResourceRecovery(struct Player *p)
             }
             Sound_PlaySong(0xcb);
             if (!(*p->inputKeys & 1)) {
-                goto finish;
+                Player_SetActionPhase(p, 4);
+                break;
             }
             if (Player_CanRecoverResourceWhileUnflagged(p)) {
                 Sound_PlaySong(0x2e4);
@@ -52,9 +52,9 @@ void Player_UpdateUnflaggedResourceRecovery(struct Player *p)
                 break;
             }
             p->chargeCounter = 0;
-            goto pause;
-        case 2: {
-            u32 zero;
+            Player_SetActionPhase(p, 3);
+            break;
+        case 2:
             Player_SetStatusBits(&p->statusFlags, 0xa0);
             if (p->chargeCounter <= 4) {
                 if (++p->chargeCounter == 5) {
@@ -66,35 +66,25 @@ void Player_UpdateUnflaggedResourceRecovery(struct Player *p)
             Player_SetActionOrigin(p);
             ConvergingEffects_EmitFarParticle(p, &p->actionOrigin);
             p->actionEighteenParameter = 0x16f;
-            {
-                u32 counter = p->tetherFrame;
-                if (counter <= 31) {
-                    p->actionEighteenDuration = counter;
-                } else {
-                    p->actionEighteenDuration = 64 - counter;
-                }
+            if (p->tetherFrame <= 31) {
+                p->actionEighteenDuration = p->tetherFrame;
+            } else {
+                p->actionEighteenDuration = 64 - p->tetherFrame;
             }
-            {
-                u16 *timer = &p->tetherFrame;
-                u32 value = *timer + 1;
-                zero = k2;
-                *timer = value;
-                if (((u16)value) > 64) {
-                    *timer = 0;
-                }
+            if (++p->tetherFrame > 64) {
+                p->tetherFrame = 0;
             }
             if (!(*p->inputKeys & 1)) {
                 Sound_StopSong(0x239);
-                p->chargeSoundActive = zero;
-                goto finish;
+                p->chargeSoundActive = 0;
+                Player_SetActionPhase(p, 4);
+                break;
             }
             if (Player_CanRecoverResourceWhileUnflagged(p)) {
                 break;
             }
             Sound_StopSong(0x239);
-            p->chargeSoundActive = zero;
-        }
-        pause:
+            p->chargeSoundActive = 0;
             Player_SetActionPhase(p, 3);
             break;
         case 3:
@@ -102,7 +92,6 @@ void Player_UpdateUnflaggedResourceRecovery(struct Player *p)
             Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 10), 64, 1);
             p->resetValue6FC = 30;
             if (!(*p->inputKeys & 1)) {
-            finish:
                 Player_SetActionPhase(p, 4);
                 break;
             }
