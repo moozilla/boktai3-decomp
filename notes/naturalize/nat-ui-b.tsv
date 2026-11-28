@@ -452,3 +452,6 @@ src/ui/town/shop/Shop_FindEquippedSlot.c	Shop_FindEquippedSlot	minor	natural	1
 src/ui/town/shop/Shop_RefreshConsumableValue.c	Shop_RefreshConsumableValue	minor	minor	3	goto into the shared hide branch, as in the item version
 src/ui/town/shop/Shop_BeginEquipmentSwapPair.c	Shop_BeginEquipmentSwapPair	contrived	minor	5	widget-run view over the panel for the flag writes (one base for both sprite groups)
 src/ui/town/shop/Shop_PopulateItemGrid.c	Shop_PopulateItemGrid	contrived	minor	8	widget-run view over the panel for the flag writes
+src/ui/town/shop/Shop_PopulateEquipmentGrid.c	Shop_PopulateEquipmentGrid	contrived	contrived	40	plain nested loops with the widget view differ only in two spill slots (flag base vs row+1)
+src/ui/town/shop/Shop_PopulateConsumableGrid.c	Shop_PopulateConsumableGrid	contrived	contrived	30	plain nested loops differ by r6/r7 between slot and sprite pointer; third loop walks pointers
+src/ui/town/shop/Shop_BeginEquipmentSpecialMove.c	Shop_BeginEquipmentSpecialMove	contrived	minor	1	widget-run view over the panel for the flag writes
