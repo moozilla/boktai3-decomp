@@ -319,3 +319,4 @@ src/player/cutscene/player_cue_actions.c	Player_UpdateThreePhaseBaseAnimationAct
 src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateRunTo	contrived	minor	22	arrival facing mask loaded before the shifted angle keeps a mask local (plain & merges the two stores)
 src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateRunTo	minor	minor	4	arrival facing mask local
 src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateRunOverlay	contrived	natural	1	-
+src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateTurningPalette	minor	natural	8	PackPaletteGreen kept (inlining the or changes operand loads)

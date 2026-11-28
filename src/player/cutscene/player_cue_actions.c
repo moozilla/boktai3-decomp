@@ -1157,8 +1157,8 @@ static inline u32 PackPaletteGreen(u32 otherChannels, s32 green)
 
 void PlayerCue_UpdateTurningPalette(struct Player *player)
 {
-    s32 a;
-    s32 b;
+    s32 fromWeight;
+    s32 toWeight;
     s32 red;
     s32 green;
     switch (player->tetherPhase) {
@@ -1168,12 +1168,9 @@ void PlayerCue_UpdateTurningPalette(struct Player *player)
                     player->facing = (player->facing - 1) & 7;
                 else
                     player->facing = (player->facing + 1) & 7;
-                {
-
-                    Player_UpdateFacingSide(player);
-                    player->heading--;
-                    player->tetherFrame = 0;
-                }
+                Player_UpdateFacingSide(player);
+                player->heading--;
+                player->tetherFrame = 0;
             } else
                 player->tetherFrame++;
             Player_SetAnimation(player, ActorVariant_GetTableValue(player->actionMode, 0x37), 0x40,
@@ -1227,7 +1224,7 @@ void PlayerCue_UpdateTurningPalette(struct Player *player)
             player->side = 1;
             if (Player_SetAnimation(player, ActorVariant_GetTableValue(player->actionMode, 0x39),
                                     0x40, 1)) {
-                if ((++player->cuePhase) > 1)
+                if (++player->cuePhase > 1)
                     player->tetherPhase = 7;
             }
             break;
@@ -1244,26 +1241,23 @@ void PlayerCue_UpdateTurningPalette(struct Player *player)
             break;
     }
 
-    if ((player->unk5A0) <= 7) {
-        a = player->unk5A0;
-        b = 8 - a;
+    if (player->unk5A0 <= 7) {
+        fromWeight = player->unk5A0;
+        toWeight = 8 - fromWeight;
     } else {
-        a = 16 - (player->unk5A0);
-        b = (player->unk5A0) - 8;
+        fromWeight = 16 - player->unk5A0;
+        toWeight = player->unk5A0 - 8;
     }
-    red = ((30 * a) + (19 * b)) >> 3;
-    green = ((13 * a) + (12 * b)) >> 3;
-    green = PackPaletteGreen(0x2C00, green) | red;
-    player->basePalette[5] = green;
-    red = ((31 * a) + (25 * b)) >> 3;
-    green = ((18 * a) + (12 * b)) >> 3;
-    green = PackPaletteGreen(0x2C00, green) | red;
-    player->basePalette[6] = green;
-    red = (31 * (a + b)) >> 3;
-    green = ((22 * a) + (13 * b)) >> 3;
-    green = PackPaletteGreen(0x2C00, green) | red;
-    player->basePalette[13] = green;
-    if ((++(player->unk5A0)) > 15)
+    red = (30 * fromWeight + 19 * toWeight) >> 3;
+    green = (13 * fromWeight + 12 * toWeight) >> 3;
+    player->basePalette[5] = PackPaletteGreen(0x2C00, green) | red;
+    red = (31 * fromWeight + 25 * toWeight) >> 3;
+    green = (18 * fromWeight + 12 * toWeight) >> 3;
+    player->basePalette[6] = PackPaletteGreen(0x2C00, green) | red;
+    red = (31 * (fromWeight + toWeight)) >> 3;
+    green = (22 * fromWeight + 13 * toWeight) >> 3;
+    player->basePalette[13] = PackPaletteGreen(0x2C00, green) | red;
+    if (++player->unk5A0 > 15)
         player->unk5A0 = 0;
     if (gGameState->form != 2) {
         gPlayerCueTimer = 0;
