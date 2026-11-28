@@ -10,3 +10,4 @@ src/monsters/ivy/ivy.c	Ivy_UpdateGrabAttack	contrived	minor	40	Ivy_ReadFrame str
 src/monsters/ivy/ivy.c	Ivy_UpdateHold	contrived	minor	9	IsIdle u8 predicate and ReportDrain/CellCenter inlines kept
 src/monsters/ivy/ivy.c	Ivy_BeginRelease	contrived	minor	4	MonsterInit_SetMotionFlags and ClearHeld accessors
 src/monsters/ivy/ivy.c	Ivy_UpdateHold	minor	minor	1	
+src/monsters/ivy/ivy.c	Ivy_ReleaseCapturedPlayer	contrived	minor	3	ContactCollider_SetFlags on colliderA/B (ROM addresses flags through the collider pointer), HalfwordFlags_Set on placement flags

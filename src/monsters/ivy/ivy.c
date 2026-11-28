@@ -1223,44 +1223,34 @@ s32 SceneActorControl_BeginSoundTransition(struct ChaseActor *actor)
  * player is held, puts the player back on the centre of the actor's terrain cell facing the
  * actor's quadrant (cue 0xE6); then returns the actor to idle with both colliders disabled. */
 
+// scope: put Ivy_ReleaseCapturedPlayer begin
 void Ivy_ReleaseCapturedPlayer(struct ChaseActor *actor)
 {
     if (Ivy_TestCaptureFlags(actor->base.context, IVY_CAPTURE_RELEASED))
         return;
     if (Ivy_TestCaptureFlags(actor->base.context, IVY_CAPTURE_HOLDS_PLAYER)) {
+        struct SceneActorBody *target;
         struct SceneVec position;
         s32 angle;
+
         CellCenter(&position, actor->base.terrainCell);
-        {
-            s32 turn = (actor->base.body.direction + 0x20) & 0xFF;
-            angle = (turn >= 0 ? turn >> 6 : -(-turn >> 6)) << 6;
+        angle = Math_ShiftTowardZero((actor->base.body.direction + 0x20) & 0xFF, 6) << 6;
+        target = (void *)actor->base.tracking.target;
+        if (target->mode <= 3) {
+            Player_ApplyPositionRequest(target->owner, &position, 0x40, angle, 0x3C, 0, 0, 0);
+            Sound_PlaySong(0xE6);
         }
-        {
-            struct SceneActorBody *target = (void *)actor->base.tracking.target;
-            if (target->mode <= 3) {
-                Player_ApplyPositionRequest(target->owner, &position, 0x40, angle, 0x3C, 0, 0, 0);
-                Sound_PlaySong(0xE6);
-            }
-        }
-        ((u8 *)actor->base.drawable)[7] = 2;
+        ((struct IvyDrawable *)actor->base.drawable)->mode = 2;
     }
     SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 16);
     SceneActorChase_SetBehavior(actor, 3);
-    {
-        struct ContactCollider *collider = &actor->base.colliderA;
-        collider->flags |= 4;
-    }
-    {
-        struct ContactCollider *collider = &actor->base.colliderB;
-        collider->flags |= 4;
-    }
-    {
-        u32 m = 0x800;
-        actor->base.placementFlags = m | actor->base.placementFlags;
-    }
-    ((struct Ivy *)actor->base.context)->captureFlags |= 1;
+    ContactCollider_SetFlags(&actor->base.colliderA, 4);
+    ContactCollider_SetFlags(&actor->base.colliderB, 4);
+    HalfwordFlags_Set(0x800, &actor->base.placementFlags);
+    ((struct Ivy *)actor->base.context)->captureFlags |= IVY_CAPTURE_RELEASED;
     actor->base.health = 0;
 }
+// scope: put Ivy_ReleaseCapturedPlayer end
 
 void SceneActorRegistry_SendToCategory(s32, s16 *);
 
