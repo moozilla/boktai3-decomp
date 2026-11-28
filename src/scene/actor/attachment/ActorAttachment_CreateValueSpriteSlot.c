@@ -138,7 +138,7 @@ struct ActorAttachmentSlotView *ActorAttachment_CreateValueSpriteSlot(
     if (!(gEngineFlags & 0x100) && emitBurst == 1) {
         struct ContactPosition *position;
         gRandomIndex = (gRandomIndex + 1) & 1023;
-        Mod(*(u16 *)(RANDOM_TABLE_ADDR + gRandomIndex * 2), 3);
+        Mod(((u16 *)RANDOM_TABLE_ADDR)[gRandomIndex], 3);
         position = burstPositions;
         for (i = 2; i >= 0; i--) {
             position->x = slot->anchor->x;
