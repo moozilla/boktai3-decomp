@@ -1,15 +1,12 @@
 #include "global.h"
 #include "engine/runtime.h"
 #include "engine/ram.h"
-struct S {
-    u8 p[0x19];
-    u8 b;
-};
+#include "system/solar/solar_measurement_task.h"
 void Solar_StopMeasurement(void);
 void Solar_PauseMeasurement(void)
 {
-    if (((struct S *)gSolarController)) {
-        if (((struct S *)gSolarController)->b)
+    if (gSolarController) {
+        if (((struct SolarMeasurementTask *)gSolarController)->state)
             Solar_StopMeasurement();
         gSolarPaused = 1;
     }
