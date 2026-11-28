@@ -84,11 +84,7 @@ s32 SceneryMotion_SteerXY(struct OrbitMotion *motion)
     s32 nextAngle;
     s32 delta;
     s32 oldAngle;
-    {
-        s32 deltaX = motion->base.x - destination->x;
-        s32 deltaOther = position->y - destination->y;
-        angle = Math_Atan2(deltaX, deltaOther);
-    }
+    angle = Math_Atan2(motion->base.x - destination->x, position->y - destination->y);
     {
         struct OrbitVector *currentDestination = motion->position;
         x = motion->base.x - currentDestination->x;
