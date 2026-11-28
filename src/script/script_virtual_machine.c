@@ -292,7 +292,7 @@ u32 Script_GetStackArgument(s32 n)
 
 void Script_SetStackArgument(s32 n, u32 v)
 {
-    *(u32 *)((u8 *)gScriptVm.argSp - (n * 4 + 4)) = v;
+    *(gScriptVm.argSp - (n + 1)) = v;
 }
 
 void Script_ResetKeywordStack(void)
