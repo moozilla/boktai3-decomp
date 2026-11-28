@@ -170,3 +170,4 @@ src/ui/dialogue/choice_menu.c	ChoiceMenu_DispatchSelection	minor	natural	1
 src/ui/dialogue/choice_menu.c	ChoiceMenu_FindSelectableRow	minor	natural	1	
 src/ui/dialogue/choice_menu.c	ChoiceMenu_LayoutText	contrived	minor	1	doubleCharacter goto shared by two tests
 src/ui/dialogue/choice_menu.c	ChoiceMenu_Initialize	minor	natural	1	
+src/ui/dialogue/choice_menu.c	ChoiceMenu_CreateFromScript	contrived	natural	1	

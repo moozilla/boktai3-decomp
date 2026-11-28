@@ -422,7 +422,6 @@ struct ChoiceMenu *ChoiceMenu_CreateFromScript(void)
     s32 stringBase, script;
     struct ChoiceMenu *p;
     s32 i;
-    s32 *base;
     if (gChoiceMenu)
         return 0;
     if (Script_SeekToKeyword('r'))
@@ -453,16 +452,13 @@ struct ChoiceMenu *ChoiceMenu_CreateFromScript(void)
         options[6] = 3;
     }
     if (Script_SeekToKeyword('A')) {
-        s32 argument;
-        base = arguments;
-        for (argument = 0; argument < 4; argument++) {
+        for (i = 0; i < 4; i++) {
             if (Script_GetPc())
-                base[argument] = Script_GetValue();
+                arguments[i] = Script_GetValue();
             else
-                base[argument] = 0;
+                arguments[i] = 0;
         }
     } else {
-        base = arguments;
         for (i = 0; i < 4; i++)
             arguments[i] = 0;
     }
@@ -472,7 +468,7 @@ struct ChoiceMenu *ChoiceMenu_CreateFromScript(void)
         p->useScript = 1;
         p->script = script;
         for (i = 0; i < 4; i++)
-            p->arguments[i] = base[i];
+            p->arguments[i] = arguments[i];
         if (ChoiceMenu_Initialize(p, window, stringBase, options) < 0) {
             Task_Kill(p);
             return 0;
