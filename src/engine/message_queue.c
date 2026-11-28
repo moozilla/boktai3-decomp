@@ -61,26 +61,26 @@ s32 MessageQueue_GetMessagesById(u32 id, struct QueueMessage **out)
 {
     struct MessageQueueBuffer *buffer = MessageQueue_GetBuffers() + (1 - gMessageQueueBufferIndex);
     struct QueueMessage *p = buffer->entries;
-    s32 i = 0;
-    s32 count, limit;
-    while (limit = buffer->count, i < limit) {
+    s32 i;
+
+    for (i = 0; i < buffer->count; i++, p++) {
         if (p->id == id) {
+            s32 count;
+
             *out = p;
             p++;
             i++;
             count = 1;
-            if (i < limit && p->id == id) {
-                limit = buffer->count;
+            /* Messages with one id are adjacent. */
+            if (i < buffer->count && p->id == id) {
                 do {
                     i++;
                     count++;
                     p++;
-                } while (i < limit && p->id == id);
+                } while (i < buffer->count && p->id == id);
             }
             return count;
         }
-        i++;
-        p++;
     }
     return 0;
 }
