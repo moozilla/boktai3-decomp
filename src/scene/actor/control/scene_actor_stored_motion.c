@@ -99,13 +99,6 @@ void SceneActorControl_UpdateTimedFacing(struct ChaseActor *);
 
 void SceneActorControl_ResetCollisionPhase(struct ChaseActor *);
 
-static inline u32 MotionRand(void)
-{
-    u32 index = (gRandomIndex + 1) & 1023;
-    gRandomIndex = index;
-    return *(const u16 *)((index << 1) + RANDOM_TABLE_ADDR);
-}
-
 // confidence=low: waits a timed interval, homes on a stored point, then picks a new point.
 
 void SceneActorControl_UpdateStoredMotion(struct ChaseActor *actor)
@@ -119,7 +112,8 @@ void SceneActorControl_UpdateStoredMotion(struct ChaseActor *actor)
         {
             u32 angle;
             struct ContactPosition target;
-            angle = (u8)MotionRand();
+            gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+            angle = (u8)((u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
             target = *(struct ContactPosition *)&gPlayers[0]->position;
             target.x += Math_ShiftTowardZero(gUnk_086149C4[angle], 3);
             target.z += Math_ShiftTowardZero(gUnk_086149C4[(angle + 64) & 255], 3);
@@ -129,10 +123,7 @@ void SceneActorControl_UpdateStoredMotion(struct ChaseActor *actor)
         }
     }
     if (body->waitTimer != 0) {
-        u32 timer = body->waitTimer;
-        timer--;
-        body->waitTimer = timer;
-        if ((timer << 16) == 0) {
+        if (--body->waitTimer == 0) {
             SceneActorControl_StartPositionCurve(
                 actor, (const struct ContactPosition *)&gPlayers[0]->position);
             MotionState_SetFlags(body, 8);
@@ -144,7 +135,8 @@ void SceneActorControl_UpdateStoredMotion(struct ChaseActor *actor)
             if ((u8)SceneActorControl_AdvancePositionCurve(actor)) {
                 struct ContactPosition target;
                 u32 angle;
-                angle = (u8)MotionRand();
+                gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+                angle = (u8)((u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
                 target = *(struct ContactPosition *)&gPlayers[0]->position;
                 target.x += Math_ShiftTowardZero(gUnk_086149C4[angle], 3);
                 target.z += Math_ShiftTowardZero(gUnk_086149C4[(angle + 64) & 255], 3);
