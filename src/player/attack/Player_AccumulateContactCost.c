@@ -22,22 +22,15 @@ void Player_AccumulateContactCost(struct ContactCollider *source, struct Contact
                     contact->costFlags |= 8;
             }
             if ((Player_ReadStatusBits(&contact->reactionFlags, 0xF80)) && !p->contactCounted) {
-                s32 total, count, threshold;
-                s32 *counter;
-                {
-                    s32 *count = (s32 *)&gGameState->unk600;
-                    (*count)++;
-                }
-                counter = (s32 *)&gGameState->unk600;
-                total = gGameState->contactThreshold;
-                threshold = total * 3 >> 2;
-                count = *counter;
-                if (count == threshold) {
+                u32 *counter = &gGameState->unk600;
+
+                (*counter)++;
+                if (gGameState->unk600 == gGameState->contactThreshold * 3 >> 2) {
                     Sound_PlaySong(0x302);
                     p->actionEighteenParameter = 0x16F;
                     p->actionEighteenDuration = 0x40;
                     p->contactCueDuration = 0x40;
-                } else if (count == (total >> 1)) {
+                } else if (gGameState->unk600 == gGameState->contactThreshold >> 1) {
                     Sound_PlaySong(0x302);
                     p->actionEighteenParameter = 0x16F;
                     p->actionEighteenDuration = 0x20;

@@ -129,3 +129,4 @@ src/player/attack/Player_CalculateBaseAttackPower.c	Player_CalculateBaseAttackPo
 src/player/attack/Player_CalculatePreviewActionStat.c	Player_CalculatePreviewActionStat	contrived	minor	1	EquipmentFlagState view cast over actionFlagState
 src/player/attack/Player_GetSpecialAttackPower.c	Player_GetSpecialAttackPower	contrived	natural	2	-
 src/player/attack/Player_CalculateActionStat.c	Player_CalculateActionStat	minor	minor	5	(void *)value callback argument and empty switch cases stay (shared callback prototype; jump table shape)
+src/player/attack/Player_AccumulateContactCost.c	Player_AccumulateContactCost	contrived	minor	7	counter pointer stays: without it cse reuses the stored value instead of reloading
