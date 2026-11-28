@@ -378,11 +378,7 @@ void IceBoulder_CreateFromScript(void)
     sprite->position = p->origin;
     Sprite_Init(p, &p->graphics, 0);
     PlayerCue_StepSequenceEnded(sprite, &p->sequence);
-    {
-        struct ContactSwarmSprite *s = sprite;
-        u32 f = s->flags;
-        s->flags = f | 1;
-    }
+    sprite->flags |= 1;
     p->variant = Script_GetKeywordValue('m', 0);
     switch (p->variant) {
         case 0:
