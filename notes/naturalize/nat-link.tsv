@@ -13,3 +13,4 @@ src/link/handshake/SlotMonitor_CheckTimeout.c	SlotMonitor_CheckTimeout	minor	nat
 src/link/handshake/LinkHandshake_AdvanceTimeout.c	LinkHandshake_AdvanceTimeout	contrived	natural	1	
 src/link/handshake/CallbackTask_Finish.c	CallbackTask_Finish	minor	natural	1	
 src/link/handshake/LinkHandshake_UpdateRestartState.c	LinkHandshake_UpdateRestartState	contrived	natural	1	
+src/link/handshake/SlotMonitor_PollResult.c	SlotMonitor_PollResult	contrived	natural	1	

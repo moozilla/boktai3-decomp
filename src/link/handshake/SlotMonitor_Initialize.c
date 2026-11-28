@@ -24,10 +24,10 @@ s32 SlotMonitor_Initialize(struct SlotMonitor *obj, s32 timeout, u32 param, u32 
     obj->f20 = 0;
     obj->result = -1;
     obj->f28 = 0;
-    obj->f2c = 0;
+    obj->finished = 0;
     obj->f30 = 0;
     obj->elapsed = 0;
-    obj->f38 = 0;
+    obj->readyFrames = 0;
     obj->activeTimer = 0;
     obj->idleTimer = 0;
     obj->f44 = -1;
