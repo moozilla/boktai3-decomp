@@ -92,17 +92,11 @@ void DarkLoan_UpdateBalanceDigits(struct DarkLoanScreen *panel)
 void DarkLoan_UpdateAdjustmentDigits(struct DarkLoanScreen *display)
 {
     s32 digits[4];
-    s32 value, remaining, i;
-    s32 *digit, *quantityDigit;
-    void *data;
-    u32 *base;
-    struct AnimSprite *anim;
-    u32 *flags;
+    s32 value;
+    s32 i;
 
     value = display->adjustment;
     if (value == 0) {
-        base = &display->widgets[DARK_LOAN_BACKGROUND].flags;
-        data = &display->resource;
         for (i = 0; i < 4; i++)
             digits[i] = 0;
     } else {
@@ -112,19 +106,12 @@ void DarkLoan_UpdateAdjustmentDigits(struct DarkLoanScreen *display)
         value -= digits[1] * 100;
         digits[2] = Div(value, 10);
         digits[3] = value - digits[2] * 10;
-        base = &display->widgets[DARK_LOAN_BACKGROUND].flags;
-        data = &display->resource;
     }
-    digit = digits;
-    anim = display->widgets + DARK_LOAN_ADJUSTMENT_DIGITS;
-    flags = base + 10 * (sizeof(struct AnimSprite) / sizeof(*base));
-    i = 3;
-    do {
-        *flags &= ~1;
-        Anim_LoadKeyframe(anim, data, (u16)(*digit++ + 8), 1);
-        anim++;
-        flags = (void *)((u8 *)flags + sizeof(struct AnimSprite));
-    } while (--i >= 0);
+    for (i = 0; i < 4; i++) {
+        display->widgets[DARK_LOAN_ADJUSTMENT_DIGITS + i].flags &= ~1;
+        Anim_LoadKeyframe(&display->widgets[DARK_LOAN_ADJUSTMENT_DIGITS + i], &display->resource,
+                          (u16)(digits[i] + 8), 1);
+    }
     display->widgets[DARK_LOAN_LOWER_RATE].flags &= ~1;
     value = display->adjustment * display->rate;
     if (value == 0) {
@@ -138,16 +125,11 @@ void DarkLoan_UpdateAdjustmentDigits(struct DarkLoanScreen *display)
         digits[2] = Div(value, 10);
         digits[3] = value - digits[2] * 10;
     }
-    quantityDigit = digits;
-    anim = display->widgets + DARK_LOAN_AMOUNT_DIGITS;
-    flags = base + 15 * (sizeof(struct AnimSprite) / sizeof(*base));
-    i = 3;
-    do {
-        *flags &= ~1;
-        Anim_LoadKeyframe(anim, data, (u16)(*quantityDigit++ + 8), 1);
-        anim++;
-        flags = (void *)((u8 *)flags + sizeof(struct AnimSprite));
-    } while (--i >= 0);
+    for (i = 0; i < 4; i++) {
+        display->widgets[DARK_LOAN_AMOUNT_DIGITS + i].flags &= ~1;
+        Anim_LoadKeyframe(&display->widgets[DARK_LOAN_AMOUNT_DIGITS + i], &display->resource,
+                          (u16)(digits[i] + 8), 1);
+    }
 }
 
 void DarkLoan_DrawPreview(struct DarkLoanScreen *panel)

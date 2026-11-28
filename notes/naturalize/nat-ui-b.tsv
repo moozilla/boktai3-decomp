@@ -361,3 +361,4 @@ src/ui/town/dark_loan.c	DarkLoan_EnableAlternateRenderMode	contrived	contrived	1
 src/ui/town/dark_loan.c	DarkLoan_ShowPrompt	natural	natural	0	
 src/ui/town/dark_loan.c	DarkLoan_ResetBackground	minor	natural	1	
 src/ui/town/dark_loan.c	DarkLoan_UpdateBalanceDigits	contrived	natural	1	
+src/ui/town/dark_loan.c	DarkLoan_UpdateAdjustmentDigits	contrived	natural	1	
