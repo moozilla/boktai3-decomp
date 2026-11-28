@@ -419,3 +419,5 @@ src/ui/title/password_menu.c	PasswordMenu_Destroy	contrived	contrived	2	display 
 src/ui/title/game_start.c	GameStart_Destroy	contrived	contrived	2	display control write: plain &=/
 src/ui/status_screen/status_screen.c	StatusScreen_Close	contrived	contrived	2	display control write: plain &=/
 src/ui/results/time_result.c	TimeResult_InitializeBackground	contrived	contrived	2	display control write: plain &=/
+src/ui/town/shop/SceneInputPanel_InitBackground.c	SceneInputPanel_InitBackground	natural	natural	0	
+src/ui/town/shop/SceneInputPanel_InitWidgets.c	SceneInputPanel_InitWidgets	contrived	minor	3	parameter copied into a local (copy order); zero priority read back from a playback struct
