@@ -65,19 +65,13 @@ void SceneActorReaction_ApplyStaggerDamage(struct ChaseActor *actor)
     if (actor->base.health <= 0) {
         collider->responseValue = 0;
         ActorStatus_ClearDrawableFlags(actor, 1);
-        {
-            void *control = actor->base.onDefeat;
-            SceneActorTerrain_InstallControl(actor, control, 17);
-        }
+        SceneActorTerrain_InstallControl(actor, actor->base.onDefeat, 17);
         SceneActorTerrain_EnterState(actor, 3, 0, 0);
         actor->base.hitOwners = 32;
         SceneActorRecord_RecordDefeat(actor);
     } else {
         SetHit(0x20, (void *)&actor->base.motionFlags);
-        {
-            void *control = SceneActorReaction_PlayStaggerBurst;
-            SceneActorTerrain_InstallControl(actor, control, 0x21);
-        }
+        SceneActorTerrain_InstallControl(actor, SceneActorReaction_PlayStaggerBurst, 0x21);
         SceneActorTerrain_EnterState(actor, 3, 0, 0);
     }
     {
