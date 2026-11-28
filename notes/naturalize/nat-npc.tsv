@@ -415,3 +415,4 @@ src/npc/kuro/Kuro_OnBehaviorUpdate.c	Kuro_OnBehaviorUpdate	natural	natural	0
 src/npc/kuro/Kuro_UpdateAnimationSequence.c	Kuro_UpdateAnimationSequence	contrived	minor	2	per-case tag pointer locals; animation passed through the targetPosition field that overlaps it
 src/npc/kuro/Kuro_TurnTowardAngle.c	Kuro_TurnTowardAngle	contrived	natural	5	
 src/npc/kuro/Kuro_EnterIdleFacing.c	Kuro_EnterIdleFacing	contrived	natural	1	
+src/npc/kuro/sub_081D1A8C.c	sub_081D1A8C	contrived	minor	3	facing/position pointer copies and speed local: the plain form changes register allocation
