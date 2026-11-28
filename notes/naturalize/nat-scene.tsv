@@ -139,3 +139,8 @@ src/scene/actor/animation/SceneActorPalette_BeginTransition.c	SceneActorPalette_
 src/scene/actor/animation/SceneActorPalette_ApplyTransition.c	SceneActorPalette_ApplyTransition	contrived	minor	5	WordFlags_Has/Set accessors: plain operators drop the materialized 0/1 flag and load the mask second
 src/scene/actor/animation/SceneActorPalette_ClearCompletedTransitions.c	SceneActorPalette_BindActiveTransition	contrived	contrived	3	unchanged: manager view alias keeps a second register copy
 src/scene/actor/animation/SceneActorPalette_ClearCompletedTransitions.c	SceneActorPalette_ClearCompletedTransitions	contrived	minor	1	(u8) casts on SceneActorRegistry_TestCategoryFlags; word-flag accessors
+src/scene/actor/animation/SceneActorPalette_IsTransitionComplete.c	SceneActorPalette_IsTransitionComplete	natural	natural	0	
+src/scene/actor/animation/SceneActorScript_ClearManagerFlagsFromScript.c	SceneActorScript_ClearManagerFlagsFromScript	natural	natural	0	
+src/scene/actor/animation/SceneActorScript_GetManagerField62.c	SceneActorScript_GetManagerField62	natural	natural	0	
+src/scene/actor/animation/SceneActorScript_SetManagerFlagsFromScript.c	SceneActorScript_SetManagerFlagsFromScript	natural	natural	0	
+src/scene/actor/animation/SceneActorScript_SetManagerModeFromScript.c	SceneActorScript_SetManagerModeFromScript	natural	natural	0	
