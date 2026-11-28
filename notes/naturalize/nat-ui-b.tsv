@@ -396,3 +396,4 @@ src/ui/town/dark_loan.c	DarkLoan_OpenDisplay	natural	natural	0
 src/ui/town/ScriptPanel_IsCallbackActive.c	ScriptPanel_IsCallbackActive	natural	natural	0	
 src/ui/town/town_map.c	TownMap_SetState	natural	natural	0	
 src/ui/town/town_map.c	TownMap_ApplyPaletteStep	minor	natural	1	
+src/ui/town/town_map.c	TownMap_UpdateAnimations	minor	natural	4	

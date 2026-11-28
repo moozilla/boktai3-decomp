@@ -68,27 +68,28 @@ void TownMap_ApplyPaletteStep(struct RegistryChoiceMenu *transition, u32 step)
 
 void TownMap_UpdateAnimations(struct RegistryChoiceMenu *menu)
 {
-    void *data = &menu->resource;
+    struct AnimSpriteResource *resource = &menu->resource;
     struct AnimSprite *anim = &menu->animations[1];
-    struct MenuCursorEntry *offset;
+    struct MenuCursorEntry *entry;
+
     if (menu->selection >= 0 && TestFlags(menu->cursor, 2)) {
         anim->flags &= ~1;
-        Anim_LoadKeyframe(anim, data, (u16)(menu->selection + 0x2B), 0);
+        Anim_LoadKeyframe(anim, resource, (u16)(menu->selection + 0x2B), 0);
     } else {
         anim->flags |= 1;
     }
     anim = &menu->animations[3];
-    offset = MenuCursor_GetEntry(menu->cursor, menu->initialSelection);
-    if (offset) {
-        anim->width = offset->x;
-        anim->height = offset->y;
+    entry = MenuCursor_GetEntry(menu->cursor, menu->initialSelection);
+    if (entry) {
+        anim->width = entry->x;
+        anim->height = entry->y;
     } else {
         anim->width = 0;
         anim->height = 0;
     }
     anim = &menu->animations[4];
     if (menu->selection == 1)
-        Anim_Step(anim, data);
+        Anim_Step(anim, resource);
 }
 
 void TownMap_ConfirmSelection(struct RegistryChoiceMenu *menu)
