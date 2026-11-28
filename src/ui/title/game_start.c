@@ -62,7 +62,6 @@ void GameStart_DrawSaveInfo(struct GameStart *p)
     u8 titleTiles[6][16];
     s32 i;
     const u8 *s;
-    struct AnimSpriteResource *levelRes;
 
     seqs = gUnk_0824FD50;
     memcpy(titleTiles, gUnk_0824FD5C, sizeof(titleTiles));
@@ -70,8 +69,6 @@ void GameStart_DrawSaveInfo(struct GameStart *p)
     BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0);
     if ((s16)gGameState->flag86E != 0) {
         u8 misc[10];
-        u32 zero;
-        u32 *zp;
         s32 portraitIndex;
         s32 hours, minutes, level;
         u8 *q;
@@ -94,7 +91,6 @@ void GameStart_DrawSaveInfo(struct GameStart *p)
         p->cursor.flags &= ~1;
         for (i = 0; i <= 11; i++) {
             Bg_SetTilemapEntry(3, i + 8, 6, titleTiles[portraitIndex][i], 0, 2);
-            zp = &zero;
             hourOnes = &p->timeDigits[1];
             minuteOnes = &p->timeDigits[4];
             minuteTens = &p->timeDigits[3];
@@ -102,8 +98,7 @@ void GameStart_DrawSaveInfo(struct GameStart *p)
             levelOnes = &p->levelDigits[1];
         }
         Menu_EraseRect(3, 10, 24, 2);
-        *zp = 0;
-        CpuSet(zp, text, 0x05000008);
+        CpuFill32(0, text, sizeof(text));
         s = Text_LookupString(Script_ParseStringRef((void *)gListMenuParameters.aBlock) +
                               MenuSequence_GetSelectedMessage());
         q = text;
@@ -141,10 +136,9 @@ void GameStart_DrawSaveInfo(struct GameStart *p)
             level = gGameState->level;
         }
         tens = &p->levelDigits[0];
-        levelRes = &p->itemResource;
-        Anim_LoadKeyframe(levelOnes, levelRes, (u16)Mod(level, 10), 0);
+        Anim_LoadKeyframe(levelOnes, &p->itemResource, (u16)Mod(level, 10), 0);
         level = Div(level, 10);
-        Anim_LoadKeyframe(tens, levelRes, (u16)Mod(level, 10), 0);
+        Anim_LoadKeyframe(tens, &p->itemResource, (u16)Mod(level, 10), 0);
         tens->flags &= ~1;
         tens[1].flags &= ~1;
         s = Text_LookupString(Script_ParseStringRef((void *)gListMenuParameters.mBlock) + 3);

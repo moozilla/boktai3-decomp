@@ -219,3 +219,5 @@ src/ui/title/game_start.c	GameStart_LoadAvailableSave	contrived	natural	4	-
 src/ui/title/game_start.c	GameStart_Update	contrived	minor	4	state value (0) still written to pulseTimer: a literal loads another register
 src/ui/title/game_start.c	GameStart_Destroy	contrived	minor	1	literal mask 3 passed to Bg_DisableDisplay
 src/ui/title/game_start.c	GameStart_Init	contrived	natural	2	-
+src/ui/title/game_start.c	GameStart_UpdateSelectionPalette	minor	minor	2	named cycle start local kept: literal thresholds are 42 insns off
+src/ui/title/game_start.c	GameStart_DrawSaveInfo	contrived	contrived	12	digit sprite pointers assigned inside the tile loop and the portrait selected temp stay: moving or inlining them is 13-60 insns off
