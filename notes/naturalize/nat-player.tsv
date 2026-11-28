@@ -625,3 +625,4 @@ src/player/motions/Player_UpdateChargedBurst.c	Player_UpdateChargedBurst	natural
 src/player/motions/Player_UpdateSpiralBurst.c	Player_UpdateSpiralBurst	natural	natural	0	-
 src/player/motions/Player_UpdateActionEighteen.c	Player_UpdateActionEighteen	natural	natural	0	-
 src/player/motions/PileTrap_UpdatePlacementAction.c	PileTrap_UpdatePlacementAction	minor	natural	1	-
+src/player/motions/Player_OnRecoveryActionEnd.c	Player_OnRecoveryActionEnd	contrived	natural	1	-

@@ -1,6 +1,9 @@
 #include "global.h"
-void PileTrap_BeginRecovery(u32);
-void Player_OnRecoveryActionEnd(u8 *p)
+#include "player/player.h"
+
+void PileTrap_BeginRecovery(void *);
+
+void Player_OnRecoveryActionEnd(struct Player *p)
 {
-    PileTrap_BeginRecovery(*(u32 *)(p + 0xb40));
+    PileTrap_BeginRecovery(p->actionRequestEffect);
 }
