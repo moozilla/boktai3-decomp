@@ -212,3 +212,4 @@ src/bosses/hresvelgr/ScalarApproach_ApplyProfileArray.c	ScalarApproach_ApplyProf
 src/bosses/hresvelgr/sub_0819B69C.c	sub_0819B69C	minor	minor	6	res/near reuse stays
 src/bosses/hresvelgr/sub_0819B734.c	sub_0819B734	minor	minor	2	pointer copies stay
 src/bosses/hresvelgr/Math_ApproachAngleArrayByHalf.c	Math_ApproachAngleArrayByHalf	minor	minor	1	array helper stays
+src/bosses/hresvelgr/Math_ApproachAngleArrayByQuarter.c	Math_ApproachAngleArrayByQuarter	minor	minor	1	array helper stays
