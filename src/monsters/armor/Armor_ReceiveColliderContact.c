@@ -95,7 +95,7 @@ void Armor_ReceiveColliderContact(struct ContactCollider *attack, struct Contact
                         Collision_CalculateDamageResponse(attack, contact);
                         if (ContactCollider_TestReactionFlags(attack, 0x10))
                             damage = -damage;
-                        else if (ContactCollider_TestReactionFlags(attack, 0x20))
+                        else if (attack->reactionFlags & 0x20)
                             ActorMarker_EmitRingEffects(p);
                         else {
                             knockback >>= 2;
@@ -110,7 +110,7 @@ void Armor_ReceiveColliderContact(struct ContactCollider *attack, struct Contact
                         contact->statRewardFlags = savedCategory;
                         if (ContactCollider_TestReactionFlags(attack, 0x20))
                             damage = -damage;
-                        else if (ContactCollider_TestReactionFlags(attack, 0x10))
+                        else if (attack->reactionFlags & 0x10)
                             ActorMarker_EmitRingEffects(p);
                         else {
                             knockback >>= 2;
@@ -124,7 +124,7 @@ void Armor_ReceiveColliderContact(struct ContactCollider *attack, struct Contact
                         Collision_CalculateDamageResponse(attack, contact);
                         if (ContactCollider_TestReactionFlags(attack, 8))
                             damage = -damage;
-                        else if (ContactCollider_TestReactionFlags(attack, 4))
+                        else if (attack->reactionFlags & 4)
                             ActorMarker_EmitRingEffects(p);
                         else {
                             knockback >>= 2;
@@ -138,7 +138,7 @@ void Armor_ReceiveColliderContact(struct ContactCollider *attack, struct Contact
                         Collision_CalculateDamageResponse(attack, contact);
                         if (ContactCollider_TestReactionFlags(attack, 4))
                             damage = -damage;
-                        else if (ContactCollider_TestReactionFlags(attack, 8))
+                        else if (attack->reactionFlags & 8)
                             ActorMarker_EmitRingEffects(p);
                         else {
                             knockback >>= 2;
@@ -151,7 +151,7 @@ void Armor_ReceiveColliderContact(struct ContactCollider *attack, struct Contact
                         Collision_CalculateDamageResponse(attack, contact);
                         if (ContactCollider_TestReactionFlags(attack, 2))
                             damage = -damage;
-                        else if (ContactCollider_TestReactionFlags(attack, 1))
+                        else if (attack->reactionFlags & 1)
                             ActorMarker_EmitRingEffects(p);
                         else {
                             knockback >>= 2;
@@ -164,7 +164,7 @@ void Armor_ReceiveColliderContact(struct ContactCollider *attack, struct Contact
                         Collision_CalculateDamageResponse(attack, contact);
                         if (ContactCollider_TestReactionFlags(attack, 1))
                             damage = -damage;
-                        else if (!(ContactCollider_TestReactionFlags(attack, 2))) {
+                        else if (!(attack->reactionFlags & 2)) {
                             knockback >>= 2;
                             damage >>= 1;
                         } else

@@ -99,3 +99,4 @@ src/monsters/armor/armor_behavior.c	DirectionalActor_UpdateVisibilityDelay	contr
 src/monsters/armor/armor_behavior.c	Armor_DispatchBehaviorUpdate	contrived	natural	1	
 src/monsters/armor/Armor_UpdateModeAttackDecision.c	Armor_UpdateModeAttackDecision	contrived	minor	5	
 src/monsters/armor/Armor_UpdateBehaviorAfterContact.c	Armor_UpdateBehaviorAfterContact	contrived	minor	3	
+src/monsters/armor/Armor_ReceiveColliderContact.c	Armor_ReceiveColliderContact	contrived	minor	74	
