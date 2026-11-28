@@ -1493,14 +1493,12 @@ void Mummy_UpdateDescriptorPursuit(struct ChaseActor *a)
 {
     struct SceneActorChaseGroup *group = &a->group;
     s32 motion;
-    s32 event;
     SceneActorControl_TakeStateEntry(a);
     if ((u8)Callback_InvokeActor(a, a->base.contactQuery.opaque))
         return;
     motion = Callback_InvokeActor(a, a->base.animationQuery.opaque);
     SceneActorTurn_ApplyActorDuration(a);
-    event = NavMesh_ConsumeProbeEvent(group->route);
-    if (!event) {
+    if (!NavMesh_ConsumeProbeEvent(group->route)) {
         if (SceneActorBehavior_AccelerateTowardDescriptor(a, group->route, 32, 32, motion)) {
             SceneActorChase_SetBehavior(a, 0x12);
             return;
