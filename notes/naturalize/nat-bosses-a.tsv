@@ -26,3 +26,4 @@ src/bosses/count/actor_graphics_and_basic_states.c	SceneActors_StopBackgroundFla
 src/bosses/count/actor_graphics_and_basic_states.c	sub_08022B18	contrived	minor	16	second graphics view 'actor' used only where the ROM reads through a copy (r8); other graphics fields reached by cast; TestFlags/SetFlags accessors kept (mask loaded first)
 src/bosses/count/actor_graphics_and_basic_states.c	SceneActorState_StepTableByte	contrived	natural	2	
 src/bosses/count/actor_graphics_and_basic_states.c	SceneActorState_StepTableByKind	minor	natural	2	
+src/bosses/count/actor_graphics_and_basic_states.c	SceneActorState_SelectReactionPhase	minor	minor	2	GetHealthRatio helper kept (a plain u8 compare lets jump2 merge the phase tails)

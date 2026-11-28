@@ -638,10 +638,9 @@ static inline s32 SceneActorState_GetHealthRatio(const struct StateActor *actor)
     return ratio;
 }
 
-void SceneActorState_SelectReactionPhase(u8 *p)
+void SceneActorState_SelectReactionPhase(struct SceneGraphicsActor *actor)
 {
-    struct StateActor *state = (struct StateActor *)p;
-    struct SceneGraphicsActor *actor = (struct SceneGraphicsActor *)p;
+    struct StateActor *state = (struct StateActor *)actor;
     if (actor->graphics.stepTableKind == 3) {
         if (actor->graphics.flashPhase) {
             SceneActorState_EnterPhase(state, 14);
@@ -649,7 +648,7 @@ void SceneActorState_SelectReactionPhase(u8 *p)
         }
     } else {
         if (actor->graphics.flashPhase == 3)
-            SceneActors_StopBackgroundFlash(p);
+            SceneActors_StopBackgroundFlash(actor);
         else if (actor->graphics.flashPhase) {
             SceneActorState_EnterPhase(state, 14);
             return;
@@ -663,11 +662,10 @@ void SceneActorState_SelectReactionPhase(u8 *p)
             SceneActorState_EnterPhase(state, 10);
             return;
         case 2:
-            if (actor->graphics.stepTableKind != 3 && SceneActorState_GetHealthRatio(state) <= 63) {
+            if (actor->graphics.stepTableKind != 3 && SceneActorState_GetHealthRatio(state) <= 63)
                 actor->graphics.particleFlag = 1;
-            } else {
+            else
                 actor->graphics.particleFlag = 0;
-            }
             SceneActorState_EnterPhase(state, 2);
             return;
         case 3:
@@ -689,7 +687,6 @@ void SceneActorState_SelectReactionPhase(u8 *p)
             return;
     }
 }
-
 // confidence=low: reaction-kind selector controls the far-point mode and motion timer.
 void Path_SnapToRandomFarPoint(void *, void *, u32, u32);
 struct SnapVector {
