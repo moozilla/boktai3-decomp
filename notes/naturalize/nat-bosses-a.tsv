@@ -171,3 +171,4 @@ src/bosses/count/CountBats_UpdateCharge.c	CountBats_UpdateCharge	contrived	contr
 src/bosses/count/CountBats_UpdateReaction.c	CountBats_UpdateReaction	contrived	contrived	16	product/raw speed/read pointer temporaries stay (store order and register choice)
 src/bosses/count/CountBats_Update.c	CountBats_Update	contrived	minor	12	fade-out keeps value/zero locals
 src/bosses/count/CountBats_Destroy.c	CountBats_Destroy	minor	natural	3	
+src/bosses/count/CountBats_Initialize.c	CountBats_Initialize	minor	natural	3	

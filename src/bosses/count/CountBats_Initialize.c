@@ -6,12 +6,8 @@ s32 CountBats_Initialize(struct ContactSwarm *pool)
     s32 index;
     pool->activeMask = 0;
     pool->sequenceResource = ScriptProc_Start(0x922E, 0x5BB7);
-    slot = &pool->slots[0];
-    index = 0;
-    do {
+    slot = pool->slots;
+    for (index = 0; index < 16; index++, slot++)
         CountBats_InitializeSlot(pool, slot, index);
-        index++;
-        slot++;
-    } while (index <= 15);
     return 0;
 }
