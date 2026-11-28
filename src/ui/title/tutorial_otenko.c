@@ -1166,18 +1166,10 @@ void TutorialOtenko_UpdateAppearanceAnimation(struct ActorAnimController *p)
 
 void TutorialOtenko_UpdateCompactEntryAnimation(struct ActorAnimController *p)
 {
-    struct DisplaySequenceSprite *o;
-    struct DisplaySequenceState *a;
-    const u16 *entry;
-    u32 flag;
-    u8 done;
     if (take(p)) {
-        u16 *first = (u16 *)&p->targetX;
-        s32 zero;
-        zero = 0;
-        *first = 25;
+        p->targetX = 25;
         p->targetY = 102;
-        p->targetZ = zero;
+        p->targetZ = 0;
         p->state = 1;
         Anim_SetSequence(&p->anim, p->arg, 1, 0, p->next);
         p->obj.flags &= ~1;
@@ -1189,75 +1181,13 @@ void TutorialOtenko_UpdateCompactEntryAnimation(struct ActorAnimController *p)
         TutorialOtenko_SetInteractionControlFlag(p);
         AnimData_SelectPaletteBank(p->effect, 343);
     }
-    o = &p->obj;
-    a = &p->anim;
-    entry = a->commands + a->index;
-    o->frame = *entry >> 6;
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = a->flags;
-        bit = 1;
-        first = (u8)(control.raw & bit);
-        if (first != (((*entry & 0x30) >> 4) & bit))
-            o->flags |= 4;
-        else
-            o->flags &= ~4;
-    }
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = a->flags;
-        bit = 2;
-        first = (u8)(control.raw & bit);
-        if (first != (((*entry & 0x30) >> 4) & bit))
-            o->flags |= 8;
-        else
-            o->flags &= ~8;
-    }
-    if (++a->elapsed >= a->duration) {
-        a->elapsed = 0;
-        if (a->flags & 4) {
-            if (a->index == 0) {
-                if (a->flags & 8) {
-                    a->elapsed = a->duration;
-                } else {
-                    a->index = a->frameCount - 1;
-                }
-                done = 1;
-            } else {
-                a->index--;
-                done = 0;
-            }
-        } else {
-            if (++a->index >= a->frameCount) {
-                if ((u8)(a->flags & 8)) {
-                    a->elapsed = a->duration;
-                    a->index = a->frameCount - 1;
-                    done = 1;
-                } else {
-                    a->index = 0;
-                    done = 1;
-                }
-            } else
-                done = 0;
-        }
-        entry = a->commands + a->index;
-        a->frameWeight = frame_factor(*entry);
-        a->duration = (a->frameWeight * a->speed) >> 6;
-        if (!a->duration)
-            a->duration = 1;
-    } else
-        done = 0;
-    p->done = done;
-    if (done) {
+    p->done = DisplaySequence_StepSprite(&p->obj, &p->anim);
+    if (p->done) {
         TutorialOtenko_SetState(p, 3, 1);
-        {
-            if (p->handle) {
-                void *h = p->handle;
-                p->handle = 0;
-                Script_Call(h, 0);
-            }
+        if (p->handle) {
+            void *handle = p->handle;
+            p->handle = 0;
+            Script_Call(handle, 0);
         }
     }
 }
