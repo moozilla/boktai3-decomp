@@ -500,3 +500,4 @@ src/system/game_state/SolarFruit_Command.c	SolarFruit_Command	contrived	natural	
 src/system/game_state/sub_0822E764.c	sub_0822E764	contrived	minor	1	s16 store through unk50; index-first array form
 src/system/game_state/SolarFruit_IsInventorySlotEquipped.c	SolarFruit_IsInventorySlotEquipped	minor	minor	1	pointer walk over the fruit slots
 src/system/game_state/GameState_AddEquipment.c	GameState_AddEquipment	contrived	minor	1	array indexed as *(i + field) for the index-first address sum; replaces the earlier row, whose commit did not change the source
+src/system/game_state/sub_0822E43C.c	sub_0822E43C	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
