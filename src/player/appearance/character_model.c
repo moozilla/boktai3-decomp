@@ -117,10 +117,8 @@ void CharacterModel_LoadPrimaryPalette(struct CharacterPreviewModel *model)
 
 void CharacterModel_LoadSecondaryPalette(struct CharacterPreviewModel *model, s32 appearance)
 {
-    u8 **paletteBank;
-    u32 paletteIndex = appearance + 0x379;
-    paletteBank = &gPaletteBankData;
-    CpuSet(*paletteBank + (paletteIndex << 5), model->normalPalette, 0x10);
+    s32 paletteIndex = appearance + 0x379;
+    CpuSet(gPaletteBankData + (paletteIndex << 5), model->normalPalette, 0x10);
 }
 
 void CharacterModel_InitPalettes(struct CharacterPreviewModel *model, s32 appearance)
