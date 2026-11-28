@@ -323,3 +323,5 @@ src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateTurningPalette	minor	na
 src/player/cutscene/player_cue_actions.c	Player_RestartAnimationFromSetup	natural	natural	0	-
 src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateWalkTarget	minor	minor	14	unchanged: u8 direction block in the moving branch (a plain store differs by one orr)
 src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateMotionFade	minor	natural	2	-
+src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateRecoilSlide	natural	natural	0	-
+src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateAlternateFormChange	contrived	natural	4	-

@@ -1464,28 +1464,28 @@ void PlayerCue_UpdateAlternateFormChange(struct Player *player)
         player->actionEighteenEnabled = 1;
         Sound_PlaySong(0x306);
         player->auxiliarySprite[0].sprite.flags &= ~1;
-        player->auxiliarySprite[0].sprite.position.x = (u16)gGameState->positionX - 6;
-        player->auxiliarySprite[0].sprite.position.y = 450 + (u16)gGameState->positionY;
-        player->auxiliarySprite[0].sprite.position.z = (u16)gGameState->positionZ + 6;
+        player->auxiliarySprite[0].sprite.position.x = gGameState->positionX - 6;
+        player->auxiliarySprite[0].sprite.position.y = gGameState->positionY + 450;
+        player->auxiliarySprite[0].sprite.position.z = gGameState->positionZ + 6;
         Anim_SetSequence(&player->auxiliarySequence, player->auxiliaryResource, 21, 0, 0);
         player->auxiliarySequenceEnded = 0;
     }
     if (player->auxiliarySequenceEnded)
         Anim_SetSequence(&player->auxiliarySequence, player->auxiliaryResource, 21, 0, 0);
-    player->auxiliarySequenceEnded = PlayerCue_StepSequenceEnded(
-        &player->auxiliarySprite[0].sprite, (void *)(&player->auxiliarySequence));
+    player->auxiliarySequenceEnded =
+        PlayerCue_StepSequenceEnded(&player->auxiliarySprite[0].sprite, &player->auxiliarySequence);
     if (player->auxiliarySequence.sequenceId == 21) {
         if (player->auxiliarySprite[0].sprite.position.pad == 1)
             player->auxiliarySprite[0].sprite.position.y -= 10;
         else
             player->auxiliarySprite[0].sprite.position.y += 10;
     }
-    if ((player->auxiliarySprite[0].sprite.position.pad == 1) &&
-        (((s16)player->auxiliarySprite[0].sprite.position.y) < (gGameState->positionY + 220)))
-        player->auxiliarySprite[0].sprite.position.y = (u16)gGameState->positionY + 220;
+    if (player->auxiliarySprite[0].sprite.position.pad == 1 &&
+        (s16)player->auxiliarySprite[0].sprite.position.y < gGameState->positionY + 220)
+        player->auxiliarySprite[0].sprite.position.y = gGameState->positionY + 220;
     switch (player->tetherPhase) {
         case 0:
-            if (((u8)(player->facing - 2)) <= 4) {
+            if (player->facing >= 2 && player->facing <= 6) {
                 player->facing = 4;
                 player->heading = 4;
                 player->side = 0;
@@ -1522,8 +1522,8 @@ void PlayerCue_UpdateAlternateFormChange(struct Player *player)
             }
             break;
 
-        case 2: {
-            if ((player->tetherFrame & 7) < (7 - (player->tetherFrame >> 2)))
+        case 2:
+            if ((player->tetherFrame & 7) < 7 - (player->tetherFrame >> 2))
                 Player_SetAnimation(player, ActorVariant_GetTableValue(player->actionMode, 10), 64,
                                     1);
             else if (player->actionMode == 0)
@@ -1533,27 +1533,26 @@ void PlayerCue_UpdateAlternateFormChange(struct Player *player)
             if ((player->actionEighteenDuration += 3) > 32)
                 player->actionEighteenDuration = 32;
             player->resetValue6FC = 30;
-            if ((++player->tetherFrame) > 9) {
+            if (++player->tetherFrame > 9) {
                 if (!player->actionMode)
                     player->actionMode = 2;
                 else
                     player->actionMode = 0;
                 Player_InitVisualResources(player);
                 player->savedSpriteResource = 0xFFFF;
-                if ((player->unk536 != 21) && (player->unk536 != 49))
+                if (player->unk536 != 21 && player->unk536 != 49)
                     player->active = 0;
                 Player_SetActionPhase(player, 4);
                 player->auxiliarySprite[0].sprite.flags |= 1;
             }
             break;
-        }
 
         case 3:
             if (!player->tetherFrame)
                 Sound_PlaySong(0x192);
             Player_SetAnimation(player, ActorVariant_GetTableValue(player->actionMode, 10), 64, 1);
             player->resetValue6FC = 30;
-            if ((++player->tetherFrame) > 15)
+            if (++player->tetherFrame > 15)
                 Player_SetActionPhase(player, 4);
             break;
 
@@ -1576,7 +1575,7 @@ void PlayerCue_UpdateAlternateFormChange(struct Player *player)
             Player_InitVisualResources(player);
             player->savedSpriteResource = 0xFFFF;
             player->actionEighteenDuration = 0;
-            if ((++player->tetherFrame) > 29) {
+            if (++player->tetherFrame > 29) {
                 Player_UpdateFacingSide(player);
                 player->actionLatch464 = 1;
                 player->actionLatch465 = 2;
