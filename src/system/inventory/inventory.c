@@ -111,40 +111,26 @@ void Inventory_RestoreLifePercent(struct SceneHudState *s, s32 percent)
     Hud_DrawDefaultHealthMeter(s, 1, 2, 12);
 }
 
-void sub_0813D834(void *, s32, s32);
+void sub_0813D834(struct Player *, s32, s32);
 
-struct QCF2C {
-    u8 f[0x424];
-    u16 done;
-    u16 total;
-};
-
-struct SCF2C {
-    u8 f[0xa40];
-    struct QCF2C *q;
-    u8 f2[0x4866 - 0xa44];
-    s16 value;
-};
-
-void Inventory_RestoreLifePercentTimed(struct SCF2C *s, s32 n, s32 extra)
+void Inventory_RestoreLifePercentTimed(struct SceneHudState *s, s32 percent, s32 duration)
 {
-    struct QCF2C *q = s->q;
-    s32 v;
+    struct Player *p = s->actionOwner;
     s32 sum;
-    if (q == 0)
+
+    if (p == 0)
         return;
-    v = Div(n * q->total, 100);
-    s->value = v;
-    sum = q->done + s->value;
-    if (sum > q->total) {
-        s->value = q->total - q->done;
-        q->done = q->total;
+    s->appliedStatB = Div(percent * p->maximumStatA, 100);
+    sum = p->currentStatA + s->appliedStatB;
+    if (sum > p->maximumStatA) {
+        s->appliedStatB = p->maximumStatA - p->currentStatA;
+        p->currentStatA = p->maximumStatA;
     } else {
-        q->done = sum;
+        p->currentStatA = sum;
     }
     Hud_DrawDefaultHealthMeter(s, 1, 2, 12);
-    if (extra > 0)
-        sub_0813D834(q, 0, extra * 60);
+    if (duration > 0)
+        sub_0813D834(p, 0, duration * 60);
 }
 
 void Hud_DrawDefaultEnergyMeter(struct SceneHudState *, s32, s32, s32, s32, s32);

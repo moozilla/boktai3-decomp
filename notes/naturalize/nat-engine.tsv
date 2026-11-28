@@ -522,3 +522,4 @@ src/system/game_state/GameState_HasUnlockedInventoryEntry.c	GameState_HasUnlocke
 src/system/inventory/inventory.c	Inventory_SetUsePermissionFlagsFromScript	minor	natural	1	
 src/system/inventory/inventory.c	Inventory_InitializeSelectionGrid	minor	natural	1	
 src/system/inventory/inventory.c	Inventory_RestoreLifePercent	contrived	natural	1	
+src/system/inventory/inventory.c	Inventory_RestoreLifePercentTimed	contrived	natural	1	
