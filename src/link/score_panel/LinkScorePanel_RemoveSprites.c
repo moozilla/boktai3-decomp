@@ -1,14 +1,10 @@
 #include "global.h"
+#include "ui/save/save_menu.h"
 
-void Anim_Remove(u8 *);
-
-void LinkScorePanel_RemoveSprites(u8 *p)
+void LinkScorePanel_RemoveSprites(struct SaveMenu *menu)
 {
-    u8 *q = p + 0x24;
     s32 i;
 
-    for (i = 0x11; i >= 0; i--) {
-        Anim_Remove(q);
-        q += 0x60;
-    }
+    for (i = 0; i < 18; i++)
+        Anim_Remove(&menu->widgets[i]);
 }
