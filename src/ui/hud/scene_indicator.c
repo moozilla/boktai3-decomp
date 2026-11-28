@@ -110,12 +110,14 @@ int SceneIndicators_Update(struct SceneIndicators *m)
 
 u32 SceneIndicators_Destroy(struct SceneIndicators *s)
 {
-    struct SceneIndicator *e = s->indicators;
-    s32 i;
-    for (i = 15; i >= 0; i--, e++) {
-        SceneIndicator_Destroy(s, e);
+    int i;
+    struct SceneIndicator *p = s->indicators;
+
+    for (i = 0; i < 16; i++, p++) {
+        SceneIndicator_Destroy(s, p);
     }
-    return (u32)(gSceneIndicators = 0);
+    gSceneIndicators = 0;
+    return 0;
 }
 
 int SceneIndicators_Initialize(struct SceneIndicators *m)
