@@ -508,3 +508,10 @@ src/ui/hud/display/hud_stat_display.c	Hud_SetInteractionCallback	fudged	natural	
 src/ui/hud/display/hud_stat_display.c	Hud_SetupBackgroundLayer	fudged	natural	1	
 src/ui/hud/display/hud_stat_display.c	Hud_GetMinimum	fudged	natural	1	
 src/ui/hud/display/hud_stat_display.c	Hud_DrawPlayerValue	fudged	natural	1	
+src/ui/hud/display/hud_stat_display.c	Hud_DrawStatRatio	fudged	fudged	2	unchanged: the variable-length digit arrays (size local 5) are required; fixed arrays change the frame
+src/ui/hud/display/hud_stat_display.c	Hud_SetUpdateCallback	natural	natural	0	
+src/ui/hud/display/hud_stat_display.c	Hud_GetTilemapCell	natural	natural	0	
+src/ui/hud/display/hud_stat_display.c	Hud_GetStyleTileIndex	natural	natural	0	
+src/ui/hud/display/hud_stat_display.c	Hud_InitSelectionBounds	natural	natural	0	
+src/ui/hud/display/hud_stat_display.c	Hud_DrawHealthRatio	natural	natural	0	
+src/ui/hud/display/hud_stat_display.c	Hud_DrawEnergyRatio	natural	natural	0	
