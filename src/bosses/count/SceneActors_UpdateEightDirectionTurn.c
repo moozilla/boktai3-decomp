@@ -1,6 +1,7 @@
 #include "scene/actor/scene_actors.h"
 #include "bosses/count/scene_graphics_actor.h"
 
+/* SceneActors_SetFacing with one local per cue, as this handler compiled it. */
 static inline void setFacing(struct StateActor *p, int angle)
 {
     p->bodyDirection = angle;
@@ -17,51 +18,46 @@ static inline void setFacing(struct StateActor *p, int angle)
         p->animationFacing8 = value;
     }
 }
-static inline int choose(u32 mode, int normal, int alternate)
-{
-    int test = mode & 1;
-    int result;
-    result = normal;
-    if (test)
-        result = alternate;
-    return result;
-}
 void SceneActors_UpdateEightDirectionTurn(struct StateActor *p)
 {
-    struct StateActor *p2 = p;
-    u8 *position = (u8 *)&p->bodyId;
+    struct SceneGraphicsActor *actor = (struct SceneGraphicsActor *)p;
+    struct SceneActorBody *body = &actor->body;
+
     if (p->actionChanged) {
         int sequence;
         p->actionChanged = 0;
-        sequence = choose(((struct SceneGraphicsActor *)p)->graphics.animationFlags, 38, 0);
-        SceneActors_StartEightDirectionAnimation(
-            p, &((struct SceneGraphicsActor *)p)->animation,
-            (int)&((struct SceneGraphicsActor *)p)->animationResource, sequence, 1, 1, 4);
+        if (actor->graphics.animationFlags & 1)
+            sequence = 0;
+        else
+            sequence = 38;
+        SceneActors_StartEightDirectionAnimation(p, &actor->animation, (int)&actor->animationResource,
+                                              sequence, 1, 1, 4);
     } else {
-        int sequence = choose(((struct SceneGraphicsActor *)p)->graphics.animationFlags, 38, 0);
-        SceneActors_StartEightDirectionAnimation(
-            p, &((struct SceneGraphicsActor *)p)->animation,
-            (int)&((struct SceneGraphicsActor *)p)->animationResource, sequence, 1, 1, 1);
+        int sequence;
+        if (actor->graphics.animationFlags & 1)
+            sequence = 0;
+        else
+            sequence = 38;
+        SceneActors_StartEightDirectionAnimation(p, &actor->animation, (int)&actor->animationResource,
+                                              sequence, 1, 1, 1);
     }
-    SceneGraphicsActor_ClearPendingDamage((struct SceneGraphicsActor *)p);
-    SceneActorState_SetFlags(p2, 12);
-    if (!p2->actionReset(p2)) {
-        int delta = (s8)(position[9] - (u8)p2->savedFacing), distance = delta;
-        if (distance < 0)
-            distance = -distance;
-        if (distance <= 7) {
-            setFacing(p2, p2->savedFacing);
-            p2->actionFinished = 1;
+    SceneGraphicsActor_ClearPendingDamage(actor);
+    SceneActorState_SetFlags(p, 12);
+    if (!p->actionReset(p)) {
+        int delta = (s8)(body->direction - (u8)p->savedFacing);
+        if (abs(delta) <= 7) {
+            setFacing(p, p->savedFacing);
+            p->actionFinished = 1;
         } else {
             int angle;
             if (delta < 0)
-                angle = position[9] + 8;
+                angle = body->direction + 8;
             else
-                angle = position[9] - 8;
-            setFacing(p2, angle);
+                angle = body->direction - 8;
+            setFacing(p, angle);
         }
-        ((struct SceneGraphicsActor *)p)->graphics.scaleMin = 0;
-        ((struct SceneGraphicsActor *)p)->graphics.scaleMax = 0;
-        ((struct SceneGraphicsActor *)p)->variant = 0;
+        actor->graphics.scaleMin = 0;
+        actor->graphics.scaleMax = 0;
+        actor->variant = 0;
     }
 }

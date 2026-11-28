@@ -108,3 +108,4 @@ src/bosses/count/Count_UpdateSwayReaction.c	Count_UpdateSwayReaction	contrived	m
 src/bosses/count/SceneActorAnimation_UpdateChargeApproach.c	SceneActorAnimation_UpdateChargeApproach	contrived	natural	1	
 src/bosses/count/sub_08027214.c	sub_08027214	contrived	minor	30	typed actor fields replace the private DeathActor struct; kept local scale/terrain/velocity/mode helpers, packed DeathState (shares constant 7 with facing mask), expanded effect block, pos pointer and base/actor view choice
 src/bosses/count/SceneActors_UpdateDirectionalTurn.c	SceneActors_UpdateDirectionalTurn	contrived	minor	25	typed fields; kept local facing helper (shared SceneActors_SetFacing swaps one register in the second call)
+src/bosses/count/SceneActors_UpdateEightDirectionTurn.c	SceneActors_UpdateEightDirectionTurn	contrived	minor	1	typed fields; kept local facing helper (shared SceneActors_SetFacing swaps one register in the second call)
