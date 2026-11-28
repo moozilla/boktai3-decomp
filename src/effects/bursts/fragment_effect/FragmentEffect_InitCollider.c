@@ -1,25 +1,23 @@
-#include "global.h"
-#include "scene/collision/packed_contact_halfwords.h"
+#include "effects/bursts/fragment_effect.h"
 #include "scene/collision/packed_contact_vector.h"
-void Collider_Init(u8 *, u32, u32, u32, u32, struct PackedContactVector *,
-                   struct PackedContactVector *);
-void Collider_SetAttackProperties(u8 *, u32, u32, u32, u32, u32);
-void Collider_SetCallback(u8 *, void (*)(void), u8 *);
-void Collider_SetPosition(u8 *, u8 *, u32);
+
+void Collider_SetAttackProperties(struct ContactCollider *, u32, u32, u32, u32, u32);
 void FragmentEffect_OnColliderContact(void);
-void FragmentEffect_InitCollider(u8 *p, u32 a, u32 b, u32 c, u32 d)
+
+void FragmentEffect_InitCollider(struct Fragment *fragment, u32 a, u32 b, u32 c, u32 d)
 {
-    struct PackedContactVector s1, s2;
-    u8 *q;
-    s1.x = 0x18;
-    s1.y = 0x80;
-    s1.z = 0x18;
-    s2.x = 0;
-    s2.y = 0;
-    s2.z = 0;
-    q = p + 0x3C;
-    Collider_Init(q, 0, 0x2401, 0, 0x10, &s1, &s2);
-    Collider_SetAttackProperties(q, a, b, 0, c, d);
-    Collider_SetCallback(q, FragmentEffect_OnColliderContact, p);
-    Collider_SetPosition(q, p + 0x1c, 0);
+    struct ContactCollider *collider;
+    struct PackedContactVector size, offset;
+
+    size.x = 0x18;
+    size.y = 0x80;
+    size.z = 0x18;
+    offset.x = 0;
+    offset.y = 0;
+    offset.z = 0;
+    collider = &fragment->collider;
+    Collider_Init(collider, 0, 0x2401, 0, 0x10, &size, &offset);
+    Collider_SetAttackProperties(collider, a, b, 0, c, d);
+    Collider_SetCallback(collider, FragmentEffect_OnColliderContact, fragment);
+    Collider_SetPosition(collider, &fragment->sprite.position, 0);
 }

@@ -141,3 +141,5 @@ src/effects/bursts/fragment_burst/FragmentBurst_ResetPool.c	FragmentBurst_ResetP
 src/effects/bursts/fragment_burst/FragmentBurst_Create.c	FragmentBurst_Create	contrived	minor	12	table local and split mask for the random start frame
 src/effects/bursts/fragment_effect/PursuingActor_RetireAll.c	PursuingActor_RetireAll	contrived	natural	1	-
 src/effects/bursts/fragment_effect/PursuingActor_RetireAll.c	PursuingActor_RecoilAll	contrived	natural	1	-
+src/effects/bursts/fragment_effect/PursuingActor_RetireAll.c	PursuingActor_CreateHomingSlashFromScript	minor	minor	0	left: most optional script values spelled out; the helper only matches for the last one
+src/effects/bursts/fragment_effect/FragmentEffect_InitCollider.c	FragmentEffect_InitCollider	contrived	natural	1	-
