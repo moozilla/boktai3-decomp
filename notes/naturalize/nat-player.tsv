@@ -534,3 +534,7 @@ src/player/effects/burst/FrameDisplay_GetCompactFrameIndex.c	FrameDisplay_GetCom
 src/player/effects/burst/FrameDisplay_UpdateSprite.c	FrameDisplay_UpdateSprite	minor	minor	1	unchanged: SetFrame helper orders the store
 src/player/effects/burst/ActorDebris_Update.c	ActorDebris_Update	natural	natural	0	-
 src/player/effects/burst/ActorDebris_Destroy.c	ActorDebris_Destroy	contrived	natural	1	-
+src/player/effects/burst/ActorDebris_Init.c	ActorDebris_Init	natural	natural	0	-
+src/player/effects/burst/ActorDebris_Create.c	ActorDebris_Create	natural	natural	0	-
+src/player/effects/burst/ActorDebris_Hide.c	ActorDebris_Hide	natural	natural	0	-
+src/player/effects/burst/ActorDebris_Show.c	ActorDebris_Show	contrived	minor	4	mask local shared by the two clears

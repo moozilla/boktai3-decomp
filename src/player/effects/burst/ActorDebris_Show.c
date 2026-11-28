@@ -1,17 +1,10 @@
-#include "global.h"
+#include "player/effects/frame_display.h"
 
-struct P {
-    u8 f00[0x34];
-    u32 w34;
-    u8 f38[0x60 - 0x38];
-    u32 w60;
-};
-
-void ActorDebris_Show(struct P *p)
+void ActorDebris_Show(struct FrameDisplay *display)
 {
-    if (p != 0) {
-        u32 m = ~1;
-        p->w60 &= m;
-        p->w34 &= m;
+    if (display != 0) {
+        u32 mask = ~1;
+        display->flags &= mask;
+        display->sprite.flags &= mask;
     }
 }
