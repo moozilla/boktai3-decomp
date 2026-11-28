@@ -1,33 +1,19 @@
 #include "global.h"
+#include "engine/engine.h"
 #include "engine/ram.h"
-struct Member {
-    u8 pad0[0x140];
-    void *owner;
-    u8 pad144[0x184 - 0x144];
-};
-struct MemberManager {
-    u8 pad0[0x1C];
-    struct Member members[4];
-    u8 pad[0x62C - 0x1C - 4 * 0x184];
-    u32 activeMask;
-};
-static inline u8 IsActive(u32 mask, s32 i)
+#include "objects/loot_deposits/callback_pool.h"
+
+struct CallbackPoolEntry *sub_08104280(void *owner)
 {
-    if ((1 << i) & mask)
-        return 1;
-    return 0;
-}
-struct Member *sub_08104280(void *owner)
-{
-    struct MemberManager *manager = gActorGroupPool;
+    struct CallbackPool *pool = gActorGroupPool;
     s32 i;
-    if (!manager)
+    if (!pool)
         return NULL;
-    for (i = 0; i <= 3; i++) {
-        if (IsActive(manager->activeMask, i)) {
-            struct Member *m = &manager->members[i];
-            if (m->owner == owner)
-                return m;
+    for (i = 0; i < 4; i++) {
+        if (LootDepositCallbackPool_IsActive(&pool->activeMask, i)) {
+            struct CallbackPoolEntry *entry = &pool->entries[i];
+            if (entry->healthDisplay == owner)
+                return entry;
         }
     }
     return NULL;
