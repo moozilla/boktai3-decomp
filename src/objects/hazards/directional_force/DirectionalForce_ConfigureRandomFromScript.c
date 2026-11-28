@@ -4,20 +4,20 @@ s32 Script_GetValue(void);
 void DirectionalForce_ConfigureRandom(s32, s32, s32, s32);
 void DirectionalForce_ConfigureRandomFromScript(void)
 {
-    s32 a, b, c, d;
-    if (Script_SeekToKeyword(0x70)) {
-        a = Script_GetValue();
-        b = Script_GetValue();
+    s32 baseMagnitude, magnitudeRange, baseDelay, delayRange;
+    if (Script_SeekToKeyword('p')) {
+        baseMagnitude = Script_GetValue();
+        magnitudeRange = Script_GetValue();
     } else {
-        a = 3;
-        b = 3;
+        baseMagnitude = 3;
+        magnitudeRange = 3;
     }
-    if (Script_SeekToKeyword(0x74)) {
-        c = Script_GetValue();
-        d = Script_GetValue();
+    if (Script_SeekToKeyword('t')) {
+        baseDelay = Script_GetValue();
+        delayRange = Script_GetValue();
     } else {
-        c = 0x78;
-        d = 0x78;
+        baseDelay = 120;
+        delayRange = 120;
     }
-    DirectionalForce_ConfigureRandom(a, b, c, d);
+    DirectionalForce_ConfigureRandom(baseMagnitude, magnitudeRange, baseDelay, delayRange);
 }
