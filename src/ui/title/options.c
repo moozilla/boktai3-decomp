@@ -1,27 +1,27 @@
 #include "ui/title/options.h"
+#include "gba/io_reg.h"
 #include "engine/video/palette_pulse.h"
 
 void Options_UpdateScreen(struct OptionsScreen *p)
 {
     s32 value;
-    s32 state;
     struct ScriptUtilityArguments message;
     struct SceneInputPackedPosition rect;
     message.count = 1;
     message.values = &value;
-    switch (state = p->state) {
+    switch (p->state) {
         case 0:
-            if (gPadState[1] & 1) {
+            if (gPadState[1] & A_BUTTON) {
                 if (p->selection == 0) {
                     Sound_PlaySong(0xDD);
-                    p->fade = state;
+                    p->fade = 0;
                     Menu_StartFadeOut(0);
                     p->state = 1;
                     p->exitChoice = 1;
                     break;
                 } else if (p->selection == 1) {
                     Sound_PlaySong(0xDD);
-                    p->fade = state;
+                    p->fade = 0;
                     Menu_StartFadeOut(0);
                     p->state = 1;
                     p->exitChoice = 2;
@@ -35,7 +35,7 @@ void Options_UpdateScreen(struct OptionsScreen *p)
                     break;
                 }
             }
-            if (gPadState[1] & 2) {
+            if (gPadState[1] & B_BUTTON) {
                 Sound_PlaySong(0xDE);
                 p->fade = 3;
                 Menu_StartFadeOut(3);
@@ -43,25 +43,25 @@ void Options_UpdateScreen(struct OptionsScreen *p)
                 p->exitChoice = 0;
                 break;
             }
-            if (gPadState[1] & 0x40) {
+            if (gPadState[1] & DPAD_UP) {
                 Sound_PlaySong(0xDC);
                 if (--p->selection < 0)
                     p->selection = 2;
             }
-            if (gPadState[1] & 0x80) {
+            if (gPadState[1] & DPAD_DOWN) {
                 Sound_PlaySong(0xDC);
                 if (++p->selection > 2)
                     p->selection = 0;
             }
             if (p->selection == 2) {
-                if (gPadState[1] & 0x20) {
+                if (gPadState[1] & DPAD_LEFT) {
                     Sound_PlaySong(0xDC);
                     if (--p->choice < 0)
                         p->choice = 8;
                     Menu_EraseRect(9, 12, 18, 2);
                     Menu_DrawStringRef(9, 12, gChoiceMenuParameters.eBlock, p->choice);
                 }
-                if (gPadState[1] & 0x10) {
+                if (gPadState[1] & DPAD_RIGHT) {
                     Sound_PlaySong(0xDC);
                     if (++p->choice > 8)
                         p->choice = 0;
@@ -70,11 +70,9 @@ void Options_UpdateScreen(struct OptionsScreen *p)
                 }
                 gChoiceMenuParameters.n2 = p->choice;
             }
-            {
-                rect.x = 0;
-                rect.y = p->selection * 32 + 32;
-                rect.z = 0;
-            }
+            rect.x = 0;
+            rect.y = p->selection * 32 + 32;
+            rect.z = 0;
             Menu_SetTextRect(&p->cursor.sprite, &rect);
             p->cursor.sprite.flags &= ~1;
             Palette_UpdateHighlightPulse(p->highlightPalette + 12, &p->highlightPhase);
@@ -87,12 +85,12 @@ void Options_UpdateScreen(struct OptionsScreen *p)
             }
             break;
         case 1:
-            if (p->timer > (state << p->fade)) {
-                p->rightArrow.sprite.flags |= state;
-                p->leftArrow.sprite.flags |= state;
-                p->cursor.sprite.flags |= state;
-                p->menu.sprite.flags |= state;
-                p->background.sprite.flags |= state;
+            if (p->timer > (1 << p->fade)) {
+                p->rightArrow.sprite.flags |= 1;
+                p->leftArrow.sprite.flags |= 1;
+                p->cursor.sprite.flags |= 1;
+                p->menu.sprite.flags |= 1;
+                p->background.sprite.flags |= 1;
                 Script_Call(gChoiceMenuParameters.p, 0);
                 if (p->exitChoice == 0)
                     Script_Call(gChoiceMenuParameters.c, 0);
