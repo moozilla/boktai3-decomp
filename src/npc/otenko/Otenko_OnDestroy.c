@@ -1,14 +1,15 @@
-#include "global.h"
+#include "npc/otenko/otenko_actor.h"
 #include "engine/ram.h"
-void SceneMessages_UnregisterReceiver(u8 *);
+
+void SceneMessages_UnregisterReceiver(struct SceneEventReceiver *);
 void ParticlePool_Destroy(u32);
-void GroundEffect_Destroy(u8 *);
-s32 Otenko_OnDestroy(u8 *a, u8 *b)
+
+s32 Otenko_OnDestroy(void *context, struct OtenkoActor *npc)
 {
-    u8 *q = b + 0x20;
-    SceneMessages_UnregisterReceiver(b + 0x168);
-    ParticlePool_Destroy(*(u32 *)(q + 4));
-    if (q[0xd] != 0)
-        GroundEffect_Destroy(b + 0x344);
+    struct OtenkoEffectState *effect = &npc->effect;
+    SceneMessages_UnregisterReceiver(&npc->receiver);
+    ParticlePool_Destroy(effect->particleHandle);
+    if (effect->attached)
+        GroundEffect_Destroy(&npc->groundEffect);
     gSceneNpc = 0;
 }

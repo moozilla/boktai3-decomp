@@ -370,3 +370,7 @@ src/npc/otenko/Otenko_UpdateProjectedIdle.c	Otenko_UpdateProjectedIdle	minor	nat
 src/npc/otenko/Otenko_OnStateChange.c	Otenko_OnStateChange	contrived	minor	1	callback local loaded before the prevState store; result variable
 src/npc/otenko/sub_081CFCF8.c	sub_081CFCF8	minor	minor	1	local toward-zero shift writes its result variable; the shared helper allocates differently
 src/npc/otenko/Otenko_UpdateProjectedMove.c	Otenko_UpdateProjectedMove	contrived	natural	3	
+src/npc/otenko/Otenko_PlayAttachmentEffect.c	Otenko_PlayAttachmentEffect	minor	minor	0	local descriptor view of the actor body and attachment field
+src/npc/otenko/Otenko_OnModeUpdate.c	Otenko_OnModeUpdate	natural	natural	0	
+src/npc/otenko/Otenko_OnStateUpdate.c	Otenko_OnStateUpdate	natural	natural	0	
+src/npc/otenko/Otenko_OnDestroy.c	Otenko_OnDestroy	contrived	natural	2	falls off the end without a return value, as before
