@@ -117,3 +117,5 @@ src/player/appearance/player_visuals.c	Player_GetUsableEnchantment	natural	natur
 src/player/appearance/player_visuals.c	Player_HasRequiredEnergy	minor	natural	1	-
 src/player/appearance/player_visuals.c	Player_CanSpendSharedResource	contrived	natural	2	-
 src/player/appearance/player_visuals.c	Player_SelectRequestedActionMode	contrived	minor	1	request view cast over thresholdMode stays: Player declares the five request bytes separately
+src/player/appearance/player_visuals.c	Player_SetActionRequest	minor	minor	0	request view cast over thresholdMode (shared Player layout used by other areas)
+src/player/appearance/player_visuals.c	Player_GetSelectedAbility	contrived	natural	3	-

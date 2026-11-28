@@ -2091,8 +2091,7 @@ void Player_SetActionRequest(struct Player *p, s32 kind)
 s32 Player_GetSelectedAbility(struct Player *p)
 {
     if (p->actionMode != 6)
-        /* Add the slot index before the field offset to retain the original address lifetime. */
-        return *(s16 *)((u8 *)gGameState + gGameState->selected * 2 + 0x88);
+        return *(gGameState->slots88 + gGameState->selected);
     gPlayerAbilityLatched = 0;
     if (gGameState->abilityVariant == 0)
         return 4;
