@@ -324,12 +324,8 @@ void PopInSprite_StartDisappearing(struct ContactImpactEffect *p)
 
 void PopInSprite_SetHidden(struct ContactImpactEffect *p)
 {
-    void (*f)(struct ContactImpactEffect *);
     p->sprite.flags |= 1;
-    f = SpriteController_UpdateStopped;
-    p->update = f;
-    p->timer = 0;
-    p->stateResult = 0;
+    ContactImpactEffect_EnterUpdate(p, SpriteController_UpdateStopped);
 }
 
 /* Installed at controller +0xF4 after setting drawable flag bit zero. */
