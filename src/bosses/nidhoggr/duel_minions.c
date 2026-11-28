@@ -478,9 +478,8 @@ s32 NidhoggrDuelMinionPool_SpawnActor(struct ContactSequenceOwner *pool,
     actor->variant = variant;
     {
         struct DisplaySequenceState *state = &actor->sequence;
-        void *resource = (void *)owner->sequenceResource;
-        const struct ContactSequenceFrame *frames = gUnk_08605974;
-        Anim_SetSequence(state, resource, frames[variant & 1].frame, 0, 8);
+        Anim_SetSequence(state, (void *)owner->sequenceResource, gUnk_08605974[variant & 1].frame,
+                         0, 8);
         actor->cooldown = 0;
         actor->active = 1;
     }
