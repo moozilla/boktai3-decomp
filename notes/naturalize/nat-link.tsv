@@ -34,3 +34,6 @@ src/link/lobby/RecordMenu_PositionSprites.c	RecordMenu_PositionSprites	minor	nat
 src/link/lobby/RecordMenu_LoadPlayerSprites.c	RecordMenu_LoadPlayerSprites	contrived	natural	2	validSelection inline keeps its goto spelling (shared with record panel)
 src/link/lobby/LinkLobbyPanel_HideSprites.c	LinkLobbyPanel_HideSprites	contrived	natural	1	
 src/link/lobby/LinkLobbyPanel_RemoveSprites.c	LinkLobbyPanel_RemoveSprites	contrived	natural	1	
+src/link/lobby/sub_0810F254.c	sub_0810F254	natural	natural	0	
+src/link/lobby/sub_0810F254.c	sub_0810F264	natural	natural	0	
+src/link/lobby/sub_0810F254.c	sub_0810F268	contrived	natural	1	

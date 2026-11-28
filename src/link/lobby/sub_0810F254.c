@@ -1,13 +1,12 @@
 #include "global.h"
+#include "engine/engine.h"
+#include "link/lobby/record_menu.h"
 
 void ScrollingDialogue_ClearScript(void);
 void ScrollingDialogue_RequestShow(void);
 void ScrollingDialogue_HideImmediately(void);
-void Bg_ClearTilemap(s32 bg);
-void LinkLobbyPanel_HideSprites(u8 *self);
+void LinkLobbyPanel_HideSprites(struct RecordMenu *menu);
 void LinkSession_SetMenuRequest(u32 request);
-void Script_Call(u32 script, void *args);
-void Task_Kill(void *task);
 
 void sub_0810F254(void)
 {
@@ -19,7 +18,7 @@ void sub_0810F264(void)
 {
 }
 
-void sub_0810F268(u8 *self)
+void sub_0810F268(struct RecordMenu *menu)
 {
     ScrollingDialogue_ClearScript();
     ScrollingDialogue_HideImmediately();
@@ -27,11 +26,11 @@ void sub_0810F268(u8 *self)
     Bg_ClearTilemap(1);
     Bg_ClearTilemap(2);
     Bg_ClearTilemap(3);
-    LinkLobbyPanel_HideSprites(self);
+    LinkLobbyPanel_HideSprites(menu);
     LinkSession_SetMenuRequest(2);
-    if (*(u16 *)(self + 0x1502) != 0) {
-        Script_Call(*(u16 *)(self + 0x1502), 0);
-        Task_Kill(self);
+    if (menu->exitScript) {
+        Script_Call(menu->exitScript, NULL);
+        Task_Kill(menu);
     }
 }
 
