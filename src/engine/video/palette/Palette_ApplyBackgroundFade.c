@@ -5,8 +5,8 @@ u16 *Palette_GetBackgroundBuffer(void);
 void Palette_ApplyBackgroundFade(void)
 {
     u16 *buffer = Palette_GetBackgroundBuffer();
-    s32 scaledBank = gBgFadeLevel * gFadeMultiplier;
-    s32 value = scaledBank >> 6;
+    s32 productOrBank = gBgFadeLevel * gFadeMultiplier;
+    s32 value = productOrBank >> 6;
     s32 entry;
     u16 *src;
     u16 *dst;
@@ -20,12 +20,12 @@ void Palette_ApplyBackgroundFade(void)
     }
     if (value == 0) {
         dst = buffer;
-        for (scaledBank = 0; scaledBank < 16; scaledBank++) {
-            if ((gBgFadeBankMask >> scaledBank) & 1) {
+        for (productOrBank = 0; productOrBank < 16; productOrBank++) {
+            if ((gBgFadeBankMask >> productOrBank) & 1) {
                 for (entry = 0; entry < 16; entry++)
                     *dst++ = gBgFadeColor;
             } else {
-                src = gBgPaletteBuffer + (scaledBank * 16);
+                src = gBgPaletteBuffer + (productOrBank * 16);
                 for (entry = 0; entry < 16; entry++) {
                     *dst++ = *src++;
                 }
@@ -35,14 +35,14 @@ void Palette_ApplyBackgroundFade(void)
         gBgPaletteSource = buffer;
         return;
     }
-    level = scaledBank >> 7;
+    level = productOrBank >> 7;
     inverse = 32 - level;
     gBgPaletteSource = buffer;
     if (!gBgFadeColor) {
         src = gBgPaletteBuffer;
         dst = buffer;
-        for (scaledBank = 0; scaledBank < 16; scaledBank++) {
-            if ((gBgFadeBankMask >> scaledBank) & 1) {
+        for (productOrBank = 0; productOrBank < 16; productOrBank++) {
+            if ((gBgFadeBankMask >> productOrBank) & 1) {
                 for (entry = 0; entry < 16; entry++) {
                     u32 c = *src;
                     *dst = (((level * (c & 0x7C1F)) & 0xF83E0) |
@@ -62,8 +62,8 @@ void Palette_ApplyBackgroundFade(void)
         fadeGreen = gBgFadeColor & 0x3E0;
         src = gBgPaletteBuffer;
         dst = buffer;
-        for (scaledBank = 0; scaledBank < 16; scaledBank++) {
-            if ((gBgFadeBankMask >> scaledBank) & 1) {
+        for (productOrBank = 0; productOrBank < 16; productOrBank++) {
+            if ((gBgFadeBankMask >> productOrBank) & 1) {
                 for (entry = 0; entry < 16; entry++) {
                     u32 c = *src;
                     *dst = (((level * ((u16)c & 0x7C1F) + (fadeRedBlue * inverse)) & 0xF83E0) |
