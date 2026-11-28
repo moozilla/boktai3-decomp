@@ -1,10 +1,10 @@
 #include "global.h"
+#include "ui/town/storage_screen.h"
 void Storage_UpdateBrowse(void);
-void Storage_SetUpdateCallback(u8 *, void (*)(void));
-void Storage_UpdateOpeningDelay(u8 *p)
+void Storage_SetUpdateCallback(struct StorageScreen *, void (*)(void));
+void Storage_UpdateOpeningDelay(struct StorageScreen *screen)
 {
-    u16 *c = (u16 *)(p + 0x174E);
-    (*c)++;
-    if (*c > 0x1f)
-        Storage_SetUpdateCallback(p, Storage_UpdateBrowse);
+    screen->timer++;
+    if (screen->timer > 0x1f)
+        Storage_SetUpdateCallback(screen, Storage_UpdateBrowse);
 }
