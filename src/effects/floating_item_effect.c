@@ -254,16 +254,14 @@ void FloatingItemEffect_UpdateFlight(struct LinkedWidgetSet *manager, struct Flo
 
 s32 FloatingEffectManager_Update(struct LinkedWidgetSet *manager)
 {
-    s32 i = 0;
-    void (**table)(struct LinkedWidgetSet *, struct FloatingEffect *, s32) = gUnk_08604C64;
-    u8 *state;
-    struct FloatingEffect *effect;
-    state = &manager->effects[0].state;
-    effect = manager->effects;
-    for (; i <= 7; state += sizeof(*effect), effect++, i++) {
+    s32 i;
+
+    for (i = 0; i < 8; i++) {
+        struct FloatingEffect *effect = &manager->effects[i];
+
         if (manager->active & (1 << i)) {
-            if (*state <= FLOATING_EFFECT_FLY)
-                table[*state](manager, effect, i);
+            if (effect->state <= FLOATING_EFFECT_FLY)
+                gUnk_08604C64[effect->state](manager, effect, i);
         }
     }
 }

@@ -27,3 +27,4 @@ src/effects/floating_item_effect.c	FloatingEffect_RiseAndShrink	minor	minor	3	fl
 src/effects/floating_item_effect.c	FloatingEffect_RiseAndSettle	contrived	minor	110	goto to share the timer increment: the ternary and if/else forms invert one branch
 src/effects/floating_item_effect.c	FloatingItemEffect_UpdateFlight	contrived	minor	12	(s16) cast on x - 8: keeps the load ahead of the scale term
 src/effects/floating_item_effect.c	FloatingEffectManager_Destroy	contrived	natural	1	
+src/effects/floating_item_effect.c	FloatingEffectManager_Update	contrived	natural	1	
