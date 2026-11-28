@@ -46,22 +46,26 @@ static inline u32 frame_factor(u16 v)
     return DisplaySequence_MaskCommand(v, 15);
 }
 
+static inline void BatFlockBat_GetFacingFlips(u8 quadrant, u8 *flipX, u8 *flipY)
+{
+    if (quadrant == 1 || quadrant == 2)
+        *flipX = 1;
+    else
+        *flipX = 0;
+    if (quadrant >= 2)
+        *flipY = 1;
+    else
+        *flipY = 0;
+}
+
 void BatFlockBat_SetFacingAnim(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
-    u8 left;
-    u8 right;
-    u32 dir = (((u16)p->direction + 0x60) >> 6) & 3;
-    u8 *l = &left;
-    u8 *r = &right;
-    if ((u8)(dir - 1) <= 1)
-        *l = 1;
-    else
-        *l = 0;
-    if (dir > 1)
-        *r = 1;
-    else
-        *r = 0;
-    Anim_SetSequence(&p->anim, m->animation, (u16)index, left, right);
+    u32 quadrant = (((u16)p->direction + 0x60) >> 6) & 3;
+    u8 flipX;
+    u8 flipY;
+
+    BatFlockBat_GetFacingFlips(quadrant, &flipX, &flipY);
+    Anim_SetSequence(&p->anim, m->animation, (u16)index, flipX, flipY);
 }
 
 void BatFlockBat_UpdateAnimation(struct GroupPiece *p)

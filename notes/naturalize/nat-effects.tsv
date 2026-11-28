@@ -1,2 +1,4 @@
 path	function	verdict_before	verdict_after	compiles	what_stays_and_why
 src/effects/bat_flock.c	BatFlockBat_Initialize	contrived	minor	70	u16 initialTimer[] = {0}: the ROM loads the timer's zero as a separate pseudo before the first store
+src/effects/bat_flock.c	BatFlockBat_Destroy	natural	natural	0	
+src/effects/bat_flock.c	BatFlockBat_SetFacingAnim	contrived	natural	5	
