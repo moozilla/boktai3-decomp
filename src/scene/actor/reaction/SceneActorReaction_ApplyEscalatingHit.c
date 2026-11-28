@@ -5,14 +5,13 @@
 #include "scene/areas/area_effect_link.h"
 #include "engine/video/render.h"
 #include "scene/collision/scene_actor_damage_visibility.h"
+#include "scene/actor/scene_actor_status.h"
 void SceneActorEffects_EmitRandomOffsets(void *, s32, u32, u32, s32, s32);
 void SceneHud_SetTimedState(u32, s32, s32, s32, s32, s32);
 void CpuSet(const void *, void *, u32);
 void DamageNumberDisplay_Show(void *, s32, u32, void *, void *, u32);
 void SceneBody_StartRoute(void *, void *, int, int, int);
 void AnimData_SelectPaletteBank(void *, s32);
-
-#define FIELD(p, off, T) (*(T *)((u8 *)(p) + (off)))
 
 u8 SceneActorReaction_ApplyEscalatingHit(struct ChaseActor *actor)
 {
@@ -80,19 +79,11 @@ u8 SceneActorReaction_ApplyEscalatingHit(struct ChaseActor *actor)
                                              actor->base.reactionSoundVariant, 0,
                                              &actor->base.body.position, &offset, 1);
             }
-            SceneBody_StartRoute(
-                &actor->base.body, &group->homeRoute,
-                group->homeRoute.branches[1 ^ group->homeRoute.activeBranch], 0, 0);
-            {
-                group->field5C4 = 600;
-            }
-            {
-                u16 bank = actor->base.alternateOffset;
-                if (actor->base.drawableKind == 0)
-                    AnimData_SelectPaletteBank((u8 *)actor->base.drawable + 0x2C, bank);
-                else
-                    FIELD(actor->base.drawable, 0x68, u8 *) = gPaletteBankData + bank * 32;
-            }
+            SceneBody_StartRoute(&actor->base.body, &group->homeRoute,
+                                 group->homeRoute.branches[1 ^ group->homeRoute.activeBranch], 0,
+                                 0);
+            group->field5C4 = 600;
+            ActorStatus_SetPalette(actor, actor->base.alternateOffset);
             {
                 u32 bit = 0x2000000;
                 actor->base.behaviorFlags |= bit;
