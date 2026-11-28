@@ -246,3 +246,6 @@ src/engine/video/background_layers.c	Bg_SetCharacterBase	minor	minor	1	u16 temp 
 src/engine/video/background_layers.c	Bg_SetAffineTransform	contrived	minor	6	the reciprocal inline keeps a two-step divide (the one-line form changes the argument conversion)
 src/engine/video/background_layers.c	Bg_FillTilemapRectangle	minor	natural	3	
 src/engine/video/background_layers.c	Bg_CopyTilemapRectangle	minor	natural	3	
+src/engine/video/background_layers.c	BgGfx_FindEntryById	natural	natural		
+src/engine/video/background_layers.c	Bg_SetTilemapEntry	natural	natural		
+src/engine/video/background_layers.c	Bg_UploadTileEntries	contrived	natural	9	

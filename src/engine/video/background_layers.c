@@ -303,18 +303,10 @@ s32 Bg_UploadTileEntries(s32 layer, struct BgTileResource *res, s32 count, u16 *
     for (i = 0; i < count; i++) {
         ent = BgGfx_FindEntryById(&hdr, ids[i]);
         p = (u16 *)(ent->offset + hdr.tileIndices);
-        for (j = 0; j < ent->count; j++) {
-            u32 s = hdr.tiles + (*p << 5);
-            u32 t = dst + 0x06000000;
-            {
-                struct VideoDmaRegisters *d = (struct VideoDmaRegisters *)0x040000D4;
-                d->source = s;
-                d->destination = t;
-                d->control = 0x84000008;
-                d->control;
-            }
-            p++;
-            dst += 0x20;
+        for (j = 0; j < ent->count; p++, dst += 0x20, j++) {
+            u32 src = hdr.tiles + (*p << 5);
+            u32 vram = dst + 0x06000000;
+            DmaCopy32(3, src, vram, 32);
         }
     }
     return 0;
