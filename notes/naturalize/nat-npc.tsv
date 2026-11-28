@@ -67,3 +67,4 @@ src/npc/manager/scene_actor_animation.c	SceneCharacter_UpdateStopState	natural	n
 src/npc/manager/scene_actor_animation.c	SceneCharacter_UpdateTetherReactionState	natural	natural	0	
 src/npc/manager/scene_actor_animation.c	SceneCharacter_UpdatePhaseReactionState	natural	natural	0	
 src/npc/manager/scene_actor_animation.c	SceneCharacter_UpdatePathWaitState	contrived	minor	30	goto checkSchedule: both cover paths share one state change; two pointers to hasDestination: ROM copies the address before the first test
+src/npc/manager/scene_actor_animation.c	SceneCharacter_UpdatePathActionState	contrived	minor	1	same fudges as SceneCharacter_UpdatePathWaitState

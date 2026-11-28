@@ -1517,78 +1517,52 @@ void SceneCharacter_UpdatePathTurnState(struct SceneActorManager *manager, struc
 void SceneCharacter_UpdatePathActionState(struct SceneActorManager *manager,
                                           struct SceneActor *actor)
 {
-    int close;
-    int nextState;
-    int zero;
     if (actor->commandEntered) {
         actor->commandEntered = 0;
         actor->finished = 0;
         actor->action = 8;
     }
     if (!(actor->ticks & 15)) {
-        s8 *firstMode = (s8 *)&actor->hasDestination;
-        int flag = *firstMode;
-        s8 *mode = firstMode;
+        s8 *firstRead = (s8 *)&actor->hasDestination;
+        int flag = *firstRead;
+        s8 *hasDestination = firstRead;
         if (flag) {
-            struct ContactPosition *q = TetherActor_GetPosition();
+            struct ContactPosition *tether = TetherActor_GetPosition();
             int nearby = 0;
-            if (q) {
+            if (tether) {
                 struct ContactPosition *pos = &actor->body.position;
-                int dx = pos->x - q->x;
-                int dz = pos->z - q->z;
-                int distance = dx * dx + dz * dz;
-                if (distance <= 159999)
+                int dx = pos->x - tether->x;
+                int dz = pos->z - tether->z;
+                if (dx * dx + dz * dz < 160000)
                     nearby = 1;
             }
-            {
-                if (nearby)
-                    actor->cooldown = 1800;
-                else {
-                    if (!*mode || !manager->weather)
-                        goto checkPhase;
-                    actor->cooldown = 300;
-                }
-                nextState = 12;
-                zero = 0;
-                goto changeState;
+            if (nearby)
+                actor->cooldown = 1800;
+            else if (*hasDestination && manager->weather)
+                actor->cooldown = 300;
+            else
+                goto checkSchedule;
+            SceneCharacter_EnterState(actor, 12);
+            return;
+        }
+    checkSchedule:
+        if (actor->hasParameters && manager->minuteChanged) {
+            if ((manager->hour == actor->paramC && manager->minute >= actor->paramD) ||
+                (manager->hour - 1 == actor->paramC && manager->minute <= actor->paramD)) {
+                SceneCharacter_EnterState(actor, 13);
+                return;
             }
         }
-    checkPhase:
-        if (actor->hasParameters && manager->minuteChanged) {
-            u8 *phase = &manager->hour;
-            u8 *last = &actor->paramC;
-            if (*phase == *last && manager->minute >= actor->paramD)
-                goto state13;
-            if (*phase - 1 != *last)
-                goto afterPhase;
-            if (manager->minute > actor->paramD)
-                goto afterPhase;
-        state13:
-            nextState = 13;
-            zero = 0;
-            goto changeState;
-        }
     }
-afterPhase:
-    close = SceneActor_HasNearbyTarget(manager, actor);
-    if (close) {
+    if (SceneActor_HasNearbyTarget(manager, actor)) {
         SceneCharacter_InterruptForTarget(actor);
-        goto done;
-    } else if (actor->finished) {
-        actor->state = 7;
-        actor->ticks = close;
-        actor->commandEntered = 1;
-        goto done;
+        return;
     }
-    goto tick;
-changeState:
-    actor->state = nextState;
-    actor->ticks = zero;
-    actor->commandEntered = 1;
-    goto done;
-tick:
+    if (actor->finished) {
+        SceneCharacter_EnterState(actor, 7);
+        return;
+    }
     actor->ticks++;
-done:;
 }
 
 static inline int SceneActor_IsNearBodyPosition(struct SceneActor *actor, struct ContactPosition *b,
