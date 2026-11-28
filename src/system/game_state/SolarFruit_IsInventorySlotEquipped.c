@@ -1,11 +1,13 @@
 #include "global.h"
-extern u8 *gGameState;
-u32 SolarFruit_IsInventorySlotEquipped(s32 a)
+#include "system/game_state/game_state.h"
+
+u32 SolarFruit_IsInventorySlotEquipped(s32 slot)
 {
     s32 i = 0;
-    s16 *p = (s16 *)(gGameState + 0x90);
-    for (; i <= 7; p++, i++) {
-        if (*p == a)
+    s16 *entry = &gGameState->slots88[4];
+
+    for (; i < 8; entry++, i++) {
+        if (*entry == slot)
             return 1;
     }
     return 0;
