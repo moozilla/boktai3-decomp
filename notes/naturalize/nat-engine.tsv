@@ -174,3 +174,14 @@ src/engine/video/fill_tilemap_rectangle.c	SceneTilemap_FillRectangle	contrived	n
 src/engine/video/display_animation.c	DisplayAnimation_TestFinished	minor	natural	1	
 src/engine/video/display_animation.c	DisplayAnimation_GetTileIndex	minor	natural	1	
 src/engine/video/display_animation.c	DisplayAnimation_UpdatePlayback	contrived	minor	6	keyframe resource pointer temp stays: the ROM computes its address first
+src/engine/video/display_animation.c	DisplayAnimation_SetEntry	minor	minor	1	union body pointer used in both branches: direct member access differs
+src/engine/video/display_animation.c	DisplayAnimation_GetFrameBoundary	natural	natural	0	
+src/engine/video/display_animation.c	DisplayAnimation_Destroy	natural	natural	0	
+src/engine/video/display_animation.c	DisplayAnimation_InitializeKeyframes	contrived	contrived	3	gotos stay: the shared return -1 sits between the two checks
+src/engine/video/display_animation.c	DisplayAnimation_SetPosition	natural	natural	0	
+src/engine/video/display_animation.c	DisplayAnimation_TestFlags	natural	natural	0	
+src/engine/video/display_animation.c	DisplayAnimation_SetPriority	minor	minor	1	per-branch sprite pointers needed for the address computation
+src/engine/video/display_animation.c	DisplayAnimation_SetPalette	minor	minor	1	per-branch sprite pointers needed for the address computation
+src/engine/video/display_animation.c	DisplayAnimation_SelectPaletteBank	natural	natural	0	
+src/engine/video/display_animation.c	DisplayAnimation_SetTileSource	natural	natural	0	
+src/engine/video/wrapped_tilemap_cells.c	SceneTilemap_GetWrappedCell	minor	minor	4	stepwise pointer adds: a single expression reassociates
