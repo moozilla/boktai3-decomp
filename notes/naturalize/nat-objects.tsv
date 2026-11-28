@@ -78,3 +78,6 @@ src/objects/coffin/tether_actor.c	TetherActor_SelectInteractionState	natural	nat
 src/objects/coffin/tether_actor.c	TetherActor_ClearInstance	natural	natural	0	
 src/objects/coffin/tether_actor.c	TetherActor_AdjustSlopeMovement	contrived	natural	14	
 src/objects/coffin/tether_actor.c	TetherActor_TestNearbyInteraction	contrived	minor	30	one goto yes keeps the single return-TRUE copy in the neighbor branch (jump2 would keep the last copy); cornerPosition pointer keeps &corner in a register
+src/objects/coffin/tether_actor.c	TetherActor_ClearExternalStatus	minor	minor	2	pointer local for gGameState->unk5AA stays: the plain store loads the -1 before the address
+src/objects/coffin/tether_actor.c	TetherActor_TestMatchingStatus	contrived	contrived	7	goto yes/no stays: every if/return form emits the shared return-0 block in a different place (jump2 tail order)
+src/objects/coffin/tether_actor.c	TetherActor_CopySampledPosition	minor	natural	3	

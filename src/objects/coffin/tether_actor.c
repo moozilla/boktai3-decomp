@@ -1181,17 +1181,14 @@ struct ContactPosition *TetherActor_GetPosition(void)
 u32 TetherActor_CopySampledPosition(struct ContactPosition *a)
 {
     struct TetherActor *p = gTetherActor;
-    u32 r;
-    if (p) {
-        *a = p->sampledPosition;
-        r = 1;
-    } else {
-        ((u16 *)a)[0] = 0;
-        ((u16 *)a)[1] = 0;
-        ((u16 *)a)[2] = 0;
-        r = 0;
+    if (!p) {
+        a->x = 0;
+        a->y = 0;
+        a->z = 0;
+        return 0;
     }
-    return r;
+    *a = p->sampledPosition;
+    return 1;
 }
 
 u32 TetherActor_IsState(u32 a)
