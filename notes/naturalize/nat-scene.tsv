@@ -400,3 +400,4 @@ src/scene/actor/placement/SceneActorMovement_ProjectProbe.c	SceneActorMovement_P
 src/scene/actor/placement/SceneActorMovement_UpdateStatus.c	SceneActorMovement_UpdateStatus	minor	minor	2	status helper calls: plain flag operators load the field before the mask
 src/scene/actor/placement/SceneActorMovement_RequestAvailableAction.c	SceneActorMovement_RequestAvailableAction	contrived	minor	2	result local: early returns drop the shared exit
 src/scene/actor/placement/SceneActorTerrain_GetNeighborCell.c	SceneActorTerrain_GetNeighborCell	minor	minor	5	current-cell pointer blocks: direct reads reorder the width call
+src/scene/actor/placement/SceneActorTerrain_ReadScriptParameters.c	SceneActorTerrain_ReadScriptParameters	contrived	natural	3	-

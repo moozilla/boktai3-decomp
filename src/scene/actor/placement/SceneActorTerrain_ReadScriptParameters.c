@@ -8,15 +8,15 @@ void SceneActorTerrain_ReadScriptParameters(struct SceneActorTerrainView *actor)
     actor->scriptParameterI = ReadParameter('I');
     if (Script_SeekToKeyword('G')) {
         u32 *parameters = actor->scriptParametersG;
-        s32 i = 4;
-        do {
+        s32 i;
+        for (i = 0; i < 5; i++) {
             u32 value;
             if (Script_GetPc())
                 value = Script_GetValue();
             else
                 value = 0;
             *parameters++ = value;
-        } while (--i >= 0);
+        }
     }
     actor->scriptParameterD = ReadParameter('D');
 }
