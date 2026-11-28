@@ -382,3 +382,4 @@ src/npc/otenko/Otenko_CreateFromScript.c	Otenko_CreateFromScript	contrived	contr
 src/npc/otenko/Otenko_CommandFromScript.c	Otenko_CommandFromScript	contrived	minor	2	mode and update locals for the state change; position pointer for the player angle
 src/npc/otenko/Otenko_UpdateTransitionFade.c	Otenko_UpdateTransitionFade	contrived	minor	5	origin pointer, graphics pointer and parked 0x300 masks (mask loaded before the flags)
 src/npc/otenko/sub_081CF398.c	sub_081CF398	contrived	minor	1	graphics pointer locals
+src/npc/otenko/Otenko_UpdateDashSlide.c	Otenko_UpdateDashSlide	contrived	natural	6	

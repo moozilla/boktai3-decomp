@@ -1,11 +1,9 @@
 #include "npc/otenko/otenko_actor.h"
 #include "ui/hud/scene_indicator.h"
+#include "engine/math/math_shift.h"
 
 extern const s16 gUnk_086149C4[];
-static inline s32 trunc12(s32 x)
-{
-    return x >= 0 ? x >> 12 : -((-x) >> 12);
-}
+
 void Otenko_UpdateDashSlide(void *ctx, struct OtenkoActor *npc)
 {
     if (npc->animationEntered) {
@@ -14,19 +12,16 @@ void Otenko_UpdateDashSlide(void *ctx, struct OtenkoActor *npc)
         Actor_PlayAnimationEntry(npc, 9, 2, 0, 4);
     }
     if ((u8)npc->animationCallback(npc) != 1) {
-        u32 speed = npc->speed;
-        if (speed == 0) {
+        if (npc->speed == 0) {
             npc->done = 1;
-            return;
-        }
-        {
-            struct ContactPosition *vel = &npc->body.motion;
+        } else {
+            struct ContactPosition *velocity = &npc->body.motion;
             u8 angle = npc->targetAngle;
-            u32 spd = speed;
-            vel->x = trunc12(spd * gUnk_086149C4[(angle + 0x40) & 0xff]);
-            vel->y = 0;
-            vel->z = trunc12(spd * gUnk_086149C4[angle]);
+            s32 speed = npc->speed;
+            velocity->x = Math_ShiftTowardZero(speed * gUnk_086149C4[(angle + 64) & 255], 12);
+            velocity->y = 0;
+            velocity->z = Math_ShiftTowardZero(speed * gUnk_086149C4[angle], 12);
+            npc->speed = (u32)npc->speed * 3 / 4;
         }
-        npc->speed = (u32)npc->speed * 3 / 4;
     }
 }
