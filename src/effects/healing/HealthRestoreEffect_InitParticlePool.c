@@ -1,37 +1,21 @@
-#include "global.h"
-struct Elem {
-    u32 flags;
-    u8 pad4[11];
-    u8 attr;
-    u8 pad10[0x18];
-    u16 age, active;
-    u8 pad2C[8];
-    u32 data;
-    void (*update)(struct Elem *);
-};
-struct Owner {
-    u8 pad[0x8c];
-    struct Elem elems[8];
-};
-u32 AnimData_FindEntry(u32);
-void ParticleSprite_Initialize(struct Elem *, u32, s32);
-void Effect_SetOrigin(struct Elem *, s32, s32);
-void SpriteDrawable_SelectTileFrame(struct Elem *, u32, s32);
-void Effect_SetPalette(struct Elem *, s32);
-void HealthRestoreEffect_InitParticlePool(struct Owner *p)
+#include "effects/healing/healing_effect.h"
+#include "engine/engine.h"
+
+void HealthRestoreEffect_InitParticlePool(struct HealthRestoreEffect *effect)
 {
-    u32 resource = AnimData_FindEntry(0x1c1e);
-    u32 zero = 0;
-    struct Elem *e = p->elems;
+    const struct SpriteEffectTileResource *resource = AnimData_FindEntry(0x1C1E);
     s32 i;
-    for (i = 0; i < 8; e++, i++) {
-        p->elems[i].data = resource;
-        ParticleSprite_Initialize(e, resource, 17);
-        Effect_SetOrigin(e, -4, -4);
-        SpriteDrawable_SelectTileFrame(e, p->elems[i].data, 2);
-        Effect_SetPalette(e, 1);
-        e->attr = zero;
-        e->age = zero;
-        e->active = zero;
+
+    for (i = 0; i < 8; i++) {
+        struct HealingParticle *particle = &effect->particles[i];
+
+        effect->particles[i].resource = resource;
+        ParticleSprite_Initialize(&particle->drawable, resource, 17);
+        Effect_SetOrigin(&particle->drawable, -4, -4);
+        SpriteDrawable_SelectTileFrame(&particle->drawable, effect->particles[i].resource, 2);
+        Effect_SetPalette(&particle->drawable, 1);
+        particle->drawable.priority = 0;
+        effect->particles[i].age = 0;
+        effect->particles[i].active = 0;
     }
 }
