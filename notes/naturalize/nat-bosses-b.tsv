@@ -310,3 +310,4 @@ src/bosses/vanargand/Vanargand_SetPendingCue.c	Vanargand_SetPendingCue	near-natu
 src/bosses/vanargand/ScreenPalette_UpdateState.c	ScreenPalette_UpdateState	contrived	partial	6	hide label, mask and display-control locals kept: plain compound assignments load in another order
 src/bosses/vanargand/Vanargand_UpdateCameraOffset.c	Vanargand_UpdateCameraOffset	unchanged	unchanged	5	out/position aliases kept: no simpler form matched
 src/bosses/vanargand/Camera_UpdatePlayerBlendOffset.c	Camera_UpdatePlayerBlendOffset	unchanged	unchanged	5	out/position aliases kept: no simpler form matched
+src/bosses/vanargand/Vanargand_RemovePartSprites.c	Vanargand_RemovePartSprites	contrived	natural	1	

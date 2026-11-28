@@ -6,13 +6,19 @@
 #include "player/target_registry/target_registry.h"
 #include "scene/collision/contact_collider.h"
 
+/* A second sprite and its graphics, drawn alongside a damage part. */
+struct VanargandPartSprite {
+    struct DisplaySequenceSprite sprite;
+    struct SpriteRenderResource graphics;
+};
+
 struct VanargandDamagePart {
     struct DisplaySequenceSprite sprite;
     struct SpriteRenderResource graphics;
     struct DisplaySequenceState sequence;
     const void *sequenceResource;
     u32 sequenceId;
-    u8 auxiliarySprite[0xA8 - 0x60];
+    struct VanargandPartSprite auxiliarySprite;
     struct ContactCollider collider;
     u16 damage, contactFlags;
     u32 flags;

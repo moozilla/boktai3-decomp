@@ -1,19 +1,14 @@
 #include "global.h"
+#include "bosses/vanargand/vanargand_damage_part.h"
 
-struct A {
-    u8 f[4];
-    u8 a;
-    u8 g[0x5f];
-    u8 b;
-};
 void Sprite_Remove(void *);
 
-void Vanargand_RemovePartSprites(struct A *p)
+void Vanargand_RemovePartSprites(struct VanargandDamagePart *part)
 {
-    if (p != 0) {
-        if (p->b != 0)
-            Sprite_Remove((u8 *)p + 0x60);
-        if (p->a != 0)
-            Sprite_Remove(p);
+    if (part != NULL) {
+        if (part->auxiliarySprite.sprite.unknown4[0])
+            Sprite_Remove(&part->auxiliarySprite);
+        if (part->sprite.unknown4[0])
+            Sprite_Remove(part);
     }
 }
