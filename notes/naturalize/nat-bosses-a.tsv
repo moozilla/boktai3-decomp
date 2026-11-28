@@ -214,3 +214,4 @@ src/bosses/hresvelgr/sub_0819B734.c	sub_0819B734	minor	minor	2	pointer copies st
 src/bosses/hresvelgr/Math_ApproachAngleArrayByHalf.c	Math_ApproachAngleArrayByHalf	minor	minor	1	array helper stays
 src/bosses/hresvelgr/Math_ApproachAngleArrayByQuarter.c	Math_ApproachAngleArrayByQuarter	minor	minor	1	array helper stays
 src/bosses/hresvelgr/Math_ApproachAngleArrayByEighth.c	Math_ApproachAngleArrayByEighth	minor	minor	1	array helper stays
+src/bosses/hresvelgr/Math_ApproachAngleArrayBySixteenth.c	Math_ApproachAngleArrayBySixteenth	minor	minor	1	array helper stays
