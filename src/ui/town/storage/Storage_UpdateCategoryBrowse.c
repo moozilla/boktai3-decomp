@@ -72,7 +72,7 @@ void Storage_UpdateCategoryBrowse(struct StorageBrowse *p)
                         goto allow;
                     goto error;
                 case 2:
-                    if (*(s16 *)((u8 *)gGameState + 0x160 + slot * 2) < 0)
+                    if (*(slot + gGameState->table160) < 0)
                         goto error;
                     if (GameState_IsConsumableSlotEquipped(slot)) {
                         allowed = 0;
