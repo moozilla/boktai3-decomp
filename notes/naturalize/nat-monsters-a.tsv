@@ -557,3 +557,8 @@ src/monsters/golem/golem_main.c	Skeleton_TryTriggerAction	minor	minor	3	mask loc
 src/monsters/golem/golem_main.c	Skeleton_ClearPendingFlag	minor	minor	1	word view of the state bytes; context block stays
 src/monsters/golem/golem_main.c	Golem_UpdateIdle	contrived	natural	1	
 src/monsters/golem/golem_main.c	Golem_UpdateIdleState	contrived	natural	1	
+src/monsters/golem/golem_main.c	Golem_UpdateRevivalReturn	contrived	contrived	2	flag pointer from take helper plus hand-written control install: the shared setter orders the stores differently
+src/monsters/golem/golem_main.c	Golem_UpdateDying	contrived	contrived	2	reused mask and value locals around the motion and status flags
+src/monsters/golem/golem_main.c	Golem_UpdateChargeBuildup	minor	minor	1	second context pointer for the wait time
+src/monsters/golem/golem_main.c	Golem_UpdateChargeWindup	contrived	minor	2	reaction flag mask block and direct random table address remain
+src/monsters/golem/golem_main.c	Golem_UpdateRouteMotion	natural	natural	0	
