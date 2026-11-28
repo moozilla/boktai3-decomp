@@ -1,4 +1,5 @@
 #include "global.h"
+#include "monsters/centipede/centipede_body.h"
 
 void Centipede_UpdateSegmentColliders(u8 *);
 void Tentacle_FireSecondaryAttack(u8 *);
@@ -11,7 +12,7 @@ void Centipede_ResolveBlockedMovement(u8 *);
 
 s32 Centipede_UpdateComponents(u8 *p)
 {
-    s16 *timer;
+    struct TentacleBody *body = (void *)p;
     Centipede_UpdateSegmentColliders(p);
     Tentacle_FireSecondaryAttack(p);
     ActorTrail_UpdateTimedScale(p);
@@ -20,8 +21,7 @@ s32 Centipede_UpdateComponents(u8 *p)
     Centipede_UpdateSegmentImpulses(p);
     Centipede_AlignSegmentsToTerrain(p);
     Centipede_ResolveBlockedMovement(p);
-    timer = (s16 *)(p + 0x8d6);
-    if (*timer > 0)
-        (*timer)--;
+    if (body->hitReactionTimer > 0)
+        body->hitReactionTimer--;
     return 1;
 }
