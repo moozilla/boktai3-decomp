@@ -518,3 +518,4 @@ src/monsters/centipede/tentacle_body.c	CentipedeBody_OnAttackCollision	minor	min
 src/monsters/centipede/tentacle_body.c	CentipedeBody_UpdateSpreadWindup	minor	minor	1	direction pointer and spin sample blocks: plain reads change address materialization; stage count temp stays
 src/monsters/centipede/tentacle_body.c	CentipedeBody_UpdateSpreadRelease	minor	minor	4	direction pointer and spin sample blocks: plain reads change address materialization; stage count temp stays
 src/monsters/centipede/tentacle_body.c	CentipedeBody_UpdateChargeSpread	minor	minor	4	direction pointer and spin sample blocks: plain reads change address materialization; stage count temp stays
+src/monsters/centipede/Centipede_ResetOscillation.c	Centipede_ResetOscillation	contrived	natural	1	
