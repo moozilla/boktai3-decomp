@@ -3253,15 +3253,15 @@ void Mummy_ResumeRouteAfterCheckpoint(struct ChaseActor *actor)
     struct SceneActorChaseGroup *group = &actor->group;
     struct Mummy *body = actor->base.context;
     if (Chase_TakeArrived(actor)) {
-        SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
+        SceneActorAnimation_SelectDirectionalEntry(actor, 0);
         SceneActorChase_SetControl(actor, SceneActor_UpdateAnimationCheckpoint, 0x26);
     }
     if (actor->base.stepDone) {
         s32 contextBits = 0x800;
         SceneActorChase_ClearMotionFlagComponent(actor, 0x100);
         body->flags6F2 &= ~contextBits;
-        SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
-        Mummy_ClearCheckpointFlags((void *)&group->common.gate.flags, ~6);
+        SceneActorAnimation_SelectDirectionalEntry(actor, 0);
+        Mummy_ClearCheckpointFlags(&group->common.gate.flags, ~6);
         {
             u32 mask = 0x1000;
             body->flags6F2 = mask | body->flags6F2;
