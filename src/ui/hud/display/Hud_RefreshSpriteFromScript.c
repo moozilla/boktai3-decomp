@@ -1,15 +1,10 @@
 #include "global.h"
 #include "engine/ram.h"
-struct Hud {
-    u8 pad0[0x18];
-    void *field18;
-    u8 pad1C[0x10];
-    s32 field2C;
-};
-void Hud_SetupBackgroundLayer(struct Hud *, void *, s32, s32, s32);
+#include "ui/pause/scene_hud_display.h"
+void Hud_SetupBackgroundLayer(struct SceneHudState *, u32, s32, s32, u32);
 void Hud_RefreshSpriteFromScript(void)
 {
-    struct Hud *hud = gFieldHud;
+    struct SceneHudState *hud = (struct SceneHudState *)gFieldHud;
     if (hud)
-        Hud_SetupBackgroundLayer(hud, hud->field18, 0, 0, hud->field2C);
+        Hud_SetupBackgroundLayer(hud, hud->panelResource, 0, 0, hud->panelConfig);
 }
