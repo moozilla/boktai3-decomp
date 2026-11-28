@@ -325,3 +325,4 @@ src/scene/actor/control/SceneActorControl_TickSway.c	SceneActorControl_TickSway	
 src/scene/actor/control/SceneActorControl_GetTravelProfile.c	SceneActorControl_GetTravelProfile	contrived	minor	12	TestFlags predicate with a parked mask: a plain test loses the materialized 0/1
 src/scene/actor/control/SceneActorControl_AdvancePositionCurve.c	SceneActorControl_AdvancePositionCurve	contrived	natural	2	-
 src/scene/actor/control/SceneActorControl_ResetCollisionPhase.c	SceneActorControl_ResetCollisionPhase	contrived	contrived	7	flag pointer and mask blocks: plain |= and &= load the field before the mask
+src/scene/actor/control/SceneActorControl_GetDirectionalVariant.c	SceneActorControl_GetDirectionalVariant	minor	natural	1	-

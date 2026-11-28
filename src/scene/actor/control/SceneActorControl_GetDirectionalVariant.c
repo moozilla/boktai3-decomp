@@ -1,13 +1,14 @@
 #include "global.h"
 
-void SceneActorControl_GetDirectionalVariant(u16 a, s32 *b, s32 *c)
+/* Splits a direction into one of five animation variants and whether it is mirrored. */
+void SceneActorControl_GetDirectionalVariant(u16 direction, s32 *variant, s32 *mirrored)
 {
-    s32 t = ((a + 0x70) >> 5) & 7;
-    if (t > 4) {
-        *b = 8 - t;
-        *c = 1;
+    s32 sector = ((direction + 0x70) >> 5) & 7;
+    if (sector > 4) {
+        *variant = 8 - sector;
+        *mirrored = 1;
     } else {
-        *b = t;
-        *c = 0;
+        *variant = sector;
+        *mirrored = 0;
     }
 }
