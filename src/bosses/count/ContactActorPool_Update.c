@@ -3,9 +3,8 @@ void ContactActorPool_HideSlots(struct ContactActorPool *);
 void ContactActor_UpdateDisplay(struct ContactActor *);
 void Palette_InterpolateBanks(void *, void *, void *, s32, s32);
 extern void (*const gUnk_086058FC[])(struct ContactActorPool *, struct ContactActor *, s32);
-u32 ContactActorPool_Update(struct ContactActorPool *poolInput)
+u32 ContactActorPool_Update(struct ContactActorPool *pool)
 {
-    struct ContactActorPool *pool = poolInput;
     if (pool->state) {
         s32 fade;
         if (pool->lifetime > 599) {
@@ -41,24 +40,19 @@ u32 ContactActorPool_Update(struct ContactActorPool *poolInput)
             ContactActorPool_HideSlots(pool);
         } else {
             s32 ready = 0;
-            struct ContactActor *slot = &pool->slots[0];
-            s32 index = 0;
-            do {
+            struct ContactActor *slot = pool->slots;
+            s32 index;
+            for (index = 0; index < 16; index++, slot++) {
                 gUnk_086058FC[slot->state](pool, slot, index);
                 ContactActor_UpdateDisplay(slot);
                 if (slot->state == 7)
                     ready++;
-                index++;
-                slot++;
-            } while (index <= 15);
-            {
-                u32 lifetime = pool->lifetime;
-                if (ready == 16 || lifetime > 1199) {
-                    if (!pool->hideRequested)
-                        pool->hideRequested = 1;
-                }
-                pool->lifetime = lifetime + 1;
             }
+            if (ready == 16 || pool->lifetime > 1199) {
+                if (!pool->hideRequested)
+                    pool->hideRequested = 1;
+            }
+            pool->lifetime++;
         }
     }
     return 0;

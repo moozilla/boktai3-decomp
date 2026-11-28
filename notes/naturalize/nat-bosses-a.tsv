@@ -152,3 +152,4 @@ src/bosses/count/ContactActor_UpdateReaction.c	ContactActor_UpdateReaction	contr
 src/bosses/count/ContactActor_UpdateRetreat.c	ContactActor_UpdateRetreat	contrived	contrived	14	unchanged core: once-loops, mask/cursor union and a dead origin constant (ROM loads 0x403B714 into r8 and ORs its low bits); removing any of them changes allocation
 src/bosses/count/ContactActor_UpdateAwaitHide.c	ContactActor_UpdateAwaitHide	minor	natural	3	
 src/bosses/count/ContactActor_UpdateInactive.c	ContactActor_UpdateInactive	minor	natural	3	
+src/bosses/count/ContactActorPool_Update.c	ContactActorPool_Update	minor	minor	8	fade local and first/second palette pointers stay (inline expressions differ)
