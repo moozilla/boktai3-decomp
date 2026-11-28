@@ -316,3 +316,4 @@ src/engine/video/anim_sprite.c	Widget_CopyMasked	natural	natural
 src/engine/video/anim_sprite.c	Anim_SelectPaletteBank	minor	minor	2	selected temp: reading the stored bank directly changes one load
 src/engine/video/anim/Collision_AccumulateNearbyResponse.c	Collision_AccumulateNearbyResponse	minor	natural	1	
 src/engine/video/anim/Anim_ApplyDurationScales.c	Anim_ApplyDurationScales	contrived	natural	1	
+src/engine/video/anim/Anim_SetSequence.c	Anim_SetSequence	contrived	minor	1	address local reused for the frame list and first command; weight masked through a constant-first local
