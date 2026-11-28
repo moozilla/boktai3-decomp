@@ -200,3 +200,4 @@ src/monsters/popbud/Popbud_OnTaskDestroy.c	Popbud_OnTaskDestroy	minor	minor	0	ra
 src/monsters/screamer/Screamer_HandleDefeat.c	Screamer_HandleDefeat	contrived	minor	2	counter casts for fields missing from game_state.h
 src/monsters/screamer/Screamer_OnColliderContact.c	Screamer_OnColliderContact	natural	natural	0	
 src/monsters/screamer/Screamer_ApplyHitReaction.c	Screamer_ApplyHitReaction	contrived	minor	2	spark loop frame struct and pointer temps: loop invariant allocation
+src/monsters/screamer/Screamer_InitColliders.c	Screamer_InitColliders	contrived	natural	2	(u16) casts on s16 reaction flags passed as u32
