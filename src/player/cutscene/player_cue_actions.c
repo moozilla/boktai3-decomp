@@ -234,17 +234,17 @@ static inline struct Player *PlayerCue_ResolveReference(void *actor)
 
 void Player_AdvanceScriptDestination(struct Player *player)
 {
-    s32 deltaX = (player->cueDestination.x) - (player->position.x);
-    s32 dz = (player->cueDestination.z) - (player->position.z);
+    s32 deltaX = player->cueDestination.x - player->position.x;
+    s32 dz = player->cueDestination.z - player->position.z;
     s32 angle = Math_Atan2(deltaX, dz);
     s32 speed = 12;
     Player_GetMovementRateScale(12);
     if (player && IsMovementSlowed(player))
         speed = (speed * player->animation.scaleX) >> 6;
-    if (((deltaX * deltaX) + (dz * dz)) <= (speed * speed)) {
+    if (deltaX * deltaX + dz * dz <= speed * speed) {
         player->position.x = player->cueDestination.x;
         player->position.z = player->cueDestination.z;
-        if ((player->targetFacing) >= 0) {
+        if (player->targetFacing >= 0) {
             player->facing = player->targetFacing;
             player->targetFacing = -1;
         } else {
@@ -267,15 +267,15 @@ void Player_AdvanceScriptDestination(struct Player *player)
         player->velocityX = TruncateQ12(gUnk_086149C4[(angle + 64) & 255] * speed);
         player->velocityZ = TruncateQ12(gUnk_086149C4[angle & 255] * speed);
         if (player->velocityScaleAxis == 1) {
-            if ((player->velocityZ) < 0)
-                player->velocityZ = TruncateQ6((player->velocityZ) * 40);
+            if (player->velocityZ < 0)
+                player->velocityZ = TruncateQ6(player->velocityZ * 40);
             else
-                player->velocityZ = TruncateQ6((player->velocityZ) * 52);
+                player->velocityZ = TruncateQ6(player->velocityZ * 52);
         } else if (player->velocityScaleAxis == 2) {
-            if ((player->velocityX) < 0)
-                player->velocityX = TruncateQ6((player->velocityX) * 40);
+            if (player->velocityX < 0)
+                player->velocityX = TruncateQ6(player->velocityX * 40);
             else
-                player->velocityX = TruncateQ6((player->velocityX) * 52);
+                player->velocityX = TruncateQ6(player->velocityX * 52);
         }
         player->facing = ((((angle + 16) & 255) >> 5) + 3) & 7;
         if (player->facing > 4) {
@@ -285,20 +285,20 @@ void Player_AdvanceScriptDestination(struct Player *player)
             player->heading = player->facing;
             player->side = 0;
         }
-        if ((!((player->animation.frameIndex) & 3)) && (!(player->animation.elapsed))) {
-            if ((!((player && (player->active)) && (!(player->sceneMode)))) &&
-                (!(player && ((u8)Player_ReadStatusBits(&player->actionFlags, 4))))) {
+        if (!(player->animation.frameIndex & 3) && !player->animation.elapsed) {
+            if (!(player && player->active && !player->sceneMode) &&
+                !(player && (u8)Player_ReadStatusBits(&player->actionFlags, 4))) {
                 if (PlayerCue_ResolveReference(player) && IsMovementSlowed(player)) {
-                    if (!(player->animation.frameIndex))
+                    if (!player->animation.frameIndex)
                         Sound_PlaySong(0xC8);
                     else
                         Sound_PlaySong(0xC7);
-                } else if ((player->tetherStatusFlags) || (!player->velocityScaleAxis)) {
-                    if (!(player->animation.frameIndex))
+                } else if (player->tetherStatusFlags || !player->velocityScaleAxis) {
+                    if (!player->animation.frameIndex)
                         Sound_PlaySong(0xCA);
                     else
                         Sound_PlaySong(0xC9);
-                } else if (!(player->animation.frameIndex))
+                } else if (!player->animation.frameIndex)
                     Sound_PlaySong(0x28E);
                 else
                     Sound_PlaySong(0x28D);

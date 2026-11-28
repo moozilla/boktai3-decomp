@@ -294,3 +294,8 @@ src/player/cutscene/player_cue_actions.c	PlayerCue_CompleteAction	minor	natural	
 src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateHidden	natural	natural	0	
 src/player/cutscene/player_cue_actions.c	PlayerCue_UpdatePeriodicParticles	minor	natural	1	
 src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateFaceSide	minor	natural	1	
+src/player/cutscene/player_cue_actions.c	Player_UpdateTransitionAnimation	natural	natural	0	
+src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateStandDiagonal	natural	natural	0	
+src/player/cutscene/player_cue_actions.c	Player_UpdateTriggerAnimation	natural	natural	1	
+src/player/cutscene/player_cue_actions.c	Player_TurnTowardTargetFacing	natural	natural	0	
+src/player/cutscene/player_cue_actions.c	Player_AdvanceScriptDestination	contrived	minor	6	facing mask temporaries, rate-scale call with ignored result, reference union forcing a reload
