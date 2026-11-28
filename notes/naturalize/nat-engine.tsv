@@ -475,3 +475,4 @@ src/system/game_state/GameState_GetChallengeBestScore.c	GameState_GetChallengeBe
 src/system/game_state/GameState_ResetChallengeRecords.c	GameState_ResetChallengeRecords	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
 src/system/game_state/sub_0811D600.c	sub_0811D600	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
 src/system/game_state/GameState_IsConsumableSlotEquipped.c	GameState_IsConsumableSlotEquipped	contrived	natural	1	
+src/system/game_state/GameState_HasEquippedConsumable.c	GameState_HasEquippedConsumable	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
