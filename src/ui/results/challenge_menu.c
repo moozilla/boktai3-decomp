@@ -52,22 +52,15 @@ void ChallengeMenu_DrawOptions(struct ChallengeMenu *menu)
 
 void ChallengeMenu_UpdateDescription(struct ChallengeMenu *menu)
 {
-    if (menu->selection == 0)
-        goto close;
-    if (menu->selection > 3)
-        return;
-    if (!((menu->enabledChoices >> (menu->selection - 1)) & 1)) {
-    close:
+    if (menu->selection == 0 ||
+        (menu->selection <= 3 && !((menu->enabledChoices >> (menu->selection - 1)) & 1))) {
         ScrollingDialogue_ClearScript();
         ScrollingDialogue_HideImmediately();
-    } else {
+    } else if (menu->selection <= 3) {
+        s32 id;
         ScrollingDialogue_ClearScript();
-        {
-            s32 id = Script_ParseStringRef(menu->descriptionText) + menu->group * 3;
-            id--;
-            id += menu->selection;
-            ScrollingDialogue_SetScript(Text_LookupString(id));
-        }
+        id = Script_ParseStringRef(menu->descriptionText) + menu->group * 3 - 1;
+        ScrollingDialogue_SetScript(Text_LookupString(id + menu->selection));
         ScrollingDialogue_RequestShow();
     }
 }

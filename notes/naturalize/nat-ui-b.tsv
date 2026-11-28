@@ -58,3 +58,4 @@ src/ui/results/challenge_menu.c	ChallengeMenu_CreateFromScript	natural	natural	0
 src/ui/results/challenge_menu.c	ChallengeMenu_ResetStoredRanks	minor	minor	0	raw offsets into gGameState->unk654
 src/ui/results/challenge_menu.c	ChallengeMenu_GetRankKeyframe	natural	natural	0	
 src/ui/results/challenge_menu.c	ChallengeMenu_DrawOptions	minor	natural	1	
+src/ui/results/challenge_menu.c	ChallengeMenu_UpdateDescription	contrived	natural	4	
