@@ -100,16 +100,13 @@ struct S {
 
 s32 Armor_InitFromScript(struct S *p, u32 arg)
 {
-    struct SceneCombatActor *actor = (void *)p;
     struct ContactSampleVector t;
     void *q;
     u32 r;
     s32 i;
     u32 *n;
-    u8 *a;
     u8 *w;
     u8 *x;
-    struct ContactSampleVector *y;
     u32 one;
 
     t.x = 0x480;
@@ -163,11 +160,9 @@ s32 Armor_InitFromScript(struct S *p, u32 arg)
     clr(&p->e[2]);
     w = p->fb4;
     x = p->f3c;
-    y = &p->fd4;
-    a = p->f18;
     for (i = 0; i < 9; i++) {
-        actor->fragments[i].update = NULL;
-        actor->fragments[i].destroy = NULL;
+        ((struct SceneCombatActor *)p)->fragments[i].update = NULL;
+        ((struct SceneCombatActor *)p)->fragments[i].destroy = NULL;
     }
     AnimData_Load(p->f2e0, 0x24B9);
     AnimData_Load(p->f2fc, 0x24B9);
@@ -177,13 +172,13 @@ s32 Armor_InitFromScript(struct S *p, u32 arg)
     SceneBody_Init(x, p->fB18, &t, 0, 4, p);
     TerrainOverlay_QueueAddActor(x);
     SceneBody_SetKeyframeDisplay(x, w);
-    *y = t;
+    p->fd4 = t;
     n = p->f180;
     TargetRegistry_RegisterActor(n, x, Armor_ReceiveTargetEvent);
     one = 1;
     n[1] |= one;
-    ScaledShadow_InitializeDefaultLarge(p->f114, y);
-    ProximityVolume_TranslateBounds(a, &t);
+    ScaledShadow_InitializeDefaultLarge(p->f114, &p->fd4);
+    ProximityVolume_TranslateBounds(p->f18, &t);
     Armor_InitCombatColliders(p, arg);
     p->hB2E = 0;
     r = 0;
