@@ -151,16 +151,14 @@ u32 TriggerManager_InsertTrigger(struct Trigger *p)
 }
 u32 TriggerManager_RemoveTrigger(struct Trigger *p)
 {
-    struct Trigger *a = p->previous;
-    struct Trigger *b = p->next;
-    if (a) {
-        a->next = b;
-    } else {
-        gTriggerManager->head = b;
-    }
-    if (b) {
-        b->previous = a;
-    }
+    struct Trigger *previous = p->previous;
+    struct Trigger *next = p->next;
+    if (previous)
+        previous->next = next;
+    else
+        gTriggerManager->head = next;
+    if (next)
+        next->previous = previous;
     return 0;
 }
 u32 Trigger_Destroy(struct Trigger *s)
