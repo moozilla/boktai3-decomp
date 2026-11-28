@@ -313,3 +313,19 @@ src/objects/hazards/falling_objects.c	FallingObject_ReceiveHit	minor	minor	6	obj
 src/objects/hazards/falling_objects.c	FallingObjectManager_AddObject	contrived	natural	1	
 src/objects/hazards/falling_objects.c	FallingObject_CreateFromScript	minor	natural	1	
 src/objects/hazards/falling_objects.c	FallingObjectManager_Create	minor	natural	1	
+src/objects/hazards/falling_objects.c	FallingObject_UpdateFinish	minor	minor	1	flag word read/mask locals keep the constant as the orrs destination
+src/objects/hazards/falling_objects.c	FallingObjectManager_ClearGlobal	natural	natural	0	
+src/objects/hazards/falling_objects.c	FallingObject_ReceiveAttackHit	natural	natural	0	
+src/objects/hazards/falling_objects.c	FallingObjectManager_RemoveObject	natural	natural	0	
+src/objects/hazards/falling_objects.c	FallingObject_ClearEffect	natural	natural	0	
+src/objects/hazards/falling_objects.c	FallingObject_Destroy	natural	natural	0	
+src/objects/hazards/falling_objects.c	FallingObject_UpdateFalling	natural	natural	0	
+src/objects/hazards/falling_objects.c	FallingObject_UpdateLanding	natural	natural	0	
+src/objects/hazards/falling_objects.c	FallingObject_UpdateShatter	natural	natural	0	
+src/objects/hazards/falling_objects.c	FallingObject_UpdateBounceAway	natural	natural	0	
+src/objects/hazards/falling_objects.c	FallingObject_UpdateWaiting	natural	natural	0	
+src/objects/hazards/falling_objects.c	FallingObject_SpawnFinishParticles	natural	natural	0	
+src/objects/hazards/falling_objects.c	FallingObjectManager_Update	natural	natural	0	
+src/objects/hazards/falling_objects.c	FallingObjectManager_Destroy	natural	natural	0	
+src/objects/hazards/falling_objects.c	FallingObjectManager_Initialize	natural	natural	0	
+src/objects/hazards/falling_objects.c	FallingObject_Create	contrived	natural	10	

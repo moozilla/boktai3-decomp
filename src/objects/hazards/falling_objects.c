@@ -1,6 +1,6 @@
 #include "objects/hazards/falling_objects.h"
-#include "scene/terrain/terrain_collision.h"
 #include "player/cutscene/player_cue_sequence.h"
+#include "scene/motion/scene_actor_terrain.h"
 
 void FallingObjectManager_ClearGlobal(void)
 {
@@ -80,27 +80,9 @@ u32 FallingObject_Destroy(struct FallingObject *s)
 
 extern u16 gUnk_08604ABC[];
 
-u8 *TerrainModifiers_FindCellOverride(s32, s32);
-
 void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
 
 void ScaledShadow_Initialize(void *, void *, u32, u32, u32, u32, u32, u32, u32, u32, u32);
-
-static inline s32 cellIndex(struct FallingVec *pos)
-{
-    s32 x = pos->x >> 8, z = pos->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        return 0;
-    return gTerrainMap->rows[z] + x;
-}
-
-static inline struct TerrainCell *getCell(s32 index)
-{
-    u8 *dynamic = TerrainModifiers_FindCellOverride(index, 1);
-    if (dynamic)
-        return &((struct TerrainCellOverride *)dynamic)->cell;
-    return &((struct TerrainGrid *)gTerrainMap->cells)->cells[index];
-}
 
 s32 FallingObject_Create(u16 id, s32 type, u32 flags, u32 parameter, u32 speed, u32 health,
                          u32 power, u32 force, struct FallingVec *position)
@@ -108,7 +90,7 @@ s32 FallingObject_Create(u16 id, s32 type, u32 flags, u32 parameter, u32 speed, 
     struct FallingPackedVec size, offset;
     struct FallingObject *p;
     s32 variant;
-    struct FallingVec *pos;
+    struct ContactPosition *ground;
     void *resource;
     if (!gFallingObjectManager && !FallingObjectManager_Create((void *)0xc0db, 0))
         return -1;
@@ -125,47 +107,23 @@ s32 FallingObject_Create(u16 id, s32 type, u32 flags, u32 parameter, u32 speed, 
         p->type = type;
     p->state = 0;
     p->timer = 0;
-    {
-        p->entered = 1;
-        p->flags = flags;
-        p->parameter = parameter;
-        p->position = *position;
-        if (p->type == 0)
-            p->animated = 1;
-        else
-            p->animated = 0;
-    }
+    p->entered = 1;
+    p->flags = flags;
+    p->parameter = parameter;
+    p->position = *position;
+    if (p->type == 0)
+        p->animated = 1;
+    else
+        p->animated = 0;
     p->speed = speed;
-    {
-        struct FallingVec *groundPos = &p->position;
-        s32 x = p->position.x >> 8, z = groundPos->z >> 8, index;
-        struct TerrainCell *cell;
-        u32 slope;
-        s32 height;
-        pos = groundPos;
-        if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-            index = 0;
-        else
-            index = gTerrainMap->rows[z] + x;
-        cell = getCell(index);
-        slope = cell->shapeAndHeight >> 4;
-        height = (cell->shapeAndHeight & 15) << 8;
-        switch (slope) {
-            case 1:
-                height -= (u8)groundPos->z;
-                break;
-            case 2:
-                height -= (u8)groundPos->x;
-                break;
-        }
-        p->ground = height;
-    }
+    ground = (struct ContactPosition *)&p->position;
+    p->ground = SceneActorTerrain_GetHeight(SceneActorTerrain_GetCellIndex(ground), ground);
     p->health = health;
     if (p->flags & 1) {
-        p->collider = Heap_Alloc(84);
+        p->collider = Heap_Alloc(sizeof(struct ContactCollider));
         if (!p->collider)
             return -1;
-        Memory_Clear(p->collider, 84);
+        Memory_Clear(p->collider, sizeof(struct ContactCollider));
         if (p->flags & 4) {
             size.x = 180;
             size.y = 256;
@@ -184,32 +142,29 @@ s32 FallingObject_Create(u16 id, s32 type, u32 flags, u32 parameter, u32 speed, 
         Collider_Init(p->collider, p->id, 0x4001, 0, 16, &size, &offset);
         Collider_SetCallback(p->collider, FallingObject_ReceiveHit, p);
         Collider_Refresh(p->collider);
-        Collider_SetPosition(p->collider, pos, 0);
+        Collider_SetPosition(p->collider, &p->position, 0);
     } else
         p->collider = 0;
-    if ((u8)(p->flags & 2)) {
+    if (p->flags & 2) {
         u32 attackFlags;
-        u32 big;
-        p->attack = Heap_Alloc(84);
+        p->attack = Heap_Alloc(sizeof(struct ContactCollider));
         if (!p->attack)
             return -1;
-        Memory_Clear(p->attack, 84);
-        big = (u8)(p->flags & 4);
-        if (big) {
-            big = 0;
-            ((struct FallingVec *)&size)->x = 120;
-            ((struct FallingVec *)&size)->y = 160;
-            ((struct FallingVec *)&size)->z = 120;
-            ((struct FallingVec *)&offset)->x = big;
-            ((struct FallingVec *)&offset)->y = 80;
-            ((struct FallingVec *)&offset)->z = big;
+        Memory_Clear(p->attack, sizeof(struct ContactCollider));
+        if (p->flags & 4) {
+            size.x = 120;
+            size.y = 160;
+            size.z = 120;
+            offset.x = 0;
+            offset.y = 80;
+            offset.z = 0;
         } else {
-            ((struct FallingVec *)&size)->x = 60;
-            ((struct FallingVec *)&size)->y = 80;
-            ((struct FallingVec *)&size)->z = 60;
-            ((struct FallingVec *)&offset)->x = big;
-            ((struct FallingVec *)&offset)->y = 40;
-            ((struct FallingVec *)&offset)->z = big;
+            size.x = 60;
+            size.y = 80;
+            size.z = 60;
+            offset.x = 0;
+            offset.y = 40;
+            offset.z = 0;
         }
         attackFlags = 0;
         if (!p->type)
@@ -217,7 +172,7 @@ s32 FallingObject_Create(u16 id, s32 type, u32 flags, u32 parameter, u32 speed, 
         Collider_Init(p->attack, p->id, 0x2001, 0, 32, &size, &offset);
         Collider_SetAttackProperties(p->attack, power, force, 65536, attackFlags, 60);
         Collider_SetCallback(p->attack, FallingObject_ReceiveAttackHit, p);
-        Collider_SetPosition(p->attack, pos, 0);
+        Collider_SetPosition(p->attack, &p->position, 0);
     } else
         p->attack = 0;
     resource = p->resource;
@@ -239,7 +194,7 @@ s32 FallingObject_Create(u16 id, s32 type, u32 flags, u32 parameter, u32 speed, 
     }
     if (p->animated)
         Anim_SetSequence(&p->anim, gFallingObjectManager->animation, 3, 0, 0);
-    ScaledShadow_Initialize(p->effect, pos, 80, 7, 107, 107, 3200, 1, 5, 1, 0);
+    ScaledShadow_Initialize(p->effect, &p->position, 80, 7, 107, 107, 3200, 1, 5, 1, 0);
     p->effectActive = 1;
     p->remove = 0;
     p->previous = 0;
