@@ -1,11 +1,7 @@
 #include "global.h"
+#include "ui/books/bestiary_display.h"
 
-struct S {
-    u8 pad[0x25];
-    u8 b25;
-};
-
-void BestiaryDisplay_Hide(struct S *p)
+void BestiaryDisplay_Hide(struct BestiaryDisplay *p)
 {
-    p->b25 = 1;
+    p->hidden = 1;
 }
