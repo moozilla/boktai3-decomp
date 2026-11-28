@@ -22,3 +22,5 @@ src/link/handshake/SlotMonitor_Initialize.c	SlotMonitor_Initialize	minor	natural
 src/link/handshake/sub_08108FB4.c	sub_08108FB4	natural	natural	0	
 src/link/handshake/LinkConnection_SetCallbacks.c	LinkConnection_SetCallbacks	contrived	natural	1	cast of the u32 gSlotMonitor global (shared ram.h)
 src/link/lobby/LinkLobbyPanel_LoadBackground.c	LinkLobbyPanel_LoadBackground	contrived	natural	2	
+src/link/lobby/TimerDisplay_DrawRecord.c	TimerDisplay_DrawRecord	contrived	natural	1	
+src/link/lobby/TimerDisplay_DrawRecord.c	RecordMenu_DrawRecords	contrived	minor	22	clamped scores stored through u16 lvalues: a field store lets the compiler keep the gGameState pointer, the ROM reloads it

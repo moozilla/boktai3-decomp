@@ -1,21 +1,25 @@
 #include "global.h"
+#include "engine/ram.h"
 #include "link/lobby/record_menu.h"
-#define TileNumber_GetCell     Video_GetWrappedBackgroundMapEntry
-#define TileNumber_DrawDecimal PanelText_DrawDigits
-#define TimerDisplay_DrawEmpty Video_DrawBackgroundRowMarkers
-struct TimerRecords {
-    u8 unknown[0x24c];
-    s32 ticks[2];
-};
+#include "scene/areas/area_effect_link.h"
+#include "system/game_state/game_state.h"
+
 s32 Div(s32, s32);
-u8 *Video_GetWrappedBackgroundMapEntry(u32, u32, u32);
+u16 *Video_GetWrappedBackgroundMapEntry(u32, u32, u32);
 void PanelText_DrawDigits(s32, s32, s32, u32, s32);
 void Video_DrawBackgroundRowMarkers(s32, u32);
-void TimerDisplay_DrawRecord(struct TimerRecords *records, s32 x, u32 y, s32 unused, s32 index)
+void AnimSprite_SelectGlyph(void *, void *, u16);
+void Sound_PlayTrackedSong(u32);
+
+void TimerDisplay_DrawRecord(struct AreaEffectLinkState *records, s32 x, u32 y, s32 unused,
+                             s32 index)
 {
-    s32 ticks, seconds, fraction;
+    s32 ticks;
+    s32 seconds;
+    s32 fraction;
     u16 *cell;
-    cell = (u16 *)Video_GetWrappedBackgroundMapEntry(3, x + 3, y);
+
+    cell = Video_GetWrappedBackgroundMapEntry(3, x + 3, y);
     *cell = 31;
     if (!records)
         Video_DrawBackgroundRowMarkers(x, y);
@@ -23,43 +27,23 @@ void TimerDisplay_DrawRecord(struct TimerRecords *records, s32 x, u32 y, s32 unu
         index = 0;
     if (index > 1)
         index = 1;
-    ticks = records->ticks[index];
+    ticks = records->recordTicks[index];
     if (!ticks) {
         Video_DrawBackgroundRowMarkers(x, y);
     } else {
         if (ticks > 59999) {
-            fraction = 999;
-            seconds = fraction;
+            seconds = fraction = 999;
         } else {
             seconds = Div(ticks, 60);
             fraction = Div((ticks - seconds * 60) * 169, 10);
         }
         PanelText_DrawDigits(seconds, 100, x, y, 0);
         PanelText_DrawDigits(fraction, 100, x + 4, y, 0);
-        cell = (u16 *)Video_GetWrappedBackgroundMapEntry(3, x + 7, y);
+        cell = Video_GetWrappedBackgroundMapEntry(3, x + 7, y);
         *cell = 1;
     }
 }
-struct RecActor {
-    u8 unknown[0x18];
-    s16 side;
-    u8 pad1a[0x53 - 0x1a];
-    u8 flag;
-    u8 pad54[0x24c - 0x54];
-    u32 ticksA;
-    u32 ticksB;
-};
-struct RecScore {
-    u8 unknown[0x7b6];
-    s16 wins;
-    u8 pad7b8[0x7fa - 0x7b8];
-    s16 losses;
-    s16 draws;
-};
-extern struct RecActor *gLinkSession;
-extern struct RecScore *gGameState;
-void AnimSprite_SelectGlyph(void *, void *, u16);
-void Sound_PlayTrackedSong(u32);
+
 static inline s32 Clamp999(s32 x)
 {
     if (x > 999)
@@ -68,66 +52,60 @@ static inline s32 Clamp999(s32 x)
         x = 0;
     return x;
 }
-/* The store goes through a plain s16 lvalue (not a struct field), so the score pointer is reloaded after it. */
-#define CLAMP_SCORE(field, off) *(s16 *)((u8 *)gGameState + off) = Clamp999(gGameState->field);
-static inline s32 ActorSide(void)
+
+static inline s32 LinkSession_GetLocalPlayer(void)
 {
-    struct RecActor *a = gLinkSession;
-    if (a == 0)
+    if (!gLinkSession)
         return -1;
-    return a->side;
+    return gLinkSession->localPlayer;
 }
+
 void RecordMenu_DrawRecords(struct RecordMenu *menu)
 {
-    struct RecActor *rec;
+    struct AreaEffectLinkState *records;
     u16 *cell;
     s32 i;
-    {
-        struct RecActor *a = gLinkSession;
-        u8 f;
-        if (a != 0) {
-            f = a->flag;
-            rec = a;
-            if (f != 1)
-                rec = 0;
-        } else
-            rec = 0;
-    }
-    TimerDisplay_DrawRecord((struct TimerRecords *)rec, 5, 0x11, menu->selection, 0);
-    TimerDisplay_DrawRecord((struct TimerRecords *)rec, 0x17, 0x11, menu->selection, 1);
-    cell = (u16 *)Video_GetWrappedBackgroundMapEntry(3, 0, 0x10);
+
+    if (!gLinkSession)
+        records = NULL;
+    else if (gLinkSession->unavailable != 1)
+        records = NULL;
+    else
+        records = gLinkSession;
+    TimerDisplay_DrawRecord(records, 5, 17, menu->selection, 0);
+    TimerDisplay_DrawRecord(records, 23, 17, menu->selection, 1);
+    cell = Video_GetWrappedBackgroundMapEntry(3, 0, 16);
     for (i = 0; i < 30; i++)
         *cell++ = 1;
-    if (rec->ticksA == rec->ticksB) {
-        gGameState->draws++;
+    if (records->recordTicks[0] == records->recordTicks[1]) {
+        gGameState->linkScoreOtherRows[1]++;
         menu->spriteIds[4] = 0x37;
         menu->spriteIds[5] = 0x37;
         for (i = 4; i <= 5; i++)
             AnimSprite_SelectGlyph(&menu->sprites[i], menu->rowResource, menu->spriteIds[i]);
         menu->sprites[4].x = 0;
         menu->sprites[5].x = 0x90;
-    } else if (rec->ticksA < rec->ticksB) {
-        if (gLinkSession != 0 && gLinkSession->side == 0)
-            gGameState->wins++;
+    } else if (records->recordTicks[0] < records->recordTicks[1]) {
+        if (gLinkSession && gLinkSession->localPlayer == 0)
+            gGameState->linkScoreFirstRow++;
         else
-            gGameState->losses++;
+            gGameState->linkScoreOtherRows[0]++;
         menu->sprites[4].x = 0;
         menu->sprites[5].x = 0x90;
-        if (gLinkSession != 0 && gLinkSession->side == 0)
-            Sound_PlayTrackedSong(0xa9);
+        if (gLinkSession && gLinkSession->localPlayer == 0)
+            Sound_PlayTrackedSong(0xA9);
     } else {
-        s32 side = ActorSide();
-        if (side == 1)
-            gGameState->wins++;
+        if (LinkSession_GetLocalPlayer() == 1)
+            gGameState->linkScoreFirstRow++;
         else
-            gGameState->losses++;
+            gGameState->linkScoreOtherRows[0]++;
         menu->sprites[4].x = 0x90;
         menu->sprites[5].x = 0;
-        side = ActorSide();
-        if (side == 1)
-            Sound_PlayTrackedSong(0xa9);
+        if (LinkSession_GetLocalPlayer() == 1)
+            Sound_PlayTrackedSong(0xA9);
     }
-    CLAMP_SCORE(wins, 0x7b6)
-    CLAMP_SCORE(losses, 0x7fa)
-    CLAMP_SCORE(draws, 0x7fc)
+    /* Stored through u16 lvalues, so the state pointer is reloaded after each one. */
+    *(u16 *)&gGameState->linkScoreFirstRow = Clamp999(gGameState->linkScoreFirstRow);
+    *(u16 *)&gGameState->linkScoreOtherRows[0] = Clamp999(gGameState->linkScoreOtherRows[0]);
+    *(u16 *)&gGameState->linkScoreOtherRows[1] = Clamp999(gGameState->linkScoreOtherRows[1]);
 }

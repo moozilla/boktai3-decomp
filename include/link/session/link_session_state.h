@@ -69,7 +69,8 @@ struct AreaEffectLinkState {
     u32 emptySelectionScript; /* 0x23C */
     u32 selectionScript;      /* 0x240 */
     u32 menuEventScript;      /* 0x244 */
-    u8 unknown248[0xC];
+    u8 unknown248[4];
+    u32 recordTicks[2];            /* 0x24C: each player's time, in frames; confidence=low */
     const u8 *choiceMessageScript; /* 0x254 */
     u8 unknown258[4];
     const u8 *menuMessageScript; /* 0x25C */
