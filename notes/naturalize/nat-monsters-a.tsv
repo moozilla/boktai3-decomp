@@ -499,3 +499,13 @@ src/monsters/dragon_puppy/DragonPuppy_OnTaskDestroy.c	DragonPuppy_OnTaskDestroy	
 src/monsters/cannons/vulcan/VulcanCannon_Destroy.c	VulcanCannon_Destroy	minor	minor	0	byte-offset Sprite_Remove argument with a local s32 prototype that the header declares void
 src/monsters/garmr_statue/GarmrStatue_OnTaskDestroy.c	GarmrStatue_OnTaskDestroy	natural	natural	0	
 src/monsters/cannons/plasma/PlasmaCannon_OnTaskDestroy.c	PlasmaCannon_OnTaskDestroy	natural	natural	0	
+src/monsters/cannons/wind/WindCannon_IsPathToPlayerClear.c	WindCannon_IsPathToPlayerClear	minor	minor	0	local cannon view and packed sample union
+src/monsters/cannons/wind/CombatActor_UpdateDefeatEffect.c	CombatActor_UpdateDefeatEffect	contrived	minor	2	local view structs and a byte read of the random entry
+src/monsters/cannons/plasma/PlasmaCannon_UpdateDefeatEffect.c	PlasmaCannon_UpdateDefeatEffect	minor	minor	1	pos pointer for the burst position
+src/monsters/cannons/wind/WindCannonManager_Update.c	WindCannonManager_Update	minor	minor	1	pause mask local: literal mask loads after the status word
+src/monsters/cannons/wind/WindCannonManager_Destroy.c	WindCannonManager_Destroy	minor	minor	2	do-while slot walk: a for loop changes the exit compare
+src/monsters/cannons/wind/WindCannonManager_Init.c	WindCannonManager_Init	minor	minor	2	do-while slot walk: a for loop changes the exit compare
+src/monsters/cannons/plasma/PlasmaCannon_FireProjectile.c	PlasmaCannon_FireProjectile	contrived	contrived	4	typeof pointer temp and angle mask arithmetic: ternary and direct member forms differ
+src/monsters/cannons/plasma/PlasmaCannon_RecordDefeat.c	PlasmaCannon_RecordDefeat	minor	minor	0	H() halfword view for the unnamed game-state counters
+src/monsters/cannons/plasma/PlasmaCannon_UpdateDamageState.c	PlasmaCannon_UpdateDamageState	minor	minor	0	collider alias per branch and nested blocks
+src/monsters/cannons/vulcan/VulcanCannon_InitializeFromScript.c	VulcanCannon_InitializeFromScript	minor	minor	0	script reader with cached member pointers; previously naturalized where it matched
