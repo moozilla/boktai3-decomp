@@ -375,3 +375,4 @@ src/bosses/vanargand/Vanargand_UpdateTargetDash.c	Vanargand_UpdateTargetDash	con
 src/bosses/vanargand/Vanargand_UpdateMovingPairAttack.c	Vanargand_UpdateMovingPairAttack	contrived	near-natural	3	flag mask and second alias locals kept
 src/bosses/vanargand/ActorSoundPhase_StartAnimation15.c	ActorSoundPhase_StartAnimation15	contrived	near-natural	3	constant locals and second aliases kept where present
 src/bosses/vanargand/ActorSoundPhase_StartTimedAnimation.c	ActorSoundPhase_StartTimedAnimation	contrived	near-natural	3	constant locals and second aliases kept where present
+src/bosses/vanargand/ActorSoundPhase_StartAnimation4.c	ActorSoundPhase_StartAnimation4	contrived	near-natural	3	constant locals and second aliases kept where present
