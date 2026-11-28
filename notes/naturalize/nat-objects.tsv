@@ -184,3 +184,4 @@ src/objects/deck_cannons/DeckCannon_DestroyProjectile.c	DeckCannon_DestroyProjec
 src/objects/deck_cannons/DeckCannon_OnProjectileCollision.c	DeckCannon_OnProjectileCollision	contrived	natural	1	
 src/objects/deck_cannons/DeckCannon_UpdateMuzzleFlash.c	DeckCannon_UpdateMuzzleFlash	contrived	natural	1	
 src/objects/deck_cannons/DeckCannon_DestroyMuzzleFlash.c	DeckCannon_DestroyMuzzleFlash	contrived	natural	1	
+src/objects/deck_cannons/DeckCannon_CreateCannon.c	DeckCannon_CreateCannon	minor	natural	1	
