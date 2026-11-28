@@ -1,9 +1,10 @@
 #include "global.h"
-extern u8 *gGameState;
+#include "ui/books/forging_book.h"
+
 void sub_08211820(s32 bit)
 {
     if (bit <= 31)
-        *(u32 *)(gGameState + 0x72c) |= 1 << bit;
+        gGameState->flags72C |= 1 << bit;
     else
-        *(u32 *)(gGameState + 0x730) |= 1 << (bit - 32);
+        gGameState->flags730 |= 1 << (bit - 32);
 }
