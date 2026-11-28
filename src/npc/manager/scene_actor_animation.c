@@ -333,14 +333,12 @@ s32 Math_Atan2(s32, s32);
 void Terrain_MoveFootprint(void *, struct ContactPosition *, struct ContactPosition *, u16, u16,
                            u8);
 
-static inline void SceneActor_OffsetAlongHeading(const s16 *table, struct ContactPosition *v,
-                                                 u32 angle, const s32 radius)
+static inline void SceneActor_OffsetAlongHeading(struct ContactPosition *v, u32 angle,
+                                                 const s32 radius)
 {
-    u32 heading = angle;
-    s32 length = radius;
-    v->x = SceneActor_ChargeComponent(table[(heading + 64) & 255] * length);
+    v->x = SceneActor_ChargeComponent(gUnk_086149C4[(angle + 64) & 255] * radius);
     v->y = 0;
-    v->z = SceneActor_ChargeComponent(table[heading & 255] * length);
+    v->z = SceneActor_ChargeComponent(gUnk_086149C4[angle & 255] * radius);
 }
 
 // confidence=low: emits toward flagged nearby actors using an outward radial offset.
@@ -355,25 +353,19 @@ static inline void Add(struct ContactPosition *out, struct ContactPosition *a,
 
 void Actor_EmitTowardNearbyActors(struct SceneActorBody *emitter)
 {
+    struct SceneActorManager *manager = gSceneActorListManager;
     struct SceneActor *actor;
     struct ContactPosition offset;
-    const s16 *table;
-    if ((!((struct SceneActorManager *)gSceneActorListManager)) || (gEngineFlags & 0x200))
+    if (!manager || (gEngineFlags & 0x200))
         return;
-    actor = ((struct SceneActorManager *)gSceneActorListManager)->head;
-    if (!actor)
-        return;
-    table = gUnk_086149C4;
-    do {
+    for (actor = manager->head; actor; actor = actor->previous) {
         if (SceneActor_TestFlags(actor, 0x1000)) {
             struct ContactPosition *position = &actor->body.position;
             struct ContactPosition *origin = &emitter->position;
-            s32 distance;
             s32 dx = origin->x - position->x;
             s32 dz = origin->z - position->z;
-            distance = (s32)((((u32)dx) * dx) + (((u32)dz) * dz));
-            if (distance <= 9999) {
-                SceneActor_OffsetAlongHeading(table, &offset, Math_Atan2(dx, dz), 100);
+            if (dx * dx + dz * dz < 10000) {
+                SceneActor_OffsetAlongHeading(&offset, Math_Atan2(dx, dz), 100);
                 Add(&offset, position, &offset);
                 Vanargand_Difference(&emitter->motion, &offset, &emitter->position);
                 if (emitter->movementProbe)
@@ -382,8 +374,7 @@ void Actor_EmitTowardNearbyActors(struct SceneActorBody *emitter)
                                           emitter->probeExtentZ, emitter->mode);
             }
         }
-        actor = actor->previous;
-    } while (actor);
+    }
 }
 
 s32 Scene_CanOpenMenu(void);
