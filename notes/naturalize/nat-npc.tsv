@@ -366,3 +366,4 @@ src/npc/otenko/sub_081CFD6C.c	sub_081CFD6C	natural	natural	0
 src/npc/otenko/sub_081CFD84.c	sub_081CFD84	natural	natural	0	
 src/npc/otenko/Otenko_UpdateTurnInPlace.c	Otenko_UpdateTurnInPlace	contrived	natural	1	
 src/npc/otenko/Otenko_UpdateProjectedVisible.c	Otenko_UpdateProjectedVisible	contrived	minor	1	u32 mask parked before the display flag OR
+src/npc/otenko/Otenko_UpdateProjectedIdle.c	Otenko_UpdateProjectedIdle	minor	natural	1	
