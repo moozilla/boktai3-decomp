@@ -4,85 +4,78 @@
 
 // confidence=low: repeats charges until terrain or the attempt limit ends them.
 
-
 s32 Hresvelgr_HasCellOverride(void *);
-static inline s32 FacesBoundary(struct HresvelgrTravelActor *p)
+static inline s32 FacesBoundary(struct HresvelgrTravelActor *actor)
 {
-    s32 direction = p->targetHeading;
-    s32 result;
-    if (!p->side) {
-        direction = (direction + 32) & 255;
-        if (direction > 64)
-            goto outside;
-        return 1;
+    s32 direction = actor->targetHeading;
+    if (!actor->side) {
+        if (((direction + 32) & 255) <= 64)
+            return 1;
     } else {
-        direction = (direction - 32) & 255;
-        result = 1;
-        if (direction > 64) {
-        outside:
-            result = 0;
-        }
+        if (((direction - 32) & 255) <= 64)
+            return 1;
     }
-    return result;
+    return 0;
 }
-void Hresvelgr_UpdateRepeatedCharge(struct HresvelgrTravelActor *p)
+
+void Hresvelgr_UpdateRepeatedCharge(struct HresvelgrTravelActor *actor)
 {
-    struct HresvelgrTravelActor *q = p;
-    struct BossActionState *a = &p->behavior;
-    if (Hresvelgr_EnterVulnerableBehavior(p)) {
-        p->chargeCount = 0;
-        ActionState_Reset(a);
-        ActionState_SetState(a, 0);
+    struct HresvelgrTravelActor *self = actor;
+    struct BossActionState *action = &actor->behavior;
+    if (Hresvelgr_EnterVulnerableBehavior(actor)) {
+        actor->chargeCount = 0;
+        ActionState_Reset(action);
+        ActionState_SetState(action, 0);
     }
-    switch (a->state) {
+    switch (action->state) {
         case 0:
-            if (!a->frame) {
-                Hresvelgr_SetActionAnimation(q, 24);
-                a->frame++;
-            } else if (q->finished)
-                ActionState_AdvanceState(a);
+            if (!action->frame) {
+                Hresvelgr_SetActionAnimation(self, 24);
+                action->frame++;
+            } else if (self->finished)
+                ActionState_AdvanceState(action);
             break;
         case 1:
-            if (!a->frame) {
-                if (Hresvelgr_HasCellOverride(q)) {
-                    ActionState_SetState(a, 3);
+            if (!action->frame) {
+                if (Hresvelgr_HasCellOverride(self)) {
+                    ActionState_SetState(action, 3);
                     break;
                 }
-                Hresvelgr_SetActionAnimation(q, 26);
-                (p->chargeCount)++;
-                a->frame++;
-            } else if (q->finished) {
-                if (p->chargeCount > 3)
-                    ActionState_SetState(a, 4);
-                else if (FacesBoundary(q))
-                    ActionState_SetState(a, 1);
+                Hresvelgr_SetActionAnimation(self, 26);
+                actor->chargeCount++;
+                action->frame++;
+            } else if (self->finished) {
+                if (actor->chargeCount > 3)
+                    ActionState_SetState(action, 4);
+                else if (FacesBoundary(self))
+                    ActionState_SetState(action, 1);
                 else
-                    ActionState_SetState(a, 2);
+                    ActionState_SetState(action, 2);
             }
             break;
         case 2:
-            if (!a->frame) {
-                Hresvelgr_SetActionAnimation(q, 2);
-                a->frame++;
-            } else if (q->finished)
-                ActionState_SetState(a, 1);
+            if (!action->frame) {
+                Hresvelgr_SetActionAnimation(self, 2);
+                action->frame++;
+            } else if (self->finished)
+                ActionState_SetState(action, 1);
             break;
         case 3:
-            if (!a->frame) {
-                Hresvelgr_SetActionAnimation(q, 25);
-                a->frame++;
-            } else if (q->finished)
-                ActionState_SetState(a, 1);
+            if (!action->frame) {
+                Hresvelgr_SetActionAnimation(self, 25);
+                action->frame++;
+            } else if (self->finished)
+                ActionState_SetState(action, 1);
             break;
         case 4:
-            if (!a->frame) {
-                Hresvelgr_SetActionAnimation(q, 12);
-                a->frame++;
-            } else if (q->finished)
-                ActionState_SetState(a, 5);
+            if (!action->frame) {
+                Hresvelgr_SetActionAnimation(self, 12);
+                action->frame++;
+            } else if (self->finished)
+                ActionState_SetState(action, 5);
             break;
         case 5:
-            p->behaviorFinished = 1;
+            actor->behaviorFinished = 1;
             break;
     }
 }

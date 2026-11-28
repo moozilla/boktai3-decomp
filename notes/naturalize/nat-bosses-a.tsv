@@ -258,3 +258,4 @@ src/bosses/hresvelgr/OffsetActor_UpdateFacingWait.c	OffsetActor_UpdateFacingWait
 src/bosses/hresvelgr/Hresvelgr_UpdateActionTwoRequest.c	Hresvelgr_UpdateActionTwoRequest	minor	minor	2	second actor pointer stays
 src/bosses/hresvelgr/ActorAction_PlayDescentSequence.c	ActorAction_PlayDescentSequence	minor	minor	3	second actor pointer stays
 src/bosses/hresvelgr/ActorAction_PlayTetherSequence.c	ActorAction_PlayTetherSequence	minor	minor	3	second actor pointer stays
+src/bosses/hresvelgr/Hresvelgr_UpdateRepeatedCharge.c	Hresvelgr_UpdateRepeatedCharge	contrived	minor	6	second actor pointer stays
