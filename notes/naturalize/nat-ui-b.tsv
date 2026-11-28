@@ -250,3 +250,6 @@ src/ui/title/tutorial_otenko.c	TutorialOtenko_TryInteraction	contrived	minor	22	
 src/ui/title/tutorial_otenko.c	TutorialOtenko_SelectNearestInteraction	contrived	minor	15	offset arithmetic for the best-distance compare (address base added before the scaled index); timer pointer and old-timer local (register allocation)
 src/ui/title/tutorial_otenko.c	TutorialOtenko_SetInteractionControlFlag	contrived	minor	1	u8 * parameter kept (callers pass bytes)
 src/ui/title/tutorial_otenko.c	TutorialOtenko_RestoreSavedAnimationPlayback	contrived	minor	1	u8 * parameter kept (callers pass bytes)
+src/ui/title/tutorial_otenko.c	TutorialOtenko_UpdateScaleGrowth	minor	minor	0	scale kept in the palette fields of the shared sprite struct
+src/ui/title/tutorial_otenko.c	TutorialOtenko_ArmRestIdleTransition	natural	natural	0	
+src/ui/title/tutorial_otenko.c	TutorialOtenko_UpdateIdleWait	contrived	minor	5	u8 one for the state flag (constant before the field address)

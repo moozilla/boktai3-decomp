@@ -477,19 +477,12 @@ void TutorialOtenko_UpdateIdleWait(struct ActorAnimController *p)
             p->savedPhase = p->phase;
             TutorialOtenko_SetPhase(p, 5);
             {
-                u32 one = 1;
-                u32 zero;
-                u8 *field;
-                u32 value;
-                field = &p->flags;
-                value = *field;
-                zero = 0;
-                one |= value;
-                *field = one;
-                p->fn = TutorialOtenko_UpdateIdlePhaseRestoration;
-                p->count = zero;
-                p->savedY2 = p->obj.position.y;
+                u8 one = 1;
+                p->flags |= one;
             }
+            p->fn = TutorialOtenko_UpdateIdlePhaseRestoration;
+            p->count = 0;
+            p->savedY2 = p->obj.position.y;
         }
     }
 }
