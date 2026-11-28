@@ -146,3 +146,4 @@ src/bosses/count/contact_actor_display.c	ContactActor_SetDirectionalSequence	con
 src/bosses/count/Count_ApplyPendingDamage.c	Count_ApplyPendingDamage	contrived	contrived	40	partial: keeps base alias, damagePtr/specialPtr, health pointer and forced temporaries; whole-function plain rewrite is 2 insns off (state alias placement and health base register)
 src/bosses/count/ContactActor_UpdateTracking.c	ContactActor_UpdateTracking	contrived	minor	22	keeps a block-local position pointer in the two target reads
 src/bosses/count/ContactActor_UpdateRoaming.c	ContactActor_UpdateRoaming	contrived	minor	70	keeps local vector helpers; the random draws need three different shared/local accessors to keep register choice (table r2 vs r4)
+src/bosses/count/ContactActor_UpdateRandomWalk.c	ContactActor_UpdateRandomWalk	contrived	minor	25	keeps delta write/read pointer blocks: direct field writes differ (stack address caching)
