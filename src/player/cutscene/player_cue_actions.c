@@ -414,7 +414,7 @@ void PlayerCue_UpdateMoveDestination(struct Player *player)
 
 void Player_UpdateSongCueAnimation(struct Player *player)
 {
-    switch ((s32)player->tetherPhase) {
+    switch (player->tetherPhase) {
         case 0:
             player->resetValue6FC = 15;
             if (Player_SetAnimation(player, ActorVariant_GetTableValue(player->actionMode, 8), 0x40,
@@ -443,12 +443,11 @@ void Player_UpdateSongCueAnimation(struct Player *player)
             player->resetValue6FC = 15;
             if (Player_SetAnimation(player, ActorVariant_GetTableValue(player->actionMode, 11),
                                     0x40, 1)) {
-                u32 facing = player->facing;
-                if (facing > 4) {
-                    player->heading = 8 - facing;
+                if (player->facing > 4) {
+                    player->heading = 8 - player->facing;
                     player->side = 1;
                 } else {
-                    player->heading = facing;
+                    player->heading = player->facing;
                     player->side = 0;
                 }
                 PlayerCue_EnterStandUpdate(player);
