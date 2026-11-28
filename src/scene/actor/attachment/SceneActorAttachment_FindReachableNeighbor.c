@@ -22,19 +22,8 @@ static inline s32 DistanceSquared_FindReachableNeighbor(struct ContactPosition *
                                                         const struct ContactPosition *a,
                                                         const struct ContactPosition *b)
 {
-    s32 x;
-    s32 z;
-    s32 xSquare;
-    s32 zSquare;
     SceneActorTerrain_Subtract(difference, a, b);
-    x = difference->x;
-    xSquare = x * x;
-    z = difference->z;
-    zSquare = z * z;
-    {
-        s32 copy = zSquare;
-        return (u32)xSquare + (u32)copy;
-    }
+    return difference->x * difference->x + difference->z * difference->z;
 }
 
 void SceneActorAttachment_FindReachableNeighbor(const struct SceneActorPositionSource *source,
@@ -46,13 +35,12 @@ void SceneActorAttachment_FindReachableNeighbor(const struct SceneActorPositionS
     struct ContactPosition center;
     struct ContactPosition difference;
     s32 i;
-    {
-        u8 k1 = 0xC3;
-        if ((!(((struct NeighborTerrainCell *)SceneActorTerrain_GetCell(cell))->flags & k1)) &&
-            Nav_IsPositionInMesh(context, &source->position, input)) {
-            *output = *input;
-            return;
-        }
+    u16 flags;
+    flags = ((struct NeighborTerrainCell *)SceneActorTerrain_GetCell(cell))->flags;
+    flags &= 0xC3;
+    if (!flags && Nav_IsPositionInMesh(context, &source->position, input)) {
+        *output = *input;
+        return;
     }
     Neighbor_GetCenter(&center, cell + 1);
     candidates[0].key =

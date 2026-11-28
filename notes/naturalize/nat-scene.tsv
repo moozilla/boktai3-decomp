@@ -209,3 +209,4 @@ src/scene/actor/attachment/SceneActorAttachment_BeginReturnResponse.c	SceneActor
 src/scene/actor/attachment/SceneActorAttachment_ReplaceResponseSlot.c	SceneActorAttachment_ReplaceResponseSlot	contrived	contrived	6	owner/group aliases, kind/event narrow locals and the count block are needed (aliases keep a second register)
 src/scene/actor/attachment/SceneActorAttachment_TestPositionWindow.c	SceneActorAttachment_TestPositionWindow	natural	natural	0	-
 src/scene/actor/attachment/SceneActorEffect_SortCandidates.c	SceneActorEffect_SortCandidates	contrived	natural	3	-
+src/scene/actor/attachment/SceneActorAttachment_FindReachableNeighbor.c	SceneActorAttachment_FindReachableNeighbor	contrived	minor	8	flags local for the terrain mask test (plain & writes the other operand register)
