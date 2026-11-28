@@ -1,41 +1,30 @@
 #include "global.h"
+#include "engine/ram.h"
+#include "ui/dialogue/text_window.h"
+#include "ui/dialogue/text_window_manager.h"
 
-struct TextState {
-    u8 pad0[0x1c];
-    void *pc;
-};
+struct TextWindow *TextWindow_Find(int);
+const u8 *TextWindow_ResolveString(struct TextWindow *, int);
+void TextState_Reset(struct TextState *);
 
-struct TextWindow {
-    u8 pad0[0x10];
-    u16 wait;
-    u8 pad12[2];
-    void *script;
-    u16 frame, count;
-    u16 frames[0x20];
-    u8 pad5c[4];
-    struct TextState text;
-};
-struct TextWindow *TextWindow_Find(s32);
-void *TextWindow_ResolveString(struct TextWindow *, int);
-void TextState_Reset(void *);
-
-s32 sub_080338A8(s32 id, void *script, u32 count, u32 frame, u16 *frames)
+int sub_080338A8(int id, const u8 *script, u32 count, u32 frame, u16 *frames)
 {
-    struct TextWindow *w = TextWindow_Find(id);
-    struct TextState *state;
-    s32 i;
-    if (w == 0)
+    struct TextWindow *window = TextWindow_Find(id);
+    struct TextState *text;
+    int i;
+
+    if (!window)
         return -1;
-    state = &w->text;
-    w->script = script;
-    state->pc = TextWindow_ResolveString(w, 0);
-    w->frame = frame;
-    w->count = count;
-    if ((u16)count > 0x20)
-        w->count = 0x20;
-    for (i = 0; i < w->count; i++)
-        w->frames[i] = frames[i];
-    w->wait = w->frames[w->frame];
-    TextState_Reset(&w->text);
+    text = &window->text;
+    window->script = script;
+    text->pc = TextWindow_ResolveString(window, 0);
+    window->sequenceIndex = frame;
+    window->sequenceCount = count;
+    if (window->sequenceCount > 32)
+        window->sequenceCount = 32;
+    for (i = 0; i < window->sequenceCount; i++)
+        window->sequence[i] = frames[i];
+    window->symbol = window->sequence[window->sequenceIndex];
+    TextState_Reset(&window->text);
     return 0;
 }
