@@ -1,26 +1,20 @@
 #include "ui/widgets/scene_input.h"
-
-struct ScoreDigits {
-    u8 taskAndResources[0x24];
-    struct AnimSprite slots[18];
-    u8 unknown6E4[0x20];
-    struct AnimSpriteResource glyphs;
-};
+#include "ui/save/save_menu.h"
 
 // Returns the next slot index.
-static inline s32 SetDigitVisible(struct ScoreDigits *p, s32 idx, s32 glyph)
+static inline s32 SetDigitVisible(struct SaveMenu *p, s32 idx, s32 glyph)
 {
     if (glyph == 0x3e)
-        p->slots[idx].flags |= 1;
+        p->widgets[idx].flags |= 1;
     else
-        p->slots[idx].flags &= ~1;
+        p->widgets[idx].flags &= ~1;
     return ++idx;
 }
 
 // Slots 9 through 17 hold the three rows of digits positioned by sub_0810FADC.
 // `row` is reused as the hundreds slot; its dead final increment keeps that copy
 // separate from `base` (cse keeps the longer-lived register as the class head).
-void sub_0810FDDC(struct ScoreDigits *p, s32 row, s32 n)
+void sub_0810FDDC(struct SaveMenu *p, s32 row, s32 n)
 {
     s32 base = (row * 3) + 9;
     s32 glyph;
@@ -32,20 +26,20 @@ void sub_0810FDDC(struct ScoreDigits *p, s32 row, s32 n)
     }
     row = base;
     SetDigitVisible(p, row, glyph);
-    AnimSprite_SelectGlyph(&p->slots[base], &p->glyphs, (u16)glyph);
+    AnimSprite_SelectGlyph(&p->widgets[base], &p->widgetResource, (u16)glyph);
     glyph = 0x3e;
     while (n > 9) {
         glyph++;
         n -= 10;
     }
     SetDigitVisible(p, base + 1, glyph);
-    AnimSprite_SelectGlyph(&p->slots[base + 1], &p->glyphs, (u16)glyph);
+    AnimSprite_SelectGlyph(&p->widgets[base + 1], &p->widgetResource, (u16)glyph);
     glyph = 0x3e;
     while (n > 0) {
         glyph++;
         n--;
     }
     ones = base + 2;
-    AnimSprite_SelectGlyph(&p->slots[ones], &p->glyphs, (u16)glyph);
+    AnimSprite_SelectGlyph(&p->widgets[ones], &p->widgetResource, (u16)glyph);
     row++;
 }
