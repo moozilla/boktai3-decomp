@@ -1,31 +1,21 @@
 #include "global.h"
+#include "engine/engine.h"
+#include "engine/ram.h"
+#include "objects/loot_deposits/callback_pool.h"
 
-struct PoolActor {
-    u8 pad0[0xC];
-    void *anim;
-    u8 pad10[0x5E - 0x10];
-    u16 flags5E;
-    u8 pad60[0x9C - 0x60];
-    u16 timer9C;
-    u8 padA0[0x15B - 0xA0];
-    u8 count15B;
-};
-void AnimData_SelectPaletteBank(void *, u32);
-
-void sub_08104748(struct PoolActor *o)
+void sub_08104748(struct CallbackPoolEntry *entry)
 {
-    u8 *q = (u8 *)o;
-    if (o->timer9C) {
-        o->flags5E |= 4;
-        o->timer9C--;
+    struct CallbackPoolEntry *self = entry;
+    if (entry->collider.responseValue) {
+        entry->collider.flags |= 4;
+        entry->collider.responseValue--;
     } else {
-        o->flags5E &= ~4;
+        entry->collider.flags &= ~4;
     }
-    q += 0x15B;
-    if (*q) {
-        AnimData_SelectPaletteBank(o->anim, 0x192);
-        (*q)--;
+    if (self->hitTimer) {
+        AnimData_SelectPaletteBank((void *)entry->sprite.resource, 0x192);
+        self->hitTimer--;
     } else {
-        AnimData_SelectPaletteBank(o->anim, 0x1EA);
+        AnimData_SelectPaletteBank((void *)entry->sprite.resource, 0x1EA);
     }
 }
