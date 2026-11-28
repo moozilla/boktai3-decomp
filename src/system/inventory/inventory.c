@@ -230,8 +230,6 @@ s32 SceneHud_SelectUpgradeableStat(s32 amount)
     return 0xff;
 }
 
-#define Player_RecalculateStats Player_RefreshStatsAndVitals
-
 s32 SceneHud_SelectUpgradeableStat(s32);
 
 void Player_RefreshStatsAndVitals(struct Player *);
@@ -244,10 +242,9 @@ void InventoryPanel_DrawStatComparison(void *, s32, s32, s32, s32, s32);
 
 static inline s32 ClampIncrease(s32 index, s32 amount)
 {
-    struct GameState *state = gGameState;
-    struct GameState *entry = (struct GameState *)(index * 2 + (u32)state);
-    s32 base = (s16)entry->baseStats[0];
-    s32 bonus = (s16)entry->statBonuses[0];
+    s32 base = *(s16 *)&gGameState->baseStats[index];
+    s32 bonus = *(s16 *)&gGameState->statBonuses[index];
+
     if (base + bonus + amount > 100)
         amount = 100 - base - bonus;
     return amount;
@@ -256,7 +253,6 @@ static inline s32 ClampIncrease(s32 index, s32 amount)
 void SceneHud_IncreaseStatBonus(struct SceneHudState *s, s32 index, s32 amount)
 {
     struct Player *p = s->actionOwner;
-    struct GameState *entry;
     s32 increase;
     if (p) {
         if (index <= 2)
@@ -270,8 +266,7 @@ void SceneHud_IncreaseStatBonus(struct SceneHudState *s, s32 index, s32 amount)
         increase = s->appliedStatIncrease;
         increase = ClampIncrease(s->selectedStat, increase);
         s->appliedStatIncrease = increase;
-        entry = (struct GameState *)(s->selectedStat * 2 + (u32)gGameState);
-        entry->statBonuses[0] += increase;
+        *(s->selectedStat + gGameState->statBonuses) += increase;
         Player_RefreshStatsAndVitals(p);
         Hud_DrawStatusMetersAndCounts(s, 2, 12);
         MenuDisplay_DrawStatComparison(s, 10, 6);

@@ -525,3 +525,4 @@ src/system/inventory/inventory.c	Inventory_RestoreLifePercent	contrived	natural	
 src/system/inventory/inventory.c	Inventory_RestoreLifePercentTimed	contrived	natural	1	
 src/system/inventory/inventory.c	PlayerStatusPanel_ResetScriptCounters	contrived	minor	1	counter indexed as *(slot + counters) for the index-first address sum
 src/system/inventory/inventory.c	SceneHud_SelectUpgradeableStat	contrived	minor	1	stat fields are u16 and read as signed through a cast
+src/system/inventory/inventory.c	SceneHud_IncreaseStatBonus	contrived	minor	1	stat fields read as signed through a cast; bonus updated as *(index + field)
