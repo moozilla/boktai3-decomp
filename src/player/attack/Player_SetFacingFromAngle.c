@@ -1,19 +1,15 @@
 #include "global.h"
+#include "player/player.h"
 
-struct P0814AFE4 {
-    u8 f0[0x3A2];
-    u8 f3A2;
-    u8 f3A3;
-};
-
-void Player_SetFacingFromAngle(struct P0814AFE4 *p, s32 v)
+void Player_SetFacingFromAngle(struct Player *p, s32 angle)
 {
-    s32 k = ((v + 0x60) & 0xff) >> 6;
-    if (k > 1) {
-        p->f3A2 = 3 - k;
-        p->f3A3 = 1;
+    s32 heading = ((angle + 0x60) & 0xff) >> 6;
+
+    if (heading > 1) {
+        p->heading = 3 - heading;
+        p->side = 1;
     } else {
-        p->f3A2 = k;
-        p->f3A3 = 0;
+        p->heading = heading;
+        p->side = 0;
     }
 }

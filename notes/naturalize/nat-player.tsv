@@ -136,3 +136,4 @@ src/player/attack/Player_CalculateTotalAttackPower.c	Player_CalculateTotalAttack
 src/player/attack/Player_GetAttackPower.c	Player_GetAttackPower	natural	natural	0	-
 src/player/attack/ActorFlags_GetResponseBits.c	ActorFlags_GetResponseBits	minor	minor	11	for(;;) with ++i return and walking pointer stay: every counted loop form is reversed by loop.c
 src/player/attack/Player_UpdateSelectedSpinAttack.c	Player_UpdateSelectedSpinAttack	contrived	minor	3	SceneVec/ContactPosition view casts
+src/player/attack/Player_SetFacingFromAngle.c	Player_SetFacingFromAngle	contrived	natural	1	-
