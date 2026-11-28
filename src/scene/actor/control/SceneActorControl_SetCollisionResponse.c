@@ -1,3 +1,4 @@
+#include "scene/motion/scene_actor_terrain_reaction.h"
 #include "scene/actor/scene_actor_control_helpers.h"
 void SceneActorControl_SetCollisionResponse(struct ChaseActor *input)
 {
@@ -39,10 +40,7 @@ void SceneActorControl_SetCollisionResponse(struct ChaseActor *input)
                 *field = behavior;
                 actor->base.counter2AC = zeroWord;
             }
-            {
-                u8 *field = &actor->base.field2B1;
-                *field = 1;
-            }
+            actor->base.field2B1 = 1;
         }
     }
 }
