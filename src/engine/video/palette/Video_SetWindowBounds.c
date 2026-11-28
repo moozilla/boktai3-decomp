@@ -1,17 +1,18 @@
 #include "global.h"
+#include "gba/io_reg.h"
 #include "engine/video/render.h"
 
-void Video_SetWindowBounds(u32 n, u32 a, u32 b, u32 c, u32 d)
+void Video_SetWindowBounds(u32 window, u32 left, u32 top, u32 right, u32 bottom)
 {
-    if (n == 0) {
-        gWindowShadow0 = (a << 8) | c;
-        *(vu16 *)0x04000040 = gWindowShadow0;
-        gWindowShadow2 = (b << 8) | d;
-        *(vu16 *)0x04000044 = gWindowShadow2;
+    if (window == 0) {
+        gWindowShadow0 = (left << 8) | right;
+        REG_WIN0H = gWindowShadow0;
+        gWindowShadow2 = (top << 8) | bottom;
+        REG_WIN0V = gWindowShadow2;
     } else {
-        gWindowShadow3 = (a << 8) | c;
-        *(vu16 *)0x04000042 = gWindowShadow3;
-        gWindowShadow1 = (b << 8) | d;
-        *(vu16 *)0x04000046 = gWindowShadow1;
+        gWindowShadow3 = (left << 8) | right;
+        REG_WIN1H = gWindowShadow3;
+        gWindowShadow1 = (top << 8) | bottom;
+        REG_WIN1V = gWindowShadow1;
     }
 }
