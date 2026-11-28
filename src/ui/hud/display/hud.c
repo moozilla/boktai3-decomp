@@ -779,23 +779,21 @@ void Hud_DrawHeaderCounter(void)
 void Hud_DrawSelectedCounter(struct SceneHudState *hud)
 {
     u16 *cell = Hud_GetTilemapCell(0, 0x12, 1);
-    u8 mode = hud->clockSelection;
-
-    if (mode == 0) {
+    if (hud->clockSelection == 0) {
         *cell++ = 0xF023;
         *cell++ = 0xF022;
         *cell++ = 0xF024;
-        cell[0] = 0xF09B;
-        cell[1] = 0xF001;
+        *cell++ = 0xF09B;
+        *cell = 0xF001;
         if (gGameState->unk7B0 > 9999)
             gGameState->unk7B0 = 9999;
         Hud_DrawCounter7B0(0x17, 1);
-    } else if (mode == 1) {
+    } else if (hud->clockSelection == 1) {
         *cell++ = 0xF025;
         *cell++ = 0xF026;
         *cell++ = 0xF022;
-        cell[0] = 0xF09B;
-        cell[1] = 0xF030;
+        *cell++ = 0xF09B;
+        *cell = 0xF030;
         if (gGameState->menuRewardBalance > 9999)
             gGameState->menuRewardBalance = 9999;
         Hud_DrawCounter50C(0x17, 1);
@@ -803,8 +801,8 @@ void Hud_DrawSelectedCounter(struct SceneHudState *hud)
         *cell++ = 0xF0B9;
         *cell++ = 0xF0BA;
         *cell++ = 0xF022;
-        cell[0] = 0xF0BB;
-        cell[1] = 0xF09B;
+        *cell++ = 0xF0BB;
+        *cell = 0xF09B;
         if (gGameState->unk77C > 9999)
             gGameState->unk77C = 9999;
     }

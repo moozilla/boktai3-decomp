@@ -534,3 +534,13 @@ src/ui/hud/display/hud.c	Hud_PlayActionChangeCue	fudged	partial	3	unsigned selec
 src/ui/hud/display/hud.c	Hud_UpdateCountdownDigits	fudged	partial	7	SetDigitVisibility/TestFlags helpers (mask-first load)
 src/ui/hud/display/hud.c	Hud_DrawDecimalDigits	fudged	natural	32	
 src/ui/hud/display/hud.c	Hud_FillDigitCells	fudged	natural	3	
+src/ui/hud/display/hud.c	Hud_DrawActiveStatValue	natural	natural	0	
+src/ui/hud/display/hud.c	Hud_DrawDefaultResourceCounts	natural	natural	0	
+src/ui/hud/display/hud.c	Hud_FillTileRun	natural	natural	0	
+src/ui/hud/display/hud.c	Hud_DrawCounter7B0	natural	natural	0	
+src/ui/hud/display/hud.c	Hud_DrawCounter50C	natural	natural	0	
+src/ui/hud/display/hud.c	Hud_DrawHeaderCounter	natural	natural	0	
+src/ui/hud/display/hud.c	Hud_DrawSunClockTimeB	natural	natural	0	
+src/ui/hud/display/hud.c	Hud_DrawSunClockTimeA	natural	natural	0	
+src/ui/hud/display/hud.c	Hud_DrawStatusMetersAndCounts	natural	natural	0	
+src/ui/hud/display/hud.c	Hud_DrawSelectedCounter	fudged	natural	6	
