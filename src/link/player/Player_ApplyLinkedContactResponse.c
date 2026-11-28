@@ -29,22 +29,20 @@ void Player_ApplyLinkedContactResponse(struct Player *p, struct ContactCollider 
         return;
     }
     if (flagBits(&p->statusFlags, 0x8000)) {
-        s32 dir;
         if (source->flags & 0x100) {
-            dir = ((source->direction + 0x70) >> 5) & 7;
+            p->contactDirection = ((source->direction + 0x70) >> 5) & 7;
         } else {
             s32 dx = source->x - target->x;
             s32 dy = source->z - target->z;
+
             if (dx == 0 && dy == 0) {
                 p->contactDirection = p->facing;
-                goto done;
+            } else {
+                s32 dir = (((u16)Math_Atan2(dx, dy) + 0x70) >> 5) & 7;
+
+                p->contactDirection = (dir + 4) & 7;
             }
-            dir = (((u16)Math_Atan2(dx, dy) + 0x70) >> 5) & 7;
-            p->contactDirection = (dir + 4) & 7;
-            goto done;
         }
-        p->contactDirection = dir;
-    done:
         p->contactMagnitude = target->responseParameter;
         target->responseParameter = 0;
         target->flags |= 4;
