@@ -169,16 +169,14 @@ done:
 
 s32 EffectManager_DestroyManager(struct EffectManager *manager)
 {
-    s32 i;
-    for (i = 0; i <= 5; i++) {
+    s32 i, j;
+
+    for (i = 0; i < 6; i++) {
         struct Effect *effect = &manager->effects[i];
-        if (effect->active != 0) {
-            struct EffectSprite *sprite = &effect->particles[0].sprite;
-            s32 j;
-            for (j = 3; j >= 0; j--) {
-                Effect_Remove(sprite);
-                sprite = (struct EffectSprite *)((u8 *)sprite + sizeof(struct EffectParticle));
-            }
+
+        if (effect->active) {
+            for (j = 0; j < 4; j++)
+                Effect_Remove(&effect->particles[j].sprite);
         }
     }
     EffectManager_SetGlobal(NULL);
