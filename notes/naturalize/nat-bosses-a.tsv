@@ -28,3 +28,4 @@ src/bosses/count/actor_graphics_and_basic_states.c	SceneActorState_StepTableByte
 src/bosses/count/actor_graphics_and_basic_states.c	SceneActorState_StepTableByKind	minor	natural	2	
 src/bosses/count/actor_graphics_and_basic_states.c	SceneActorState_SelectReactionPhase	minor	minor	2	GetHealthRatio helper kept (a plain u8 compare lets jump2 merge the phase tails)
 src/bosses/count/actor_graphics_and_basic_states.c	SceneActorState_SnapReactionPosition	contrived	natural	1	
+src/bosses/count/actor_graphics_and_basic_states.c	SceneActors_DispatchCommands	contrived	minor	11	guarded do-while kept (a for loop reuses the dispatch-state address); duration-dependent scale temp in the effect helper

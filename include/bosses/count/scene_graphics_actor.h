@@ -61,12 +61,20 @@ struct SceneActorGraphics {
     u8 paletteBank0[0x200];  /* 0x3C4 */
     u8 paletteBank1[0x200];  /* 0x5C4 */
     u8 paletteBank2[0x200];  /* 0x7C4 */
-    u8 unk9C4[0x9D8 - 0x9C4];
+    struct ContactPosition snapPosition; /* 0x9C4: set by scene command 12. */
+    u8 unk9CC[0x9D8 - 0x9CC];
     struct ContactActorPool *contactPool; /* 0x9D8: SceneActors_RequestContactPoolClear. */
     struct BackgroundFlashController *backgroundFlash; /* 0x9DC: SceneActors_StopBackgroundFlash. */
 };
 
 /* Actor-relative view used by contact, animation and palette handlers. */
+/* A scene command as the actor reads it: the event header and up to three halfword arguments. */
+struct SceneGraphicsCommand {
+    u8 unk0[6];
+    u8 kind, argumentCount;
+    s16 arguments[3];
+};
+
 struct SceneGraphicsActor {
     u8 unk0[0x48];
     struct SceneActorBody body; /* 0x48 */

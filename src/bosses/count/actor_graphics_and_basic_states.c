@@ -12,6 +12,7 @@
 #include "scene/collision/contact_position.h"
 #include "scene/collision/contact_reaction_vector_layout.h"
 #include "scene/collision/packed_contact_vector.h"
+#include "scene/actor/scene_event_types.h"
 
 int SceneActorGraphics_GetResourceId(struct StateActor *p)
 {
@@ -33,43 +34,7 @@ u8 *SceneActorGraphics_GetDefaultResourceId(void)
 
 int SceneActorGraphics_GetResourceId(struct StateActor *);
 
-struct T {
-    u8 pad0[0x260];
-    u16 h260, h262, h264;
-    u8 pad266[0x288 - 0x266];
-    u8 *palette;
-    u8 pad28c[0x344 - 0x28C];
-    u16 h344;
-    u8 pad346[0x38C - 0x346];
-    u8 b38C;
-    u8 pad38d;
-    u8 b38E;
-    u8 b38F;
-    u32 w390;
-    u8 pad394[0x3B8 - 0x394];
-    u8 b3B8;
-    u8 pad3b9;
-    u8 b3BA;
-    u8 pad3bb[0x3C4 - 0x3BB];
-    u8 pal3C4[0x5C4 - 0x3C4];
-    u8 pal5C4[0x7C4 - 0x5C4];
-    u8 pal7C4[0x9C4 - 0x7C4];
-    u16 h9C4, h9C6, h9C8;
-    u8 pad9ca[0x9DC - 0x9CA];
-    void *flash;
-};
 void CpuSet(const void *, void *, u32);
-static inline void DispatchSelectPalette(struct T *t, s32 r)
-{
-    if (r == 0)
-        t->palette = t->pal5C4;
-    else if (r == 1)
-        t->palette = t->pal7C4;
-    else {
-        CpuSet(gPaletteBankData + r * 32, t->pal3C4, 0x04000008);
-        t->palette = t->pal3C4;
-    }
-}
 
 static inline void SceneActorGraphics_SelectPalette(struct SceneGraphicsActor *actor, s32 bank)
 {
@@ -689,9 +654,6 @@ void SceneActorState_SelectReactionPhase(struct SceneGraphicsActor *actor)
 }
 // confidence=low: reaction-kind selector controls the far-point mode and motion timer.
 void Path_SnapToRandomFarPoint(void *, void *, u32, u32);
-struct SnapVector {
-    u32 a, b;
-};
 void SceneActorState_SnapReactionPosition(struct SceneGraphicsActor *actor,
                                           struct ContactPosition *position)
 {
@@ -732,222 +694,166 @@ void SceneActorState_SnapReactionPosition(struct SceneGraphicsActor *actor,
     actor->graphics.approachFrames = 64;
 }
 /* Scene commands set actor states, positions, graphics variants and background flashes. */
-typedef struct {
-    u16 id;
-    u8 unk[4];
-    u8 count[2];
-    s16 *messages[2][4];
-    u8 pad[8];
-    void *next;
-} Entry;
-
-struct S {
-    u8 pad0[0x54];
-    u16 h54, h56, h58;
-    u8 pad5a[0xAC - 0x5A];
-    u8 state;
-    u8 entered;
-    u8 sub;
-    u8 padAF;
-    u8 changed;
-    u8 padB1[0xC4 - 0xB1];
-    u32 timer;
-    u8 padC8[0xD0 - 0xC8];
-    u16 hD0, hD2, hD4;
-    u8 padD6[0x114 - 0xD6];
-    u8 angle;
-    u8 pad115[0x118 - 0x115];
-    Entry entry;
+/* 0x0200047C: the dispatch phase selects the pending command list. */
+struct SceneEventDispatchState {
+    u8 unknown0[0x24];
+    u8 phase;
 };
+extern struct SceneEventDispatchState *gSceneEventDispatchState;
 
-extern u8 *gSceneEventDispatchState;
-
-void SceneMessages_SetPendingTrigger(void *, void *);
-
-static inline void setStateFull(struct S *s, u32 state, u32 entered, u32 sub)
+static inline void SceneActorGraphics_SetEffect(struct SceneGraphicsActor *actor, int mode,
+                                                int resource, int duration)
 {
-    s->state = state;
-    s->entered = entered;
-    s->sub = sub;
-    s->timer = entered;
+    actor->graphics.resourceId = resource;
+    actor->graphics.effectMode = mode;
+    actor->graphics.effectDuration = duration;
+    if (actor->graphics.effectMode == 2) {
+        u32 scale = duration == 5 ? 32 : 64;
+        actor->graphics.effectScale = scale;
+    } else if (actor->graphics.effectMode == 1)
+        actor->graphics.effectScale = 0;
 }
 
-#define setState(s, sub) setStateFull(s, 2, 0, sub)
-
-static inline void effect2(struct T *p, int mode, int id, int duration)
+void SceneActors_DispatchCommands(struct StateActor *p)
 {
-    p->w390 = id;
-    p->b38E = mode;
-    p->b38F = duration;
-    if (p->b38E == 2) {
-        u32 value = duration == 5 ? 32 : 64;
-        p->b38C = value;
-    } else if (p->b38E == 1)
-        p->b38C = 0;
-}
-
-#define effect(p, id, mode, d) effect2(p, mode, id, d)
-
-void SceneActors_DispatchCommands(struct S *s)
-{
-    struct T *t = (struct T *)s;
-    Entry *entry = &s->entry;
+    struct SceneGraphicsActor *actor = (struct SceneGraphicsActor *)p;
+    struct SceneEventReceiver *receiver = (struct SceneEventReceiver *)p->receiver2;
     s32 i;
 
     i = 0;
-    if (i < entry->count[gSceneEventDispatchState[0x24]])
-        do {
-            s16 *m;
-            u8 *controller = gSceneEventDispatchState;
-            m = entry->messages[controller[0x24]][i];
-            SceneMessages_SetPendingTrigger(entry, m);
-            switch (((u8 *)m)[6]) {
-                case 0:
-                    setState(s, 0);
-                    s->changed = 1;
+    if (i < receiver->count[gSceneEventDispatchState->phase]) do {
+        struct SceneEventDispatchState *dispatch = gSceneEventDispatchState;
+        struct SceneGraphicsCommand *command =
+            (struct SceneGraphicsCommand *)receiver->pending[dispatch->phase][i];
+        SceneMessages_SetPendingTrigger(receiver, command);
+        switch (command->kind) {
+            case 0:
+                    SceneActorState_StartAction(p, 2, 0, 0);
                     break;
-                case 1:
-                    s->angle = (m[4] + 5) << 5;
-                    setState(s, 1);
-                    s->changed = 1;
+            case 1:
+                    p->savedFacing = (command->arguments[0] + 5) << 5;
+                    SceneActorState_StartAction(p, 2, 0, 1);
                     break;
-                case 3:
-                    s->angle = (m[4] + 5) << 5;
-                    setState(s, 2);
-                    s->changed = 1;
+            case 3:
+                    p->savedFacing = (command->arguments[0] + 5) << 5;
+                    SceneActorState_StartAction(p, 2, 0, 2);
                     break;
-                case 4:
-                    s->angle = (m[4] + 5) << 5;
-                    setState(s, 3);
-                    s->changed = 1;
+            case 4:
+                    p->savedFacing = (command->arguments[0] + 5) << 5;
+                    SceneActorState_StartAction(p, 2, 0, 3);
                     break;
-                case 5:
-                    s->angle = (m[4] + 5) << 5;
-                    setState(s, 4);
-                    s->changed = 1;
+            case 5:
+                    p->savedFacing = (command->arguments[0] + 5) << 5;
+                    SceneActorState_StartAction(p, 2, 0, 4);
                     break;
-                case 6:
-                    s->angle = (m[4] + 5) << 5;
-                    setState(s, 5);
-                    s->changed = 1;
+            case 6:
+                    p->savedFacing = (command->arguments[0] + 5) << 5;
+                    SceneActorState_StartAction(p, 2, 0, 5);
                     break;
-                case 7:
-                    setState(s, 6);
-                    s->changed = 1;
+            case 7:
+                    SceneActorState_StartAction(p, 2, 0, 6);
                     break;
-                case 8:
-                    setState(s, 7);
-                    s->changed = 1;
+            case 8:
+                    SceneActorState_StartAction(p, 2, 0, 7);
                     break;
-                case 10:
-                    setState(s, 8);
-                    s->changed = 1;
+            case 10:
+                    SceneActorState_StartAction(p, 2, 0, 8);
                     break;
-                case 11:
-                    setState(s, 9);
-                    s->changed = 1;
+            case 11:
+                    SceneActorState_StartAction(p, 2, 0, 9);
                     break;
-                case 12:
-                    t->h9C4 = m[4];
-                    t->h9C6 = m[5];
-                    t->h9C8 = m[6];
-                    setState(s, 10);
-                    s->changed = 1;
+            case 12:
+                    actor->graphics.snapPosition.x = command->arguments[0];
+                    actor->graphics.snapPosition.y = command->arguments[1];
+                    actor->graphics.snapPosition.z = command->arguments[2];
+                    SceneActorState_StartAction(p, 2, 0, 10);
                     break;
-                case 19:
-                    setState(s, 11);
-                    s->changed = 1;
+            case 19:
+                    SceneActorState_StartAction(p, 2, 0, 11);
                     break;
-                case 20:
-                    setState(s, 12);
-                    s->changed = 1;
+            case 20:
+                    SceneActorState_StartAction(p, 2, 0, 12);
                     break;
-                case 21:
-                    setState(s, 13);
-                    s->changed = 1;
+            case 21:
+                    SceneActorState_StartAction(p, 2, 0, 13);
                     break;
-                case 23:
-                    setState(s, 14);
-                    s->changed = 1;
+            case 23:
+                    SceneActorState_StartAction(p, 2, 0, 14);
                     break;
-                case 24:
-                    setState(s, 15);
-                    s->changed = 1;
+            case 24:
+                    SceneActorState_StartAction(p, 2, 0, 15);
                     break;
-                case 25:
-                    if (m[4])
-                        SceneActors_StopBackgroundFlash(t);
-                    else if (m[5])
-                        BackgroundFlash_BeginAlternating(t->flash);
+            case 25:
+                    if (command->arguments[0])
+                        SceneActors_StopBackgroundFlash(actor);
+                    else if (command->arguments[1])
+                        BackgroundFlash_BeginAlternating(actor->graphics.backgroundFlash);
                     else
-                        BackgroundFlash_BeginAppearance(t->flash);
+                        BackgroundFlash_BeginAppearance(actor->graphics.backgroundFlash);
                     break;
-                case 13:
-                    setState(s, 16);
-                    s->changed = 1;
+            case 13:
+                    SceneActorState_StartAction(p, 2, 0, 16);
                     break;
-                case 14:
-                    setState(s, 18);
-                    s->changed = 1;
+            case 14:
+                    SceneActorState_StartAction(p, 2, 0, 18);
                     break;
-                case 22:
-                    s->hD0 = m[4];
-                    s->hD2 = m[5];
-                    s->hD4 = m[6];
-                    setState(s, 19);
-                    s->changed = 1;
+            case 22:
+                    p->targetPosition.x = command->arguments[0];
+                    p->targetPosition.y = command->arguments[1];
+                    p->targetPosition.z = command->arguments[2];
+                    SceneActorState_StartAction(p, 2, 0, 19);
                     break;
-                case 18:
-                    setState(s, 20);
-                    s->changed = 1;
+            case 18:
+                    SceneActorState_StartAction(p, 2, 0, 20);
                     break;
-                case 15:
-                    if (m[4] == 0) {
-                        t->b38C = 0;
-                        t->b38E = 0;
-                        t->w390 = SceneActorGraphics_GetResourceId(t);
-                        DispatchSelectPalette(t, SceneActorGraphics_GetResourceId(t));
-                    } else if (m[5] == 0) {
-                        effect(t, 0x338, 3, 5);
+            case 15:
+                    if (command->arguments[0] == 0) {
+                        actor->graphics.effectScale = 0;
+                        actor->graphics.effectMode = 0;
+                        actor->graphics.resourceId =
+                            SceneActorGraphics_GetResourceId((struct StateActor *)actor);
+                        SceneActorGraphics_SelectPalette(
+                            actor, SceneActorGraphics_GetResourceId((struct StateActor *)actor));
+                    } else if (command->arguments[1] == 0) {
+                        SceneActorGraphics_SetEffect(actor, 3, 0x338, 5);
                     } else {
-                        effect(t, 0x33A, 3, 5);
+                        SceneActorGraphics_SetEffect(actor, 3, 0x33A, 5);
                     }
-                    Trigger_ConsumePending(&s->entry, 1);
+                    Trigger_ConsumePending(p->receiver2, 1);
                     break;
-                case 16:
-                    if (m[4] == 0)
-                        effect(t, 0x335, 1, 5);
-                    else if (m[5] == 0)
-                        effect(t, 0x338, 2, 5);
+            case 16:
+                    if (command->arguments[0] == 0)
+                        SceneActorGraphics_SetEffect(actor, 1, 0x335, 5);
+                    else if (command->arguments[1] == 0)
+                        SceneActorGraphics_SetEffect(actor, 2, 0x338, 5);
                     else
-                        effect(t, 0x33A, 2, 5);
-                    Trigger_ConsumePending(&s->entry, 1);
+                        SceneActorGraphics_SetEffect(actor, 2, 0x33A, 5);
+                    Trigger_ConsumePending(p->receiver2, 1);
                     break;
-                case 9:
-                    SceneActors_ConfigureEffect(s, m[4], 0xB4, 0xB4);
-                    Trigger_ConsumePending(&s->entry, 1);
+            case 9:
+                    SceneActors_ConfigureEffect(p, command->arguments[0], 0xB4, 0xB4);
+                    Trigger_ConsumePending(p->receiver2, 1);
                     break;
-                case 17:
-                    t->b3B8 = m[4];
-                    Trigger_ConsumePending(&s->entry, 1);
+            case 17:
+                    actor->graphics.unk3B8 = command->arguments[0];
+                    Trigger_ConsumePending(p->receiver2, 1);
                     break;
-                case 2:
-                    s->h54 = m[4];
-                    s->h56 = m[5];
-                    s->h58 = m[6];
-                    t->h260 = s->h54;
-                    t->h262 = s->h56 + t->h344;
-                    t->h264 = s->h58;
-                    Trigger_ConsumePending(&s->entry, 1);
+            case 2:
+                    p->target.x = command->arguments[0];
+                    p->target.y = command->arguments[1];
+                    p->target.z = command->arguments[2];
+                    actor->animation.position.x = p->target.x;
+                    actor->animation.position.y = p->target.y + actor->graphics.scale;
+                    actor->animation.position.z = p->target.z;
+                    Trigger_ConsumePending(p->receiver2, 1);
                     break;
-                case 66:
-                    t->b3BA = m[4];
-                    setState(s, 21);
-                    s->changed = 1;
+            case 66:
+                    actor->graphics.projectileDirection = command->arguments[0];
+                    SceneActorState_StartAction(p, 2, 0, 21);
                     break;
-            }
-            i++;
-        } while (i < entry->count[gSceneEventDispatchState[0x24]]);
+        }
+        i++;
+    } while (i < receiver->count[gSceneEventDispatchState->phase]);
 }
 
 void SceneActorState_AdvanceToState1A(struct StateActor *p)
@@ -1215,7 +1121,7 @@ void SceneActorState_WaitForDelayedAction(struct StateActor *p)
     }
     if (p->actionTimer > actor->graphics.recoveryTimer && SceneActorState_StepTableByKind(actor)) {
         SceneActorState_SnapReactionPosition((u8 *)actor,
-                                             (struct SnapVector *)actor->graphics.unk9C4);
+                                             &actor->graphics.snapPosition);
         SceneActorState_EnterPhase(p, 1);
     } else
         p->actionTimer++;
