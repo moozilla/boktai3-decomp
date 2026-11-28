@@ -70,3 +70,4 @@ src/engine/math/ScalarApproach_Snap2Array.c	ScalarApproach_Snap2Array	contrived	
 src/engine/math/ScalarApproach_Snap4Array.c	ScalarApproach_Snap4Array	contrived	natural	1	
 src/engine/math/ScalarApproach_Snap8Array.c	ScalarApproach_Snap8Array	contrived	natural	1	
 src/engine/math/ScalarApproach_Snap16Array.c	ScalarApproach_Snap16Array	contrived	natural	1	
+src/engine/math/sub_08221CC8.c	sub_08221CC8	contrived	natural	8	
