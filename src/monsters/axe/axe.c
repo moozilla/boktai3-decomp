@@ -3440,8 +3440,6 @@ void Axe_UpdateRouteDestinationPhase(struct ChaseActor *actor)
     struct AxeVec *copy;
     struct SceneActorChaseRoutePoint *point;
     struct SceneActorRegistryRoute *link;
-    s16 deltaX;
-    s16 deltaZ;
     if (actor->base.field2B1)
         actor->base.field2B1 = 0;
     if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
@@ -3468,9 +3466,7 @@ void Axe_UpdateRouteDestinationPhase(struct ChaseActor *actor)
             copy->y -= position->y;
             copy->z -= position->z;
         }
-        deltaZ = copy->z;
-        deltaX = target->x;
-        actor->base.nextDirection = Math_Atan2(deltaX, deltaZ);
+        actor->base.nextDirection = Math_Atan2(target->x, copy->z);
         ZeroFill8(context->clearF14);
     } else
         actor->base.counter2AC++;
