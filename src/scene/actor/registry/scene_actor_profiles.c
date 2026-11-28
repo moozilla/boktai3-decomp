@@ -17,24 +17,16 @@ s32 SceneActorProfiles_FindDefaultIndex(u32 category)
     struct SceneActorProfile *head = list->head;
     struct SceneActorProfile *profile;
     s32 count;
-    if (head)
-        goto initialize;
-    goto missing;
-found:
-    return profile->id;
-initialize:
+    if (head == NULL)
+        return -1;
     profile = head;
     count = 0;
-scan:
-    if (profile->category == category && profile->mode == 0)
-        goto found;
-    profile = profile->next;
-    count++;
-    if (count > 11)
-        goto missing;
-    if (profile)
-        goto scan;
-missing:
+    do {
+        if (profile->category == category && profile->mode == 0)
+            return profile->id;
+        profile = profile->next;
+        count++;
+    } while (count <= 11 && profile);
     return -1;
 }
 

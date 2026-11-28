@@ -114,39 +114,30 @@ void Golem_ResetIdleControl(struct ChaseActor *actor);
 
 void SceneActorControl_OnIdle(u8 *);
 
+static inline void SceneActor_SetHalfFlags(u16 mask, u16 *flags)
+{
+    *flags |= mask;
+}
+
+static inline void SceneActorChase_SetTrackingFlags(struct SceneActorChaseTracking *tracking, u8 mask)
+{
+    tracking->flags |= mask;
+}
+
 void SceneActorControl_RefreshMotionRoute(struct ChaseActor *actor)
 {
-    u32 active = SceneActorChase_TrackingFlags(&actor->base.tracking, 8);
-    if (active) {
-        {
-            u16 *flags = &actor->group.common.gate.flags;
-            u32 mask = 4;
-            u32 value = *flags;
-            mask |= value;
-            *flags = mask;
-        }
-        {
-            u32 mask = 128;
-            u16 *flags = &actor->base.motionFlags;
-            u32 value = *flags;
-            mask |= value;
-            *flags = mask;
-        }
+    if (SceneActorChase_TrackingFlags(&actor->base.tracking, 8)) {
+        SceneActorChase_GroupSetFlags(&actor->group, 4);
+        SceneActor_SetHalfFlags(0x80, &actor->base.motionFlags);
         actor->group.common.gate.counter = actor->group.common.gate.duration;
-        if (SceneActorTurn_Flags(&actor->base.motionFlags, 256))
+        if (SceneActorTurn_Flags(&actor->base.motionFlags, 0x100))
             return;
         Golem_ResetIdleControl(actor);
     } else {
         Chase_SetState(actor, 0, 1, 0);
         Chase_SetCtl(actor, SceneActorControl_OnIdle, 16);
     }
-    {
-        struct SceneActorChaseTracking *tracking = &actor->base.tracking;
-        u32 mask = 8;
-        u32 value = tracking->flags;
-        mask |= value;
-        tracking->flags = mask;
-    }
+    SceneActorChase_SetTrackingFlags(&actor->base.tracking, 8);
 }
 
 /* Golem_RestoreRoute: unless flags2D4 bit 0x100 is set, restores after a delay, records the follow-up control (chase when flags2D4 & 0x80, else the entry target) and routes back toward the chased object via the route point (provisional name) */

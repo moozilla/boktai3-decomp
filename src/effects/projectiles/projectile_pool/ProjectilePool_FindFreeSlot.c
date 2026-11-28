@@ -2,18 +2,14 @@
 
 struct ProjectileSlot *ProjectilePool_FindFreeSlot(struct TimedProjectilePool *pool, s32 *out)
 {
-    struct ProjectileSlot *e = pool->slots;
-    s32 i = 0;
-    u32 m = 1;
-    u32 w = pool->mask;
-    do {
-        if ((m << i & w) != 0) {
-            i++;
-            e++;
-            continue;
+    struct ProjectileSlot *slot = pool->slots;
+    s32 i;
+
+    for (i = 0; i < 16; i++, slot++) {
+        if (!(pool->mask & (1 << i))) {
+            *out = i;
+            return slot;
         }
-        *out = i;
-        return e;
-    } while (i <= 0xf);
-    return 0;
+    }
+    return NULL;
 }

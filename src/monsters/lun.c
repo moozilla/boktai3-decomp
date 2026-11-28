@@ -444,40 +444,25 @@ void Lun_BeginMoveToPosition(struct ChaseActor *actor, struct ContactPosition *t
 
 void Lun_UpdateWaitingAnimation(struct RoomActor *actor, s32 frame);
 
-void Lun_ResumeAfterLiftPenalty(struct ChaseActor *input, s32 elapsed)
+void Lun_ResumeAfterLiftPenalty(struct ChaseActor *actor, s32 frame)
 {
-    s32 frame = elapsed;
-    u8 zero8;
-    if (TakeFlag(&input->base.field2B2))
-        SceneActorControl_ConsumeLiftFlagPenalty(input);
-    {
-        u32 flags = 0x10;
-        u16 *p = &input->base.reactionFlags;
-        u32 value = *p;
-        u16 initialState[1] = {0};
-        zero8 = initialState[0];
-        flags |= value;
-        *p = flags;
-    }
-    MonsterInit_SetStatusFlags(input, 0x100000);
+    if (TakeFlag(&actor->base.field2B2))
+        SceneActorControl_ConsumeLiftFlagPenalty(actor);
+    SceneActorChase_OrReactionFlags(actor, 0x10);
+    MonsterInit_SetStatusFlags(actor, 0x100000);
     if (frame > 30) {
-        struct Lun *ctx = input->base.context;
-        u16 delay;
-        SceneActorControl_ResetCollisionFlags(input);
-        delay = ctx->routeDelay;
-        if (delay) {
-            u32 flags = 0x100;
-            u16 *p = &input->base.motionFlags;
-            flags = flags | (*p);
-            *p = flags;
+        struct Lun *ctx = actor->base.context;
+        SceneActorControl_ResetCollisionFlags(actor);
+        if (ctx->routeDelay) {
+            SceneActorChase_SetMotionFlags(actor, 0x100);
             ctx->routeDelay = ctx->field442;
-            Lun_BeginMoveToPosition(input, &gPlayers[0]->position);
-            SceneActorChase_SetPhase(input, 2, 1);
+            Lun_BeginMoveToPosition(actor, &gPlayers[0]->position);
+            SceneActorChase_SetPhase(actor, 2, 1);
         } else {
-            SceneActorChase_SetControl(input, Lun_UpdateWaitingAnimation, 10);
-            SceneActorChase_SetPhase(input, 1, 1);
-            input->base.body.direction = input->base.tracking.heading;
-            input->base.field2C2 = 64;
+            SceneActorChase_SetControl(actor, Lun_UpdateWaitingAnimation, 10);
+            SceneActorChase_SetPhase(actor, 1, 1);
+            actor->base.body.direction = actor->base.tracking.heading;
+            actor->base.field2C2 = 64;
         }
     }
 }
