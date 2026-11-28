@@ -1042,29 +1042,25 @@ void SceneActorControl_WaitForTarget(struct ChaseActor *actor)
 
 #define SceneActorControl_UpdateDirectionalIdle Ivy_UpdateActiveState
 
+// scope: put SceneActorControl_UpdateTargetApproachPhase begin
 void SceneActorControl_UpdateTargetApproachPhase(struct ChaseActor *actor)
 {
     struct Ivy *state = actor->base.context;
+
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
-        void *callback = SceneActorReaction_PlayHiddenCue;
-        SceneActorChase_SetControl(actor, callback, 0x2A);
+        SceneActorChase_SetControl(actor, SceneActorReaction_PlayHiddenCue, 0x2A);
         state->targetMissFrames = 0;
     }
     if (actor->base.stepDone) {
-        struct ContactCollider *collider = &actor->base.colliderA;
-        u32 mask = ~4;
-        collider->flags &= mask;
-        collider->flags |= 8;
-        {
-            u16 *flags = &actor->base.placementFlags;
-            u32 mask = ~0x800;
-            *flags = mask & *flags;
-        }
+        ContactCollider_ClearFlags(&actor->base.colliderA, 4);
+        ContactCollider_SetFlags(&actor->base.colliderA, 8);
+        HalfwordFlags_Clear(&actor->base.placementFlags, 0x800);
         SceneActorChase_SetControl(actor, Ivy_UpdateActiveState, 0x22);
         SceneActorChase_SetBehavior(actor, 2);
     }
     actor->base.counter2AC++;
 }
+// scope: put SceneActorControl_UpdateTargetApproachPhase end
 
 /* Arm the vine's hold: Ivy_UpdateHold takes over with state 0x25. The
    arguments, the early address and the local constants give the ROM's

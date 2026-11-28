@@ -17,3 +17,4 @@ src/monsters/ivy/ivy.c	Ivy_UpdateRestartFlags	minor	natural	1
 src/monsters/ivy/ivy.c	Ivy_SetAuxiliaryColliderFlag	minor	minor	2	ContactCollider_SetFlags (constant before address)
 src/monsters/ivy/ivy.c	Ivy_UpdateColliderPosition	natural	natural	0	
 src/monsters/ivy/ivy.c	SceneActorControl_WaitForTarget	contrived	contrived	3	ContactCollider_ClearFlags/SetFlags accessors and HalfwordFlags_Clear
+src/monsters/ivy/ivy.c	SceneActorControl_UpdateTargetApproachPhase	contrived	contrived	2	ContactCollider_ClearFlags/SetFlags accessors and HalfwordFlags_Clear
