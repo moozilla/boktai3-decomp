@@ -2,12 +2,8 @@
 #include "player/player.h"
 #include "engine/engine.h"
 #include "engine/ram.h"
+#include "player/cutscene/player_cue_commands.h"
 // confidence=low: action-mode gates and input select the player's next sequence.
-struct PlayerPendingNotification {
-    void *receiver;
-    u32 flags;
-    void *payload;
-};
 void ActorSequence_Begin(struct Player *, s32, s32);
 void Player_BeginDirectionSequence(struct Player *, u32);
 void Player_StopMovementEffects(struct Player *);
@@ -32,13 +28,6 @@ static inline u32 HasActionFlag(struct Player *p, u32 mask)
         return *flags & bits;
     }
 }
-static inline const u16 *InitialInput(struct Player *p)
-{
-    s16 offset = (u32) & ((struct Player *)0)->inputKeys;
-    const u16 **field;
-    field = (const u16 **)((u8 *)p + offset);
-    return *field;
-}
 static inline const u16 *ReloadInput(struct Player *p)
 {
     return p->inputKeys;
@@ -54,8 +43,7 @@ static inline u32 IsSceneFive(struct Player *p)
 s32 Player_SelectActionSequence(struct Player *p)
 {
     u32 mode;
-    const u16 *keys;
-    if ((gEngineFlags & 0x1000) && (u8)(p->tetherMode - 10) <= 1)
+    if ((gEngineFlags & 0x1000) && (p->tetherMode == 10 || p->tetherMode == 11))
         return p->tetherMode;
     if (p->tetherMode != 0x17 && (s8)p->movementAnimationState >= 0 && p->tetherMode != 0x26) {
         p->interactionResetCounter = 0;
@@ -66,7 +54,7 @@ s32 Player_SelectActionSequence(struct Player *p)
     if (p->tetherMode != 4 && p->gateCount)
         Player_BeginDirectionSequence(p, p->coordinateAxis);
     mode = p->tetherMode;
-    if (!p->statGaugeFull && (u8)(p->actionMode - 1) <= 1) {
+    if (!p->statGaugeFull && (p->actionMode == 1 || p->actionMode == 2)) {
         if (!p->statusValue) {
             if (p->contactSpecial && mode != 0x1E)
                 ActorSequence_Begin(p, 0x1E, 0);
@@ -107,7 +95,7 @@ s32 Player_SelectActionSequence(struct Player *p)
             p->statusValue = 0;
     }
     if (p->tetherMode == 0x26)
-        goto end;
+        return 0;
     if (p->directionFrame) {
         if (p->unk432[1]) {
             p->actionLatch464 = 1;
@@ -119,128 +107,116 @@ s32 Player_SelectActionSequence(struct Player *p)
                 ActorSequence_Begin(p, 0x1E, 0);
         } else
             ActorSequence_Begin(p, 0x1D, 0);
-        if ((*(struct PlayerPendingNotification **)&gPlayerPendingActor) &&
-            gPlayerNotificationPending) {
-            if (!((*(struct PlayerPendingNotification **)&gPlayerPendingActor)->flags & 1)) {
-                if ((*(struct PlayerPendingNotification **)&gPlayerPendingActor)->flags & 0x10)
-                    sub_08249244(
-                        (*(struct PlayerPendingNotification **)&gPlayerPendingActor)->receiver, 1,
-                        60, (*(struct PlayerPendingNotification **)&gPlayerPendingActor)->payload);
+        if (gPlayerPendingActor && gPlayerNotificationPending) {
+            struct PlayerPendingNotification *notification = gPlayerPendingActor;
+            if (!(notification->flags & 1)) {
+                if (notification->flags & 0x10)
+                    sub_08249244(notification->receiver, 1, 60, notification->callback);
                 else
-                    sub_08249244(
-                        (*(struct PlayerPendingNotification **)&gPlayerPendingActor)->receiver, 1,
-                        60, (*(struct PlayerPendingNotification **)&gPlayerPendingActor)->payload);
+                    sub_08249244(notification->receiver, 1, 60, notification->callback);
             }
-            (*(struct PlayerPendingNotification **)&gPlayerPendingActor) = 0;
+            gPlayerPendingActor = 0;
             gPlayerNotificationPending = 0;
         }
         Player_StopMovementEffects(p);
-        goto end;
+        return 0;
     }
     if (mode - 0x1D > 1 && mode != 0x1B && mode != 0x1C && mode != 0x18 && mode != 0x17 &&
         mode != 0x16 && mode != 0x15 && mode != 0x1A && p->positionResetTimer) {
         ActorSequence_Begin(p, 0x15, 0);
-        goto end;
+        return 0;
     }
     switch (mode) {
         case 6:
             if (Player_TestTetherActionInput(p))
-                goto end;
+                break;
             Sound_PlaySong(218);
-            goto idle;
+            ActorSequence_Begin(p, 0, 0);
+            break;
         default:
             if (p && IsSceneFive(p)) {
-                if ((InitialInput(p)[1] & 1) &&
-                    (u8)Trigger_TryOpenNearby(&p->positionalEffectGroup))
-                    goto idle;
-                if (((s16)p->directionHistory[0]) == -1)
-                    goto idle;
-                if (ReloadInput(p)[0] & 0x100)
-                    goto idle;
-                ActorSequence_Begin(p, 1, 0);
-                goto end;
+                if (((p->inputKeys[1] & 1) &&
+                     (u8)Trigger_TryOpenNearby(&p->positionalEffectGroup)) ||
+                    (s16)p->directionHistory[0] == -1 || (ReloadInput(p)[0] & 0x100))
+                    ActorSequence_Begin(p, 0, 0);
+                else
+                    ActorSequence_Begin(p, 1, 0);
+                break;
             }
-            keys = p->inputKeys;
-            if (keys[1] & 0x200) {
-                u32 am;
-                u32 sg;
-                am = p->actionMode;
-                if (am == 6) {
+            if (p->inputKeys[1] & 0x200) {
+                if (p->actionMode == 6) {
                     ActorSequence_Begin(p, 2, 0);
-                    goto end;
+                    break;
                 }
-                sg = p->statGaugeFull;
-                if (sg && (u8)(am - 1) <= 1) {
+                if (p->statGaugeFull && (p->actionMode == 1 || p->actionMode == 2)) {
                     Sound_PlaySong(402);
-                    goto end;
+                    break;
                 }
                 if (PileTrap_IsActive(p->actionRequestEffect) && p->actionMode == 0) {
                     PileTrap_Hide(p->actionRequestEffect);
-                    goto end;
+                    break;
                 }
                 mode = Player_SelectRequestedActionMode(p);
                 ActorSequence_Begin(p, mode, 0);
-                goto end;
+                break;
             }
-            if (keys[1] & 2) {
+            if (p->inputKeys[1] & 2) {
                 if (p->actionMode == 2) {
                     ActorSequence_Begin(p, 38, 0);
-                    goto end;
+                    break;
                 }
                 if (p->actionMode == 1) {
                     ActorSequence_Begin(p, 12, 0);
-                    goto end;
+                    break;
                 }
                 if (Player_GetEventFlags(p, 0x4000))
                     goto cancel;
                 if (Player_GetEventFlags(p, 1)) {
-                    if (p->statModifierContext.statBOverrideEnabled == 3)
-                        goto primary;
-                cancel:
-                    ActorSequence_Begin(p, 0, 0);
-                    Player_CallCompletionScript(p);
-                    goto end;
+                    if (p->statModifierContext.statBOverrideEnabled != 3) {
+                    cancel:
+                        ActorSequence_Begin(p, 0, 0);
+                        Player_CallCompletionScript(p);
+                        break;
+                    }
+                    ActorSequence_Begin(p, 3, 0);
+                    break;
                 }
-                goto normalAttack;
-            primary:
                 ActorSequence_Begin(p, 3, 0);
-                goto end;
-            normalAttack:
-                ActorSequence_Begin(p, 3, 0);
-                goto end;
+                break;
             }
-            if (keys[1] & 1) {
+            if (p->inputKeys[1] & 1) {
                 if (p->actionMode == 2) {
                     if (p->historyDirectionMode == 1)
                         ActorSequence_Begin(p, 38, 0);
                     else
                         ActorSequence_Begin(p, 38, 3);
-                    goto end;
+                    break;
                 }
                 if (p->actionMode == 1) {
                     if (p->historyDirectionMode == 1)
                         ActorSequence_Begin(p, 12, 0);
                     else
                         ActorSequence_Begin(p, 12, 3);
-                    goto end;
+                    break;
                 }
                 if (p->actionMode == 0 && Player_TestNearbyInteraction(p)) {
                     Sound_PlaySong(218);
                     ActorSequence_Begin(p, 6, 0);
-                    goto end;
+                    break;
                 }
-                if ((u8)Trigger_TryOpenNearby(&p->positionalEffectGroup))
-                    goto idle;
+                if ((u8)Trigger_TryOpenNearby(&p->positionalEffectGroup)) {
+                    ActorSequence_Begin(p, 0, 0);
+                    break;
+                }
                 if (!p->actionMode && PileTrap_IsActive(p->actionRequestEffect)) {
                     ActorSequence_Begin(p, 20, 0);
-                    goto end;
+                    break;
                 }
                 ActorSequence_Begin(p, 7, 0);
-                goto end;
+                break;
             }
-            if ((s16)p->directionHistory[0] == -1 || (keys[0] & 0x100) ||
+            if ((s16)p->directionHistory[0] == -1 || (p->inputKeys[0] & 0x100) ||
                 p->historyDirectionMode == 1) {
-            idle:
                 ActorSequence_Begin(p, 0, 0);
             } else
                 ActorSequence_Begin(p, 1, 0);
@@ -277,6 +253,5 @@ s32 Player_SelectActionSequence(struct Player *p)
         case 38:
             break;
     }
-end:
     return 0;
 }
