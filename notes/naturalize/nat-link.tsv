@@ -238,3 +238,4 @@ src/link/player/Player_EmitSweepSpark.c	Player_EmitSweepSpark	minor	natural	10	r
 src/link/player/Player_UpdateSweepAction.c	Player_UpdateSweepAction	contrived	minor	5	left-side angle keeps a heading pointer local: single expression reorders the loads
 src/link/player/Player_UpdateThrowAction.c	Player_UpdateThrowAction	minor	natural	1	
 src/link/player/SceneVec_OffsetPolar.c	SceneVec_OffsetPolar	minor	natural	1	
+src/link/player/Player_GetTerrainHeightAtPosition.c	Player_GetTerrainHeightAtPosition	minor	natural	2	

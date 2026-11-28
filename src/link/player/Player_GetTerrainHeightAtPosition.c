@@ -1,16 +1,18 @@
 #include "global.h"
-u32 Player_GetTerrainHeightAtPosition(u8 *a, u8 *b)
+#include "engine/math/scene_vec.h"
+#include "scene/terrain/terrain_collision.h"
+
+u32 Player_GetTerrainHeightAtPosition(const struct TerrainCell *cell, const struct SceneVec *pos)
 {
-    u32 v = *a;
-    u32 r = (v & 0xf) << 8;
-    u32 t = v >> 4;
-    switch (t) {
+    u32 height = (cell->shapeAndHeight & 0xf) << 8;
+
+    switch (cell->shapeAndHeight >> 4) {
         case 1:
-            r -= b[4];
+            height -= (u8)pos->z;
             break;
         case 2:
-            r -= b[0];
+            height -= (u8)pos->x;
             break;
     }
-    return r;
+    return height;
 }
