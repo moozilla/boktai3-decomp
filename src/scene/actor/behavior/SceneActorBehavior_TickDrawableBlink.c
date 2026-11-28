@@ -1,3 +1,4 @@
+#include "scene/actor/scene_actor_drawable_flags.h"
 #include "scene/actor/scene_actor_registry.h"
 /* SceneActorBehavior_TickDrawableBlink: Toggles drawable visibility at age-dependent intervals and restores visibility after age 60 */
 extern const s16 gUnk_08605C20[3];
@@ -7,10 +8,8 @@ static inline u8 TestNonzero(u32 value)
         return 1;
     return 0;
 }
-u8 SceneActorBehavior_TickDrawableBlink(struct ChaseActor *inputActor, s32 inputAge)
+u8 SceneActorBehavior_TickDrawableBlink(struct ChaseActor *actor, s32 age)
 {
-    struct ChaseActor *actor = inputActor;
-    s32 age = inputAge;
     s32 cadence = 0;
     if (age <= 30) {
         cadence = 2;
@@ -21,22 +20,20 @@ u8 SceneActorBehavior_TickDrawableBlink(struct ChaseActor *inputActor, s32 input
         void *drawable;
         u32 kind;
         u32 hidden;
-        {
-            u32 mask = 1;
-            kind = actor->base.drawableKind;
-            if (kind == 0) {
-                void *base = actor->base.drawable;
-                u32 flags = ((struct SceneActorRegistrySequenceDrawable *)base)->flags;
-                flags &= mask;
-                drawable = base;
-                hidden = TestNonzero(flags);
-            } else {
-                void *base = actor->base.drawable;
-                u32 flags = ((struct SceneActorRegistryTileDrawable *)base)->flags;
-                flags &= mask;
-                drawable = base;
-                hidden = TestNonzero(flags);
-            }
+        u32 mask = 1;
+        kind = actor->base.drawableKind;
+        if (kind == 0) {
+            void *base = actor->base.drawable;
+            u32 flags = ((struct SceneActorRegistrySequenceDrawable *)base)->flags;
+            flags &= mask;
+            drawable = base;
+            hidden = TestNonzero(flags);
+        } else {
+            void *base = actor->base.drawable;
+            u32 flags = ((struct SceneActorRegistryTileDrawable *)base)->flags;
+            flags &= mask;
+            drawable = base;
+            hidden = TestNonzero(flags);
         }
         if (hidden) {
             if (!kind) {
@@ -60,15 +57,7 @@ u8 SceneActorBehavior_TickDrawableBlink(struct ChaseActor *inputActor, s32 input
         }
     }
     if (age > 60) {
-        if (!actor->base.drawableKind) {
-            void *base = actor->base.drawable;
-            u32 mask = ~1;
-            ((struct SceneActorRegistrySequenceDrawable *)base)->flags &= mask;
-        } else {
-            struct AnimSprite *tile = (void *)((u8 *)actor->base.drawable + 0x20);
-            u32 mask = ~1;
-            tile->flags &= mask;
-        }
+        ActorStatus_ClearDrawableFlags(actor, 1);
         return 1;
     }
     return 0;
