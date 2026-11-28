@@ -23,6 +23,17 @@ struct PairedHalfTarget {
     s32 (*begin)(struct ActorStatusOwner *, s32, s32);
     struct PairedHalfTarget *next;
 };
+
+static inline void PairedHalfTarget_SetFlags(struct PairedHalfTarget *p, u32 mask)
+{
+    p->flags |= mask;
+}
+
+static inline void PairedHalfTarget_ClearFlags(struct PairedHalfTarget *p, u32 mask)
+{
+    p->flags &= ~mask;
+}
+
 struct PairedSceneHalf {
     struct ContactSwarmSprite sprite;
     struct PairedHalfGraphics graphics;
@@ -48,6 +59,17 @@ struct PairedSceneHalf {
     u8 shadow[0x6C];
     struct PairedHalfTarget target;
 };
+
+static inline void PairedSceneHalf_SetActionFlags(struct PairedSceneHalf *p, u32 mask)
+{
+    p->actionFlags |= mask;
+}
+
+static inline u32 PairedSceneHalf_TestActionFlags(struct PairedSceneHalf *p, u32 mask)
+{
+    return p->actionFlags & mask;
+}
+
 struct VanargandAttackPair {
     struct Task task;
     struct AnimSprite animSprite;

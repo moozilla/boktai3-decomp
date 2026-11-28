@@ -11,13 +11,18 @@ struct ActorSoundPhase {
     u16 mode;
     u16 phase;
 };
+
+static inline void ActorSoundPhase_SetFlags(struct ActorSoundPhase *p, u32 mask)
+{
+    p->flags |= mask;
+}
+
 void Vanargand_SetPendingCue(void *, u16);
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, int, int, int);
 void Anim_SetFrameDurationScale(void *, s32);
 void ActorSoundPhase_StartAnimation15(struct ActorSoundPhase *p)
 {
-    u32 flag = 4;
-    p->flags |= flag;
+    ActorSoundPhase_SetFlags(p, 4);
     Vanargand_SetPendingCue(p, 3);
     if (p->pendingAnimation) {
         void *animation;

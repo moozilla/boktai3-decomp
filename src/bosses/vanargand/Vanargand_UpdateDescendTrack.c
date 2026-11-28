@@ -23,6 +23,12 @@ struct Vanargand {
     u8 pad55E[0x5C2 - 0x55E];
     u16 counter;
 };
+
+static inline void Vanargand_SetFlags(struct Vanargand *p, u32 mask)
+{
+    p->flags |= mask;
+}
+
 void MotionTrack_Initialize(void *, const void *, const void *, const void *, u32);
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, int, int, int);
 void Vanargand_SetPendingCue(void *, u16);
@@ -51,7 +57,7 @@ void Vanargand_UpdateDescendTrack(struct Vanargand *p)
     void *animation = p->animation;
     u32 mask = 4;
     s16 first[4], second[4];
-    p->flags |= mask;
+    Vanargand_SetFlags(p, 4);
     Vanargand_SetPendingCue(p, 1);
     if (p->pendingAnimation) {
         p->pendingAnimation = 0;

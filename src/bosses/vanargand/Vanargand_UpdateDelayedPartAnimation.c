@@ -21,12 +21,17 @@ struct Vanargand {
     u8 pad45C[0x500 - 0x45c];
     u16 partActive;
 };
+
+static inline void Vanargand_SetFlags(struct Vanargand *p, u32 mask)
+{
+    p->flags |= mask;
+}
+
 u32 Anim_SetSequence(void *, void *, u32, u32, u32);
 void Vanargand_SetPendingCue(void *, u16);
 void Vanargand_UpdateDelayedPartAnimation(struct Vanargand *p)
 {
-    u32 mask = 4;
-    p->flags |= mask;
+    Vanargand_SetFlags(p, 4);
     Vanargand_SetPendingCue(p, 4);
     if (p->pending) {
         p->pending = 0;

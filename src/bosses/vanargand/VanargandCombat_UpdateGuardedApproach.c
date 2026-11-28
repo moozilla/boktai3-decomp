@@ -53,8 +53,7 @@ static inline u32 PlayerNear(struct PairedSceneHalf *p)
 
 static inline void RequestBehavior(struct PairedSceneHalf *p, u32 action)
 {
-    u32 mask = 0x100;
-    if (!(p->actionFlags & mask)) {
+    if (!PairedSceneHalf_TestActionFlags(p, 0x100)) {
         if ((u8)(p->requestedState - 25) > 1 || p->finished) {
             p->requestedState = action;
             p->state = action;
@@ -79,8 +78,7 @@ void VanargandCombat_UpdateGuardedApproach(struct VanargandAttackPair *boss,
     struct SceneVec target;
     struct SceneVec delta;
     u8 *enter;
-    u32 mask = 0x28;
-    p->actionFlags |= mask;
+    PairedSceneHalf_SetActionFlags(p, 0x28);
     if (p->entered) {
         p->entered = 0;
         SetAnimation(p, (void *)owner->effectResource, 11, 0);

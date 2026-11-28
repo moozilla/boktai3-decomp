@@ -13,13 +13,19 @@ struct ActorSoundPhase {
     u16 mode;
     u16 phase;
 };
+
+static inline void ActorSoundPhase_SetFlags(struct ActorSoundPhase *p, u32 mask)
+{
+    p->flags |= mask;
+}
+
 void Vanargand_SetPendingCue(void *, u16);
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, int, int, int);
 void Sound_PlaySong(u32);
 void ActorSoundPhase_StartAnimation4(struct ActorSoundPhase *p)
 {
     u32 flag = 4;
-    p->flags |= flag;
+    ActorSoundPhase_SetFlags(p, 4);
     Vanargand_SetPendingCue(p, 3);
     if (p->pendingAnimation) {
         p->pendingAnimation = 0;

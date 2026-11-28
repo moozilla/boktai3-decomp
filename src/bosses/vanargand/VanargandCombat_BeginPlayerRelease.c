@@ -10,8 +10,7 @@ void Player_ApplyPositionRequest(void *, void *, u32, u32, u32, u32, u32, u32);
 void VanargandCombat_BeginPlayerRelease(struct VanargandAttackPair *owner,
                                         struct PairedSceneHalf *s)
 {
-    u32 mask = 12;
-    s->actionFlags |= mask;
+    PairedSceneHalf_SetActionFlags(s, 12);
     if (s->entered) {
         s->entered = 0;
         PairedSceneHalf_BeginActionPhase(s, 0);

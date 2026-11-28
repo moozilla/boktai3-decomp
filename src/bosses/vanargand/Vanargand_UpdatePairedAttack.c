@@ -18,6 +18,12 @@ struct Vanargand {
     u8 pad570[8];
     u32 resetTimer;
 };
+
+static inline void Vanargand_SetFlags(struct Vanargand *p, u32 mask)
+{
+    p->flags |= mask;
+}
+
 s32 Player_RequestTimedReset(struct Player *, u32);
 void Sound_PlaySong(u32);
 void Vanargand_SetPendingCue(void *, u16);
@@ -27,8 +33,7 @@ void Vanargand_UpdatePairedAttack(struct Vanargand *p)
     s32 phase;
     u32 *timer;
 
-    u32 flags = 0x40;
-    p->flags |= flags;
+    Vanargand_SetFlags(p, 0x40);
     Vanargand_SetPendingCue(p, 1);
     callbackResult = p->callback(p);
     if ((s16)callbackResult > 0)

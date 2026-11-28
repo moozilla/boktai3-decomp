@@ -18,8 +18,7 @@ s32 VanargandCombat_BeginTimedState(struct ActorStatusOwner *owner, s32 cancel, 
         else
             duration -= *(u16 *)status->unknown18A;
         if (duration > 0) {
-            u32 mask = 0x100;
-            if (!masked(&status->actionFlags, mask)) {
+            if (!PairedSceneHalf_TestActionFlags(status, 0x100)) {
                 status->state = 0x15;
                 status->finished = 0;
             }

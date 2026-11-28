@@ -29,8 +29,7 @@ void VanargandCombat_UpdateFlankingStrike(struct VanargandAttackPair *boss,
 {
     struct SceneVec target;
     u8 *enter;
-    u32 mask = 8;
-    p->actionFlags |= mask;
+    PairedSceneHalf_SetActionFlags(p, 8);
     if (p->entered) {
         p->entered = 0;
         PairedSceneHalf_BeginActionPhase(p, 0);

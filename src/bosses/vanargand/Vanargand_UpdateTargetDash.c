@@ -26,6 +26,12 @@ struct DashActor {
     u8 pad55E[0xF44 - 0x55E];
     void *afterimages;
 };
+
+static inline void DashActor_SetFlags(struct DashActor *p, u32 mask)
+{
+    p->flags |= mask;
+}
+
 extern const s16 gUnk_086149C4[];
 void Vanargand_SetPendingCue(void *, u16);
 u8 Callback_InvokeActor(void *, void *);
@@ -77,9 +83,8 @@ static inline void SetPolar(struct Vector *v, s32 angle, s32 radius)
 void Vanargand_UpdateTargetDash(struct DashActor *p)
 {
     struct DashActor *self = p;
-    u32 mask = 0x48;
     u8 result;
-    p->flags |= mask;
+    DashActor_SetFlags(p, 0x48);
     Vanargand_SetPendingCue(p, 1);
     result = Callback_InvokeActor(p, p->callback);
     if (result)

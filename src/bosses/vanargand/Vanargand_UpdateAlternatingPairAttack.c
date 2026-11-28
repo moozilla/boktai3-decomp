@@ -22,6 +22,12 @@ struct Vanargand {
     u16 pad584;
     u16 parameter;
 };
+
+static inline void Vanargand_SetFlags(struct Vanargand *p, u32 mask)
+{
+    p->flags |= mask;
+}
+
 void Vanargand_SetPendingCue(void *, u16);
 u8 Callback_InvokeActor(void *, void *);
 void Vanargand_SetPairedMotionParameter(void *, u16);
@@ -35,10 +41,7 @@ static inline s32 RandomValue(void)
 void Vanargand_UpdateAlternatingPairAttack(struct Vanargand *p)
 {
     struct Vanargand *self = p;
-    {
-        u32 mask = 0x40;
-        p->flags |= mask;
-    }
+    Vanargand_SetFlags(p, 0x40);
     Vanargand_SetPendingCue(p, 0);
     if (p->pending) {
         p->pending = 0;

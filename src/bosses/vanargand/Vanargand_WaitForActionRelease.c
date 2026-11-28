@@ -19,13 +19,18 @@ struct Vanargand {
     u8 padF24[0x10];
     s32 modeF34;
 };
+
+static inline void Vanargand_SetFlags(struct Vanargand *p, u32 mask)
+{
+    p->flags |= mask;
+}
+
 s32 Player_IsSlotInActionTwelveOrThirtyEight(s32);
 void Vanargand_SetPendingCue(void *, u16);
 void Vanargand_WaitForActionRelease(struct Vanargand *p)
 {
     struct Vanargand *actor = p;
-    u32 flag = 4;
-    p->flags |= flag;
+    Vanargand_SetFlags(p, 4);
     Vanargand_SetPendingCue(p, 3);
     if (p->pending) {
         p->pending = 0;

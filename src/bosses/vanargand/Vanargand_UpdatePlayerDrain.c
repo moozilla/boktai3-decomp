@@ -1,5 +1,6 @@
 #include "bosses/vanargand/vanargand_pair_attack.h"
 #include "player/player.h"
+#include "bosses/vanargand/flag_accessors.h"
 
 // confidence=low: requests player contact damage and adds the returned amount to boss health.
 
@@ -56,7 +57,7 @@ void Vanargand_UpdatePlayerDrain(struct VanargandPairAttack *p)
         AddPosition(&initial, &p->position, initialBase);
         target = gPlayers[0];
         one = 1;
-        if (!TestFlags(&target->statusFlags, 0x40000)) {
+        if (!Player_TestStatusFlags(target, 0x40000)) {
             void *animation;
             void *drawable;
             Player_BeginPositionRequest(gPlayers[0], &initial, 0, 0, 0, 0, one, 0, 2);

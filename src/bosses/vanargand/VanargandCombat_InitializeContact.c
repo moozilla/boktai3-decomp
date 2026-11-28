@@ -21,6 +21,12 @@ struct ContactActor {
     u8 pad43;
     u16 value44;
 };
+
+static inline u32 ContactActor_TestFlags(struct ContactActor *p, u32 mask)
+{
+    return p->flags & mask;
+}
+
 struct ActorStatus {
     u8 pad0[0x15C];
     u32 mode;
@@ -62,7 +68,7 @@ void VanargandCombat_InitializeContact(struct ContactActor *input, struct Contac
         if (status->contactStrength < status->duration)
             status->contactStrength = status->duration;
     }
-    if (testFlags(&input->flags, 0x100))
+    if (ContactActor_TestFlags(input, 0x100))
         status->contactDirection = input->direction;
     else
         status->contactDirection = Math_Atan2(other->x - input->x, other->y - input->y);

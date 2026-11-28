@@ -6,8 +6,7 @@ void Vanargand_ResetState(struct PairedSceneHalf *actor, s32 state)
         if (actor->health <= 0)
             actor->health = actor->maxHealth;
         {
-            u32 mask = 0x100;
-            u32 blocked = actor->actionFlags & mask;
+            u32 blocked = PairedSceneHalf_TestActionFlags(actor, 0x100);
             u8 *requested;
             u8 *ready;
             u8 current;

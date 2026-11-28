@@ -111,8 +111,7 @@ void VanargandCombat_UpdateRisingStrike(struct VanargandAttackPair *boss, struct
     struct MotionTrackVector speed;
     u8 *enter;
     struct MotionTrack *motion;
-    u32 mask = 0x20;
-    p->actionFlags |= mask;
+    PairedSceneHalf_SetActionFlags(p, 0x20);
     if (p->entered) {
         p->entered = 0;
         SetAnimation(p, boss, 8, 4);

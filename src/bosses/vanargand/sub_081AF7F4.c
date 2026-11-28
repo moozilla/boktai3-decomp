@@ -31,6 +31,11 @@ struct PairedSceneHalf {
     u32 shake;
 };
 
+static inline u32 PairedSceneHalf_TestFlags(struct PairedSceneHalf *p, u32 mask)
+{
+    return p->flags & mask;
+}
+
 void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
 s32 Player_IsSlotInActionTwelveOrThirtyEight(s32);
 
@@ -41,8 +46,7 @@ static inline void SetFlags(struct PairedSceneHalf *actor, u32 mask)
 
 static inline void EnterState(struct PairedSceneHalf *actor, s32 state)
 {
-    u32 mask = 0x100;
-    u32 blocked = actor->flags & mask;
+    u32 blocked = PairedSceneHalf_TestFlags(actor, 0x100);
     u8 current;
     if (blocked)
         return;

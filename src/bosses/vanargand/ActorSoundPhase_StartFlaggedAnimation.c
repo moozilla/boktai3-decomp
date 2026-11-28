@@ -12,14 +12,19 @@ struct ActorSoundPhase {
     u8 drawable[0x56c - 0x1ec];
     void *attachment;
 };
+
+static inline void ActorSoundPhase_SetFlags(struct ActorSoundPhase *p, u32 mask)
+{
+    p->flags |= mask;
+}
+
 void Vanargand_SetPendingCue(void *, u16);
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, int, int, int);
 void PairedSceneActor_ApplyToSelectedHalves(void *, s32, s32);
 s32 Callback_InvokeActor(void *, void *);
 void ActorSoundPhase_StartFlaggedAnimation(struct ActorSoundPhase *p)
 {
-    u32 flag = 0x40;
-    p->flags |= flag;
+    ActorSoundPhase_SetFlags(p, 0x40);
     Vanargand_SetPendingCue(p, 0);
     if (p->pendingAnimation) {
         p->pendingAnimation = 0;

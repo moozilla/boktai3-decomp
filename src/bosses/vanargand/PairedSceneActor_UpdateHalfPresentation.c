@@ -109,21 +109,17 @@ void PairedSceneActor_UpdateHalfPresentation(struct VanargandAttackPair *owner,
     if (testFlagsP(flagsp, 4)) {
         collider->flags |= 4;
     } else {
-        s32 clearMask = ~4;
-        collider->flags &= clearMask;
+        ContactCollider_ClearFlags(collider, 4);
         Collider_SetPosition(collider, &half->sprite.position, 0);
     }
     if (testFlagsP(flagsp, 0x20)) {
         struct PairedHalfTarget *control = &half->target;
-        s32 mask = ~1;
-        control->flags &= mask;
+
+        PairedHalfTarget_ClearFlags(control, 1);
     } else {
         struct PairedHalfTarget *control;
         control = &half->target;
-        {
-            u32 mask = 1;
-            control->flags |= mask;
-        }
+        PairedHalfTarget_SetFlags(control, 1);
     }
     {
         u16 *timer;

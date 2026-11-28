@@ -2,8 +2,7 @@
 
 static inline void ApplyState(struct PairedSceneHalf *half, u32 value)
 {
-    u32 bit = 0x100;
-    if (!(half->actionFlags & bit)) {
+    if (!PairedSceneHalf_TestActionFlags(half, 0x100)) {
         half->state = value;
         half->finished = 0;
     }

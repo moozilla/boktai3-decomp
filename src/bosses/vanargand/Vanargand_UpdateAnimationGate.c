@@ -19,6 +19,12 @@ struct Vanargand {
     u16 w5B8;
     u16 w5BA;
 };
+
+static inline void Vanargand_SetFlags(struct Vanargand *p, u32 mask)
+{
+    p->flags |= mask;
+}
+
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, int, int, int);
 void Vanargand_SetPendingCue(void *, u16);
 void Vanargand_UpdateAnimationGate(struct Vanargand *p, s32 frame)
@@ -52,8 +58,5 @@ void Vanargand_UpdateAnimationGate(struct Vanargand *p, s32 frame)
             p->finished = phase;
             return;
     }
-    {
-        u32 mask = 5;
-        p->flags |= mask;
-    }
+    Vanargand_SetFlags(p, 5);
 }

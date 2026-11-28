@@ -94,6 +94,11 @@ struct DepartureActor {
     void *effectPool;
 };
 
+static inline u32 DepartureActor_TestActorFlags(struct DepartureActor *p, u32 mask)
+{
+    return p->actorFlags & mask;
+}
+
 void ActorDisplay_UpdateScreenAnchor(struct DepartureActor *);
 void ActorDisplay_UpdateForegroundSprite(struct DepartureActor *);
 void ActorDisplay_UpdateAccentSprite(struct DepartureActor *);

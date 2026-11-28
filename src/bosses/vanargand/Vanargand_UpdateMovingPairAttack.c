@@ -20,6 +20,12 @@ struct MovingPairActor {
     struct MotionTrack track;
     struct VanargandAttackPair *pair;
 };
+
+static inline void MovingPairActor_SetFlags(struct MovingPairActor *p, u32 mask)
+{
+    p->flags |= mask;
+}
+
 void Vanargand_SetPendingCue(void *, u16);
 s32 Vanargand_GetComponentWithFlag10(u8 *);
 struct OrbitMotion;
@@ -47,10 +53,10 @@ static inline void AddReferenceOffset(const struct MotionTrackVector *base,
 void Vanargand_UpdateMovingPairAttack(struct MovingPairActor *p)
 {
     struct MovingPairActor *self = p;
-    u32 mask = 0x40;
+
     s32 result;
     s32 phase;
-    p->flags |= mask;
+    MovingPairActor_SetFlags(p, 0x40);
     Vanargand_SetPendingCue(p, 0);
     result = p->callback(p);
     if ((s16)result > 0)
@@ -70,8 +76,8 @@ void Vanargand_UpdateMovingPairAttack(struct MovingPairActor *p)
                 }
                 p->timer++;
             } else if (PairedSceneActor_AreSelectedHalvesFinished(p->pair)) {
-                u32 mask = 4;
-                p->flags |= mask;
+
+                MovingPairActor_SetFlags(p, 4);
                 p->phase = 1;
                 p->timer = phase;
             }

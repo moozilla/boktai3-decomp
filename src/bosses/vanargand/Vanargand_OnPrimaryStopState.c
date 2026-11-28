@@ -9,13 +9,18 @@ struct A {
     u16 x;
     u16 y;
 };
+
+static inline void A_SetFl(struct A *p, u32 mask)
+{
+    p->fl |= mask;
+}
+
 void Vanargand_SetPendingCue(void *, s32);
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, s32, s32, s32);
 
 void Vanargand_OnPrimaryStopState(struct A *p)
 {
-    u32 m = 4;
-    p->fl |= m;
+    A_SetFl(p, 4);
     Vanargand_SetPendingCue(p, 1);
     if (p->b1 != 0) {
         p->b1 = 0;

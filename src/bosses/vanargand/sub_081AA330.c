@@ -16,8 +16,7 @@ u32 PairedSceneActor_GetActiveMask(struct VanargandAttackPair *);
 
 void sub_081AA330(struct VanargandPairAttack *p)
 {
-    u32 m = 4;
-    p->flags |= m;
+    VanargandPairAttack_SetFlags(p, 4);
     Vanargand_SetPendingCue(p, 1);
     if (p->pending != 0) {
         p->pending = 0;

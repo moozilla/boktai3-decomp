@@ -1,11 +1,12 @@
 #include "bosses/vanargand/vanargand_pair_attack.h"
+#include "bosses/vanargand/flag_accessors.h"
 void Collider_SetPosition(void *, void *, u32);
 void Vanargand_UpdatePartCollision(struct VanargandPairAttack *boss, struct VanargandDamagePart *part)
 {
     struct VanargandPairAttack *owner = boss;
     struct ContactCollider *collider;
-    u32 mask = 4;
-    if ((boss->flags & mask) || boss->mode == 1) {
+
+    if (VanargandPairAttack_TestFlags(boss, 4) || boss->mode == 1) {
         part->flags |= 1;
         part->damage = 0;
         part->contactFlags = 0;
@@ -22,11 +23,11 @@ void Vanargand_UpdatePartCollision(struct VanargandPairAttack *boss, struct Vana
         }
     }
     {
-        u32 mask = 0x40;
-        if (boss->flags & mask) {
+
+        if (VanargandPairAttack_TestFlags(boss, 0x40)) {
             struct MotionTarget *target = &part->target;
-            s32 mask = -2;
-            target->flags &= mask;
+
+            MotionTarget_KeepFlags(target, -2);
         } else {
             struct MotionTarget *target = &part->target;
             u32 mask = 1;

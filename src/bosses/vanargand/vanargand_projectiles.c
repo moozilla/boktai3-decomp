@@ -1,4 +1,5 @@
 #include "bosses/vanargand/vanargand_projectiles.h"
+#include "bosses/vanargand/flag_accessors.h"
 
 struct VanargandProjectile *
 VanargandProjectilePool_FindFreeSlot(struct VanargandProjectilePool *pool, s32 *slotIndex)
@@ -29,7 +30,7 @@ void VanargandProjectile_OnContact(struct ContactCollider *actor, void *context,
     Collision_CalculateDamageResponse(actor, context);
     {
         u32 one = 1;
-        if (actor->statRewardFlags & one) {
+        if (ContactCollider_TestStatRewardFlags(actor, 1)) {
             Sound_PlaySong(0x592);
             reaction->state = one;
             reaction->entered = one;

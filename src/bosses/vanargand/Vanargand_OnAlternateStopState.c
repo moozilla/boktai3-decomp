@@ -9,12 +9,17 @@ struct A {
     u16 x;
     u16 y;
 };
+
+static inline void A_SetFl(struct A *p, u32 mask)
+{
+    p->fl |= mask;
+}
+
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, s32, s32, s32);
 
 void Vanargand_OnAlternateStopState(struct A *p)
 {
-    u32 m = 4;
-    p->fl |= m;
+    A_SetFl(p, 4);
     if (p->b1 != 0) {
         p->b1 = 0;
         p->x = 0;

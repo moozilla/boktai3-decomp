@@ -70,6 +70,12 @@ struct VanargandPresentation {
     u16 cameraShake, cameraMode;
     s32 debugValue;
 };
+
+static inline void VanargandPresentation_SetFlags(struct VanargandPresentation *p, u32 mask)
+{
+    p->flags |= mask;
+}
+
 extern const s16 gUnk_086149C4[];
 void SceneActors_UpdateEffects(void *);
 void Camera_BlendOffset(void *, void *, s32);
@@ -108,6 +114,7 @@ static inline void ClearColliderFlag(u32 mask, struct PresentationCollider *c)
 {
     c->flags &= ~mask;
 }
+
 static inline void SetAnimationFlag(struct PresentationAnimation *a)
 {
     a->flags |= 1;
@@ -167,8 +174,7 @@ void Vanargand_UpdatePresentation(struct VanargandPresentation *p)
         p->cameraShake--;
     }
     if (p->pauseTimer > 0) {
-        u32 mask = 4;
-        self->flags |= mask;
+        VanargandPresentation_SetFlags(self, 4);
         p->pauseTimer--;
     }
     if (TestActorFlag(16, self)) {

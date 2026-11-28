@@ -43,6 +43,12 @@ struct Vanargand {
     u8 padF3E[0xF44 - 0xF3E];
     void *afterimages;
 };
+
+static inline void Vanargand_SetFlags(struct Vanargand *p, u32 mask)
+{
+    p->flags |= mask;
+}
+
 void MotionTrack_Initialize(void *, const void *, const void *, const void *, u32);
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, int, int, int);
 void Vanargand_SetPendingCue(void *, u16);
@@ -101,10 +107,7 @@ void Vanargand_RunDefeatSequence(struct Vanargand *p)
     void *animation = p->animation;
     s16 origin[4];
     struct VanargandPoint first, second;
-    {
-        u32 mask = 0xC;
-        p->flags |= mask;
-    }
+    Vanargand_SetFlags(p, 0xC);
     Vanargand_SetPendingCue(p, 3);
     if (p->pendingAnimation) {
         p->pendingAnimation = 0;
@@ -219,8 +222,5 @@ void Vanargand_RunDefeatSequence(struct Vanargand *p)
         case 8:
             return;
     }
-    {
-        u32 mask = 2;
-        p->flags |= mask;
-    }
+    Vanargand_SetFlags(p, 2);
 }

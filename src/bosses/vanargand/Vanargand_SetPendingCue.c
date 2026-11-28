@@ -2,7 +2,6 @@
 
 void Vanargand_SetPendingCue(struct VanargandPairAttack *boss, u16 cue)
 {
-    u32 mask = 0x200000;
-    boss->flags |= mask;
+    VanargandPairAttack_SetFlags(boss, 0x200000);
     boss->pendingCue = cue;
 }

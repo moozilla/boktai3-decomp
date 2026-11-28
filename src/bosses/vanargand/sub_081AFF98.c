@@ -7,8 +7,7 @@
 
 static inline void EnterState(struct PairedSceneHalf *actor, u8 state)
 {
-    u32 mask = 0x100;
-    u32 blocked = actor->actionFlags & mask;
+    u32 blocked = PairedSceneHalf_TestActionFlags(actor, 0x100);
     u8 *requested;
     u8 *ready;
     u8 current;

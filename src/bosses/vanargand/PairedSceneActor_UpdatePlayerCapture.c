@@ -112,10 +112,7 @@ void PairedSceneActor_UpdatePlayerCapture(struct VanargandAttackPair *owner,
 {
     struct MotionTrackVector target;
     struct MotionTrackVector position;
-    {
-        u32 mask = 12;
-        half->actionFlags |= mask;
-    }
+    Vanargand_SetFlags(half, 12);
     if (half->entered) {
         half->entered = 0;
         {

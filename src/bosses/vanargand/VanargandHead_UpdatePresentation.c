@@ -91,8 +91,8 @@ void VanargandHead_UpdatePresentation(struct DepartureActor *actor)
         actor->actorFlags = mask | actor->actorFlags;
         actor->invincibilityTimer--;
         if (actor->invincibilityTimer == 0) {
-            u32 mask = ~4;
-            actor->actorFlags = mask & actor->actorFlags;
+
+            actor->actorFlags = DepartureActor_TestActorFlags(actor, ~4);
         }
     }
     if (gSceneCamera) {

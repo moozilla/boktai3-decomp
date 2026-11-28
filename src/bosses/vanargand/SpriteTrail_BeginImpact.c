@@ -1,5 +1,6 @@
 #include "bosses/vanargand/sprite_trail.h"
 #include "scene/collision/spatial_index.h"
+#include "bosses/vanargand/flag_accessors.h"
 
 void SpriteTrail_UpdatePositions(struct SpriteTrail *);
 s32 SceneTilemap_GetScrollDelta(void);
@@ -14,8 +15,7 @@ void SpriteTrail_BeginImpact(void *unused, struct SpriteTrail *p)
         p->entered = 0;
         {
             struct SpatialEntry *collider = (void *)p->renderCollider;
-            u32 one = 1;
-            collider->flags |= one;
+            SpatialEntry_SetFlags(collider, 1);
         }
     }
     SpriteTrail_UpdatePositions(p);

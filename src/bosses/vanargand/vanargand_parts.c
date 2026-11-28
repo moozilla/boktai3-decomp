@@ -1277,10 +1277,9 @@ void Vanargand_UpdatePartEmergence(struct VanargandAttackPair *boss, struct Pair
     struct AnimSprite *animation;
     u32 entering;
     u32 state;
-    u32 mask = 12;
     void *paletteSource;
     void *paletteDestination;
-    p->actionFlags |= mask;
+    PairedSceneHalf_SetActionFlags(p, 12);
     if (p->entered) {
         p->entered = 0;
         if (!(p->sprite.flags & 1)) {
@@ -1417,8 +1416,7 @@ void Vanargand_UpdatePartFadeOut(struct VanargandAttackPair *boss, struct Paired
                                  s32 frame)
 {
 
-    u32 twelve = 12;
-    p->actionFlags |= twelve;
+    PairedSceneHalf_SetActionFlags(p, 12);
     if (p->entered) {
         p->entered = 0;
         CpuSet(p->palettes[0], p->graphics.palette, 0x04000008);

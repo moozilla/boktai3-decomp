@@ -19,6 +19,12 @@ struct Vanargand {
     u8 pad55E[0x5b0 - 0x55e];
     u16 delay;
 };
+
+static inline void Vanargand_SetFlags(struct Vanargand *p, u32 mask)
+{
+    p->flags |= mask;
+}
+
 void MotionTrack_Initialize(struct MotionTrack *, const void *, const struct MotionTrackVector *,
                             const struct MotionTrackVector *, u32);
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, int, int, int);
@@ -60,8 +66,7 @@ void Vanargand_UpdateOffsetMotion(struct Vanargand *p)
         if (done)
             p->finished = 1;
         else {
-            u32 mask = 5;
-            p->flags |= mask;
+            Vanargand_SetFlags(p, 5);
         }
     }
 }

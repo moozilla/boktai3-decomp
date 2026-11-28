@@ -3,7 +3,7 @@ u32 Vanargand_IsEitherComponentFlag40Set(void *);
 s32 VanargandPair_RequestPairReaction(struct VanargandPairAttack *panel)
 {
     u32 two = 2;
-    if (panel->flags & two) {
+    if (VanargandPairAttack_TestFlags(panel, 2)) {
         Vanargand_StartAction(panel, 1, 0, 6);
         return 1;
     }

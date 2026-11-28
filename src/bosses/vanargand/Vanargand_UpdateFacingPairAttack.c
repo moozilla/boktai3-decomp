@@ -37,6 +37,12 @@ struct Vanargand {
     u8 pad5B8[0x5C2 - 0x5B8];
     s16 mode;
 };
+
+static inline void Vanargand_SetFlags(struct Vanargand *p, u32 mask)
+{
+    p->flags |= mask;
+}
+
 void Vanargand_SetPendingCue(void *, u16);
 u8 Callback_InvokeActor(void *, void *);
 void Vanargand_SetPairedMotionParameter(void *, u16);
@@ -68,13 +74,10 @@ void Vanargand_UpdateFacingPairAttack(struct Vanargand *p)
     s32 phase;
     u8 result;
     if (p->mode == 1) {
-        u32 mask = 0x40000;
-        p->flags |= mask;
+
+        Vanargand_SetFlags(p, 0x40000);
     }
-    {
-        u32 mask = 0x40;
-        p->flags |= mask;
-    }
+    Vanargand_SetFlags(p, 0x40);
     result = Callback_InvokeActor(p, p->callback);
     if (result)
         return;
