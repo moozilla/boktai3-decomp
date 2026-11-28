@@ -150,3 +150,4 @@ src/monsters/mummy/mummy_entry.c	Mummy_ResumeRouteAfterCheckpoint	contrived	cont
 src/monsters/mummy/mummy_entry.c	Mummy_Init	contrived	contrived	59	MonsterInit helpers fix spill slot order
 src/monsters/mummy/mummy_entry.c	BouncingObject_RefreshNearbyHeading	contrived	contrived	1	repeated context locals and parked masks
 src/monsters/muspell_head/MuspellHead_InitializeColliders.c	MuspellHead_InitializeColliders	contrived	natural	2	
+src/monsters/muspell_head/MuspellHead_RecordDefeat.c	MuspellHead_RecordDefeat	contrived	natural	8	file-local IncrementCounter (shape of SceneState_IncrementCounters.c) replaces H/W/INC macros; plain if/else drops the HImode move of 9999
