@@ -1,16 +1,10 @@
-#include "global.h"
+#include "player/effects/orbit_effect.h"
 
-struct P {
-    u8 f00[0x4C4];
-    u32 w;
-};
+void PlayerOrbitEffect_UpdateParticles(struct PlayerOrbitEffect *);
 
-void PlayerOrbitEffect_UpdateParticles(struct P *);
-void Callback_InvokeActor(struct P *, u32);
-
-s32 PlayerBurst_Update(struct P *p)
+s32 PlayerBurst_Update(struct PlayerOrbitEffect *effect)
 {
-    PlayerOrbitEffect_UpdateParticles(p);
-    Callback_InvokeActor(p, p->w);
+    PlayerOrbitEffect_UpdateParticles(effect);
+    Callback_InvokeActor(effect, effect->updateState);
     return 0;
 }
