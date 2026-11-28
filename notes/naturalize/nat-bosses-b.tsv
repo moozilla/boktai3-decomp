@@ -358,3 +358,9 @@ src/bosses/vanargand/VanargandPair_UpdateActivePairState.c	VanargandPair_UpdateA
 src/bosses/vanargand/Vanargand_UpdateEntryTransition.c	Vanargand_UpdateEntryTransition	natural	natural	0	
 src/bosses/vanargand/Vanargand_UpdateMode9Transition.c	Vanargand_UpdateMode9Transition	near-natural	near-natural	1	object cast kept: variant read from the incoming pointer
 src/bosses/vanargand/Vanargand_UpdateMode3Transition.c	Vanargand_UpdateMode3Transition	near-natural	near-natural	2	object casts kept: reads from the incoming pointer
+src/bosses/vanargand/Vanargand_UpdateMode23Transition.c	Vanargand_UpdateMode23Transition	natural	natural	0	
+src/bosses/vanargand/Vanargand_UpdateMode20.c	Vanargand_UpdateMode20	natural	natural	0	
+src/bosses/vanargand/Vanargand_UpdateMode24Transition.c	Vanargand_UpdateMode24Transition	natural	natural	0	
+src/bosses/vanargand/Vanargand_UpdateMode25Transition.c	Vanargand_UpdateMode25Transition	near-natural	near-natural	1	second boss alias kept
+src/bosses/vanargand/ActorSoundPhase_EnterPhase21.c	ActorSoundPhase_EnterPhase21	near-natural	near-natural	1	second boss alias kept
+src/bosses/vanargand/Vanargand_DispatchSecondaryState.c	Vanargand_DispatchSecondaryState	contrived	natural	1	

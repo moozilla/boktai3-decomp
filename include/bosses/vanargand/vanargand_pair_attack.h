@@ -37,7 +37,8 @@ struct VanargandPairAttack {
     s16 health;
     u8 pad96[6];
     u32 flags;
-    u8 padA0[2];
+    u8 padA0;
+    u8 modeInterrupted; /* 0xA1: cleared before the mode callback (tentative). */
     u8 phase;
     u8 action;
     u32 timer;
