@@ -474,3 +474,4 @@ src/ui/hud/damage_numbers/damage_number_display.c	DamageNumberDisplay_Create	nat
 src/ui/hud/damage_numbers/damage_number_display.c	DamageNumberDisplay_Show	natural	natural	0	
 src/ui/hud/damage_numbers/DamageNumberDisplay_ResetInstance.c	DamageNumberDisplay_ResetInstance	natural	natural	0	
 src/ui/hud/damage_numbers/TransientSpriteEffects_ResetInstance.c	TransientSpriteEffects_ResetInstance	natural	natural	0	
+src/ui/hud/stage_icon/StageIconDisplay_TickReveal.c	StageIconDisplay_TickReveal	fudged	partial	16	once-loop and revealed pointer stay: without them display loses r4 to the revealed address

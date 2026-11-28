@@ -17,10 +17,7 @@ void StageIconDisplay_TickReveal(struct StageIconDisplay *display)
         } else {
             Sound_PlaySong(540);
             {
-                struct ProjectedDisplayEntry *indicator =
-                    (void *)(*revealed * sizeof(struct ProjectedDisplayEntry) + (u32)display +
-                             0x98);
-                indicator->flags &= ~1;
+                (*revealed + display->indicators)->flags &= ~1;
             }
             (*revealed)++;
             display->stateFrame = 1;
