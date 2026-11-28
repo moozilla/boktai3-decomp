@@ -627,3 +627,4 @@ src/bosses/nidhoggr/duel.c	NidhoggrDuel_TryStartDamageReaction	natural	natural	0
 src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdateWaitAction	minor	minor	1	actor alias: removing it changes the saved register
 src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdateActionTwo	minor	minor	1	actor alias: removing it changes the saved register
 src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdateDeathAction	minor	minor	1	actor alias: removing it changes the saved register
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_EmitSpriteParticles	minor	minor	0	reused value local and index pointer in the random spark draw
