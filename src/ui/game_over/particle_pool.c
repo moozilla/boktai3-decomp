@@ -309,15 +309,16 @@ s32 ParticlePool_Init(struct ParticlePool *p)
 
 struct ParticlePool *ParticlePool_Create(void)
 {
-    struct ParticlePool *p = Task_Create(10, 0x43c);
-    if (p == 0)
+    struct ParticlePool *pool = Task_Create(10, sizeof(struct ParticlePool));
+
+    if (!pool)
         return 0;
-    Task_SetCallbacks(p, ParticlePool_OnUpdate, ParticlePool_OnDestroy);
-    if (ParticlePool_Init(p) < 0) {
-        Task_Kill(p);
+    Task_SetCallbacks(pool, ParticlePool_OnUpdate, ParticlePool_OnDestroy);
+    if (ParticlePool_Init(pool) < 0) {
+        Task_Kill(pool);
         return 0;
     }
-    return p;
+    return pool;
 }
 
 void ParticlePool_Destroy(struct ParticlePool *p)
