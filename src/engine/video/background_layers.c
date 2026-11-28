@@ -470,6 +470,8 @@ void Bg_SetupLayers(s32 mode, u16 resourceId, struct BgMapResource *res, u16 x, 
     struct BgMapEntry entry;
     s32 n, i;
     s32 offset;
+    u16 width, height;
+    s16 originX, originY;
     hdr = *res;
     hdr.maps += (u32)res;
     hdr.tiles += (u32)res;
@@ -479,59 +481,68 @@ void Bg_SetupLayers(s32 mode, u16 resourceId, struct BgMapResource *res, u16 x, 
             bgs[0] = 0;
             n = 1;
             offset = 0x8000;
-            Bg_EnableDisplay(0x100);
+            Bg_EnableDisplay(DISPCNT_BG0_ON);
             Bg_SetCharacterBase(0, 2);
             break;
         case 1:
-            Bg_SetCharacterBase(bgs[0] = 2, 0);
+            bgs[0] = 2;
+            Bg_SetCharacterBase(2, 0);
             if (count == 2) {
-                Bg_EnableDisplay(0x800);
-                Bg_SetCharacterBase(bgs[1] = 3, 0);
+                Bg_EnableDisplay(DISPCNT_BG3_ON);
+                bgs[1] = 3;
+            Bg_SetCharacterBase(3, 0);
                 n = 2;
             } else
                 n = 1;
             offset = hdr.tileCount << 5;
-            Bg_EnableDisplay(0x400);
+            Bg_EnableDisplay(DISPCNT_BG2_ON);
             break;
         case 2:
-            Bg_SetCharacterBase(bgs[0] = 3, 0);
+            bgs[0] = 3;
+            Bg_SetCharacterBase(3, 0);
             n = 1;
             offset = hdr.tileCount << 5;
-            Bg_EnableDisplay(0x800);
+            Bg_EnableDisplay(DISPCNT_BG3_ON);
             break;
         case 3:
-            Bg_SetCharacterBase(bgs[0] = 1, 0);
+            bgs[0] = 1;
+            Bg_SetCharacterBase(1, 0);
             n = 1;
             offset = hdr.tileCount << 5;
-            Bg_EnableDisplay(0x200);
+            Bg_EnableDisplay(DISPCNT_BG1_ON);
             break;
         case 4:
-            Bg_SetCharacterBase(bgs[0] = 1, 0);
+            bgs[0] = 1;
+            Bg_SetCharacterBase(1, 0);
             if (count == 2) {
-                Bg_EnableDisplay(0x800);
-                Bg_SetCharacterBase(bgs[1] = 3, 0);
+                Bg_EnableDisplay(DISPCNT_BG3_ON);
+                bgs[1] = 3;
+            Bg_SetCharacterBase(3, 0);
                 n = 2;
             } else
                 n = 1;
             offset = hdr.tileCount << 5;
-            Bg_EnableDisplay(0x200);
+            Bg_EnableDisplay(DISPCNT_BG1_ON);
             break;
         case 5:
-            Bg_SetCharacterBase(bgs[0] = 2, 0);
+            bgs[0] = 2;
+            Bg_SetCharacterBase(2, 0);
             if (count == 2) {
-                Bg_EnableDisplay(0x200);
-                Bg_SetCharacterBase(bgs[1] = 1, 0);
+                Bg_EnableDisplay(DISPCNT_BG1_ON);
+                bgs[1] = 1;
+            Bg_SetCharacterBase(1, 0);
                 n = 2;
             } else
                 n = 1;
             offset = hdr.tileCount << 5;
-            Bg_EnableDisplay(0x400);
+            Bg_EnableDisplay(DISPCNT_BG2_ON);
             break;
         case 6:
-            Bg_SetCharacterBase(bgs[0] = 1, 2);
+            bgs[0] = 1;
+            Bg_SetCharacterBase(1, 2);
             n = 1;
             offset = 0x8000;
-            Bg_EnableDisplay(0x200);
+            Bg_EnableDisplay(DISPCNT_BG1_ON);
             break;
         case 7:
             n = 3;
@@ -541,15 +552,14 @@ void Bg_SetupLayers(s32 mode, u16 resourceId, struct BgMapResource *res, u16 x, 
             Bg_SetCharacterBase(2, 0);
             Bg_SetCharacterBase(3, 0);
             Bg_SetCharacterBase(1, 0);
-            {
-                Bg_EnableDisplay(0x200);
-                Bg_EnableDisplay(0x400);
-                Bg_EnableDisplay(0x800);
-            }
+            Bg_EnableDisplay(DISPCNT_BG1_ON);
+            Bg_EnableDisplay(DISPCNT_BG2_ON);
+            Bg_EnableDisplay(DISPCNT_BG3_ON);
             offset = hdr.tileCount << 5;
             break;
         default:
-            Bg_SetCharacterBase(bgs[0] = 2, 0);
+            bgs[0] = 2;
+            Bg_SetCharacterBase(2, 0);
             n = 0;
             offset = 0;
             break;
@@ -573,20 +583,16 @@ void Bg_SetupLayers(s32 mode, u16 resourceId, struct BgMapResource *res, u16 x, 
         layer->y = 0;
         layer->scaleX = 0x1000;
         layer->scaleY = 0x1000;
-        {
-            s16 lx = (s16)x >> 4, ly = (s16)y >> 4;
-            layer->originX = lx;
-            layer->originY = ly;
-        }
+        originX = (s16)x >> 4;
+        originY = (s16)y >> 4;
+        layer->originX = originX;
+        layer->originY = originY;
         layer->extraData = (u16 *)hdr.extra;
         layer->mapData = (u16 *)entry.data;
-        {
-            u16 w, h;
-            layer->width = w = entry.width;
-            layer->height = h = entry.height;
-            layer->halfWidth = w;
-            layer->halfHeight = h;
-        }
+        layer->width = width = entry.width;
+        layer->height = height = entry.height;
+        layer->halfWidth = width;
+        layer->halfHeight = height;
         layer->map = Video_GetBackgroundMap(bg);
     }
 }

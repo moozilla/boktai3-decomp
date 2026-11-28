@@ -250,3 +250,4 @@ src/engine/video/background_layers.c	BgGfx_FindEntryById	natural	natural
 src/engine/video/background_layers.c	Bg_SetTilemapEntry	natural	natural		
 src/engine/video/background_layers.c	Bg_UploadTileEntries	contrived	natural	9	
 src/engine/video/background_layers.c	Bg_CopyTiles	minor	natural	9	
+src/engine/video/background_layers.c	Bg_SetupLayers	contrived	minor	12	origin and size pass through locals: storing the expressions directly reorders the entry reads
