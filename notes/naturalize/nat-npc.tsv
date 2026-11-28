@@ -681,3 +681,5 @@ src/minigames/result_game/Transformation_ReportResult.c	Transformation_ReportRes
 src/minigames/result_game/Transformation_Finish.c	Transformation_Finish	contrived	natural	1	
 src/minigames/result_game/Transformation_Charge.c	Transformation_Charge	contrived	minor	9	positionActor copy of the player and an out pointer for the position: direct member updates change addressing
 src/minigames/result_game/Transformation_Reveal.c	Transformation_Reveal	contrived	minor	6	out and origin pointers for the dropped item position
+src/minigames/result_game/ResultMenu_CreateGraphics.c	ResultMenu_CreateGraphics	natural	natural	0	
+src/minigames/result_game/ResultMenu_SendCommand.c	ResultMenu_SendCommand	contrived	minor	16	counted do/while copy with src and count locals: a for loop adds a second count test

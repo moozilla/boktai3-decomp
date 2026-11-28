@@ -6,6 +6,7 @@
 #include "scene/scene_value_equipment.h"
 #include "engine/math/scene_vec.h"
 #include "engine/video/sprite_oam.h"
+#include "scene/actor/scene_event_types.h"
 
 /* The result game and its tutorial share the same task and display objects.
  * Position and velocity use five fractional bits. Identities are tentative. */
@@ -59,7 +60,9 @@ struct ResultMenu {
     u8 unknown7A2[2];
     void *update;
     void (*gameUpdate)(struct ResultMenu *);
-    u8 unknown7AC[0x48];
+    u16 receiverId, receiverKind; /* 0x7AC: where ResultMenu_SendCommand sends */
+    struct SceneEventCommand command;
+    u8 unknown7BC[0x38];
 };
 
 struct ResultTutorialStep {

@@ -1,10 +1,11 @@
-#include "scene/actor/scene_event_types.h"
+#include "minigames/result_game/result_tutorial.h"
 s32 SceneMessages_Send(struct SceneEventCommand *);
-int ResultMenu_SendCommand(u8 *p, int command, int count, u16 *args)
+
+int ResultMenu_SendCommand(struct ResultMenu *menu, int command, int count, u16 *args)
 {
-    struct SceneEventCommand *packet = (struct SceneEventCommand *)(p + 0x7b0);
-    packet->id = *(u16 *)(p + 0x7ac);
-    packet->receiverKind = *(u16 *)(p + 0x7ae);
+    struct SceneEventCommand *packet = &menu->command;
+    packet->id = menu->receiverId;
+    packet->receiverKind = menu->receiverKind;
     packet->trigger = 0;
     packet->unknown4 = 0;
     packet->kind = command;
@@ -13,7 +14,7 @@ int ResultMenu_SendCommand(u8 *p, int command, int count, u16 *args)
         u16 *src = args;
         u16 *out;
         int n;
-        out = (u16 *)(p + 0x7b8);
+        out = (u16 *)&menu->command.value;
         n = count;
         do {
             *out++ = *src++;
