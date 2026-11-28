@@ -878,12 +878,8 @@ void Ivy_UpdateDefeat(struct ChaseActor *actor, s32 frame)
         SceneActorAnimation_SelectDirectionFlagsVariant((void *)actor, 10, 1);
         {
             struct ContactCollider *collider = &actor->base.colliderA;
-            {
-                u32 flags = collider->flags;
-                flags |= 4;
-                flags &= 0xFFF7;
-                collider->flags = flags;
-            }
+            collider->flags |= 4;
+            collider->flags &= ~8;
         }
         {
             u32 m = 0x800;
