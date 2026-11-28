@@ -1,19 +1,21 @@
 #include "global.h"
-void ForgingBook_SetupPageBackground(u32);
-void CollectionBook_RefreshCollectedEntryVisibility(u32);
-void CollectionBook_UpdateSelectionCursor(u32);
-void CollectionBook_RefreshCompletionDigits(u32);
-void CollectionBook_RefreshPageHeading(u32);
-void CollectionBook_UpdateTrackedEntryMarker(u32);
-void ForgingBook_RefreshEntryDescription(u32);
-u32 ForgingBook_RefreshPage(u32 a)
+#include "ui/books/collection_book.h"
+void ForgingBook_SetupPageBackground(struct CollectionBook *);
+void CollectionBook_RefreshCollectedEntryVisibility(struct CollectionBook *);
+void CollectionBook_UpdateSelectionCursor(struct CollectionBook *);
+void CollectionBook_RefreshCompletionDigits(struct CollectionBook *);
+void CollectionBook_RefreshPageHeading(struct CollectionBook *);
+void CollectionBook_UpdateTrackedEntryMarker(struct CollectionBook *);
+void ForgingBook_RefreshEntryDescription(struct CollectionBook *);
+
+u32 ForgingBook_RefreshPage(struct CollectionBook *book)
 {
-    ForgingBook_SetupPageBackground(a);
-    CollectionBook_RefreshCollectedEntryVisibility(a);
-    CollectionBook_UpdateSelectionCursor(a);
-    CollectionBook_RefreshCompletionDigits(a);
-    CollectionBook_RefreshPageHeading(a);
-    CollectionBook_UpdateTrackedEntryMarker(a);
-    ForgingBook_RefreshEntryDescription(a);
+    ForgingBook_SetupPageBackground(book);
+    CollectionBook_RefreshCollectedEntryVisibility(book);
+    CollectionBook_UpdateSelectionCursor(book);
+    CollectionBook_RefreshCompletionDigits(book);
+    CollectionBook_RefreshPageHeading(book);
+    CollectionBook_UpdateTrackedEntryMarker(book);
+    ForgingBook_RefreshEntryDescription(book);
     return 0;
 }
