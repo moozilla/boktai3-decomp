@@ -122,3 +122,4 @@ src/link/panel/link_panel.c	LinkPanel_InitFromScript	natural	natural	0
 src/link/panel/link_panel.c	LinkPanel_Create	natural	natural	0	
 src/link/player/Player_UpdateActionFacingSide.c	Player_UpdateActionFacingSide	natural	natural	0	
 src/link/player/Player_SetAnimationIndex.c	Player_SetAnimationIndex	contrived	natural	6	
+src/link/player/LinkPlayer_SetScaledDirectionalVelocity.c	LinkPlayer_SetScaledDirectionalVelocity	minor	natural	1	
