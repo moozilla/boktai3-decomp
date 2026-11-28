@@ -132,9 +132,6 @@ void LightFixture_React(struct PooledInteractableManager *manager, struct Pooled
         LightFixture_EnterState(slot, 2);
 }
 
-/* Particle emission uses packed coordinate fields. */
-#define POSITION (*(struct SceneExtent *)&slot->drawable.position)
-
 void LightFixture_Activate(struct PooledInteractableManager *manager,
                            struct PooledInteractable *slot)
 {
@@ -170,8 +167,6 @@ void LightFixture_Activate(struct PooledInteractableManager *manager,
     if (slot->counter > 10)
         LightFixture_EnterState(slot, 1);
 }
-
-#undef POSITION
 
 /* Motion 1: steps along the route and moves the position by the step. */
 void LightFixture_UpdateRouteMotion(struct PooledInteractable *slot)
