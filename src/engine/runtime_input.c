@@ -98,15 +98,12 @@ void Input_UpdatePadStates(void)
 
 u16 String_Hash(u8 *s)
 {
-    u16 h = 0;
+    u16 hash = 0;
     while (*s != 0) {
-        u32 a = h << 5;
-        u32 b = h >> 11;
-        h = a | b;
-        h = h + *s;
-        s++;
+        hash = (u16)(hash << 5) | (hash >> 11);
+        hash += *s++;
     }
-    return h;
+    return hash;
 }
 
 u32 Random_Next15(void)
