@@ -437,3 +437,4 @@ src/scene/actor/reaction/SceneActorContacts_ResetList.c	SceneActorContacts_Reset
 src/scene/actor/reaction/SceneActorContacts_RegisterNode.c	SceneActorContacts_RegisterNode	natural	natural	0	-
 src/scene/actor/reaction/SceneActorContacts_RemoveNode.c	SceneActorContacts_RemoveNode	natural	natural	0	-
 src/scene/actor/reaction/SceneActorContacts_ReleaseInvalidOwners.c	SceneActorContacts_ReleaseInvalidOwners	contrived	contrived	17	partial: hoisted mask locals and the state pointer out-param stay; plain literals are not hoisted out of the loop by loop.c and the ROM keeps all of them in saved registers
+src/scene/actor/reaction/SceneActorContacts_ReleaseNode.c	SceneActorContacts_ReleaseNode	natural	natural	1	-

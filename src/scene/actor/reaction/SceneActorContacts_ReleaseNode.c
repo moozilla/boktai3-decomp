@@ -7,7 +7,7 @@ void SceneActorContacts_ReleaseNode(struct SceneActorContactNode *input)
         return;
     for (node = manager->head; node; node = node->next) {
         if (node == input && (node->flags & 1)) {
-            node->flags &= 0xFD;
+            node->flags &= ~2;
             node->owner = NULL;
             node->cooldown = 240;
             return;
