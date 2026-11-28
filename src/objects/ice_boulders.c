@@ -63,14 +63,9 @@ void IceBoulder_ApplyContactDamage(struct ContactCollider *a, struct ContactColl
         }
     }
     if (p->variant == 1) {
-        void *data = a->owner;
-        if (data) {
-            void *callback = a->callback;
-            if (callback && (Mask(&a->statRewardFlags, 16)))
-                sub_08249244(a, b, data, callback);
-        }
+        if (a->owner && a->callback && Mask(&a->statRewardFlags, 16))
+            sub_08249244(a, b, a->owner, a->callback);
     }
-    return;
 }
 
 void IceBoulder_InitializeCollider(struct RegionActor *actor, s16 width, s16 height)
