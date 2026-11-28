@@ -379,3 +379,4 @@ src/engine/video/palette/SpriteDrawable_SelectTileFrame.c	SpriteDrawable_SelectT
 src/engine/video/palette/ObjShape_InitTables.c	ObjShape_InitTables	minor	natural	1	
 src/engine/video/palette/sub_08217BBC.c	sub_08217BBC	contrived	natural	1	
 src/engine/video/palette/sub_08217C7C.c	sub_08217C7C	minor	minor	1	gray summed with += to keep the loop shape; palette rows viewed as 16-entry arrays
+src/engine/video/palette/Palette_ApplyBackgroundFade.c	Palette_ApplyBackgroundFade	minor	minor	20	productOrBank holds the fade product then the bank counter (register choice); u16 casts pick the multiply operand form
