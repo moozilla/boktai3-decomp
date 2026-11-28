@@ -420,13 +420,12 @@ s32 ModifierMenu_ToggleSelection(struct ModifierMenu *menu)
     return 0;
 }
 
-s32 ModifierMenu_CommitSecondarySource(struct ModifierMenu *p)
+s32 ModifierMenu_CommitSecondarySource(struct ModifierMenu *menu)
 {
-    struct ModifierSelection *s = &p->pending;
-    struct ModifierSelection *d = &p->current;
-    u16 v = s->secondaryId;
-    d->secondaryId = v;
-    gGameState->unk81A = v;
+    struct ModifierSelection *pending = &menu->pending;
+    struct ModifierSelection *current = &menu->current;
+    current->secondaryId = pending->secondaryId;
+    gGameState->unk81A = current->secondaryId;
     return 0;
 }
 
