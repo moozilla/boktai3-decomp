@@ -631,7 +631,7 @@ static inline void SetDigitVisibility(struct SceneHudState *hud, u32 mask, s32 h
 
 void Hud_UpdateCountdownDigits(struct SceneHudState *hud)
 {
-    s32 value, hundreds, tens, ones, base;
+    s32 value, hundreds, tens, ones;
     u8 *resource;
     if (hud->countdownEnabled) {
         if (!hud->actionOwner || TestFlags(4, &gUnk_02000560)) {
@@ -648,18 +648,17 @@ void Hud_UpdateCountdownDigits(struct SceneHudState *hud)
                 if (value > 0) {
                     value = Div(value - 1, 60) + 1;
                     hundreds = Div(value, 100);
-                    base = hundreds * 100;
-                    tens = Div(value - base, 10);
-                    ones = value - tens * 10 - base;
+                    tens = Div(value - hundreds * 100, 10);
+                    ones = value - tens * 10 - hundreds * 100;
                 } else {
                     hundreds = 0;
                     tens = 0;
                     ones = 0;
                 }
-                if ((gEngineFlags & 0x1000) || (*&gGameState->flags868 & 0x400)) {
+                if ((gEngineFlags & 0x1000) || (gGameState->flags868 & 0x400)) {
                     AnimSprite_Hide(&hud->countdownDigits[2]);
                     if (hundreds == 0 && tens == 0) {
-                        Anim_LoadKeyframe(&hud->countdownDigits[0], resource, (u16)(0x33), 1);
+                        Anim_LoadKeyframe(&hud->countdownDigits[0], resource, 0x33, 1);
                         Anim_LoadKeyframe(&hud->countdownDigits[1], resource, (u16)(ones + 0x33),
                                           1);
                     } else {
@@ -670,8 +669,8 @@ void Hud_UpdateCountdownDigits(struct SceneHudState *hud)
                     }
                 } else {
                     if (hundreds == 0 && tens == 0) {
-                        Anim_LoadKeyframe(&hud->countdownDigits[0], resource, (u16)(0x33), 1);
-                        Anim_LoadKeyframe(&hud->countdownDigits[1], resource, (u16)(0x33), 1);
+                        Anim_LoadKeyframe(&hud->countdownDigits[0], resource, 0x33, 1);
+                        Anim_LoadKeyframe(&hud->countdownDigits[1], resource, 0x33, 1);
                         Anim_LoadKeyframe(&hud->countdownDigits[2], resource, (u16)(ones + 0x33),
                                           1);
                     } else {
