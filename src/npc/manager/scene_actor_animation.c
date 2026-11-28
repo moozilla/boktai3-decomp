@@ -1203,13 +1203,6 @@ void Actor_UpdateNavigationWalk(void *unused, struct SceneActor *actor)
     }
 }
 
-static inline s32 RouteWalk_Scale12(s32 value)
-{
-    if (value >= 0)
-        return value >> 12;
-    return -((-value) >> 12);
-}
-
 // confidence=low: walks toward the navigation target while the animation permits a fixed motion step.
 
 void Actor_UpdateNavigationStep(void *unused, struct SceneActor *actor)
@@ -1257,24 +1250,16 @@ void Actor_UpdateNavigationStep(void *unused, struct SceneActor *actor)
     }
 }
 
-static inline void RouteWalk_Polar(struct ContactPosition *step, s32 angle, s32 speed)
-{
-    step->x = RouteWalk_Scale12(speed * gUnk_086149C4[(angle + 64) & 255]);
-    step->y = 0;
-    step->z = RouteWalk_Scale12(speed * gUnk_086149C4[angle]);
-}
-
 void SceneActorAnimation_UpdateRouteWalk(void *unused, struct SceneActor *actor)
 {
-    struct SceneActorBody *motion = &actor->body;
+    struct SceneActorBody *body = &actor->body;
     struct SceneActorNavigationProbe *probe = &actor->probe;
     struct SceneActorRouteCursor *route = &actor->route;
-    u32 *animType = &actor->drawable.common.kind;
+    union SceneActorDisplay *drawable = &actor->drawable;
     if (actor->animationEntered) {
         struct ContactPosition path;
         struct ContactPosition *pos;
         struct ContactPosition *target;
-        s32 angle;
         actor->animationEntered = 0;
         actor->finished = 0;
         actor->routeProgress = 0;
@@ -1284,43 +1269,38 @@ void SceneActorAnimation_UpdateRouteWalk(void *unused, struct SceneActor *actor)
         Path_GetPointPosition(&path, actor->route.point, 0);
         Terrain_ApplyBlocked(probe, pos, &path);
         target = &actor->probe.target;
-        angle = Math_Atan2(probe->target.x - motion->position.x, target->z - pos->z);
-        actor->body.direction = angle;
-        actor->facing8 = SceneFacing_EightWay(angle);
-        actor->facing4 = SceneFacing_FourWay(angle);
+        SceneActorAnimation_SetAngle(
+            actor, Math_Atan2(probe->target.x - body->position.x, target->z - pos->z));
         Actor_PlayAnimationEntry(actor, 1, 1, 0, 4);
     }
     SceneActor_SetFlags(actor, 0x1000);
     if ((u8)actor->query(actor) != 1) {
         struct ContactPosition *pos = &actor->body.position;
-        struct ContactPosition *probePos = &actor->probe.current;
-        s32 x = probe->current.x - motion->position.x;
-        s32 z = probePos->z - pos->z;
-        s32 distance = (s32)((u32)x * x + (u32)z * z);
+        struct ContactPosition *current = &actor->probe.current;
+        s32 x = probe->current.x - body->position.x;
+        s32 z = current->z - pos->z;
+        s32 distance = x * x + z * z;
         s32 limit = 0x9C3;
-        struct ContactPosition *current = pos;
+        struct ContactPosition *from = pos;
         if (distance <= limit) {
-            motion->position.x = actor->probe.target.x;
-            motion->position.z = actor->probe.target.z;
+            body->position.x = actor->probe.target.x;
+            body->position.z = actor->probe.target.z;
             actor->finished = 1;
-        } else if (*animType == 2) {
-            struct DisplayKeyframeState *anim = &actor->drawable.keyframe.keyframes;
-            if (anim->status & 4) {
+        } else if (drawable->common.kind == 2) {
+            struct DisplayKeyframeState *keyframes = &actor->drawable.keyframe.keyframes;
+            if (keyframes->status & 4) {
                 struct ContactPosition *target = &actor->probe.target;
-                s32 angle =
-                    Math_Atan2(probe->target.x - motion->position.x, target->z - current->z);
-                s32 speed;
                 struct ContactPosition step;
-                actor->body.direction = angle;
-                actor->facing8 = SceneFacing_EightWay(angle);
-                actor->facing4 = SceneFacing_FourWay(angle);
-                speed = (anim->frame & 1) ? 24 : 48;
-                RouteWalk_Polar(&step, motion->direction, speed);
-                motion->position.x += step.x;
-                motion->position.z += step.z;
+                s32 speed;
+                SceneActorAnimation_SetAngle(
+                    actor, Math_Atan2(probe->target.x - body->position.x, target->z - from->z));
+                speed = (keyframes->frame & 1) ? 24 : 48;
+                SceneActor_OffsetAlongHeading(&step, body->direction, speed);
+                body->position.x += step.x;
+                body->position.z += step.z;
             }
         }
-        NavMesh_UpdateProbe(probe, current);
+        NavMesh_UpdateProbe(probe, from);
         Actor_PlayFootstepSound(actor, 1);
         Actor_PlayAnimationEntry(actor, 1, 1, 0, 1);
     }
