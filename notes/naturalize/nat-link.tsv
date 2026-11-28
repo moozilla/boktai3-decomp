@@ -191,3 +191,4 @@ src/link/player/LinkPlayer_InitOptionalPlayerState.c	LinkPlayer_InitOptionalPlay
 src/link/player/sub_0823ADB4.c	sub_0823ADB4	contrived	minor	4	two game state clears keep unsigned views so the global pointer is reloaded
 src/link/player/keyframe_actor.c	KeyframeActor_InitKeyframeDisplay	contrived	natural	4	
 src/link/player/keyframe_actor.c	KeyframeActor_InitAuxiliarySprite	contrived	minor	33	zero local and data, sprite and sequence pointers stay: register allocation
+src/link/player/keyframe_actor.c	KeyframeActor_InitBodyFromScript	contrived	natural	22	
