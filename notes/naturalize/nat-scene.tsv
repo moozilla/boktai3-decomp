@@ -163,3 +163,4 @@ src/scene/actor/attachment/ActorAttachment_GetActionOffset.c	ActorAttachment_Get
 src/scene/actor/attachment/ActorAttachment_NoOp.c	ActorAttachment_NoOp	natural	natural	0	-
 src/scene/actor/attachment/ActorAttachment_GetAction25Offset.c	ActorAttachment_GetAction25Offset	contrived	natural	2	-
 src/scene/actor/attachment/ActorAttachment_UpdateValueFrame.c	ActorAttachment_UpdateValueFrame	contrived	contrived	72	value/sample pointer chain, status/timer/flags/cutoff locals, a local for the flag-test mask and the zero-to-mask local are all forced by the ROM's hoisting and register reuse
+src/scene/actor/attachment/ActorAttachment_TickValueFrame.c	ActorAttachment_TickValueFrame	minor	minor	5	shakingBit and wave locals: literal test loads mask after address; unlocalized shift narrows the table load
