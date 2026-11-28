@@ -91,26 +91,23 @@ int MessageWindow_UpdateSpeakerPortrait(struct MessageWindow *window)
 int MessageWindow_SetDisplayMode(int mode)
 {
     struct MessageWindow *window = (void *)gMessageWindow;
+
     if (!window)
         return 0;
     window->displayMode = mode;
     if (!(u8)mode) {
         MessageWindow_SetPlayback(window, MessageWindow_UpdateNormalPlayback);
-        {
-            u8 *mode = &window->inputDelay;
-            *mode = 3;
-        }
+        window->inputDelay = 3;
     } else {
         window->playbackCounter = 0;
         MessageWindow_SetPlayback(window, MessageWindow_UpdateImmediatePlayback);
     }
     {
-        u8 *fresh = &window->state.complete;
-        *fresh = 0;
-        {
-            struct MessagePlaybackState *state = &window->state;
-            state->speaker = -1;
-        }
+        struct MessagePlaybackState *state;
+
+        window->state.complete = 0;
+        state = &window->state;
+        state->speaker = -1;
     }
     return MessageWindow_UpdateSpeakerPortrait(window);
 }
