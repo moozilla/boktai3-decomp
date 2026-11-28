@@ -393,3 +393,4 @@ src/ui/game_over/particle_pool.c	ParticlePool_SpawnJitteredParticle	fudged	parti
 src/ui/game_over/particle_pool.c	SpriteParticles_UpdateEntries	fudged	natural	17	
 src/ui/game_over/particle_pool.c	ParticlePool_OnDestroy	fudged	natural	1	
 src/ui/game_over/particle_pool.c	ParticlePool_Create	fudged	natural	1	
+src/ui/game_over/particle_pool.c	ParticlePool_EmitTriple	fudged	partial	2	self alias of the pool argument stays: without it the argument copies are emitted in another order

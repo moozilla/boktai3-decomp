@@ -329,10 +329,9 @@ void ParticlePool_Destroy(struct ParticlePool *p)
 void ParticlePool_EmitTriple(struct ParticlePool *pool, struct SceneVec *position, s32 angle,
                              u32 kind)
 {
+    struct ParticlePool *self = pool;
     s32 i;
-    struct ParticlePool *saved;
-    saved = pool;
-    for (i = 2; i >= 0; i--) {
-        ParticlePool_SpawnJitteredParticle(saved, position, angle, kind);
-    }
+
+    for (i = 0; i < 3; i++)
+        ParticlePool_SpawnJitteredParticle(self, position, angle, kind);
 }
