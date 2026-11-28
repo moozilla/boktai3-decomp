@@ -292,3 +292,4 @@ src/effects/orbits/converging_effects.c	ConvergingEffects_UpdateParticles	minor	
 src/effects/orbits/converging_effects.c	ConvergingEffects_EmitNearParticle	minor	minor	40	draw alias; u16 radius sample: modulo form
 src/effects/orbits/converging_effects.c	ConvergingEffects_EmitFarParticle	minor	minor	40	draw alias; u16 radius sample: modulo form
 src/effects/orbits/converging_effects.c	ConvergingEffects_RemoveSprites	minor	natural	40	
+src/effects/orbits/converging_effects.c	ConvergingEffects_InitSprites	natural	natural	0	
