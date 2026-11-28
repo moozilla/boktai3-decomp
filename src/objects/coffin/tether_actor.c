@@ -1621,11 +1621,11 @@ void TetherActor_InitInteractionFromScript(struct TetherActor *actor)
     actor->currentValue = actor->maximumValue = gUnk_08605A04[actor->kind] * 120;
     if (actor->kind == 2 || actor->kind == 9) {
         actor->interactionEnabled = 0;
-        if ((u8)(actor->state - 3) <= 1)
+        if (actor->state == 3 || actor->state == 4)
             actor->state = 0;
     } else {
         actor->interactionEnabled = 1;
-        if ((u8)(actor->state - 3) <= 1)
+        if (actor->state == 3 || actor->state == 4)
             TetherActor_SelectInteractionState(actor);
     }
     actor->secondaryValue = actor->secondaryMaximum = gUnk_08605A04[actor->kind] * 60;
