@@ -40,3 +40,4 @@ src/effects/link_effect.c	SceneEffect_CreateLinkedEntry	minor	natural	1
 src/effects/link_effect.c	LinkEffect_UpdateProjectileBurst	contrived	minor	5	spawn pointer and byte read of the random table
 src/effects/link_effect.c	SceneBurstEmitter_SetState	contrived	natural	1	
 src/effects/link_effect.c	SceneBurstEmitter_Init	contrived	natural	1	
+src/effects/link_effect.c	SceneOrbitHazard_Init	minor	natural	1	

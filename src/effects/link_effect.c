@@ -378,9 +378,8 @@ void SpriteComponent_Init(void *);
 
 s32 SceneOrbitHazard_Init(struct SceneOrbitHazard *hazard)
 {
-    struct LinkSpriteComponent *q = &hazard->effect;
-    SpriteComponent_Init(q);
-    SpriteComponent_Suspend(q);
+    SpriteComponent_Init(&hazard->effect);
+    SpriteComponent_Suspend(&hazard->effect);
     SceneOrbitHazard_SetState(hazard, 0);
     return 0;
 }
