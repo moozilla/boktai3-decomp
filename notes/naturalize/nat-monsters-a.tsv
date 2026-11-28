@@ -233,3 +233,4 @@ src/monsters/centipede/Centipede_AdvanceMotionPhase.c	Centipede_AdvanceMotionPha
 src/monsters/centipede/Centipede_ResolveBlockedMovement.c	Centipede_ResolveBlockedMovement	contrived	contrived	9	remaining: rawoff,u8cast,block,constlocal,mask
 src/monsters/golem/golem_main.c	Golem_AlignChargeTarget	contrived	contrived	10	remaining: bytep,block,structcast
 src/monsters/golem/golem_main.c	Golem_RestoreRoute	contrived	minor	3	remaining: maskhelper
+src/monsters/golem/golem_main.c	SceneActorRoute_CommitReachableDestination	minor	natural	4	

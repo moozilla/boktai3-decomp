@@ -177,8 +177,7 @@ void SceneActorRoute_CommitReachableDestination(struct ChaseActor *actor)
     struct SceneActorRouteContext *context = actor->base.context;
     struct SceneActorChaseGroup *group = &actor->group;
     struct SceneActorChaseTarget *target = actor->base.tracking.target;
-    s32 cell = SceneActorTerrain_GetCellIndex(&target->position);
-    u32 flags = SceneActor_CellAttributes(cell);
+    u32 flags = SceneActor_CellAttributes((SceneActorTerrain_GetCellIndex(&target->position)));
     if (!(flags & 0x43)) {
         if (Nav_IsPositionInMesh(group->route, &actor->base.body.position,
                                  &actor->base.tracking.target->position)) {
