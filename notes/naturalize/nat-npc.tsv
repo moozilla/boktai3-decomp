@@ -479,3 +479,4 @@ src/script/script_keyframe_pool.c	ScriptKeyframe_UpdateEntry	natural	natural	0
 src/script/script_keyframe_pool.c	ScriptKeyframe_InitManager	natural	natural	0	
 src/script/script_keyframe_pool.c	ScriptKeyframe_CreateManagerFromScript	natural	natural	0	
 src/script/script_keyframe_pool.c	ScriptKeyframe_AddFromScript	contrived	minor	4	mirror block, resource id block and position pointer: plain forms change register allocation
+src/script/script_keyframe_pool.c	ScriptKeyframe_SetFrameFromScript	minor	natural	1	
