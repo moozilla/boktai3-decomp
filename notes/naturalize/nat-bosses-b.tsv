@@ -98,3 +98,4 @@ src/bosses/ratatosk/AnimationActor_ProcessKeys.c	AnimationActor_ProcessKeys	cont
 src/bosses/ratatosk/PreviewActor_UpdateHeading.c	PreviewActor_UpdateHeading	contrived	minor	4	second actor alias stays: ROM keeps a second copy of the pointer
 src/bosses/ratatosk/Ratatosk_ProcessDefeatState.c	Ratatosk_ProcessDefeatState	minor	minor	2	mask-parameter flag accessors stay: mask loaded before the field
 src/bosses/ratatosk/SceneActor_UpdateDirectionalTrigger.c	SceneActor_UpdateDirectionalTrigger	contrived	minor	8	second actor alias stays: ROM keeps a second copy of the pointer
+src/bosses/ratatosk/Ratatosk_UpdateDirectionalTrigger.c	Ratatosk_UpdateDirectionalTrigger	contrived	minor	6	second actor alias stays: ROM keeps a second copy of the pointer
