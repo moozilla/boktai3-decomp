@@ -362,3 +362,4 @@ src/engine/video/palette/Palette_GetBackgroundBuffer.c	Palette_GetBackgroundBuff
 src/engine/video/palette/sub_082171C0.c	sub_082171C0	natural	natural		
 src/engine/video/palette/sub_08216E54.c	sub_08216E54	contrived	contrived	0	cached payload address computed as a heap-relative difference; the literal address folds to one load
 src/engine/video/palette/Palette_CacheReservedObjectBank.c	Palette_CacheReservedObjectBank	contrived	natural	1	
+src/engine/video/palette/Palette_CacheObjectBank.c	Palette_CacheObjectBank	contrived	natural	1	

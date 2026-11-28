@@ -1,22 +1,16 @@
 #include "global.h"
 #include "engine/video/render.h"
+
 u32 Palette_CacheObjectBank(u32 key, void *src)
 {
-    s32 i = 0;
-    u32 result;
-    for (; i < (*(s32 *)&gObjPaletteBankCount); i++)
+    s32 i;
+    for (i = 0; i < gObjPaletteBankCount; i++) {
         if (gObjPaletteKeys[i] == key)
-            goto found;
-    if ((*(s32 *)&gObjPaletteBankCount) > 15)
-        goto overflow;
-    {
-        s32 n = (*(s32 *)&gObjPaletteBankCount);
-        gObjPaletteKeys[n] = key;
-        CpuFastSet(src, ((u8 *)gObjPaletteBuffer) + n * 32, 8);
-        return (*(s32 *)&gObjPaletteBankCount)++;
+            return i;
     }
-found:
-    return i;
-overflow:
-    return 0;
+    if (gObjPaletteBankCount > 15)
+        return 0;
+    gObjPaletteKeys[gObjPaletteBankCount] = key;
+    CpuFastCopy(src, gObjPaletteBuffer[gObjPaletteBankCount], 32);
+    return gObjPaletteBankCount++;
 }
