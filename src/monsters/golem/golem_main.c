@@ -1283,7 +1283,6 @@ void Golem_UpdateRecoil(struct ChaseActor *actor)
 {
     struct GolemChargeContext *context = actor->base.context;
     struct SceneActorBody *motion = &actor->base.body;
-    s16 *speed;
 
     if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
         actor->base.restart = 0;
@@ -1318,15 +1317,17 @@ void Golem_UpdateRecoil(struct ChaseActor *actor)
                 context->charge.speed -= 0x80;
                 break;
         }
-        speed = &context->charge.speed;
-        if (*speed < 0) {
+        if (context->charge.speed < 0) {
             context->charge.phase = 1;
-            *speed = 0;
+            context->charge.speed = 0;
             return;
         }
         actor->base.body.motion.x +=
-            (*speed * gUnk_086149C4[(context->charge.routeDirection + 0x40) & 0xFF]) >> 16;
-        actor->base.body.motion.z += (*speed * gUnk_086149C4[context->charge.routeDirection]) >> 16;
+            (context->charge.speed *
+             gUnk_086149C4[(context->charge.routeDirection + 0x40) & 0xFF]) >>
+            16;
+        actor->base.body.motion.z +=
+            (context->charge.speed * gUnk_086149C4[context->charge.routeDirection]) >> 16;
     } else if (context->charge.phase == 1) {
         struct ContactPosition delta;
         Chase_Delta(&delta, &motion->position, &context->charge.stopPosition);
