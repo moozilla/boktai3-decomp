@@ -112,7 +112,6 @@ static inline u8 HasPendingHitSave(struct ChaseActor *actor, u16 **out)
     return 1;
 }
 
-
 static inline void PlacementDamage_ReportHud(struct ChaseActor *actor, u32 id, s32 health,
                                              u32 maximum, u32 kind, u32 mode, u32 parameter,
                                              u32 *damageFlags, s32 priority,
@@ -276,9 +275,7 @@ u8 SceneActorReaction_ResolvePlacementDamage(struct ChaseActor *actor)
         u32 bit = 0x80;
         u32 keep = bit & *flags2CC;
         struct SceneActorRegistryControl *control = &group->common.control;
-        {
-            *flags2CC &= 0xFFFEBE3F;
-        }
+        *flags2CC &= 0xFFFEBE3F;
         ResetMotion(control);
         *flags2CC |= keep;
     }
