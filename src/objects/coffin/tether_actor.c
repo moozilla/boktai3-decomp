@@ -24,19 +24,6 @@ static inline s32 scaleEmission(s32 value)
     return -((-value) >> 12);
 }
 
-static inline u32 cellByte(s32 cell)
-{
-    u8 *properties = TerrainModifiers_FindCellOverride(cell, 1);
-    if (properties)
-        properties += 4;
-    else {
-        struct EngineMap *map = gTerrainMap;
-        u32 offset = cell * 4 + 12;
-        properties = map->cells + offset;
-    }
-    return *properties;
-}
-
 static inline s32 cellIndex_08049840(s32 x, s32 z)
 {
     s32 index;
@@ -994,30 +981,10 @@ void TetherActor_BeginAuxiliaryState(struct TetherActor *actor)
 
 // fix.py best (sweep after the inlined-insn fix)
 
-static inline void slopePush(struct TetherActor *actor, s32 octant)
+static inline void TetherActor_PushDownSlope(struct TetherActor *actor, s32 angle)
 {
-    s32 angle = (octant + 1) << 5;
     s32 cosine = gUnk_086149C4[(angle + 64) & 255];
     s32 sine = gUnk_086149C4[angle & 255];
-    actor->movementDelta.x -= scaleOffset(gPlayerBackgroundState * cosine);
-    actor->movementDelta.z -= scaleOffset(gPlayerBackgroundState * sine);
-}
-
-static inline u32 NeighborHeight(s32 cell)
-{
-    u32 value = cellByte(cell);
-    u32 mask = 15;
-    mask &= value;
-    return mask;
-}
-inline static void slopePush_AdjustSlopeMovement(struct TetherActor *actor, s32 octant)
-{
-    s32 angle = octant;
-    const s16 *table = gUnk_086149C4;
-    s32 cosine;
-    s32 sine;
-    cosine = table[(angle + 64) & 255];
-    sine = table[angle & 255];
     actor->movementDelta.x -= scaleOffset(gPlayerBackgroundState * cosine);
     actor->movementDelta.z -= scaleOffset(gPlayerBackgroundState * sine);
 }
@@ -1026,8 +993,7 @@ void TetherActor_AdjustSlopeMovement(struct TetherActor *actor)
 {
     s32 neighbor;
     s32 octant;
-    if (((actor->kind != 9) || (actor->state == 11)) ||
-        (gPlayerBackgroundState < gPlayerDirectionLatch))
+    if (actor->kind != 9 || actor->state == 11 || gPlayerBackgroundState < gPlayerDirectionLatch)
         return;
     if (!actor->movementProbe) {
         void *probe = &actor->movementProbeStorage;
@@ -1038,75 +1004,60 @@ void TetherActor_AdjustSlopeMovement(struct TetherActor *actor)
     neighbor = 0;
     if (octant & 1) {
         if (octant == 1)
-            neighbor = ((s16 *)gTerrainMap->cells)[2];
+            neighbor = SceneActorTerrain_Width();
         else if (octant == 3)
             neighbor = -1;
         else if (octant == 5)
-            neighbor = -((s16 *)gTerrainMap->cells)[2];
+            neighbor = -SceneActorTerrain_Width();
         else if (octant == 7)
             neighbor = 1;
-        {
-            u32 h;
-            u32 value = cellByte(actor->movementProbeStorage.cell);
-            h = 15;
-            h &= value;
-            if (h < NeighborHeight(actor->movementProbeStorage.cell + neighbor))
-                return;
-        }
+        if ((*SceneActorTerrain_GetCell(actor->movementProbeStorage.cell) & 15) <
+            (*SceneActorTerrain_GetCell(actor->movementProbeStorage.cell + neighbor) & 15))
+            return;
         octant = (octant + 1) << 5;
-        slopePush_AdjustSlopeMovement(actor, octant);
+        TetherActor_PushDownSlope(actor, octant);
     } else {
         s32 x;
         s32 z;
         if (octant == 0)
-            neighbor = ((s16 *)gTerrainMap->cells)[2] + 1;
+            neighbor = SceneActorTerrain_Width() + 1;
         else if (octant == 2)
-            neighbor = ((s16 *)gTerrainMap->cells)[2] - 1;
+            neighbor = SceneActorTerrain_Width() - 1;
         else if (octant == 4)
-            neighbor = ~((s16 *)gTerrainMap->cells)[2];
+            neighbor = ~SceneActorTerrain_Width();
         else if (octant == 6)
-            neighbor = (-((s16 *)gTerrainMap->cells)[2]) + 1;
-        {
-            u32 h;
-            u32 value = cellByte(actor->movementProbeStorage.cell);
-            h = 15;
-            h &= value;
-            if (h < NeighborHeight(actor->movementProbeStorage.cell + neighbor))
-                return;
-        }
+            neighbor = -SceneActorTerrain_Width() + 1;
+        if ((*SceneActorTerrain_GetCell(actor->movementProbeStorage.cell) & 15) <
+            (*SceneActorTerrain_GetCell(actor->movementProbeStorage.cell + neighbor) & 15))
+            return;
         x = (u8)actor->position.x;
         z = (u8)actor->position.z;
         if (octant == 0) {
             if (x > z)
                 neighbor = 1;
             else
-                neighbor = ((s16 *)gTerrainMap->cells)[2];
+                neighbor = SceneActorTerrain_Width();
         } else if (octant == 2) {
-            if ((x + z) > 256)
-                neighbor = ((s16 *)gTerrainMap->cells)[2];
+            if (x + z > 256)
+                neighbor = SceneActorTerrain_Width();
             else
                 neighbor = -1;
         } else if (octant == 4) {
             if (x > z)
-                neighbor = -((s16 *)gTerrainMap->cells)[2];
+                neighbor = -SceneActorTerrain_Width();
             else
                 neighbor = -1;
         } else if (octant == 6) {
-            if ((x + z) > 256)
+            if (x + z > 256)
                 neighbor = 1;
             else
-                neighbor = -((s16 *)gTerrainMap->cells)[2];
+                neighbor = -SceneActorTerrain_Width();
         }
-        {
-            u32 h;
-            u32 value = cellByte(actor->movementProbeStorage.cell);
-            h = 15;
-            h &= value;
-            if (h < NeighborHeight(actor->movementProbeStorage.cell + neighbor))
-                return;
-        }
+        if ((*SceneActorTerrain_GetCell(actor->movementProbeStorage.cell) & 15) <
+            (*SceneActorTerrain_GetCell(actor->movementProbeStorage.cell + neighbor) & 15))
+            return;
         octant = (octant + 1) << 5;
-        slopePush_AdjustSlopeMovement(actor, octant);
+        TetherActor_PushDownSlope(actor, octant);
     }
 }
 
