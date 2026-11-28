@@ -704,3 +704,4 @@ src/minigames/result_game/ResultGame_HandlePress.c	ResultGame_HandlePress	contri
 src/minigames/result_game/ResultGame_TrackTarget.c	ResultGame_TrackTarget	natural	natural	0	
 src/minigames/result_game/ResultGame_ScorePress.c	ResultGame_ScorePress	natural	natural	0	
 src/minigames/result_game/ResultGame_TimedPress.c	ResultGame_TimedPress	natural	natural	0	
+src/minigames/result_game/ResultGame_Finish.c	ResultGame_Finish	contrived	natural	1	
