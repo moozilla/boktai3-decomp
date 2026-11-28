@@ -112,7 +112,7 @@ void Player_UpdateInteractionMovement(struct Player *p)
                     (p->movementContactFlags & 1))
                     enabled = nonzero(p->facing & 1);
                 if (enabled) {
-                    if (++*(u16 *)p->unk4A6 == 5) {
+                    if (++p->unk4A6 == 5) {
                         s32 angle;
                         u32 flags;
                         pos.point = p->position;
@@ -129,7 +129,7 @@ void Player_UpdateInteractionMovement(struct Player *p)
                         ActorSequence_Begin(p, 4, 0);
                     }
                 } else
-                    *(u16 *)p->unk4A6 = enabled;
+                    p->unk4A6 = enabled;
             }
             break;
         case 4:

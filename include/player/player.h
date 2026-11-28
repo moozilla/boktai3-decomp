@@ -308,7 +308,7 @@ struct Player {
     u16 burstParameter;          /* 0x4A2: passed to ActionFlashBurst_Create. */
     u8 actionFourEnabled;        /* 0x4A4: permits action 4 in modes 0, 1 and 6 (tentative) */
     u8 coordinateAxis;           /* 0x4A5: 1/5 select X, other values select Z (tentative) */
-    u8 unk4A6[2];
+    u16 unk4A6;                  /* 0x4A6: frames spent pushing toward a ledge (tentative) */
     struct SceneVec cameraTarget;                     /* 0x4A8: blended focus position */
     s16 cameraOffsetX, cameraOffsetY, cameraOffsetZ;  /* 0x4B0 */
     s16 cameraOffsetActive;                           /* 0x4B6 */
