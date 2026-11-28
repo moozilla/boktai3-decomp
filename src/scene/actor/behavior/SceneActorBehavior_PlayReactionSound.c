@@ -1,8 +1,8 @@
 #include "scene/actor/scene_actor_behavior.h"
+#include "engine/word_flags.h"
 void SceneActorBehavior_PlayReactionSound(struct RoomActor *actor)
 {
-    u32 m = 6;
-    if (actor->motionFlags & m) {
+    if (HalfwordFlags_Test(6, &actor->motionFlags)) {
         Sound_PlaySong(0x13e);
         return;
     }

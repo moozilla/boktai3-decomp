@@ -216,3 +216,4 @@ src/scene/actor/attachment/SceneActorReaction_ApplyHitResponse.c	SceneActorReact
 src/scene/actor/attachment/SceneActorRecovery_ResumePursuit.c	SceneActorRecovery_ResumePursuit	minor	minor	0	actor alias (2 shape diffs elsewhere without it), control address block and ClearGate helper (plain &= ~4 differs)
 src/scene/actor/behavior/SceneActorBehavior_IsNearParticipant.c	SceneActorBehavior_IsNearParticipant	contrived	natural	3	-
 src/scene/actor/behavior/SceneActorBehavior_CallTerrainScript.c	SceneActorBehavior_CallTerrainScript	contrived	minor	6	status flag read through Flags_MaskedWord (plain & loads the field first); terrain flags local (plain & swaps registers)
+src/scene/actor/behavior/SceneActorBehavior_PlayReactionSound.c	SceneActorBehavior_PlayReactionSound	minor	natural	3	-
