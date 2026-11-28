@@ -229,3 +229,6 @@ src/player/core/player_core.c	Player_CallCompletionScript	natural	natural	0
 src/player/core/player_core.c	Player_GetSelectedSlotActionScale	contrived	natural	1	
 src/player/core/player_core.c	Player_CallEventScript	minor	minor	8	count-mask and argument pointer locals: folded forms differ by one instruction
 src/player/core/player_core.c	ActorResponse_Apply	minor	minor	3	half-flag helper and status bit accessor: plain tests change the branch layout
+src/player/core/player_core.c	ActorFlags_SelectResponse	natural	natural	0	
+src/player/core/player_core.c	Player_RecalculateDerivedStats	contrived	contrived	9	unchanged: second loop's state cursor advances two bytes per stat; indexed forms are strength-reduced differently
+src/player/core/player_core.c	Player_GetMaxLife	contrived	minor	8	equipment block view over actionFlagState with signed bonus read

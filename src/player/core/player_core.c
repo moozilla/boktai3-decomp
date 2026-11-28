@@ -379,15 +379,11 @@ void Player_RecalculateDerivedStats(struct Player *player)
 s32 Player_GetMaxLife(struct Player *player)
 {
     s32 lifeStat;
-    /* Keep the stat-state base used by the original signed bonus loads. */
     if (gEngineFlags & 0x1000)
         return gGameState->lifeMax;
     {
-        u8 *statState = player->actionFlagState;
-        lifeStat =
-            *(s16 *)(statState + ((u32) & ((struct Player *)0)->menuSnapshotValues[0] - (u32) &
-                                  ((struct Player *)0)->actionFlagState)) +
-            player->derivedStats[0];
+        struct EquipmentFlagState *equipment = (struct EquipmentFlagState *)player->actionFlagState;
+        lifeStat = (s16)equipment->bonus[0] + player->derivedStats[0];
     }
     if (lifeStat > 0x78)
         lifeStat = 0x78;
@@ -396,14 +392,11 @@ s32 Player_GetMaxLife(struct Player *player)
 
 s32 Player_GetMaxEnergy(struct Player *player)
 {
-    u8 *statState = player->actionFlagState;
+    struct EquipmentFlagState *equipment = (struct EquipmentFlagState *)player->actionFlagState;
     s32 energyStat;
-    /* Keep the stat-state base used by the original signed bonus loads. */
     if (gEngineFlags & 0x1000)
         return 0xc;
-    energyStat = *(s16 *)(statState + ((u32) & ((struct Player *)0)->menuSnapshotValues[1] - (u32) &
-                                       ((struct Player *)0)->actionFlagState)) +
-                 player->derivedStats[1];
+    energyStat = (s16)equipment->bonus[1] + player->derivedStats[1];
     if (energyStat > 0x78)
         energyStat = 0x78;
     return energyStat * 5 + 100;
