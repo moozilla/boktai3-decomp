@@ -222,15 +222,12 @@ struct ScrollingDialogue *ScrollingDialogue_Create(void)
 int ScrollingDialogue_SetScript(const u8 *script)
 {
     struct ScrollingDialogue *dialogue = (void *)gScrollingDialogue;
-    int result;
-    if (dialogue) {
-        dialogue->script = script;
-        ScrollingDialogue_ResetPlayback(dialogue, 1);
-        result = 0;
-    } else {
-        result = -1;
-    }
-    return result;
+
+    if (!dialogue)
+        return -1;
+    dialogue->script = script;
+    ScrollingDialogue_ResetPlayback(dialogue, 1);
+    return 0;
 }
 
 u32 ScrollingDialogue_ClearScript(void)
