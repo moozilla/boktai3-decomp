@@ -10,11 +10,9 @@ static inline void ShakeDrawable(struct RoomActor *actor, s32 span)
     s32 value;
     u32 coordinate;
     if (!actor->drawableKind)
-        position =
-            &((struct SceneActorRegistrySequenceDrawable *)actor->drawable)->position;
+        position = &((struct SceneActorRegistrySequenceDrawable *)actor->drawable)->position;
     else
-        position =
-            &((struct SceneActorRegistryTileDrawable *)actor->drawable)->position;
+        position = &((struct SceneActorRegistryTileDrawable *)actor->drawable)->position;
     table = gRandomTable;
     index = &gRandomIndex;
     {
@@ -38,12 +36,9 @@ static inline void ShakeDrawable(struct RoomActor *actor, s32 span)
 u32 SceneActorPlacement_ConsumeShakeFlags(struct ChaseActor *argument)
 {
     struct RoomActor *actor = (void *)argument;
-    u32 unavailable = SceneActor_ActionsBlocked((void *)actor);
-    if (!unavailable && actor->reactionFlags) {
-        u8 small;
+    if (!SceneActor_ActionsBlocked((void *)actor) && actor->reactionFlags) {
         u16 *flags;
-        small = SceneActor_TestPendingFlag((void *)actor, 0x10, &flags);
-        if (small) {
+        if (SceneActor_TestPendingFlag((void *)actor, 0x10, &flags)) {
             ShakeDrawable(actor, 10);
             SceneActorPlacement_ClearFlags(flags, ~0x10);
         } else if (SceneActorPlacement_TestFlags(flags, 0x20)) {

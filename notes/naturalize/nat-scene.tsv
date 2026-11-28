@@ -410,3 +410,4 @@ src/scene/actor/placement/SceneActorTerrain_ResumeDrawable.c	SceneActorTerrain_R
 src/scene/actor/placement/SceneActorPlacement_ResetActorState.c	SceneActorPlacement_ResetActorState	contrived	contrived	0	parked masks and motion-flag pointer: plain operators load the field before the mask
 src/scene/actor/placement/SceneActorPlacement_ResetToPathPoint.c	SceneActorPlacement_ResetToPathPoint	contrived	minor	4	flag mask helper and flags pointer: plain &= ~4 loads the field before the mask
 src/scene/actor/placement/SceneActorPlacement_ConsumeCallbackFlag.c	SceneActorPlacement_ConsumeCallbackFlag	minor	natural	2	-
+src/scene/actor/placement/SceneActorPlacement_ConsumeShakeFlags.c	SceneActorPlacement_ConsumeShakeFlags	contrived	contrived	8	random index block and coordinate local: plain index updates and += reload the coordinate
