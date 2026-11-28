@@ -1,5 +1,7 @@
 #include "objects/hit_switch.h"
 #include "player/player.h"
+#include "scene/collision/packed_contact_vector.h"
+#include "scene/motion/scene_actor_terrain.h"
 
 void HitSwitch_SetUpdate(struct HitSwitchEntry *entry, void (*update)(struct HitSwitchEntry *))
 {
@@ -40,12 +42,11 @@ void HitSwitch_RegisterCompletedCell(struct HitSwitchEntry *entry)
 void HitSwitch_ReceiveCollision(struct ContactCollider *other, void *unused,
                                 struct HitSwitchEntry *entry)
 {
-    u8 *cooldown = &entry->hitCooldown;
-    if (*cooldown == 0) {
+    if (entry->hitCooldown == 0) {
         u32 mask = 0x20;
         if (other->reactionFlags & mask) {
             entry->hitCount++;
-            *cooldown = mask;
+            entry->hitCooldown = mask;
             gHitSwitchManager->hitPending = 1;
         }
     }

@@ -343,3 +343,4 @@ src/objects/hazards/timed_hazard/ScriptSpriteManager_Init.c	ScriptSpriteManager_
 src/objects/hazards/timed_hazard/ColliderSpritePool_Create.c	ColliderSpritePool_Create	minor	natural	1	
 src/objects/hazards/timed_hazard/TimedHazard_ResetManager.c	TimedHazard_ResetManager	natural	natural	0	
 src/objects/hazards/timed_hazard/TimedHazard_OnAttackContact.c	TimedHazard_OnAttackContact	natural	natural	0	
+src/objects/hit_switch.c	HitSwitch_ReceiveCollision	contrived	minor	3	mask local keeps the constant loaded before the reaction flags and reused as the cooldown
