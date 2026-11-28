@@ -6,7 +6,7 @@ u32 Script_ParseStringRef(u8 *);
 u8 *Text_LookupString(u32);
 void Text_SetSilentCharacterFromScript(void)
 {
-    if (Script_SeekToKeyword(0x73)) {
+    if (Script_SeekToKeyword('s')) {
         u8 *pc = Script_GetPc();
         if (pc) {
             u8 *t;
