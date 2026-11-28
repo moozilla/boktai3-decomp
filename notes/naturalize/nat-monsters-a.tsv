@@ -234,3 +234,4 @@ src/monsters/centipede/Centipede_ResolveBlockedMovement.c	Centipede_ResolveBlock
 src/monsters/golem/golem_main.c	Golem_AlignChargeTarget	contrived	contrived	10	remaining: bytep,block,structcast
 src/monsters/golem/golem_main.c	Golem_RestoreRoute	contrived	minor	3	remaining: maskhelper
 src/monsters/golem/golem_main.c	SceneActorRoute_CommitReachableDestination	minor	natural	4	
+src/monsters/golem/golem_main.c	SceneActorRoute_SetReachableDestination	minor	minor	7	remaining: maskhelper

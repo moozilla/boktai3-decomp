@@ -198,8 +198,7 @@ void SceneActorRoute_SetReachableDestination(struct ChaseActor *actor,
 {
     struct SceneActorRouteContext *context = actor->base.context;
     struct SceneActorChaseGroup *group = &actor->group;
-    s32 cell = SceneActorTerrain_GetCellIndex(destination);
-    u32 flags = SceneActor_CellAttributes(cell);
+    u32 flags = SceneActor_CellAttributes((SceneActorTerrain_GetCellIndex(destination)));
     if (!(flags & 0x43)) {
         if (Nav_IsPositionInMesh(group->route, &actor->base.body.position, destination)) {
             context->destination = *destination;
