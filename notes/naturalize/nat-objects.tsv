@@ -489,3 +489,13 @@ src/objects/loot_deposits/LootDeposit_UpdateMemberFall.c	LootDeposit_UpdateMembe
 src/objects/loot_deposits/callback_pool_feedback.c	LootDepositCallbackPool_UpdateShake	minor	natural	4	
 src/objects/loot_deposits/callback_pool_feedback.c	LootDepositCallbackPool_SpawnHitParticles	contrived	minor	6	vector cleared through a stack array: a fill macro changes 15 insns
 src/objects/loot_deposits/callback_pool_feedback.c	LootDepositCallbackPool_RefreshHealthDisplay	contrived	natural	1	
+src/objects/loot_deposits/callback_pool_feedback.c	LootDepositCallbackPool_ApplyDamage	contrived	contrived	4	damage vector cleared through a stack array: fill macro and named locals change 2-22 insns
+src/objects/loot_deposits/callback_pool_feedback.c	LootDeposit_EmitRemovalDebris	contrived	contrived	24	first particle's nested angle and pointer aliases pick the registers (7 insns); shared random helpers differ
+src/objects/loot_deposits/callback_pool_feedback.c	LootDepositFeedback_SetState	contrived	contrived	31	table union and per-axis blocks: 27 shared-helper combinations all differ by 20+ insns
+src/objects/loot_deposits/callback_pool_feedback.c	LootDepositCallbackPool_InitializeCollider	natural	natural	0	
+src/objects/loot_deposits/callback_pool_feedback.c	LootDepositFeedback_CheckPlayerRange	natural	natural	0	
+src/objects/loot_deposits/callback_pool_feedback.c	LootDepositFeedback_IsPlayerInsideOriginRange	natural	natural	0	
+src/objects/loot_deposits/LootDepositPool_OnStateNoOp.c	LootDepositPool_OnStateNoOp	natural	natural	0	
+src/objects/loot_deposits/LootDepositPool_ResetManager.c	LootDepositPool_ResetManager	natural	natural	0	
+src/objects/loot_deposits/LootDepositCallbackPool_UpdateEntries.c	LootDepositCallbackPool_UpdateEntries	minor	minor	1	entries base and index pointer kept; only shared slot test
+src/objects/loot_deposits/LootDepositCallbackPool_DestroyEntries.c	LootDepositCallbackPool_DestroyEntries	minor	minor	1	shared slot test moved to the header
