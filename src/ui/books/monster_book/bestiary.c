@@ -277,24 +277,14 @@ void Bestiary_UnlockRewardFromScript(void)
 
 void Bestiary_UnlockEntry(u32 flag)
 {
-    u8 *word;
-    u32 mask;
     if (flag > 0x52)
         return;
-    if ((s32)flag <= 31) {
-        word = (u8 *)gGameState;
-        word += (u32) & ((struct GameState *)0)->bestiaryUnlocked[0];
-        mask = 1 << flag;
-    } else if ((s32)flag <= 63) {
-        word = (u8 *)gGameState;
-        word += (u32) & ((struct GameState *)0)->bestiaryUnlocked[1];
-        mask = 1 << (flag - 32);
-    } else {
-        word = (u8 *)gGameState;
-        word += (u32) & ((struct GameState *)0)->bestiaryUnlocked[2];
-        mask = 1 << (flag - 64);
-    }
-    *(u32 *)word |= mask;
+    if ((s32)flag <= 31)
+        gGameState->bestiaryUnlocked[0] |= 1 << flag;
+    else if ((s32)flag <= 63)
+        gGameState->bestiaryUnlocked[1] |= 1 << (flag - 32);
+    else
+        gGameState->bestiaryUnlocked[2] |= 1 << (flag - 64);
 }
 
 void Bestiary_UnlockEntryFromScript(void)
