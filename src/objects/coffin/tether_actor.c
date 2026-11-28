@@ -5,9 +5,6 @@
 #include "engine/math/monster_particle_random.h"
 #include "monsters/armor/armor_decision_ops.h"
 
-
-
-
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 
 extern u32 gUnk_02000560;
@@ -79,7 +76,6 @@ static inline s32 absolute_08049840(s32 value)
         value = -value;
     return value;
 }
-
 
 static inline s32 cellIndex_0804AF80(s32 x, s32 z)
 {
@@ -179,7 +175,6 @@ static inline s32 absolute_0804BB30(s32 value)
         value = -value;
     return value;
 }
-
 
 static inline s32 scale(s32 value)
 {
@@ -605,12 +600,10 @@ void TetherActor_UpdateSegments(struct TetherActor *actor)
 void TetherActor_RemoveSegments(struct TetherActor *actor)
 {
     struct SpriteDrawable *segment = actor->segments;
-    s32 remaining = 6;
-    do {
+    s32 i;
+
+    for (i = 0; i < 7; i++, segment++)
         Effect_Remove(segment);
-        --remaining;
-        ++segment;
-    } while (remaining >= 0);
 }
 
 void TetherActor_CreateAuxiliarySprite(struct TetherActor *actor)

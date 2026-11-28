@@ -45,3 +45,4 @@ src/objects/bouncing_bombs/BouncingBomb_InitializePool.c	BouncingBomb_Initialize
 src/objects/bouncing_bombs/BouncingBomb_EnsurePool.c	BouncingBomb_EnsurePool	natural	natural	0	
 src/objects/bouncing_bombs/BouncingBomb_ResetPool.c	BouncingBomb_ResetPool	natural	natural	0	
 src/objects/bouncing_bombs/BouncingBomb_TickActive.c	BouncingBomb_TickActive	contrived	minor	18	sprite/pos/velocity/cellPtr pointer locals kept: direct fields reallocate the whole physics step
+src/objects/coffin/tether_actor.c	TetherActor_RemoveSegments	minor	natural	1	
