@@ -468,13 +468,11 @@ void MonsterBook_RefreshPage(struct MonsterBook *book)
     }
 }
 
-void MonsterBook_SetPage(struct MonsterBook *book, u8 v)
+void MonsterBook_SetPage(struct MonsterBook *book, u8 mode)
 {
-    u8 *q = &book->mode;
-    u32 z = 0;
-    *q = v;
-    book->pendingExit = z;
-    MonsterBook_SetupPageBackgrounds(book, *q + 0xd);
+    book->mode = mode;
+    book->pendingExit = 0;
+    MonsterBook_SetupPageBackgrounds(book, book->mode + 0xd);
     MonsterBook_RefreshPage(book);
 }
 

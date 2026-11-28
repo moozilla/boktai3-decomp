@@ -62,3 +62,4 @@ src/ui/books/monster_book/bestiary.c	Script_ConsumeOptionalKeywordValue	natural	
 src/ui/books/monster_book/monster_book.c	MonsterBook_ClearWindows	contrived	natural	1	
 src/ui/books/monster_book/monster_book.c	MonsterBook_UpdateDescription	contrived	natural	1	
 src/ui/books/monster_book/monster_book.c	MonsterBook_UpdateHighlightPulse	contrived	natural	8	
+src/ui/books/monster_book/monster_book.c	MonsterBook_SetPage	contrived	natural	1	
