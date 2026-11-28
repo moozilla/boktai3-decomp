@@ -2,18 +2,12 @@
 /* ScalarApproach_StepHalfArray: Updates signed halfword values toward corresponding targets using half steps */
 void ScalarApproach_StepHalfArray(s16 *values, const s16 *targets, s32 count)
 {
-    s32 remaining = count;
-    s16 *cursor = values;
-    const s16 *targetCursor;
-    targetCursor = targets;
-    while ((remaining = (s32)((u32)remaining - 1)) >= 0) {
-        s32 target = *targetCursor;
-        s32 current;
-        s32 result;
-        current = *cursor;
-        result = ScalarApproach_Half(current, target);
-        *cursor = result;
-        ++cursor;
-        ++targetCursor;
+    s16 *value = values;
+    const s16 *target = targets;
+
+    while (--count >= 0) {
+        *value = ScalarApproach_Half(*value, *target);
+        value++;
+        target++;
     }
 }
