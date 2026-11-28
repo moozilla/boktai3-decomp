@@ -1,4 +1,5 @@
 #include "global.h"
+#include "bosses/vanargand/vanargand_pair_attack.h"
 #include "engine/engine_globals.h"
 #include "engine/ram.h"
 #include "scene/actor/scene_actor_components.h"
@@ -7,65 +8,18 @@
 
 // confidence=low: runs a seven-phase attack sequence for the paired actors: cues, animates the pair, and spawns projectiles.
 
-struct VanargandHalf {
-    u8 unk_00[0xB4];
-    struct ContactPosition position;
-    u8 unknownBC[0x20C - 0xBC];
-    s16 counter;
-    u8 unk_20E[0x21C - 0x20E];
-};
-struct VanargandPair {
-    struct VanargandHalf half[2];
-};
-static inline struct ContactPosition *HalfPosition(struct VanargandPair *pair, u32 index)
+static inline struct ContactPosition *HalfPosition(struct VanargandAttackPair *pair, u32 index)
 {
-    u32 offset = index * sizeof(struct VanargandHalf);
+    u32 offset = index * sizeof(struct PairedSceneHalf);
     u32 halfwords = offset / sizeof(s16);
-    struct VanargandHalf *half = (struct VanargandHalf *)((halfwords << 1) + (u32)pair);
-    return &half->position;
+    struct VanargandAttackPair *base = (struct VanargandAttackPair *)((halfwords << 1) + (u32)pair);
+    return &base->halves[0].sprite.position;
 }
-struct Vanargand {
-    u8 pad0[0x48];
-    struct SceneActorBody body;
-    u8 pad90[0x9C - 0x90];
-    u32 flags;
-    u8 padA0[2];
-    u8 phase;
-    u8 padA3;
-    u32 timer;
-    u8 padA8[7];
-    u8 finished;
-    u8 entered;
-    u8 pending;
-    u8 unkB2;
-    u8 padB3[0xCC - 0xB3];
-    u8 unkCC;
-    u8 padCD[0x104 - 0xCD];
-    void *callback;
-    u8 pad108[0x110 - 0x108];
-    void *target;
-    u8 pad114[0x500 - 0x114];
-    u16 partActive;
-    u8 pad502[0x534 - 0x502];
-    struct MotionTrack track;
-    struct VanargandPair *pair;
-    u8 pad570[0x57C - 0x570];
-    void *sprite;
-    u8 pad580[0x5B0 - 0x580];
-    u16 unk5B0;
-    u8 pad5B2[0x5B4 - 0x5B2];
-    s16 repeats;
-    u8 pad5B6[0x5C7 - 0x5B6];
-    u8 level;
-};
 void Vanargand_SetPendingCue(void *, u16);
 s32 Callback_InvokeActor(void *, void *);
-void PairedSceneActor_ApplyToSelectedHalves(void *, s32, s32);
-s32 PairedSceneActor_AreSelectedHalvesFinished(void *);
-s32 ScenePair_CountPositiveCounters(void *);
 void MotionTrack_Update(void *);
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, s32, s32, s32);
-void Anim_SetSequence(void *, void *, u32, u32, u32);
+void Anim_SetSequence(void *, const void *, u32, u32, u32);
 void Sprite_ApplyAnimation(void *, void *);
 void Sound_PlaySong(u32);
 s32 VanargandProjectile_CreateWithSource(void *, void *, void *, void *, u32, u32, u32);
@@ -75,10 +29,6 @@ struct HalfOrder {
     u32 index[2];
 };
 extern const struct HalfOrder gUnk_0824F788;
-static inline void InitializeHalfOrder(struct HalfOrder *order)
-{
-    *order = gUnk_0824F788;
-}
 
 static inline s32 SpanHalf(s32 sum)
 {
@@ -87,16 +37,12 @@ static inline s32 SpanHalf(s32 sum)
         return value >> 1;
     return -(-value >> 1);
 }
-static inline u8 MotionComplete(struct Vanargand *p)
+static inline u8 MotionComplete(struct VanargandPairAttack *p)
 {
     u8 result = 0;
     if (p->track.active == 2)
         result = 1;
     return result;
-}
-static inline void SetFlags(struct Vanargand *p, u32 mask)
-{
-    p->flags |= mask;
 }
 static inline void SetPosition(s16 *origin, s32 x, s32 y, s32 z)
 {
@@ -105,12 +51,6 @@ static inline void SetPosition(s16 *origin, s32 x, s32 y, s32 z)
     origin[1] = y;
     origin[2] = z;
 }
-struct PartAnimation {
-    u8 unknown0[0x48];
-    u8 animation[0x10];
-    void *resource;
-    u32 cursor;
-};
 static inline s32 RandomOffsetValue(void)
 {
     s32 value;
@@ -125,18 +65,12 @@ static inline s32 RandomOffset(s32 base)
     s32 remainder = r % 8;
     return remainder + base;
 }
-static inline void SetPhase(struct Vanargand *p, u32 phase)
-{
-    u32 next = phase;
-    p->phase = next;
-    p->timer = 0;
-}
 static inline void SetPhasePointer(u8 *phase, u32 *timer, u32 value)
 {
     *phase = value;
     *timer = 0;
 }
-static inline void SpawnPartProjectile(struct Vanargand *owner, struct ContactPosition *position,
+static inline void SpawnPartProjectile(struct VanargandPairAttack *owner, struct SceneVec *position,
                                        void *target, struct ContactPosition *source, u16 base,
                                        s32 sideOffset)
 {
@@ -163,10 +97,10 @@ static inline void SpawnPartProjectile(struct Vanargand *owner, struct ContactPo
     sampleOffset = *cursor * 2;
     r = *(u16 *)(sampleOffset + (u32)table);
     index = sub_08249350(r >> 3, 6);
-    VanargandProjectile_CreateWithSource(owner->sprite, position, target, source, spread,
+    VanargandProjectile_CreateWithSource(owner->projectilePool, position, target, source, spread,
                                          sideOffset, index);
 }
-static inline void SpawnFreeProjectile(struct Vanargand *owner, struct ContactPosition *position,
+static inline void SpawnFreeProjectile(struct VanargandPairAttack *owner, struct SceneVec *position,
                                        void *target, u16 base, s32 sideOffset)
 {
     const u16 *table = (const u16 *)RANDOM_TABLE_ADDR;
@@ -192,17 +126,17 @@ static inline void SpawnFreeProjectile(struct Vanargand *owner, struct ContactPo
     sampleOffset = *cursor * 2;
     r = *(u16 *)(sampleOffset + (u32)table);
     index = sub_08249350(r >> 3, 6);
-    VanargandProjectile_Create(owner->sprite, position, target, spread, sideOffset, index);
+    VanargandProjectile_Create(owner->projectilePool, position, target, spread, sideOffset, index);
 }
-void Vanargand_UpdateSweepingProjectileAttack(struct Vanargand *p)
+void Vanargand_UpdateSweepingProjectileAttack(struct VanargandPairAttack *p)
 {
-    struct Vanargand *self = p;
-    u8 *object = (u8 *)p + 0x18C;
+    struct VanargandPairAttack *self = p;
+    u8 *object = (u8 *)&p->animation;
 
     s32 sideOffset;
     u8 result;
 
-    SetFlags(p, 0x40);
+    VanargandPairAttack_SetFlags(p, 0x40);
     Vanargand_SetPendingCue(p, 0);
     result = Callback_InvokeActor(p, p->callback);
     if (result)
@@ -218,7 +152,7 @@ void Vanargand_UpdateSweepingProjectileAttack(struct Vanargand *p)
         case 0:
             if (PairedSceneActor_AreSelectedHalvesFinished(self->pair)) {
                 PairedSceneActor_ApplyToSelectedHalves(self->pair, 3, 2);
-                SetPhase(p, 1);
+                VanargandPairAttack_EnterPhase(p, 1);
             }
             break;
         case 1:
@@ -226,35 +160,34 @@ void Vanargand_UpdateSweepingProjectileAttack(struct Vanargand *p)
                 SceneActors_StartUnmirroredAnimation(p, object, object + 0x60, 8, 2, 0);
                 p->timer++;
                 {
-                    struct PartAnimation *part = (struct PartAnimation *)((u8 *)self + 0x3FC);
-                    Anim_SetSequence((u8 *)self + 0x444, part->resource, 0, 0, 0);
-                    self->partActive = 1;
-                    part->cursor = 0;
+                    struct VanargandDamagePart *part = &self->part;
+                    Anim_SetSequence(&self->part.sequence, part->sequenceResource, 0, 0, 0);
+                    self->part.animation = 1;
+                    part->sequenceId = 0;
                 }
             }
-            if (p->unkB2) {
-                SetPhase(p, 2);
+            if (p->animationEvent) {
+                VanargandPairAttack_EnterPhase(p, 2);
             }
             break;
         case 2:
-            SetFlags(p, 0x80000);
+            VanargandPairAttack_SetFlags(p, 0x80000);
             if (p->timer <= 3)
-                self->unk5B0 = 8;
+                self->delay = 8;
             p->timer++;
             {
-                u8 band = self->level;
+                u8 band = self->pairLevel;
                 s32 mask = 0x10;
                 if (band > 1)
                     mask = 8;
                 if (p->timer & mask) {
-                    SetPhase(p, 3);
+                    VanargandPairAttack_EnterPhase(p, 3);
                 }
             }
             break;
         case 3:
-            SetFlags(p, 0x180000);
+            VanargandPairAttack_SetFlags(p, 0x180000);
             if (p->timer == 0) {
-                u32 timer = p->timer;
                 s16 backward[4];
                 s16 origin[4];
                 struct HalfOrder halves;
@@ -263,53 +196,47 @@ void Vanargand_UpdateSweepingProjectileAttack(struct Vanargand *p)
                 s16 *span;
                 u32 selected;
                 u32 *halfIndex;
-                struct VanargandPair *pair;
-                struct Vanargand *poolOwner;
+                struct VanargandAttackPair *pair;
+                struct VanargandPairAttack *poolOwner;
 
-                s32 vx = p->body.position.x;
-                s32 vy = p->body.position.y;
-                s32 vz = p->body.position.z;
-                SetPosition(backward, vx - 0x100, vy, vz - 0x100);
-                MotionTrack_Initialize(&self->track, &p->body.position,
+                SetPosition(backward, p->position.x - 0x100, p->position.y, p->position.z - 0x100);
+                MotionTrack_Initialize(&self->track, &p->position,
                                        (const struct MotionTrackVector *)backward, 0, 1);
                 SceneActors_StartUnmirroredAnimation(p, object, object + 0x60, 9, 2, 0);
                 span = (s16 *)(object + 0x128);
-                *(u32 *)origin = timer;
+                *(u32 *)origin = 0;
                 x = origin[0];
                 y = origin[1];
                 span[0] = SpanHalf(x + y);
                 span[1] = 0x40;
                 span[2] = SpanHalf(-x + y);
                 poolOwner = p;
-                InitializeHalfOrder(&halves);
-                if (p->level > 1)
+                halves = gUnk_0824F788;
+                if (p->pairLevel > 1)
                     sideOffset = RandomOffset(0x14);
                 else
                     sideOffset = RandomOffset(0xC);
                 if (ScenePair_CountPositiveCounters(poolOwner->pair) == 0)
                     sideOffset += 8;
 
-                {
-                    u32 slot = poolOwner->repeats & 1;
-                    halfIndex = &halves.index[slot];
-                }
+                halfIndex = &halves.index[poolOwner->repeats & 1];
                 pair = poolOwner->pair;
                 selected = *halfIndex;
-                if (pair->half[selected].counter > 0) {
-                    void *target = p->target;
+                if (pair->halves[selected].health > 0) {
+                    void *target = p->destination;
                     struct ContactPosition *source = HalfPosition(pair, selected);
-                    SpawnPartProjectile(poolOwner, &p->body.position, target, source, p->unkCC,
-                                        sideOffset);
+                    SpawnPartProjectile(poolOwner, &p->position, target, source,
+                                        p->targetBearings[0], sideOffset);
                 } else {
                     u32 alternate = halves.index[(poolOwner->repeats + 1) & 1];
-                    if (pair->half[alternate].counter > 0) {
-                        void *target = p->target;
+                    if (pair->halves[alternate].health > 0) {
+                        void *target = p->destination;
                         struct ContactPosition *source = HalfPosition(pair, alternate);
-                        SpawnPartProjectile(poolOwner, &p->body.position, target, source, p->unkCC,
-                                            sideOffset);
+                        SpawnPartProjectile(poolOwner, &p->position, target, source,
+                                            p->targetBearings[0], sideOffset);
                     } else {
-                        void *target = p->target;
-                        SpawnFreeProjectile(poolOwner, &p->body.position, target, p->unkCC,
+                        void *target = p->destination;
+                        SpawnFreeProjectile(poolOwner, &p->position, target, p->targetBearings[0],
                                             sideOffset);
                     }
                 }
@@ -317,7 +244,7 @@ void Vanargand_UpdateSweepingProjectileAttack(struct Vanargand *p)
                 p->timer++;
             }
             {
-                s32 level = p->unkCC;
+                s32 level = p->targetBearings[0];
                 u8 *sprite = object + 0xA8;
                 s32 anim;
 
@@ -344,27 +271,25 @@ void Vanargand_UpdateSweepingProjectileAttack(struct Vanargand *p)
             }
             break;
         case 4:
-            SetFlags(p, 0x180000);
+            VanargandPairAttack_SetFlags(p, 0x180000);
             if (p->timer == 0) {
                 struct ContactPosition forward;
-                s32 vx = p->body.position.x;
-                s32 vy = p->body.position.y;
-                s32 vz = p->body.position.z;
-                SetPosition((s16 *)&forward, vx + 0x100, vy, vz + 0x100);
-                if (self->level > 1)
-                    MotionTrack_Initialize(&self->track, &p->body.position,
+                SetPosition((s16 *)&forward, p->position.x + 0x100, p->position.y,
+                            p->position.z + 0x100);
+                if (self->pairLevel > 1)
+                    MotionTrack_Initialize(&self->track, &p->position,
                                            (const struct MotionTrackVector *)&forward, 0, 2);
                 else
-                    MotionTrack_Initialize(&self->track, &p->body.position,
+                    MotionTrack_Initialize(&self->track, &p->position,
                                            (const struct MotionTrackVector *)&forward, 0, 4);
                 p->timer++;
             }
             MotionTrack_Update(&self->track);
             if (MotionComplete(self)) {
                 if (self->repeats > 3) {
-                    SetPhase(p, 5);
+                    VanargandPairAttack_EnterPhase(p, 5);
                 } else {
-                    SetPhase(p, 2);
+                    VanargandPairAttack_EnterPhase(p, 2);
                 }
             }
             break;
@@ -373,15 +298,15 @@ void Vanargand_UpdateSweepingProjectileAttack(struct Vanargand *p)
                 SceneActors_StartUnmirroredAnimation(p, object, object + 0x60, 8, 2, 2);
                 p->timer++;
                 {
-                    struct PartAnimation *part = (struct PartAnimation *)((u8 *)self + 0x3FC);
+                    struct VanargandDamagePart *part = &self->part;
                     u32 flags = 4;
-                    Anim_SetSequence((u8 *)self + 0x444, part->resource, 0, 0, flags);
-                    self->partActive = 1;
-                    part->cursor = 0;
+                    Anim_SetSequence(&self->part.sequence, part->sequenceResource, 0, 0, flags);
+                    self->part.animation = 1;
+                    part->sequenceId = 0;
                 }
             }
-            if (p->unkB2) {
-                SetPhase(p, 6);
+            if (p->animationEvent) {
+                VanargandPairAttack_EnterPhase(p, 6);
             }
             break;
         case 6:

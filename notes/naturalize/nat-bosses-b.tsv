@@ -400,3 +400,4 @@ src/bosses/vanargand/Vanargand_UpdateSynchronizedPairAttack.c	Vanargand_UpdateSy
 src/bosses/vanargand/Vanargand_UpdateChargedPairAttack.c	Vanargand_UpdateChargedPairAttack	contrived	natural	40	self alias kept (compiler keeps a second register copy of the boss)
 src/bosses/vanargand/Vanargand_UpdateTimedAnimationAttack.c	Vanargand_UpdateTimedAnimationAttack	contrived	partial	40	kept: flags pointer, mask/one/five locals, shared result/limit variable (global alloc order of flags pointer vs result)
 src/bosses/vanargand/sub_081AA330.c	sub_081AA330	contrived	partial	3	mask local kept; function still unnamed
+src/bosses/vanargand/Vanargand_UpdateSweepingProjectileAttack.c	Vanargand_UpdateSweepingProjectileAttack	contrived	partial	40	uses the shared boss/pair structs; kept: HalfPosition halfword-address arithmetic, duplicated projectile spawn helpers with negated spread (compiler: address form and operand order), object+0x60/0xA8/0x128 views, SetPosition pointer alias
