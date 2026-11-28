@@ -1,12 +1,7 @@
 #include "global.h"
 // confidence=low: copies the local link result and clamps its displayed score.
 #include "scene/areas/area_effect_link.h"
-
-struct LinkScorePanel {
-    u8 unknown0[0x102E];
-    u16 timer;
-    u16 score;
-};
+#include "ui/save/save_menu.h"
 
 static inline u8 validSelection(s32 i)
 {
@@ -20,19 +15,18 @@ yes:
     return 1;
 }
 
-static inline s32 ClampScore(struct LinkScorePanel *panel)
+static inline s32 ClampScore(struct SaveMenu *menu)
 {
-    s32 v = panel->score;
+    s32 v = menu->remaining;
     if (v > 9999)
         v = 9999;
     return v;
 }
-void LinkScorePanel_UpdateDisplayedScore(struct LinkScorePanel *panel)
+void LinkScorePanel_UpdateDisplayedScore(struct SaveMenu *menu)
 {
     struct AreaEffectLinkState *link = gLinkSession;
     struct AreaEffectLinkState *link2;
     s32 i, v;
-    u8 ok;
 
     if (link == NULL || link->unavailable != 1)
         goto zero;
@@ -42,19 +36,17 @@ void LinkScorePanel_UpdateDisplayedScore(struct LinkScorePanel *panel)
         goto hi;
     goto lo;
 zero:
-    panel->score = 0;
+    menu->remaining = 0;
     goto clamp;
 lo:
     v = 0;
 hi:
-    ok = validSelection(i);
-sel:
-    if (!ok)
+    if (!validSelection(i))
         v = 0;
     else
         v = link2->menuResults[i];
-    panel->score = v;
+    menu->remaining = v;
 clamp:
-    panel->score = ClampScore(panel);
-    panel->timer = 0x5a;
+    menu->remaining = ClampScore(menu);
+    menu->skip = 0x5a;
 }
