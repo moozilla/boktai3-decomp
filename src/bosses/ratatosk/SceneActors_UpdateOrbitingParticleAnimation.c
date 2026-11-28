@@ -1,19 +1,6 @@
 #include "scene/collision/contact_position.h"
-#define gSceneAngleSineTable gUnk_086149C4
 #include "global.h"
-typedef struct SceneParticleActor {
-    u8 pad0[0x90];
-    u32 tick;
-    u8 pad94[0x1b];
-    u8 finished;
-    u8 padB0;
-    u8 changed;
-    u8 padB2[0x2ba];
-    struct {
-        s16 x, y, z, pad;
-    } position;
-} SceneParticleActor;
-typedef struct ContactPosition ParticlePosition;
+#include "bosses/ratatosk/ratatosk.h"
 extern s16 gUnk_086149C4[];
 s32 Mod(s32, s32);
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, int, int, int);
@@ -24,45 +11,36 @@ static inline int trunc12(int n)
 {
     return n >= 0 ? n >> 12 : -(-n >> 12);
 }
-static inline void add(ParticlePosition *a, ParticlePosition *b)
+static inline void add(struct ContactPosition *a, struct ContactPosition *b)
 {
     b->x += a->x;
     b->y += a->y;
     b->z += a->z;
 }
-void SceneActors_UpdateOrbitingParticleAnimation(SceneParticleActor *p)
+static inline void polar(s32 angle, s32 radius, struct ContactPosition *v)
+{
+    s32 x = trunc12(gUnk_086149C4[(angle + 64) & 255] * radius);
+    v->x = x;
+    v->y = 0;
+    v->z = trunc12(gUnk_086149C4[angle & 255] * radius);
+}
+
+void SceneActors_UpdateOrbitingParticleAnimation(struct Ratatosk *p)
 {
     u8 particle[0x18];
-    ParticlePosition delta;
-    ParticlePosition pos;
-    u32 angle;
-    int speed;
-    u32 zero;
-    s16 *velocity;
-    if (p->changed) {
-        p->changed = 0;
-        SceneActors_StartUnmirroredAnimation(p, (u8 *)p + 0x34c, (u8 *)p + 0x32c, 31, 1, 4);
+    struct ContactPosition delta;
+    struct ContactPosition pos;
+    if (p->actionChanged) {
+        p->actionChanged = 0;
+        SceneActors_StartUnmirroredAnimation(p, p->animationData, p->animation, 31, 1, 4);
     }
-    pos = *(ParticlePosition *)&p->position;
-    angle = (u8)(Mod(p->tick, 31) << 3);
-    speed = 160;
-    velocity = (s16 *)&delta;
-    {
-        int x = trunc12(gUnk_086149C4[(angle + 64) & 255] * speed);
-        int zero = 0;
-        velocity[0] = x;
-        velocity[1] = zero;
-    }
-    {
-        int z = trunc12(gUnk_086149C4[angle] * speed);
-        zero = 0;
-        velocity[2] = z;
-    }
+    pos = p->anchor;
+    polar((u8)(Mod(p->callbackFrame, 31) << 3), 160, &delta);
     add(&delta, &pos);
     pos.y += 256;
     SlotMotion_Initialize(particle);
-    Ratatosk_ConfigureParticle(particle, 20, zero, zero, 2, zero);
+    Ratatosk_ConfigureParticle(particle, 20, 0, 0, 2, 0);
     SceneParticles_SpawnAtPosition(particle, &pos);
-    if (p->tick > 60)
-        p->finished = 1;
+    if (p->callbackFrame > 60)
+        p->actionFinished = 1;
 }
