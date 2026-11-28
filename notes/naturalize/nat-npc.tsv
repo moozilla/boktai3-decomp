@@ -359,3 +359,4 @@ src/npc/otenko/Otenko_UpdateBlinkWithCallback.c	Otenko_UpdateBlinkWithCallback	m
 src/npc/otenko/Otenko_PlayAnimation12.c	Otenko_PlayAnimation12	contrived	minor	1	u32 mask parked before the display flag OR
 src/npc/otenko/Otenko_UpdateRisingToTerrain.c	Otenko_UpdateRisingToTerrain	contrived	minor	1	u32 mask parked before the display flag OR
 src/npc/otenko/Otenko_UpdateDescendingDash.c	Otenko_UpdateDescendingDash	minor	minor	1	u32 mask parked before the display flag OR
+src/npc/otenko/Otenko_UpdateParticleDisappearance.c	Otenko_UpdateParticleDisappearance	contrived	contrived	5	u32 masks parked before the display flag ORs; callback local; graphics pointer for the palette override
