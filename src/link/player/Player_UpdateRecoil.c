@@ -2,12 +2,10 @@
 #include "engine/engine.h"
 #include "system/game_state/game_state.h"
 #include "player/player.h"
+#include "scene/terrain/terrain_cell_probe.h"
+#include "scene/terrain/terrain_sampling.h"
 
 extern const s16 gUnk_086149C4[];
-
-struct StackPoint {
-    u32 x : 16, y : 16, z : 16, pad : 16;
-};
 
 static inline s32 Truncate12(s32 v)
 {
@@ -16,7 +14,6 @@ static inline s32 Truncate12(s32 v)
     return -((-v) >> 12);
 }
 
-u8 *TerrainModifiers_FindCellOverride(s32, s32);
 u32 Player_IsFlaggedWithGlobalModifier10(u32);
 s32 ActorVariant_GetTableValue(u32, s32);
 s32 Player_SetAnimationIndex(struct Player *, s32, s32);
@@ -29,10 +26,9 @@ void Player_RestoreLinkedActionState(struct Player *);
 void Player_UpdateRecoil(struct Player *p)
 {
     if (p->tetherMode != 0x1F) {
-        u8 *variant = &p->actionMode;
-        Player_SetAnimationIndex(p, ActorVariant_GetTableValue(*variant, 0x29), 0x40);
+        Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 0x29), 0x40);
         p->interactionResetCounter = 0;
-        if (*variant == 6)
+        if (p->actionMode == 6)
             Player_PlayLocalSong(p->slot, 0x2EB);
         else
             Player_PlayLocalSong(p->slot, 0xE7);
@@ -41,29 +37,18 @@ void Player_UpdateRecoil(struct Player *p)
     }
     switch (p->tetherPhase) {
         case 0: {
-            u32 a = ((p->facing + 1) & 7) << 5;
-            struct StackPoint pos;
-            s32 x, z;
+            u32 angle = ((p->facing + 1) & 7) << 5;
+            struct ContactPosition pos;
             u32 cell;
-            u8 *data;
-            p->velocityX = Truncate12(gUnk_086149C4[(a + 0x40) & 0xFF] * p->directionFrame);
-            p->velocityZ = Truncate12(gUnk_086149C4[a] * p->directionFrame);
+            p->velocityX = Truncate12(gUnk_086149C4[(angle + 0x40) & 0xFF] * p->directionFrame);
+            p->velocityZ = Truncate12(gUnk_086149C4[angle] * p->directionFrame);
             p->directionFrame = p->directionFrame * 3 >> 2;
-            pos = *(struct StackPoint *)&p->position;
+            pos = *(struct ContactPosition *)&p->position;
             pos.x += p->velocityX;
             pos.z += p->velocityZ;
-            x = ((struct SceneVec *)&pos)->x >> 8;
-            z = ((struct SceneVec *)&pos)->z >> 8;
-            if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-                cell = 0;
-            else
-                cell = gTerrainMap->rows[z] + x;
-            data = TerrainModifiers_FindCellOverride(cell, 1);
-            if (data)
-                data += 4;
-            else
-                data = gTerrainMap->cells + (cell * 4 + 12);
-            if (Player_IsFlaggedWithGlobalModifier10(*(u16 *)(data + 2))) {
+            cell = Terrain_GetCellIndex(&pos);
+            if (Player_IsFlaggedWithGlobalModifier10(
+                    ((struct TerrainCell *)cellProps(cell))->flags)) {
                 p->velocityX = 0;
                 p->velocityZ = 0;
             }
