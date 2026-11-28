@@ -1,7 +1,8 @@
 #include "global.h"
+#include "bosses/vanargand/vanargand_pair_attack.h"
 
-void Vanargand_StartActionSequence(u8 *p)
+void Vanargand_StartActionSequence(struct VanargandActionSequence *sequence)
 {
-    if (p[0x15] == 0)
-        p[0x15] = 1;
+    if (sequence->step == 0)
+        sequence->step = 1;
 }
