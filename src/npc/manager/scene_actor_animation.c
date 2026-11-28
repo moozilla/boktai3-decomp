@@ -1005,51 +1005,22 @@ static inline u32 AttachmentFlag(void)
 
 // confidence=low: tracks a target facing and enables contact response when positions and angles agree.
 
-void Actor_UpdateTargetFacing(struct SceneActorManager *ctx, struct SceneActor *actor)
+void Actor_UpdateTargetFacing(struct SceneActorManager *manager, struct SceneActor *actor)
 {
     struct ContactPosition *pos = &actor->body.position;
     s32 facing;
-    if (ctx->target) {
-        struct ContactPosition *target = ctx->target;
-        s32 angle = Math_Atan2(target->x - pos->x, target->z - pos->z);
+    if (manager->target) {
+        s32 angle = Math_Atan2(manager->target->x - pos->x, manager->target->z - pos->z);
         if (actor->animationEntries->kind) {
-            u8 *current = &actor->body.direction;
-            s32 diff = (s8)(angle - (*current));
-            s32 value;
-            s32 octant;
-            s32 mask;
-            s32 quadrantMask;
-            if (diff > 8) {
-                value = *current;
-                value += 8;
-                *current = value;
-                octant = value + 112;
-            } else if (diff < -8) {
-                value = *current;
-                value -= 8;
-                *current = value;
-                value = (u32)value << 16;
-                value = (u32)value >> 16;
-                octant = value + 112;
-            } else {
-                value = *current;
-                value += diff;
-                *current = value;
-                value = (u32)value << 16;
-                value = (u32)value >> 16;
-                octant = value + 112;
-            }
-            octant >>= 5;
-            mask = 7;
-            mask &= octant;
-            actor->facing8 = mask;
-            value += 96;
-            value >>= 6;
-            quadrantMask = 3;
-            quadrantMask &= value;
-            actor->facing4 = quadrantMask;
+            s32 diff = (s8)(angle - actor->body.direction);
+            if (diff > 8)
+                SceneActorAnimation_SetAngle(actor, actor->body.direction + 8);
+            else if (diff < -8)
+                SceneActorAnimation_SetAngle(actor, actor->body.direction - 8);
+            else
+                SceneActorAnimation_SetAngle(actor, actor->body.direction + diff);
         }
-        facing = (u8)ctx->player->unk2D;
+        facing = (u8)manager->player->unk2D;
     } else
         facing = 0;
     if (actor->animationEntered) {
@@ -1057,15 +1028,12 @@ void Actor_UpdateTargetFacing(struct SceneActorManager *ctx, struct SceneActor *
         actor->finished = 0;
         Actor_PlayAnimationEntry(actor, 0, 1, 0, 4);
         actor->routeProgress = 1;
-        {
-            u8 angle = actor->body.direction;
-            actor->savedAnimationAngle = angle;
-        }
-        if (((ctx->player && !TargetAllowsInteraction(ctx->player)) && (!(gEngineFlags & 0x200))) &&
-            (actor->enabled)) {
-            struct Player *target = ctx->player;
+        actor->savedAnimationAngle = actor->body.direction;
+        if (manager->player && !TargetAllowsInteraction(manager->player) &&
+            !(gEngineFlags & 0x200) && actor->enabled) {
+            struct Player *player = manager->player;
             u8 tether;
-            if ((target->tetherMode == 6) && TetherActor_GetPosition())
+            if (player->tetherMode == 6 && TetherActor_GetPosition())
                 tether = 1;
             else
                 tether = 0;
@@ -1077,23 +1045,22 @@ void Actor_UpdateTargetFacing(struct SceneActorManager *ctx, struct SceneActor *
     } else
         Actor_PlayAnimationEntry(actor, 0, 1, 0, 1);
     SceneActor_SetFlags(actor, 0x1000);
-    if (((u8)actor->query(actor)) != 1) {
-        struct ContactPosition *target = ctx->target;
+    if ((u8)actor->query(actor) != 1) {
+        struct ContactPosition *target = manager->target;
         s32 radius = actor->rateC;
-        u8 SceneActor_IsNearTarget;
-        if (((Ghoul_Abs(target->x - pos->x) < radius) && (Ghoul_Abs(target->y - pos->y) <= 255)) &&
-            (Ghoul_Abs(target->z - pos->z) < radius))
-            SceneActor_IsNearTarget = 1;
+        u8 near;
+        if (Ghoul_Abs(target->x - pos->x) < radius && Ghoul_Abs(target->y - pos->y) <= 255 &&
+            Ghoul_Abs(target->z - pos->z) < radius)
+            near = 1;
         else
-            SceneActor_IsNearTarget = 0;
-        if (SceneActor_IsNearTarget) {
-            struct ContactPosition *destination = ctx->target;
-            s32 direction = (s8)Math_Atan2(pos->x - destination->x, pos->z - destination->z);
+            near = 0;
+        if (near) {
+            struct ContactPosition *from = manager->target;
+            s32 direction = (s8)Math_Atan2(pos->x - from->x, pos->z - from->z);
             s32 delta = facing - direction;
-            s32 oppositeFacing = (actor->body.direction) + 128;
-            u8 opposite;
-            opposite = facing - oppositeFacing;
-            if ((Ghoul_Abs((s8)delta) <= 63) && (Ghoul_Abs((s8)opposite) <= 31))
+            s32 behind = actor->body.direction + 128;
+            u8 opposite = facing - behind;
+            if (Ghoul_Abs((s8)delta) <= 63 && Ghoul_Abs((s8)opposite) <= 31)
                 SceneActor_SetFlags(actor, 0x800);
         }
     }
