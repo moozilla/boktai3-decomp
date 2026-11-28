@@ -1,33 +1,22 @@
-#include "global.h"
-#include "engine/video/render.h"
+#include "effects/healing/healing_effect.h"
+#include "engine/engine.h"
 #include "engine/engine_globals.h"
-void HealthRestoreEffect_StartParticleBurst(u8 *);
-void Sound_PlaySong(u32);
+#include "engine/engine_pause_flags.h"
+
 void Sound_ResumePersistentSongs(void);
-void Task_Kill(u8 *);
-static inline void clear(u32 *dst, u32 mask)
+
+void HealthRestoreEffect_UpdateCompletion(struct HealthRestoreEffect *effect)
 {
-    *dst &= mask;
-}
-#define H(o) (*(u16 *)(p + (o)))
-void HealthRestoreEffect_UpdateCompletion(u8 *p)
-{
-    if (H(0x270) == 30) {
-        HealthRestoreEffect_StartParticleBurst(p);
+    if (effect->timer == 30) {
+        HealthRestoreEffect_StartParticleBurst(effect);
         Sound_PlaySong(0x285);
-        *(u32 *)(p + 0x24) |= 1;
+        effect->icon.flags |= 1;
     }
-    H(0x270)++;
-    if (H(0x270) > 59) {
-        u32 mask, value;
-        u32 *flags;
+    effect->timer++;
+    if (effect->timer > 59) {
         Sound_ResumePersistentSongs();
-        flags = &gEnginePauseFlags;
-        mask = ~4;
-        clear(flags, mask);
-        value = gEngineFlags;
-        mask += 3;
-        gEngineFlags = value & mask;
-        Task_Kill(p);
+        Engine_ClearPauseFlags(4);
+        gEngineFlags &= ~1;
+        Task_Kill(effect);
     }
 }
