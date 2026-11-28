@@ -110,16 +110,12 @@ void Sabata_UpdateRemovalSequence(struct SabataActorState *actor)
                 actor->pendingAction++;
             }
             if (actor->finished) {
-                {
-                    Sabata_EnterSequenceStep(actor, 2);
-                }
+                Sabata_EnterSequenceStep(actor, 2);
             }
             break;
         case 2:
             if (actor->graphics.status & 2) {
-                {
-                    Sabata_EnterSequenceStep(actor, 3);
-                }
+                Sabata_EnterSequenceStep(actor, 3);
                 SceneActors_RunSecondEventScript(actor, &actor->graphics.position);
             }
             break;
