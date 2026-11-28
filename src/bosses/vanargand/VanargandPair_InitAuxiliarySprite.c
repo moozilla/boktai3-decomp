@@ -1,42 +1,26 @@
 #include "global.h"
-/* Paired Vanargand actor. Field names follow observed state and sprite operations. */
+#include "bosses/vanargand/vanargand_pair_attack.h"
 
-struct VanargandPairAnimation {
-    u8 pad0[6];
-    u16 tile;
-    u8 pad8[4];
-    void *tiles;
-    u8 pad10[12];
-};
-struct VanargandPairAuxiliarySprite {
-    u8 pad0[7];
-    u8 mode;
-    u8 pad8[8];
-    u16 priority;
-    u8 pad12[10];
-    u16 scale[3];
-    u8 pad22[10];
-    struct VanargandPairAnimation animation;
-};
 s32 AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
 
-void VanargandPair_InitAuxiliarySprite(u8 *panel,
-                                                struct VanargandPairAuxiliarySprite *sprite)
+void VanargandPair_InitAuxiliarySprite(struct VanargandPairAttack *boss,
+                                       struct VanargandPartSprite *auxiliary)
 {
-    struct VanargandPairAnimation *animation = &sprite->animation;
-    u16 *scale;
+    struct SpriteRenderResource *graphics = &auxiliary->graphics;
+    struct ContactPosition *position;
     u32 width, height;
-    AnimData_Load(animation, 0x89CC);
-    animation->tile = 0x6F;
-    animation->tiles = panel + 0x718;
-    Sprite_Init(sprite, animation, 0);
-    sprite->priority = 5;
-    sprite->mode = 3;
-    scale = sprite->scale;
+
+    AnimData_Load(graphics, 0x89CC);
+    graphics->paletteKey = 0x6F;
+    graphics->palette = boss->palettes;
+    Sprite_Init(auxiliary, graphics, 0);
+    auxiliary->sprite.frame = 5;
+    auxiliary->sprite.priority = 3;
+    position = &auxiliary->sprite.position;
     width = 0x33B;
     height = 0x100;
-    sprite->scale[0] = width;
-    scale[1] = height;
-    scale[2] = width;
+    position->x = width;
+    position->y = height;
+    position->z = width;
 }

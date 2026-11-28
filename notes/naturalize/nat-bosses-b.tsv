@@ -311,3 +311,4 @@ src/bosses/vanargand/ScreenPalette_UpdateState.c	ScreenPalette_UpdateState	contr
 src/bosses/vanargand/Vanargand_UpdateCameraOffset.c	Vanargand_UpdateCameraOffset	unchanged	unchanged	5	out/position aliases kept: no simpler form matched
 src/bosses/vanargand/Camera_UpdatePlayerBlendOffset.c	Camera_UpdatePlayerBlendOffset	unchanged	unchanged	5	out/position aliases kept: no simpler form matched
 src/bosses/vanargand/Vanargand_RemovePartSprites.c	Vanargand_RemovePartSprites	contrived	natural	1	
+src/bosses/vanargand/VanargandPair_InitAuxiliarySprite.c	VanargandPair_InitAuxiliarySprite	contrived	near-natural	6	width/height locals kept: ROM loads both scale constants before the first store
