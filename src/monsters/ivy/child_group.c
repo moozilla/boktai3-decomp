@@ -191,15 +191,13 @@ struct IvySegmentWordView {
 
 void Ivy_SetSegmentProperties(u8 *p, u32 b, s32 a)
 {
-    struct IvySegmentWordView *word = (struct IvySegmentWordView *)(p + 0x164);
-    struct IvySegmentHalfwordView *halfword = (struct IvySegmentHalfwordView *)(p + 0x15e);
-    s32 i = 3;
-    do {
-        halfword->property = a;
-        word->property = b;
-        word++;
-        halfword++;
-    } while (--i >= 0);
+    struct PhaseObject *object = (struct PhaseObject *)p;
+    s32 i;
+
+    for (i = 0; i < 4; i++) {
+        object->segments[i].halfword = a;
+        object->segments[i].property = b;
+    }
 }
 
 s32 Script_GetValue(void);
