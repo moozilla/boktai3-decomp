@@ -914,14 +914,14 @@ void TutorialOtenko_BeginPositionedEffect(void)
 void TutorialOtenko_BeginRadialBurst(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
-    u32 three = 2;
+    u32 mode = 2;
     if (g == 0) {
         g = (struct ActorAnimController *)TutorialOtenko_EnsureController(0xBB34, 0);
         if (g == 0)
             return;
     }
     g->oldMode = g->mode;
-    g->mode = three;
+    g->mode = mode;
     g->phase = 15;
     if (g->oldMode == 3 && g->mode == 3) {
         g->savedFrame = g->anim.index;

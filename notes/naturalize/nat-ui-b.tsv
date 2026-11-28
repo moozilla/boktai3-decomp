@@ -279,3 +279,4 @@ src/ui/title/tutorial_otenko.c	TutorialOtenko_BeginFadeAnimation	natural	natural
 src/ui/title/tutorial_otenko.c	TutorialOtenko_BeginReverseFadeAnimation	natural	natural	0	
 src/ui/title/tutorial_otenko.c	TutorialOtenko_BeginHide	natural	natural	0	
 src/ui/title/tutorial_otenko.c	TutorialOtenko_BeginPositionedEffect	contrived	natural	1	
+src/ui/title/tutorial_otenko.c	TutorialOtenko_BeginRadialBurst	contrived	contrived	3	expanded state change with the mode parked before the null check (the shared helper keeps the phase constant in another register); u8 one flag
