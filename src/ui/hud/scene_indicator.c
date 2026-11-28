@@ -160,7 +160,7 @@ int SceneIndicators_Initialize(struct SceneIndicators *m)
     }
     {
         struct SceneIndicator *p = first;
-        for (i = 15; i >= 0; i--, p++)
+        for (i = 0; i < 16; i++, p++)
             SceneIndicator_Initialize(m, p);
     }
     if (gPlayers[0]) {

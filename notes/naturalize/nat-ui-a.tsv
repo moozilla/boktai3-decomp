@@ -401,3 +401,4 @@ src/ui/game_over/particle_pool.c	ParticlePool_Init	natural	natural	0
 src/ui/game_over/particle_pool.c	ParticlePool_Destroy	natural	natural	0	
 src/ui/hud/scene_indicator.c	SceneIndicators_Update	fudged	natural	6	
 src/ui/hud/scene_indicator.c	SceneIndicators_Destroy	fudged	natural	5	
+src/ui/hud/scene_indicator.c	SceneIndicators_Initialize	fudged	partial	8	has/first block stays: the indicator base is computed after the keyword call
