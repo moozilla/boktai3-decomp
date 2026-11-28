@@ -1,10 +1,8 @@
-#include "global.h"
+#include "ui/dialogue/message_window.h"
 
-struct S {
-    u8 f[0x110];
-    u32 a[1];
-};
-u32 TextState_SetString(struct S *p, u32 i, u32 v)
+u32 TextState_SetString(void *playback, u32 index, u32 string)
 {
-    p->a[i] = v;
+    struct MessagePlaybackState *state = playback;
+
+    state->strings[index] = (const u8 *)string;
 }
