@@ -2748,19 +2748,12 @@ void TetherActor_UpdatePassiveState(struct TetherActor *actor)
 
 void TetherActor_UpdateSpecialEntryTransition(struct TetherActor *p)
 {
-    u16 *q;
-    u32 z, v, m;
-    if (p->state != 0xe)
-        TetherActor_SetState(p, 0xe);
-    q = &p->chargeCollider.flags;
-    v = *q;
-    m = 4;
-    z = 0;
-    m |= v;
-    *q = m;
-    p->heading = z;
+    if (p->state != 0xE)
+        TetherActor_SetState(p, 0xE);
+    p->chargeCollider.flags |= 4;
+    p->heading = 0;
     if (TetherActor_SetEntry(p, 9))
-        TetherActor_SetState(p, 0xd);
+        TetherActor_SetState(p, 0xD);
 }
 
 void TetherActor_UpdateSpecialEntryState(struct TetherActor *actor)
