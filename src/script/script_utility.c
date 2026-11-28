@@ -1,5 +1,6 @@
 #include "script/script_utility.h"
 #include "script/script_virtual_machine.h"
+#include "link/wireless/random.h"
 
 s32 ScriptUtility_WriteValuesToReference(void)
 {
@@ -44,19 +45,11 @@ s32 ScriptUtility_GetRandom(void)
     if (Script_SeekToKeyword('p')) {
         s32 bound = Script_GetValue();
         if (bound > 0) {
-            gRandomIndex = (gRandomIndex + 1) & 1023;
-            {
-                u32 offset = gRandomIndex * sizeof(gRandomTable[0]);
-                s32 sample = *(u16 *)(offset + (u32)gRandomTable);
-                return Mod(sample >> 3, bound);
-            }
+            s32 sample = RANDOM_NEXT();
+            return Mod(sample >> 3, bound);
         }
     }
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    {
-        u32 offset = gRandomIndex * sizeof(gRandomTable[0]);
-        return *(u16 *)(offset + (u32)gRandomTable);
-    }
+    return RANDOM_NEXT();
 }
 
 u32 ScriptUtility_GetKeys(void)
