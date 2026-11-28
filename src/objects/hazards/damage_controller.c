@@ -133,8 +133,8 @@ s32 DamageController_Initialize(struct DamageController *controller, u32 id)
 
 void *DamageController_Create(u32 arg)
 {
-    void *obj;
-    obj = Task_Create(8, 0x90);
+    struct DamageController *obj;
+    obj = Task_Create(8, sizeof(*obj));
     if (obj != 0) {
         Task_SetCallbacks(obj, DamageController_Update, DamageController_Destroy);
         if (DamageController_Initialize(obj, arg) < 0) {

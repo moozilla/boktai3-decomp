@@ -286,3 +286,4 @@ src/objects/hazards/animated_hazard.c	AnimatedHazardManager_Create	natural	natur
 src/objects/hazards/animated_hazard.c	AnimatedHazardManager_GetFreeSlot	natural	natural	0	
 src/objects/hazards/animated_hazard.c	AnimatedHazardManager_RetractAll	natural	natural	0	
 src/objects/hazards/damage_controller.c	DamageController_Initialize	minor	natural	1	
+src/objects/hazards/damage_controller.c	DamageController_Create	minor	natural	1	
