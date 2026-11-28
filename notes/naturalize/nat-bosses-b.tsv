@@ -324,3 +324,8 @@ src/bosses/vanargand/Vanargand_UpdateMode16.c	Vanargand_UpdateMode16	natural	nat
 src/bosses/vanargand/Vanargand_UpdateMode2.c	Vanargand_UpdateMode2	unchanged	unchanged	1	owner alias keeps the pair read in a second register
 src/bosses/vanargand/Vanargand_UpdateMode13.c	Vanargand_UpdateMode13	natural	natural	0	
 src/bosses/vanargand/VanargandPair_RunSelectionScript.c	VanargandPair_RunSelectionScript	contrived	near-natural	8	second boss alias and animation local kept: register copy and constant order
+src/bosses/vanargand/Vanargand_BeginExitTransition.c	Vanargand_BeginExitTransition	natural	natural	0	
+src/bosses/vanargand/VanargandPair_UpdateTimedExit.c	VanargandPair_UpdateTimedExit	natural	natural	0	
+src/bosses/vanargand/Vanargand_UpdateIdleTransition.c	Vanargand_UpdateIdleTransition	natural	natural	0	
+src/bosses/vanargand/Vanargand_UpdateActiveExitTransition.c	Vanargand_UpdateActiveExitTransition	natural	natural	0	
+src/bosses/vanargand/Vanargand_DispatchPrimaryState.c	Vanargand_DispatchPrimaryState	contrived	natural	1	
