@@ -7,6 +7,7 @@
 #include "scene/collision/contact_collider.h"
 
 struct ContactActorPool;
+struct ContactSwarm;
 struct BackgroundFlashController;
 struct Player;
 
@@ -69,7 +70,7 @@ struct SceneActorGraphics {
     u8 paletteBank2[0x200];  /* 0x7C4 */
     struct ContactPosition snapPosition; /* 0x9C4: set by scene command 12. */
     struct ContactPosition grabPosition; /* 0x9CC: the grabbed player's position. */
-    u8 unk9D4[0x9D8 - 0x9D4];
+    struct ContactSwarm *batPool; /* 0x9D4: bats spawned by the charge shot. */
     struct ContactActorPool *contactPool; /* 0x9D8: SceneActors_RequestContactPoolClear. */
     struct BackgroundFlashController *backgroundFlash; /* 0x9DC: SceneActors_StopBackgroundFlash. */
 };

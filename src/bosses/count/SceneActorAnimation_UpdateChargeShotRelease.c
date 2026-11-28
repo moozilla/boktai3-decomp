@@ -5,21 +5,13 @@
 #include "engine/ram.h"
 
 int Math_Atan2(int, int);
-static inline int choose(u32 mode, int normal, int alternate)
-{
-    int test = mode & 1;
-    int result;
-    result = normal;
-    if (test)
-        result = alternate;
-    return result;
-}
 static inline void add(struct ContactPosition *a, struct ContactPosition *b)
 {
     a->x += b->x;
     a->y += b->y;
     a->z += b->z;
 }
+
 static inline int clampTurn(int delta)
 {
     if (delta > 32)
@@ -28,20 +20,21 @@ static inline int clampTurn(int delta)
         delta = -32;
     return delta;
 }
+
 void SceneActorAnimation_UpdateChargeShotRelease(struct StateActor *p, int tick)
 {
     struct SceneGraphicsActor *actor = (struct SceneGraphicsActor *)p;
-    u8 *position = (u8 *)&p->bodyId;
+    struct SceneActorBody *body = &actor->body;
     struct ContactPosition spawn;
     if (p->actionChanged) {
         int sequence;
         p->actionChanged = 0;
-        sequence = choose(actor->graphics.animationFlags, 68, 30);
-        {
-
-            SceneActors_StartDirectionalAnimation(
-                p, &actor->animation, (int)&actor->animationResource, sequence, 2, 1, 4);
-        }
+        if (actor->graphics.animationFlags & 1)
+            sequence = 30;
+        else
+            sequence = 68;
+        SceneActors_StartDirectionalAnimation(p, &actor->animation, (int)&actor->animationResource,
+                                              sequence, 2, 1, 4);
         Sound_PlaySongChecked(860);
     }
     if (p->actionTryUpdate(p))
@@ -55,10 +48,10 @@ void SceneActorAnimation_UpdateChargeShotRelease(struct StateActor *p, int tick)
             SceneActor_SetChargeOffset((p->animationFacing4 * 64) - 64, &spawn, 180);
         else
             SceneActor_SetChargeOffset((p->animationFacing4 * 64) - 64, &spawn, 110);
-        add(&spawn, (struct ContactPosition *)(position + 12));
+        add(&spawn, &body->position);
         spawn.y += 300;
         power = actor->graphics.chargeShotPower;
-        direction = position[9] + clampTurn(p->requestedAngle - position[9]);
+        direction = body->direction + clampTurn(p->requestedAngle - body->direction);
         gRandomIndex = (gRandomIndex + 1) & 1023;
         {
             u32 random = *(u16 *)(RANDOM_TABLE_ADDR + (gRandomIndex << 1));
@@ -66,8 +59,7 @@ void SceneActorAnimation_UpdateChargeShotRelease(struct StateActor *p, int tick)
             random &= 15;
             direction += random;
         }
-        CountBats_SpawnCharge(*(void **)((u8 *)actor + 0x9d4), &spawn, direction, 20, power, 30,
-                                 8);
+        CountBats_SpawnCharge(actor->graphics.batPool, &spawn, direction, 20, power, 30, 8);
         Sound_PlaySongChecked(234);
     }
     if (actor->animation.status & 2) {
