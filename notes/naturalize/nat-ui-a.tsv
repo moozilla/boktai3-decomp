@@ -67,3 +67,17 @@ src/ui/books/monster_book/monster_book.c	MonsterBook_SetupPageBackgrounds	contri
 src/ui/books/monster_book/monster_book.c	MonsterBook_InitWidgets	minor	natural	1	
 src/ui/books/monster_book/monster_book.c	MonsterBook_Init	contrived	natural	4	
 src/ui/books/monster_book/monster_book.c	MonsterBook_UpdateNavigation	contrived	natural	8	MonsterBook_CurrentEntry getter kept (insn count sets the PRE stack slot order)
+src/ui/books/monster_book/monster_book.c	MonsterBook_DrawEntryDetails	natural	natural	0	
+src/ui/books/monster_book/monster_book.c	MonsterBook_RefreshPage	natural	natural	0	
+src/ui/books/monster_book/monster_book.c	MonsterBook_RemoveActiveAnimation	natural	natural	0	
+src/ui/books/monster_book/monster_book.c	MonsterBook_Destroy	natural	natural	0	
+src/ui/books/monster_book/monster_book.c	MonsterBook_Create	natural	natural	0	
+src/ui/books/monster_book/monster_book.c	MonsterBook_HideEntryRows	natural	natural	0	
+src/ui/books/monster_book/monster_book.c	MonsterBook_DrawListNumbers	natural	natural	0	
+src/ui/books/monster_book/monster_book.c	MonsterBook_DrawDetailNumber	natural	natural	0	
+src/ui/books/monster_book/monster_book.c	MonsterBook_HideCompletionCounts	natural	natural	0	
+src/ui/books/monster_book/monster_book.c	MonsterBook_UpdateSelectionCursor	natural	natural	0	
+src/ui/books/monster_book/monster_book.c	MonsterBook_DrawCompletionCounts	natural	natural	0	
+src/ui/books/monster_book/monster_book.c	MonsterBook_DrawListWindows	natural	natural	0	
+src/ui/books/monster_book/monster_book.c	MonsterBook_HideCategoryWidgets	natural	natural	0	
+src/ui/books/monster_book/monster_book.c	MonsterBook_DrawCategoryWidgets	natural	natural	0	
