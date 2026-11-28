@@ -185,8 +185,8 @@ void ScriptKeyframe_AddFromScript(void)
             position = &entry->position;
         }
     }
-    AnimSprite_InitLinked(&entry->animation, &entry->resource, (u16)frame, mode, (u8)priority, 0, 60,
-                      position);
+    AnimSprite_InitLinked(&entry->animation, &entry->resource, (u16)frame, mode, (u8)priority, 0,
+                          60, position);
     value = Script_SeekToKeyword('A');
     if (value)
         entry->conditionalVisibility = Script_GetValue();
@@ -198,15 +198,9 @@ void ScriptKeyframe_AddFromScript(void)
 
 u32 ScriptKeyframe_TickManager(struct ScriptKeyframeManager *manager)
 {
-    s32 index = 0;
-    if (index < manager->count) {
-        struct ScriptKeyframeEntry *entry = manager->entries;
-        do {
-            ScriptKeyframe_UpdateEntry(entry);
-            entry++;
-            index++;
-        } while (index < manager->count);
-    }
+    s32 i;
+    for (i = 0; i < manager->count; i++)
+        ScriptKeyframe_UpdateEntry(&manager->entries[i]);
     return 0;
 }
 
