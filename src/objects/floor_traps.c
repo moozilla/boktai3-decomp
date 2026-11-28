@@ -424,11 +424,10 @@ void FloorTrap_StepActivation(struct TileTrigger *trigger)
     struct TileTrigger *self = trigger;
     struct TileTriggerManager *manager = gTileTriggerManager;
     if (trigger->timer > 30) {
-        u8 *forced = &trigger->forced;
-        if (*forced) {
+        if (trigger->forced) {
             Anim_RestartSequence(&trigger->animation, manager->animationData, 0,
                                  (u8)trigger->sequence, 4);
-            *forced = 0;
+            trigger->forced = 0;
             switch (trigger->sequence) {
                 case 0:
                 case 1:
