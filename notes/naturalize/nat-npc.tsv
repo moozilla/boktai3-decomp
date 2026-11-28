@@ -689,3 +689,4 @@ src/minigames/result_game/ResultGame_HidePressMarker.c	ResultGame_HidePressMarke
 src/minigames/result_game/ResultGame_ShowTargetMarker.c	ResultGame_ShowTargetMarker	contrived	natural	3	
 src/minigames/result_game/ResultGame_HideTargetMarker.c	ResultGame_HideTargetMarker	contrived	natural	3	
 src/minigames/result_game/ResultGame_SetTrackingVisibility.c	ResultGame_SetTrackingVisibility	contrived	natural	3	reused sprite pointer: two helper calls swap registers
+src/minigames/result_game/ResultGame_SetPressVisibility.c	ResultGame_SetPressVisibility	contrived	natural	3	reused sprite pointer: two helper calls add address instructions
