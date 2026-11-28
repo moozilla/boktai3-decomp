@@ -873,14 +873,6 @@ void Player_DestroyEffects(struct Player *p)
 
 /* Player_GetEffectIntensity: Returns the global signed value also used to pace inward particle emission; intensity interpretation tentative */
 
-/* Tentative names for the per-channel effect reset state. */
-struct PlayerEffectResetState {
-    u8 unk_00[0xAF2];
-    u16 duration;
-    u8 modes[4];
-    u8 counters[4];
-    u16 limits[4];
-};
 /* The position copy includes the fourth halfword of the stored vector. */
 struct PlayerEffectPositionWords {
     u32 first, second;
@@ -905,20 +897,19 @@ static inline u8 PlayerEffects_IsSceneModeFive(struct Player *p)
 
 void Player_InitEffects(struct Player *p)
 {
-    struct PlayerEffectPositionWords *position;
     if (p->unk419 == 1)
         sub_08232264(&p->effectGroup, &p->colliderPosition, 0, 0, 1);
     else
         sub_08232264(&p->effectGroup, &p->animation.position, 0, 0, 1);
-    position = (void *)&p->animation.position;
-    *(struct PlayerEffectPositionWords *)p->effectPosition = *position;
+    *(struct PlayerEffectPositionWords *)p->effectPosition =
+        *(struct PlayerEffectPositionWords *)&p->animation.position;
     p->resetValue6F8 = 0;
     p->resetValue6FA = 0;
     p->resetValue6FC = 0;
     Shadow_Initialize(p->shadow, p->effectPosition, 0);
     SceneParticlePool_EnsureSingleton();
     if (p && PlayerEffects_IsSceneModeFive(p)) {
-        ((struct PlayerEffectResetState *)p)->duration = 64;
+        p->visualSlowdownTimer = 64;
         p->unk4E1[0] = 1;
     }
     Player_InitVisualState(p);
@@ -927,18 +918,18 @@ void Player_InitEffects(struct Player *p)
     Player_InitOrbitingEffect(p);
     ConvergingEffects_InitSprites(p);
     DirectionalSpriteEffect_InitSprite(p);
-    ((struct PlayerEffectResetState *)p)->modes[0] = 4;
-    ((struct PlayerEffectResetState *)p)->modes[1] = 4;
-    ((struct PlayerEffectResetState *)p)->modes[2] = 4;
-    ((struct PlayerEffectResetState *)p)->modes[3] = 4;
-    ((struct PlayerEffectResetState *)p)->counters[0] = 0;
-    ((struct PlayerEffectResetState *)p)->counters[1] = 0;
-    ((struct PlayerEffectResetState *)p)->counters[2] = 0;
-    ((struct PlayerEffectResetState *)p)->counters[3] = 0;
-    ((struct PlayerEffectResetState *)p)->limits[0] = 4;
-    ((struct PlayerEffectResetState *)p)->limits[1] = 4;
-    ((struct PlayerEffectResetState *)p)->limits[2] = 4;
-    ((struct PlayerEffectResetState *)p)->limits[3] = 4;
+    p->effectModes[0] = 4;
+    p->effectModes[1] = 4;
+    p->effectModes[2] = 4;
+    p->effectModes[3] = 4;
+    p->effectCounters[0] = 0;
+    p->effectCounters[1] = 0;
+    p->effectCounters[2] = 0;
+    p->effectCounters[3] = 0;
+    p->effectLimits[0] = 4;
+    p->effectLimits[1] = 4;
+    p->effectLimits[2] = 4;
+    p->effectLimits[3] = 4;
     p->unkAF0 = 0;
     p->movementRequestTarget.x = 0;
     p->movementRequestTarget.y = 0;

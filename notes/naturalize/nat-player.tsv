@@ -67,3 +67,5 @@ src/player/appearance/player_visuals.c	Player_UpdateStatusVisuals	contrived	cont
 src/player/appearance/player_visuals.c	Player_AdvanceEffectTick	natural	natural	0	-
 src/player/appearance/player_visuals.c	SceneActor_UpdateVisualEffects	minor	minor	1	bare block orders the callback address before the context load
 src/player/appearance/player_visuals.c	Player_GetBlockedActionBonus	contrived	natural	1	-
+src/player/appearance/player_visuals.c	Player_DestroyEffects	natural	natural	0	-
+src/player/appearance/player_visuals.c	Player_InitEffects	contrived	minor	6	position copy through a two-word struct view; scene-mode helper materializes the bool the ROM tests
