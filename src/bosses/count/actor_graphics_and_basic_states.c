@@ -322,25 +322,21 @@ void SceneActors_AddHealthCost(int amount)
 }
 // confidence=low: index of the first of the count tracked positions at 0x110 that lies inside
 // the box min..max on x and z, or -1.
-struct BoxSearchPosition {
-    s16 x, y, z;
-};
-
 static inline s32 SceneGraphicsActor_GetPlayerPosition(struct SceneGraphicsActor *actor,
                                                        s32 index,
-                                                       struct BoxSearchPosition **out)
+                                                       struct ContactPosition **out)
 {
-    *out = (struct BoxSearchPosition *)actor->playerPositions[index];
+    *out = actor->playerPositions[index];
     return *out != NULL;
 }
 
-s32 sub_08022624(void *owner, s32 count, struct BoxSearchPosition *min,
-                 struct BoxSearchPosition *max)
+s32 sub_08022624(void *owner, s32 count, struct ContactPosition *min,
+                 struct ContactPosition *max)
 {
     struct SceneGraphicsActor *actor = owner;
     s32 i;
     for (i = 0; i < count; i++) {
-        struct BoxSearchPosition *pos;
+        struct ContactPosition *pos;
         SceneGraphicsActor_GetPlayerPosition(actor, i, &pos);
         if (pos) {
             s32 inside;
@@ -1162,13 +1158,6 @@ void SceneActorState_EnterPhase6AndResetAnimation(struct StateActor *p)
     actor->graphics.trackedPlayerEscaped = 0;
 }
 
-struct ProbeBox {
-    s32 x : 16, y : 16, z : 16, w : 16;
-};
-
-struct ProbePos {
-    s16 x, y, z, w;
-};
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 
 static inline s32 ProbeTruncate12(s32 value)
@@ -1176,21 +1165,21 @@ static inline s32 ProbeTruncate12(s32 value)
     return value >= 0 ? value >> 12 : -((-value) >> 12);
 }
 
-static inline void ProbeProject(struct ProbePos *out, u8 angle, s32 distance)
+static inline void ProbeProject(struct ContactPosition *out, u8 angle, s32 distance)
 {
     out->x = ProbeTruncate12(gUnk_086149C4[(angle + 0x40) & 0xff] * distance);
     out->y = 0;
     out->z = ProbeTruncate12(gUnk_086149C4[angle] * distance);
 }
 
-static inline void ProbeAdd(struct ProbePos *dst, struct ProbePos *src)
+static inline void ProbeAdd(struct ContactPosition *dst, const struct ContactPosition *src)
 {
     dst->x += src->x;
     dst->y += src->y;
     dst->z += src->z;
 }
 
-static inline s32 ProbeCellAt(struct ProbePos *p)
+static inline s32 ProbeCellAt(struct ContactPosition *p)
 {
     s32 x = p->x >> 8;
     s32 z = p->z >> 8;
@@ -1223,14 +1212,14 @@ static inline bool32 ProbeHeightOutOfRange(s32 height, s32 referenceHeight, s32 
 static inline bool32
 SceneActorGraphics_IsForwardGroundOutOfRange(const struct SceneGraphicsActor *actor, s32 distance)
 {
-    struct ProbePos pos;
-    u8 *s = (u8 *)actor + 0x48;
+    struct ContactPosition pos;
+    const struct SceneActorBody *body = &actor->body;
     u8 *props;
-    struct ProbePos *at;
+    struct ContactPosition *at;
     u32 type;
     s32 h;
-    ProbeProject(&pos, s[9], distance);
-    ProbeAdd(&pos, (struct ProbePos *)(s + 0xc));
+    ProbeProject(&pos, body->direction, distance);
+    ProbeAdd(&pos, &body->position);
     at = &pos;
     props = ProbeCellProps(ProbeCellAt(at));
     type = *props >> 4;
@@ -1251,23 +1240,23 @@ SceneActorGraphics_IsForwardGroundOutOfRange(const struct SceneGraphicsActor *ac
 void sub_08023FE8(struct StateActor *p)
 {
     struct SceneGraphicsActor *actor = (struct SceneGraphicsActor *)p;
-    struct ProbePos *sprite = (struct ProbePos *)((u8 *)p + 0x48);
+    struct SceneActorBody *body = &actor->body;
     p->vulnerable = 1;
     if (StateActor_ConsumeActionEntry(p))
         SceneActorState_SetAnimation(p, 6);
     if (actor->graphics.particleFlag == 1) {
-        struct ProbePos off, min, max;
+        struct ContactPosition off, min, max;
         s32 r;
-        ProbeProject(&off, ((u8 *)sprite)[9], 0x80);
-        ProbeAdd(&off, (struct ProbePos *)((u8 *)sprite + 0xc));
+        ProbeProject(&off, body->direction, 0x80);
+        ProbeAdd(&off, &body->position);
         min.x = -0x80;
         min.z = -0x80;
         ProbeAdd(&min, &off);
         max.x = 0x80;
         max.z = 0x80;
         ProbeAdd(&max, &off);
-        r = sub_08022624(actor, ((u8 *)actor)[0x174], (struct BoxSearchPosition *)&min,
-                         (struct BoxSearchPosition *)&max);
+        r = sub_08022624(actor, actor->playerCount, &min,
+                         &max);
         if (r >= 0) {
             struct Player *player = gPlayers[r];
             if (!SceneActorState_TestPlayerFlags(player, 0x40000)) {
