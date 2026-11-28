@@ -756,14 +756,13 @@ void AnimData_SetResourceBank(struct AnimResourceHeader *h)
 
 /* Sprite resource bank (header at 0x03004300): entries of 12 bytes from +0x18. */
 
-/* Fills anim from the resource entry with this id; 0 if there is none. */
-
 struct AnimResourceInfo {
     u16 unk00;
     u16 paletteKey;
     u32 tileOffset;
 };
 
+/* Fills anim from the resource entry with this id; 0 if there is none. */
 s32 AnimData_Load(struct SpriteRenderResource *anim, u32 id)
 {
     struct AnimResourceHeader *header = gAnimationResource;
