@@ -3,13 +3,14 @@
 #include "engine/engine.h"
 #include "engine/input.h"
 #include "engine/ram.h"
+#include "link/wireless/random.h"
 // Tentative family name: actor animation/state handlers; specific actor identity unknown.
 s32 Mod(s32, s32);
 u32 HomingProjectile_GetActiveCount(void);
 void AnimationActor_UpdateProjectileSequence(struct Ratatosk *p)
 {
     struct Ratatosk *q = p;
-    if (Ratatosk_ConsumeActionEntry(q)) {
+    if (Ratatosk_ConsumeActionEntry(p)) {
         Ratatosk_SetAnimation(q, 6);
         p->sequence = 0;
     }
@@ -20,7 +21,7 @@ void AnimationActor_UpdateProjectileSequence(struct Ratatosk *p)
                 if (q->actionFinished) {
                     if (p->healthPhase > 0) {
                         Ratatosk_SetAnimation(q, 10);
-                        *sequence = 1;
+                        p->sequence = 1;
                     } else
                         goto next;
                 }
@@ -35,12 +36,7 @@ void AnimationActor_UpdateProjectileSequence(struct Ratatosk *p)
             case 2:
                 if (q->actionFinished) {
                     p->duration = 128;
-                    gRandomIndex = (gRandomIndex + 1) & 1023;
-                    p->destination =
-                        *(struct ContactPosition
-                              *)((Mod(*(const u16 *)(gRandomIndex * 2 + (u32)gRandomTable), 9) * 8 +
-                                  (u32)p) +
-                                 0xccc);
+                    p->destination = *(Mod(RANDOM_NEXT(), 9) + p->points);
                 }
                 if (HomingProjectile_GetActiveCount() == 0)
                     p->sequenceDone = 1;
