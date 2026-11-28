@@ -133,3 +133,4 @@ src/monsters/mummy/mummy_entry.c	Mummy_UpdateProbeNavigation	contrived	contrived
 src/monsters/mummy/mummy_entry.c	Mummy_ResumeDelayedRoute	contrived	minor	13	flag component helpers remain
 src/monsters/mummy/mummy_entry.c	Mummy_UpdateDescriptorPursuit	minor	natural	4	
 src/monsters/mummy/mummy_entry.c	SceneActor_WaitForControlCompletion	minor	minor	3	busy local kept
+src/monsters/mummy/mummy_entry.c	Mummy_FireAcceleratingVolley	contrived	contrived	21	velocity temps and bare blocks fix allocation

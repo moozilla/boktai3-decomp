@@ -1647,9 +1647,8 @@ void Mummy_FireAcceleratingVolley(struct ChaseActor *actor)
         {
             u32 shot = actor->base.attacks.first[2];
             u32 category = actor->base.attacks.second[2];
-            struct ContactPosition *target = &actor->base.tracking.target->position;
-            BouncingBomb_Spawn(&source, &delta, target, shot, category, strength,
-                               actor->base.body.id);
+            BouncingBomb_Spawn(&source, &delta, &actor->base.tracking.target->position, shot,
+                               category, strength, actor->base.body.id);
         }
         strength = Div(strength << 3, 10);
         speed += Div(speed << 2, 10);
