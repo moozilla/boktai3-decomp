@@ -474,3 +474,4 @@ src/objects/light_fixtures.c	LightFixture_ScriptSetState	natural	natural	0
 src/objects/loot_deposits/LootDepositPool_AddStatusFlags.c	LootDepositPool_AddStatusFlags	contrived	natural	1	
 src/objects/loot_deposits/LootDepositPool_RemoveStatusFlags.c	LootDepositPool_RemoveStatusFlags	contrived	natural	1	
 src/objects/loot_deposits/LootDepositPool_TestStatusFlags.c	LootDepositPool_TestStatusFlags	contrived	natural	2	
+src/objects/loot_deposits/LootDepositPool_Allocate.c	LootDepositPool_Allocate	minor	natural	1	

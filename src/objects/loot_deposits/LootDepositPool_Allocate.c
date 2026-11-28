@@ -1,37 +1,19 @@
 #include "global.h"
+#include "engine/engine.h"
+#include "engine/ram.h"
+#include "objects/loot_deposits/callback_pool.h"
 
-void Memory_Clear(void *, u32);
-
-struct E {
-    u8 a[0x154];
-    u16 idx;
-    u8 b[0x184 - 0x154 - sizeof(u16)];
-};
-struct S {
-    u8 pad0[0x1C];
-    struct E e[4];
-    u8 pad[0x62C - 0x1C - 0x184 * 4];
-    u32 mask;
-};
-
-static inline u8 Tst(u32 *m, s32 i)
-{
-    if (*m & (1 << i))
-        return TRUE;
-    return FALSE;
-}
-
-struct E *LootDepositPool_Allocate(struct S *b)
+struct CallbackPoolEntry *LootDepositPool_Allocate(struct CallbackPool *pool)
 {
     s32 i;
-    struct E *e;
+    struct CallbackPoolEntry *entry;
     for (i = 0; i < 4; i++) {
-        if (!Tst(&b->mask, i)) {
-            e = &b->e[i];
-            b->mask |= 1 << i;
-            Memory_Clear(e, 0x184);
-            e->idx = i;
-            return e;
+        if (!LootDepositCallbackPool_IsActive(&pool->activeMask, i)) {
+            entry = &pool->entries[i];
+            pool->activeMask |= 1 << i;
+            Memory_Clear(entry, sizeof(*entry));
+            entry->slot = i;
+            return entry;
         }
     }
     return 0;
