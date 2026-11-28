@@ -178,39 +178,19 @@ void Palette_StartSlide(s32, s32, s32);
 
 void BreakableBarrier_UpdateBroken(struct BreakableBarrierManager *m, struct BreakableBarrier *p)
 {
-    u32 index_3;
-    u32 index_2;
     struct BarrierExtent size;
-    if (BreakableBarrier_ConsumeEntered(p)) {
+
+    if (BreakableBarrier_ConsumeEntered(p))
         disable(&p->collider);
-    }
     if ((p->timer & 3) == 0) {
         s32 angle, count, speed;
-        const u16 *table;
-        u32 *indexPtr;
-        u32 index;
+
         size.x = 164;
         size.y = 16;
         size.z = 164;
-        table = gRandomTable;
-        indexPtr = &gRandomIndex;
-        index = *indexPtr;
-        index++;
-        index &= 1023;
-        angle = (u8)table[index];
-        index_2 = (index + 1) & 1023;
-        {
-            u32 sample = table[index_2];
-            sample &= 3;
-            count = sample + 2;
-        }
-        index_3 = (index_2 + 1) & 1023;
-        *indexPtr = index_3;
-        {
-            u32 sample = table[index_3];
-            sample &= 3;
-            speed = sample + 20;
-        }
+        angle = (u8)ParticleRandom_ReadDirectSample(gRandomTable);
+        count = (ParticleRandom_ReadDirectSample(gRandomTable) & 3) + 2;
+        speed = (ParticleRandom_ReadDirectSample(gRandomTable) & 3) + 20;
         SparkParticle_Spawn(&p->sprite.position, 1, &size, angle, count, speed, 2, 2);
         sub_08012B34(m, p);
         Sound_PlaySongChecked(0x339);

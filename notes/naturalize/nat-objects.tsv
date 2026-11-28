@@ -28,3 +28,4 @@ src/objects/bat_curtain/breakable_barrier.c	BreakableBarrier_UpdateSprite	natura
 src/objects/bat_curtain/breakable_barrier.c	BatCurtain_Create	natural	natural	0	
 src/objects/bat_curtain/BreakableBarriers_Reset.c	BreakableBarriers_Reset	natural	natural	0	
 src/objects/bat_curtain/breakable_barrier.c	BreakableBarrier_Update	contrived	minor	12	ContactCollider_ClearFlags kept to re-enable the collider: plain &= ~4 loads a halfword mask literal
+src/objects/bat_curtain/breakable_barrier.c	BreakableBarrier_UpdateBroken	contrived	natural	2	
