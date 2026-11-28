@@ -10,11 +10,9 @@ u16 CountdownTimer_GetRemaining(void)
 void CountdownTimer_Stop(void)
 {
     if (gCountdownTimer) {
-        struct CountdownTimer *timer;
         Hud_ClearTimer();
-        timer = gCountdownTimer;
-        timer->remaining = 0;
-        Task_Kill(timer);
+        gCountdownTimer->remaining = 0;
+        Task_Kill(gCountdownTimer);
     }
 }
 
