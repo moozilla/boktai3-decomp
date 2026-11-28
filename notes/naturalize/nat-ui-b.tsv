@@ -400,3 +400,12 @@ src/ui/town/town_map.c	TownMap_UpdateAnimations	minor	natural	4
 src/ui/town/town_map.c	TownMap_InitAnimations	minor	natural	3	
 src/ui/town/town_map.c	TownMap_ConfirmSelection	minor	natural	1	
 src/ui/town/town_map.c	TownMap_InitBackground	contrived	natural	4	
+src/ui/town/town_map.c	TownMap_ConfigureDisplay	natural	natural	0	
+src/ui/town/town_map.c	TownMap_UpdateSelection	natural	natural	0	
+src/ui/town/town_map.c	TownMap_UpdateOpeningDelay	natural	natural	0	
+src/ui/town/town_map.c	TownMap_UpdateScriptDelay	natural	natural	0	
+src/ui/town/town_map.c	TownMap_StartSelection	natural	natural	0	
+src/ui/town/town_map.c	TownMap_StartOpeningFade	natural	natural	0	
+src/ui/town/town_map.c	TownMap_StartClosingFade	natural	natural	0	
+src/ui/town/town_map.c	TownMap_OnUpdate	natural	natural	0	
+src/ui/town/town_map.c	TownMap_OnDestroy	contrived	natural	1	

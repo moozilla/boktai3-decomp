@@ -222,19 +222,14 @@ void TownMap_OnUpdate(struct RegistryChoiceMenu *menu)
 
 void TownMap_OnDestroy(struct RegistryChoiceMenu *menu)
 {
-    struct AnimSprite *animation = menu->animations;
-    s32 i = 4;
-    do {
-        if (animation->active)
-            Anim_Remove(animation);
-        animation++;
-        i--;
-    } while (i >= 0);
-    {
-        struct MenuCursor **cursor = &menu->cursor;
-        if (*cursor)
-            *cursor = 0;
+    s32 i;
+
+    for (i = 0; i < 5; i++) {
+        if (menu->animations[i].active)
+            Anim_Remove(&menu->animations[i]);
     }
+    if (menu->cursor)
+        menu->cursor = 0;
 }
 
 void TownMap_CreateSelectionCursor(struct RegistryChoiceMenu *menu, s32 selection)
