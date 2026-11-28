@@ -163,3 +163,4 @@ src/ui/books/forging_book/ForgingBook_CreateFromScript.c	ForgingBook_CreateFromS
 src/ui/books/forging_book/Lookup_FindValueIndex.c	Lookup_FindValueIndex	natural	natural	0	
 src/ui/books/forging_book/ForgingBook_IsGridPositionValid.c	ForgingBook_IsGridPositionValid	natural	natural	0	
 src/ui/books/forging_book/ForgingBook_FinalizeState.c	ForgingBook_FinalizeState	natural	natural	0	empty
+src/ui/books/forging_book/sub_0821358C.c	sub_0821358C	contrived	contrived	30	frame store still builds the entry address from the book pointer (off + book order stops address reuse)
