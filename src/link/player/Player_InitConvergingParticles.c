@@ -1,35 +1,23 @@
 #include "global.h"
+#include "player/player.h"
+#include "effects/orbits/homing_effect.h"
 
-struct E0823960C {
-    u8 f0[0xF];
-    u8 fF;
-    u8 f10[0x34 - 0x10];
-};
-struct Q0823960C {
-    u32 f0;
-    u8 f4;
-    u8 f5;
-    u8 f6;
-    u8 f7;
-    struct E0823960C e[4];
-};
-u32 AnimData_FindEntry(u32);
-void ParticleSprite_Initialize(void *, u32, u32);
+void ParticleSprite_Initialize(void *, void *, u32);
 void Effect_SetOrigin(void *, s32, s32);
-void Effect_SetPalette(void *, u32);
 
-void Player_InitConvergingParticles(u8 *p)
+void Player_InitConvergingParticles(struct Player *p)
 {
-    struct Q0823960C *q = (struct Q0823960C *)(p + 0x9A8);
+    struct ConvergingEffectState *state = &p->convergingEffects;
     s32 i;
-    q->f0 = AnimData_FindEntry(0x1C1E);
+
+    state->graphics = AnimData_FindEntry(0x1C1E);
     for (i = 0; i < 4; i++) {
-        struct E0823960C *e = &q->e[i];
-        ParticleSprite_Initialize(e, q->f0, 1);
-        Effect_SetOrigin(e, -4, -4);
-        Effect_SetPalette(e, 1);
-        e->fF = 2;
+        struct ConvergingParticle *particle = &state->particles[i];
+        ParticleSprite_Initialize(particle, state->graphics, 1);
+        Effect_SetOrigin(particle, -4, -4);
+        Effect_SetPalette(particle, 1);
+        particle->renderMode = 2;
     }
-    q->f5 = 0;
-    q->f6 = 0;
+    state->next = 0;
+    state->ticks = 0;
 }
