@@ -1,17 +1,17 @@
-#include "global.h"
-extern u8 *gGameState;
+#include "system/game_state/game_state.h"
 s32 sub_082280F8(void)
 {
     s32 best = 0;
     s32 max = -100;
-    s32 i = 0;
-    s16 *v = (s16 *)(gGameState + 0x666);
-    for (; i <= 4; i++) {
-        if (*v > max) {
-            max = *v;
+    s32 i;
+
+    for (i = 0; i < 5; i++) {
+        s16 value = ((s16 *)gGameState->unk666)[i];
+
+        if (value > max) {
+            max = value;
             best = i;
         }
-        v++;
     }
     return best;
 }

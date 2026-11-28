@@ -642,3 +642,4 @@ src/system/save/SaveData_RequestSave.c	SaveData_RequestSave	minor	minor	2	set_fl
 src/system/save/Settings_LoadOrInitializeDefaults.c	Settings_LoadOrInitializeDefaults	contrived	contrived	8	parked constants: direct field stores load the constants after the addresses
 src/system/save/GameState_UpdateCounterBalanceRank.c	GameState_UpdateCounterBalanceRank	contrived	natural	1	
 src/system/save/GameStats_SelectLeadingCounter.c	GameStats_SelectLeadingCounter	contrived	minor	1	array indexed as *(i + field) for the index-first address sum
+src/system/save/sub_082280F8.c	sub_082280F8	contrived	minor	1	values live in a byte-array field of the shared header, read through an s16 cast
