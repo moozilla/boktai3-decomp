@@ -127,3 +127,4 @@ src/objects/coffin/tether_actor.c	TetherActor_UpdateWorldPosition	contrived	mino
 src/objects/coffin/tether_actor.c	TetherActor_TestTerrainTransition	contrived	natural	7	
 src/objects/coffin/tether_actor.c	TetherActor_UpdateInteractionValue	minor	natural	1	
 src/objects/coffin/tether_actor.c	TetherActor_UpdateIdleState	contrived	natural	4	
+src/objects/coffin/tether_actor.c	TetherActor_UpdateLockedShake	minor	minor	6	PARTICLE_RANDOM_SAVE_ORIGIN stays: plain table loads reorder the random draws

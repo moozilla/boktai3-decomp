@@ -2094,12 +2094,8 @@ void TetherActor_UpdateLockedShake(struct TetherActor *actor)
     actor->shakeX = Mod(ParticleRandom_ReadSample(randomTable), amplitude) - (amplitude >> 1);
     actor->shakeZ = Mod(ParticleRandom_ReadSample(randomTable), amplitude) - (amplitude >> 1);
     if ((++actor->lockSoundFrame & 7) == 0) {
-        {
-            u32 sample = ParticleRandom_ReadSample(randomTable);
-            sample &= 1;
-            if (sample)
-                Sound_PlaySong(0x2B9);
-        }
+        if (ParticleRandom_ReadSample(randomTable) & 1)
+            Sound_PlaySong(0x2B9);
     }
     if (++actor->lockFrame > 127) {
         actor->interactionLock = 0;
