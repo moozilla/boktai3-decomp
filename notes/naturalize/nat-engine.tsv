@@ -46,3 +46,4 @@ src/engine/iwram_code.c	sub_08001038	natural	natural	0
 src/engine/iwram_code.c	sub_08001120	natural	natural	0	
 src/engine/iwram_code.c	sub_080012E0	natural	natural	0	
 src/engine/math/ScalarApproach_ClampCentered.c	ScalarApproach_ClampCentered	contrived	minor	1	assignment inside the condition
+src/engine/math/ScalarApproach_ClampAngle.c	ScalarApproach_ClampAngle	contrived	minor	1	assignment inside the condition
