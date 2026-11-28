@@ -478,3 +478,4 @@ src/monsters/axe_armor/AxeArmor_RecordDefeat.c	AxeArmor_RecordDefeat	minor	minor
 src/monsters/cannons/vulcan/VulcanCannon_InitCollider.c	VulcanCannon_InitCollider	contrived	natural	4	
 src/monsters/cannons/vulcan/VulcanCannon_ApplyHitReaction.c	VulcanCannon_ApplyHitReaction	contrived	natural	3	
 src/monsters/cannons/vulcan/VulcanCannon_ReadScriptValueList.c	VulcanCannon_ReadScriptValueList	contrived	natural	3	
+src/monsters/cannons/vulcan/VulcanCannon_RecordDefeat.c	VulcanCannon_RecordDefeat	contrived	minor	3	H() halfword view for the unnamed game-state counters

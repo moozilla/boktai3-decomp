@@ -1,18 +1,9 @@
-#include "global.h"
-struct Args {
-    s32 x, y, z, a, b, c, d, e;
-};
-struct Message {
-    u32 type : 16;
-    u32 reserved : 16;
-    struct Args *args;
-};
-extern u8 *gGameState;
-void Script_Call(u32, struct Message *);
+#include "monsters/cannons/vulcan_cannon_worker.h"
+#include "script/script_utility.h"
+#include "system/game_state/game_state.h"
 void Bestiary_UnlockEntry(s32);
 void Player_AddExperience(s32);
-#define H(p, n) (*(s16 *)((p) + (n)))
-#define W(p, n) (*(u32 *)((p) + (n)))
+#define H(p, n) (*(s16 *)((u8 *)(p) + (n)))
 static inline s32 clamp(s32 v)
 {
     if (v > 9999)
@@ -21,43 +12,42 @@ static inline s32 clamp(s32 v)
         v = 0;
     return v;
 }
-#define INC(n) H(gGameState, n) = clamp(H(gGameState, n) + 1)
-void VulcanCannon_RecordDefeat(u8 *p)
+void VulcanCannon_RecordDefeat(struct VulcanCannon *p)
 {
-    struct Args a;
-    struct Message m;
-    u32 q = W(p, 0x174);
-    if (q) {
-        a.x = H(p, 0x88);
-        a.y = H(p, 0x8A);
-        a.z = H(p, 0x8C);
-        a.a = W(p, 0x164);
-        a.b = W(p, 0x168);
-        a.c = W(p, 0x16C);
-        a.d = W(p, 0x15C);
-        a.e = W(p, 0x158);
-        m.type = 8;
-        m.args = &a;
-        Script_Call(q, &m);
+    s32 values[8];
+    struct ScriptUtilityArguments arguments;
+    u32 script = p->deathScript;
+    if (script) {
+        values[0] = p->display.position.x;
+        values[1] = p->display.position.y;
+        values[2] = p->display.position.z;
+        values[3] = p->args[0];
+        values[4] = p->args[1];
+        values[5] = p->args[2];
+        values[6] = p->hitFlags;
+        values[7] = (s32)p->owner;
+        arguments.count = 8;
+        arguments.values = values;
+        Script_Call(script, &arguments);
     }
     Bestiary_UnlockEntry(35);
-    if (W(p, 0x15C) & 1) {
+    if (p->hitFlags & 1) {
         u16 flags;
-        Player_AddExperience(H(p, 0x150));
+        Player_AddExperience(p->defeatId);
         H(gGameState, 0x87C) = H(gGameState, 0x87C) < 9999 ? H(gGameState, 0x87C) + 1 : 9999;
         H(gGameState, 0x538) = H(gGameState, 0x538) < 9999 ? H(gGameState, 0x538) + 1 : 9999;
-        flags = H(p, 0x146);
+        flags = p->bodyFlags;
         H(gGameState, 0x566) = H(gGameState, 0x566) < 9999 ? H(gGameState, 0x566) + 1 : 9999;
         if (flags & 0x80) {
-            INC(0x58A);
+            gGameState->targetFlagBonuses[0] = clamp(gGameState->targetFlagBonuses[0] + 1);
         } else if (flags & 0x100) {
-            INC(0x58C);
+            gGameState->targetFlagBonuses[1] = clamp(gGameState->targetFlagBonuses[1] + 1);
         } else if (flags & 0x200) {
-            INC(0x58E);
+            gGameState->targetFlagBonuses[2] = clamp(gGameState->targetFlagBonuses[2] + 1);
         } else if (flags & 0x400) {
-            INC(0x590);
+            gGameState->targetFlagBonuses[3] = clamp(gGameState->targetFlagBonuses[3] + 1);
         } else if (flags & 0x800) {
-            INC(0x592);
+            gGameState->targetFlagBonuses[4] = clamp(gGameState->targetFlagBonuses[4] + 1);
         }
     }
 }
