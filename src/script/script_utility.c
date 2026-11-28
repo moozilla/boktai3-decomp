@@ -156,20 +156,15 @@ u32 ScriptUtility_IsControlFlagSet(void)
     return FALSE;
 }
 
-/* ScriptUtility_SetPauseLatch: Sets bit 0x800 in the shared control flags and preserves the incoming return value; pairs with ScriptUtility_WritePauseLatchToReference. */
+/* ScriptUtility_SetPauseLatch: Sets bit 0x800 in the shared control flags; pairs with ScriptUtility_WritePauseLatchToReference. */
 
-u32 ScriptUtility_SetPauseLatch(u32 result)
+u32 ScriptUtility_SetPauseLatch(void)
 {
-    u32 *flags;
-    do {
-        do {
-            do {
-                flags = &gEngineFlags;
-            } while (0);
-        } while (0);
-    } while (0);
-    *flags |= 0x800;
-    return result;
+    gEngineFlags |= 0x800;
+#ifdef UBFIX
+    // falls off the end: the result is whatever the caller left in r0
+    return 0;
+#endif
 }
 
 void ScriptUtility_WritePauseLatchToReference(void)
