@@ -694,17 +694,16 @@ void Hud_DrawDecimalDigits(s32 value, s32 divisor, s32 x, s32 y, s32 alternateSt
 {
     u32 base = 0x31;
     u16 *cell;
-    if (!alternateStyle) {
+    s32 remaining;
+    if (!alternateStyle)
         base = 0x21;
-    }
     cell = Hud_GetTilemapCell(0, x, y);
+    remaining = value;
     while (divisor > 0) {
-        s32 digit = Div(value, divisor);
+        s32 digit = Div(remaining, divisor);
         u16 tile = digit + base;
         *cell++ = tile | 0xF000;
-        do {
-            value -= divisor * digit;
-        } while (0);
+        remaining -= divisor * digit;
         divisor = Div(divisor, 10);
     }
 }

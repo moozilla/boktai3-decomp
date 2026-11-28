@@ -532,3 +532,4 @@ src/ui/hud/display/hud.c	Hud_UpdateTransientStatGauge	fudged	partial	18	dead zer
 src/ui/hud/display/hud.c	Hud_UpdateTimedStatusIcon	fudged	natural	7	
 src/ui/hud/display/hud.c	Hud_PlayActionChangeCue	fudged	partial	3	unsigned selection - 1 <= 2 range test (a two-sided test compiles differently)
 src/ui/hud/display/hud.c	Hud_UpdateCountdownDigits	fudged	partial	7	SetDigitVisibility/TestFlags helpers (mask-first load)
+src/ui/hud/display/hud.c	Hud_DrawDecimalDigits	fudged	natural	32	
