@@ -1,8 +1,9 @@
 #include "global.h"
+#include "engine/video/sprite_component.h"
 
-u32 Sprite_Remove(u8 *);
+void Sprite_Remove(struct DisplaySequenceSprite *);
 
-void ArmorIndicator_DestroySprite(u8 *p)
+void ArmorIndicator_DestroySprite(struct SpriteComponent *component)
 {
-    Sprite_Remove(p + 0x8);
+    Sprite_Remove(&component->sprite);
 }
