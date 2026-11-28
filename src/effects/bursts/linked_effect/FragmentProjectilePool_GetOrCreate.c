@@ -1,25 +1,22 @@
-#include "global.h"
-#include "engine/ram.h"
+#include "effects/bursts/linked_effect.h"
 
-u8 *Task_Create(u32, u32);
-void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
-s32 FragmentProjectilePool_Init(u8 *);
-void Task_Kill(u8 *);
-void ActorEffect_UpdatePool(void);
-void FragmentProjectilePool_Cleanup(void);
+s32 FragmentProjectilePool_Init(struct LinkedEffectPool *);
+s32 ActorEffect_UpdatePool(struct LinkedEffectPool *);
+u32 FragmentProjectilePool_Cleanup(struct LinkedEffectPool *);
 
-u8 *FragmentProjectilePool_GetOrCreate(void)
+struct LinkedEffectPool *FragmentProjectilePool_GetOrCreate(void)
 {
-    u8 *p;
-    if (gActorEffectManager != 0)
-        return gActorEffectManager;
-    p = Task_Create(0x8, 0xc80);
-    if (p != 0) {
-        Task_SetCallbacks(p, ActorEffect_UpdatePool, FragmentProjectilePool_Cleanup);
-        if (FragmentProjectilePool_Init(p) < 0) {
-            Task_Kill(p);
+    struct LinkedEffectPool *pool;
+
+    if (gActorEffectManager)
+        return (struct LinkedEffectPool *)gActorEffectManager;
+    pool = Task_Create(0x8, sizeof(*pool));
+    if (pool) {
+        Task_SetCallbacks(pool, ActorEffect_UpdatePool, FragmentProjectilePool_Cleanup);
+        if (FragmentProjectilePool_Init(pool) < 0) {
+            Task_Kill(pool);
             return 0;
         }
     }
-    return p;
+    return pool;
 }

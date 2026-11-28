@@ -165,3 +165,4 @@ src/effects/bursts/linked_effect/FragmentProjectilePool_AllocSprite.c	FragmentPr
 src/effects/bursts/linked_effect/ActorEffect_UpdatePool.c	ActorEffect_UpdatePool	contrived	natural	8	named pause and lock predicates keep their mask locals
 src/effects/bursts/linked_effect/FragmentProjectilePool_Cleanup.c	FragmentProjectilePool_Cleanup	minor	natural	1	-
 src/effects/bursts/linked_effect/FragmentProjectilePool_Init.c	FragmentProjectilePool_Init	contrived	natural	1	-
+src/effects/bursts/linked_effect/FragmentProjectilePool_GetOrCreate.c	FragmentProjectilePool_GetOrCreate	minor	natural	1	-
