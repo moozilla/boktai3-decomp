@@ -413,3 +413,4 @@ src/npc/kuro/Kuro_BlendPalette.c	Kuro_BlendPalette	contrived	contrived	6	parked 
 src/npc/kuro/Kuro_UpdateBehavior.c	Kuro_UpdateBehavior	natural	natural	0	
 src/npc/kuro/Kuro_OnBehaviorUpdate.c	Kuro_OnBehaviorUpdate	natural	natural	0	
 src/npc/kuro/Kuro_UpdateAnimationSequence.c	Kuro_UpdateAnimationSequence	contrived	minor	2	per-case tag pointer locals; animation passed through the targetPosition field that overlaps it
+src/npc/kuro/Kuro_TurnTowardAngle.c	Kuro_TurnTowardAngle	contrived	natural	5	
