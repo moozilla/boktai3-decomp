@@ -33,18 +33,18 @@ void PaletteTransition_InitDisplays(struct PaletteTransition *p)
 {
     u8 *anim = p->anim;
     struct PaletteDisplayEntry *e = &gUnk_086126E0[p->index];
-    u16 t = p->timer;
     s32 i;
-    if (t == 0) {
+    if (p->timer == 0) {
         s32 x = e->offsetX;
         s32 y = e->offsetY;
         u16 *origin = p->origin;
+
         x += 0x40;
         y += 0x54;
         origin[0] = x;
         origin[1] = y;
-        origin[2] = t;
-        origin[3] = t;
+        origin[2] = 0;
+        origin[3] = 0;
     }
     for (i = 0; i < 2; i++) {
         u8 *a = anim + i * 0x94;
