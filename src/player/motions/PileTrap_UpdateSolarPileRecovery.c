@@ -1,8 +1,6 @@
 #include "global.h"
+#include "player/player.h"
 #include "player/player_slot_status.h"
-#define B(n) (*(u8 *)(p + (n)))
-#define H(n) (*(u16 *)(p + (n)))
-#define W(n) (*(u32 *)(p + (n)))
 s32 Player_ConsumeStateEntry(void *);
 s32 ActorVariant_GetTableValue(u32, s32);
 s32 Player_SetAnimation(void *, s32, s32, s32);
@@ -17,73 +15,68 @@ void Player_OnRecoveryActionEnd(void *);
 void Player_SetPendingCallback(void *, void (*)(void *));
 s32 PileTrap_TryActivate(void *);
 void PileTrap_BeginRecovery(void *);
-static inline void SetByte(u8 *a, u32 value)
-{
-    *a = value;
-}
 // confidence=low: refreshes the barrier through the resource recovery phases.
-void PileTrap_UpdateSolarPileRecovery(u8 *p)
+void PileTrap_UpdateSolarPileRecovery(struct Player *p)
 {
     if (Player_ConsumeStateEntry(p)) {
         Player_SetPendingCallback(p, Player_OnRecoveryActionEnd);
     }
-    switch (*((u8 *)(p + 0x458))) {
+    switch (p->tetherPhase) {
         case 0:
-            PileTrap_TryActivate(*(void **)(p + 0xB40));
+            PileTrap_TryActivate(p->actionRequestEffect);
             Sound_PlaySong(0x128);
-            Player_SetAnimation(p, ActorVariant_GetTableValue(B(0x418), 0), 64, 1);
+            Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0), 64, 1);
             Player_SetActionPhase(p, 1);
             break;
         case 1:
-            PileTrap_TryActivate(*(void **)(p + 0xB40));
-            if (H(0x45a) == 0) {
-                if ((u8)(B(0x3a4) - 2) <= 4) {
-                    B(0x3a4) = 4;
-                    B(0x3a2) = 1;
-                    B(0x3a3) = 0;
+            PileTrap_TryActivate(p->actionRequestEffect);
+            if (p->tetherFrame == 0) {
+                if ((u8)(p->facing - 2) <= 4) {
+                    p->facing = 4;
+                    p->heading = 1;
+                    p->side = 0;
                 } else {
-                    B(0x3a4) = 0;
-                    B(0x3a2) = 0;
-                    B(0x3a3) = 0;
+                    p->facing = 0;
+                    p->heading = 0;
+                    p->side = 0;
                 }
                 Player_SetActionOrigin(p);
-                ++H(0x45a);
+                ++p->tetherFrame;
             }
-            *((u16 *)(p + 0x6fc)) = 15;
-            if (!Player_SetAnimation(p, ActorVariant_GetTableValue(*((u8 *)(p + 0x418)), 8), 64,
-                                     1)) {
+            p->resetValue6FC = 15;
+            if (!Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 8), 64, 1)) {
                 break;
             }
             Sound_PlaySong(0xcb);
-            if (!((*(*((u16 **)(p + 0x348)))) & 1)) {
-                goto finish;
+            if (!(p->inputKeys[0] & 1)) {
+                Player_SetActionPhase(p, 4);
+                break;
             }
             if (Player_CanRecoverResourceWhileFlagged(p)) {
-                B(0x4fd) = 1;
-                H(0x4f8) = 0;
+                p->chargeSoundActive = 1;
+                p->chargeCounter = 0;
                 Player_SetActionPhase(p, 2);
                 break;
             }
-            H(0x4f8) = 0;
+            p->chargeCounter = 0;
             Player_SetActionPhase(p, 3);
             break;
         case 2:
-            PileTrap_TryActivate(*(void **)(p + 0xB40));
-            Player_SetAnimation(p, ActorVariant_GetTableValue(B(0x418), 9), 64, 1);
-            H(0x6FC) = 30;
-            if (*(*(u16 **)(p + 0x348)) & 1)
-                break;
-            goto finish;
+            PileTrap_TryActivate(p->actionRequestEffect);
+            Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 9), 64, 1);
+            p->resetValue6FC = 30;
+            if (!(p->inputKeys[0] & 1))
+                Player_SetActionPhase(p, 4);
+            break;
         case 3:
-            if (PileTrap_TryActivate(*(void **)(p + 0xB40)) == 1 && H(0x4F8) <= 19) {
-                if (++H(0x4F8) > 19)
+            if (PileTrap_TryActivate(p->actionRequestEffect) == 1 && p->chargeCounter <= 19) {
+                if (++p->chargeCounter > 19)
                     Sound_PlaySong(0xF5);
             }
-            Player_SetStatusBits((u32 *)(p + 0x20), 0x80);
-            Player_SetAnimation(p, ActorVariant_GetTableValue(B(0x418), 10), 64, 1);
-            H(0x6fc) = 30;
-            if (!(*(*(u16 **)(p + 0x348)) & 1)) {
-            finish:
+            Player_SetStatusBits(&p->statusFlags, 0x80);
+            Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 10), 64, 1);
+            p->resetValue6FC = 30;
+            if (!(p->inputKeys[0] & 1)) {
                 Player_SetActionPhase(p, 4);
                 break;
             }
@@ -91,17 +84,17 @@ void PileTrap_UpdateSolarPileRecovery(u8 *p)
                 break;
             }
             Sound_PlaySong(0xd8);
-            B(0x4fd) = 1;
-            H(0x4f8) = 0;
+            p->chargeSoundActive = 1;
+            p->chargeCounter = 0;
             Player_SetActionPhase(p, 2);
             break;
         case 4:
-            H(0x6fc) = 15;
-            if (Player_SetAnimation(p, ActorVariant_GetTableValue(B(0x418), 11), 64, 1)) {
-                SetByte(p + 0x3a2, B(0x3a4));
-                B(0x3a3) = 0;
+            p->resetValue6FC = 15;
+            if (Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 11), 64, 1)) {
+                p->heading = p->facing;
+                p->side = 0;
                 ActorSequence_Begin(p, 0, 0);
-                PileTrap_BeginRecovery(*(void **)(p + 0xB40));
+                PileTrap_BeginRecovery(p->actionRequestEffect);
             }
             break;
     }
