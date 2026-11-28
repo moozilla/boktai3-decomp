@@ -131,3 +131,4 @@ src/ui/books/forging_book/ForgingBook_RefreshSelection.c	ForgingBook_RefreshSele
 src/ui/books/forging_book/ForgingBook_RemoveDisplayObjects.c	ForgingBook_RemoveDisplayObjects	contrived	natural	1	
 src/ui/books/forging_book/ForgingBook_InitializeFromScript.c	ForgingBook_InitializeFromScript	contrived	natural	1	
 src/ui/books/forging_book/ForgingBook_Create.c	ForgingBook_Create	natural	natural	1	
+src/ui/books/forging_book/SceneGrid_IsCellBeforeLimit.c	SceneGrid_IsCellBeforeLimit	contrived	contrived	25	row*6+column must be accumulated in four statements (column stays in r0)
