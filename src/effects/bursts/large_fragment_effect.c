@@ -13,17 +13,26 @@
 #include "engine/video/display_sequence.h"
 #include "scene/collision/packed_contact_vector.h"
 
+struct FragmentStateSlot {
+    u8 unk_00[0xBA];
+    u8 state;
+    u8 unk_BB[5];
+};
+
+struct FragmentStatePool {
+    u8 unk_00[0x3C];
+    struct FragmentStateSlot slots[8];
+};
+
 u32 LargeFragmentEffect_IsActive(void)
 {
-    u8 *s = gFragmentEffectManager;
+    struct FragmentStatePool *pool = (struct FragmentStatePool *)gFragmentEffectManager;
     s32 i;
-    u8 *p;
-    if (s == NULL)
+
+    if (!pool)
         return 0;
-    i = 0;
-    p = s + 0xf6;
-    for (; i <= 7; p += 0xc0, i++) {
-        if ((u8)(*p - 1) <= 1)
+    for (i = 0; i < 8; i++) {
+        if (pool->slots[i].state == 1 || pool->slots[i].state == 2)
             return 1;
     }
     return 0;
@@ -48,6 +57,23 @@ void LargeFragmentEffect_OnCollision(void)
 }
 
 void LargeFragmentEffect_OnCollision(void); // a `bx lr` stub
+
+struct ScriptedColliderActor {
+    u32 flags;
+    u8 unknown4[3], priority;
+    u8 unknown8[4];
+    void *graphics;
+    u8 unknown10[0xc];
+    struct SceneVec position;
+    u8 unknown24[8];
+    u8 animation[0x10];
+    u8 collider[0x54];
+    void *script;
+    u16 timer;
+    u8 state, unknown97;
+    s16 variant;
+    u8 unknown9a[5], entered;
+};
 
 void LargeFragmentEffect_InitCollider(u8 *p, u32 a, u32 b, u32 c, u32 d)
 {
@@ -250,7 +276,7 @@ void LargeFragmentEffect_UpdateAnimation(void *unused, struct Feather *p)
         p->enter = 0;
     }
     if ((u16)(p->sequence.index - 1) <= 2) {
-        LargeFragmentEffect_UpdateCollider((u8 *)p);
+        LargeFragmentEffect_UpdateCollider((struct ScriptedColliderActor *)p);
         if (Mod(p->timer, 6) == 0)
             LargeFragmentEffect_SpawnRandomParticle(&p->position);
     }
@@ -279,23 +305,6 @@ void SceneSlot_Remove(struct LargeFragmentSlotPool *pool, struct LargeFragmentSl
 #define ScriptedColliderActors_EnsureManager FragmentSpritePool_GetOrCreate
 
 #define ScriptedColliderActor_InitCollider LargeFragmentEffect_InitCollider
-
-struct ScriptedColliderActor {
-    u32 flags;
-    u8 unknown4[3], priority;
-    u8 unknown8[4];
-    void *graphics;
-    u8 unknown10[0xc];
-    struct SceneVec position;
-    u8 unknown24[8];
-    u8 animation[0x10];
-    u8 collider[0x54];
-    void *script;
-    u16 timer;
-    u8 state, unknown97;
-    s16 variant;
-    u8 unknown9a[5], entered;
-};
 
 struct ScriptedColliderManager {
     u8 task[0x18];
