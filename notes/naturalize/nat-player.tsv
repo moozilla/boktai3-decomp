@@ -208,3 +208,7 @@ src/player/control/SceneActorControl_OnJitterPosition.c	SceneActorControl_OnJitt
 src/player/control/Player_BeginResourceStationInteraction.c	Player_BeginResourceStationInteraction	contrived	natural	1	
 src/player/control/Player_BeginDirectionalCue.c	Player_BeginDirectionalCue	minor	natural	1	
 src/player/control/Player_NotifyActionInterruption.c	Player_NotifyActionInterruption	contrived	minor	1	both notification branches identical in the ROM
+src/player/core/player_core.c	ScreenMote_ResetManager	natural	natural	0	
+src/player/core/player_core.c	Player_UpdateFacingSide	natural	natural	0	
+src/player/core/player_core.c	Player_SetAnimation	contrived	contrived	3	unchanged so far: plain member forms differ by 1+ insns (alias, anim pointer and sum block fix register order); retry
+src/player/core/player_core.c	PlayerAnimation_SelectSecondaryKeyframes	contrived	contrived	2	unchanged so far: plain forms change register use; retry
