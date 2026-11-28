@@ -1,4 +1,5 @@
 #include "objects/coffin/tether_presentation.h"
+#include "scene/motion/scene_actor_terrain.h"
 
 /* Tentative: caller derives quadrant from x/y, then selects a sprite animation. */
 
@@ -41,8 +42,6 @@ s32 DirectionMarker_Update(struct TetherRequestIndicator *indicator)
     return quadrant;
 }
 
-u8 *TerrainModifiers_FindCellOverride(s32, s32);
-
 static inline s32 scale(s32 value)
 {
     if (value >= 0)
@@ -50,59 +49,37 @@ static inline s32 scale(s32 value)
     return -((-value) >> 12);
 }
 
-static inline u8 *cellProperties(s32 cell)
-{
-    u8 *properties = TerrainModifiers_FindCellOverride(cell, 1);
-    if (properties)
-        properties += 4;
-    else {
-        struct EngineMap *map = gTerrainMap;
-        u32 offset = cell * 4 + 12;
-        properties = map->cells + offset;
-    }
-    return properties;
-}
-
 static inline u16 cellFlags(s32 cell)
 {
-    return *(u16 *)(cellProperties(cell) + 2);
-}
-
-static inline s32 cellIndex(s32 x, s32 z)
-{
-    s32 index;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        index = 0;
-    else
-        index = gTerrainMap->rows[z] + x;
-    return index;
+    return ((u16 *)SceneActorTerrain_GetCell(cell))[1];
 }
 
 // confidence=low: true when the tether position, or a point 1 or 2 cells out in any of the four
-
 // directions, lies on a cell with flag 0x80 set.
 
-s32 TetherActor_IsNearRequestTerrain(void *p)
+s32 TetherActor_IsNearRequestTerrain(void *unused)
 {
-    struct ContactPosition *pos = TetherActor_GetPosition();
-    struct ContactPosition v;
-    s32 i, j;
-    if (cellFlags(cellIndex(pos->x >> 8, pos->z >> 8)) & 0x80)
+    struct ContactPosition *center = TetherActor_GetPosition();
+    struct ContactPosition probe;
+    s32 direction, distance;
+
+    if (cellFlags(SceneActorTerrain_GetCellIndex(center)) & 0x80)
         return 1;
-    for (i = 0; i < 4; i++) {
+    for (direction = 0; direction < 4; direction++) {
         s32 angle;
-        j = 1;
-        angle = i << 6;
-        for (; j <= 2; j++) {
-            s32 r = j << 8;
-            struct ContactPosition *pv = &v;
-            pv->x = scale(gUnk_086149C4[(angle + 64) & 255] * r);
-            pv->y = 0;
-            pv->z = scale(gUnk_086149C4[angle & 255] * r);
-            pv->x += pos->x;
-            pv->y += pos->y;
-            pv->z += pos->z;
-            if (cellFlags(cellIndex(pv->x >> 8, pv->z >> 8)) & 0x80)
+
+        distance = 1;
+        angle = direction << 6;
+        for (; distance <= 2; distance++) {
+            s32 radius = distance << 8;
+            struct ContactPosition *position = &probe;
+            position->x = scale(gUnk_086149C4[(angle + 64) & 255] * radius);
+            position->y = 0;
+            position->z = scale(gUnk_086149C4[angle & 255] * radius);
+            position->x += center->x;
+            position->y += center->y;
+            position->z += center->z;
+            if (cellFlags(SceneActorTerrain_GetCellIndex(position)) & 0x80)
                 return 1;
         }
     }
@@ -244,13 +221,12 @@ void Palette_InterpolateBanks(void *, void *, void *, int, int);
 void ScenePaletteFade_BlendPaletteBanks(u8 *destination, u8 *first, u8 *second, int frame,
                                         int shift, int banks)
 {
-    u16 (*outputBank)[16] = (u16 (*)[16])destination;
-    u16 (*firstBank)[16] = (u16 (*)[16])first;
-    u16 (*secondBank)[16] = (u16 (*)[16])second;
+    u16(*outputBank)[16] = (u16(*)[16])destination;
+    u16(*firstBank)[16] = (u16(*)[16])first;
+    u16(*secondBank)[16] = (u16(*)[16])second;
     int bank;
     for (bank = 0; bank < banks; bank++) {
-        Palette_InterpolateBanks(outputBank[bank], firstBank[bank], secondBank[bank],
-                                 frame, shift);
+        Palette_InterpolateBanks(outputBank[bank], firstBank[bank], secondBank[bank], frame, shift);
     }
 }
 
