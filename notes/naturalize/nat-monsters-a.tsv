@@ -576,3 +576,54 @@ src/monsters/golem/golem_main.c	SceneActor_AccelerateForTerrain	minor	minor	0	te
 src/monsters/golem/golem_main_2.c	Golem_OnDestroy	natural	natural	0	
 src/monsters/golem/golem_main_2.c	Golem_Init	minor	minor	1	instance alias removed; duplicated routeDelay store and drawable byte pointer remain
 src/monsters/centipede/Centipede_Init.c	Centipede_Init	minor	minor	0	shared initializer accessors and repeated drawable byte-pointer blocks
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_RemoveSprite	natural	natural	0	
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_SetAnimation	natural	natural	0	
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_OnBodyCollision	natural	natural	0	
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_InitBodyCollider	natural	natural	0	
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_InitDamageCollider	natural	natural	0	
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_ResetAttackAnimationHistory	natural	natural	0	
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_RequestLinkedActorState	natural	natural	0	
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_NotifyLinkedActorLatePhase	natural	natural	0	
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdateIdle	natural	natural	0	
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdateGridAttack	natural	natural	0	
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdateElevatedGridAttack	minor	minor	0	actor alias used only for the final flag
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_GetGridPosition	minor	minor	0	s16 pointer parameter viewed as a vector and a stray block
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_SpawnGridContact	minor	minor	0	s16 view of the position vector
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_OnDamageCollision	minor	minor	4	actor alias and value block for the contact words: direct copies load differently
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_SpawnGridPattern	contrived	natural	3	
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_SpawnTargetedProjectile	contrived	minor	6	position view casts and a destination pointer block remain
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_OnDamage	contrived	minor	6	transform alias remains: direct members change register allocation
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_SelectAttackAnimation	contrived	minor	6	byte-offset random read block remains
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdateTargetedAttack	minor	minor	2	actor alias and random value block
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdateDamageHold	natural	natural	0	
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdateDamageRecovery	natural	natural	0	
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdateStaggerState	natural	natural	0	
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdateHiddenState	natural	natural	0	
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdateDeathState	minor	minor	1	actor alias
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdateIdleState	contrived	natural	1	
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdateAnimationElevenState	contrived	natural	1	
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdateAlternateIdleState	contrived	natural	1	
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdateAnimationNineState	minor	minor	1	transform alias
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdateRandomAnimationState	natural	natural	0	
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdateAnimationThreeState	natural	natural	0	
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdateFastAnimationThreeState	natural	natural	0	
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdateTimedHideState	contrived	contrived	2	actor and transform aliases with duplicated branches
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_RunStateIfUnpaused	natural	natural	0	
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_ApplyRequestedState	minor	minor	1	callback table value block
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_ApplyPendingDamage	contrived	contrived	5	local pointers and nested blocks around the damage counters: direct members change allocation
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_SelectNextAction	minor	minor	3	trigger local only; single-use locals and alias removed
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_ProcessMessages	minor	minor	2	guarded do-while message loop and actor alias: a for loop compiles differently
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdateStateNineAction	natural	natural	0	
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdateStateElevenAction	natural	natural	0	
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdateStateTwelveAction	natural	natural	0	
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdateStateThirteenAction	natural	natural	0	
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdateAnimationFourteen	natural	natural	0	
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdateAnimationFifteen	natural	natural	0	
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdateAnimationSixteen	natural	natural	0	
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdateAnimationSeventeen	natural	natural	0	
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_DispatchSpecialAnimation	natural	natural	0	
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdateIdleAction	minor	minor	0	compared result stored as the requested state
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_TryStartDamageReaction	natural	natural	0	
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdateWaitAction	minor	minor	1	actor alias: removing it changes the saved register
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdateActionTwo	minor	minor	1	actor alias: removing it changes the saved register
+src/bosses/nidhoggr/duel.c	NidhoggrDuel_UpdateDeathAction	minor	minor	1	actor alias: removing it changes the saved register
