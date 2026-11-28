@@ -87,3 +87,4 @@ src/ui/books/collection/collection.c	Collection_UpdatePageIndicator	contrived	na
 src/ui/books/collection/collection.c	Collection_UpdateHighlightPulse	contrived	natural	1	
 src/ui/books/collection/collection.c	Collection_CountUnlockedEntries	contrived	natural	5	
 src/ui/books/collection/collection.c	Collection_UpdateSelectedEntryText	contrived	natural	5	
+src/ui/books/collection/collection.c	Collection_LoadPageBackground	contrived	natural	8	

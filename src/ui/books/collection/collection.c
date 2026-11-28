@@ -136,43 +136,35 @@ u32 Collection_UpdateSelectedEntryText(struct CollectionMenu *p)
 void Collection_LoadPageBackground(struct CollectionMenu *p)
 {
     u32 size;
-    s32 max, count, row;
-    struct BackgroundLayer *tile;
+    s32 max, count, row, column;
+
     Bg_ClearTilemap(0);
     BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0);
     Bg_ClearTilemap(2);
     BgGfx_LoadTilemapSimple(2, 0, 0, 0, 0);
     Bg_ClearTilemap(3);
     BgGfx_LoadTilemapSimple(3, 0, 0, 0, 0);
-    {
-        u8 *res = ScriptProc_Start(0xc091, 0x3536);
-        p->backgroundMap = res;
-        size = 16;
-        Bg_SetupLayers(2, 0, res, 0, 0, 1, &size);
-    }
+    p->backgroundMap = ScriptProc_Start(0xc091, 0x3536);
+    size = 16;
+    Bg_SetupLayers(2, 0, p->backgroundMap, 0, 0, 1, &size);
     Bg_SetPriority(3, 3);
     BgGfx_LoadTilemapSimple(3, 0, 0, 0, 0);
     CpuSet(((struct CollectionPalette *)ScriptProc_Start(0x92b3, 0x204))->colors, gBgPaletteBuffer,
            0x100);
     count = 0;
     max = Collection_GetPageEntryCount(p->page);
-    row = 0;
-    tile = &gBgRecords[3];
-    do {
-        int next = row + 1;
-        int x = 3, y = row * 5, i = 4;
-        do {
-            tile->width = 16;
-            tile->x = 0;
-            tile->y = 0;
+    for (row = 0; row < 2; row++) {
+        for (column = 0; column < 5; column++) {
+            struct BackgroundLayer *layer = &gBgRecords[3];
+
+            layer->width = 16;
+            layer->x = 0;
+            layer->y = 0;
             count++;
             if (count > max)
-                Bg_FillTilemapRectangle(3, x, y + 3, 4, 4, 1, 0, 2);
-            x += 5;
-            i--;
-        } while (i >= 0);
-        row = next;
-    } while (row <= 1);
+                Bg_FillTilemapRectangle(3, column * 5 + 3, row * 5 + 3, 4, 4, 1, 0, 2);
+        }
+    }
 }
 
 s32 Collection_RefreshPage(struct CollectionMenu *s)
