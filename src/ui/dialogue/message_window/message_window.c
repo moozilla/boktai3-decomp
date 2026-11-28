@@ -2,6 +2,7 @@
 #include "engine/input.h"
 #include "engine/video/display_sequence_inline.h"
 #include "engine/video/display_sprite_playback.h"
+#include "gba/io_reg.h"
 
 static inline s32 MessageWindow_GetCharacterDelay(void)
 {
@@ -31,7 +32,7 @@ int MessageWindow_LoadPalette(struct MessageWindow *window, int palette)
 
 void MessageWindow_ApplyPalette(struct MessageWindow *window)
 {
-    CpuSet(window->paletteData->banks[15], gBgPaletteBank15, 0x04000008);
+    CpuCopy32(window->paletteData->banks[15], gBgPaletteBank15, 32);
 }
 
 int MessageWindow_UpdateSpeakerPortrait(struct MessageWindow *window)

@@ -247,3 +247,4 @@ src/ui/dialogue/message_window/message_window.c	MessageWindow_OpenFromScript	min
 src/ui/dialogue/message_window/message_window.c	MessageWindow_SetPageAdvanceDelay	minor	natural	5	
 src/ui/dialogue/message_window/message_window.c	MessageWindow_ClearTextCompletion	minor	natural	2	
 src/ui/dialogue/message_window/message_window.c	MessageWindow_UpdateImmediatePlayback	contrived	natural	1	
+src/ui/dialogue/message_window/message_window.c	MessageWindow_ApplyPalette	minor	natural	1	
