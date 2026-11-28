@@ -7,21 +7,15 @@ s32 MenuPanel_FindEmptyOppositeHalf(struct MenuPanel *panel, u32 index)
     if (index <= 15) {
         start = 16;
         end = 32;
-        goto scan;
+    } else if (index - 16 <= 15) {
+        start = 0;
+        end = 16;
+    } else {
+        return -1;
     }
-    if (index - 16 <= 15)
-        goto lower;
-    goto none;
-found:
-    return i;
-lower:
-    start = 0;
-    end = 16;
-scan:
     for (i = start; i < end; i++) {
         if (MenuPanel_IsEntryEmpty(panel, i))
-            goto found;
+            return i;
     }
-none:
     return -1;
 }
