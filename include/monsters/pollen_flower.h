@@ -10,7 +10,7 @@ struct CannonPaletteColor {
 struct PollenFlower {
     struct Task task;
     struct ContactPosition initialPosition;
-    struct DisplaySequenceSprite sprite;
+    struct ContactSwarmSprite sprite;
     struct ContactSwarmGraphics graphics;
     u8 body[0x48];
     struct CannonPaletteColor flashPalette[16];

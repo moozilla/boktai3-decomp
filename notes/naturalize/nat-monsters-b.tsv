@@ -181,3 +181,4 @@ src/monsters/poison_hand/PoisonHand_Destroy.c	PoisonHand_Destroy	minor	minor	0	r
 src/monsters/poison_hand/PoisonHand_UpdateDefeatBurst.c	PoisonHand_UpdateDefeatBurst	contrived	minor	14	CopyPosition helper; base/random/palette/attributes locals (argument evaluation order)
 src/monsters/poison_hand/PoisonHand_UpdateEmergence.c	PoisonHand_UpdateEmergence	contrived	minor	16	CopyPosition/Polar/Distance helpers; angle/jitter/palette/attributes locals
 src/monsters/poison_hand/PoisonHand_WaitForPlayerApproach.c	PoisonHand_WaitForPlayerApproach	minor	natural	2	pos/origin pointer locals
+src/monsters/pollen_flowers/PollenFlower_InitializeFromScript.c	PollenFlower_InitializeFromScript	contrived	natural	1	
