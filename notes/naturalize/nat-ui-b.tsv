@@ -258,3 +258,13 @@ src/ui/title/tutorial_otenko.c	TutorialOtenko_BeginInteractionSoundSequence	cont
 src/ui/title/tutorial_otenko.c	TutorialOtenko_InitInteractionSoundDelay	contrived	natural	0	
 src/ui/title/tutorial_otenko.c	TutorialOtenko_UpdateInteractionSoundDelay	natural	natural	0	
 src/ui/title/tutorial_otenko.c	TutorialOtenko_UpdateScaleGrowth	minor	minor	0	scale kept in the palette fields of the shared sprite struct
+src/ui/title/tutorial_otenko.c	TutorialOtenko_BeginAnimationPhaseOne	natural	natural	0	
+src/ui/title/tutorial_otenko.c	TutorialOtenko_BeginAnimationPhaseTwo	natural	natural	0	
+src/ui/title/tutorial_otenko.c	TutorialOtenko_BeginAnimationPhaseThree	natural	natural	0	
+src/ui/title/tutorial_otenko.c	TutorialOtenko_BeginAnimationPhaseFour	natural	natural	0	
+src/ui/title/tutorial_otenko.c	TutorialOtenko_BeginAnimationPhaseFive	natural	natural	0	
+src/ui/title/tutorial_otenko.c	TutorialOtenko_BeginAnimationPhaseSix	natural	natural	0	
+src/ui/title/tutorial_otenko.c	TutorialOtenko_BeginAnimationPhaseSeven	natural	natural	0	
+src/ui/title/tutorial_otenko.c	TutorialOtenko_BeginAnimationPhaseEight	natural	natural	0	
+src/ui/title/tutorial_otenko.c	TutorialOtenko_BeginScriptedAnimationPhaseNine	natural	natural	0	
+src/ui/title/tutorial_otenko.c	TutorialOtenko_SetAnimationPhase	minor	natural	2	

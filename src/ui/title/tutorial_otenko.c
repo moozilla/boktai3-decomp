@@ -719,12 +719,8 @@ void TutorialOtenko_SetAnimationPhase(u32 phase)
         ScriptUtility_ClearControlFlag();
         return;
     }
-    phase = (u16)phase;
-    TutorialOtenko_SetState(g, 3, phase);
-    {
-        u32 value = g->phase;
-        g->savedPhase = value;
-    }
+    TutorialOtenko_SetState(g, 3, (u16)phase);
+    g->savedPhase = g->phase;
 }
 
 /* TutorialOtenko_BeginAnimationPhaseTen: Ensures the controller exists and requests mode three phase ten with playback preservation */
