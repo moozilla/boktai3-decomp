@@ -101,3 +101,4 @@ src/engine/sound/Sound_SuspendPlayer29And30Songs.c	Sound_SuspendPlayer29And30Son
 src/engine/sound/Sound_SuspendPlayer30Song.c	Sound_SuspendPlayer30Song	minor	natural	1	
 src/engine/sound/Sound_StopPlayer30Song.c	Sound_StopPlayer30Song	minor	natural	1	
 src/engine/sound/Sound_FadeOutChannel10.c	Sound_FadeOutChannel10	minor	natural	1	
+src/engine/sound/Sound_PauseChannel10.c	Sound_PauseChannel10	minor	natural	1	
