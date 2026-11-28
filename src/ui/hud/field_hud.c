@@ -305,13 +305,9 @@ void MeterDisplay_InitializeWidgets(struct FieldHudWidgets *widgets)
 
 void FieldHud_InitializeNumber(struct FieldHudWidgets *widgets, s32 *source)
 {
-    s32 value;
     widgets->source = source;
     widgets->value = *source;
-    value = widgets->value;
-    if (widgets->value > 999)
-        value = 999;
-    widgets->displayedValue = value;
+    widgets->displayedValue = widgets->value > 999 ? 999 : widgets->value;
     widgets->numberColor = 0x1084;
     widgets->numberStep = Div(widgets->value * 3, 10);
     CpuSet((u8 *)ScriptProc_Start(0x92B3, 0x6458) + 0x1B4, widgets->numberResource, 8);
