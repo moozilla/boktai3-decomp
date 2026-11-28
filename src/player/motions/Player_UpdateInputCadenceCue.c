@@ -7,10 +7,6 @@ s32 Player_SetAnimation(struct Player *, s32, s32, s32);
 void Sound_PlaySong(u32);
 void Player_AddControlFlags(struct Player *, s32);
 void ActorSequence_Begin(struct Player *, s32, s32);
-struct CadenceHistory {
-    u8 pad[0x500];
-    u8 samples[32];
-};
 void Player_UpdateInputCadenceCue(struct Player *p)
 {
     Player_ConsumeStateEntry(p);
@@ -22,16 +18,15 @@ void Player_UpdateInputCadenceCue(struct Player *p)
             p->side = 1;
             p->displaySegmentCount = 0;
             for (i = 31; i > 0; i--) {
-                if (((struct CadenceHistory *)p)->samples[i - 1])
+                if (p->inputHistory[i - 1])
                     p->displaySegmentCount++;
-                ((struct CadenceHistory *)p)->samples[i] =
-                    ((struct CadenceHistory *)p)->samples[i - 1];
+                p->inputHistory[i] = p->inputHistory[i - 1];
             }
             if (p->inputKeys[1] & p->interactionPromptFlags) {
-                ((struct CadenceHistory *)p)->samples[0] = 1;
+                p->inputHistory[0] = 1;
                 p->displaySegmentCount++;
             } else
-                ((struct CadenceHistory *)p)->samples[0] = 0;
+                p->inputHistory[0] = 0;
             if (p->displaySegmentCount) {
                 if (p->displaySegmentCount <= 3)
                     p->indicatorUpdateRate = 128 - (p->displaySegmentCount << 4);

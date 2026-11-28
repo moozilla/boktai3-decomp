@@ -351,7 +351,8 @@ struct Player {
     u16 chargeCounter; /* 0x4F8 (tentative) */
     u8 unk4FA[3];
     u8 chargeSoundActive; /* 0x4FD (tentative) */
-    u8 unk4FE[0x22];
+    u8 unk4FE[2];
+    u8 inputHistory[0x20];      /* 0x500: one byte per frame, newest first */
     u16 interactionPromptFlags; /* 0x520: bits OR'd in by ControlPanel based on interactionPromptCategory (tentative) */
     u16 displaySegmentCount; /* 0x522: input hits in the 32-frame history, clamped to seven for display. */
     u16 indicatorUpdateRate; /* 0x524: player input animation rate, used as the control panel phase divisor. */
