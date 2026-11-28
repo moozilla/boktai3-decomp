@@ -1,16 +1,11 @@
 #include "global.h"
+#include "bosses/ratatosk/ratatosk.h"
 
-extern u32 gUnk_08613F54[];
-struct A {
-    u8 f[0xa1];
-    u8 a;
-    u8 g[0xa];
-    u8 i;
-};
-void Callback_InvokeActor(void *, u32);
+extern void *const gUnk_08613F54[];
+void Callback_InvokeActor(void *, void *);
 
-void Ratatosk_UpdateBehavior(struct A *p)
+void Ratatosk_UpdateBehavior(struct Ratatosk *p)
 {
-    p->a = 0;
-    Callback_InvokeActor(p, gUnk_08613F54[p->i]);
+    p->behaviorFlag = 0;
+    Callback_InvokeActor(p, gUnk_08613F54[p->actionMode]);
 }
