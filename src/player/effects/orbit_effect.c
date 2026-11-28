@@ -45,16 +45,8 @@ void PlayerOrbitEffect_UpdateParticle(struct PlayerOrbitEffect *effect,
 void PlayerBurst_UpdateParticle(struct PlayerOrbitEffect *effect,
                                 struct PlayerOrbitParticle *particle)
 {
-    {
-        u16 x = particle->motion.velocityX;
-        u16 y = particle->position.x;
-        particle->position.x = x + y;
-    }
-    {
-        u16 x = particle->motion.velocityZ;
-        u16 y = particle->position.z;
-        particle->position.z = x + y;
-    }
+    particle->position.x += particle->motion.velocityX;
+    particle->position.z += particle->motion.velocityZ;
     particle->motion.animationPhase++;
     if (particle->motion.animationPhase == 5)
         SpriteDrawable_SelectTileFrame(particle, effect->resource, 5);

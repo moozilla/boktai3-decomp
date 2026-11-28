@@ -542,3 +542,4 @@ src/player/effects/burst/VariantSprite_SelectAnimation.c	VariantSprite_SelectAni
 src/player/effects/burst/PlayerBurst_InitializeParticles.c	PlayerBurst_InitializeParticles	contrived	contrived	3	unchanged: second record cursor and per-iteration table reloads
 src/player/effects/orbit_effect.c	PlayerBurst_SetStateCallback	natural	natural	0	-
 src/player/effects/orbit_effect.c	PlayerOrbitEffect_UpdateParticle	minor	natural	2	-
+src/player/effects/orbit_effect.c	PlayerBurst_UpdateParticle	contrived	natural	2	-
