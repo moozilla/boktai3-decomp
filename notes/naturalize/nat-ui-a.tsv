@@ -122,3 +122,4 @@ src/ui/books/forging_book/ForgingBook_SetAnimation.c	ForgingBook_SetAnimation	mi
 src/ui/books/forging_book/ForgingBook_HasDiscoveredAllWeapons.c	ForgingBook_HasDiscoveredAllWeapons	natural	natural	0	
 src/ui/books/forging_book/ForgingBook_HasDiscoveredAllItems.c	ForgingBook_HasDiscoveredAllItems	natural	natural	0	
 src/ui/books/forging_book/ForgingBook_RefreshEntrySprites.c	ForgingBook_RefreshEntrySprites	contrived	natural	1	
+src/ui/books/forging_book/ForgingBook_UpdateCategoryCountDigits.c	ForgingBook_UpdateCategoryCountDigits	contrived	natural	1	

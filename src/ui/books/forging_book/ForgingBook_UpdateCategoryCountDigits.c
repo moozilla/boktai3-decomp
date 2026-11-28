@@ -1,28 +1,25 @@
 #include "global.h"
-s32 ForgingBook_CountDiscoveredCategoryEntries(void *, s32);
-s32 ForgingBook_GetCategoryEntryCount(s32);
+#include "ui/books/forging_book.h"
 s32 Div(s32, s32);
 s32 Mod(s32, s32);
-void Anim_LoadKeyframe(void *, void *, u32, u32);
-u32 ForgingBook_UpdateCategoryCountDigits(u8 *p)
+
+u32 ForgingBook_UpdateCategoryCountDigits(struct ForgingBook *book)
 {
-    s16 *idx = (s16 *)(p + 0xb60);
-    s32 a = ForgingBook_CountDiscoveredCategoryEntries(p, *idx), b;
-    s32 ad, am, bd, bm;
-    void *anchor;
-    b = ForgingBook_GetCategoryEntryCount(*idx);
-    if (*idx > 5) {
-        a--;
-        b--;
+    s32 discovered = ForgingBook_CountDiscoveredCategoryEntries(book, book->category);
+    s32 total = ForgingBook_GetCategoryEntryCount(book->category);
+    s32 discoveredTens, discoveredOnes, totalTens, totalOnes;
+
+    if (book->category > 5) {
+        discovered--;
+        total--;
     }
-    ad = Div(a, 10);
-    am = Mod(a, 10);
-    bd = Div(b, 10);
-    bm = Mod(b, 10);
-    Anim_LoadKeyframe(p + 0x1e4, p + 0x24, (u16)ad, 0);
-    anchor = p + 0x24;
-    Anim_LoadKeyframe(p + 0x244, anchor, (u16)am, 0);
-    Anim_LoadKeyframe(p + 0x2a4, anchor, (u16)bd, 0);
-    Anim_LoadKeyframe(p + 0x304, anchor, (u16)bm, 0);
+    discoveredTens = Div(discovered, 10);
+    discoveredOnes = Mod(discovered, 10);
+    totalTens = Div(total, 10);
+    totalOnes = Mod(total, 10);
+    Anim_LoadKeyframe(&book->countDigits[0], &book->resource, (u16)discoveredTens, 0);
+    Anim_LoadKeyframe(&book->countDigits[1], &book->resource, (u16)discoveredOnes, 0);
+    Anim_LoadKeyframe(&book->countDigits[2], &book->resource, (u16)totalTens, 0);
+    Anim_LoadKeyframe(&book->countDigits[3], &book->resource, (u16)totalOnes, 0);
     return 0;
 }
