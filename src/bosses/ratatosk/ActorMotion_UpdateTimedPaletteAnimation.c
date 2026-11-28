@@ -38,13 +38,11 @@ updateFlags:
     if (p->actionPhase == 4) {
         Player_ClearScriptToggle();
         Ratatosk_SetFlags(p, 8);
-        Ratatosk_SetFlags(p, 16);
+        p->flags |= 16;
     }
-    {
-        Ratatosk_SetFlags(p, 0x100000);
-        if (p->actionPhase != 4)
-            p->flags |= 64;
-    }
+    Ratatosk_SetFlags(p, 0x100000);
+    if (p->actionPhase != 4)
+        p->flags |= 64;
     Ratatosk_SetFlags(p, 0x1000000);
     Callback_InvokeActor(p, p->actionTryUpdate);
 }
