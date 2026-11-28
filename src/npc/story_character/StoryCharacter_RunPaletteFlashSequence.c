@@ -21,11 +21,8 @@ static inline s32 Interpolate(s32 start, s32 end, s32 tick, s32 duration)
 }
 void StoryCharacter_RunPaletteFlashSequence(u32 a, struct SceneActor *p, s32 a2)
 {
-    s32 *base20 = (s32 *)((u8 *)p + 0x20);
-    {
-        u16 mask = 0x400;
-        p->flags |= mask;
-    }
+    s32 *effects = (s32 *)p->unknown20;
+    SceneActor_SetFlags(p, 0x400);
     if (p->animationEntered != 0) {
         u32 animId;
         p->animationEntered = 0;
@@ -72,36 +69,24 @@ void StoryCharacter_RunPaletteFlashSequence(u32 a, struct SceneActor *p, s32 a2)
         Sound_PlaySong(0x577);
     }
     switch (p->animationPhase) {
-        case 0: {
-            s32 color;
-            s32 base;
-            s32 hi;
-            s32 r2;
-            if (a2 > 0x77)
-                goto finalize;
-            color = Interpolate(0x40, 0, a2, 0x78);
-            DisplayAnimation_SetPalette(&p->drawable.common, color, color, 0);
-            base = p->target.y;
-            hi = base + 0x40;
-            r2 = Interpolate(base, hi, a2, 0x78);
-            p->body.position.y = r2;
-            break;
-        finalize:
-            DisplayAnimation_SetPalette(&p->drawable.common, 0x40, 0x40, 0);
-            DisplayAnimation_ClearFlags(&p->drawable.common, 2);
-            sub_081FED40(base20[1]);
-            p->animationPhase++;
-            {
-                u16 mask = 0x100;
-                p->flags |= mask;
+        case 0:
+            if (a2 <= 119) {
+                s32 color = Interpolate(0x40, 0, a2, 0x78);
+                s32 base;
+                DisplayAnimation_SetPalette(&p->drawable.common, color, color, 0);
+                base = p->target.y;
+                p->body.position.y = Interpolate(base, base + 0x40, a2, 0x78);
+            } else {
+                DisplayAnimation_SetPalette(&p->drawable.common, 0x40, 0x40, 0);
+                DisplayAnimation_ClearFlags(&p->drawable.common, 2);
+                sub_081FED40(effects[1]);
+                p->animationPhase++;
+                SceneActor_SetFlags(p, 0x100);
             }
             break;
-        }
-        case 1: {
-            u16 mask = 0x100;
-            p->flags |= mask;
+        case 1:
+            SceneActor_SetFlags(p, 0x100);
             p->finished = 1;
             break;
-        }
     }
 }
