@@ -465,3 +465,12 @@ src/ui/hud/damage_numbers/damage_number_display.c	DamageNumberDisplay_UpdateBoun
 src/ui/hud/damage_numbers/damage_number_display.c	DamageNumberDisplay_Update	fudged	natural	7	
 src/ui/hud/damage_numbers/damage_number_display.c	DamageNumberDisplay_Destroy	fudged	natural	1	
 src/ui/hud/damage_numbers/damage_number_display.c	DamageNumberDisplay_Initialize	fudged	natural	6	
+src/ui/hud/damage_numbers/damage_number_display.c	DamageNumberDisplay_UpdateLeaving	fudged	fudged	20	unchanged: cached count, centers/sine pointers keep the hoisted-address load order; closest rewrite is one instruction order off
+src/ui/hud/damage_numbers/damage_number_display.c	DamageNumberDisplay_SetActiveBit	natural	natural	0	
+src/ui/hud/damage_numbers/damage_number_display.c	DamageNumberDisplay_ClearActiveBit	natural	natural	0	
+src/ui/hud/damage_numbers/damage_number_display.c	DamageNumberDisplay_GetActiveBit	natural	natural	0	
+src/ui/hud/damage_numbers/damage_number_display.c	DamageNumberGroup_AdvancePhase	natural	natural	0	
+src/ui/hud/damage_numbers/damage_number_display.c	DamageNumberDisplay_Create	natural	natural	0	
+src/ui/hud/damage_numbers/damage_number_display.c	DamageNumberDisplay_Show	natural	natural	0	
+src/ui/hud/damage_numbers/DamageNumberDisplay_ResetInstance.c	DamageNumberDisplay_ResetInstance	natural	natural	0	
+src/ui/hud/damage_numbers/TransientSpriteEffects_ResetInstance.c	TransientSpriteEffects_ResetInstance	natural	natural	0	
