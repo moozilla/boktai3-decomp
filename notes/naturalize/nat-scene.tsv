@@ -476,3 +476,4 @@ src/scene/actor/reaction/SceneActorReaction_BeginHiddenDefeat.c	SceneActorReacti
 src/scene/actor/reaction/SceneActorReaction_PlayStaggerBurst.c	SceneActorReaction_PlayStaggerBurst	contrived	contrived	0	state store reuse, mask locals and drawable casts stay; plain forms change the random mask register
 src/scene/actor/reaction/SceneActorReaction_SettleDisplacement.c	SceneActorReaction_SettleDisplacement	contrived	contrived	7	partial: accessor helpers and the stopped-motion predicate stay; plain forms change load order and registers
 src/scene/actor/reaction/SceneActorReaction_TryResumeRoute.c	SceneActorReaction_TryResumeRoute	contrived	natural	12	-
+src/scene/actor/reaction/SceneActorReaction_ApplyAreaDamage.c	SceneActorReaction_ApplyAreaDamage	contrived	contrived	6	partial: mask-first locals and halfword flag wrappers stay; plain operators load the field first
