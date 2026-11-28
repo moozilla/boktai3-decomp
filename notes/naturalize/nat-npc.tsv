@@ -214,3 +214,4 @@ src/npc/story_character/StoryCharacter_SimpleStep.c	StoryCharacter_SimpleStep	co
 src/npc/story_character/SceneCharacter_UpdateSlowingBlink.c	SceneCharacter_UpdateSlowingBlink	contrived	minor	1	
 src/npc/story_character/SceneCharacter_UpdateAcceleratingBlink.c	SceneCharacter_UpdateAcceleratingBlink	contrived	natural	1	
 src/npc/story_character/SceneCharacter_UpdateContinuousBlink.c	SceneCharacter_UpdateContinuousBlink	contrived	natural	1	
+src/npc/story_character/StoryCharacter_SimpleStep.c	StoryCharacter_SimpleStep	natural	natural	1	
