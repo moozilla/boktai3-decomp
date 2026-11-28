@@ -38,8 +38,7 @@ void SceneActorBehavior_ActivatePendingControl(struct RoomActor *actor)
     clear = ~1;
     *flags &= clear;
     {
-        const void **field = &actor->pendingControl;
-        control = *field;
+        control = (const void *)actor->pendingControl;
     }
     kind = actor->pendingControlKind;
     {
@@ -58,11 +57,10 @@ void SceneActorBehavior_ActivatePendingControl(struct RoomActor *actor)
         *(const void **)((u32)actor + offset) = (void *)zero;
     }
     {
-        void **allocation = &actor->pendingControlData;
-        void *value = *allocation;
-        if (value) {
-            Callback_InvokeActor(actor->pendingControlRelease, value);
-            *allocation = (void *)zero;
+        if (actor->pendingControlData) {
+            Callback_InvokeActor((void *)actor->pendingControlRelease,
+                                 (void *)actor->pendingControlData);
+            actor->pendingControlData = zero;
         }
     }
 }
