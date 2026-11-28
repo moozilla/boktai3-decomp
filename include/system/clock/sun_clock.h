@@ -31,7 +31,7 @@ u32 SunClock_GetBaseMinute(void);
 u32 SunClock_GetSecond(void);
 s32 Div(s32, s32);
 u8 SunClock_GetPhase(void);
-void Clock_SyncFromRtc(void);
+s32 Clock_SyncFromRtc(void);
 static inline void SunClock_Update(void)
 {
     struct SunClock *c = &gSunClock;
