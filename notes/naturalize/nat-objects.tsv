@@ -487,3 +487,4 @@ src/objects/loot_deposits/LootDepositPool_InitManager.c	LootDepositPool_InitMana
 src/objects/loot_deposits/LootDepositPool_CreateManager.c	LootDepositPool_CreateManager	contrived	natural	2	
 src/objects/loot_deposits/LootDeposit_UpdateMemberFall.c	LootDeposit_UpdateMemberFall	contrived	minor	6	local ground height helper with a position alias: the shared terrain helpers reorder 9 insns
 src/objects/loot_deposits/callback_pool_feedback.c	LootDepositCallbackPool_UpdateShake	minor	natural	4	
+src/objects/loot_deposits/callback_pool_feedback.c	LootDepositCallbackPool_SpawnHitParticles	contrived	minor	6	vector cleared through a stack array: a fill macro changes 15 insns

@@ -8,13 +8,6 @@
 
 s32 Mod(s32, s32);
 
-static inline u16 LootDepositCallbackPool_NextRandom(void)
-{
-    u16 *table = gRandomTable;
-    gRandomIndex = (gRandomIndex + 1) & 0x3ff;
-    return table[gRandomIndex];
-}
-
 void LootDepositCallbackPool_UpdateShake(struct CallbackPoolEntry *entry)
 {
     if (entry->shakeTimer == 0) {
@@ -100,10 +93,10 @@ void LootDepositCallbackPool_SpawnHitParticles(struct CallbackPoolEntry *entry)
     struct SceneExtent *velocity = (struct SceneExtent *)(stack + 1);
     ClearVector(velocity, stack);
     ((u16 *)velocity)[1] = 16;
-    spread.x = (NextRandom() & 3U) + 15U;
-    spread.y = (NextRandom() & 7U) + 15U;
-    spread.z = (NextRandom() & 3U) + 15U;
-    ImpactParticleGroup_SpawnBouncing((NextRandom() & 3) + 2, 17,
+    spread.x = (ParticleRandom_ReadDirectSample(gRandomTable) & 3U) + 15U;
+    spread.y = (ParticleRandom_ReadDirectSample(gRandomTable) & 7U) + 15U;
+    spread.z = (ParticleRandom_ReadDirectSample(gRandomTable) & 3U) + 15U;
+    ImpactParticleGroup_SpawnBouncing((ParticleRandom_ReadDirectSample(gRandomTable) & 3) + 2, 17,
                                       (struct SceneExtent *)&entry->sprite.position, velocity,
                                       &spread, 12, 15);
 }
