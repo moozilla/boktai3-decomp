@@ -541,3 +541,6 @@ src/monsters/centipede/SceneActor_ResetQueuedState.c	SceneActor_ResetQueuedState
 src/monsters/centipede/Centipede_UpdateComponents.c	Centipede_UpdateComponents	contrived	natural	1	
 src/monsters/centipede/Centipede_RecoverFromSegmentLoss.c	Centipede_RecoverFromSegmentLoss	contrived	minor	3	mask helpers and halfword value blocks remain
 src/monsters/centipede/Tentacle_FireSecondaryAttack.c	Tentacle_FireSecondaryAttack	contrived	natural	2	
+src/monsters/centipede/Centipede_OnUpdate.c	Centipede_OnUpdate	contrived	natural	1	
+src/monsters/centipede/SceneActor_TryRequestFacingReaction.c	SceneActor_TryRequestFacingReaction	contrived	contrived	4	second sensor pointer, mask local and halfword views for the delta
+src/monsters/centipede/Centipede_InitStateHandlers.c	Centipede_InitStateHandlers	contrived	natural	1	

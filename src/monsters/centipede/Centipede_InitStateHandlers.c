@@ -1,6 +1,7 @@
 #include "global.h"
-extern const u32 gUnk_08605F90[];
-void Centipede_InitStateHandlers(u8 *p)
+#include "link/session/room_actor.h"
+extern void *gUnk_08605F90[];
+void Centipede_InitStateHandlers(struct RoomActor *actor)
 {
-    *(const u32 **)(p + 0x28c) = gUnk_08605F90;
+    actor->behaviorCallbacks = gUnk_08605F90;
 }
