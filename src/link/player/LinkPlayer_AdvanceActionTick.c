@@ -1,10 +1,8 @@
 #include "global.h"
+#include "player/player.h"
 
-void LinkPlayer_AdvanceActionTick(u8 *p)
+void LinkPlayer_AdvanceActionTick(struct Player *p)
 {
-    u8 *q = *(u8 **)(p + 0x348);
-
-    if (*(u16 *)(q + 2) & 0xF0) {
-        p[0x4F4]++;
-    }
+    if (p->inputKeys[1] & 0xF0)
+        p->facingChangeEffects++;
 }
