@@ -1,6 +1,7 @@
 #include "global.h"
-extern const u32 gUnk_08605F50[];
-void CentipedeBody_InitBehaviorTable(u8 *p)
+#include "link/session/room_actor.h"
+extern void *gUnk_08605F50[];
+void CentipedeBody_InitBehaviorTable(struct RoomActor *actor)
 {
-    *(const u32 **)(p + 0x284) = gUnk_08605F50;
+    actor->callbacks284 = gUnk_08605F50;
 }
