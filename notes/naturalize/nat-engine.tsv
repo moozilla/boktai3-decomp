@@ -53,3 +53,4 @@ src/engine/math/ScalarApproach_HalfAngle.c	ScalarApproach_HalfAngle	contrived	na
 src/engine/math/ScalarApproach_HalfAngleArray.c	ScalarApproach_HalfAngleArray	contrived	natural	1	
 src/engine/math/ScalarApproach_QuarterAngle.c	ScalarApproach_QuarterAngle	contrived	natural	1	
 src/engine/math/ScalarApproach_EighthAngle.c	ScalarApproach_EighthAngle	contrived	natural	1	
+src/engine/math/ScalarApproach_SixteenthAngle.c	ScalarApproach_SixteenthAngle	contrived	natural	1	
