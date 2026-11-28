@@ -1,21 +1,11 @@
-#include "global.h"
-#include "effects/directional_effect/point_layout.h"
-struct DirectionalEffect {
-    u8 unknown0[0x7fc];
-    u32 flags;
-    u8 unknown800[2], palette;
-    u8 unknown803[0x15];
-    struct Point position;
-    u8 unknown820[0x40];
-    u8 active;
-    u8 unknown861[0x3a9];
-    u16 paletteValue;
-};
-void DirectionalEffect_PlaceSprite(struct DirectionalEffect *p, s32 unused, struct Point *position)
+#include "player/player.h"
+
+void DirectionalEffect_PlaceSprite(struct Player *player, s32 unused,
+                                   union DirectionalSpritePosition *position)
 {
-    p->flags &= ~1;
-    p->position = *position;
-    p->position.z += 230;
-    p->palette = p->paletteValue;
-    p->active = 1;
+    player->directionalEffect[0].sprite.flags &= ~1;
+    player->directionalEffect[0].sprite.position = *position;
+    player->directionalEffect[0].sprite.position.axis.height += 230;
+    player->directionalEffect[0].sprite.angle = player->statModifierContext.contactTimer;
+    player->directionalEffect[0].active = 1;
 }
