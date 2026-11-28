@@ -71,16 +71,29 @@ static inline void DispatchSelectPalette(struct T *t, s32 r)
     }
 }
 
-void SceneActorGraphics_SelectResource(struct T *t)
+static inline void SceneActorGraphics_SelectPalette(struct SceneGraphicsActor *actor, s32 bank)
 {
-    if (t->b38E) {
-        t->b38C = 0;
-        t->b38E = 0;
-        t->w390 = SceneActorGraphics_GetResourceId((struct StateActor *)t);
-        DispatchSelectPalette(t, SceneActorGraphics_GetResourceId((struct StateActor *)t));
+    if (bank == 0)
+        actor->animation.palette = (u16 *)actor->graphics.paletteBank1;
+    else if (bank == 1)
+        actor->animation.palette = (u16 *)actor->graphics.paletteBank2;
+    else {
+        CpuSet(gPaletteBankData + bank * 32, actor->graphics.paletteBank0, 0x04000008);
+        actor->animation.palette = (u16 *)actor->graphics.paletteBank0;
     }
 }
 
+void SceneActorGraphics_SelectResource(struct SceneGraphicsActor *actor)
+{
+    if (actor->graphics.effectMode) {
+        actor->graphics.effectScale = 0;
+        actor->graphics.effectMode = 0;
+        actor->graphics.resourceId =
+            SceneActorGraphics_GetResourceId((struct StateActor *)actor);
+        SceneActorGraphics_SelectPalette(actor,
+                                         SceneActorGraphics_GetResourceId((struct StateActor *)actor));
+    }
+}
 void Collision_CalculateDamageResponse(void *, void *);
 void PlayerStats_AddContactHundredths(void *, void *, s32);
 void Sound_PlaySongChecked(u32);

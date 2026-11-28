@@ -1,0 +1,2 @@
+path	function	verdict_before	verdict_after	compiles	what_stays_and_why
+src/bosses/count/actor_graphics_and_basic_states.c	SceneActorGraphics_SelectResource	contrived	natural	2	struct T view replaced by SceneGraphicsActor fields
