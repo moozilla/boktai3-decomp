@@ -1,18 +1,13 @@
 #include "global.h"
 #include "engine/ram.h"
+#include "player/effects/player_attack_particles.h"
 
-s32 Sprite_Remove(u8 *);
+s32 Sprite_Remove(struct DisplaySequenceSprite *);
 
-s32 PlayerAttackEffect_Destroy(u8 *p)
+s32 PlayerAttackEffect_Destroy(struct AttackParticleEffect *effect)
 {
-    u8 *q = p + 0xc4;
-    s32 i = 15;
-    u32 z;
-    do {
-        Sprite_Remove(q);
-        q += 0x2c;
-        i--;
-    } while (i >= 0);
-    z = 0;
-    gPlayerAttackEffect = z;
+    s32 i;
+    for (i = 0; i < 16; i++)
+        Sprite_Remove(&effect->sprites[i]);
+    gPlayerAttackEffect = NULL;
 }
