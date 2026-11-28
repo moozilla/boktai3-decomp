@@ -1,5 +1,4 @@
 #include "bosses/ratatosk/particle_config_layout.h"
-#define SlotMotion_SetCallback Ratatosk_SetParticleUpdateCallback
 #include "global.h"
 void sub_081FB808(void);
 void Memory_Clear(void *, u32);
