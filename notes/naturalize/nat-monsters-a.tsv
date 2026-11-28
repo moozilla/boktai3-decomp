@@ -510,3 +510,4 @@ src/monsters/cannons/plasma/PlasmaCannon_RecordDefeat.c	PlasmaCannon_RecordDefea
 src/monsters/cannons/plasma/PlasmaCannon_UpdateDamageState.c	PlasmaCannon_UpdateDamageState	minor	minor	0	collider alias per branch and nested blocks
 src/monsters/cannons/vulcan/VulcanCannon_InitializeFromScript.c	VulcanCannon_InitializeFromScript	minor	minor	0	script reader with cached member pointers; previously naturalized where it matched
 src/monsters/centipede/SceneActorPlacement_UpdateFlaggedResponse.c	SceneActorPlacement_UpdateFlaggedResponse	contrived	minor	8	status flag clear keeps pointer and mask: the mask loads before the field
+src/monsters/centipede/CentipedeBody_ClearStateEntryFlag.c	CentipedeBody_ClearStateEntryFlag	contrived	natural	1	

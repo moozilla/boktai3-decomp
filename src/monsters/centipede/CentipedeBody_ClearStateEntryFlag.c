@@ -1,8 +1,9 @@
 #include "global.h"
+#include "link/session/room_actor.h"
 /* CentipedeBody_ClearStateEntryFlag: Clears the pending state-entry byte when set */
 
-void CentipedeBody_ClearStateEntryFlag(u8 *p)
+void CentipedeBody_ClearStateEntryFlag(struct RoomActor *actor)
 {
-    if (p[0x2b2])
-        p[0x2b2] = 0;
+    if (actor->field2B2)
+        actor->field2B2 = 0;
 }
