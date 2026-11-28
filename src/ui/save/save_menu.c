@@ -208,9 +208,7 @@ void SaveMenu_UpdateScoreTransfer(struct SaveMenu *menu)
 
 void SaveMenu_UpdateScoreReveal(struct SaveMenu *menu)
 {
-    u8 *redraw = &menu->entering;
-    u16 *timer;
-    if (*redraw) {
+    if (menu->entering) {
         Bg_SetLayerMap(3, menu->backgroundResource, 3);
         BgGfx_LoadTilemapSimple(3, 0, 0, 0, 0);
         TextWindow_SetScript(menu->windows[0], menu->scoreScript);
@@ -235,10 +233,9 @@ void SaveMenu_UpdateScoreReveal(struct SaveMenu *menu)
         TextWindow_StartPlayback(menu->windows[5]);
         TextWindow_StartPlayback(menu->windows[6]);
         menu->timer = 0;
-        *redraw = 0;
+        menu->entering = 0;
     }
-    timer = &menu->timer;
-    if (*timer > 9) {
+    if (menu->timer > 9) {
         CharacterModel_UpdatePairedAnimations(&menu->preview.model, 0);
         PaletteFade_CycleMenuColors(&menu->paletteCycle);
         if (!menu->skip) {
@@ -249,10 +246,10 @@ void SaveMenu_UpdateScoreReveal(struct SaveMenu *menu)
             LinkScorePanel_UpdateRollingNumber(menu);
             LinkScorePanel_UpdateNumberReveal(menu);
             LinkScorePanel_SetNumber(menu, 1, gGameState->clockDisplayValue);
-            (*timer)++;
+            menu->timer++;
         }
     } else {
-        (*timer)++;
+        menu->timer++;
     }
 }
 
