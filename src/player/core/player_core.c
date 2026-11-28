@@ -206,7 +206,6 @@ void Player_ApplyContactResponse(struct Player *player, struct ContactCollider *
         return;
     }
     if (flagBits(&player->statusFlags, 0x8000)) {
-        s32 direction;
         if (source->flags & 0x100) {
             player->contactDirection = ((source->direction + 0x70) >> 5) & 7;
         } else {
@@ -215,7 +214,7 @@ void Player_ApplyContactResponse(struct Player *player, struct ContactCollider *
             if (deltaX == 0 && deltaZ == 0) {
                 player->contactDirection = player->facing;
             } else {
-                direction = (((u16)Math_Atan2(deltaX, deltaZ) + 0x70) >> 5) & 7;
+                s32 direction = (((u16)Math_Atan2(deltaX, deltaZ) + 0x70) >> 5) & 7;
                 player->contactDirection = (direction + 4) & 7;
             }
         }
