@@ -1,13 +1,7 @@
 #include "global.h"
+#include "gba/m4a_internal.h"
 #include "engine/video/render.h"
 #include "engine/ram.h"
-
-struct SongEntry {
-    void *header;
-    u16 ms; /* music player */
-    u16 me;
-};
-extern const struct SongEntry gSongTable[];
 void m4aSongNumStop(u16);
 
 /* Stops song. With sound off (engine flags bits 1-2) it is stopped outright;
@@ -15,14 +9,13 @@ void m4aSongNumStop(u16);
    is cleared. */
 void Sound_StopSong(u32 song)
 {
-    u32 off = gEnginePauseFlags & 6;
-    if (off) {
+    if (gEnginePauseFlags & 6) {
         m4aSongNumStop(song);
     } else {
-        u16 *players = gMusicSlotSongs;
-        u16 *playing = &players[gSongTable[song].ms];
+        u16 *slots = gMusicSlotSongs;
+        u16 *playing = &slots[gSongTable[song].ms];
         if (song == *playing) {
-            *playing = off;
+            *playing = 0;
             m4aSongNumStop(song);
         }
     }
