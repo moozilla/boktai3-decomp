@@ -287,3 +287,11 @@ src/bosses/vanargand/positioned_effect.c	PositionedEffect_InitRadialAttackCollid
 src/bosses/vanargand/positioned_effect.c	PositionedEffect_InterpolateArcNodes	contrived	natural	7	
 src/bosses/vanargand/positioned_effect.c	PositionedEffect_EmitParticles	machine-shaped	partial	8	fill source/destination temporaries and single table load kept: ROM forms &center before the zero store and writes gRandomIndex once
 src/bosses/vanargand/positioned_effect.c	PositionedEffect_UpdateVectors	near-natural	near-natural	3	per-animation helper kept: calling AddVector at the site does not match
+src/bosses/vanargand/positioned_effect.c	PositionedEffect_OnAttackContact	natural	natural	0	
+src/bosses/vanargand/positioned_effect.c	PositionedEffect_ReceiveContact	natural	natural	0	
+src/bosses/vanargand/positioned_effect.c	Vanargand_RunUnusedHook	natural	natural	0	
+src/bosses/vanargand/positioned_effect.c	Debug_TestIsometricProjection	unchanged	unchanged	8	
+src/bosses/vanargand/positioned_effect.c	ScreenPalette_ProjectPosition	natural	natural	0	
+src/bosses/vanargand/positioned_effect.c	ScreenPalette_ProjectPositionAt88	natural	natural	0	
+src/bosses/vanargand/positioned_effect.c	PositionedEffect_SetHalfScaleCoordinates	natural	natural	0	
+src/bosses/vanargand/positioned_effect.c	PositionedEffect_UpdateOscillatingCoordinates	natural	natural	0	
