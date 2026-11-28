@@ -2019,44 +2019,36 @@ s32 PileTrap_IsActive(void *);
 s32 Player_SelectRequestedActionMode(struct Player *p)
 {
     struct PlayerActionRequest *request = (struct PlayerActionRequest *)&p->thresholdMode;
-    if (request->kind < 0)
+
+    if (request->kind < 0 || !request->enabled || request->blocked)
         return p->tetherMode;
-    if (!request->enabled)
+    if (p->tetherMode > 1)
         return p->tetherMode;
-    if (request->blocked)
-        return p->tetherMode;
-    {
-        u8 *mode = &p->tetherMode;
-        if (*mode > 1)
-            return *mode;
-        {
-            switch (request->kind) {
-                case 3:
-                    if (gEngineFlags & 0x1000)
-                        return *mode;
-                    return 19;
-                case 2:
-                    if (p->actionRequestRestricted == 1) {
-                        Sound_PlaySong(0x192);
-                        return *mode;
-                    }
-                    if (gEngineFlags & 0x1000)
-                        return *mode;
-                    return 10;
-                case 1:
-                    if (p->actionRequestRestricted == 1) {
-                        Sound_PlaySong(0x192);
-                        return *mode;
-                    }
-                    if (gEngineFlags & 0x1000)
-                        return *mode;
-                    return 11;
-                case 0:
-                    if (p->actionMode == 0 || p->actionMode == 6)
-                        return 2;
-                    return *mode;
+    switch (request->kind) {
+        case 3:
+            if (gEngineFlags & 0x1000)
+                return p->tetherMode;
+            return 19;
+        case 2:
+            if (p->actionRequestRestricted == 1) {
+                Sound_PlaySong(0x192);
+                return p->tetherMode;
             }
-        }
+            if (gEngineFlags & 0x1000)
+                return p->tetherMode;
+            return 10;
+        case 1:
+            if (p->actionRequestRestricted == 1) {
+                Sound_PlaySong(0x192);
+                return p->tetherMode;
+            }
+            if (gEngineFlags & 0x1000)
+                return p->tetherMode;
+            return 11;
+        case 0:
+            if (p->actionMode == 0 || p->actionMode == 6)
+                return 2;
+            return p->tetherMode;
     }
     return p->tetherMode;
 }
