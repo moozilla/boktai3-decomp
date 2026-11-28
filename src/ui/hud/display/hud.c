@@ -369,8 +369,9 @@ enum { GAUGE_TILE_PALETTE = 13 << 12 };
 
 void Hud_DrawTwoDigitCounter(s32 value)
 {
-    u16 *tiles, *ones;
-    s32 tens, remaining;
+    u16 *tiles;
+    s32 tens;
+    s32 remaining;
     if (!(gEngineFlags & 0x1000)) {
         tiles = Hud_GetTilemapCell(0, 25, 0);
         *tiles++ = 0xD0C9;
@@ -384,13 +385,12 @@ void Hud_DrawTwoDigitCounter(s32 value)
             tiles[1] = 0xD0CC;
         } else {
             tens = 0;
-            ones = tiles + 1;
             while (remaining > 9) {
                 tens++;
                 remaining -= 10;
             }
-            tiles[0] = (tens + 0x11) | -12288;
-            *ones = (remaining + 0x11) | -12288;
+            *tiles++ = (tens + 0x11) | 0xD000;
+            *tiles = (remaining + 0x11) | 0xD000;
         }
     }
 }
