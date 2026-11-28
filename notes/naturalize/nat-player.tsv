@@ -635,3 +635,9 @@ src/player/motions/Player_UpdateFallPose.c	Player_UpdateFallPose	minor	minor	1	P
 src/player/motions/Player_UpdateInterpolatedMotion.c	Player_UpdateInterpolatedMotion	contrived	contrived	6	duration/elapsed pointer temps, ScaleStep wrapper and separate z step fix the register allocation
 src/player/motions/Player_OnFadeMotionExit.c	Player_OnFadeMotionExit	contrived	minor	2	animation pointer: the member access folds the offset
 src/player/motions/Player_UpdateScaleTransition.c	Player_UpdateScaleTransition	contrived	minor	16	animation pointer and Player_AddStatusFlags
+src/player/motions/Player_UpdateTerrainRecoil.c	Player_UpdateTerrainRecoil	natural	natural	0	-
+src/player/motions/Player_UpdateContactKnockdown.c	Player_UpdateContactKnockdown	minor	minor	1	Player_AddStatusFlags: ROM loads the mask before the status word
+src/player/motions/Player_UpdateDefeatSlide.c	Player_UpdateDefeatSlide	natural	natural	0	-
+src/player/motions/Player_UpdateDefeatRecoil.c	Player_UpdateDefeatRecoil	natural	natural	0	-
+src/player/motions/Player_UpdateDeathSequence.c	Player_UpdateDeathSequence	natural	natural	0	-
+src/player/motions/Player_UpdateTimedScreenTransition.c	Player_UpdateTimedScreenTransition	contrived	natural	1	-
