@@ -5,133 +5,121 @@
 
 // confidence=low: initial attack sequence before arena departure.
 
-
-static inline u32 PlayerFlags(struct Player *p, u32 mask)
+static inline u32 PlayerFlags(struct Player *actor, u32 mask)
 {
-    return p->statusFlags & mask;
+    return actor->statusFlags & mask;
 }
-void Hresvelgr_UpdateOpeningAttackCycle(struct HresvelgrTravelActor *p)
+void Hresvelgr_UpdateOpeningAttackCycle(struct HresvelgrTravelActor *actor)
 {
-    struct HresvelgrTravelActor *q = p;
-    struct BossActionState *a = &p->behavior;
-    if (Hresvelgr_EnterVulnerableBehavior(p)) {
-        u16 *counter = &p->recoveryFrames;
-        *counter = 0;
-        ActionState_Reset(a);
-        ActionState_SetState(a, 0);
+    struct HresvelgrTravelActor *self = actor;
+    struct BossActionState *action = &actor->behavior;
+    if (Hresvelgr_EnterVulnerableBehavior(actor)) {
+        actor->recoveryFrames = 0;
+        ActionState_Reset(action);
+        ActionState_SetState(action, 0);
     }
-    switch (a->state) {
+    switch (action->state) {
         case 0:
-            if (!a->frame) {
-                Hresvelgr_SetActionAnimation(q, 14);
-                a->frame++;
-            } else if (q->finished)
-                ActionState_AdvanceState(a);
+            if (!action->frame) {
+                Hresvelgr_SetActionAnimation(self, 14);
+                action->frame++;
+            } else if (self->finished)
+                ActionState_AdvanceState(action);
             break;
-        case 1: {
-            u8 *f = &q->behaviorFlags;
-            u32 old = *f;
-            u32 bits = 2;
-            bits |= old;
-            *f = bits;
-        }
-            if (!a->frame) {
-                Hresvelgr_SetActionAnimation(q, 15);
-                a->frame++;
-            } else if (q->finished)
-                ActionState_AdvanceState(a);
-            if (Hresvelgr_TestFlags(q, 0x4000000))
-                ActionState_SetState(a, 3);
+        case 1:
+            self->behaviorFlags |= 2;
+            if (!action->frame) {
+                Hresvelgr_SetActionAnimation(self, 15);
+                action->frame++;
+            } else if (self->finished)
+                ActionState_AdvanceState(action);
+            if (Hresvelgr_TestFlags(self, 0x4000000))
+                ActionState_SetState(action, 3);
             break;
-        case 2: {
-            u8 *f = &q->behaviorFlags;
-            u32 old = *f;
-            u32 value = 2;
-            value |= old;
-            value |= 4;
-            *f = value;
-        }
-            if (!a->frame) {
-                Hresvelgr_SetActionAnimation(q, 3);
-                a->frame++;
-            } else if (q->finished) {
-                ActionState_SetState(a, 4);
-            }
-            if (Hresvelgr_TestFlags(q, 0x4000000))
-                ActionState_SetState(a, 3);
+        case 2:
+            self->behaviorFlags |= 2;
+            self->behaviorFlags |= 4;
+            if (!action->frame) {
+                Hresvelgr_SetActionAnimation(self, 3);
+                action->frame++;
+            } else if (self->finished)
+                ActionState_SetState(action, 4);
+            if (Hresvelgr_TestFlags(self, 0x4000000))
+                ActionState_SetState(action, 3);
             break;
         case 3:
-            if (!a->frame) {
-                Hresvelgr_SetActionAnimation(q, 32);
-                a->frame++;
-            } else if (q->finished)
-                ActionState_SetState(a, 4);
+            if (!action->frame) {
+                Hresvelgr_SetActionAnimation(self, 32);
+                action->frame++;
+            } else if (self->finished)
+                ActionState_SetState(action, 4);
             break;
         case 4:
-            if (!a->frame) {
-                Hresvelgr_SetActionAnimation(q, 16);
-                a->frame++;
+            if (!action->frame) {
+                Hresvelgr_SetActionAnimation(self, 16);
+                action->frame++;
             } else {
-                if (Hresvelgr_TestFlags(q, 0x40000000))
-                    ActionState_SetState(a, 7);
-                else if ((s32)q->flags < 0)
-                    ActionState_SetState(a, 6);
-                else if (q->finished) {
-                    if (Hresvelgr_TestFlags(q, 0x20000000) && !PlayerFlags(q->player, 0x40000))
-                        ActionState_SetState(a, 5);
+                if (Hresvelgr_TestFlags(self, 0x40000000))
+                    ActionState_SetState(action, 7);
+                else if ((s32)self->flags < 0)
+                    ActionState_SetState(action, 6);
+                else if (self->finished) {
+                    if (Hresvelgr_TestFlags(self, 0x20000000) &&
+                        !PlayerFlags(self->player, 0x40000))
+                        ActionState_SetState(action, 5);
                     else
-                        ActionState_SetState(a, 9);
+                        ActionState_SetState(action, 9);
                 }
             }
             break;
         case 5:
-            if (!a->frame) {
-                Hresvelgr_SetActionAnimation(q, 17);
-                a->frame++;
-            } else if (q->finished)
-                ActionState_SetState(a, 9);
+            if (!action->frame) {
+                Hresvelgr_SetActionAnimation(self, 17);
+                action->frame++;
+            } else if (self->finished)
+                ActionState_SetState(action, 9);
             break;
         case 6:
-            ActionState_SetState(a, 7);
+            ActionState_SetState(action, 7);
             break;
         case 7:
-            if (!a->frame) {
-                Hresvelgr_SetActionAnimation(q, 35);
-                a->frame++;
-            } else if (q->finished)
-                ActionState_SetState(a, 8);
+            if (!action->frame) {
+                Hresvelgr_SetActionAnimation(self, 35);
+                action->frame++;
+            } else if (self->finished)
+                ActionState_SetState(action, 8);
             break;
         case 8:
-            if (!a->frame) {
-                Hresvelgr_SetActionAnimation(q, 24);
-                a->frame++;
-            } else if (q->finished)
-                ActionState_SetState(a, 12);
+            if (!action->frame) {
+                Hresvelgr_SetActionAnimation(self, 24);
+                action->frame++;
+            } else if (self->finished)
+                ActionState_SetState(action, 12);
             break;
         case 9:
-            if (!a->frame) {
-                Hresvelgr_SetActionAnimation(q, 18);
-                a->frame++;
-            } else if (q->finished)
-                ActionState_SetState(a, 10);
+            if (!action->frame) {
+                Hresvelgr_SetActionAnimation(self, 18);
+                action->frame++;
+            } else if (self->finished)
+                ActionState_SetState(action, 10);
             break;
         case 10:
-            if (!a->frame) {
-                Hresvelgr_SetActionAnimation(q, 19);
-                a->frame++;
-            } else if (q->finished)
-                ActionState_SetState(a, 11);
+            if (!action->frame) {
+                Hresvelgr_SetActionAnimation(self, 19);
+                action->frame++;
+            } else if (self->finished)
+                ActionState_SetState(action, 11);
             break;
         case 11:
-            if (!a->frame) {
-                Hresvelgr_SetActionAnimation(q, 1);
-                a->frame++;
+            if (!action->frame) {
+                Hresvelgr_SetActionAnimation(self, 1);
+                action->frame++;
             }
-            if (q->position.y <= 832)
-                ActionState_SetState(a, 12);
+            if (self->position.y <= 832)
+                ActionState_SetState(action, 12);
             break;
         case 12:
-            p->behaviorFinished = 1;
+            actor->behaviorFinished = 1;
             break;
     }
 }
