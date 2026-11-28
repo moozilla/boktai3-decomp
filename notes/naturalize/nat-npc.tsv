@@ -210,3 +210,4 @@ src/npc/story_character/SceneCharacter_UpdateAlternatePalettePulse.c	SceneCharac
 src/npc/story_character/sub_081CBB1C.c	sub_081CBB1C	contrived	minor	22	pointer copies (facing, velocity, from, to) and the first velocity product: register allocation across Math_Atan2
 src/npc/story_character/StoryCharacter_StartAnimStep.c	StoryCharacter_StartAnimStep	contrived	natural	1	
 src/npc/story_character/SceneCharacter_StartAnimationThree.c	SceneCharacter_StartAnimationThree	contrived	natural	1	
+src/npc/story_character/StoryCharacter_SimpleStep.c	StoryCharacter_SimpleStep	contrived	natural	1	
