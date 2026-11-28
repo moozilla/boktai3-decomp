@@ -203,3 +203,9 @@ src/ui/dialogue/text_sequence.c	TextSequence_SetState	contrived	natural	1
 src/ui/dialogue/text_sequence.c	TextSequence_UpdateHold	contrived	natural	1	
 src/ui/dialogue/text_sequence.c	TextSequence_UpdateFadeOut	contrived	natural	1	
 src/ui/dialogue/text_sequence.c	TextSequence_InitializeFromScript	minor	natural	1	
+src/ui/dialogue/text_sequence.c	TextSequence_UpdateFadeIn	natural	natural	1	quotient local needed
+src/ui/dialogue/text_sequence.c	TextSequence_UpdateHiddenWait	natural	natural	0	
+src/ui/dialogue/text_sequence.c	TextSequence_OnDestroy	natural	natural	0	
+src/ui/dialogue/text_sequence.c	TextSequence_Update	natural	natural	0	
+src/ui/dialogue/text_sequence.c	TextSequence_ReturnZero	natural	natural	0	
+src/ui/dialogue/text_sequence.c	TextSequence_CreateFromScript	natural	natural	0	
