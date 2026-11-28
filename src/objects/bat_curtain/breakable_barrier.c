@@ -283,13 +283,11 @@ u32 BreakableBarrier_Destroy(u32, struct BreakableBarrier *);
 
 u32 BreakableBarriers_Destroy(struct BreakableBarrierManager *p)
 {
-    struct BreakableBarrier *q = p->barriers;
-    s32 i = 3;
-    do {
-        BreakableBarrier_Destroy((u32)p, q);
-        i--;
-        q++;
-    } while (i >= 0);
+    struct BreakableBarrier *barrier = p->barriers;
+    s32 i;
+
+    for (i = 0; i < 4; i++, barrier++)
+        BreakableBarrier_Destroy((u32)p, barrier);
     return 0;
 }
 
