@@ -169,15 +169,12 @@ s32 sub_0817FDE0(struct BossInit *boss, u32 arg1)
     u32 zero;
     struct BossInit *actor = boss;
 
-    {
-        struct GameState *gp = gGameState;
-        gp->flags868 |= 0x400;
-    }
+    gGameState->flags868 |= 0x400;
 
     mode = Script_GetKeywordValue(0x74, 2);
     if (mode != 2)
         return -1;
-    SceneActors_Register((u8 *)actor, 2);
+    SceneActors_Register((u8 *)boss, 2);
     boss->parameter = Script_GetKeywordValue(0x42, 0);
     boss->special = Script_GetKeywordValue(0x69, 0);
     count = Script_GetKeywordValue(0x50, 1);
@@ -281,7 +278,6 @@ s32 sub_0817FDE0(struct BossInit *boss, u32 arg1)
     SabataImpact_InitCollider((u8 *)boss);
 
     if (Script_SeekToKeyword(0x65)) {
-        u32 *p;
         cameraTarget = &actor->targets[1];
         volumePosition = actor->body.position;
         for (i = 0; i < 2; i++)
@@ -294,9 +290,9 @@ s32 sub_0817FDE0(struct BossInit *boss, u32 arg1)
     }
 
     if (Script_SeekToKeyword(0x63)) {
-        s32 a = Script_GetValue();
-        s32 b = Script_GetValue();
-        SceneActors_SetEventScripts((u8 *)actor, a, b);
+        s32 first = Script_GetValue();
+        s32 second = Script_GetValue();
+        SceneActors_SetEventScripts((u8 *)actor, first, second);
     } else {
         SceneActors_SetEventScripts((u8 *)actor, 0, 0);
     }
@@ -359,7 +355,8 @@ s32 sub_0817FDE0(struct BossInit *boss, u32 arg1)
     boss->effectEnabled = 1;
     CameraFollow_Initialize(&boss->camera, *cameraTarget, boss->widget.shadowPart, 1);
     CameraTracking_SetRange(&boss->camera, zero, 0x8C);
-    SceneActors_SetDamageCallback((u8 *)actor, boss->attackCollider, SabataPosition_BeginReaction, boss->damage);
+    SceneActors_SetDamageCallback((u8 *)actor, boss->attackCollider, SabataPosition_BeginReaction,
+                                  boss->damage);
     ProximityVolume_TranslateBounds(boss->bounds, volumePosition);
     ProjectileTask_Destroy();
     TimedEffect_GetOrCreateManager(0x11);

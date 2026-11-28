@@ -275,3 +275,4 @@ src/bosses/sabata/Sabata_UpdateFrame.c	Sabata_UpdateFrame	machine-shaped	partial
 src/bosses/sabata/Sabata_UpdatePresentation.c	Sabata_UpdatePresentation	machine-shaped	partial	13	kept q alias and effect duplicate branches
 src/bosses/sabata/SceneActor_UpdateUnlessPaused.c	SceneActor_UpdateUnlessPaused	machine-shaped	natural	2	
 src/bosses/sabata/SceneActor_DestroyComponents.c	SceneActor_DestroyComponents	machine-shaped	natural	2	
+src/bosses/sabata/sub_0817FDE0.c	sub_0817FDE0	machine-shaped	partial	11	kept actor/boss alias, callback setters, tile-copy loops, facing expression and duplicate summon arms
