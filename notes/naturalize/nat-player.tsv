@@ -572,3 +572,14 @@ src/player/effects/spiral_trail/RadialBurstEffect_BlendPaletteTowardWhite.c	Radi
 src/player/effects/spiral_trail/SpiralTrail_UpdateSlots.c	SpiralTrail_UpdateSlots	contrived	natural	8	-
 src/player/effects/spiral_trail/AttachmentSprite_Setup.c	AttachmentSprite_Setup	contrived	minor	10	u16 kind compared through (u8) casts fixes the load-then-copy; fill local keeps the 0x3DEF load ahead of the hoisted addresses
 src/player/effects/spiral_trail/SpiralTrail_EmitOrbitParticle.c	SpiralTrail_EmitOrbitParticle	contrived	contrived	24	table and index pointer locals, split index increment and sprite alias fix the register allocation
+src/player/effects/spiral_trail/SpiralTrail_UpdateOrbitParticle.c	SpiralTrail_UpdateOrbitParticle	natural	natural	0	-
+src/player/effects/spiral_trail/SpiralTrail_RemoveParticles.c	SpiralTrail_RemoveParticles	natural	natural	0	-
+src/player/effects/spiral_trail/sub_08236DC4.c	sub_08236DC4	natural	natural	0	-
+src/player/effects/spiral_trail/SpiralTrail_AdvanceFrame.c	SpiralTrail_AdvanceFrame	natural	natural	0	-
+src/player/effects/spiral_trail/SpiralTrail_RewindFrame.c	SpiralTrail_RewindFrame	natural	natural	0	-
+src/player/effects/spiral_trail/SpiralTrail_RemoveSprite.c	SpiralTrail_RemoveSprite	natural	natural	0	-
+src/player/effects/spiral_trail/SpiralTrail_Update.c	SpiralTrail_Update	natural	natural	0	-
+src/player/effects/spiral_trail/SpiralTrail_Destroy.c	SpiralTrail_Destroy	natural	natural	0	-
+src/player/effects/spiral_trail/ActorAttachment_Initialize.c	ActorAttachment_Initialize	natural	natural	0	-
+src/player/effects/spiral_trail/ActorAttachment_Create.c	ActorAttachment_Create	natural	natural	0	-
+src/player/effects/spiral_trail/SpiralTrail_CreateWithParticles.c	SpiralTrail_CreateWithParticles	natural	natural	0	-
