@@ -374,3 +374,5 @@ src/ui/town/dark_loan.c	DarkLoan_BeginAlternateOpening	natural	natural	0
 src/ui/town/dark_loan.c	DarkLoan_HideDisplay	natural	natural	0	
 src/ui/town/dark_loan.c	DarkLoan_UpdateHidden	natural	natural	0	
 src/ui/town/dark_loan.c	DarkLoan_UpdateOpeningAnimation	minor	natural	1	
+src/ui/town/dark_loan.c	DarkLoan_ConfirmPreview	natural	natural	0	
+src/ui/town/dark_loan.c	DarkLoan_UpdateConfirmation	minor	natural	1	

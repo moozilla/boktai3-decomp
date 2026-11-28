@@ -318,7 +318,7 @@ void DarkLoan_UpdateConfirmation(struct DarkLoanScreen *panel)
     Palette_UpdateHighlightPulse(
         ((struct DarkLoanHighlightPalette *)panel->widgets[DARK_LOAN_CURSOR].palette)->colors,
         &panel->highlightPulse);
-    if (gPadState[1] & 1) {
+    if (gPadState[1] & A_BUTTON) {
         if (panel->selection) {
             Sound_PlaySong(0xdd);
             DarkLoan_BeginAdjustment(panel);
@@ -329,13 +329,13 @@ void DarkLoan_UpdateConfirmation(struct DarkLoanScreen *panel)
             else
                 DarkLoan_BeginClosing(panel);
         }
-    } else if (gPadState[1] & 2) {
+    } else if (gPadState[1] & B_BUTTON) {
         Sound_PlaySong(0xde);
         if (!panel->exitScript)
             DarkLoan_ConfirmPreview(panel);
         else
             DarkLoan_BeginClosing(panel);
-    } else if (gPadState[1] & 0x30) {
+    } else if (gPadState[1] & (DPAD_RIGHT | DPAD_LEFT)) {
         Sound_PlaySong(0xdc);
         panel->selection = 1 - panel->selection;
         if (panel->selection)
