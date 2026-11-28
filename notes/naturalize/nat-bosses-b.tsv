@@ -308,3 +308,5 @@ src/bosses/vanargand/Vanargand_TestProjectedHorizontalRange.c	Vanargand_TestProj
 src/bosses/vanargand/Vanargand_GetTargetLateralDistance.c	Vanargand_GetTargetLateralDistance	near-natural	near-natural	3	destination slot pointer and SetVector helper kept: load order and store merging
 src/bosses/vanargand/Vanargand_SetPendingCue.c	Vanargand_SetPendingCue	near-natural	unchanged	2	mask local kept: plain |= mismatches; passing the constant to the flag setter only moves it into a helper argument
 src/bosses/vanargand/ScreenPalette_UpdateState.c	ScreenPalette_UpdateState	contrived	partial	6	hide label, mask and display-control locals kept: plain compound assignments load in another order
+src/bosses/vanargand/Vanargand_UpdateCameraOffset.c	Vanargand_UpdateCameraOffset	unchanged	unchanged	5	out/position aliases kept: no simpler form matched
+src/bosses/vanargand/Camera_UpdatePlayerBlendOffset.c	Camera_UpdatePlayerBlendOffset	unchanged	unchanged	5	out/position aliases kept: no simpler form matched
