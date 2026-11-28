@@ -64,7 +64,7 @@ static inline s32 StageResults_Clamp(s32 value, s32 max)
 }
 
 static inline void StageResults_SetUpdate(struct StageResults *results,
-                                          void (*update)(struct StageResults *), u8 state)
+                                          void (*update)(struct StageResults *), u32 state)
 {
     results->update = update;
     results->entering = 1;
