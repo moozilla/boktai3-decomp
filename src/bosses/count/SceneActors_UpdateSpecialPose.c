@@ -9,7 +9,7 @@ void SceneActors_UpdateSpecialPose(struct StateActor *p)
         SceneActors_SetFacing(p, p->savedFacing);
         SceneActors_StartAnimation(p, &actor->animation, (int)&actor->animationResource, 71, 2, 4);
     }
-    SceneGraphicsActor_ClearPendingDamage((struct SceneGraphicsActor *)p);
+    SceneGraphicsActor_ClearPendingDamage(actor);
     SceneActorState_SetFlags(p, 12);
     p->actionReset(p);
 }

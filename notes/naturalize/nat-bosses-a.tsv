@@ -115,3 +115,4 @@ src/bosses/count/SceneActors_UpdateStationaryReaction.c	SceneActors_UpdateStatio
 src/bosses/count/SceneActors_UpdateHazardAttack.c	SceneActors_UpdateHazardAttack	contrived	natural	1	
 src/bosses/count/SceneActors_UpdateRestPose.c	SceneActors_UpdateRestPose	minor	natural	1	
 src/bosses/count/SceneActors_UpdateReleasePose.c	SceneActors_UpdateReleasePose	minor	natural	1	
+src/bosses/count/SceneActors_UpdateSpecialPose.c	SceneActors_UpdateSpecialPose	minor	natural	1	
