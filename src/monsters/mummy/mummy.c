@@ -98,10 +98,8 @@ void SceneActor_UpdateAnimationCheckpoint(struct ChaseActor *actor)
     struct SceneActorAnimationSequenceDrawable *drawable = actor->base.drawable;
     struct DisplaySequenceState *sequence = &drawable->sequence;
     if (SceneActorReaction_TakePrepared(actor)) {
-        u32 mask;
         SceneActorAnimation_SelectDirectionalEntry(&actor->base, 5);
-        mask = 0x100;
-        actor->base.motionFlags |= mask;
+        SceneActorChase_SetMotionFlags(actor, 0x100);
     }
     if (sequence->index > 2) {
         if (sequence->index == 4 && sequence->elapsed == 0)
