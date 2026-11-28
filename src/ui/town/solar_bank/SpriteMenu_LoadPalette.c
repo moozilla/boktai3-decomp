@@ -1,18 +1,11 @@
 #include "global.h"
 #include "engine/video/render.h"
-struct SpriteMenuPalette {
-    u8 pad0[0x6EC];
-    void *paletteResource;
-    u8 pad6F0[0x1E];
-    u8 paletteState;
-    u8 pad70F;
-    u32 savedPalette[8];
-};
+#include "ui/town/solar_bank_panel.h"
 void *ScriptProc_Start(u16, u16);
-void SpriteMenu_LoadPalette(struct SpriteMenuPalette *menu)
+void SpriteMenu_LoadPalette(struct SolarBankPanel *panel)
 {
-    menu->paletteResource = (u8 *)ScriptProc_Start(0x92B3, 0x2E9) + 0x1B4;
-    CpuSet(menu->paletteResource, gBgPaletteBank13, 0x04000018);
-    CpuSet(gPaletteBankData + 0x7540, menu->savedPalette, 0x04000008);
-    menu->paletteState = 0;
+    panel->paletteResource = (u8 *)ScriptProc_Start(0x92B3, 0x2E9) + 0x1B4;
+    CpuSet(panel->paletteResource, gBgPaletteBank13, 0x04000018);
+    CpuSet(gPaletteBankData + 0x7540, panel->promptPalette, 0x04000008);
+    panel->paletteState = 0;
 }
