@@ -266,3 +266,4 @@ src/effects/orbits/homing_effect.c	GunDelHell_Create	natural	natural	0
 src/effects/orbits/homing_effect.c	EffectManager_UpdateParticles	minor	natural	2	particle pointer local: pointer strength reduction
 src/effects/orbits/homing_effect.c	EffectManager_DestroyManager	contrived	natural	2	effect pointer local: address computation order
 src/effects/orbits/homing_effect.c	EffectManager_Init	contrived	natural	4	actor local: the player load precedes the field address
+src/effects/orbits/homing_effect.c	EffectManager_Create	minor	natural	1	

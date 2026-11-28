@@ -214,15 +214,16 @@ s32 EffectManager_Init(struct EffectManager *manager, void *unused)
 
 void *EffectManager_Create(void *a, u32 unused)
 {
-    void *p = Task_Create(8, 0x7DC);
-    if (p != 0) {
-        Task_SetCallbacks(p, EffectManager_UpdateAll, EffectManager_DestroyManager);
-        if (EffectManager_Init(p, a) < 0) {
-            Task_Kill(p);
-            return 0;
+    struct EffectManager *manager = Task_Create(8, sizeof(*manager));
+
+    if (manager != NULL) {
+        Task_SetCallbacks(manager, EffectManager_UpdateAll, EffectManager_DestroyManager);
+        if (EffectManager_Init(manager, a) < 0) {
+            Task_Kill(manager);
+            return NULL;
         }
     }
-    return p;
+    return manager;
 }
 
 s32 Mod(s32, s32);
