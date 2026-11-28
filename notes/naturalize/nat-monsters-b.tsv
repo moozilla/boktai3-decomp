@@ -47,3 +47,4 @@ src/monsters/lun.c	Lun_Destroy	contrived	minor	1	MonsterInit_TestMotionFlags and
 src/monsters/ghost.c	Ghost_Destroy	contrived	minor	2	MonsterInit_TestMotionFlags and SceneActorPlacement_ReadFlags32 accessors
 src/monsters/ivy/ivy.c	Ivy_Init	contrived	contrived	30	partial: MonsterInit_*/IvyInit_* helpers stay: each inline's pseudos fix global-alloc spill slot order (plain operators or the shared pursuit-body helper move frame offsets)
 src/monsters/ivy/ivy.c	Ivy_InitColorTransition	minor	natural	1	
+src/monsters/ivy/ivy.c	ColorPulse_FinishRedFade	contrived	minor	3	finished flag: early returns reorder the shared epilogue

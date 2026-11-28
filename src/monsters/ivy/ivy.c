@@ -1880,20 +1880,18 @@ s32 Ivy_InitColorTransition(struct PhaseObject *p);
 
 s32 ColorPulse_FinishRedFade(struct PhaseObject *p)
 {
-    s32 result;
-    s32 value = Div((u32)p->pulseTimer * 16, p->pulseDuration);
-    s8 *red = &p->red;
-    *red = value;
+    s32 finished;
+    p->red = Div(p->pulseTimer * 16, p->pulseDuration);
     if (--p->pulseTimer != -1) {
-        p->color = ((u32)p->blue << 10) | ((u32)p->green << 5) | (u32)*red;
-        result = 0;
+        p->color = (p->blue << 10) | (p->green << 5) | p->red;
+        finished = 0;
     } else {
         p->phaseUpdate = (void *)Ivy_InitColorTransition;
         p->pulseTimer = 0;
-        p->color = ((u32)p->blue << 10) | ((u32)p->green << 5) | (u32)*red;
-        result = 1;
+        p->color = (p->blue << 10) | (p->green << 5) | p->red;
+        finished = 1;
     }
-    return result;
+    return finished;
 }
 
 s32 Ivy_WaitForColorRelease(struct PhaseObject *s)
