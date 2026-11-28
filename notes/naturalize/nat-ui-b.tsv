@@ -101,3 +101,20 @@ src/ui/save/save_menu.c	SaveMenu_CreateFromScript	natural	natural	0
 src/ui/save/scene_tilemap.c	SceneTilemap_LoadLayoutFromScript	minor	natural	2	-
 src/ui/save/scene_tilemap.c	TilemapPanel_LoadScriptTileList	minor	natural	2	-
 src/ui/save/scene_tilemap.c	SceneTilemap_WaitCopyDelay	contrived	natural	4	-
+src/ui/save/scene_tilemap.c	TileRows_CopyPackedRows	contrived	contrived	36	count doubles as the destination address: an indexed loop is 12 insns off (no loop reversal, source base add swaps); pointer loops hoist the pointer setup above the width test
+src/ui/save/scene_tilemap.c	TilemapPanel_StreamColumns	contrived	contrived	25	stripOffset also holds drawnX: a separate local lets the switch value take r1 and the per-case offset constants disappear (10 insns); cursorX = rightEdge steers cross-jumping
+src/ui/save/scene_tilemap.c	SaveMenu_ClearSingleton	natural	natural	0	-
+src/ui/save/scene_tilemap.c	SaveMenu_Close	natural	natural	0	-
+src/ui/save/scene_tilemap.c	SceneEffect_ExecuteCommandList	natural	natural	0	-
+src/ui/save/scene_tilemap.c	SceneTilemap_IsActive	natural	natural	0	-
+src/ui/save/scene_tilemap.c	TilemapPanel_DrawRegion	natural	natural	0	-
+src/ui/save/scene_tilemap.c	SceneTilemap_Update	natural	natural	0	-
+src/ui/save/scene_tilemap.c	SceneTilemap_Destroy	natural	natural	0	-
+src/ui/save/scene_tilemap.c	TilemapPanel_Initialize	natural	natural	0	-
+src/ui/save/scene_tilemap.c	SceneTilemap_CreateFromScript	natural	natural	0	-
+src/ui/save/scene_tilemap.c	SceneTilemap_GetLayoutLength	natural	natural	0	-
+src/ui/save/scene_tilemap.c	SceneTilemap_GetScrollDelta	natural	natural	0	-
+src/ui/save/scene_tilemap.c	SceneTilemap_SetScrollSource	natural	natural	0	-
+src/ui/save/scene_tilemap.c	SceneTilemap_CopyScrollSourceState	natural	natural	0	-
+src/ui/save/scene_tilemap.c	SceneTilemap_GetScrollLimit	natural	natural	0	-
+src/ui/save/scene_tilemap.c	Bg_SetControlFields	minor	minor	0	unchanged
