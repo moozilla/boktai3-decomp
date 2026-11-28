@@ -390,3 +390,4 @@ src/scene/actor/placement/SceneActorRoute_AdvanceActorPoint.c	SceneActorRoute_Ad
 src/scene/actor/placement/SceneActorMovement_UpdateHeight.c	SceneActorMovement_UpdateHeight	contrived	minor	5	parked 0x4000 mask: a plain test loads the field first
 src/scene/actor/placement/SceneActorCollision_InitBody.c	SceneActorCollision_InitBody	contrived	natural	2	-
 src/scene/actor/placement/SceneActorCollision_InitBodyWithFlags.c	SceneActorCollision_InitBodyWithFlags	contrived	natural	2	-
+src/scene/actor/placement/SceneActorCollision_InitAttack.c	SceneActorCollision_InitAttack	contrived	minor	3	flags local before Collider_Init: the literal argument reorders the constant load

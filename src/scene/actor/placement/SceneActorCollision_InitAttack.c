@@ -1,15 +1,8 @@
 #include "scene/collision/scene_actor_collision.h"
-void SceneActorCollision_InitAttack(struct ChaseActor *actor, void *inputSize, void *inputOffset,
-                                    void *inputCallback, u32 inputIndex, void *owner)
+void SceneActorCollision_InitAttack(struct ChaseActor *actor, void *size, void *offset,
+                                    void *callback, u32 index, void *owner)
 {
-    void *size = inputSize;
-    void *offset = inputOffset;
-    void *callback = inputCallback;
-    u32 index = inputIndex;
-    struct ContactCollider *collider;
-    {
-        collider = &actor->base.colliderB;
-    }
+    struct ContactCollider *collider = &actor->base.colliderB;
     {
         u32 flags = 0x2401;
         Collider_Init(collider, (u16)actor->base.body.id, flags, 0, 16, size, offset);
