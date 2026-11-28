@@ -270,3 +270,4 @@ src/engine/video/text_graphics.c	Text_FlushTileUploads	contrived	natural	4
 src/engine/video/text_graphics.c	Text_FindCachedGlyph	minor	natural	4	
 src/engine/video/text_graphics.c	Text_DrawGlyph	contrived	minor	12	cache entry address built by integer sum (operand order); nibble masks held in locals
 src/engine/video/text_graphics.c	Text_ReleaseCachedGlyph	contrived	natural	2	
+src/engine/video/text_graphics.c	TextWindow_BlankRect	contrived	natural	3	

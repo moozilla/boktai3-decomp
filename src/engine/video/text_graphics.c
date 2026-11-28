@@ -192,18 +192,14 @@ s32 Text_ReleaseCachedGlyph(u32);
 
 void TextWindow_BlankRect(u32 x, u32 y, u32 w, u32 h)
 {
-    u16 *map;
-    u32 xEnd, yEnd, x0, left;
-
-    map = (u16 *)Video_GetBackgroundMap(0);
-    xEnd = (x0 = x) + w;
-    yEnd = h + y;
-    for (; y < yEnd; y++) {
-        left = x0;
-        for (x = left; x < xEnd; x++) {
-            u16 *p = (u16 *)(((y * 32 + x) * 2) + (u32)map);
-            if (Text_ReleaseCachedGlyph(*p & 0x3FF) != 0)
-                *p = 0xF001;
+    u16 *map = (u16 *)Video_GetBackgroundMap(0);
+    u32 left = x;
+    u32 right = x + w;
+    u32 bottom = y + h;
+    for (; y < bottom; y++) {
+        for (x = left; x < right; x++) {
+            if (Text_ReleaseCachedGlyph(map[y * 32 + x] & 0x3FF) != 0)
+                map[y * 32 + x] = 0xF001;
         }
     }
 }
