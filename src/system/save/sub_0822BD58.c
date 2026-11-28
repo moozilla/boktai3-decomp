@@ -13,12 +13,8 @@ bool8 sub_0822BD58(u16 block, s32 size)
     buf = Heap_Alloc(size);
     if (buf == NULL)
         return FALSE;
-    for (i = size >> 1; i > 0;) {
-        u16 *p = buf;
-        do
-            *p++ = 0xabcd;
-        while (--i != 0);
-    }
+    for (i = 0; i < size >> 1; i++)
+        buf[i] = 0xabcd;
     Save_WriteBlockWithRetries(block, buf, size);
     Heap_Free(buf);
     return TRUE;
