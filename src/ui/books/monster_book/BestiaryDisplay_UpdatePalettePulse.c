@@ -1,10 +1,15 @@
 #include "global.h"
-void PaletteTransition_BlendBankColors(u8 *, u32, u32);
-void BestiaryDisplay_UpdatePalettePulse(u8 *p)
+struct BestiaryPulseDisplay {
+    u8 pad0[0x20];
+    u32 pulse;
+};
+void PaletteTransition_BlendBankColors(struct BestiaryPulseDisplay *, u32, u32);
+void BestiaryDisplay_UpdatePalettePulse(struct BestiaryPulseDisplay *p)
 {
-    u32 v = *(u32 *)(p + 0x20);
-    if (v > 0x1f)
-        v = 0x40 - v;
-    PaletteTransition_BlendBankColors(p, v, 5);
-    *(u32 *)(p + 0x20) = (*(u32 *)(p + 0x20) + 1) & 0x3f;
+    u32 weight = p->pulse;
+
+    if (weight > 0x1f)
+        weight = 0x40 - weight;
+    PaletteTransition_BlendBankColors(p, weight, 5);
+    p->pulse = (p->pulse + 1) & 0x3f;
 }

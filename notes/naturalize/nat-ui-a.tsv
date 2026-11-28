@@ -9,3 +9,4 @@ src/ui/books/monster_book/PaletteTransition_InitializeChainDisplays.c	PaletteTra
 src/ui/books/monster_book/sub_081D3C90.c	sub_081D3C90	contrived	natural	8	
 src/ui/books/monster_book/PaletteTransition_CopyBanks.c	PaletteTransition_CopyBanks	contrived	natural	20	
 src/ui/books/monster_book/PaletteTransition_ResetBuffers.c	PaletteTransition_ResetBuffers	contrived	natural	3	
+src/ui/books/monster_book/BestiaryDisplay_UpdatePalettePulse.c	BestiaryDisplay_UpdatePalettePulse	minor	natural	1	
