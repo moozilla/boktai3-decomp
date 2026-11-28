@@ -413,3 +413,4 @@ src/objects/items/item_container.c	Trigger_TryOpenNearby	contrived	minor	10	goto
 src/objects/items/item_container.c	TriggerManager_DestroyAllOfType	minor	natural	1	falls off the end (returns leftover)
 src/objects/items/item_container.c	Trigger_UpdateDropTimer	minor	natural	1	
 src/objects/items/item_container.c	Trigger_UpdateFalling	minor	natural	1	
+src/objects/items/item_container.c	Trigger_UpdateProximity	contrived	contrived	30	box/pointer aliases (out, v, o, proj = i*8+manager+60): the array index and direct box forms strength-reduce or reorder 4-50 insns

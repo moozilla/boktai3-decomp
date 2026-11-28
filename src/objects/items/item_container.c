@@ -227,18 +227,15 @@ s32 Trigger_UpdateProximity(struct TriggerManager *manager, struct Trigger *p)
     for (i = 0; i < 4; i++) {
         struct Player *actor = manager->actors[i];
         struct SceneVec *proj, *v;
-        s32 dy, near;
+        s32 dy;
         s16 *o = box;
-        if (!actor)
-            continue;
-        if (PlayerSlot_ReadStatus(i, 12))
+        if (!actor || PlayerSlot_ReadStatus(i, 12))
             continue;
         v = p->position;
         proj = (struct SceneVec *)(i * 8 + (u32)manager);
         proj = (struct SceneVec *)((u8 *)proj + 60);
         dy = o[1] - proj->y;
-        near = inBox(v, proj, o, actor, dy);
-        if (!near)
+        if (!inBox(v, proj, o, actor, dy))
             continue;
         pos = *p->position;
         pos.y += 128;
