@@ -1,21 +1,15 @@
 #include "global.h"
+#include "gba/m4a_internal.h"
 #include "engine/ram.h"
-struct Song {
-    u32 p;
-    u16 ms, me;
-};
-extern struct Song gSongTable[];
-struct MP {
-    u32 a, b, c;
-};
-extern struct MP gUnk_082643EC[];
-void m4aMPlayFadeOutTemporarily(u32, u16);
-void Sound_PauseChannel12(u32 t)
+
+void m4aMPlayFadeOutTemporarily(struct MusicPlayerInfo *, u16);
+
+void Sound_PauseChannel12(u32 speed)
 {
-    u16 s = gMusicSlotSongs[0x18 / 2];
-    if (s != 0) {
-        u32 m = gSongTable[s].ms;
-        m4aMPlayFadeOutTemporarily(gUnk_082643EC[m].a, t);
-        gMusicSlotSongs[m] = 0;
+    u16 song = gMusicSlotSongs[12];
+    if (song != 0) {
+        u32 player = gSongTable[song].ms;
+        m4aMPlayFadeOutTemporarily(gMPlayTable[player].info, speed);
+        gMusicSlotSongs[player] = 0;
     }
 }
