@@ -1,13 +1,7 @@
 #include "npc/manager/scene_actor_animation.h"
 #include "scene/actor/scene_actor_palette.h"
+#include "engine/word_flags.h"
 #include "scene/actor/scene_actor_status.h"
-
-static inline u8 TestManagerFlag(struct SceneActorRegistryManager *manager, u32 mask)
-{
-    if (manager->flags & mask)
-        return TRUE;
-    return FALSE;
-}
 
 static inline void BindPalette(struct RoomActor *actor, u16 *colors)
 {
@@ -41,19 +35,19 @@ u32 SceneActorPalette_ApplyTransition(struct SceneActorRegistryManager *manager,
     u32 category;
     if (ActorStatus_IsDown(actor))
         return 0;
-    if (!TestManagerFlag(manager, 0x2000))
+    if (!WordFlags_Has(0x2000, &manager->flags))
         return 0;
     alreadyAdvanced = 0;
     category = actor->base.category;
     switch (category) {
         case 23:
             transition = &manager->category23;
-            if (TestManagerFlag(manager, 0x8000))
+            if (WordFlags_Has(0x8000, &manager->flags))
                 alreadyAdvanced = 1;
             break;
         case 10:
             transition = &manager->category10;
-            if (TestManagerFlag(manager, 0x4000))
+            if (WordFlags_Has(0x4000, &manager->flags))
                 alreadyAdvanced = 1;
             break;
         default:
@@ -66,16 +60,12 @@ u32 SceneActorPalette_ApplyTransition(struct SceneActorRegistryManager *manager,
     if (!alreadyAdvanced) {
         AdvancePaletteTransition(transition);
         switch (category) {
-            case 23: {
-                u32 mask = 0x8000;
-                manager->flags |= mask;
+            case 23:
+                WordFlags_Set(0x8000, &manager->flags);
                 break;
-            }
-            case 10: {
-                u32 mask = 0x4000;
-                manager->flags |= mask;
+            case 10:
+                WordFlags_Set(0x4000, &manager->flags);
                 break;
-            }
         }
     }
     BindPalette(&actor->base, transition->colors);
