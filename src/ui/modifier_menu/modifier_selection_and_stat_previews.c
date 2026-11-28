@@ -749,12 +749,11 @@ u32 ModifierMenu_LoadBackground(struct ModifierMenu *menu, u32 flags)
     return 0;
 }
 
-u32 ModifierMenu_StartBackgroundScript(struct ModifierMenu *p)
+u32 ModifierMenu_StartBackgroundScript(struct ModifierMenu *menu)
 {
-    u32 v;
-    v = 3;
-    p->backgroundScript = ScriptProc_Start(0xC091, 0xA597);
-    Bg_SetupLayers(0, 0, p->backgroundScript, 0, 0, 1, &v);
+    u32 flags = 3;
+    menu->backgroundScript = ScriptProc_Start(0xC091, 0xA597);
+    Bg_SetupLayers(0, 0, menu->backgroundScript, 0, 0, 1, &flags);
     return 0;
 }
 

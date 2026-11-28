@@ -643,3 +643,4 @@ src/ui/modifier_menu/modifier_selection_and_stat_previews.c	ModifierMenu_DrawSta
 src/ui/modifier_menu/modifier_selection_and_stat_previews.c	ModifierMenu_DrawCapacity	fudged	natural	4	
 src/ui/modifier_menu/modifier_selection_and_stat_previews.c	ModifierMenu_DrawBackground	fudged	natural	17	
 src/ui/modifier_menu/modifier_selection_and_stat_previews.c	ModifierMenu_LoadBackground	fudged	natural	1	
+src/ui/modifier_menu/modifier_selection_and_stat_previews.c	ModifierMenu_StartBackgroundScript	natural	natural	1	
