@@ -1,15 +1,12 @@
-#include "global.h"
+#include "system/game_state/game_state.h"
 #include "ui/dialogue/text_state.h"
 
-struct G {
-    u8 f[0x12];
-    s16 a;
-};
-extern struct G *gGameState;
-void TextState_ResetPlaybackMode(struct TextState *p)
+void TextState_ResetPlaybackMode(struct TextState *state)
 {
-    s32 v;
-    p->entered = 0;
-    v = gGameState->a;
-    p->mode = v;
+    state->entered = 0;
+    {
+        s32 mode = (s16)gGameState->unk12;
+
+        state->mode = mode;
+    }
 }
