@@ -566,3 +566,4 @@ src/system/inventory/Inventory_SortValuables.c	Inventory_SortValuables	natural		
 src/system/inventory/Inventory_IsKeyItemId.c	Inventory_IsKeyItemId	minor	3	u8-returning inline: the plain boolean forms compile branchless or without the byte normalization	minor
 src/system/inventory/Inventory_RollIcePopStick.c	Inventory_RollIcePopStick	contrived	natural	1	
 src/system/inventory/sub_0822D2E0.c	sub_0822D2E0	minor	natural	1	
+src/system/inventory/Inventory_ResetConsumables.c	Inventory_ResetConsumables	minor	natural	1	
