@@ -194,7 +194,7 @@ extern u8 gSpriteWidthPixels[]; /* sprite width in pixels per shape/size index (
 /* 0x03004DA0 */
 extern s32 gBgFadeLevel; /* background fade level */
 /* 0x03004DA4 */
-extern u32 gObjPaletteBankCount; /* allocated object-palette bank count */
+extern s32 gObjPaletteBankCount; /* allocated object-palette bank count */
 /* 0x03004DA8 */
 extern u32 gBgFadeApplied; /* cached/applied background fade level */
 /* 0x03004DAC */
@@ -208,7 +208,7 @@ extern u16 gBgFadeBankMask; /* background-palette fade bank mask */
 /* 0x030051C8 */
 extern u32 gObjPaletteEffect; /* object-palette refresh/effect control */
 /* 0x030051CC */
-extern u32 gPaletteBanksInUse; /* active/reserved palette-bank count */
+extern s32 gPaletteBanksInUse; /* active/reserved palette-bank count */
 /* 0x030051D0 */
 extern u16 gBackdropColor; /* backdrop RGB15 color */
 /* 0x030051D4 */

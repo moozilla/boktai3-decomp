@@ -357,3 +357,8 @@ src/engine/video/palette/sub_082170D4.c	sub_082170D4	minor	natural	1
 src/engine/video/palette/sub_082170FC.c	sub_082170FC	minor	natural	1	
 src/engine/video/palette/sub_0821710C.c	sub_0821710C	minor	natural	1	
 src/engine/video/palette/ResourceSlots_Reset.c	ResourceSlots_Reset	minor	natural	1	
+src/engine/video/palette/sub_08216ED0.c	sub_08216ED0	natural	natural		
+src/engine/video/palette/Palette_GetBackgroundBuffer.c	Palette_GetBackgroundBuffer	natural	natural		
+src/engine/video/palette/sub_082171C0.c	sub_082171C0	natural	natural		
+src/engine/video/palette/sub_08216E54.c	sub_08216E54	contrived	contrived	0	cached payload address computed as a heap-relative difference; the literal address folds to one load
+src/engine/video/palette/Palette_CacheReservedObjectBank.c	Palette_CacheReservedObjectBank	contrived	natural	1	

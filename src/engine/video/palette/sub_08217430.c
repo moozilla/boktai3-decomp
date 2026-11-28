@@ -45,7 +45,7 @@ static inline u32 ObjectFade_SkipBank(s32 i)
 }
 static inline u16 *ObjectFade_SourceBank(s32 i)
 {
-    if (i < (s32)gPaletteBanksInUse)
+    if (i < gPaletteBanksInUse)
         return (u16 *)(gPaletteBankData + (gObjPaletteKeys[i] << 5));
     return gObjPaletteBuffer[i];
 }
@@ -57,7 +57,7 @@ void sub_08217430(void)
     if (gObjFadeLevel == 0x40 && gObjPaletteEffect == 0) {
         if (gObjFadeApplied != 0x40) {
             i = 0;
-            if (i < (s32)gPaletteBanksInUse) {
+            if (i < gPaletteBanksInUse) {
                 u8 **basePtr = &gPaletteBankData;
                 u16 *keys = gObjPaletteKeys;
                 do {
@@ -78,7 +78,7 @@ void sub_08217430(void)
                 nextCopy:
                     keys++;
                     i++;
-                } while (i < (s32)gPaletteBanksInUse);
+                } while (i < gPaletteBanksInUse);
             }
         }
         gObjFadeApplied = gObjFadeLevel;
