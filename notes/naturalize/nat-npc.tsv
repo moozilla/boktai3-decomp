@@ -384,3 +384,4 @@ src/npc/otenko/Otenko_UpdateTransitionFade.c	Otenko_UpdateTransitionFade	contriv
 src/npc/otenko/sub_081CF398.c	sub_081CF398	contrived	minor	1	graphics pointer locals
 src/npc/otenko/Otenko_UpdateDashSlide.c	Otenko_UpdateDashSlide	contrived	natural	6	
 src/npc/otenko/Otenko_DispatchCommands.c	Otenko_DispatchCommands	contrived	contrived	22	s16 message view with byte casts, parked mode bit and copy word, flag-mask helpers, SetFlaggedFacing and guarded do-while: each plain form moves cross-jump tails or register choice
+src/npc/otenko/Otenko_SetBehaviorTwoFromScript.c	Otenko_SetBehaviorTwoFromScript	contrived	minor	2	state and callback locals: agbcc materializes the state before the stage stores and loads the callback before prevState
