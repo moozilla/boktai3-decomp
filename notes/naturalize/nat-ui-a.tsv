@@ -364,3 +364,4 @@ src/ui/dialogue/text_window/TextWindow_OnPlaybackComplete.c	TextWindow_OnPlaybac
 src/ui/dialogue/text_window/DialogueTransition_Init.c	DialogueTransition_Init	natural	natural	0	
 src/ui/game_over/game_over.c	GameOver_UpdateOpening	fudged	natural	1	
 src/ui/game_over/game_over.c	GameOver_UpdateLetterTransforms	fudged	partial	16	inline AddScaledLetterSpacing stays: spelling it at the site loses the ldrsh/subs order (best two variants differ by order)
+src/ui/game_over/game_over.c	GameOver_ShowGraphics	fudged	natural	1	

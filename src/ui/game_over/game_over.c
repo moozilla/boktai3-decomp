@@ -176,13 +176,10 @@ void GameOver_UpdateLetterAnimation(struct GameOver *panel)
 
 void GameOver_ShowGraphics(struct GameOver *panel)
 {
-    struct GameOverSprite *q = panel->sprites;
-    s32 i = 7;
-    do {
-        Sprite_LinkToList(q, 0);
-        q++;
-        i--;
-    } while (i >= 0);
+    s32 i;
+
+    for (i = 0; i < 8; i++)
+        Sprite_LinkToList(&panel->sprites[i], 0);
     Anim_LinkToList(&panel->overlay, 0);
     panel->graphicsLinked = 1;
 }
