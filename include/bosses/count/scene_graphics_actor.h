@@ -106,7 +106,8 @@ struct SceneGraphicsActor {
     struct ContactCollider overlayCollider; /* 0x1CC */
     struct AnimSpriteResource animationResource; /* 0x220: keyframe resource. */
     struct AnimSprite animation; /* 0x240: body animation playback. */
-    u8 unk2A0[0x33C - 0x2A0];
+    u8 unk2A0[0x30C - 0x2A0];
+    u8 approachMotion[0x33C - 0x30C]; /* 0x30C: polar interpolation state of the charge approach. */
     s32 pendingDamage;
     u8 damagePending;
     u8 specialReaction; /* 0x341: sound, sparks and script on reaction completion. */
