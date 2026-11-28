@@ -320,3 +320,4 @@ src/scene/actor/control/SceneActorControl_TickGroundBob.c	SceneActorControl_Tick
 src/scene/actor/control/SceneActorControl_ConsumeLiftFlag.c	SceneActorControl_ConsumeLiftFlag	contrived	contrived	7	materialized 0/1 flag predicate and widened flag stores: plain tests and |= lose the predicate and load the field first
 src/scene/actor/control/SceneActorControl_InitContactColliders.c	SceneActorControl_InitContactColliders	contrived	minor	2	contact callbacks passed as void *: their prototypes differ from the init parameters
 src/scene/actor/control/SceneActorControl_SetDefaultProfile.c	SceneActorControl_SetDefaultProfile	contrived	natural	2	-
+src/scene/actor/control/SceneActorControl_InitPositionCurveEndpoints.c	SceneActorControl_InitPositionCurveEndpoints	contrived	natural	1	-
