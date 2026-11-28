@@ -26,7 +26,9 @@ struct ResultMenu {
     u8 markerAnimationState, unknown49, nextFeedbackSlot;
     u8 unknown4B[5];
     s32 level;
-    u8 unknown54[0x20];
+    u8 unknown54[0x14];
+    s32 gaugePosition; /* 0x68: clamped to 0..0x1600; purpose unclear */
+    u8 unknown6C[8];
     void *messageTable, *owner;
     struct SceneValueEquipment transformationResult;
     s32 playerPosition, playerVelocity;
