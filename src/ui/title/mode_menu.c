@@ -40,29 +40,24 @@ u8 Save_LoadAlternateSlot(void);
 
 s32 ModeMenu_LoadAvailableSave(struct ModeMenu *unused)
 {
-    s32 r;
+    s32 result;
     s16 flag;
-    int failure;
     if (Save_LoadSelectedSlot()) {
         gGameState->flag86E = 1;
-        r = 1;
+        result = 1;
+    } else if (Save_LoadAlternateSlot()) {
+        gGameState->flag86E = 1;
+        result = 0;
     } else {
-        u8 v = Save_LoadAlternateSlot();
-        if (v) {
-            gGameState->flag86E = 1;
-            r = 0;
-        } else {
-            gGameState->flag86E = v;
-            failure = -1;
-            r = failure;
-        }
+        gGameState->flag86E = 0;
+        result = -1;
     }
-    flag = (s16)gGameState->flag86E;
+    flag = gGameState->flag86E;
     if (flag) {
-        flag = (s16)gGameState->flag86E;
+        flag = gGameState->flag86E;
         GameState_BackupActiveRegions(flag);
     }
-    return r;
+    return result;
 }
 
 static inline void Confirm(struct ModeMenu *p)
