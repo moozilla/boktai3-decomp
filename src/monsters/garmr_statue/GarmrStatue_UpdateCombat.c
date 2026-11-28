@@ -52,26 +52,24 @@ s32 GarmrStatue_UpdateCombat(struct GarmrStatue *p)
         p->reactionFlags = p->pendingReaction;
         Sound_PlaySong(0x13e);
         if (p->damage > 0) {
-            DamageNumberDisplay_Show(collider, p->damage, 0, &p->collider.position, &p->collider.offset,
-                                     1);
-            SceneHud_SetTimedState(p->hud, p->health, p->maxHealth, p->hudStyle, p->collider.costFlags == 4,
-                                   p->hudTime);
+            DamageNumberDisplay_Show(collider, p->damage, 0, &p->collider.position,
+                                     &p->collider.offset, 1);
+            SceneHud_SetTimedState(p->hud, p->health, p->maxHealth, p->hudStyle,
+                                   p->collider.costFlags == 4, p->hudTime);
         }
         if (p->health <= 0) {
-            const u16 *table;
             s32 count;
             p->defeated = 1;
             p->collider.responseValue = 0;
             SceneVec_Copy(&position, &p->sprite.coordinates.position);
             position.y += 200;
             velocity.x = -4;
-            table = gRandomTable;
-            velocity.y = ParticleRandom_ReadDirectSample(table) & 7;
+            velocity.y = ParticleRandom_ReadDirectSample(gRandomTable) & 7;
             velocity.z = -4;
             size.x = 24;
-            size.y = (ParticleRandom_ReadDirectSample(table) & 7) + 3;
+            size.y = (ParticleRandom_ReadDirectSample(gRandomTable) & 7) + 3;
             size.z = 24;
-            count = (ParticleRandom_ReadDirectSample(table) & 3) + 4;
+            count = (ParticleRandom_ReadDirectSample(gRandomTable) & 3) + 4;
             ImpactParticleGroup_SpawnBouncing(count, 2, &position, &velocity, &size, 15, 15);
             Anim_RestartSequence(&p->sequence, p->resource, 10, 0, 0);
             AnimData_SelectPaletteBank(p->graphics, 0x1bc);
