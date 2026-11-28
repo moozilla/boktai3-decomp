@@ -70,7 +70,6 @@ s32 Math_Atan2(s32, s32);
 
 void Armor_UpdateRandomFlankAction42(struct ArmorActor *p)
 {
-    u8 r;
     switch (p->phase) {
         case 0: {
             struct ArmorTarget *g = gGameState;
@@ -78,24 +77,20 @@ void Armor_UpdateRandomFlankAction42(struct ArmorActor *p)
             u32 random;
             gRandomIndex = (gRandomIndex + 1) & 0x3ff;
             random = *(const u16 *)((gRandomIndex * 2) + (u32)gRandomTable);
-            random &= 0x10;
-            if (random)
+            if (random & 0x10)
                 a += 0x40;
             else
                 a -= 0x40;
             a += 0x10;
             a &= 0xe0;
             p->direction = a;
-            if (DirectionalActor_TryBeginState(p, 0x2a)) {
+            if (DirectionalActor_TryBeginState(p, 0x2a))
                 p->phase = 1;
-            }
             break;
         }
         case 1:
-            r = p->actionStatus;
-            if (r == 0xff) {
-                p->phase = r;
-            }
+            if (p->actionStatus == 0xff)
+                p->phase = 0xff;
             break;
     }
 }
