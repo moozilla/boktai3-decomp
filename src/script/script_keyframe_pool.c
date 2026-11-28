@@ -206,15 +206,9 @@ u32 ScriptKeyframe_TickManager(struct ScriptKeyframeManager *manager)
 
 s32 ScriptKeyframe_DestroyManager(struct ScriptKeyframeManager *manager)
 {
-    s32 index = 0;
-    if (index < manager->count) {
-        union ScriptKeyframeAnimation *animation = &manager->entries[0].animation;
-        do {
-            Anim_Remove(animation);
-            animation = (void *)((u8 *)animation + sizeof(struct ScriptKeyframeEntry));
-            index++;
-        } while (index < manager->count);
-    }
+    s32 i;
+    for (i = 0; i < manager->count; i++)
+        Anim_Remove(&manager->entries[i].animation);
     gScriptKeyframeManager = 0;
     return 0;
 }

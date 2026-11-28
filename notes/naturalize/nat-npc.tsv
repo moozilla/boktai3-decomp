@@ -468,3 +468,4 @@ src/script/script_selector.c	ScriptSelector_MoveSelection	minor	natural	2
 src/script/script_selector.c	ScriptSelector_UpdateTask	minor	natural	4	
 src/script/demo_manager.c	SceneMessages_SetPendingTrigger	natural	natural	0	
 src/script/script_keyframe_pool.c	ScriptKeyframe_TickManager	contrived	natural	1	
+src/script/script_keyframe_pool.c	ScriptKeyframe_DestroyManager	contrived	natural	1	
