@@ -327,3 +327,4 @@ src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateRecoilSlide	natural	nat
 src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateAlternateFormChange	contrived	natural	4	-
 src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateFormChange	minor	natural	4	-
 src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateSpiralMotion	minor	natural	2	-
+src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateSideWalkTarget	minor	minor	20	PlayerCue_FaceSideWalkAngle helper (its facing/heading pointers fix the address-then-copy order)

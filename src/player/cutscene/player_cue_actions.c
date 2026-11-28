@@ -1787,8 +1787,8 @@ static inline void PlayerCue_FaceSideWalkAngle(struct Player *player, u16 angle)
 
 void PlayerCue_UpdateSideWalkTarget(struct Player *player)
 {
-    s32 deltaX = player->cueDestination.x - player->position.x,
-        deltaZ = player->cueDestination.z - player->position.z;
+    s32 deltaX = player->cueDestination.x - player->position.x;
+    s32 deltaZ = player->cueDestination.z - player->position.z;
     s32 angle = Math_Atan2(deltaX, deltaZ);
     if (deltaX * deltaX + deltaZ * deltaZ <= 144) {
         player->position.x = player->cueDestination.x;
@@ -1820,22 +1820,16 @@ void PlayerCue_UpdateSideWalkTarget(struct Player *player)
         player->velocityX = TruncateQ12(gUnk_086149C4[(angle + 64) & 255] * 12);
         player->velocityZ = TruncateQ12(gUnk_086149C4[angle & 255] * 12);
         if (player->velocityScaleAxis == 1) {
-            s32 v;
             if (player->velocityZ < 0) {
-                v = player->velocityZ * 40;
-                player->velocityZ = TruncateQ6(v);
+                player->velocityZ = TruncateQ6(player->velocityZ * 40);
             } else {
-                v = player->velocityZ * 52;
-                player->velocityZ = TruncateQ6(v);
+                player->velocityZ = TruncateQ6(player->velocityZ * 52);
             }
         } else if (player->velocityScaleAxis == 2) {
-            s32 v;
             if (player->velocityX < 0) {
-                v = player->velocityX * 40;
-                player->velocityX = TruncateQ6(v);
+                player->velocityX = TruncateQ6(player->velocityX * 40);
             } else {
-                v = player->velocityX * 52;
-                player->velocityX = TruncateQ6(v);
+                player->velocityX = TruncateQ6(player->velocityX * 52);
             }
         }
         PlayerCue_FaceSideWalkAngle(player, angle);
