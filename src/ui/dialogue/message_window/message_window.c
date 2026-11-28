@@ -603,28 +603,21 @@ void MessageWindow_UpdateImmediatePlayback(struct MessageWindow *window)
 {
     struct MessagePlaybackState *state = &window->state;
     int i;
-    void *close;
-    void **callback;
-    u32 *counter;
+
     state->skip = 1;
-    i = 0;
-    close = MessageWindow_ClearTextCompletion;
-    callback = &window->callback;
-    counter = &window->playbackCounter;
-    do {
+    for (i = 0; i < 4; i++) {
         if (state->pc) {
             state->characterTimer = 0;
             if (TextState_StepPlayback(state)) {
-                *counter = 1;
+                window->playbackCounter = 1;
                 if (state->complete)
-                    *callback = close;
+                    MessageWindow_SetPlayback(window, MessageWindow_ClearTextCompletion);
                 else
-                    *callback = MessageWindow_UpdateIdle;
+                    MessageWindow_SetPlayback(window, MessageWindow_UpdateIdle);
                 break;
             }
         }
-        i++;
-    } while (i <= 3);
+    }
 }
 
 s32 MessageWindow_Update(struct MessageWindow *window)
