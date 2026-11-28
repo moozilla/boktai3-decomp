@@ -50,3 +50,4 @@ src/scene/actor/actor_pool/pooled_actor_helpers.c	Actor_CapturePendingHit	minor	
 src/scene/actor/actor_pool/pooled_actor_helpers.c	Actor_SetActionParameters	minor	natural	1	
 src/scene/actor/actor_pool/pooled_actor_helpers.c	Actor_StepFacingAngle	contrived	natural	4	
 src/scene/actor/actor_pool/pooled_actor_helpers.c	Actor_FindTargetInFacingArc	contrived	natural	8	
+src/scene/actor/actor_pool/pooled_actor_helpers.c	Actor_RefreshTarget	contrived	natural	4	
