@@ -568,3 +568,10 @@ src/monsters/golem/golem_2.c	Golem_ResumeDelayedRoute	contrived	natural	1
 src/monsters/golem/golem_2.c	Golem_TickFacingQuadrant	minor	minor	1	quadrant mask local: the literal loads before the shift
 src/monsters/golem/golem_main_2.c	Golem_ResumeRouteAfterControl	minor	minor	2	flag pointer and returning local remain
 src/monsters/golem/golem_main.c	SceneActorReaction_SlideBack	contrived	contrived	1	hand-inlined animation selection with pointer temps and goto: the shared selector computes addresses differently
+src/monsters/axe/axe.c	SpriteGroup_InitAnimatedSprites	contrived	contrived	1	parallel pointers and offset in a do-while: an indexed loop is strength-reduced differently
+src/monsters/centipede/Centipede_UpdateSegmentPositions.c	Centipede_UpdateSegmentPositions	contrived	contrived	3	local segment and group views and address arithmetic on the segment copy remain
+src/monsters/centipede/Centipede_OnResolveVariantValue.c	Centipede_OnResolveVariantValue	minor	minor	1	local drawable views and a flag constant local
+src/monsters/centipede/Centipede_UpdateRetraction.c	Centipede_UpdateRetraction	contrived	contrived	0	union byte test of the actor pointer repeated in four identical branches
+src/monsters/golem/golem_main.c	SceneActor_AccelerateForTerrain	minor	minor	0	terrain entry byte arithmetic and motion alias
+src/monsters/golem/golem_main_2.c	Golem_OnDestroy	natural	natural	0	
+src/monsters/golem/golem_main_2.c	Golem_Init	minor	minor	1	instance alias removed; duplicated routeDelay store and drawable byte pointer remain
