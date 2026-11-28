@@ -1,35 +1,20 @@
-#include "global.h"
-struct S {
-    u8 p0[0x164];
-    u8 *pc;
-    u8 p1[0x1c];
-    s16 n;
-    s16 pad;
-    s16 d[8];
-};
+#include "monsters/dragon_puppy.h"
 void Script_SetPc(u8 *);
 u8 *Script_GetPc(void);
 s32 Script_GetValue(void);
-void DragonPuppy_ReadAttackSchedule(struct S *p)
+void DragonPuppy_ReadAttackSchedule(struct DragonPuppy *p)
 {
     s32 i;
-    s16 *d;
-    s16 *np;
-    Script_SetPc(p->pc);
+
+    Script_SetPc((u8 *)p->attackSchedule);
     i = 0;
     if (Script_GetPc() != 0) {
-        s32 v = Script_GetValue();
-        np = &p->n;
-        *np = v;
-        if (*np > 8)
-            *np = 8;
-        if (*np != 0 && i < *np) {
-            d = p->d;
-            do {
-                *d = Script_GetValue();
-                d++;
-                i++;
-            } while (i < p->n);
+        p->attackCount = Script_GetValue();
+        if (p->attackCount > 8)
+            p->attackCount = 8;
+        if (p->attackCount != 0) {
+            for (; i < p->attackCount; i++)
+                p->attackTimes[i] = Script_GetValue();
         }
     }
 }

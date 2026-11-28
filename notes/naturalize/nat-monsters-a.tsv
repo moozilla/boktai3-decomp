@@ -490,3 +490,4 @@ src/monsters/garmr_statue/GarmrStatue_HandleDefeat.c	GarmrStatue_HandleDefeat	co
 src/monsters/dragon_puppy/DragonPuppy_InitCollider.c	DragonPuppy_InitCollider	contrived	natural	2	
 src/monsters/garmr_statue/GarmrStatue_InitCollider.c	GarmrStatue_InitCollider	contrived	natural	2	
 src/monsters/cannons/wind/WindCannon_ReadToggleSchedule.c	WindCannon_ReadToggleSchedule	contrived	natural	2	
+src/monsters/dragon_puppy/DragonPuppy_ReadAttackSchedule.c	DragonPuppy_ReadAttackSchedule	contrived	natural	2	

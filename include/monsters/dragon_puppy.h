@@ -23,7 +23,8 @@ struct DragonPuppy {
     u32 stateWord, savedStateWord, unknown158, unknown15C, unknown160, attackSchedule;
     u32 unknown168, terrainEnabled;
     void *deathAnimation;
-    u8 terrain[0x24];
+    u8 terrain[0x10];
+    s16 attackCount, attackIndex, attackTimes[8];
 };
 
 typedef char DragonPuppySizeCheck[sizeof(struct DragonPuppy) == 0x198 ? 1 : -1];
