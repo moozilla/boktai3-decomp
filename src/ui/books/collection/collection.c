@@ -76,7 +76,7 @@ s32 Collection_UpdateCountDigits(struct CollectionMenu *p)
 
 u32 Collection_UpdatePageIndicator(struct CollectionMenu *p)
 {
-    Anim_LoadKeyframe(&p->pageIndicator, &p->resource, (u16)(*(u16 *)&p->page + 0x59), 0);
+    Anim_LoadKeyframe(&p->pageIndicator, &p->resource, (u16)(p->page + 0x59), 0);
     return 0;
 }
 
