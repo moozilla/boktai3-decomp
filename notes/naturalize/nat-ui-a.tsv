@@ -590,3 +590,4 @@ src/ui/hud/display/Hud_CloseMessageFromScript.c	Hud_CloseMessageFromScript	fudge
 src/ui/hud/display/Hud_ShowPanelFromScript.c	Hud_ShowPanelFromScript	fudged	natural	1	
 src/ui/hud/display/SceneHud_RefreshActionKeyframes.c	SceneHud_RefreshActionKeyframes	natural	natural	0	
 src/ui/hud/display/SceneHud_DrawSlotMarkers.c	SceneHud_DrawSlotMarkers	fudged	natural	14	flag local read before the kind pointer is formed
+src/ui/hud/display/SceneHud_DrawSlotMeter.c	SceneHud_DrawSlotMeter	fudged	natural	1	
