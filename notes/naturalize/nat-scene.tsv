@@ -261,3 +261,5 @@ src/scene/actor/behavior/SceneActor_DispatchActivePhase.c	SceneActor_DispatchAct
 src/scene/actor/behavior/SceneActorRoute_UpdateTimedPhase.c	SceneActorRoute_UpdateTimedPhase	natural	natural	0	-
 src/scene/actor/behavior/SceneActorRoute_UpdateWaitPhase.c	SceneActorRoute_UpdateWaitPhase	contrived	minor	3	parked status clear mask (plain &= loads the field first)
 src/scene/actor/behavior/SceneActorRoute_UpdateAdvancePhase.c	SceneActorRoute_UpdateAdvancePhase	contrived	minor	4	duration scale pointer assigned in both branches
+src/scene/actor/behavior/SceneActorRoute_UpdateTriggeredWaitPhase.c	SceneActorRoute_UpdateTriggeredWaitPhase	minor	minor	0	finished/flags locals order the status test
+src/scene/actor/behavior/SceneActorRoute_UpdateRouteCompletion.c	SceneActorRoute_UpdateRouteCompletion	contrived	minor	5	parked masks around the interaction clear, descriptor field pointer, scale pointer assigned in both branches

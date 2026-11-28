@@ -12,20 +12,12 @@ u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, u32, u32, u32);
 u8 SceneActorBehavior_RequestDescriptorTurn(void *, void *, u32, u32, u32);
 // confidence=low: selects control behavior after a route descriptor completes.
 
-static inline u32 FlagsSave(struct ChaseActor *a, u32 mask, u16 **out)
-{
-    u16 *flags = &a->base.motionFlags;
-    u32 value = *flags & mask;
-    *out = flags;
-    return value;
-}
 void SceneActorMovement_ResolveRoutePosition(void *);
 void SceneActorRoute_UpdateRouteCompletion(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
     s32 speed, event;
     u16 *scale;
-    u16 *motionFlags;
 
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         DEBUG_PRINT();
@@ -36,7 +28,7 @@ void SceneActorRoute_UpdateRouteCompletion(struct ChaseActor *actor)
         return;
     SceneActorAnimation_SelectDirectionalEntry(actor, 1);
     speed = Callback_InvokeActor(actor, actor->base.animationQuery.opaque);
-    if (FlagsSave(actor, 0xA02F, &motionFlags)) {
+    if (SceneActorContact_MotionFlags(actor, 0xA02F)) {
         u16 *p = &actor->base.field2C2;
         *p = 64;
         scale = p;
@@ -62,8 +54,7 @@ void SceneActorRoute_UpdateRouteCompletion(struct ChaseActor *actor)
         } else if (SceneActorBehavior_AccelerateTowardDescriptor(actor, *descriptor, 32, 32,
                                                                  speed)) {
             struct ContactPosition **destination;
-            u32 zero = event;
-            group->common.control.timer = zero;
+            group->common.control.timer = 0;
             destination = &group->destination;
             if ((*destination)->pad != 0) {
                 struct SceneActorRegistryControl *control;
