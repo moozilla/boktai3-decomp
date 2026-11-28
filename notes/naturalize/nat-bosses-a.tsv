@@ -240,3 +240,7 @@ src/bosses/hresvelgr/Hresvelgr_GetTravelTarget.c	Hresvelgr_GetTravelTarget	minor
 src/bosses/hresvelgr/Hresvelgr_SetRandomTravelTarget.c	Hresvelgr_SetRandomTravelTarget	contrived	contrived	5	unchanged: one variable holds the table address and then the angle (register priority, see source comment)
 src/bosses/hresvelgr/SceneMover_SetSideTarget.c	SceneMover_SetSideTarget	contrived	contrived	3	unchanged: second anchor alias selects the register of the x load
 src/bosses/hresvelgr/SceneMover_IsNearTarget.c	SceneMover_IsNearTarget	contrived	minor	6	square temporaries stay
+src/bosses/hresvelgr/DirectionGate_IsAngleInModeRange.c	DirectionGate_IsAngleInModeRange	natural	natural	0	
+src/bosses/hresvelgr/Hresvelgr_SetSineScaledVelocity.c	Hresvelgr_SetSineScaledVelocity	minor	minor	0	s16 angle and product operand order (see source comment)
+src/bosses/hresvelgr/Hresvelgr_SetCosineScaledVelocity.c	Hresvelgr_SetCosineScaledVelocity	minor	minor	0	s16 angle and product operand order (see source comment)
+src/bosses/hresvelgr/ColliderActor_SetTargetPosition.c	ColliderActor_SetTargetPosition	contrived	minor	8	delta/position pointers stay
