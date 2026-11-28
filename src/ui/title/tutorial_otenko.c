@@ -325,15 +325,12 @@ void TutorialOtenko_SelectNearestInteraction(struct ActorAnimController *p)
 {
     s32 i;
     struct InteractionPartner *q;
-    s32 dx, dz, xOffset, zOffset, length;
-    s32 height;
-    u32 radius;
-    u32 a, b, c;
-    u32 sector;
-    u8 *owner;
+    s32 dx, dz, xOffset, zOffset, height;
+    s8 a, b, c;
+    u8 angle;
     p->group = -1;
     for (i = 0; i < 16; i++) {
-        q = (struct InteractionPartner *)((u8 *)p + 0x1c + i * 0xdc);
+        q = (struct InteractionPartner *)&p->children[i];
         q->eligible = 0;
         if (q->flags & 10)
             continue;
@@ -344,12 +341,9 @@ void TutorialOtenko_SelectNearestInteraction(struct ActorAnimController *p)
             xOffset = 128;
             zOffset = 0;
         }
-        owner = *(u8 **)((u8 *)p + 0x18);
-        dx = *(s16 *)(owner + 0x30) - q->worldX - xOffset;
-        dz = *(s16 *)(owner + 0x34) - q->worldZ - zOffset;
-        length = dx * dx + dz * dz;
-        radius = p->speed;
-        if (length >= (s32)(radius * radius))
+        dx = p->owner->position.x - q->worldX - xOffset;
+        dz = p->owner->position.z - q->worldZ - zOffset;
+        if (dx * dx + dz * dz >= p->speed * p->speed)
             continue;
         if (q->orientation == 0) {
             a = 0;
@@ -360,29 +354,16 @@ void TutorialOtenko_SelectNearestInteraction(struct ActorAnimController *p)
             b = 1;
             c = 2;
         }
-        {
-            u32 angle = (u8)(Math_Atan2(dx, dz) - 16);
-            s32 first = (s8)a;
-            sector = angle >> 5;
-            if (first != sector && (s8)b != sector && (s8)c != sector) {
-                c = 255;
-                b = 255;
-                a = 255;
-            }
-        }
-        if ((s8)a != gGameState->unk85E && (s8)b != gGameState->unk85E &&
-            (s8)c != gGameState->unk85E)
+        angle = Math_Atan2(dx, dz) - 16;
+        if (a != angle >> 5 && b != angle >> 5 && c != angle >> 5)
+            a = b = c = -1;
+        if (a != gGameState->unk85E && b != gGameState->unk85E && c != gGameState->unk85E)
             continue;
-        {
-            s32 y = q->worldY;
-            u8 *parent = *(u8 **)((u8 *)p + 0x18);
-            height = y - *(s16 *)(parent + 0x32);
-        }
+        height = q->worldY - p->owner->position.y;
         if (height < 0)
             height = -height;
         if (height > 119)
             continue;
-
         q->eligible = 1;
         q->distance = dx * dx + dz * dz;
         if (p->group == -1)
@@ -395,21 +376,21 @@ void TutorialOtenko_SelectNearestInteraction(struct ActorAnimController *p)
         }
     }
     for (i = 0; i < 16; i++) {
-        q = (struct InteractionPartner *)((u8 *)p + 0x1c + i * 0xdc);
+        q = (struct InteractionPartner *)&p->children[i];
         if (i == p->group) {
             u8 *timer = &q->timer;
             if (++*timer > 10) {
-                AnimData_SelectPaletteBank((u8 *)q + 0x2c, q->resource);
+                AnimData_SelectPaletteBank(q->effect, q->resource);
                 *timer = 10;
             } else
-                AnimData_SelectPaletteBank((u8 *)q + 0x2c, q->resource + 1);
+                AnimData_SelectPaletteBank(q->effect, q->resource + 1);
         } else {
             u8 old = q->timer--;
             if (old == 0) {
                 q->timer = 0;
-                AnimData_SelectPaletteBank((u8 *)q + 0x2c, q->resource + 2);
+                AnimData_SelectPaletteBank(q->effect, q->resource + 2);
             } else
-                AnimData_SelectPaletteBank((u8 *)q + 0x2c, q->resource + 1);
+                AnimData_SelectPaletteBank(q->effect, q->resource + 1);
         }
     }
 }

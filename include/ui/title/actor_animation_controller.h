@@ -136,7 +136,8 @@ typedef char ActorAnimControllerSizeCheck[sizeof(struct ActorAnimController) == 
 struct InteractionPartner {
     u8 unk00[0x1c];
     s16 x, y, z;
-    u8 unk22[0x48 - 0x22];
+    u8 unk22[0x2c - 0x22];
+    u8 effect[0x48 - 0x2c]; /* palette bank buffer, see AnimData_SelectPaletteBank */
     s16 worldX, worldY, worldZ;
     u8 unk4E[0xa4 - 0x4e];
     void *handle, *request;
