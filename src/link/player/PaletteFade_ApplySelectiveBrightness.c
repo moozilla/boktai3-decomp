@@ -3,8 +3,6 @@
 #include "link/player/link_player_palette.h"
 
 /* tentative: copies a palette bank, optionally brightening each channel capped at 31 */
-
-/* tentative: copies a palette bank, optionally brightening each channel capped at 31 */
 void PaletteFade_ApplySelectiveBrightness(struct LinkPlayerFade *p)
 {
     u16 *src;
