@@ -6,7 +6,8 @@ void Shop_ConfirmEquipmentAction(struct ShopControlView *s)
         case 5:
             switch (Shop_ClassifyEquipmentAction(s)) {
                 case 0:
-                    goto error;
+                    Sound_PlaySong(0x192);
+                    break;
                 case 1:
                     Sound_PlaySong(0xDD);
                     Shop_BeginPurchaseConfirmation(s);
@@ -23,7 +24,6 @@ void Shop_ConfirmEquipmentAction(struct ShopControlView *s)
             break;
         case 2:
             if (Shop_ClassifyEquipmentAction(s) == 0) {
-            error:
                 Sound_PlaySong(0x192);
             } else {
                 Sound_PlaySong(0xDD);
