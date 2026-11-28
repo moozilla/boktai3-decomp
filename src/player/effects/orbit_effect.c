@@ -58,9 +58,8 @@ void PlayerOrbitEffect_SpawnParticle(struct PlayerOrbitEffect *effect,
     s32 slotIndex;
     struct PlayerOrbitParticle *particle;
     for (slotIndex = 0; slotIndex < 16; slotIndex++) {
-        if (!effect->particles[slotIndex].motion.active) {
+        if (!effect->particles[slotIndex].motion.active)
             break;
-        }
     }
     if (slotIndex < 16) {
         {

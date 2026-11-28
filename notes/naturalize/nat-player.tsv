@@ -543,3 +543,4 @@ src/player/effects/burst/PlayerBurst_InitializeParticles.c	PlayerBurst_Initializ
 src/player/effects/orbit_effect.c	PlayerBurst_SetStateCallback	natural	natural	0	-
 src/player/effects/orbit_effect.c	PlayerOrbitEffect_UpdateParticle	minor	natural	2	-
 src/player/effects/orbit_effect.c	PlayerBurst_UpdateParticle	contrived	natural	2	-
+src/player/effects/orbit_effect.c	PlayerOrbitEffect_SpawnParticle	minor	minor	3	random cursor blocks and mask order
