@@ -104,3 +104,4 @@ src/bosses/count/SceneActors_UpdateRouteProjectileAttack.c	SceneActors_UpdateRou
 src/bosses/count/SceneActors_UpdateTravelProjectileAttack.c	SceneActors_UpdateTravelProjectileAttack	contrived	minor	1	typed fields; player slot read through a second actor view
 src/bosses/count/SceneActors_UpdateShrinkingReaction.c	SceneActors_UpdateShrinkingReaction	contrived	natural	1	plain branches
 src/bosses/count/SceneActors_UpdateKnockbackReaction.c	SceneActors_UpdateKnockbackReaction	contrived	natural	2	typed body
+src/bosses/count/Count_UpdateSwayReaction.c	Count_UpdateSwayReaction	contrived	minor	90	typed fields; kept scale pointers with u16 old/s32 current (two loads before pointer set) and expanded state entry with one/zero locals (zero order before state strb, shared with script and variant clears)
