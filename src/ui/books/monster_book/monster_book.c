@@ -351,7 +351,6 @@ u32 MonsterBook_InitWidgets(struct MonsterBook *book)
     struct ContactPosition position;
     struct AnimSpriteResource *resource;
     s32 i, j;
-    struct AnimSprite *badge;
 
     resource = ScriptProc_Start(0xCB05, 0xE2AB);
     book->resource = *resource;
@@ -371,9 +370,9 @@ u32 MonsterBook_InitWidgets(struct MonsterBook *book)
     }
     AnimSprite_InitLinked(&book->countSeparator, &book->resource, 0x15, 0x10, 0, 2, 0x3C, &position);
     WidgetPos_Clear(&position);
-    badge = &book->completionBadge;
-    AnimSprite_InitLinked(badge, &book->resource, 0x3E, 0x10, 0, 2, 0x3C, &position);
-    badge->flags |= 1;
+    AnimSprite_InitLinked(&book->completionBadge, &book->resource, 0x3E, 0x10, 0, 2, 0x3C,
+                          &position);
+    AnimSprite_Hide(&book->completionBadge);
     WidgetPos_Clear(&position);
     AnimSprite_InitLinked(&book->groupBadge, &book->resource, 0x40, 0x10, 0, 2, 0x3C, &position);
     book->groupBadge.flags |= 1;
