@@ -4,27 +4,23 @@ s32 StageIconDisplay_SelectUpdate(struct StageIconDisplay *, s32);
 s32 StageIconDisplay_InitFromScript(struct StageIconDisplay *display)
 {
     s32 variant;
-    u32 value;
+    s32 status;
+
     display->scriptCompletion = 1;
     if (Script_SeekToKeyword('m'))
         variant = Script_GetValue();
     else
         variant = 0;
-    {
-        u32 flag = Script_SeekToKeyword('f');
-        if (flag)
-            flag = Script_GetValue();
-        display->option = flag;
-    }
-    value = Script_SeekToKeyword('p');
-    if (value)
+    if (Script_SeekToKeyword('f'))
+        display->option = Script_GetValue();
+    else
+        display->option = 0;
+    if (Script_SeekToKeyword('p'))
         display->completionScriptId = Script_GetValue();
     else
-        display->completionScriptId = value;
+        display->completionScriptId = 0;
     StageIconDisplay_InitAnimations(display, variant);
-    {
-        s32 status = StageIconDisplay_SelectUpdate(display, variant);
-        gStageIconDisplay = display;
-        return status;
-    }
+    status = StageIconDisplay_SelectUpdate(display, variant);
+    gStageIconDisplay = display;
+    return status;
 }
