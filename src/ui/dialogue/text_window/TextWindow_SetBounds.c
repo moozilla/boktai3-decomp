@@ -1,30 +1,25 @@
 #include "global.h"
+#include "engine/ram.h"
+#include "ui/dialogue/text_window.h"
+#include "ui/dialogue/text_window_manager.h"
 
-struct Win {
-    u8 pad[4];
-    u8 x, y, w, h;
-};
+struct TextWindow *TextWindow_Find(int);
+void TextWindow_BlankRect(int, int, int, int);
+int TextState_SetBounds(struct TextState *, int, int, int, int);
 
-s32 TextState_SetBounds(void *state, u32 left, u32 top, u32 width, u32 height);
-void TextWindow_BlankRect(s32 x, s32 y, s32 width, s32 height);
-void *TextWindow_Find(u32 id);
-
-s32 TextWindow_SetBounds(u32 id, u32 x, u32 y, u32 w, u32 h)
+int TextWindow_SetBounds(int id, int x, int y, int width, int height)
 {
-    struct Win *win = TextWindow_Find(id);
-    u8 *state;
-    s32 r;
+    struct TextWindow *window = TextWindow_Find(id);
 
-    if (win == 0) {
-        r = -1;
-    } else {
-        state = (u8 *)win + 0x60;
-        TextWindow_BlankRect(win->x, win->y, win->w, win->h);
-        win->x = x;
-        win->y = y;
-        win->w = w;
-        win->h = h;
-        r = TextState_SetBounds(state, win->x, win->y, win->w, win->h);
+    if (window) {
+        struct TextState *text = &window->text;
+
+        TextWindow_BlankRect(window->x, window->y, window->width, window->height);
+        window->x = x;
+        window->y = y;
+        window->width = width;
+        window->height = height;
+        return TextState_SetBounds(text, window->x, window->y, window->width, window->height);
     }
-    return r;
+    return -1;
 }
