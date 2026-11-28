@@ -13,3 +13,4 @@ src/bosses/ratatosk/Ratatosk_UpdatePointDistancesToPlayer.c	Ratatosk_UpdatePoint
 src/bosses/ratatosk/Ratatosk_FindNearestPointExcept.c	Ratatosk_FindNearestPointExcept	contrived	natural	1	
 src/bosses/ratatosk/Ratatosk_FindPointNearestReferenceExcept.c	Ratatosk_FindPointNearestReferenceExcept	contrived	natural	1	
 src/bosses/ratatosk/Ratatosk_GetSelectedPointIndex.c	Ratatosk_GetSelectedPointIndex	minor	natural	1	
+src/bosses/ratatosk/Ratatosk_GetSelectedTargetIndex.c	Ratatosk_GetSelectedTargetIndex	minor	natural	1	

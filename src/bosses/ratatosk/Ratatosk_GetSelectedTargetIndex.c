@@ -1,8 +1,8 @@
 #include "global.h"
-
-u8 *SceneActors_GetBySlot(u32);
+#include "bosses/ratatosk/ratatosk.h"
+#include "scene/actor/scene_actors.h"
 
 s32 Ratatosk_GetSelectedTargetIndex(void)
 {
-    return *(s16 *)(SceneActors_GetBySlot(4) + 0xE4E);
+    return ((struct Ratatosk *)SceneActors_GetBySlot(4))->selectedTarget;
 }
