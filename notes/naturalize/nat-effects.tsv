@@ -183,3 +183,4 @@ src/effects/bursts/radial_burst/RadialBurstEffect_UpdateParticle.c	RadialBurstEf
 src/effects/bursts/radial_burst/RadialBurstEffect_RemoveParticles.c	RadialBurstEffect_RemoveParticles	contrived	natural	1	-
 src/effects/bursts/radial_burst/PaletteTransition_UpdateFadeIn.c	PaletteTransition_UpdateFadeIn	minor	natural	1	-
 src/effects/bursts/radial_burst/PaletteTransition_UpdateFadeOut.c	PaletteTransition_UpdateFadeOut	minor	natural	1	-
+src/effects/bursts/radial_burst/PaletteTransition_UpdateOwnerFade.c	PaletteTransition_UpdateOwnerFade	minor	natural	1	-
