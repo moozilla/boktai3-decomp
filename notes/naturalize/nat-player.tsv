@@ -126,3 +126,4 @@ src/player/appearance/player_visuals.c	Player_InitEventProcedureFromScript	natur
 src/player/appearance/player_visuals.c	Player_InitVisualResources	contrived	minor	9	VisualBonusFlag/ReadVisualFlag accessors stay: plain && tests change 81 instructions (mask loaded before the field)
 src/player/attack/Player_UpdateAttackFacing.c	Player_UpdateAttackFacing	contrived	natural	1	-
 src/player/attack/Player_CalculateBaseAttackPower.c	Player_CalculateBaseAttackPower	contrived	minor	3	EquipmentFlagState view cast over actionFlagState (Player lists overlapping fields separately)
+src/player/attack/Player_CalculatePreviewActionStat.c	Player_CalculatePreviewActionStat	contrived	minor	1	EquipmentFlagState view cast over actionFlagState

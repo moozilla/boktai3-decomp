@@ -9,8 +9,8 @@ s32 Player_CalculatePreviewActionStat(struct Player *p, s32 bonus,
                                       struct PlayerActionEntry *entry, s32 mode)
 {
     u8 buffer[32];
-    u8 *q = p->actionFlagState;
-    s32 sum = *(s16 *)(q + 10) + p->derivedStats[2] + bonus;
+    struct EquipmentFlagState *equipment = (struct EquipmentFlagState *)p->actionFlagState;
+    s32 sum = (s16)equipment->bonus[2] + p->derivedStats[2] + bonus;
     switch (mode) {
         case 0:
         case 1:
