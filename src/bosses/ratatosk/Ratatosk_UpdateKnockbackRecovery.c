@@ -55,20 +55,18 @@ void Ratatosk_UpdateKnockbackRecovery(struct Ratatosk *p, s32 tick)
             polar(&body->motion, p->savedAngle + 128, 16 - tick);
     }
     {
-        u16 *value = &p2->scaleX;
-        u16 old = *value;
-        s32 current = (s16)*value;
-        scaleX = value;
+        u16 old = p2->scaleX;
+        s32 current = (s16)p2->scaleX;
+        scaleX = &p2->scaleX;
         if (current > 23)
             *scaleX = old - 24;
         else
             *scaleX = 0;
     }
     {
-        u16 *value = &p2->scaleZ;
-        u16 old = *value;
-        s32 current = (s16)*value;
-        scaleZ = value;
+        u16 old = p2->scaleZ;
+        s32 current = (s16)p2->scaleZ;
+        scaleZ = &p2->scaleZ;
         if (current > 23)
             *scaleZ = old - 24;
         else
@@ -76,9 +74,7 @@ void Ratatosk_UpdateKnockbackRecovery(struct Ratatosk *p, s32 tick)
     }
     p2->phaseTimer = 8;
     p2->frameDamage = 0;
-    {
-        Ratatosk_SetFlags(p, 12);
-    }
+    Ratatosk_SetFlags(p, 12);
     if (tick > 29) {
         *scaleX = 0;
         *scaleZ = 0;
@@ -119,8 +115,6 @@ void Ratatosk_UpdateKnockbackRecovery(struct Ratatosk *p, s32 tick)
                                                variant, drift);
             Ratatosk_SpawnAnimatedParticle(&params, &spawn);
         }
-        {
-            Ratatosk_SetFlags(p, 1);
-        }
+        Ratatosk_SetFlags(p, 1);
     }
 }
