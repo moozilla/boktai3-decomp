@@ -154,3 +154,7 @@ src/bosses/ratatosk/sub_081FB828.c	sub_081FB828	natural	natural	0
 src/bosses/ratatosk/Ratatosk_UpdateParticlePool.c	Ratatosk_UpdateParticlePool	contrived	minor	18	Scale/ClearFlags helpers, two velocity-component pointers and a position pointer stay (register allocation)
 src/bosses/ratatosk/SceneParticles_SpawnAtPosition.c	SceneParticles_SpawnAtPosition	contrived	minor	8	velocity pointer with zero/zero2 locals stays (plain member stores differ)
 src/bosses/ratatosk/Ratatosk_UpdateParticleFallAndWander.c	Ratatosk_UpdateParticleFallAndWander	contrived	minor	5	one local stays for the motion flag: mask loaded before the field
+src/bosses/ratatosk/Ratatosk_OnAnimatedParticleUpdate.c	Ratatosk_OnAnimatedParticleUpdate	natural	natural	0	
+src/bosses/ratatosk/OverlaySlot_InitializeExtended.c	OverlaySlot_InitializeExtended	natural	natural	0	clear helper
+src/bosses/ratatosk/Ratatosk_ReleaseAnimatedParticle.c	Ratatosk_ReleaseAnimatedParticle	natural	natural	0	
+src/bosses/ratatosk/Ratatosk_UpdateAnimatedParticlePool.c	Ratatosk_UpdateAnimatedParticlePool	contrived	minor	2	Scale/ClearFlags helpers, position pointers and two-step negate stay (register allocation)

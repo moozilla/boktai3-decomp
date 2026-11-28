@@ -8,36 +8,24 @@ static inline s32 Scale(s32 x)
 {
     return x >= 0 ? x >> 12 : -((-x) >> 12);
 }
-static inline void updatePlayback(struct DisplaySequenceState *state,
-                                  struct DisplaySequenceSprite *spriteInput)
-{
-    DisplaySequence_StepSprite(spriteInput, state);
-}
-
-static inline u32 TestMask(u32 mask, struct RatatoskParticlePool *pool)
-{
-    struct RatatoskParticlePool *p = pool;
-    return p->mask & mask;
-}
 static inline void ClearFlags(u32 mask, struct RatatoskParticle *e)
 {
     e->motionFlags &= mask;
 }
 // confidence=low: advances the larger particle records and their animation sequences.
-s32 Ratatosk_UpdateAnimatedParticlePool(struct RatatoskParticlePool *aIn)
+s32 Ratatosk_UpdateAnimatedParticlePool(struct RatatoskParticlePool *pool)
 {
-    struct RatatoskParticlePool *a = aIn;
     s32 i;
     struct RatatoskParticle *e;
     s32 last;
-    e = a->particles;
+    e = pool->particles;
     i = 0;
     do {
-        if (TestMask(1 << i, a)) {
+        if (pool->mask & (1 << i)) {
             struct DisplaySequenceSprite *sprite = &e->sprite;
             struct RatatoskParticleConfig *cfg = &e->config;
             if (cfg->callback(e, i) == 1) {
-                Ratatosk_ReleaseAnimatedParticle(a, e, i);
+                Ratatosk_ReleaseAnimatedParticle(pool, e, i);
             } else {
                 u32 active = e->motionFlags & 1;
                 struct ContactPosition *velocity = &e->velocity;
@@ -53,7 +41,7 @@ s32 Ratatosk_UpdateAnimatedParticlePool(struct RatatoskParticlePool *aIn)
                 }
                 {
                     struct ContactPosition *pos = &sprite->position;
-                    sprite->position.x += e->velocity.x;
+                    pos->x += e->velocity.x;
                     pos->y += velocity->y;
                     pos->z += velocity->z;
                     if (e->fallSpeed < 0) {
@@ -66,20 +54,14 @@ s32 Ratatosk_UpdateAnimatedParticlePool(struct RatatoskParticlePool *aIn)
                 if (!(e->config.appearanceFlags & 0x200)) {
                     if (e->config.appearanceFlags & 0x100)
                         e->sequence.flags |= 4;
-                    updatePlayback(&e->sequence, sprite);
+                    DisplaySequence_StepSprite(sprite, &e->sequence);
                 }
-                {
-                    u32 age = e->age;
-                    struct RatatoskParticleConfig *data = cfg;
-                    if (age >= data->lifespan)
-                        Ratatosk_ReleaseAnimatedParticle(a, e, i);
-                }
+                if (e->age >= cfg->lifespan)
+                    Ratatosk_ReleaseAnimatedParticle(pool, e, i);
                 e->age++;
             }
         }
-        {
-            i += 1;
-        }
+        i++;
         e++;
         last = i;
     } while (last <= 31);
