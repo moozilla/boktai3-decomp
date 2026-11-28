@@ -205,3 +205,6 @@ src/monsters/screamer/Screamer_WaitForPlayerApproach.c	Screamer_WaitForPlayerApp
 src/monsters/screamer/Screamer_UpdateScream.c	Screamer_UpdateScream	contrived	minor	5	counter pointer temps in the loop case force load/store order
 src/monsters/screamer/SceneDrawablePair_SetFlags.c	SceneDrawablePair_SetFlags	contrived	natural	1	
 src/monsters/screamer/Screamer_UpdateDamageParticles.c	Screamer_UpdateDamageParticles	contrived	minor	30	CopyPosition helper (plain struct copy allocates differently); dataOwner shared by random bank and age increment
+src/monsters/screamer/Screamer_Destroy.c	Screamer_Destroy	minor	minor	0	raw +0x20/0x24: s32 tail return needs Sprite_Remove declared s32
+src/monsters/screamer/Screamer_Create.c	Screamer_Create	natural	natural	0	
+src/monsters/screamer/Screamer_InitFromScript.c	Screamer_InitFromScript	contrived	minor	20	animation resource temp and offset position pointer (direct forms allocate differently)

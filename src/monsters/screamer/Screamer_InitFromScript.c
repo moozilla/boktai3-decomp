@@ -7,134 +7,126 @@ s32 Screamer_InitColliders(struct ScreamerState *);
 void SceneBody_Init(void *, void *, void *, u32, u32, void *);
 void SceneBody_SetSprite(void *, void *);
 void TerrainOverlay_QueueAddActor(void *);
-s32 Screamer_InitFromScript(struct ScreamerState *p, void *resource)
+s32 Screamer_InitFromScript(struct ScreamerState *screamer, void *resource)
 {
     struct ContactPosition position;
-    void *graphics;
     void *sequences;
-    s32 value;
-    s16 side;
     if (Script_SeekToKeyword('p')) {
-        p->initialPosition.x = Script_GetValue();
-        p->initialPosition.y = Script_GetValue();
-        p->initialPosition.z = Script_GetValue();
+        screamer->initialPosition.x = Script_GetValue();
+        screamer->initialPosition.y = Script_GetValue();
+        screamer->initialPosition.z = Script_GetValue();
     }
     if (Script_SeekToKeyword('a')) {
-        p->f1C4 = Script_GetValue();
-        p->f1C6 = Script_GetValue();
-        p->f1C8 = Script_GetValue();
+        screamer->f1C4 = Script_GetValue();
+        screamer->f1C6 = Script_GetValue();
+        screamer->f1C8 = Script_GetValue();
     } else {
-        p->f1C4 = 30;
-        p->f1C6 = 10;
-        p->f1C8 = 30;
+        screamer->f1C4 = 30;
+        screamer->f1C6 = 10;
+        screamer->f1C8 = 30;
     }
     if (Script_SeekToKeyword('l')) {
-        value = Script_GetValue();
-        p->f1E6 = value;
-        p->f1E4 = value;
-        if (((s16)value) < 0)
-            p->f1F6 = 1;
+        screamer->f1E4 = screamer->f1E6 = Script_GetValue();
+        if (screamer->f1E4 < 0)
+            screamer->f1F6 = 1;
     } else {
-        p->f1E6 = 120;
-        p->f1E4 = 120;
+        screamer->f1E6 = 120;
+        screamer->f1E4 = 120;
     }
     if (Script_SeekToKeyword('i'))
-        p->f1CC = Script_GetValue();
+        screamer->f1CC = Script_GetValue();
     else
-        p->f1CC = 120;
+        screamer->f1CC = 120;
     if (Script_SeekToKeyword('r'))
-        p->f1DA = Script_GetValue();
+        screamer->f1DA = Script_GetValue();
     else
-        p->f1DA = 256;
+        screamer->f1DA = 256;
     if (Script_SeekToKeyword('w')) {
-        p->f1D4 = Script_GetValue();
-        p->f1D0 = Script_GetValue();
+        screamer->f1D4 = Script_GetValue();
+        screamer->f1D0 = Script_GetValue();
     } else {
-        p->f1D4 = 30;
-        p->f1D0 = 3;
+        screamer->f1D4 = 30;
+        screamer->f1D0 = 3;
     }
     if (Script_SeekToKeyword('h')) {
-        p->f1D8 = Script_GetValue();
-        p->f1D8 = (side = (p->f1D8 - 1) / 2);
-        if ((u32)(u16)side <= 3) {
-            if ((u32)(u16)side <= 1)
-                p->f1D8 = 0;
-            else
-                p->f1D8 = 1;
-        } else
-            p->f1D8 = 1;
-
+        screamer->f1D8 = Script_GetValue();
+        screamer->f1D8 = (screamer->f1D8 - 1) / 2;
+        if ((u16)screamer->f1D8 > 3)
+            screamer->f1D8 = 1;
+        else if ((u16)screamer->f1D8 <= 1)
+            screamer->f1D8 = 0;
+        else
+            screamer->f1D8 = 1;
     } else
-        p->f1D8 = 0;
+        screamer->f1D8 = 0;
     if (Script_SeekToKeyword('S'))
-        p->f1EE = Script_GetValue();
+        screamer->f1EE = Script_GetValue();
     if (Script_SeekToKeyword('z')) {
-        p->f1E8 = Script_GetValue();
-        p->f1EA = Script_GetValue();
+        screamer->f1E8 = Script_GetValue();
+        screamer->f1EA = Script_GetValue();
     }
     if (Script_SeekToKeyword('g'))
-        p->f1EC = Script_GetValue();
+        screamer->f1EC = Script_GetValue();
     else
-        p->f1EC = 2;
+        screamer->f1EC = 2;
     if (Script_SeekToKeyword('D'))
-        p->f214 = Script_GetValue();
+        screamer->f214 = Script_GetValue();
     if (Script_SeekToKeyword('G')) {
-        p->f208 = Script_GetValue();
-        p->f20C = Script_GetValue();
-        p->f210 = Script_GetValue();
+        screamer->f208 = Script_GetValue();
+        screamer->f20C = Script_GetValue();
+        screamer->f210 = Script_GetValue();
     }
     if (Script_SeekToKeyword('X')) {
-        p->f1F0 = Script_GetValue();
-        p->f1F2 = Script_GetValue();
+        screamer->f1F0 = Script_GetValue();
+        screamer->f1F2 = Script_GetValue();
     }
     if (Script_SeekToKeyword('V')) {
-        p->f1F4 = Script_GetValue();
-        if (p->f1F4 > 99)
-            p->f1F4 = 99;
-        if (p->f1F4 <= 0)
-            p->f1F4 = 1;
+        screamer->f1F4 = Script_GetValue();
+        if (screamer->f1F4 > 99)
+            screamer->f1F4 = 99;
+        if (screamer->f1F4 <= 0)
+            screamer->f1F4 = 1;
     } else
-        p->f1F4 = 0;
-    p->f1F8 = resource;
-    graphics = (void *)&p->graphics;
-    AnimData_Load(graphics, 0x7E7D);
-    Sprite_Init(&p->sprite, graphics, 1);
-    p->sprite.position = p->initialPosition;
-    AnimData_SelectPaletteBank(graphics, 0x1C4);
-    p->sprite.priority = 3;
+        screamer->f1F4 = 0;
+    screamer->f1F8 = resource;
+    AnimData_Load(&screamer->graphics, 0x7E7D);
+    Sprite_Init(&screamer->sprite, &screamer->graphics, 1);
+    screamer->sprite.position = screamer->initialPosition;
+    AnimData_SelectPaletteBank(&screamer->graphics, 0x1C4);
+    screamer->sprite.priority = 3;
     sequences = ScriptProc_Start(0x922E, 0x5184);
-    p->f218 = sequences;
-    if (!p->f1F6) {
-        p->update = Screamer_WaitForPlayerApproach;
-        Anim_SetSequence(&p->sequence, sequences, 0x1A, (u8)p->f1D8, 8);
+    screamer->f218 = sequences;
+    if (!screamer->f1F6) {
+        screamer->update = Screamer_WaitForPlayerApproach;
+        Anim_SetSequence(&screamer->sequence, sequences, 0x1A, (u8)screamer->f1D8, 8);
     } else {
-        p->update = SceneDrawablePair_SetFlags;
-        p->f1E0 = 1;
-        Anim_SetSequence(&p->sequence, p->f218, 0x1A, (u8)p->f1D8, 8);
+        screamer->update = SceneDrawablePair_SetFlags;
+        screamer->f1E0 = 1;
+        Anim_SetSequence(&screamer->sequence, screamer->f218, 0x1A, (u8)screamer->f1D8, 8);
     }
-    Screamer_StepAnimation(p);
-    if (!p->f1F6)
-        Screamer_InitColliders(p);
-    if (!p->f1D8)
-        p->sprite.position.x -= 16;
+    PlayerCue_StepSequenceEnded(&screamer->sprite, &screamer->sequence);
+    if (!screamer->f1F6)
+        Screamer_InitColliders(screamer);
+    if (!screamer->f1D8)
+        screamer->sprite.position.x -= 16;
     else
-        p->sprite.position.z -= 16;
-    if (p->f1EE) {
+        screamer->sprite.position.z -= 16;
+    if (screamer->f1EE) {
         struct ContactPosition *offsetPosition;
         offsetPosition = &position;
-        *offsetPosition = p->sprite.position;
-        if (!p->f1D8)
+        *offsetPosition = screamer->sprite.position;
+        if (!screamer->f1D8)
             offsetPosition->x += 128;
         else
             offsetPosition->z += 128;
-        SceneBody_Init(p->body, p->f1F8, &position, 0, 4, p);
-        SceneBody_SetSprite(p->body, &p->sprite);
-        TerrainOverlay_QueueAddActor(p->body);
+        SceneBody_Init(screamer->body, screamer->f1F8, &position, 0, 4, screamer);
+        SceneBody_SetSprite(screamer->body, &screamer->sprite);
+        TerrainOverlay_QueueAddActor(screamer->body);
     }
-    if (p->f1DA > 0)
-        p->f1FC = p->f1DA * p->f1DA;
+    if (screamer->f1DA > 0)
+        screamer->f1FC = screamer->f1DA * screamer->f1DA;
     else
-        p->f1FC = p->f1DA;
+        screamer->f1FC = screamer->f1DA;
 #ifdef UBFIX
     // falls off the end with r0 left over from its last statement; the creator only tests
     // < 0, and this initializer has no failure path here
