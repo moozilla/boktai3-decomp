@@ -53,3 +53,4 @@ src/objects/coffin/tether_actor.c	TetherActor_EmitDirectionalEffect	contrived	na
 src/objects/coffin/tether_actor.c	TetherActor_EmitRandomEffect	contrived	natural	6	
 src/objects/coffin/tether_actor.c	TetherActor_EmitRingEffects	contrived	minor	4	angle &= 255 and (u16) velocity reads kept for the exact load widths
 src/objects/coffin/tether_actor.c	TetherActor_EmitPointEffect	contrived	natural	4	
+src/objects/coffin/tether_actor.c	TetherActor_UpdateGlow	minor	minor	9	level = 128; level -= frame kept: ROM loads the frame before the constant

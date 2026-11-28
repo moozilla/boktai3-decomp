@@ -718,30 +718,28 @@ void TetherActor_UpdateGlow(struct TetherActor *actor)
     switch (actor->glowMode) {
         case 0:
             if (actor->glowFrame) {
-                s32 frame = actor->glowFrame;
-                actor->palette[1] = (frame * 31) >> 6;
+                actor->palette[1] = (actor->glowFrame * 31) >> 6;
                 --actor->glowFrame;
             } else
                 actor->palette[1] = 0;
             break;
         case 1: {
-            s32 frame;
-            if (actor->glowFrame <= 63)
-                frame = actor->glowFrame;
-            else {
-                s32 current = actor->glowFrame;
-                frame = 128;
-                frame -= current;
+            s32 level;
+            if (actor->glowFrame <= 63) {
+                level = actor->glowFrame;
+            } else {
+                s32 frame = actor->glowFrame;
+                level = 128;
+                level -= frame;
             }
-            actor->palette[1] = (frame * 31) >> 6;
+            actor->palette[1] = (level * 31) >> 6;
             ++actor->glowFrame;
             if (actor->glowFrame > 127)
                 actor->glowFrame = 0;
         } break;
         case 2:
             if (actor->glowFrame <= 63) {
-                s32 frame = actor->glowFrame;
-                actor->palette[1] = (frame * 31) >> 6;
+                actor->palette[1] = (actor->glowFrame * 31) >> 6;
                 ++actor->glowFrame;
             } else
                 actor->palette[1] = 31;
