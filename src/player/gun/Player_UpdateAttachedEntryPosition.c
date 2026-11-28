@@ -7,10 +7,10 @@ void SceneEntry_SetPosition(s32, struct SceneVec *);
 void Player_UpdateAttachedEntryPosition(struct Player *p)
 {
     struct SceneVec position;
-    s32 *entry = &p->statModifierContext.attachedEntry;
-    if (*entry >= 0) {
-        Projectile_SetEntryDirection(p->unk2D, *entry);
+
+    if (p->statModifierContext.attachedEntry >= 0) {
+        Projectile_SetEntryDirection(p->unk2D, p->statModifierContext.attachedEntry);
         PlayerContact_GetOffsetPosition(0, &position);
-        SceneEntry_SetPosition(*entry, &position);
+        SceneEntry_SetPosition(p->statModifierContext.attachedEntry, &position);
     }
 }

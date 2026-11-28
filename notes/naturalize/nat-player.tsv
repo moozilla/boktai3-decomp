@@ -594,3 +594,6 @@ src/player/effects/spiral_trail/moving_glyph.c	MovingGlyph_InitializeFromScript	
 src/player/effects/spiral_trail/moving_glyph.c	MovingGlyph_Create	natural	natural	0	-
 src/player/effects/spiral_trail/moving_glyph.c	MovingGlyph_CreateFromScript	natural	natural	0	-
 src/player/gun/Player_ConfigureActionSelectionDisplay.c	Player_ConfigureActionSelectionDisplay	contrived	natural	14	-
+src/player/gun/Player_IsStatBBelow.c	Player_IsStatBBelow	natural	natural	0	-
+src/player/gun/Player_SubtractStatB.c	Player_SubtractStatB	natural	natural	0	-
+src/player/gun/Player_UpdateAttachedEntryPosition.c	Player_UpdateAttachedEntryPosition	minor	natural	1	-
