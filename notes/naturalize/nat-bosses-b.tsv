@@ -106,3 +106,4 @@ src/bosses/ratatosk/Ratatosk_UpdateCloneAttack.c	Ratatosk_UpdateCloneAttack	cont
 src/bosses/ratatosk/AnimationActor_UpdateProjectileSequence.c	AnimationActor_UpdateProjectileSequence	contrived	minor	12	second actor alias and a sequence pointer stay (removing the pointer changes registers); goto into case 1
 src/bosses/ratatosk/Ratatosk_UpdatePlayerOrbitAttack.c	Ratatosk_UpdatePlayerOrbitAttack	contrived	minor	35	second actor alias, config inside a scratch struct with the clear word, trunc12/clear/flag helpers stay (plain division, CpuFill32 and a bare mask test all differ); vector-add helper keeps its symbol name
 src/bosses/ratatosk/Ratatosk_UpdateArenaCheckedSequence.c	Ratatosk_UpdateArenaCheckedSequence	contrived	minor	3	second actor alias stays
+src/bosses/ratatosk/Ratatosk_UpdateSunOrbPlacement.c	Ratatosk_UpdateSunOrbPlacement	contrived	minor	10	second actor alias; random sample stays hand-expanded (RANDOM_NEXT forms add one instruction); slot block
