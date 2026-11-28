@@ -383,3 +383,17 @@ src/objects/interaction_prompts.c	InteractionPrompt_CheckRemaining	contrived	min
 src/objects/interaction_prompts.c	InteractionPrompt_InitManager	minor	natural	1	
 src/objects/interaction_prompts.c	InteractionPrompt_ScriptCreate	minor	minor	4	drawable flag pointer: plain member access spills differently
 src/objects/interaction_prompts.c	InteractionPrompt_ScriptMove	minor	natural	1	
+src/objects/interaction_prompts.c	InteractionPrompt_ConsumeEntered	minor	minor	0	result local: early returns reorder the flag clear
+src/objects/interaction_prompts.c	InteractionPrompt_SetState	natural	natural	0	
+src/objects/interaction_prompts.c	InteractionPrompt_FindByScriptId	natural	natural	0	
+src/objects/interaction_prompts.c	InteractionPrompt_SetMarkerFadeLevel	natural	natural	0	
+src/objects/interaction_prompts.c	InteractionPrompt_SetPosition	natural	natural	0	
+src/objects/interaction_prompts.c	LevelController_Update	natural	natural	0	
+src/objects/interaction_prompts.c	Actor_CanInteractWithController	natural	natural	0	
+src/objects/interaction_prompts.c	LevelController_RunScript	natural	natural	0	
+src/objects/interaction_prompts.c	InteractionPrompt_SelectTarget	natural	natural	0	
+src/objects/interaction_prompts.c	InteractionPrompt_ReleaseTarget	natural	natural	0	
+src/objects/interaction_prompts.c	InteractionPrompt_UpdateAll	natural	natural	0	
+src/objects/interaction_prompts.c	InteractionPrompt_DestroyManager	natural	natural	0	
+src/objects/interaction_prompts.c	InteractionPrompt_CreateManagerTask	natural	natural	0	
+src/objects/interaction_prompts.c	InteractionPrompt_ScriptRelease	natural	natural	0	
