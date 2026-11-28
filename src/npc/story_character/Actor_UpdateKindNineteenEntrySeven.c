@@ -43,8 +43,5 @@ void Actor_UpdateKindNineteenEntrySeven(u32 a, struct SceneActor *p)
         }
         Actor_PlayAnimationEntry(p, r, 1, 0, 4);
     }
-    {
-        u32 m = 0x1000;
-        p->flags = m | p->flags;
-    }
+    SceneActor_SetFlags(p, 0x1000);
 }

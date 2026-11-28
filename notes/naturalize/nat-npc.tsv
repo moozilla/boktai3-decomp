@@ -183,3 +183,4 @@ src/npc/story_character/sub_081C8FB0.c	sub_081C8FB0	contrived	natural	3
 src/npc/story_character/Actor_UpdateAcceleratingBlink.c	Actor_UpdateAcceleratingBlink	contrived	natural	1	
 src/npc/story_character/Actor_UpdateKindNineteenEntryFour.c	Actor_UpdateKindNineteenEntryFour	minor	natural	1	
 src/npc/story_character/Actor_UpdateKindNineteenEntrySix.c	Actor_UpdateKindNineteenEntrySix	minor	natural	1	
+src/npc/story_character/Actor_UpdateKindNineteenEntrySeven.c	Actor_UpdateKindNineteenEntrySeven	minor	natural	1	
