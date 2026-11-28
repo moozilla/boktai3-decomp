@@ -67,34 +67,34 @@ void Sabata_WaitBeforeRestart(struct SabataActorState *actor)
 
 void Sabata_UpdateTurningAttackChoice(struct SabataActorStateOwner *input)
 {
-    struct SabataActorStateOwner *owner = input;
     struct SabataActorStateOwner *actor;
     u8 *trigger;
     s32 result;
     actor = input;
-    if (GetPulseTrigger(owner, &trigger)) {
-        actor = (struct SabataActorStateOwner *)(trigger - ((u8 *)&owner->actor.triggered - (u8 *)owner));
+    if (GetPulseTrigger(input, &trigger)) {
+        actor = (struct SabataActorStateOwner *)(trigger -
+                                                 ((u8 *)&input->actor.triggered - (u8 *)input));
         actor->actor.triggered = 0;
-        owner->actor.pending = 0;
+        input->actor.pending = 0;
     }
     if (ActorMovement_CanReachTarget(&actor->actor))
-        Sabata_BeginCombatPhase(&owner->actor, 1);
-    else if (Sabata_GetAttackActivity(&owner->actor))
-        Sabata_BeginCombatPhase(&owner->actor, 2);
-    else if (owner->actor.timer > 60 && Sabata_FindNearbyAttackPosition(&actor->actor) == 1)
-        Sabata_BeginCombatPhase(&owner->actor, 3);
-    else if (owner->actor.timer > 210) {
-        Sabata_RequestRestart(&owner->actor);
+        Sabata_BeginCombatPhase(&input->actor, 1);
+    else if (Sabata_GetAttackActivity(&input->actor))
+        Sabata_BeginCombatPhase(&input->actor, 2);
+    else if (input->actor.timer > 60 && Sabata_FindNearbyAttackPosition(&actor->actor) == 1)
+        Sabata_BeginCombatPhase(&input->actor, 3);
+    else if (input->actor.timer > 210) {
+        Sabata_RequestRestart(&input->actor);
     }
     if (actor->actor.requestMode == 2)
-        result = ActorEffect_StepTurn(&owner->actor, owner->actor.timer, 30, 30, 1);
+        result = ActorEffect_StepTurn(&input->actor, input->actor.timer, 30, 30, 1);
     else
-        result = ActorEffect_StepTurn(&owner->actor, owner->actor.timer, 30, 30, 0);
+        result = ActorEffect_StepTurn(&input->actor, input->actor.timer, 30, 30, 0);
     if (result) {
         u32 phase = 6;
-        owner->actor.state = phase;
+        input->actor.state = phase;
     }
-    owner->actor.timer++;
+    input->actor.timer++;
 }
 
 void Sabata_FollowHazardPath(struct SabataActorState *actor)
