@@ -1,13 +1,8 @@
 #include "scene/collision/contact_swarm.h"
 #include "player/player.h"
+#include "player/cues/player_cue.h"
 #include "player/cutscene/player_cue_sequence.h"
 // confidence=low: provisional action interpretation from retained C and assembly.
-static inline u32 Step(struct ContactSwarmSprite *sp, struct DisplaySequenceState *st, u32 firstBit,
-                       u32 pin)
-{
-    return PlayerCue_StepSequenceEnded(sp, st);
-}
-
 u32 Player_ConsumeStateEntry(struct Player *);
 void Player_AddControlFlags(struct Player *, u32);
 void Player_UpdateFacingSide(struct Player *);
@@ -16,10 +11,8 @@ void Sound_PlaySong(u32);
 // confidence=low: decays the stored recovery amount before playing the finishing pose.
 void Player_UpdatePoseRecovery(struct Player *p)
 {
-    u32 phase;
     Player_AddControlFlags(p, 8);
-    phase = p->tetherPhase;
-    switch (phase) {
+    switch (p->tetherPhase) {
         case 0:
             p->facing |= 1;
             if (p->facing > 4) {
@@ -29,9 +22,9 @@ void Player_UpdatePoseRecovery(struct Player *p)
                 p->heading = p->facing >> 1;
                 p->side = 0;
             }
-            Anim_SetSequence(&p->cueCollider.sequence, *(void **)((u8 *)p + 0x410), 2, p->heading,
+            Anim_SetSequence(&p->cueCollider.sequence, p->cueCollider.sideResource, 2, p->heading,
                              p->side);
-            Step((void *)((u8 *)p + 0x14C), &p->cueCollider.sequence, 1, 1);
+            PlayerCue_StepSequence(&PlayerCue_Graphics(p)->sprite, &p->cueCollider.sequence);
             if (p->actionCountdown <= 30) {
                 p->actionCountdown = 0;
                 Sound_PlaySong(0x1B0);
@@ -40,9 +33,10 @@ void Player_UpdatePoseRecovery(struct Player *p)
                 p->actionCountdown -= 30;
             break;
         case 1:
-            Anim_SetSequence(&p->cueCollider.sequence, *(void **)((u8 *)p + 0x410), 3, p->heading,
+            Anim_SetSequence(&p->cueCollider.sequence, p->cueCollider.sideResource, 3, p->heading,
                              p->side);
-            if (Step((void *)((u8 *)p + 0x14C), &p->cueCollider.sequence, phase, 2)) {
+            if (PlayerCue_StepSequenceEnded(&PlayerCue_Graphics(p)->sprite,
+                                            &p->cueCollider.sequence)) {
                 Player_UpdateFacingSide(p);
                 ActorSequence_Begin(p, 0, 0);
             }
