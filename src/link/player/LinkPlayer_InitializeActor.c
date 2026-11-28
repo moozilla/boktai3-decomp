@@ -2,6 +2,7 @@
 #include "link/session/link_session_state.h"
 #include "engine/ram.h"
 #include "player/player.h"
+#include "scene/collision/scene_actor_damage_visibility.h"
 void sub_08232264(void *, void *, s32, s32, s32);
 void Shadow_Initialize(void *, void *, s32);
 void *SceneParticlePool_EnsureSingleton(void);
@@ -12,17 +13,9 @@ void Player_InitSixParticleEffects(struct Player *);
 void Player_InitConvergingParticles(struct Player *);
 void DirectionalEffect_Init(struct Player *);
 
-static inline s32 LocalPlayer(void)
-{
-    if (gLinkSession == NULL)
-        return -1;
-    return gLinkSession->localPlayer;
-}
-
 // confidence=low: initializes a link player actor: shadow, effects and state bytes.
 void LinkPlayer_InitializeActor(struct Player *p)
 {
-    s32 local;
     sub_08232264(&p->effectGroup, &p->animation.position, 0, 0, 1);
     *(struct ContactPosition *)p->effectPosition = p->animation.position;
     p->resetValue6F8 = 0;
@@ -48,8 +41,7 @@ void LinkPlayer_InitializeActor(struct Player *p)
     p->effectLimits[1] = 4;
     p->effectLimits[2] = 4;
     p->effectLimits[3] = 4;
-    local = LocalPlayer();
-    if (p->slot == local)
+    if (p->slot == SceneActorDamage_LocalPlayer())
         p->unkAF0 = 0;
     else
         p->unkAF0 = 1;
