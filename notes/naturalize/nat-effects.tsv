@@ -162,3 +162,4 @@ src/effects/bursts/linked_effect/LinkedEffect_UpdateColliders.c	LinkedEffect_Upd
 src/effects/bursts/linked_effect/LinkedEffect_FinishRemoval.c	LinkedEffect_FinishRemoval	minor	natural	1	-
 src/effects/bursts/linked_effect/LargeEffectPool_AllocateSlot.c	LargeEffectPool_AllocateSlot	minor	natural	1	-
 src/effects/bursts/linked_effect/FragmentProjectilePool_AllocSprite.c	FragmentProjectilePool_AllocSprite	minor	natural	1	-
+src/effects/bursts/linked_effect/ActorEffect_UpdatePool.c	ActorEffect_UpdatePool	contrived	natural	8	named pause and lock predicates keep their mask locals
