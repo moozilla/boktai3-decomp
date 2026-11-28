@@ -256,3 +256,4 @@ src/effects/healing/SceneEffectGroup_Remove.c	SceneEffectGroup_Remove	minor	natu
 src/effects/healing/sub_082359CC.c	sub_082359CC	contrived	natural	6	
 src/effects/healing/HealthBurstEffect_InitSprites.c	HealthBurstEffect_InitSprites	minor	natural	5	
 src/effects/healing/HealthBurstEffect_InitParticlePool.c	HealthBurstEffect_InitParticlePool	minor	natural	3	particle pointer alias beside indexed fields: pointer copy order
+src/effects/healing/sub_08235B34.c	sub_08235B34	minor	natural	6	
