@@ -125,3 +125,4 @@ src/effects/bursts/charged_burst/ChargedBurst_InitParticles.c	ChargedBurst_InitP
 src/effects/bursts/charged_burst/ChargedBurst_Init.c	ChargedBurst_Init	contrived	natural	1	-
 src/effects/bursts/charged_burst/ChargedBurst_Create.c	ChargedBurst_Create	minor	natural	1	-
 src/effects/bursts/fragment_burst/FragmentBurst_RunCompletionScript.c	FragmentBurst_RunCompletionScript	contrived	natural	2	-
+src/effects/bursts/fragment_burst/sub_081281D0.c	sub_081281D0	minor	minor	4	collider pointer assigned after the size vectors
