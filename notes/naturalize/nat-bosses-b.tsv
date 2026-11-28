@@ -201,3 +201,4 @@ src/bosses/sabata/position_effects.c	SceneActors_EmitRandomBursts	natural	natura
 src/bosses/sabata/SabataPosition_FindTrackedPointInBounds.c	SabataPosition_FindTrackedPointInBounds	machine-shaped	machine-shaped	6	kept offset/address arithmetic, out-parameter inline and inside flag: plain indexed loop changes the induction variable
 src/bosses/sabata/sub_0817A918.c	sub_0817A918	contrived	partial	4	kept self alias and vector helpers
 src/bosses/sabata/Sabata_SpawnDestructionParticles.c	Sabata_SpawnDestructionParticles	contrived	natural	8	
+src/bosses/sabata/Sabata_FindNearbyAttackPosition.c	Sabata_FindNearbyAttackPosition	contrived	natural	3	minor: result variable needed

@@ -1,7 +1,5 @@
 #include "bosses/sabata/sabata_spatial_query.h"
 // Sabata attack helper. Field meanings remain tentative.
-#define PositionSearch_GetCoordinates SceneStimulus_GetTaggedPosition
-#define PositionSearch_FindNearby     SceneStimulus_FindOverlap
 u32 SceneStimulus_GetTaggedPosition(u16 *, u32);
 s8 SceneStimulus_FindOverlap(u32, u32, u32, u8, u16);
 s32 Sabata_FindNearbyAttackPosition(struct SabataAttackPositionSearch *volume)
