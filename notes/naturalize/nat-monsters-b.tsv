@@ -143,3 +143,4 @@ src/monsters/mummy/mummy_entry.c	SceneActor_StartAdjacentCellRoute	contrived	min
 src/monsters/mummy/mummy_entry.c	BouncingObject_RefreshNearbyHeading	contrived	contrived	13	repeated context locals and parked masks
 src/monsters/mummy/mummy_entry.c	SceneActor_TryTrackNearbyPlayer	contrived	contrived	47	parked masks and gotos remain
 src/monsters/mummy/mummy_entry.c	Mummy_ResetResponseState	contrived	contrived	22	half-word clear helper: 32-bit mask load
+src/monsters/mummy/mummy_entry.c	Mummy_UpdateTemporaryFlagTimer	minor	natural	6	

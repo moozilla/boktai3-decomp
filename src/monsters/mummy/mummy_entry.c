@@ -2870,9 +2870,8 @@ void Mummy_OnClearActivityFlag(struct ChaseActor *s)
 void Mummy_UpdateTemporaryFlagTimer(struct ChaseActor *actor)
 {
     struct Mummy *context = actor->base.context;
-    u8 *frames = &context->interactionFrames;
-    if (*frames)
-        --*frames;
+    if (context->interactionFrames)
+        --context->interactionFrames;
     else {
         u32 *flags = &actor->base.statusFlags;
         u32 m = 0xFEFFFFFF;
