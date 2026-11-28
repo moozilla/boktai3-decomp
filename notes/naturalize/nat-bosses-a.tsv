@@ -128,3 +128,4 @@ src/bosses/count/Count_DecrementBarrierCount.c	Count_DecrementBarrierCount	contr
 src/bosses/count/Count_GetBarrierCount.c	Count_GetBarrierCount	minor	natural	2	
 src/bosses/count/Count_TriggerBackgroundFlash.c	Count_TriggerBackgroundFlash	contrived	natural	1	
 src/bosses/count/Count_TryQueueCommand.c	Count_TryQueueCommand	contrived	natural	1	
+src/bosses/count/Count_QueueDefaultCommand.c	Count_QueueDefaultCommand	contrived	natural	1	
