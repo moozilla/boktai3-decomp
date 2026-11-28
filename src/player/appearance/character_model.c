@@ -554,26 +554,17 @@ void ModifierMenu_InitSelectionSnapshot(struct CharacterPaletteCycle *dest,
 
 void PaletteFade_CycleMenuColors(struct CharacterPaletteCycle *cycle)
 {
-    u16 *colors = cycle->colors;
     if (cycle->timer <= 1) {
         cycle->timer++;
     } else {
         u16 lastColor;
-        u16 *color;
-        s32 remaining;
-        u16 *destination;
+        s32 i;
         cycle->timer = 0;
-        lastColor = colors[7];
-        remaining = 7;
-        destination = gBgPaletteBank1;
-        color = colors + 6;
-        do {
-            color[1] = color[0];
-            color--;
-            remaining--;
-        } while (remaining > 1);
-        colors[1] = lastColor;
-        CpuSet(colors, destination, 0x04000008);
+        lastColor = cycle->colors[7];
+        for (i = 7; i > 1; i--)
+            cycle->colors[i] = cycle->colors[i - 1];
+        cycle->colors[1] = lastColor;
+        CpuSet(cycle->colors, gBgPaletteBank1, 0x04000008);
     }
 }
 
