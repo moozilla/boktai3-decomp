@@ -849,19 +849,16 @@ void PlayerCue_ShakeEffect(struct Player *player, s32 effectKind)
     struct SceneVec offset;
 
     if (player->actionMode == 3) {
-        const u16 *randomTable = gRandomTable;
-        offset.x = (randomWith(randomTable) & 7) - 3;
-        offset.y = (randomWith(randomTable) & 7) - 5;
+        offset.x = (randomWith(gRandomTable) & 7) - 3;
+        offset.y = (randomWith(gRandomTable) & 7) - 5;
         offset.z = 0;
     } else if (player->actionMode == 4) {
-        const u16 *randomTable = gRandomTable;
-        offset.x = (randomWith(randomTable) & 7) - 3;
-        offset.y = (randomWith(randomTable) & 7) - 3;
+        offset.x = (randomWith(gRandomTable) & 7) - 3;
+        offset.y = (randomWith(gRandomTable) & 7) - 3;
         offset.z = 0;
     } else {
-        const u16 *randomTable = gRandomTable;
-        offset.x = (randomWith(randomTable) & 15) - 7;
-        offset.y = -(randomWith(randomTable) & 31);
+        offset.x = (randomWith(gRandomTable) & 15) - 7;
+        offset.y = -(randomWith(gRandomTable) & 31);
         offset.z = 0;
     }
     if (EffectGroup_Spawn(&player->effectGroup, effectKind, 0xE10, &offset) >= 0) {
