@@ -570,3 +570,4 @@ src/system/inventory/Inventory_ResetConsumables.c	Inventory_ResetConsumables	min
 src/system/inventory/Inventory_ResetValuables.c	Inventory_ResetValuables	minor	natural	1	
 src/system/inventory/Inventory_ResetItemsFromScript.c	Inventory_ResetItemsFromScript	minor	natural	1	
 src/system/inventory/Inventory_CanReceiveItemFromScript.c	Inventory_CanReceiveItemFromScript	minor	minor	1	early returns compile differently: the result variable stays
+src/system/inventory/sub_0822D490.c	sub_0822D490	contrived	natural	1	
