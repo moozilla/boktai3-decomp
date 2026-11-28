@@ -191,3 +191,4 @@ src/ui/title/date_menu.c	DateMenu_InitializeDigitWidgets	natural	natural	0	-
 src/ui/title/date_menu.c	DateMenu_UpdateDigits	natural	natural	0	-
 src/ui/title/date_menu.c	DateMenu_SetParametersFromScript	natural	natural	0	-
 src/ui/title/date_menu.c	DateMenu_Create	natural	natural	0	-
+src/ui/title/password_menu.c	PasswordMenu_SaveSelections	contrived	natural	1	-

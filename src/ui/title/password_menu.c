@@ -6,15 +6,11 @@
 
 void PasswordMenu_SaveSelections(struct PasswordMenu *p)
 {
-    s32 i = 0;
-    u8 *saved = gAnimPanelSavedSelections;
-    u8 *out = saved;
-    u32 *values = p->selections;
-    do {
-        *(u8 *)(i + (u32)out) = *values++;
-    } while (++i <= 23);
-    saved[24] = p->position;
-    saved[25] = p->selection;
+    s32 i;
+    for (i = 0; i < 24; i++)
+        gAnimPanelSavedSelections[i] = p->selections[i];
+    gAnimPanelSavedSelections[24] = p->position;
+    gAnimPanelSavedSelections[25] = p->selection;
 }
 
 void PasswordMenu_LoadSelections(struct PasswordMenu *p)
@@ -676,7 +672,8 @@ s32 PasswordMenu_Initialize(struct PasswordMenu *s)
     AnimSprite_InitLinked(&s->widgets[0].sprite, firstResource, 0x39, 0x10, zero, zero, zero, zero);
     secondResource = (u8 *)&s->widgets[1].resource;
     ResourceHeader_Relocate(secondResource, resource);
-    AnimSprite_InitLinked(&s->widgets[1].sprite, secondResource, 0x16, 0x10, zero, zero, zero, zero);
+    AnimSprite_InitLinked(&s->widgets[1].sprite, secondResource, 0x16, 0x10, zero, zero, zero,
+                          zero);
     graphics = &s->widgets[2].resource;
     ResourceHeader_Relocate(graphics, resource);
     AnimSprite_InitLinked(&s->widgets[2].sprite, graphics, 0x18, 0x10, zero, zero, zero, zero);
