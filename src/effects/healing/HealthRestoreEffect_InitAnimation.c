@@ -1,24 +1,22 @@
-#include "global.h"
-struct Data {
+#include "effects/healing/healing_effect.h"
+#include "engine/engine.h"
+#include "ui/hud/stage_icon_display.h"
+
+struct IconHeader {
     u32 words[8];
 };
-struct Data *ScriptProc_Start(u32, u32);
-void ResourceHeader_Relocate(struct Data *, struct Data *);
+
 u16 Selection_GetDisplayFrame(u32);
-void AnimSprite_InitLinked(u8 *, struct Data *, u32, u32, u32, u32, u32, void *);
-void HealthRestoreEffect_InitAnimation(u8 *p)
+
+void HealthRestoreEffect_InitAnimation(struct HealthRestoreEffect *effect)
 {
-    struct Data data;
-    struct Data *source = ScriptProc_Start(0xcb05, 0x5d04);
-    u16 *coords;
-    u32 zero;
-    data = *source;
-    ResourceHeader_Relocate(&data, source);
-    coords = (u16 *)(p + 0x7c);
-    zero = 0;
-    coords[0] = 8;
-    *(u16 *)(p + 0x7e) = 32;
-    *(u16 *)(p + 0x80) = zero;
-    AnimSprite_InitLinked(p + 0x1c, &data, Selection_GetDisplayFrame(0x26), 0x33, zero, zero, 0x3c,
-                      coords);
+    struct IconHeader *source = (struct IconHeader *)ScriptProc_Start(0xCB05, 0x5D04);
+    struct IconHeader header = *source;
+
+    ResourceHeader_Relocate(&header, source);
+    effect->targetPosition.x = 8;
+    effect->targetPosition.y = 32;
+    effect->targetPosition.z = 0;
+    AnimSprite_InitLinked(&effect->icon, &header, Selection_GetDisplayFrame(0x26), 0x33, 0, 0, 0x3C,
+                          &effect->targetPosition);
 }
