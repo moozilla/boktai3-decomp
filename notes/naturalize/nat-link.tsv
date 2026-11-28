@@ -159,3 +159,4 @@ src/link/player/LinkPlayer_AdvanceActionTick.c	LinkPlayer_AdvanceActionTick	cont
 src/link/player/sub_08239F74.c	sub_08239F74	contrived	natural	3	
 src/link/player/ActorEffect_SelectFlashingValue.c	ActorEffect_SelectFlashingValue	contrived	contrived	66	goto out of a do/while(0) stays: every structured form swaps the registers holding the actor and the value
 src/link/player/sub_0823A2E4.c	sub_0823A2E4	contrived	minor	3	callback is read through its address: a direct field read loads it before the first argument
+src/link/player/sub_0823A060.c	sub_0823A060	contrived	natural	40	

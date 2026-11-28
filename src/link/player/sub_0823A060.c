@@ -1,115 +1,87 @@
 #include "global.h"
 #include "player/player.h"
-#include "link/session/link_session_state.h"
-struct LinkAura {
-    u8 pad0[0x18];
-    s32 owner;
-    u32 f1c;
-    u32 f20;
-    u8 pad24[0x94 - 0x24];
-    u32 flags;
-    u8 padLine98[0xc0 - 0x98];
-    u8 fadeA, fadeB;
-    u8 padC2[0x14c - 0xc2];
-    u32 selFlags;
-    u8 pad150[0x4e1 - 0x150];
-    u8 chimePending;
-    u8 pad4E2[0x534 - 0x4e2];
-    u16 state;
-    u16 pad536;
-    u16 active;
-    u8 pad53A[0xaf2 - 0x53a];
-    u16 fade;
-};
-extern struct AreaEffectLinkState *gLinkSession;
+#include "player/player_status_flags.h"
+#include "scene/collision/scene_actor_damage_visibility.h"
+
 void Player_PlayLocalSong(s32, s32);
-static inline s32 LinkAura_LocalSide(void)
+
+static inline s32 LinkPlayer_IsInSceneModeFour(struct Player *other)
 {
-    struct AreaEffectLinkState *a = gLinkSession;
-    if (a == 0)
-        return -1;
-    return a->localPlayer;
-}
-static inline s32 LinkAura_IsInStateFour(struct LinkAura *other)
-{
-    if (other->active != 0 && other->state == 4)
+    if (other->active != 0 && other->sceneMode == 4)
         return 1;
     return 0;
 }
-static inline void LinkAura_SetFlags(u32 *f, u32 mask)
+
+/* The aura fade level lives in visualSlowdownTimer; unk4E1[0] marks a pending end sound. */
+static inline void LinkPlayer_FadeOutAura(struct Player *p)
 {
-    *f |= mask;
-}
-static inline void LinkAura_FadeOut(struct LinkAura *p, u32 zero)
-{
-    if (p->fade != 0) {
-        u8 *chime = &p->chimePending;
-        if (*chime != 0) {
-            Player_PlayLocalSong(p->owner, 0x336);
-            *chime = zero;
+    if (p->visualSlowdownTimer != 0) {
+        if (p->unk4E1[0] != 0) {
+            Player_PlayLocalSong(p->slot, 0x336);
+            p->unk4E1[0] = 0;
         }
-        p->fade -= 1;
-        if (p->fade == 0) {
-            p->flags &= ~2;
-            p->fadeA = 0x40;
-            p->fadeB = 0x40;
+        p->visualSlowdownTimer -= 1;
+        if (p->visualSlowdownTimer == 0) {
+            p->animation.flags &= ~2;
+            p->animation.scaleX = 0x40;
+            p->animation.scaleY = 0x40;
         } else {
             s32 v;
-            p->flags |= 2;
-            v = 0x40 - (p->fade >> 1);
-            p->fadeA = v;
-            p->fadeB = v;
+            p->animation.flags |= 2;
+            v = 0x40 - (p->visualSlowdownTimer >> 1);
+            p->animation.scaleX = v;
+            p->animation.scaleY = v;
         }
     }
 }
-void sub_0823A060(struct LinkAura *p)
+
+void sub_0823A060(struct Player *p)
 {
-    u16 active = p->active;
-    if (active != 0) {
-        if (p->state == 5) {
+    if (p->active != 0) {
+        if (p->sceneMode == 5) {
             s32 v;
-            if (p->fade <= 0x3f) {
-                if (p->fade == 0) {
-                    Player_PlayLocalSong(p->owner, 0x1ee);
-                    p->chimePending = 1;
+            if (p->visualSlowdownTimer <= 0x3f) {
+                if (p->visualSlowdownTimer == 0) {
+                    Player_PlayLocalSong(p->slot, 0x1ee);
+                    p->unk4E1[0] = 1;
                 }
-                p->fade += 1;
+                p->visualSlowdownTimer += 1;
             }
-            p->flags |= 2;
-            v = 0x40 - (p->fade >> 1);
-            p->fadeA = v;
-            p->fadeB = v;
-            LinkAura_SetFlags(&p->f20, 0x50000);
+            p->animation.flags |= 2;
+            v = 0x40 - (p->visualSlowdownTimer >> 1);
+            p->animation.scaleX = v;
+            p->animation.scaleY = v;
+            Player_AddStatusFlags(p, 0x50000);
         } else {
-            LinkAura_FadeOut(p, 0);
+            LinkPlayer_FadeOutAura(p);
         }
-        if (p->state == 6) {
-            s32 side = LinkAura_LocalSide();
-            struct LinkAura *other;
-            if (p->owner == side) {
-                p->selFlags |= 0x200;
-                p->flags |= 0x200;
-                LinkAura_SetFlags(&p->f20, 0x20000);
-            } else if ((other = gPlayers[side]) != 0 && LinkAura_IsInStateFour(other)) {
-                p->selFlags |= 0x200;
-                p->flags |= 0x200;
-                LinkAura_SetFlags(&p->f20, 0x20000);
+        if (p->sceneMode == 6) {
+            s32 side = SceneActorDamage_LocalPlayer();
+            struct Player *other;
+            if (p->slot == side) {
+                p->secondaryDrawFlags |= 0x200;
+                p->animation.flags |= 0x200;
+                Player_AddStatusFlags(p, 0x20000);
+            } else if ((other = gPlayers[side]) != 0 && LinkPlayer_IsInSceneModeFour(other)) {
+                p->secondaryDrawFlags |= 0x200;
+                p->animation.flags |= 0x200;
+                Player_AddStatusFlags(p, 0x20000);
             } else {
-                p->selFlags |= 1;
-                p->flags |= 1;
-                LinkAura_SetFlags(&p->f20, 0x20000);
+                p->secondaryDrawFlags |= 1;
+                p->animation.flags |= 1;
+                Player_AddStatusFlags(p, 0x20000);
             }
         } else {
-            p->selFlags &= ~0x200;
-            p->flags &= ~0x200;
+            p->secondaryDrawFlags &= ~0x200;
+            p->animation.flags &= ~0x200;
         }
-        if (p->f1c & 1)
+        if (p->kind & 1)
             p->active--;
     } else {
-        LinkAura_FadeOut(p, active);
-        if (p->flags & 0x200)
-            p->flags &= ~0x200;
-        if (p->selFlags & 0x200)
-            p->selFlags &= ~0x200;
+        LinkPlayer_FadeOutAura(p);
+        if (p->animation.flags & 0x200)
+            p->animation.flags &= ~0x200;
+        if (p->secondaryDrawFlags & 0x200)
+            p->secondaryDrawFlags &= ~0x200;
     }
 }
