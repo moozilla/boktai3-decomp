@@ -53,12 +53,10 @@ void SpriteOam_QueueProjectedSprites(void)
 {
     struct ContactPosition pos;
     struct SpriteDrawable *sprite;
-    s32 *matrixCount;
     u32 skip = (gSceneEffectPalettePhase & 1) ? 0x201 : 0x401;
     sprite = gDrawableListHeads[gRenderListIndex];
     if (!sprite)
         return;
-    matrixCount = &gAffineRequestCount;
     do {
         s32 x, y;
         s32 tmp;
@@ -103,29 +101,12 @@ void SpriteOam_QueueProjectedSprites(void)
         y &= 255;
         attr |= y;
         if (flags & 2) {
-            u32 matrix;
-            u32 angle;
-            s32 sx, sy;
             if (!(flags & 0x20000) && (UnsignedScale(sprite->scaleX) > 60 ||
                                        UnsignedScale(sprite->scaleY) > 60 || sprite->angle != 0))
                 attr |= 0x300;
             else
                 attr |= 0x100;
-            angle = sprite->angle;
-            sx = (s8)sprite->scaleX;
-            sy = (s8)sprite->scaleY;
-            if (*matrixCount > 31)
-                matrix = 0;
-            else {
-                s32 *count = matrixCount;
-                gSpriteAffineParams[*count].angle = angle;
-                gSpriteAffineParams[*count].scaleX = sx;
-                gSpriteAffineParams[*count].scaleY = sy;
-                tmp = *count;
-                matrix = tmp++;
-                *count = tmp;
-            }
-            attr |= matrix << 25;
+            attr |= SpriteOam_AllocateAffineMatrix(sprite->angle, sprite->scaleX, sprite->scaleY, &gAffineRequestCount) << 25;
             flags = sprite->flags;
         }
         if (flags & 4)
@@ -149,8 +130,7 @@ void SpriteOam_QueueProjectedSprites(void)
         } else {
             s32 tile, n;
             u32 priority;
-            tmp = depth >= 0 ? depth >> 1 : -((-depth) >> 1);
-            depth = tmp;
+            depth = depth >= 0 ? depth >> 1 : -((-depth) >> 1);
             if (depth < -128)
                 depth = -128;
             else if (depth > 127)
