@@ -15,11 +15,11 @@ void VanargandPair_AdvancePairState(struct VanargandPairState *panel)
             break;
         case 2:
             count = ScenePair_CountPositiveCounters(panel->pair);
-            if (count == 0) {
+            if (count == 0)
                 panel->state = 12;
-                break;
-            }
-            goto reset;
+            else
+                panel->state = 0;
+            break;
         case 11:
             panel->state = 2;
             break;
@@ -34,7 +34,6 @@ void VanargandPair_AdvancePairState(struct VanargandPairState *panel)
         case 10:
         case 12:
         default:
-        reset:
             panel->state = 0;
             break;
     }
