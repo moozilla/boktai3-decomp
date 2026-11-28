@@ -1,6 +1,7 @@
 #include "global.h"
+#include "bosses/ratatosk/particle_config_layout.h"
 
-void Ratatosk_SetParticleUpdateCallback(u8 *p, u32 a)
+void Ratatosk_SetParticleUpdateCallback(struct ParticleConfig *config, u32 callback)
 {
-    *(u32 *)(p + 0x10) = a;
+    config->callback = callback;
 }
