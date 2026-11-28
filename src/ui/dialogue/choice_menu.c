@@ -47,20 +47,20 @@ void ChoiceMenu_Select(struct ChoiceMenu *p, s32 selection)
     p->selected = selection;
 }
 
-s32 ChoiceMenu_FindSelectableRow(struct ChoiceMenu *p, s32 a, s32 d)
+s32 ChoiceMenu_FindSelectableRow(struct ChoiceMenu *p, s32 start, s32 direction)
 {
-    s32 x = a;
+    s32 row = start;
     s32 i;
     for (i = 0; i < p->rows; i++) {
-        x += d;
-        if (x > p->rows)
-            x = p->rows;
-        else if (x < 0)
-            x = 0;
-        if (p->rowCount[x] != 0)
-            return x;
+        row += direction;
+        if (row > p->rows)
+            row = p->rows;
+        else if (row < 0)
+            row = 0;
+        if (p->rowCount[row] != 0)
+            return row;
     }
-    return a;
+    return start;
 }
 
 void MessageWindow_Clear(void);
