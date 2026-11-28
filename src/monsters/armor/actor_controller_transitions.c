@@ -141,25 +141,20 @@ static inline s32 ActorController_TruncateFixed(s32 value)
 
 void ActorController_UpdateMovingAttackCollider(struct SceneCombatActor *actor)
 {
-    u8 *phase = &actor->actionPhase;
-    u8 initialPhase = *phase;
-    switch (initialPhase) {
-        case 0: {
+    switch (actor->actionPhase) {
+        case 0:
             Armor_SetAnimationFromStart(actor, &gUnk_0824EC84[((actor->heading + 0x60) >> 6) & 3]);
-            (*phase)++;
-            actor->actionReady = initialPhase;
+            actor->actionPhase++;
+            actor->actionReady = 0;
             Sound_PlaySongChecked(0xb9);
             ActorController_SelectDefenseColliders(actor);
-            {
-                ActorController_ClearMotionFlags(&actor->colliderGroup.motion, 1);
-            }
+            ActorController_ClearMotionFlags(&actor->colliderGroup.motion, 1);
             actor->flags &= ~0x20;
             break;
-        }
         case 1:
             if (actor->animationComplete) {
-                *phase = 255;
-                actor->actionReady = initialPhase;
+                actor->actionPhase = 255;
+                actor->actionReady = 1;
             }
             break;
     }
@@ -196,11 +191,10 @@ void ActorController_UpdateMovingAttackCollider(struct SceneCombatActor *actor)
             offset = (const void *)(tableOffset + (const u8 *)gUnk_0824EC94);
             {
                 s16 *dest = out.components;
-                const struct ContactPosition *left = offset;
                 const struct ContactPosition *right = &actor->navigation.referencePosition;
-                dest[0] = right->x + left->x;
-                dest[1] = right->y + left->y;
-                dest[2] = right->z + left->z;
+                dest[0] = right->x + offset->x;
+                dest[1] = right->y + offset->y;
+                dest[2] = right->z + offset->z;
             }
             SceneParticleBurst_CreateWithPause(&out.position, 0, &gUnk_0824ECBC, 15, 1, zero);
             if (actor->animationFrame == 0)
@@ -216,21 +210,13 @@ void ActorController_UpdateMovingAttackCollider(struct SceneCombatActor *actor)
                 &actor->colliderGroup.colliders[0],
                 (u16)ActorController_TruncateFixed((s16)actor->attack << 11), 50);
             break;
-        case 14: {
-            u16 *flags = &actor->colliderGroup.colliders[0].flags;
-            u32 value = *flags;
-            u32 four = 4;
-            four |= value;
-            *flags = four;
+        case 14:
+            actor->colliderGroup.colliders[0].flags |= 4;
             break;
-        }
     }
-    {
-        u8 *strength = &actor->shakeStrength;
-        if (*strength) {
-            Camera_RequestShake(*strength);
-            (*strength)--;
-        }
+    if (actor->shakeStrength) {
+        Camera_RequestShake(actor->shakeStrength);
+        actor->shakeStrength--;
     }
 }
 
