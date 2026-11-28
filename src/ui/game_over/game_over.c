@@ -256,14 +256,13 @@ void GameOver_TryBeginClose(struct GameOver *panel)
 
 void GameOver_FinishDelay(struct GameOver *panel)
 {
-    if (++panel->timer > 31) {
-        void *a = SpriteOam_QueueFlaggedProjectedSprites;
-        void *b = Sprite_RenderFlipAwareList;
-        void *c = sub_08219674;
-        int i;
+    if (++panel->timer >= 32) {
+        s32 i;
+
         for (i = 0; i < 8; i++)
             panel->sprites[i].flags &= ~1;
-        Video_SetRenderCallbacks(0, a, b, c);
+        Video_SetRenderCallbacks(0, SpriteOam_QueueFlaggedProjectedSprites,
+                                 Sprite_RenderFlipAwareList, sub_08219674);
         panel->closeState = 2;
     }
 }
