@@ -6,14 +6,11 @@ void SceneActors_UpdateStationaryReaction(struct StateActor *p)
     struct SceneGraphicsActor *actor = (struct SceneGraphicsActor *)p;
     if (p->actionChanged)
         p->actionChanged = 0;
-    SceneGraphicsActor_ClearPendingDamage((struct SceneGraphicsActor *)p);
+    SceneGraphicsActor_ClearPendingDamage(actor);
     SceneActorState_SetFlags(p, 28);
-    {
-        u8 result = p->actionReset(p);
-        if (!result) {
-            actor->graphics.scaleMin = result;
-            actor->graphics.scaleMax = result;
-            actor->variant = 0;
-        }
+    if (!p->actionReset(p)) {
+        actor->graphics.scaleMin = 0;
+        actor->graphics.scaleMax = 0;
+        actor->variant = 0;
     }
 }
