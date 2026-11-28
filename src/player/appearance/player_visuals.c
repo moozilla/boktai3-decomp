@@ -1150,16 +1150,9 @@ s32 Player_RollSecondWeaponHitStatusLow(void)
 
 s32 Player_RollSecondWeaponHitStatusHigh(void)
 {
-    s32 r;
-
-    gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-    r = Mod(*(const u16 *)((const u8 *)gRandomTable + (gRandomIndex << 1)), 100);
-    if (r > 20) {
-        r = 0;
-    } else {
-        r = 0x80000;
-    }
-    return r;
+    if (Mod(Player_NextStatusRandom(), 100) <= 20)
+        return 0x80000;
+    return 0;
 }
 
 #define Player_AddStatA Player_IncreaseLifeTowardLimit
