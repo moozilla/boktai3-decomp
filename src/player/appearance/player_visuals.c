@@ -1963,14 +1963,11 @@ s32 Player_GetEnchantmentEnergyCost(struct Player *p);
 
 s32 Player_CanAffordEnchantment(struct Player *p)
 {
-    const u16 *q;
-    s32 r = Player_GetEnchantmentEnergyCost(p);
+    s32 cost = Player_GetEnchantmentEnergyCost(p);
 
-    q = &p->currentStatB;
-    if (*(u16 *)q >= r) {
-        return 1;
-    }
-    return 0;
+    if (p->currentStatB >= cost)
+        return TRUE;
+    return FALSE;
 }
 
 void Player_SpendEnchantmentEnergy(struct Player *p)

@@ -105,3 +105,9 @@ src/player/appearance/player_visuals.c	Player_ConsumeActionCharge	contrived	mino
 src/player/appearance/player_visuals.c	Player_SetWeaponInstance	minor	natural	3	retyped in the Player_ConsumeActionCharge commit
 src/player/appearance/player_visuals.c	Player_BeginDescriptorAction	minor	minor	3	retyped in the Player_ConsumeActionCharge commit; record cast to SceneInputItemDescriptor stays (two views of one record)
 src/player/appearance/player_visuals.c	PlayerAction_RefreshFlagState	contrived	minor	22	effect slot read stays an if/else over effects[0]/[1]: effects[effect] changes 40 instructions
+src/player/appearance/player_visuals.c	Player_RefreshEquipment	natural	natural	0	-
+src/player/appearance/player_visuals.c	Player_RefreshEquipmentWithOptions	natural	natural	0	-
+src/player/appearance/player_visuals.c	Player_InitEquipmentHook	natural	natural	0	-
+src/player/appearance/player_visuals.c	ActorParameter_GetModeValue	natural	natural	0	-
+src/player/appearance/player_visuals.c	Player_GetEnchantmentEnergyCost	minor	minor	2	status flag accessor stays: plain & loads the field before the mask
+src/player/appearance/player_visuals.c	Player_CanAffordEnchantment	contrived	natural	3	-
