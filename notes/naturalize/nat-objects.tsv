@@ -5,3 +5,12 @@ src/objects/animated_tile.c	AnimatedTilePool_FindByName	contrived	natural	8
 src/objects/animated_tile.c	CallbackSlots_DispatchActive	contrived	minor	8	one small inline kept to dispatch a slot: direct form flips the operand order of the slot address add
 src/objects/animated_tile.c	AnimatedTile_CreateFromScript	contrived	minor	5	allocated->tile second variable: ROM copies the result after the null test
 src/objects/animated_tile.c	AnimatedTile_TickFadeOut	minor	natural	3	slot local: ROM reads slot before forming the mask address
+src/objects/animated_tile.c	AnimatedTile_UpdateIdleState	natural	natural	0	
+src/objects/animated_tile.c	AnimatedTile_TickAlternateAnimation	natural	natural	0	
+src/objects/animated_tile.c	AnimatedTilePool_UpdateDelay	natural	natural	0	
+src/objects/animated_tile.c	AnimatedTile_OnStateComplete	natural	natural	0	
+src/objects/animated_tile.c	AnimatedTile_InitManager	natural	natural	0	
+src/objects/animated_tile.c	AnimatedTile_CreateManager	natural	natural	0	
+src/objects/animated_tile.c	AnimatedTile_ResetManager	natural	natural	0	
+src/objects/animated_tile.c	AnimatedTile_StartAlternateAnimationFromScript	natural	natural	0	
+src/objects/bat_curtain/debris_particles.c	sub_08012B34	contrived	minor	30	random-origin dance in the angle branches kept (ROM loads a dead 0x0403B714 per branch); velocity/position pointers kept: direct fields reallocate

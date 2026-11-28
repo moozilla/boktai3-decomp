@@ -41,14 +41,15 @@ static inline int Debris_Scale(int n)
 s32 sub_08012B34(void *arg0, struct BreakableBarrier *b)
 {
     struct DebrisParticle *p = SpritePool_Allocate();
-    struct SceneVec *v;
+    struct SceneVec *velocity;
     struct SceneVec pos;
     struct SceneVec *position;
     s32 angle, speed;
     u32 sampleOrigin;
+    s32 sample;
     if (p == NULL)
         return -1;
-    v = &p->velocity;
+    velocity = &p->velocity;
     if (b->sprite.flags & 4) {
         u32 origin = (u32)&gHeapHead + RESOURCE_REGISTRY_ENTRIES_ADDR;
         angle = (Debris_EarlyRandom() & 0x7F) + 0x40;
@@ -59,30 +60,18 @@ s32 sub_08012B34(void *arg0, struct BreakableBarrier *b)
         sampleOrigin = origin;
     }
     speed = (Debris_EarlyRandom() & 7) + 8;
-    v->x = Debris_Scale(gUnk_086149C4[(angle + 64) & 255] * speed);
-    v->y = 0;
-    v->z = Debris_Scale(gUnk_086149C4[angle & 255] * speed);
-    v->y = (ParticleRandom_ReadRelativeSample(sampleOrigin, gRandomTable) & 31) + 16;
+    velocity->x = Debris_Scale(gUnk_086149C4[(angle + 64) & 255] * speed);
+    velocity->y = 0;
+    velocity->z = Debris_Scale(gUnk_086149C4[angle & 255] * speed);
+    velocity->y = (ParticleRandom_ReadRelativeSample(sampleOrigin, gRandomTable) & 31) + 16;
     position = &pos;
     pos = b->sprite.position;
-    {
-        s32 sample = ParticleRandom_ReadDirectSample(gRandomTable);
-        s32 coordinate = (u16)position->x - 32;
-        sample &= 63;
-        position->x = coordinate + sample;
-    }
-    {
-        s32 sample = ParticleRandom_ReadDirectSample(gRandomTable);
-        s32 coordinate = (u16)position->y - 32;
-        sample &= 63;
-        position->y = coordinate + sample;
-    }
-    {
-        s32 sample = ParticleRandom_ReadDirectSample(gRandomTable);
-        s32 coordinate = (u16)position->z - 32;
-        sample &= 63;
-        position->z = coordinate + sample;
-    }
+    sample = ParticleRandom_ReadDirectSample(gRandomTable);
+    position->x += (sample & 63) - 32;
+    sample = ParticleRandom_ReadDirectSample(gRandomTable);
+    position->y += (sample & 63) - 32;
+    sample = ParticleRandom_ReadDirectSample(gRandomTable);
+    position->z += (sample & 63) - 32;
     SpritePool_SetResource(p, 0xDA6D);
     SpritePool_StartAnimation(p, 0x5BB7, 1, 0, ParticleRandom_ReadDirectSample(gRandomTable) & 1);
     SpritePool_SetPosition(p, &pos);
