@@ -1,8 +1,9 @@
 #include "global.h"
 #include "engine/ram.h"
+#include "player/effects/player_attack_particles.h"
 
-void PlayerAttackEffect_SetElementMode(u32 v)
+void PlayerAttackEffect_SetElementMode(u32 element)
 {
-    if (gPlayerAttackEffect != 0)
-        *(u32 *)(gPlayerAttackEffect + 0x5A0) = v;
+    if (gPlayerAttackEffect != NULL)
+        ((struct AttackParticleEffect *)gPlayerAttackEffect)->element = element;
 }
