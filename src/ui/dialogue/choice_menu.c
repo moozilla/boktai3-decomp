@@ -3,27 +3,19 @@
 #include "ui/widgets/scene_input.h"
 #include "script/script_utility.h"
 
-static inline u32 selectionScript(struct ChoiceMenu *p)
-{
-    return p->script;
-}
-
 void ChoiceMenu_DispatchSelection(struct ChoiceMenu *p, s32 selection)
 {
     s32 values[5];
     struct ScriptUtilityArguments args;
     if (p->useScript) {
         s32 i;
-        u32 script;
         values[0] = selection;
-        i = 0;
-        for (; i < 4; i++)
+        for (i = 0; i < 4; i++)
             values[i + 1] = p->arguments[i];
         args.count = 5;
         args.values = values;
-        script = selectionScript(p);
-        if (script)
-            Script_Call(script, &args);
+        if (p->script)
+            Script_Call(p->script, &args);
     } else
         Callback_InvokeActor(selection, p->callback);
 }

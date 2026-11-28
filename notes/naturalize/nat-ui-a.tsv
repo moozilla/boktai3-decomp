@@ -166,3 +166,4 @@ src/ui/books/forging_book/ForgingBook_FinalizeState.c	ForgingBook_FinalizeState	
 src/ui/books/forging_book/sub_0821358C.c	sub_0821358C	contrived	contrived	30	frame store still builds the entry address from the book pointer (off + book order stops address reuse)
 src/ui/books/forging_book/ForgingBook_ReleaseBackgrounds.c	ForgingBook_ReleaseBackgrounds	natural	natural	0	
 src/ui/books/forging_book/CollectionBook_IsEntryCollectedFromScript.c	CollectionBook_IsEntryCollectedFromScript	natural	natural	0	
+src/ui/dialogue/choice_menu.c	ChoiceMenu_DispatchSelection	minor	natural	1	
