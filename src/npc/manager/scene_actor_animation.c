@@ -821,26 +821,23 @@ void Actor_OnDescendingFadeUpdate(void *unused, struct SceneActor *actor, int ti
     if (actor->animationEntered) {
         actor->animationEntered = 0;
         actor->finished = 0;
-        {
-            void *anim = &actor->drawable.common.kind;
-            DisplayAnimation_SetFlags(anim, 2);
-            DisplayAnimation_SetPalette(anim, 0x40, 0x40, 0);
-        }
+        DisplayAnimation_SetFlags(&actor->drawable.common.kind, 2);
+        DisplayAnimation_SetPalette(&actor->drawable.common.kind, 0x40, 0x40, 0);
         Sound_PlaySong(0x201);
     }
     if ((u8)actor->query(actor) != 1) {
         int a = 0x40;
         int b = 0;
-        struct ContactPosition *dq;
-        int h;
+        struct ContactPosition *position;
+        int height;
         switch (actor->animationPhase) {
             case 0:
                 b = (8 - ticks) * 200 + 0xa0;
-                h = SceneActor_TerrainHeightLevel(
-                        (struct ContactPosition *)actor->drawable.common.position)
-                    << 8;
-                dq = (struct ContactPosition *)actor->drawable.common.position;
-                dq->y = h + b;
+                height = SceneActor_TerrainHeightLevel(
+                             (struct ContactPosition *)actor->drawable.common.position)
+                         << 8;
+                position = (struct ContactPosition *)actor->drawable.common.position;
+                position->y = height + b;
                 if (ticks > 7)
                     actor->animationPhase++;
                 DisplayAnimation_SetPalette(&actor->drawable.common.kind, 1, 0x80, 0);
@@ -849,16 +846,16 @@ void Actor_OnDescendingFadeUpdate(void *unused, struct SceneActor *actor, int ti
                 int d = 15 - ticks;
                 int c = a - d * 4;
                 if (ticks > 8) {
-                    a = (24 - ticks) << 3;
-                    b = (d * 4 + d) * 4;
+                    a = (24 - ticks) * 8;
+                    b = d * 20;
                 }
                 if (ticks > 14)
                     actor->animationPhase = 2;
-                h = SceneActor_TerrainHeightLevel(
-                        (struct ContactPosition *)actor->drawable.common.position)
-                    << 8;
-                dq = (struct ContactPosition *)actor->drawable.common.position;
-                dq->y = h + b;
+                height = SceneActor_TerrainHeightLevel(
+                             (struct ContactPosition *)actor->drawable.common.position)
+                         << 8;
+                position = (struct ContactPosition *)actor->drawable.common.position;
+                position->y = height + b;
                 DisplayAnimation_SetPalette(&actor->drawable.common.kind, c, a, 0);
                 break;
             }
@@ -867,23 +864,8 @@ void Actor_OnDescendingFadeUpdate(void *unused, struct SceneActor *actor, int ti
                 actor->finished = 1;
                 break;
         }
-        {
-            int ang = actor->direction;
-            actor->body.direction = ang;
-            {
-                s32 shifted = (ang + 112) >> 5;
-                u32 mask = 7;
-                mask &= shifted;
-                actor->facing8 = mask;
-            }
-            {
-                s32 shifted = (ang + 96) >> 6;
-                u32 mask = 3;
-                mask &= shifted;
-                actor->facing4 = mask;
-            }
-            Actor_PlayAnimationEntry(actor, 0, 2, 0, 0);
-        }
+        SceneActorAnimation_SetAngle(actor, actor->direction);
+        Actor_PlayAnimationEntry(actor, 0, 2, 0, 0);
     }
 }
 

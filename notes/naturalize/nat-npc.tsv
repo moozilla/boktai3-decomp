@@ -43,3 +43,4 @@ src/npc/manager/scene_actor_animation.c	Actor_OnHiddenIdleUpdate	natural	natural
 src/npc/manager/scene_actor_animation.c	Actor_OnIdleUpdate	natural	natural	0	
 src/npc/manager/scene_actor_animation.c	Actor_UpdateWalkToPosition	contrived	minor	12	distance/limit and from/to copies stay: the ROM copies pos/target to other registers at the range compare
 src/npc/manager/scene_actor_animation.c	Actor_UpdateTurnToAngle	contrived	minor	2	SceneActor_SetFlags stays
+src/npc/manager/scene_actor_animation.c	Actor_OnDescendingFadeUpdate	contrived	minor	1	position cast of drawable.common.position stays (shared union type)
