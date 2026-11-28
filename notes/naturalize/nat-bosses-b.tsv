@@ -15,3 +15,5 @@ src/bosses/ratatosk/Ratatosk_FindPointNearestReferenceExcept.c	Ratatosk_FindPoin
 src/bosses/ratatosk/Ratatosk_GetSelectedPointIndex.c	Ratatosk_GetSelectedPointIndex	minor	natural	1	
 src/bosses/ratatosk/Ratatosk_GetSelectedTargetIndex.c	Ratatosk_GetSelectedTargetIndex	minor	natural	1	
 src/bosses/ratatosk/Ratatosk_IsPositionOutsideArena.c	Ratatosk_IsPositionOutsideArena	minor	natural	1	
+src/bosses/ratatosk/ActorProximity_UpdateSquaredDistances.c	ActorProximity_UpdateSquaredDistances	contrived	contrived	28	unchanged: loop.c needs a hand-walked distance pointer beside the position giv and a countdown; indexed loop differs in counter/giv init order
+src/bosses/ratatosk/SceneDistance_UpdateLinkedDistances.c	SceneDistance_UpdateLinkedDistances	contrived	natural	3	
