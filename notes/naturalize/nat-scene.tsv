@@ -150,3 +150,5 @@ src/scene/actor/animation/SceneActorScript_SetPositionFromScript.c	SceneActorScr
 src/scene/actor/animation/SceneActorScript_SetPropertiesFromScript.c	SceneActorScript_SetPropertiesFromScript	minor	minor	6	keyword/type helper inlines and a pointer to rangeSquared (store order)
 src/scene/actor/attachment/ActorAttachment_TickWideShake.c	ActorAttachment_TickWideShake	contrived	minor	20	per-branch shaking=1 and mask=~1 locals: literal flag test loads mask after address and u8 &= folds mask to 0xFE
 src/scene/actor/attachment/ActorAttachment_TickNarrowShake.c	ActorAttachment_TickNarrowShake	contrived	minor	1	same as wide shake
+src/scene/actor/attachment/ActorAttachment_NotifySourceState.c	ActorAttachment_NotifySourceState	natural	natural	0	u8 region predicate kept: plain compare drops the ROM's materialized 0/1
+src/scene/actor/attachment/ActorAttachment_TickRemoval.c	ActorAttachment_TickRemoval	contrived	minor	12	IsRemoving keeps its bit local (plain & writes the wrong operand register); one id local for the slot bit

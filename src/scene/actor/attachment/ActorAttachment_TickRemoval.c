@@ -10,88 +10,33 @@ u8 ActorAttachment_TickRemoval(void *owner, void *slotInput)
 {
     struct ActorAttachmentSlot *slot = slotInput;
     struct ContactSwarmSprite *sprite = &slot->sprite;
+
     if (slot->timer <= 0) {
         if (IsRemoving(slot)) {
             s32 i;
-            u32 flagsOffset;
-            u8 *flags;
-            u32 idOffset;
-            s8 *slotId;
-            u8 *active;
-            u32 activeOffset;
-            i = 0;
-            /* offsetof-style constants retain the original separate address births. */
-            flagsOffset = (u32) & ((struct ActorAttachmentSlot *)0)->flags31;
-            flags = (u8 *)(flagsOffset + (u32)slot);
-            idOffset = (u32) & ((struct ActorAttachmentSlot *)0)->slotId;
-            slotId = (s8 *)(idOffset + (u32)slot);
-            activeOffset = (u32) & ((struct ActorAttachmentSlot *)0)->active;
-            active = (u8 *)(activeOffset + (u32)slot);
+            s32 id;
+
             for (i = 0; i < 3; i++) {
                 slot->status[i] = 0;
                 slot->secondaryStatus[i] = 0;
                 slot->counters[i] = 0;
                 slot->thresholds[i] = 0;
             }
-            {
-                u32 bit;
-                slot->unknown24 = 0;
-                slot->unknown4C = 0;
-                {
-                    u8 *low = flags;
-                    *low = 0;
-                }
-                {
-                    struct ContactSwarmSprite *low = sprite;
-                    {
-                        u32 value = low->flags;
-                        bit = 1;
-                        value |= bit;
-                        low->flags = value;
-                    }
-                }
-                {
-                    s8 *low = slotId;
-                    s32 id;
-                    id = *low;
-                    {
-                        struct ActorAttachmentOwner *recovered = owner;
-                        u32 *occupied;
-                        occupied = &recovered->occupiedSlots;
-                        bit <<= id;
-                        *occupied &= ~bit;
-                    }
-                }
-                Sprite_Remove(sprite);
-                {
-                    u8 *low = active;
-                    *low = 0;
-                }
-                {
-                    u8 *idLow;
-                    idLow = (u8 *)slotId;
-                    *idLow = 255;
-                }
-                return 1;
-            }
+            slot->unknown24 = 0;
+            slot->unknown4C = 0;
+            slot->flags31 = 0;
+            sprite->flags |= 1;
+            id = slot->slotId;
+            ((struct ActorAttachmentOwner *)owner)->occupiedSlots &= ~(1 << id);
+            Sprite_Remove(sprite);
+            slot->active = 0;
+            slot->slotId = -1;
+            return 1;
         }
     } else {
         if (slot->timer > 10 && IsRemoving(slot)) {
-            u32 index = (gRandomIndex + 1) & 1023;
-            s32 jitter;
-            gRandomIndex = index;
-            {
-                u32 offset = index << 1;
-                const u16 *table;
-                table = (const u16 *)0x0203B400;
-                jitter = Mod(*(const u16 *)(offset + (u32)table), 20);
-            }
-            {
-                struct ContactSwarmSprite *low = sprite;
-                u32 x;
-                x = (u16)low->position.x - 10;
-                low->position.x = x + jitter;
-            }
+            gRandomIndex = (gRandomIndex + 1) & 1023;
+            sprite->position.x += Mod(((u16 *)RANDOM_TABLE_ADDR)[gRandomIndex], 20) - 10;
         }
         ActorAttachment_NotifySourceState(slot);
         slot->timer--;
