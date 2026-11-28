@@ -129,3 +129,6 @@ src/bosses/ratatosk/Ratatosk_InitHurtCollider.c	Ratatosk_InitHurtCollider	contri
 src/bosses/ratatosk/Ratatosk_InitWideBodyCollider.c	Ratatosk_InitWideBodyCollider	contrived	natural	1	
 src/bosses/ratatosk/Ratatosk_InitFrontCollider.c	Ratatosk_InitFrontCollider	contrived	natural	1	polar/scale helpers and the vector-add block stay
 src/bosses/ratatosk/Ratatosk_OnFrontCollision.c	Ratatosk_OnFrontCollision	contrived	natural	1	
+src/bosses/ratatosk/Ratatosk_OnBodyCollision.c	Ratatosk_OnBodyCollision	natural	natural	0	
+src/bosses/ratatosk/Ratatosk_OnOuterCollision.c	Ratatosk_OnOuterCollision	natural	natural	0	
+src/bosses/ratatosk/PreviewActor_ReplaceProjectileTowardPlayer.c	PreviewActor_ReplaceProjectileTowardPlayer	contrived	minor	3	originPtr/targetPtr stay; (s16) casts on the u16 range[] used as damage parameters
