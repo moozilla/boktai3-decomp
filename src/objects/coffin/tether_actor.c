@@ -1262,39 +1262,27 @@ u32 TetherActor_CanStartInteraction(void)
 void TetherActor_StartInteractionEffect(void)
 {
     struct TetherActor *actor = gTetherActor;
-    register u32 zero;
     if (!actor)
         return;
     if (actor->state == 1) {
         TetherActor_UpdatePendingEffect(actor);
-        {
-            u16 *lock = &actor->interactionLock;
-            zero = 0;
-            *lock = 1;
-        }
+        actor->interactionLock = 1;
         actor->interactionCooldown = 300;
-        actor->effectValue = zero;
+        actor->effectValue = 0;
         actor->pendingEffectHandle =
             ActorAttachment_UpdateFromDescriptor(actor->pendingEffectHandle, &actor->bodyConfig, 1,
-                                                 zero, &actor->effectValue, 200, 250, 330);
-
+                                                 0, &actor->effectValue, 200, 250, 330);
     } else {
         if (actor->state != 0 && actor->state != 2 &&
-            ((u8)(actor->state - 3) > 1 || !actor->chargeReady))
+            ((actor->state != 3 && actor->state != 4) || !actor->chargeReady))
             return;
         TetherActor_UpdatePendingEffect(actor);
         TetherActor_SelectInteractionState(actor);
-        {
-            u16 *cooldown = &actor->interactionCooldown;
-            u32 delay;
-            zero = 0;
-            delay = 600;
-            *cooldown = delay;
-            actor->effectValue = zero;
-            actor->pendingEffectHandle =
-                ActorAttachment_UpdateFromDescriptor(actor->pendingEffectHandle, &actor->bodyConfig,
-                                                     1, zero, &actor->effectValue, 200, 250, 330);
-        }
+        actor->interactionCooldown = 600;
+        actor->effectValue = 0;
+        actor->pendingEffectHandle =
+            ActorAttachment_UpdateFromDescriptor(actor->pendingEffectHandle, &actor->bodyConfig, 1,
+                                                 0, &actor->effectValue, 200, 250, 330);
     }
 }
 

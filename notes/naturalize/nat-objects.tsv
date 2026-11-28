@@ -82,3 +82,10 @@ src/objects/coffin/tether_actor.c	TetherActor_ClearExternalStatus	minor	minor	2	
 src/objects/coffin/tether_actor.c	TetherActor_TestMatchingStatus	contrived	contrived	7	goto yes/no stays: every if/return form emits the shared return-0 block in a different place (jump2 tail order)
 src/objects/coffin/tether_actor.c	TetherActor_CopySampledPosition	minor	natural	3	
 src/objects/coffin/tether_actor.c	TetherActor_CanStartInteraction	minor	natural	1	
+src/objects/coffin/tether_actor.c	TetherActor_SetInteractionTarget	natural	natural	0	
+src/objects/coffin/tether_actor.c	TetherActor_GetPosition	natural	natural	0	
+src/objects/coffin/tether_actor.c	TetherActor_IsState	natural	natural	0	
+src/objects/coffin/tether_actor.c	TetherActor_ResetInteraction	natural	natural	0	
+src/objects/coffin/tether_actor.c	TetherActor_RequestPaletteBlend	natural	natural	0	
+src/objects/coffin/tether_actor.c	TetherActor_SetInteractionPathFromScript	contrived	contrived	2	comma-expression path test stays: nested ifs and calling TetherActor_TestInteractionPath both move the SetState tails
+src/objects/coffin/tether_actor.c	TetherActor_StartInteractionEffect	contrived	natural	4	
