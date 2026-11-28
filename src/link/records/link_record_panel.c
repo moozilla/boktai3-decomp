@@ -240,7 +240,6 @@ void LinkRecordPanel_InitializePreviews(struct LinkRecordPanel *panel)
         struct AreaEffectLinkState *link = gLinkSession;
         struct LinkRecordIncomingStyle *payload;
         struct CharacterPreviewActor *preview;
-        struct CharacterPreviewModel *model;
         s32 flags;
         s32 k;
         if (!link || link->unavailable != 1 || !validSelection(i))
@@ -273,12 +272,11 @@ void LinkRecordPanel_InitializePreviews(struct LinkRecordPanel *panel)
                 Memory_Clear(&pos, 8);
                 break;
         }
-        model = &preview->model;
-        ActorSprite_InitPartDrawings(preview, model, 0x3D99);
-        CharacterPreview_PositionParts(preview, model, &pos, flags);
-        CharacterModel_SetAnimationFlags(model, flags);
-        CharacterModel_SetComponentRenderMode(model, 0);
-        CharacterModel_InitPalettes(model, preview->palette);
+        ActorSprite_InitPartDrawings(preview, &preview->model, 0x3D99);
+        CharacterPreview_PositionParts(preview, &preview->model, &pos, flags);
+        CharacterModel_SetAnimationFlags(&preview->model, flags);
+        CharacterModel_SetComponentRenderMode(&preview->model, 0);
+        CharacterModel_InitPalettes(&preview->model, preview->palette);
         for (k = 0; k <= 4; k++)
             preview->model.view.parts[k].tile = i * 2 - 0x6000;
     }

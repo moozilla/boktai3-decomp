@@ -309,3 +309,8 @@ src/link/records/link_record_panel.c	LinkRecordPanel_DrawTime	minor	natural	1
 src/link/records/link_record_panel.c	LinkRecordPanel_DrawPeerTimes	natural	natural	0	
 src/link/records/link_record_panel.c	LinkRecordPanel_CreateTextWindows	natural	natural	0	
 src/link/records/link_record_panel.c	LinkRecordPanel_StartDescriptions	contrived	natural	2	
+src/link/records/link_record_panel.c	LinkRecordPanel_ClearTextWindows	natural	natural	0	
+src/link/records/link_record_panel.c	LinkRecordPanel_InitializeEntryValues	natural	natural	0	
+src/link/records/link_record_panel.c	LinkRecordPanel_InitializeWidgets	natural	natural	0	
+src/link/records/link_record_panel.c	LinkRecordPanel_PositionWidgets	natural	natural	0	
+src/link/records/link_record_panel.c	LinkRecordPanel_InitializePreviews	minor	minor	3	validSelection goto inline stays (shared with record menus)
