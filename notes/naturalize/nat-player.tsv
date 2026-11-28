@@ -662,3 +662,4 @@ src/player/motions/sub_08148E4C.c	sub_08148E4C	minor	natural	1	-
 src/player/motions/Player_GetWalkSpeed.c	Player_GetWalkSpeed	contrived	natural	1	-
 src/player/motions/Player_UpdateWalkFootsteps.c	Player_UpdateWalkFootsteps	minor	natural	3	-
 src/player/motions/Player_UpdateRearSpiralCue.c	Player_UpdateRearSpiralCue	minor	natural	1	-
+src/player/motions/Player_UpdateMovementPose.c	Player_UpdateMovementPose	natural	natural	1	-

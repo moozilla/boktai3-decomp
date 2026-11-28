@@ -1,8 +1,6 @@
 #include "player/cues/player_cue.h"
 #include "player/player.h"
 #include "player/cutscene/player_cue_sequence.h"
-// confidence=low: provisional action interpretation from retained C and assembly.
-// Remaining differences: instruction selection and register allocation.
 u32 Player_ConsumeStateEntry(struct Player *);
 void Player_EmitQueuedEffects(struct Player *);
 void Player_NotifyActionCategories(struct Player *);
