@@ -1693,13 +1693,12 @@ s32 NidhoggrDuel_Initialize(struct GridAttackActor *p, u32 ctx)
         u32 off;
         dst = (u32 *)p->palette;
         off = 0x2BA0;
-        i = 15;
-        do {
+        for (i = 0; i < 16; i++) {
             palette = *bank + off;
             CpuSet(palette, dst, 0x04000008);
             dst += 8;
             off += 0x20;
-        } while (--i >= 0);
+        }
     }
     {
         palette = gPaletteBankData + 0x3240;
