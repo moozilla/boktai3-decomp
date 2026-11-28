@@ -19,3 +19,4 @@ src/bosses/count/actor_graphics_and_basic_states.c	sub_08022624	contrived	natura
 src/bosses/count/actor_graphics_and_basic_states.c	SceneActors_AddHealthCost	natural	natural	5	second pass: helper removed
 src/bosses/count/actor_graphics_and_basic_states.c	sub_08022624	natural	natural	15	result flag 'inside' kept (ROM materializes the box test before branching); pointer getter kept in place of the old out-parameter helper
 src/bosses/count/actor_graphics_and_basic_states.c	sub_08022694	contrived	minor	6	table local reused as the NULL arguments (keeps loop.c from hoisting the table address)
+src/bosses/count/actor_graphics_and_basic_states.c	sub_08022790	contrived	minor	12	pointer 'at' to the position kept (plain pos.y += 300 treats the 8-byte struct as a register pair)

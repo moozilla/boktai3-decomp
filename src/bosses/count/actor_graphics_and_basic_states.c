@@ -428,24 +428,23 @@ void sub_08022694(void *owner)
 }
 // confidence=low: five sparks 300 units above the actor; the large burst for big, otherwise a
 // smaller one shifted by the facing kept at 0xA8.
-void sub_08022790(u8 *p, s32 big)
+void sub_08022790(void *owner, s32 big)
 {
+    struct StateActor *p = owner;
     struct ContactPosition pos;
     struct PackedContactVector size;
-    struct ContactPosition *at = &pos;
     s32 angle, count, speed;
-    u16 index;
-    u32 *indexPtr;
-    int smallMask;
+    u32 angleIndex, countIndex, speedIndex;
     const u16 *table;
-    pos = *(struct ContactPosition *)(p + 0x260);
+    struct ContactPosition *at = &pos;
+    pos = *(struct ContactPosition *)&p->worldPosition;
     at->y += 300;
     if (big) {
         size.x = 164;
         size.y = 32;
         size.z = 164;
     } else {
-        switch (p[0xA8]) {
+        switch (p->animationFacing4) {
             case 1:
                 pos.x -= 0x80;
                 break;
@@ -458,20 +457,15 @@ void sub_08022790(u8 *p, s32 big)
         size.z = 128;
     }
     table = gRandomTable;
-    indexPtr = &gRandomIndex;
-    index = *indexPtr + 1;
-    index &= 1023;
-    angle = (u8)table[index];
-    index = (index + 1) & 1023;
-    count = table[index];
-    smallMask = 3;
-    count = (count & smallMask) + 2;
-    index = (index + 1) & 1023;
-    *indexPtr = index;
-    speed = (table[index] & smallMask) + 20;
+    angleIndex = (gRandomIndex + 1) & 1023;
+    angle = (u8)table[angleIndex];
+    countIndex = (angleIndex + 1) & 1023;
+    count = (table[countIndex] % 4) + 2;
+    speedIndex = (countIndex + 1) & 1023;
+    gRandomIndex = speedIndex;
+    speed = (table[speedIndex] % 4) + 20;
     SparkParticle_Spawn(&pos, 5, &size, angle, count, speed, 0, 2);
 }
-
 typedef struct PackedContactVector BurstVec;
 extern const BurstVec gUnk_08604D84[];
 u16 Sqrt(u32);
