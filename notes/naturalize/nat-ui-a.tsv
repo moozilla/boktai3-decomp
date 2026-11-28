@@ -234,3 +234,4 @@ src/ui/dialogue/message_window/message_window.c	MessageWindow_UpdateSpeakerPortr
 src/ui/dialogue/message_window/message_window.c	MessageWindow_SetDisplayMode	contrived	minor	4	state pointer taken between the two stores for the address order
 src/ui/dialogue/message_window/message_window.c	MessageWindow_Clear	contrived	natural	4	
 src/ui/dialogue/message_window/message_window.c	MessageWindow_SetMessageTableFromScript	natural	natural	1	
+src/ui/dialogue/message_window/message_window.c	MessageWindow_ShowMessage	contrived	minor	8	message table local so the state address is computed between its load and test

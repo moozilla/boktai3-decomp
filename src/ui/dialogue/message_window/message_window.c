@@ -191,53 +191,25 @@ u32 MessageWindow_SetMessageTableFromScript(void)
 int MessageWindow_ShowMessage(int index)
 {
     struct MessageWindow *window = (void *)gMessageWindow;
-    void *script;
     struct MessagePlaybackState *state;
+    void *messages;
+
     if (!window)
         return 0;
-    script = window->messageTable;
+    messages = window->messageTable;
     state = &window->state;
-    if (!script)
+    if (!messages)
         return 0;
     TextWindow_BlankRect(window->x, window->y, window->width, window->height);
     TextState_SetBounds(state, window->x, window->y, window->width, window->height);
     window->messageIndex = index;
     state->pc = MessageWindow_GetStringAtOffset(window, window->messageIndex);
-
-    {
-        u8 mode;
-        {
-            u8 *ptr;
-            ptr = &window->displayMode;
-            mode = *ptr;
-        }
-        if (!mode) {
-            {
-                void *fn = MessageWindow_UpdateNormalPlayback;
-                void **dst;
-                dst = &window->callback;
-                *dst = fn;
-            }
-            {
-                u8 *mode;
-                mode = &window->inputDelay;
-                *mode = 3;
-            }
-        } else {
-            {
-                u32 *counter;
-                counter = &window->playbackCounter;
-                {
-                    *counter = 0;
-                }
-            }
-            {
-                void *fn = MessageWindow_UpdateImmediatePlayback;
-                void **dst;
-                dst = &window->callback;
-                *dst = fn;
-            }
-        }
+    if (!window->displayMode) {
+        MessageWindow_SetPlayback(window, MessageWindow_UpdateNormalPlayback);
+        window->inputDelay = 3;
+    } else {
+        window->playbackCounter = 0;
+        MessageWindow_SetPlayback(window, MessageWindow_UpdateImmediatePlayback);
     }
     TextState_Reset(state);
     window->queuedMessage = 0xFFFF;
