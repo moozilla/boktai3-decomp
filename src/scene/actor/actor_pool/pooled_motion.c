@@ -120,12 +120,8 @@ s32 MotionPool_Initialize(struct MotionPool *pool)
     ResourceRegistry_RegisterResource(0x5B1B, pool, 0);
     pool->activeMask = 0;
     slot = pool->slots;
-    index = 0;
-    do {
+    for (index = 0; index < 16; index++, slot++)
         MotionPool_InitializeSlot(pool, slot, index);
-        index++;
-        slot++;
-    } while (index <= 15);
     return 0;
 }
 
