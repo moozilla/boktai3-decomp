@@ -123,3 +123,6 @@ src/link/panel/link_panel.c	LinkPanel_Create	natural	natural	0
 src/link/player/Player_UpdateActionFacingSide.c	Player_UpdateActionFacingSide	natural	natural	0	
 src/link/player/Player_SetAnimationIndex.c	Player_SetAnimationIndex	contrived	natural	6	
 src/link/player/LinkPlayer_SetScaledDirectionalVelocity.c	LinkPlayer_SetScaledDirectionalVelocity	minor	natural	1	
+src/link/player/Player_SetTetherMode.c	Player_SetTetherMode	natural	natural	0	
+src/link/player/Player_ResetActionState.c	Player_ResetActionState	minor	minor	1	Player_AddStatusFlags accessor stays: the plain |= differs
+src/link/player/Player_SetSecondaryActionFlags.c	Player_SetSecondaryActionFlags	minor	natural	1	
