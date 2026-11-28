@@ -7,7 +7,6 @@
 s32 Armor_TryStartAction(void *, s32);
 s32 DirectionalActor_TryBeginState(void *, s32);
 
-
 void Armor_QueueFallingParts(void *);
 
 void Armor_UpdateAction10Sequence(struct ArmorActionController *p)
@@ -68,7 +67,6 @@ struct ArmorTarget {
 };
 
 s32 Math_Atan2(s32, s32);
-
 
 void Armor_UpdateRandomFlankAction42(struct ArmorActor *p)
 {
@@ -249,12 +247,10 @@ loop:
     }
 }
 
-
 void Armor_UpdatePlayerAlignmentAction25(u8 *p)
 {
     Armor_UpdateAxisChase(p, 0);
 }
-
 
 void Armor_UpdatePlayerAlignmentAction45(s32 a)
 {
@@ -270,7 +266,6 @@ struct Armor {
     u8 unknownB3F;
     u8 actionState;
 };
-
 
 void Armor_StartSlowWhiteFade(struct Armor *);
 
@@ -346,7 +341,6 @@ struct S {
 
 void ActorController_StartTurn(struct S *, s32);
 
-
 void Armor_UpdateTurnTriggerCompletion(struct S *p)
 {
     switch (p->b3d) {
@@ -377,17 +371,15 @@ struct DirectionalActor {
     u8 pendingVisibility, delay;
 };
 
-
 void DirectionalActor_UpdateVisibilityDelay(struct DirectionalActor *p)
 {
-    s32 mode = p->pendingVisibility;
-    switch (mode) {
+    switch (p->pendingVisibility) {
         case 0:
         case 1:
             if (p->delay) {
                 p->delay--;
             } else {
-                if (mode != 0)
+                if (p->pendingVisibility != 0)
                     ((struct DirectionalActorDisplay *)((u8 *)p + 0xB4))->flags |= 1;
                 else
                     ((struct DirectionalActorDisplay *)((u8 *)p + 0xB4))->flags &= ~1;
@@ -398,7 +390,6 @@ void DirectionalActor_UpdateVisibilityDelay(struct DirectionalActor *p)
             break;
     }
 }
-
 
 void Armor_StartAction47(s32 a)
 {
@@ -420,7 +411,6 @@ void Armor_UpdateAction48Completion(struct ArmorActionController *p)
 }
 
 extern const u32 gUnk_0824F014[];
-
 
 void Armor_DispatchBehaviorUpdate(struct S *p)
 {
