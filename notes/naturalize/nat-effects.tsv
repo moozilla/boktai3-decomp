@@ -4,3 +4,4 @@ src/effects/bat_flock.c	BatFlockBat_Destroy	natural	natural	0
 src/effects/bat_flock.c	BatFlockBat_SetFacingAnim	contrived	natural	5	
 src/effects/bat_flock.c	BatFlockBat_UpdateAnimation	contrived	minor	22	cast of the sprite to the drawable view for DisplaySequence_ApplyFrame (a local flip test cannot keep the ROM's flags-then-mask load order); (u8) on the hold-flag test
 src/effects/bat_flock.c	BatFlockBats_StartStraightAdvance	contrived	minor	25	p = piece twin pointer and addPositionAt(d, dst, src): the ROM walks two pointers, field stores through one and member addresses through the other
+src/effects/bat_flock.c	BatFlockBats_StartLaunch	contrived	minor	3	same twin pointers as StartStraightAdvance; spread uses the second random helper (byte-offset read)

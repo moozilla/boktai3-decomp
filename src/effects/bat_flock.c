@@ -204,53 +204,47 @@ int BatFlockBats_StartLaunch(struct GroupObjects *m, struct GroupQueue *q, struc
 {
     struct ContactPosition origin;
     int i;
-    int radius0;
-    int radius1;
-    int radius2;
+    int duration;
+    int startRadius;
+    int targetRadius;
     int direction;
     int spread;
     struct GroupPiece *p;
-    struct GroupPiece *r;
+    struct GroupPiece *piece;
     origin.x = cmd->originX;
     origin.y = cmd->originY;
     origin.z = cmd->originZ;
-    radius0 = cmd->radius0;
-    radius1 = cmd->radius1;
-    radius2 = cmd->radius2;
+    duration = cmd->radius0;
+    startRadius = cmd->radius1;
+    targetRadius = cmd->radius2;
     direction = cmd->direction;
     spread = cmd->spread;
     m->origin = origin;
     m->timer = 0;
     m->paletteActive = 1;
     m->paletteMask = 63;
-    {
-        void *first = gPaletteBankData + 0x5A60;
-        void *second = gPaletteBankData + 0x5AA0;
-        Palette_InterpolateBanks(m->palette, first, second, 63, 6);
-    }
-    r = m->pieces;
-    for (i = 0; i < 16; i++, r++) {
-        p = r;
-        p->state = 0;
-        p->active = 1;
-        p->timer = 0;
+    BatFlock_BlendPalette(m, 63);
+    piece = m->pieces;
+    for (i = 0; i < 16; i++, piece++) {
+        p = piece;
+        BatFlockBat_SetState(p, 0);
         p->direction = direction;
         if (spread != 0)
             p->direction += Mod(randomValue(), spread);
-        p->duration = radius0;
-        polar(&r->position, p->direction, radius1);
-        addPositionAt(&p->position, &r->position, &origin);
-        polar(&r->target, p->direction, radius2);
-        addPositionAt(&p->target, &r->target, &origin);
+        p->duration = duration;
+        polar(&piece->position, p->direction, startRadius);
+        addPositionAt(&p->position, &piece->position, &origin);
+        polar(&piece->target, p->direction, targetRadius);
+        addPositionAt(&p->target, &piece->target, &origin);
         p->angle = BatFlockBats_RandomValue();
-        p->targetY = (i << 4) + p->position.y;
+        p->targetY = i * 16 + p->position.y;
         p->speed = (BatFlockBats_RandomValue() & 7) + 7;
         p->sprite.position = p->position;
         p->sprite.flags &= ~1;
-        BatFlockBat_SetFacingAnim(m, r, 0);
-        AnimData_SelectPaletteBank(&r->resource, 0x2D3);
+        BatFlockBat_SetFacingAnim(m, piece, 0);
+        AnimData_SelectPaletteBank(&piece->resource, 0x2D3);
         p->resource.palette = m->palette;
-        ActorShadow_Enable(r->transform);
+        ActorShadow_Enable(piece->transform);
     }
 
     m->active = 1;
