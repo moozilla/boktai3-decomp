@@ -61,14 +61,13 @@ s32 ResultPrompt_Init(struct ResultPrompt *p)
     return r;
 }
 
-u8 *ResultPrompt_Create(void)
+struct ResultPrompt *ResultPrompt_Create(void)
 {
-    u8 *p;
-    p = Task_Create(11, 0x2c);
+    struct ResultPrompt *p = Task_Create(11, sizeof(struct ResultPrompt));
     if (p != 0) {
         Task_SetCallbacks(p, (void (*)(void *))ResultPrompt_Update,
                           (void (*)(void *))ResultPrompt_Destroy);
-        if (ResultPrompt_Init((struct ResultPrompt *)p) < 0) {
+        if (ResultPrompt_Init(p) < 0) {
             Task_Kill(p);
             return 0;
         }

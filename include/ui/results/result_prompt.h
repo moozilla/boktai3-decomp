@@ -34,6 +34,6 @@ u32 Script_GetTextSourcePc(void);
 int ResultPrompt_Update(struct ResultPrompt *);
 u32 ResultPrompt_Destroy(struct ResultPrompt *);
 s32 ResultPrompt_Init(struct ResultPrompt *);
-u8 *ResultPrompt_Create(void);
+struct ResultPrompt *ResultPrompt_Create(void);
 
 #endif
