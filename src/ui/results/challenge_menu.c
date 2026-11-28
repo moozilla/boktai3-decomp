@@ -67,15 +67,11 @@ void ChallengeMenu_UpdateDescription(struct ChallengeMenu *menu)
 
 u8 ChallengeMenu_ConsumeStateEntry(struct ChallengeMenu *menu)
 {
-    u8 *q = &menu->stateEntered;
-    s32 r;
-    if (*q == 0) {
-        r = 0;
-    } else {
-        *q = 0;
-        r = 1;
+    if (menu->stateEntered) {
+        menu->stateEntered = 0;
+        return 1;
     }
-    return r;
+    return 0;
 }
 
 void ChallengeMenu_SetState(struct ChallengeMenu *menu, void (*v)(struct ChallengeMenu *))
