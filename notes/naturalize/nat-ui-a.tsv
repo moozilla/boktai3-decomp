@@ -493,3 +493,14 @@ src/ui/hud/stage_icon/StageIconDisplay_SelectUpdate.c	StageIconDisplay_SelectUpd
 src/ui/hud/level_advance/LevelAdvanceDisplay_UpdateAnimation.c	LevelAdvanceDisplay_UpdateAnimation	fudged	partial	2	sprite pointer block for the first frame store and the Shake inline stay
 src/ui/hud/level_advance/LevelAdvanceDisplay_InitFromScript.c	LevelAdvanceDisplay_InitFromScript	fudged	natural	1	
 src/ui/hud/level_advance/LevelAdvanceDisplay_CreateFromScript.c	LevelAdvanceDisplay_CreateFromScript	fudged	natural	1	
+src/ui/hud/level_advance/LevelAdvanceDisplay_GetThreshold.c	LevelAdvanceDisplay_GetThreshold	fudged	fudged	6	unchanged: indexed forms put the sum in the other register
+src/ui/hud/level_advance/LevelAdvanceDisplay_TryAdvanceLevel.c	LevelAdvanceDisplay_TryAdvanceLevel	fudged	fudged	8	unchanged: level copy and field pointers are needed for the reload of gGameState
+src/ui/hud/level_advance/LevelAdvanceDisplay_StartParticle.c	LevelAdvanceDisplay_StartParticle	fudged	fudged	10	unchanged: cursor pointer, table local, mask local and one address-of-index read are all needed for register assignment; RANDOM_NEXT draws allocate differently
+src/ui/hud/level_advance/LevelAdvanceDisplay_PollSecondaryEvent.c	LevelAdvanceDisplay_PollSecondaryEvent	natural	natural	0	
+src/ui/hud/level_advance/LevelAdvanceDisplay_UpdateParticle.c	LevelAdvanceDisplay_UpdateParticle	natural	natural	0	
+src/ui/hud/level_advance/LevelAdvanceDisplay_StartLevelAnimation.c	LevelAdvanceDisplay_StartLevelAnimation	natural	natural	0	
+src/ui/hud/level_advance/LevelAdvanceDisplay_StartSecondaryAnimation.c	LevelAdvanceDisplay_StartSecondaryAnimation	natural	natural	0	
+src/ui/hud/level_advance/LevelAdvanceDisplay_UpdateManager.c	LevelAdvanceDisplay_UpdateManager	natural	natural	0	
+src/ui/hud/level_advance/LevelAdvanceDisplay_DestroyManager.c	LevelAdvanceDisplay_DestroyManager	natural	natural	0	
+src/ui/hud/level_advance/LevelAdvanceDisplay_InitSprite.c	LevelAdvanceDisplay_InitSprite	natural	natural	0	
+src/ui/hud/level_advance/LevelAdvanceDisplay_InitParticles.c	LevelAdvanceDisplay_InitParticles	natural	natural	0	
