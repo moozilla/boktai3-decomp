@@ -10,12 +10,8 @@
 /* Clears hit timers; at zero health hands control to the defeat target and records the defeat. */
 void SceneActorReaction_EndHitCheckDefeat(struct ChaseActor *actor)
 {
-    {
-        u16 *timer = &actor->base.colliderA.responseParameter;
-        u32 zero = 0;
-        *timer = zero;
-        actor->base.hitLockTimer = zero;
-    }
+    actor->base.colliderA.responseParameter = 0;
+    actor->base.hitLockTimer = 0;
     {
         u16 *flags = &actor->base.motionFlags;
         u32 mask = ~0x2000;
