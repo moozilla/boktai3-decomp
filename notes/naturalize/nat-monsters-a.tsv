@@ -493,3 +493,4 @@ src/monsters/cannons/wind/WindCannon_ReadToggleSchedule.c	WindCannon_ReadToggleS
 src/monsters/dragon_puppy/DragonPuppy_ReadAttackSchedule.c	DragonPuppy_ReadAttackSchedule	contrived	natural	2	
 src/monsters/dragon_puppy/DragonPuppy_ApplyHitReaction.c	DragonPuppy_ApplyHitReaction	contrived	natural	2	
 src/monsters/garmr_statue/GarmrStatue_ApplyHitReaction.c	GarmrStatue_ApplyHitReaction	contrived	natural	2	
+src/monsters/cannons/wind/WindCannon_ApplyHitReaction.c	WindCannon_ApplyHitReaction	contrived	natural	2	

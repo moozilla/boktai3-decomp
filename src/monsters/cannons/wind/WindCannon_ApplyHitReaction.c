@@ -1,99 +1,54 @@
 #include "global.h"
+#include "monsters/cannons/wind_cannon.h"
 #include "engine/math/hit_spark_random.h"
 #include "engine/engine.h"
-#include "engine/ram.h"
-struct Vec {
-    u16 x, y, z, pad;
-};
-struct Source {
-    u8 p0[0xa];
-    u16 type;
-    u8 pc[0x38 - 0xc];
-    u32 flags;
-    u8 p3c[8];
-    u16 reaction;
-};
-struct Hit {
-    u8 p0[0x3e];
-    u16 damage;
-    u8 p40[3];
-    u8 state;
-    u16 blocked;
-};
-struct Target {
-    u32 timer;
-    void *hud;
-    u8 p8[0x24];
-    struct Vec position;
-    u8 p34[0x58 - 0x34];
-    u8 collider[0xc];
-    struct Vec displayPosition;
-    u8 p6c[0x9b - 0x6c];
-    u8 direction;
-    u16 reaction;
-    u8 p9e[0x10e - 0x9e];
-    s16 health;
-    s16 damage;
-    u8 p112[6];
-    u16 flash;
-    u8 p11a[0x128 - 0x11a];
-    s16 hudA, hudB;
-    u16 sparkMask;
-    u8 p12e[6];
-    s16 hudTime;
-    u8 p136[0x15c - 0x136];
-    u32 damageType;
-};
-extern const struct Vec gUnk_0824FE8C;
+extern const struct ContactPosition gUnk_0824FE8C;
 void Collision_CalculateDamageResponse(void *, void *);
 void Sound_PlaySong(u32);
 void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
 void SceneHud_SetTimedState(void *, s32, s32, s32, s32, s32);
 void PlayerStats_AddContactHundredths(void *, void *, s32);
 void SparkParticle_Spawn(void *, s32, void *, s32, s32, s32, s32, s32);
-void WindCannon_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
-                                struct Target *targetInput)
+void WindCannon_ApplyHitReaction(struct ContactCollider *source, struct ContactCollider *hit,
+                                 struct FanCannon *target)
 {
     struct {
-        struct Vec position, velocity;
+        struct ContactPosition position, velocity;
     } frame;
-    struct Source *source = sourceInput;
-    struct Hit *hit = input;
-    struct Target *target = targetInput;
     Collision_CalculateDamageResponse(source, hit);
-    if (hit->blocked) {
-        hit->damage = 0;
-        hit->state = 0;
+    if (hit->responseValue) {
+        hit->cost = 0;
+        hit->costFlags = 0;
     } else {
-        target->damage = hit->damage;
-        target->damageType = source->type;
-        target->reaction = source->reaction;
-        if (source->flags & 0x40) {
+        target->damage = hit->cost;
+        target->f15c = source->contactFlags;
+        target->collider.responseValue = source->responseValue;
+        if (source->reactionFlags & 0x40) {
             void *hud;
             s32 health;
             s32 a, b, direction;
-            target->reaction = 0x26;
+            target->collider.responseValue = 0x26;
             target->flash = 8;
             Sound_PlaySong(0x211);
-            DamageNumberDisplay_Show(target->collider, target->damage, 0, &target->displayPosition,
-                                     target->p6c, 1);
-            hud = target->hud;
+            DamageNumberDisplay_Show(&target->collider, target->damage, 0,
+                                     &target->collider.position, &target->collider.offset, 1);
+            hud = (void *)target->name;
             health = target->health;
-            a = target->hudA;
-            b = target->hudB;
+            a = target->maximumHealth;
+            b = target->hudA;
             direction = 0;
-            if (target->direction == 4)
+            if (target->collider.costFlags == 4)
                 direction = 1;
             SceneHud_SetTimedState(hud, health, a, b, direction, target->hudTime);
-            if (source->flags & 0x40)
+            if (source->reactionFlags & 0x40)
                 goto sparks;
         }
         PlayerStats_AddContactHundredths(source, hit, 0);
     sparks:
-        if (source->flags & target->sparkMask) {
+        if (source->reactionFlags & (u16)target->hudB) {
             s32 i;
-            struct Vec *vel = &frame.velocity;
-            struct Vec *pos = &frame.position;
+            struct ContactPosition *vel = &frame.velocity;
+            struct ContactPosition *pos = &frame.position;
             u32 *index = &gRandomIndex;
             u32 limit = 0x3ff;
             u32 mask = 0x7f;
@@ -103,11 +58,11 @@ void WindCannon_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
                 u32 sample;
                 u32 x;
                 frame.velocity = gUnk_0824FE8C;
-                frame.position = target->position;
+                frame.position = target->sprite.position;
                 value = (u32)gRandomTable;
                 random = HitSpark_NextIndex(*index, limit);
                 sample = HitSpark_Sample(value, random);
-                x = pos->x - 0x40;
+                x = (u16)pos->x - 0x40;
                 sample &= mask;
                 x += sample;
                 pos->x = x;
@@ -117,7 +72,7 @@ void WindCannon_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
                 *index = random;
                 {
                     u32 last = HitSpark_Sample(value, random);
-                    x = pos->z - 0x40;
+                    x = (u16)pos->z - 0x40;
                     last &= mask;
                     x += last;
                     pos->z = x;
