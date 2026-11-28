@@ -89,22 +89,21 @@ void FloatingEffect_Wait(struct LinkedWidgetSet *manager, struct FloatingEffect 
     }
     FloatingEffect_Project(effect);
     if (effect->timer >= effect->duration) {
-        u32 mode = effect->mode;
-        if (mode == 0) {
-            u32 index = effect->index;
-            if (gPlayers[index])
-                effect->state = FLOATING_EFFECT_FLY;
+        if (effect->mode == 0) {
+            u32 player = effect->index;
+
+            if (gPlayers[player])
+                FloatingEffect_SetState(effect, FLOATING_EFFECT_FLY);
             else
-                effect->state = FLOATING_EFFECT_RISE_AND_SHRINK;
-            effect->entered = 1;
-            effect->timer = mode;
-        } else if (mode == 1) {
+                FloatingEffect_SetState(effect, FLOATING_EFFECT_RISE_AND_SHRINK);
+        } else if (effect->mode == 1) {
             FloatingEffect_SetState(effect, FLOATING_EFFECT_SHRINK_AWAY);
-        } else if (mode == 3) {
+        } else if (effect->mode == 3) {
             FloatingEffect_SetState(effect, FLOATING_EFFECT_FLY);
         }
-    } else
+    } else {
         effect->timer++;
+    }
 }
 
 void FloatingEffect_ShrinkAway(struct LinkedWidgetSet *manager, struct FloatingEffect *effect,
