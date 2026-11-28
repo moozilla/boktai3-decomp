@@ -550,3 +550,4 @@ src/monsters/centipede/Centipede_UpdateSegmentColliders.c	Centipede_UpdateSegmen
 src/monsters/dragon_puppy/DragonPuppy_UpdateCombat.c	DragonPuppy_UpdateCombat	contrived	minor	12	pause mask local, per-branch collider alias and position pointer block
 src/monsters/dragon_puppy/DragonPuppy_HandleDefeat.c	DragonPuppy_HandleDefeat	minor	minor	0	H() halfword view for the unnamed game-state counters
 src/monsters/garmr_statue/GarmrStatue_UpdateCombat.c	GarmrStatue_UpdateCombat	contrived	contrived	2	pause gotos and collider alias block: early returns and per-branch assignment change the layout
+src/monsters/golem/golem_main.c	Golem_InitColliders	contrived	natural	1	

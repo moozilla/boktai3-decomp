@@ -26,7 +26,6 @@
 #include "scene/collision/scene_actor_delayed_response.h"
 #include "scene/actor/scene_actor_init_actor.h"
 #include "scene/motion/scene_actor_chase_shared.h"
-#include "monsters/centipede/packed_centipede_halfwords_layout.h"
 
 void Golem_CenterPositionInCell(struct ContactPosition *position)
 {
@@ -401,14 +400,11 @@ void Skeleton_ClearPendingFlag(struct ChaseActor *actor)
     }
 }
 
-struct Z {
-    struct PackedCentipedeHalfwords a;
-    struct PackedCentipedeHalfwords b;
-};
+void SceneActorCollision_InitBody(u8 *, struct ContactPackedVector *, struct ContactPackedVector *,
+                                  void (*)(void), u8 *);
 
-void SceneActorCollision_InitBody(u8 *, struct Z *, struct Z *, void (*)(void), u8 *);
-
-void SceneActorCollision_InitAttack(u8 *, struct Z *, struct Z *, void (*)(void), u32, u8 *);
+void SceneActorCollision_InitAttack(u8 *, struct ContactPackedVector *,
+                                    struct ContactPackedVector *, void (*)(void), u32, u8 *);
 
 void Golem_OnBodyCollision(void *, void *, void *);
 
@@ -417,21 +413,21 @@ void Golem_OnAttackCollision(struct ContactCollider *self, struct ContactCollide
 
 void Golem_InitColliders(u8 *p)
 {
-    struct Z s1, s2, s3, s4;
-    s1.a.lo = 0x40;
-    s1.a.hi = 0x80;
-    s1.b.lo = 0x40;
-    s2.a.lo = 0;
-    s2.a.hi = 0x80;
-    s2.b.lo = 0;
-    SceneActorCollision_InitBody(p, &s1, &s2, Golem_OnBodyCollision, p);
-    s3.a.lo = 0x40;
-    s3.a.hi = 0x78;
-    s3.b.lo = 0x40;
-    s4.a.lo = 0;
-    s4.a.hi = 0x80;
-    s4.b.lo = 0;
-    SceneActorCollision_InitAttack(p, &s3, &s4, Golem_OnAttackCollision, 0, p);
+    struct ContactPackedVector bodySize, bodyOffset, attackSize, attackOffset;
+    bodySize.x = 64;
+    bodySize.y = 128;
+    bodySize.z = 64;
+    bodyOffset.x = 0;
+    bodyOffset.y = 128;
+    bodyOffset.z = 0;
+    SceneActorCollision_InitBody(p, &bodySize, &bodyOffset, Golem_OnBodyCollision, p);
+    attackSize.x = 64;
+    attackSize.y = 120;
+    attackSize.z = 64;
+    attackOffset.x = 0;
+    attackOffset.y = 128;
+    attackOffset.z = 0;
+    SceneActorCollision_InitAttack(p, &attackSize, &attackOffset, Golem_OnAttackCollision, 0, p);
 }
 
 void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
