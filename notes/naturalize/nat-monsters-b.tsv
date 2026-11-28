@@ -161,3 +161,4 @@ src/monsters/muspell_head/MuspellHead_UpdateState.c	MuspellHead_UpdateState	natu
 src/monsters/muspell_head/MuspellHead_ApplyHitReaction.c	MuspellHead_ApplyHitReaction	contrived	minor	40	spark loop keeps frame struct, pos/vel/index pointers, limit/mask/zero locals and HitSpark_Sample table variable (loop.c hoisting and register allocation; every single removal changes registers)
 src/monsters/muspell_head/MuspellHead_TryProjectileAttack.c	MuspellHead_TryProjectileAttack	minor	natural	4	sample stays ContactSampleVector (packed s32 bitfield writes)
 src/monsters/muspell_head/MuspellHead_InitializeFromScript.c	MuspellHead_InitializeFromScript	contrived	natural	30	
+src/monsters/ooze/Ooze_BeginAttack.c	Ooze_BeginAttack	minor	natural	4	collider pointer in case 1

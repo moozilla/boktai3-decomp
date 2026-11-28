@@ -6,7 +6,7 @@
 struct Ooze {
     struct Task task;
     struct ContactPosition initialPosition;
-    struct DisplaySequenceSprite sprite;
+    struct ContactSwarmSprite sprite;
     struct ContactSwarmGraphics graphics;
     struct ContactCollider collider;
     u8 body[0x48];
