@@ -12,13 +12,13 @@ s32 Save_ReadBlock(u16 address, u16 *data, s32 length)
 
     for (i = 0; i < blocks; i++) {
         if (Eeprom_ReadBlock(address, data))
-            goto fail;
+            return -1;
         data += 4;
         address++;
     }
     err = Eeprom_ReadBlock(address, header);
     if (err)
-        goto fail;
+        return -1;
     check[0] = 0;
     check[1] = 0;
     for (i = 0; i < length >> 1; i++) {
@@ -26,9 +26,7 @@ s32 Save_ReadBlock(u16 address, u16 *data, s32 length)
         check[1] += orig[i];
     }
     check[0] ^= header[0];
-    if (err || check[0] || check[1] != header[1] || length != header[2]) {
-    fail:
+    if (err || check[0] || check[1] != header[1] || length != header[2])
         return -1;
-    }
     return 0;
 }
