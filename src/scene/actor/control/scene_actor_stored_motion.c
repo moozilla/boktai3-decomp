@@ -178,38 +178,25 @@ static inline void SetDrawableAndShadow(struct ChaseActor *actor, u32 visible)
 void SceneActorControl_TickVisibility(struct ChaseActor *actor)
 {
     struct SceneActorControlMotionState *state;
-    u32 unavailable = SceneActor_ActionsBlocked((void *)actor);
-    if (unavailable)
+    if (SceneActor_ActionsBlocked((struct RoomActor *)actor))
         return;
     state = SceneActorControl_GetMotionState(actor);
     if (!MotionState_TestFlags(state, 0x60))
         return;
-    {
-        u32 counter;
-        u32 value;
-        {
-            u16 *field = &state->visibilityFrame;
-            counter = (u32)*field << 16;
-        }
-        value = counter >> 16;
-        if (value <= 19) {
-            SetDrawableAndShadow(actor, (u8)(counter >> 18) & 1);
-        } else if (value <= 29) {
-            SetDrawableAndShadow(actor, (u8)(counter >> 17) & 1);
-        } else if (MotionState_TestFlags(state, 0x20)) {
-            ActorStatus_ClearDrawableFlags(actor, 1);
-            MotionState_ClearFlags(state, 0x20);
-            ActorShadow_Enable(actor->base.shadow);
-        } else {
-            ActorStatus_SetDrawableFlags(actor, 1);
-            MotionState_ClearFlags(state, 0x40);
-            ActorShadow_Disable(actor->base.shadow);
-        }
+    if (state->visibilityFrame <= 19) {
+        SetDrawableAndShadow(actor, (state->visibilityFrame >> 2) & 1);
+    } else if (state->visibilityFrame <= 29) {
+        SetDrawableAndShadow(actor, (state->visibilityFrame >> 1) & 1);
+    } else if (MotionState_TestFlags(state, 0x20)) {
+        ActorStatus_ClearDrawableFlags(actor, 1);
+        MotionState_ClearFlags(state, 0x20);
+        ActorShadow_Enable(actor->base.shadow);
+    } else {
+        ActorStatus_SetDrawableFlags(actor, 1);
+        MotionState_ClearFlags(state, 0x40);
+        ActorShadow_Disable(actor->base.shadow);
     }
-    {
-        u16 *counter = &state->visibilityFrame;
-        (*counter)++;
-    }
+    state->visibilityFrame++;
 }
 
 void SceneActorControl_StartStoredCurve(struct ChaseActor *actor)

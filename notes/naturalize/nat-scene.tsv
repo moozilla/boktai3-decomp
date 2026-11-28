@@ -339,3 +339,4 @@ src/scene/actor/control/SceneActorControl_UpdatePersistentAnimation.c	SceneActor
 src/scene/actor/control/SceneActorControl_UpdateShadowReturn.c	SceneActorControl_UpdateShadowReturn	natural	natural	0	-
 src/scene/actor/control/scene_actor_stored_motion.c	SceneActorControl_WanderAroundPlayer	contrived	minor	5	StoredCurve view of the context block and the speed copy: the position is addressed through the 0x3F0 block
 src/scene/actor/control/scene_actor_stored_motion.c	SceneActorControl_UpdateStoredMotion	contrived	minor	6	flag helper calls and the StoredCurve view: plain flags3D4 operators change the load order
+src/scene/actor/control/scene_actor_stored_motion.c	SceneActorControl_TickVisibility	contrived	minor	4	materialized flag predicate and clear helper: plain tests lose the 0/1 value
