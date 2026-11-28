@@ -153,3 +153,4 @@ src/monsters/armor/ActorController_UpdateBounceParticle.c	ActorController_Update
 src/monsters/armor/actor_controller_motion.c	ActorController_UpdateRetreatMotion	contrived	natural	10	
 src/monsters/armor/actor_controller_motion.c	ActorController_UpdateTimedMotion	contrived	natural	6	
 src/monsters/armor/ActorController_UpdateAnimation.c	ActorController_UpdateAnimation	contrived	minor	6	view casts and constant locals remain
+src/monsters/armor/actor_controller_requests.c	ActorController_SetBehaviorIfFinished	contrived	natural	1	

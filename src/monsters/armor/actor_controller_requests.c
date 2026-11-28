@@ -108,8 +108,7 @@ s32 ActorController_SetBehavior(struct SceneCombatActor *actor, s32 behavior)
 
 u32 ActorController_SetBehaviorIfFinished(struct SceneCombatActor *actor, u32 behavior)
 {
-    u8 *currentBehavior = &actor->behavior;
-    if (*currentBehavior != behavior) {
+    if (actor->behavior != behavior) {
         if (actor->behaviorPhase == 0xff) {
             actor->behavior = behavior;
             actor->behaviorPhase = 0;
