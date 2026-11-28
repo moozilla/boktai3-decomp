@@ -107,11 +107,11 @@ void SaveMenu_UpdateSaveDelay(struct SaveMenu *menu)
 
 void SaveMenu_WaitForSaveTransition(struct SaveMenu *menu)
 {
-    struct AreaEffectLinkState *g = gLinkSession;
-    s32 v = -1;
-    if (g != 0)
-        v = g->unknown1C;
-    if (v == 0x1b) {
+    struct AreaEffectLinkState *session = gLinkSession;
+    s32 sessionState = -1;
+    if (session != 0)
+        sessionState = session->unknown1C;
+    if (sessionState == 0x1b) {
         SetUpdate(menu, SaveMenu_UpdateSlotCommit, 6);
     }
 }
