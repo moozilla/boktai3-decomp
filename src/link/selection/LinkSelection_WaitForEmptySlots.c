@@ -3,7 +3,6 @@
 #include "scene/areas/area_effect_link.h"
 #include "engine/ram.h"
 
-#define gLinkSelectionDisplaySlots gSceneSelectionDisplaySlots
 u8 LinkSession_ConsumeStateEntry(struct AreaEffectLinkState *);
 s32 LinkSession_CheckSessionReady(struct AreaEffectLinkState *);
 void LinkSession_SetMenuRequest(u32);

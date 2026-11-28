@@ -20,9 +20,12 @@ struct AreaEffectLinkState {
     u8 unknown22;
     u8 menuEvent;  /* 0x23; session menu callbacks */
     s8 menuChoice; /* 0x24 */
-    u8 unknown25[3];
+    u8 unknown25[2];
+    u8 acknowledgeFrames; /* 0x27: delays the acknowledgement word */
     u8 startQueued; /* 0x28: confidence=low */
-    u8 unknown29[3];
+    u8 acknowledgeActive; /* 0x29: confidence=low */
+    u8 confirmReady;      /* 0x2A: confidence=low */
+    u8 unknown2B;
     u8 menuInputLocked; /* 0x2C: link panel disables exit input when set */
     u8 startCountdown;  /* 0x2D: confidence=low */
     u16 stateTimer;     /* 0x2E: confidence=low */
@@ -38,7 +41,8 @@ struct AreaEffectLinkState {
     u8 sendBit;     /* 0x4E */
     u8 receiveBit;  /* 0x4F */
     u8 receiveBits; /* 0x50 */
-    u8 unknown51[2];
+    u8 unknown51;
+    u8 unknown52; /* 0x52: set when the timed message starts */
     u8 unavailable;      /* 0x53 */
     u8 selectionBits[8]; /* 0x54: two pages of four participants */
     u8 playerValues[4];
@@ -59,7 +63,8 @@ struct AreaEffectLinkState {
     u8 unknown98[0x1C];
     void (*menuCallback)(void); /* 0xB4 */
     s32 menuTextWindow;         /* 0xB8 */
-    u8 unknownBC[0xC];
+    u8 unknownBC[8];
+    u32 acknowledgeScript; /* 0xC4 */
     u32 readyScript; /* 0xC8 */
     u8 unknownCC[4];
     u32 confirmScript; /* 0xD0 */
@@ -86,7 +91,9 @@ struct AreaEffectLinkState {
     const u8 *choiceMessageScript; /* 0x254 */
     u8 unknown258[4];
     const u8 *menuMessageScript; /* 0x25C */
-    u8 unknown260[0x80];
+    u32 exchangeElapsed; /* 0x260: confidence=low */
+    u32 exchangeFrames;  /* 0x264: confidence=low */
+    u8 unknown268[0x78];
     u32 positionScript; /* 0x2E0 */
 };
 /* 0x020004B4 */

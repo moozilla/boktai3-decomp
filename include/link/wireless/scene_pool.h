@@ -174,6 +174,8 @@ struct ScenePoolPlayer {
     struct ScenePoolPlayerDraw gloveDraw; /* +0x8c8 */
     u8 unknown8e0[0x14];
     u16 flags;
+    u8 unknown8f6[3];
+    u8 leading; /* +0x8f9: set on the participant furthest along (tentative) */
 };
 /* 0x020004F0 */
 extern struct ScenePoolPlayer *gParticipantActors[2];
