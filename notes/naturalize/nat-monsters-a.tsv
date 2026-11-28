@@ -485,3 +485,4 @@ src/monsters/axe_armor/AxeArmor_Update.c	AxeArmor_Update	contrived	contrived	0	c
 src/monsters/cannons/vulcan/VulcanCannon_FireProjectile.c	VulcanCannon_FireProjectile	minor	minor	0	config byte buffer and one-line vector helpers
 src/monsters/cannons/vulcan/VulcanCannon_HasClearShot.c	VulcanCannon_HasClearShot	natural	natural	0	
 src/monsters/cannons/vulcan/VulcanCannon_UpdateDefeatEffects.c	VulcanCannon_UpdateDefeatEffects	minor	minor	0	byte read of the random entry through integer address arithmetic
+src/monsters/cannons/wind/CombatActor_RecordDefeat.c	CombatActor_RecordDefeat	contrived	minor	2	H() halfword view for the unnamed game-state counters

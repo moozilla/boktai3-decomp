@@ -1,18 +1,9 @@
-#include "global.h"
-struct Args {
-    s32 x, y, z, a, b, c, d, e;
-};
-struct Message {
-    u32 type : 16;
-    u32 reserved : 16;
-    struct Args *args;
-};
-extern u8 *gGameState;
-void Script_Call(u32, struct Message *);
+#include "monsters/cannons/wind_cannon.h"
+#include "script/script_utility.h"
+#include "system/game_state/game_state.h"
 void Bestiary_UnlockEntry(s32);
 void Player_AddExperience(s32);
-#define H(p, n) (*(s16 *)((p) + (n)))
-#define W(p, n) (*(u32 *)((p) + (n)))
+#define H(p, n) (*(s16 *)((u8 *)(p) + (n)))
 static inline s32 clamp(s32 v)
 {
     if (v > 9999)
@@ -21,43 +12,42 @@ static inline s32 clamp(s32 v)
         v = 0;
     return v;
 }
-#define INC(n) H(gGameState, n) = clamp(H(gGameState, n) + 1)
-void CombatActor_RecordDefeat(u8 *p)
+void CombatActor_RecordDefeat(struct FanCannon *p)
 {
-    struct Args a;
-    struct Message m;
-    u32 q = W(p, 0x13C);
-    if (q) {
-        a.x = H(p, 0x2C);
-        a.y = H(p, 0x2E);
-        a.z = H(p, 0x30);
-        a.a = W(p, 0x160);
-        a.b = W(p, 0x164);
-        a.c = W(p, 0x168);
-        a.d = W(p, 0x158);
-        a.e = W(p, 0x4);
-        m.type = 8;
-        m.args = &a;
-        Script_Call(q, &m);
+    s32 values[8];
+    struct ScriptUtilityArguments arguments;
+    u32 script = p->f13c;
+    if (script) {
+        values[0] = p->sprite.position.x;
+        values[1] = p->sprite.position.y;
+        values[2] = p->sprite.position.z;
+        values[3] = p->f160;
+        values[4] = p->f164;
+        values[5] = p->f168;
+        values[6] = p->f158;
+        values[7] = p->name;
+        arguments.count = 8;
+        arguments.values = values;
+        Script_Call(script, &arguments);
     }
     Bestiary_UnlockEntry(34);
-    if (W(p, 0x158) & 1) {
+    if (p->f158 & 1) {
         u16 flags;
-        Player_AddExperience(H(p, 0x130));
+        Player_AddExperience(p->f130);
         H(gGameState, 0x87C) = H(gGameState, 0x87C) < 9999 ? H(gGameState, 0x87C) + 1 : 9999;
         H(gGameState, 0x538) = H(gGameState, 0x538) < 9999 ? H(gGameState, 0x538) + 1 : 9999;
-        flags = H(p, 0x12E);
+        flags = p->f12e;
         H(gGameState, 0x564) = H(gGameState, 0x564) < 9999 ? H(gGameState, 0x564) + 1 : 9999;
         if (flags & 0x80) {
-            INC(0x58A);
+            gGameState->targetFlagBonuses[0] = clamp(gGameState->targetFlagBonuses[0] + 1);
         } else if (flags & 0x100) {
-            INC(0x58C);
+            gGameState->targetFlagBonuses[1] = clamp(gGameState->targetFlagBonuses[1] + 1);
         } else if (flags & 0x200) {
-            INC(0x58E);
+            gGameState->targetFlagBonuses[2] = clamp(gGameState->targetFlagBonuses[2] + 1);
         } else if (flags & 0x400) {
-            INC(0x590);
+            gGameState->targetFlagBonuses[3] = clamp(gGameState->targetFlagBonuses[3] + 1);
         } else if (flags & 0x800) {
-            INC(0x592);
+            gGameState->targetFlagBonuses[4] = clamp(gGameState->targetFlagBonuses[4] + 1);
         }
     }
 }
