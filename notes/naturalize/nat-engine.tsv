@@ -650,3 +650,4 @@ src/system/save/SaveData_GetCounterB.c	SaveData_GetCounterB	minor	natural	1
 src/system/save/SaveData_IsHeaderValid.c	SaveData_IsHeaderValid	minor	natural	1	
 src/system/save/SaveData_SetPointsFromScript.c	SaveData_SetPointsFromScript	minor	natural	1	
 src/system/save/Text_SetSilentCharacterFromScript.c	Text_SetSilentCharacterFromScript	minor	natural	1	
+src/system/save/GameState_SetSavedSceneFromScript.c	GameState_SetSavedSceneFromScript	minor	natural	1	

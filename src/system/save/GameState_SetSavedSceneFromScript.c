@@ -1,8 +1,6 @@
-#include "global.h"
+#include "system/game_state/game_state.h"
 u32 Script_GetValue(void);
-extern u8 *gGameState;
 void GameState_SetSavedSceneFromScript(void)
 {
-    u32 v = Script_GetValue();
-    *(u32 *)(gGameState + 0x5a4) = v;
+    gGameState->unk5A4 = Script_GetValue();
 }
