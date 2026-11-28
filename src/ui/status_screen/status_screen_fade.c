@@ -161,7 +161,7 @@ void StatusScreen_ClearScanlineNoise(struct StatusScreen *p)
 {
     CpuFill32(0, p->rows, 0x91 * sizeof(u32));
     gScanlineDmaSource = p->rows[p->active];
-    gScanlineDmaTarget = (void *)0x0400004C;
+    gScanlineDmaTarget = (void *)REG_ADDR_MOSAIC;
     gScanlineDmaCount = 1;
     gScanlineDmaMode = 0;
     p->noise = 0;

@@ -137,3 +137,4 @@ src/ui/status_screen/status_screen_fade.c	StatusScreen_FadeInPalette	contrived	c
 src/ui/status_screen/status_screen_fade.c	StatusScreen_FadeAndExit	contrived	contrived	45	PALETTE_EXTRACT_CHANNEL on blue and the parked blueMask stay: masking blue directly loses the mask hoist (3-20 insns)
 src/ui/status_screen/status_screen_fade.c	StatusScreen_UpdateScanlineNoise	contrived	contrived	14	StatusScreen_Random byte-offset read and the amplitude/delta pointer helper stay: plain index or direct members are 11-45 insns off (address hoisting)
 src/ui/status_screen/status_screen_fade.c	StatusScreen_UpdateScanlineNoise	contrived	contrived	1	StatusScreen_Random byte-offset read and the amplitude/delta pointer helper stay
+src/ui/status_screen/status_screen_fade.c	StatusScreen_ClearScanlineNoise	minor	natural	1	-
