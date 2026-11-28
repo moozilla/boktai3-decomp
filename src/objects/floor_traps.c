@@ -1,4 +1,5 @@
 #include "objects/tile_trigger.h"
+#include "scene/motion/scene_actor_terrain.h"
 #include "scene/motion/scene_actor_chase.h"
 #include "engine/ram.h"
 #include "effects/particles/proximity_emitter.h"
@@ -230,8 +231,6 @@ u32 TetherActor_IsState(u32);
 u8 FloorTrap_IsTetherNearby(struct TileTrigger *trigger)
 {
     struct ContactPosition difference;
-    struct ContactPosition *delta;
-    struct SceneVec *position;
     struct ContactPosition *target;
     s32 x, z;
     if (gEngineFlags & 0x800)
@@ -243,17 +242,13 @@ u8 FloorTrap_IsTetherNearby(struct TileTrigger *trigger)
     target = TetherActor_GetPosition();
     if (!target)
         return 0;
-    delta = &difference;
-    position = &trigger->position;
-    delta->x = target->x - position->x;
-    delta->y = target->y - position->y;
-    delta->z = target->z - position->z;
-    x = delta->x;
+    SceneActorTerrain_Subtract(&difference, target, (struct ContactPosition *)&trigger->position);
+    x = difference.x;
     if (x < 0)
         x = -x;
     if (x > 128)
         return 0;
-    z = delta->z;
+    z = difference.z;
     if (z < 0)
         z = -z;
     if (z > 128)
@@ -291,8 +286,8 @@ void FloorTrap_TickIdle(struct TileTrigger *trigger)
     }
 }
 
-void TrapSpellParticles_CreateDefaultBurst(void *, s32, s32, s32, s32, s32, s32, s32, s32, s32,
-                                             s32, s32);
+void TrapSpellParticles_CreateDefaultBurst(void *, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32,
+                                           s32);
 
 static inline u32 NextRandom(void)
 {
@@ -315,30 +310,30 @@ void FloorTrap_EmitParticles(struct TileTrigger *trigger)
             position.x = position.x + 92 - (NextRandom() & 63);
             position.z = position.z + 92 - (NextRandom() & 63);
             TrapSpellParticles_CreateDefaultBurst(&position, 8, 8, 4, 4, 0, 0, 32, 64, one, one,
-                                                    512);
+                                                  512);
             position = trigger->position;
             position.x = position.x - 92 - (NextRandom() & 63);
             position.z = position.z - 92 - (NextRandom() & 63);
             TrapSpellParticles_CreateDefaultBurst(&position, 8, 8, 4, 4, 0, 0, 32, 64, one, one,
-                                                    512);
+                                                  512);
             position = trigger->position;
             position.x = position.x - 92 - (NextRandom() & 63);
             position.z = position.z + 92 - (NextRandom() & 63);
             TrapSpellParticles_CreateDefaultBurst(&position, 8, 8, 4, 4, 0, 0, 32, 64, one, one,
-                                                    512);
+                                                  512);
             position = trigger->position;
             position.x = position.x + 92 - (NextRandom() & 63);
             position.z = position.z - 92 - (NextRandom() & 63);
             TrapSpellParticles_CreateDefaultBurst(&position, 8, 8, 4, 2, 0, 0, 32, 64, one, one,
-                                                    512);
+                                                  512);
             position = trigger->position;
             position.x = position.x - 92 - (NextRandom() & 63);
             TrapSpellParticles_CreateDefaultBurst(&position, 8, 8, 4, 2, 0, 0, 32, 64, one, one,
-                                                    512);
+                                                  512);
             position = trigger->position;
             position.x = position.x + 92 - (NextRandom() & 63);
             TrapSpellParticles_CreateDefaultBurst(&position, 8, 8, 4, 4, 0, 0, 32, 64, one, one,
-                                                    512);
+                                                  512);
             break;
     }
 }
@@ -691,7 +686,8 @@ u32 FloorTrapPool_IsReadyFromScript(void)
 {
     s32 name = Script_GetKeywordValue('i', -1);
     struct TileTrigger *tile;
-    if (name < 0 || (tile = FloorTrapPool_FindByName(name)) == 0 || (tile->triggerFlags & 0x180) != 0x180)
+    if (name < 0 || (tile = FloorTrapPool_FindByName(name)) == 0 ||
+        (tile->triggerFlags & 0x180) != 0x180)
         return 0;
     return 1;
 }
