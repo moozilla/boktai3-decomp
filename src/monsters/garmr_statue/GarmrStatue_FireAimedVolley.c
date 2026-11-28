@@ -36,24 +36,22 @@ u32 GarmrStatue_FireAimedVolley(struct GarmrStatue *p)
         pos->y += 128;
         player = Player_GetEffectivePosition(0);
         angle = Math_Atan2(player->x - origin->x, player->z - origin->z);
-        {
-            PARTICLE_RANDOM_SAVE_ORIGIN(sampleOrigin, gRandomTable);
-            angle = angle + (ParticleRandom_ReadDirectSample(sampleOrigin) & 31) - 16;
-            half = p->projectileSpeed >> 1;
-            range = p->projectileSpeed - half;
-            speed = half;
-            if (range != 0)
-                speed += Mod(ParticleRandom_ReadDirectSample(gRandomTable), range);
-        }
+        PARTICLE_RANDOM_SAVE_ORIGIN(sampleOrigin, gRandomTable);
+        angle = angle + (ParticleRandom_ReadDirectSample(sampleOrigin) & 31) - 16;
+        half = p->projectileSpeed >> 1;
+        range = p->projectileSpeed - half;
+        speed = half;
+        if (range != 0)
+            speed += Mod(ParticleRandom_ReadDirectSample(gRandomTable), range);
         Polar(&velocity, angle, speed);
         if (Mod(p->fireTimer, 20) == 0) {
-            SpriteEffectController_Create(&position, &velocity, 0x4384, 0xf62b, 0, 0x200, 9, effectKind,
-                                          2, 0, 0, 0, p->effectA, p->effectB, effectMask,
-                                          p->effectC, 0, 0);
+            SpriteEffectController_Create(&position, &velocity, 0x4384, 0xf62b, 0, 0x200, 9,
+                                          effectKind, 2, 0, 0, 0, p->effectA, p->effectB,
+                                          effectMask, p->effectC, 0, 0);
         } else {
-            SpriteEffectController_Create(&position, &velocity, 0x4384, 0xf62b, 0, 0x400, 9, effectKind,
-                                          2, 0, 0, 0, p->effectA, p->effectB, effectMask,
-                                          p->effectC, 0, 0);
+            SpriteEffectController_Create(&position, &velocity, 0x4384, 0xf62b, 0, 0x400, 9,
+                                          effectKind, 2, 0, 0, 0, p->effectA, p->effectB,
+                                          effectMask, p->effectC, 0, 0);
         }
         Sound_PlaySong(0x51b);
     }
