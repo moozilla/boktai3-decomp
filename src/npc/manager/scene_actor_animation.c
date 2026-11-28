@@ -771,24 +771,11 @@ void Actor_UpdateWalkToPosition(void *unused, struct SceneActor *actor)
     }
 }
 
-static inline s8 *SceneActorAnimation_SetAngle(struct SceneActor *actor, s16 angle)
+static inline void SceneActorAnimation_SetAngle(struct SceneActor *actor, s16 angle)
 {
-    u16 facing;
     actor->body.direction = angle;
-    facing = angle;
-    {
-        s32 shifted = (facing + 112) >> 5;
-        u32 mask = 7;
-        mask &= shifted;
-        actor->facing8 = mask;
-    }
-    {
-        s32 shifted = (facing + 96) >> 6;
-        u32 mask = 3;
-        mask &= shifted;
-        actor->facing4 = mask;
-    }
-    return (s8 *)&actor->body.direction;
+    actor->facing8 = SceneFacing_EightWay(angle);
+    actor->facing4 = SceneFacing_FourWay(angle);
 }
 
 // confidence=low: turns toward a scripted angle and signals completion when aligned.
@@ -801,20 +788,18 @@ void Actor_UpdateTurnToAngle(void *unused, struct SceneActor *actor)
         Actor_PlayAnimationEntry(actor, 2, 1, 0, 4);
     }
     SceneActor_SetFlags(actor, 0x1000);
-    if (((u8)actor->query(actor)) != 1) {
-        s8 *angle = (s8 *)&actor->body.direction;
-        s8 current = *angle;
-        s32 delta = (s8)(actor->direction - current);
-        s8 *savedAngle;
+    if ((u8)actor->query(actor) != 1) {
+        s8 angle = actor->body.direction;
+        s32 delta = (s8)(actor->direction - angle);
         if (delta > 8)
-            current = (s8)current + 8;
+            angle += 8;
         else if (delta < -8)
-            current = (s8)current - 8;
+            angle -= 8;
         else
-            current = (s8)current + delta;
-        savedAngle = SceneActorAnimation_SetAngle(actor, current);
+            angle += delta;
+        SceneActorAnimation_SetAngle(actor, angle);
         Actor_PlayAnimationEntry(actor, 2, 1, 0, 1);
-        if ((u8)*savedAngle == actor->direction)
+        if (actor->body.direction == actor->direction)
             actor->finished = 1;
     }
 }
