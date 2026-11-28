@@ -2,19 +2,7 @@
 #include "bosses/count/scene_graphics_actor.h"
 #include "scene/terrain/terrain_cell_probe.h"
 
-/* Play the impact cues and create a hazard at a nearby point on the same terrain level. */
-union ImpactPosition {
-    struct Pos16 vector;
-    u32 words[2];
-};
-
-struct SceneActorImpactTarget {
-    u8 unknown0[0x10C];
-    u8 *owner; /* 0x10C: supplies the impact heading. */
-    union ImpactPosition *position;
-    u8 unknown114[0x36A - 0x114];
-    s16 hazardResource;
-};
+#include "player/player.h"
 
 static inline s32 s08025FFC_Trunc12(s32 v)
 {
@@ -45,66 +33,55 @@ static inline u16 Impact_Random(const u16 *table)
 }
 
 static inline void Impact_AddPosition(struct Pos16 *out, const struct Pos16 *a,
-                                      const struct Pos16 *b)
+                                      const struct ContactPosition *b)
 {
     out->x = a->x + b->x;
     out->y = a->y + b->y;
     out->z = a->z + b->z;
 }
 
-void SceneActorAnimation_UpdateImpactHazard(struct StateActor *p, s32 arg)
+/* Play the impact cues and create a hazard at a nearby point on the same terrain level. */
+void SceneActorAnimation_UpdateImpactHazard(struct StateActor *p, s32 tick)
 {
     struct SceneGraphicsActor *actor = (struct SceneGraphicsActor *)p;
-    union ImpactPosition copy;
-    struct Pos16 d;
-    struct Pos16 *delta;
-    u16 a;
-    u16 b;
-    s32 base;
-    s32 nb;
-    union ImpactPosition *src;
-    s32 f;
-    const u16 *table;
 
     if (p->actionChanged) {
-        s32 seq;
+        s32 sequence;
         p->actionChanged = 0;
-        seq = (actor->graphics.animationFlags & 1) ? 0x1a : 0x40;
+        sequence = (actor->graphics.animationFlags & 1) ? 26 : 64;
         SceneActors_StartDirectionalAnimation(p, &actor->animation, (int)&actor->animationResource,
-                                              seq, 2, 1, 4);
-        Sound_PlaySongChecked(0x35A);
+                                              sequence, 2, 1, 4);
+        Sound_PlaySongChecked(858);
     }
-    if ((u8)Callback_InvokeActor(p, (void *)p->actionTryUpdate))
+    if (p->actionTryUpdate(p))
         return;
     SceneActorState_SetFlags(p, 0x40);
-    if ((u8)Callback_InvokeActor(p, (void *)p->actionReset))
+    if (p->actionReset(p))
         return;
-    if (arg == 0x10)
-        Sound_PlaySongChecked(0x351);
-    f = arg & 0xf;
-    if (f == 0xf) {
-        src = ((struct SceneActorImpactTarget *)p)->position;
-        copy = *src;
-        base = ((struct SceneActorImpactTarget *)p)->owner[0x2d];
-        table = gRandomTable;
-        a = Impact_Random(table) & f;
-        b = Impact_Random(table) & 0x7f;
+    if (tick == 16)
+        Sound_PlaySongChecked(849);
+    if ((tick & 15) == 15) {
+        struct ContactPosition target = *((struct SceneGraphicsActor *)p)->playerPositions[0];
+        s32 angle = (u8)((struct SceneGraphicsActor *)p)->players[0]->unk2D;
+        const u16 *table = gRandomTable;
+        u16 turn = Impact_Random(table) & 15;
+        u16 reach = Impact_Random(table) & 127;
+        struct Pos16 d;
+        struct Pos16 *delta;
+        s32 distance;
         delta = &d;
-        base = base + a;
-        base -= 8;
-        nb = b + 0x20;
-        delta->x = s08025FFC_Trunc12(gUnk_086149C4[(base + 0x40) & 0xff] * nb);
+        angle = angle + turn;
+        angle -= 8;
+        distance = reach + 32;
+        delta->x = s08025FFC_Trunc12(gUnk_086149C4[(angle + 0x40) & 0xff] * distance);
         delta->y = 0;
-        base &= 0xff;
-        delta->z = s08025FFC_Trunc12(gUnk_086149C4[base] * nb);
-        Impact_AddPosition(&d, &d, &copy.vector);
-        if (Impact_GetTerrainHeight(&d) == (s16)copy.vector.y) {
-            AnimatedHazard_Create(&d, ((struct SceneActorImpactTarget *)actor)->hazardResource,
-                                  0x3c);
-        } else {
-            AnimatedHazard_Create(&copy.vector,
-                                  ((struct SceneActorImpactTarget *)actor)->hazardResource, 0x3c);
-        }
+        angle &= 0xff;
+        delta->z = s08025FFC_Trunc12(gUnk_086149C4[angle] * distance);
+        Impact_AddPosition(&d, &d, &target);
+        if (Impact_GetTerrainHeight(&d) == target.y)
+            AnimatedHazard_Create(&d, actor->graphics.impactHazardResource, 60);
+        else
+            AnimatedHazard_Create(&target, actor->graphics.impactHazardResource, 60);
     }
     if (actor->animation.status & 2)
         p->actionFinished = 1;

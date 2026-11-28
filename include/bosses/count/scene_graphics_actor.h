@@ -29,7 +29,7 @@ struct SceneActorGraphics {
     s16 attackWidth0, attackHeight0, attackDepth0; /* 0x35C: variant-0 attack properties. */
     s16 attackWidth1, attackHeight1, attackDepth1; /* 0x362: variant-1 attack properties. */
     s16 grabHealthAmount; /* 0x368: taken from the grabbed player (tentative). */
-    u8 unk36A[2];
+    s16 impactHazardResource; /* 0x36A: passed to AnimatedHazard_Create. */
     s16 chargeShotPower;
     u8 unk36E[0x378 - 0x36E];
     s16 routeProjectileAmount, routeProjectileKind;
