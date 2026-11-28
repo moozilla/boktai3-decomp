@@ -154,10 +154,9 @@ void Golem_RestoreRoute(struct ChaseActor *actor)
         SceneActorChase_GroupSetFlags(&actor->group, 4);
         SceneActorDelay_Prepare((void *)&actor->group.saved, group->common.gate.control, 0xC, 0x1E);
         if (SceneActorTurn_Flags(flags, 0x80)) {
-            u16 *time = &actor->group.common.gate.counter;
-            *time += 0x12C;
-            if (*time > actor->group.common.gate.duration)
-                *time = actor->group.common.gate.duration;
+            actor->group.common.gate.counter += 0x12C;
+            if (actor->group.common.gate.counter > actor->group.common.gate.duration)
+                actor->group.common.gate.counter = actor->group.common.gate.duration;
         }
     } else {
         SceneActorChase_SetActorFlags(actor, 0x10);
