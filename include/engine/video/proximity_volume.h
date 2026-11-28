@@ -8,7 +8,7 @@ struct ProximityVolume {
     void (*update)(struct ProximityVolume *);  /* confidence=low */
     void (*destroy)(struct ProximityVolume *); /* confidence=low */
     struct ContactPosition position;
-    void *emitter; /* confidence=low */
+    void *emitter;  /* confidence=low */
     u8 probe[0x1c]; /* confidence=low */
     s16 targetX;
     u8 pad32[0x2];

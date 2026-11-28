@@ -8,7 +8,7 @@ s32 Clock_CalculateWeekday(s32, s32, s32);
 void SunClock_TickFrame(void)
 {
     gSunClock.extra7++;
-        if (gSunClock.extra7 > 59) {
+    if (gSunClock.extra7 > 59) {
         struct SunClock *clock;
         gSunClock.extra7 = 0;
         clock = &gSunClock;
@@ -16,10 +16,10 @@ void SunClock_TickFrame(void)
         if (clock->extra6 > 59) {
             clock->extra6 = 0;
             clock->baseMinute++;
-        if (clock->baseMinute > 59) {
+            if (clock->baseMinute > 59) {
                 clock->baseMinute = 0;
                 clock->baseHour++;
-        if (clock->baseHour > 23) {
+                if (clock->baseHour > 23) {
                     s32 year, month, day;
                     clock->baseHour = 0;
                     Clock_UnpackDate(&year, &month, &day, clock->stamp);

@@ -106,7 +106,9 @@ void SpriteOam_QueueProjectedSprites(void)
                 attr |= 0x300;
             else
                 attr |= 0x100;
-            attr |= SpriteOam_AllocateAffineMatrix(sprite->angle, sprite->scaleX, sprite->scaleY, &gAffineRequestCount) << 25;
+            attr |= SpriteOam_AllocateAffineMatrix(sprite->angle, sprite->scaleX, sprite->scaleY,
+                                                   &gAffineRequestCount)
+                    << 25;
             flags = sprite->flags;
         }
         if (flags & 4)
@@ -206,7 +208,8 @@ void SpriteOam_QueueCameraRelativeSprites(void)
                 attr |= 0x300;
             else
                 attr |= 0x100;
-            matrix = SpriteOam_AllocateAffineMatrix(sprite->angle, sprite->scaleX, sprite->scaleY, &gAffineRequestCount);
+            matrix = SpriteOam_AllocateAffineMatrix(sprite->angle, sprite->scaleX, sprite->scaleY,
+                                                    &gAffineRequestCount);
             attr |= matrix << 25;
             flags = sprite->flags;
         }
@@ -313,7 +316,9 @@ void SpriteOam_QueueFlaggedProjectedSprites(void)
                 attr |= 0x300;
             else
                 attr |= 0x100;
-            attr |= SpriteOam_AllocateAffineMatrix(sprite->angle, sprite->scaleX, sprite->scaleY, &gAffineRequestCount) << 25;
+            attr |= SpriteOam_AllocateAffineMatrix(sprite->angle, sprite->scaleX, sprite->scaleY,
+                                                   &gAffineRequestCount)
+                    << 25;
             flags = sprite->flags;
         }
         if (flags & 4)
@@ -419,7 +424,9 @@ void SpriteOam_QueueOverlayProjectedSprites(void)
                 attr |= 0x300;
             else
                 attr |= 0x100;
-            attr |= SpriteOam_AllocateAffineMatrix(sprite->angle, sprite->scaleX, sprite->scaleY, &gAffineRequestCount) << 25;
+            attr |= SpriteOam_AllocateAffineMatrix(sprite->angle, sprite->scaleX, sprite->scaleY,
+                                                   &gAffineRequestCount)
+                    << 25;
             flags = sprite->flags;
         }
         if (flags & 4)

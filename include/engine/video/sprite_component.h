@@ -12,8 +12,8 @@ struct SpriteComponent {
     struct SpriteRenderResource resource;      /* 0x34 */
     struct ContactPosition position;           /* 0x50: confidence=low */
     s16 frame;
-    s16 collisionStatus;              /* confidence=low */
-    struct ContactCollider collider;  /* 0x5C */
+    s16 collisionStatus;             /* confidence=low */
+    struct ContactCollider collider; /* 0x5C */
 };
 
 typedef char SpriteComponentSizeCheck[sizeof(struct SpriteComponent) == 0xb0 ? 1 : -1];

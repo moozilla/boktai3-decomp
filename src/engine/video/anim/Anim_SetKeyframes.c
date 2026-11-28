@@ -9,8 +9,8 @@ static inline s32 Scale6(s32 v)
     return -((-v) >> 6);
 }
 
-void Anim_SetKeyframes(struct AnimSprite *anim, struct AnimSpriteResource *data, u16 sequence, u16 mode,
-                       u16 flags)
+void Anim_SetKeyframes(struct AnimSprite *anim, struct AnimSpriteResource *data, u16 sequence,
+                       u16 mode, u16 flags)
 {
     struct AnimationKeyframeSequence *seqs;
     struct AnimationKeyframe *frames;

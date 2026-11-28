@@ -96,21 +96,25 @@ extern struct SpriteAffineParam gSpriteAffineParams[32];
 
 /* RAM objects; each row of symbols/ram.csv with header include/render.h. */
 /* 0x030042E4 */
-extern u8 *gPaletteBankData; /* palette-bank data: 32-byte banks of sixteen RGB15 colors (AnimData_SelectPaletteBank) */
+extern u8 *
+    gPaletteBankData; /* palette-bank data: 32-byte banks of sixteen RGB15 colors (AnimData_SelectPaletteBank) */
 /* 0x03004280 */
 extern u32 gVBlankDialogueState; /* scrolling-dialogue/video state copied during VBlank (guess) */
 /* 0x03004290 */
 extern u32 gRenderListIndex; /* active list index into the three render list-head pairs */
 /* 0x03004294 */
-extern u32 gSpriteRenderCallback; /* sprite render callback, called by the graphics task (function pointer) */
+extern u32
+    gSpriteRenderCallback; /* sprite render callback, called by the graphics task (function pointer) */
 /* 0x030042B4 */
 extern u32 gProjectedSpriteCallback; /* projected-sprite queue callback (function pointer) */
 /* 0x030042B8 */
 extern u32 gExtraRenderCallback; /* additional render callback (function pointer) */
 /* 0x030042D8 */
-extern s16 gDynamicTileSum; /* tile count of the dynamic OBJ slots, reset and accumulated each frame */
+extern s16
+    gDynamicTileSum; /* tile count of the dynamic OBJ slots, reset and accumulated each frame */
 /* 0x030042DC */
-extern u16 gMainSpriteTileSum; /* tile count of the main sprites, reset and accumulated each frame */
+extern u16
+    gMainSpriteTileSum; /* tile count of the main sprites, reset and accumulated each frame */
 /* 0x030042E0 */
 extern u16 gPaletteBankCount; /* palette resource bank count */
 /* 0x030042E8 */
@@ -156,7 +160,8 @@ extern u16 gBgTileUploadParamA[]; /* per-layer tile-upload parameter (4) */
 /* 0x03004BEC */
 extern u16 gBgAffineMode; /* BG affine/non-affine shadow mode */
 /* 0x03004BF0 */
-extern u16 gBgAffineMatrixBuffer[]; /* affine coefficients copied from gBgAffineMatrix, then uploaded (4) */
+extern u16 gBgAffineMatrixBuffer
+    []; /* affine coefficients copied from gBgAffineMatrix, then uploaded (4) */
 /* 0x03004BF8 */
 extern u32 gBgAffineRefX; /* BG affine reference X accumulator */
 /* 0x03004BFC */
@@ -246,17 +251,20 @@ extern u16 gMosaicParam; /* packed mosaic parameter (byte and halfword accesses)
 /* 0x03005238 */
 extern u16 gDefaultAnimFlags; /* default animation/widget flags */
 /* 0x0300523C */
-extern u32 gEnginePauseFlags; /* engine pause/suspend flags (bits 1-2: sound off; task list masks) */
+extern u32
+    gEnginePauseFlags; /* engine pause/suspend flags (bits 1-2: sound off; task list masks) */
 /* 0x03004390 */
 extern struct OamEntry gOamBuffer[]; /* final OAM entries, 8 bytes each (128) */
 /* 0x030047A0 */
 extern struct OamEntry gPendingOamBuffer[]; /* pending depth-sorted OAM entries (128) */
 /* 0x03004FC0 */
-extern u16 gBgPaletteBuffer[]; /* sixteen background palette banks of 16 colors; labels inside it are interior rows */
+extern u16 gBgPaletteBuffer
+    []; /* sixteen background palette banks of 16 colors; labels inside it are interior rows */
 /* 0x03004DC0 */
 extern u16 gObjPaletteBuffer[][16]; /* sixteen object palette banks of 16 colors */
 /* 0x03001548 */
-extern u16 gBgMapCacheKey; /* Last compressed BG map resource key, compared before LZ77 unpacking (tentative cache name) */
+extern u16
+    gBgMapCacheKey; /* Last compressed BG map resource key, compared before LZ77 unpacking (tentative cache name) */
 /* 0x0300154C */
 extern u16 gSavedDispCnt; /* DISPCNT saved by Video_SaveDisplayControl */
 /* 0x0300154E */
@@ -272,27 +280,37 @@ extern u16 gSavedWinIn; /* Saved WININ register */
 /* 0x03001558 */
 extern u16 gSavedWinOut; /* Saved WINOUT register */
 /* 0x03001560 */
-extern u8 gTextTileUploadIndices[]; /* Queued text tile indices; bounded storage precedes its count, original guard permits index 256 */
+extern u8 gTextTileUploadIndices
+    []; /* Queued text tile indices; bounded storage precedes its count, original guard permits index 256 */
 /* 0x03001660 */
 extern u32 gTextTileUploadCount; /* Number of queued text tile DMA uploads */
 /* 0x030042C0 */
-extern void *gSpriteListHeads[2]; /* Two sprite render-list heads, selected by gRenderListIndex; pointees retain subsystem views */
+extern void *gSpriteListHeads
+    [2]; /* Two sprite render-list heads, selected by gRenderListIndex; pointees retain subsystem views */
 /* 0x030042C8 */
-extern void *gMainSpriteListHeads[2]; /* Two main/animation sprite-list heads; protected ARM source retains its address declaration */
+extern void *gMainSpriteListHeads
+    [2]; /* Two main/animation sprite-list heads; protected ARM source retains its address declaration */
 /* 0x030042D0 */
-extern void *gDrawableListHeads[2]; /* Two drawable/effect render-list heads, selected by gRenderListIndex */
+extern void *
+    gDrawableListHeads[2]; /* Two drawable/effect render-list heads, selected by gRenderListIndex */
 /* 0x03004FE0 */
-extern u16 gBgPaletteBank1[]; /* Interior background palette bank 1, at gBgPaletteBuffer +0x20 bytes */
+extern u16
+    gBgPaletteBank1[]; /* Interior background palette bank 1, at gBgPaletteBuffer +0x20 bytes */
 /* 0x03005000 */
-extern u16 gBgPaletteBank2[]; /* Interior background palette bank 2, at gBgPaletteBuffer +0x40 bytes */
+extern u16
+    gBgPaletteBank2[]; /* Interior background palette bank 2, at gBgPaletteBuffer +0x40 bytes */
 /* 0x03005020 */
-extern u16 gBgPaletteBank3[]; /* Interior background palette bank 3, at gBgPaletteBuffer +0x60 bytes */
+extern u16
+    gBgPaletteBank3[]; /* Interior background palette bank 3, at gBgPaletteBuffer +0x60 bytes */
 /* 0x030050E0 */
-extern u16 gBgPaletteBank9[]; /* Interior background palette bank 9, at gBgPaletteBuffer +0x120 bytes */
+extern u16
+    gBgPaletteBank9[]; /* Interior background palette bank 9, at gBgPaletteBuffer +0x120 bytes */
 /* 0x03005140 */
-extern u16 gBgPaletteBank12[]; /* Interior background palette bank 12, at gBgPaletteBuffer +0x180 bytes */
+extern u16
+    gBgPaletteBank12[]; /* Interior background palette bank 12, at gBgPaletteBuffer +0x180 bytes */
 /* 0x03005164 */
-extern u16 gBgPaletteBank13Color2[]; /* Interior view starting at background palette bank 13 color 2 */
+extern u16
+    gBgPaletteBank13Color2[]; /* Interior view starting at background palette bank 13 color 2 */
 /* 0x03005174 */
 extern u16 gBgPaletteBank13Color10; /* Interior background palette bank 13 color 10 */
 /* 0x03005176 */
@@ -300,22 +318,31 @@ extern u16 gBgPaletteBank13Color11; /* Interior background palette bank 13 color
 /* 0x0300517C */
 extern u16 gBgPaletteBank13Color14; /* Interior background palette bank 13 color 14 */
 /* 0x03005180 */
-extern u16 gBgPaletteBank14[]; /* Interior background palette bank 14, at gBgPaletteBuffer +0x1C0 bytes */
+extern u16
+    gBgPaletteBank14[]; /* Interior background palette bank 14, at gBgPaletteBuffer +0x1C0 bytes */
 /* 0x030051A0 */
-extern u16 gBgPaletteBank15[]; /* Interior background palette bank 15, at gBgPaletteBuffer +0x1E0 bytes */
+extern u16
+    gBgPaletteBank15[]; /* Interior background palette bank 15, at gBgPaletteBuffer +0x1E0 bytes */
 /* 0x03004278 */
-extern void *gScanlineDmaSource; /* HBlank DMA0 source: the staged 160-line effect buffer (VBlank handler programs DMA0 SAD) */
+extern void *
+    gScanlineDmaSource; /* HBlank DMA0 source: the staged 160-line effect buffer (VBlank handler programs DMA0 SAD) */
 /* 0x03003A00 */
-extern void *gScanlineDmaTarget; /* HBlank DMA0 destination: the I/O register the scanline effect writes (BGnHOFS, BGnVOFS, MOSAIC, BLDY) */
+extern void *
+    gScanlineDmaTarget; /* HBlank DMA0 destination: the I/O register the scanline effect writes (BGnHOFS, BGnVOFS, MOSAIC, BLDY) */
 /* 0x03004270 */
-extern u16 gScanlineDmaCount; /* HBlank DMA0 transfer count, 1 for the single-halfword/word-per-line transfers */
+extern u16
+    gScanlineDmaCount; /* HBlank DMA0 transfer count, 1 for the single-halfword/word-per-line transfers */
 /* 0x03004274 */
-extern s16 gScanlineDmaMode; /* HBlank DMA0 mode: 0 off, 1 halfword transfer, else word transfer (low confidence) */
+extern s16
+    gScanlineDmaMode; /* HBlank DMA0 mode: 0 off, 1 halfword transfer, else word transfer (low confidence) */
 /* 0x03005160 */
-extern u16 gBgPaletteBank13[]; /* Interior background palette bank 13, at gBgPaletteBuffer + 0x1A0 */
+extern u16
+    gBgPaletteBank13[]; /* Interior background palette bank 13, at gBgPaletteBuffer + 0x1A0 */
 /* 0x03004CC0 */
-extern struct BackgroundLayer gBgRecord3; /* Interior view of gBgRecords[3] (no consumer declares it separately) */
+extern struct BackgroundLayer
+    gBgRecord3; /* Interior view of gBgRecords[3] (no consumer declares it separately) */
 /* 0x03005418 */
-extern u16 gCameraOrigin[]; /* camera origin in world coordinates (x, y, z halfwords then padding): sprites and actors subtract it, then add the 120x80 screen center */
+extern u16 gCameraOrigin
+    []; /* camera origin in world coordinates (x, y, z halfwords then padding): sprites and actors subtract it, then add the 120x80 screen center */
 
 #endif

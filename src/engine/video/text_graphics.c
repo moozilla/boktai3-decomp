@@ -160,8 +160,8 @@ s32 Text_DrawGlyph(u32 *data, u32 glyph, u32 part, u32 color, u32 wide)
     mlo = 0x0F0F0F0F;
     dst = tile;
     for (i = 7; i >= 0; i--) {
-            u32 w = *src++;
-            *dst++ = (((w & mhi) | hi) & mhi) | (((w & mlo) | lo) & mlo);
+        u32 w = *src++;
+        *dst++ = (((w & mhi) | hi) & mhi) | (((w & mlo) | lo) & mlo);
     }
     Text_QueueTileUpload(index, tile);
     return index;

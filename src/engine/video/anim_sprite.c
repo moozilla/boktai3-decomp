@@ -129,8 +129,8 @@ s32 AnimSprite_InitAtPosition(struct AnimSprite *animSprite, void *resource, u16
     return 0;
 }
 
-s32 Anim_LoadKeyframe(struct AnimSprite *animSprite, struct AnimSpriteResource *resource,
-                      u16 glyph, u8 mode)
+s32 Anim_LoadKeyframe(struct AnimSprite *animSprite, struct AnimSpriteResource *resource, u16 glyph,
+                      u8 mode)
 {
     if (AnimSprite_SelectGlyph(animSprite, resource, glyph) < 0)
         return -1;
@@ -142,8 +142,8 @@ s32 Anim_LoadKeyframe(struct AnimSprite *animSprite, struct AnimSpriteResource *
 void Anim_LinkToList(void *, u32);
 
 s32 AnimSprite_InitLinked(struct AnimSprite *animSprite, void *resource, u16 glyph, u32 flags,
-                      u8 attributeA, u8 mode, u8 duration,
-                      const struct ContactPosition *position)
+                          u8 attributeA, u8 mode, u8 duration,
+                          const struct ContactPosition *position)
 {
     struct ContactPosition initialPosition;
 
@@ -175,8 +175,8 @@ s32 AnimSprite_InitLinked(struct AnimSprite *animSprite, void *resource, u16 gly
         animSprite->palette = 0;
         animSprite->tileData = 0;
         animSprite->extraData = 0;
-        AnimSprite_InitAtPosition(animSprite, resource, glyph, flags, attributeA, mode,
-                                  duration, &initialPosition);
+        AnimSprite_InitAtPosition(animSprite, resource, glyph, flags, attributeA, mode, duration,
+                                  &initialPosition);
         gDefaultAnimFlags++;
         if (gDefaultAnimFlags == 0xFFFF)
             gDefaultAnimFlags = 0;
@@ -191,7 +191,7 @@ s32 AnimSprite_InitLinked(struct AnimSprite *animSprite, void *resource, u16 gly
 }
 
 s32 AnimSprite_InitCleared(struct AnimSprite *animSprite, void *resource, u16 glyph, u32 flags,
-                       u8 attributeA, u8 mode, u8 duration, void *position)
+                           u8 attributeA, u8 mode, u8 duration, void *position)
 {
     if (animSprite->active != 0)
         return -1;
@@ -216,8 +216,8 @@ s32 AnimSprite_InitCleared(struct AnimSprite *animSprite, void *resource, u16 gl
     animSprite->palette = 0;
     animSprite->tileData = 0;
     animSprite->extraData = 0;
-    AnimSprite_InitAtPosition(animSprite, resource, glyph, flags, attributeA, mode,
-                              duration, position);
+    AnimSprite_InitAtPosition(animSprite, resource, glyph, flags, attributeA, mode, duration,
+                              position);
     gDefaultAnimFlags++;
     if (gDefaultAnimFlags == 0xFFFF)
         gDefaultAnimFlags = 0;

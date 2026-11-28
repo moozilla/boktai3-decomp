@@ -145,8 +145,8 @@ setup:
     *resource = *source;
     ResourceHeader_Relocate(resource, (void *)source);
     {
-        s32 result = AnimSprite_InitLinked(&display->resource.keyframes.sprite, resource, 0, flags, 1,
-                                       inactive, 60, position);
+        s32 result = AnimSprite_InitLinked(&display->resource.keyframes.sprite, resource, 0, flags,
+                                           1, inactive, 60, position);
         display->position = (struct DisplayPosition *)&display->resource.keyframes.sprite.position;
         display->displayFlags = &display->resource.keyframes.sprite.flags;
         return result;

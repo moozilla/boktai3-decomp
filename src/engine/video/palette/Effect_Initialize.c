@@ -5,8 +5,8 @@
 
 u32 Palette_CacheReservedObjectBank(u32, u8 *);
 
-void Effect_Initialize(struct SpriteDrawable *sprite, const struct SpriteEffectTileResource *resource,
-                       u32 flags)
+void Effect_Initialize(struct SpriteDrawable *sprite,
+                       const struct SpriteEffectTileResource *resource, u32 flags)
 {
     if (!sprite->linked) {
         sprite->flags = flags;

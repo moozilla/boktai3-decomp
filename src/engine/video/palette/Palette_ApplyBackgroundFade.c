@@ -84,8 +84,8 @@ void Palette_ApplyBackgroundFade(void)
         u32 fadeGreen = gBgFadeColor & 0x3E0;
         s32 color = (s16)gBackdropColor;
         gBackdropColor = ((((level * (color & 0x7C1F)) + (fadeRedBlue * inverse)) & 0xF83E0) |
-                                     (((level * (color & 0x3E0)) + (fadeGreen * inverse)) & 0x7C00)) >>
-                                    5;
+                          (((level * (color & 0x3E0)) + (fadeGreen * inverse)) & 0x7C00)) >>
+                         5;
     }
     gBgFadeApplied = value;
 }

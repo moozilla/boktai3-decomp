@@ -250,8 +250,8 @@ s32 Time_LoadRegionList(struct RegionMenu *menu)
     ResourceHeader_Relocate(menu->anims[0].resource, res);
     AnimSprite_InitLinked(&menu->anims[0], menu->anims[0].resource, 0x35, 0x10, 0, 0, 0, 0);
     ResourceHeader_Relocate(menu->anims[1].resource, res);
-    AnimSprite_InitLinked(&menu->anims[1], menu->anims[1].resource, (u16)(menu->page + 0x18), 0x10, 0,
-                      0, 0, 0);
+    AnimSprite_InitLinked(&menu->anims[1], menu->anims[1].resource, (u16)(menu->page + 0x18), 0x10,
+                          0, 0, 0, 0);
     res = ScriptProc_Start(0xCB05, 0x530D);
     ResourceHeader_Relocate(menu->anims[2].resource, res);
     AnimSprite_InitLinked(&menu->anims[2], menu->anims[2].resource, 0x8a, 0x10, 0, 0, 0, 0);

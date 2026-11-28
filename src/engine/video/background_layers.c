@@ -490,7 +490,7 @@ void Bg_SetupLayers(s32 mode, u16 resourceId, struct BgMapResource *res, u16 x, 
             if (count == 2) {
                 Bg_EnableDisplay(DISPCNT_BG3_ON);
                 bgs[1] = 3;
-            Bg_SetCharacterBase(3, 0);
+                Bg_SetCharacterBase(3, 0);
                 n = 2;
             } else
                 n = 1;
@@ -517,7 +517,7 @@ void Bg_SetupLayers(s32 mode, u16 resourceId, struct BgMapResource *res, u16 x, 
             if (count == 2) {
                 Bg_EnableDisplay(DISPCNT_BG3_ON);
                 bgs[1] = 3;
-            Bg_SetCharacterBase(3, 0);
+                Bg_SetCharacterBase(3, 0);
                 n = 2;
             } else
                 n = 1;
@@ -530,7 +530,7 @@ void Bg_SetupLayers(s32 mode, u16 resourceId, struct BgMapResource *res, u16 x, 
             if (count == 2) {
                 Bg_EnableDisplay(DISPCNT_BG1_ON);
                 bgs[1] = 1;
-            Bg_SetCharacterBase(1, 0);
+                Bg_SetCharacterBase(1, 0);
                 n = 2;
             } else
                 n = 1;
