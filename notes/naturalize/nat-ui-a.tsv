@@ -373,3 +373,16 @@ src/ui/game_over/game_over.c	GameOver_UpdateCostSelection	fudged	natural	4
 src/ui/game_over/game_over.c	GameOver_OnDestroy	fudged	natural	1	
 src/ui/game_over/game_over.c	GameOver_Initialize	fudged	natural	1	
 src/ui/game_over/game_over.c	GameOver_Create	fudged	natural	3	
+src/ui/game_over/game_over.c	GameOver_InitExpansion	natural	natural	0	
+src/ui/game_over/game_over.c	GameOver_UpdateExpansion	natural	natural	0	
+src/ui/game_over/game_over.c	GameOver_UpdateLetterRebound	natural	natural	0	
+src/ui/game_over/game_over.c	GameOver_UpdateLetterSettle	natural	natural	0	
+src/ui/game_over/game_over.c	GameOver_UpdateLetterExpand	natural	natural	0	
+src/ui/game_over/game_over.c	GameOver_UpdateLetterHold	natural	natural	0	
+src/ui/game_over/game_over.c	GameOver_UpdateExitDelay	natural	natural	0	
+src/ui/game_over/game_over.c	GameOver_StopPresentation	natural	natural	0	
+src/ui/game_over/game_over.c	GameOver_UpdateLetterAnimation	natural	natural	0	
+src/ui/game_over/game_over.c	GameOver_InitSprites	natural	natural	0	
+src/ui/game_over/game_over.c	GameOver_UpdateCostPrompt	natural	natural	0	
+src/ui/game_over/game_over.c	GameOver_UpdateExit	natural	natural	0	
+src/ui/game_over/game_over.c	GameOver_OnUpdate	natural	natural	0	
