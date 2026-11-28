@@ -137,3 +137,4 @@ src/bosses/count/sub_08028F78.c	sub_08028F78	contrived	contrived	25	partial: key
 src/bosses/count/contact_actor_display.c	ContactActor_ApplyHealthContact	contrived	minor	6	keeps directionMask/mode value reuse: HealthContact register use depends on it
 src/bosses/count/contact_actor_display.c	ContactActor_InitializeSlot	contrived	minor	6	keeps initialFrame array, SlotSpritePosition and SelectSlotPalette helpers: plain forms differ
 src/bosses/count/contact_actor_display.c	ContactActor_HideSlot	minor	natural	6	
+src/bosses/count/contact_actor_display.c	ContactActorPool_HideSlots	minor	natural	6	
