@@ -14,18 +14,17 @@ u32 OrbitingParticles_HasActiveOrb(struct OrbitingParticles *particles)
     return 0;
 }
 
-void OrbitingParticles_SpawnOrb(struct OrbitingParticles *o, struct OrbitingParticle *b)
+void OrbitingParticles_SpawnOrb(struct OrbitingParticles *particles, struct OrbitingParticle *orb)
 {
-    if (b->timer == 0) {
-        if (o->duration < 0 || o->time < o->duration) {
-            b->state = 1;
-            gRandomIndex = (gRandomIndex + 1) & 0x3ff;
-            b->angle = *(const u16 *)((const u8 *)gRandomTable + gRandomIndex * 2);
-            b->rise = 0;
-            b->sprite.flags &= ~1;
+    if (orb->timer == 0) {
+        if (particles->duration < 0 || particles->time < particles->duration) {
+            orb->state = 1;
+            orb->angle = ParticleRandom_ReadDirectSample((const u16 *)RANDOM_TABLE_ADDR);
+            orb->rise = 0;
+            orb->sprite.flags &= ~1;
         }
     } else {
-        b->timer--;
+        orb->timer--;
     }
 }
 
