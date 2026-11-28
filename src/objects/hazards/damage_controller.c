@@ -75,10 +75,10 @@ s32 DamageController_Initialize(struct DamageController *controller, u32 id)
     struct DamagePackedVec position, size, offset;
     struct DamageCollider *collider;
     controller->id = id;
-    controller->maximum = Script_GetKeywordValue(108, 100);
+    controller->maximum = Script_GetKeywordValue('l', 100);
     controller->health = controller->maximum;
-    controller->height = Script_GetKeywordValue(83, 16);
-    if (Script_SeekToKeyword(112)) {
+    controller->height = Script_GetKeywordValue('S', 16);
+    if (Script_SeekToKeyword('p')) {
         position.x = Script_GetValue();
         position.y = Script_GetValue();
         position.z = Script_GetValue();
@@ -87,7 +87,7 @@ s32 DamageController_Initialize(struct DamageController *controller, u32 id)
         position.y = 0;
         position.z = 0;
     }
-    if (Script_SeekToKeyword(115)) {
+    if (Script_SeekToKeyword('s')) {
         size.x = Script_GetValue();
         size.y = Script_GetValue();
         size.z = Script_GetValue();
@@ -96,7 +96,7 @@ s32 DamageController_Initialize(struct DamageController *controller, u32 id)
         size.y = 0;
         size.z = 0;
     }
-    if (Script_SeekToKeyword(111)) {
+    if (Script_SeekToKeyword('o')) {
         offset.x = Script_GetValue();
         offset.y = Script_GetValue();
         offset.z = Script_GetValue();
@@ -111,23 +111,23 @@ s32 DamageController_Initialize(struct DamageController *controller, u32 id)
     Collider_SetCallback(collider, DamageController_AccumulateHit, controller);
     Collider_SetBodyProperties(collider, 0, 0, 0);
     Collider_Refresh(collider);
-    controller->flags = Script_GetKeywordValue(102, 0);
-    if (Script_SeekToKeyword(119)) {
+    controller->flags = Script_GetKeywordValue('f', 0);
+    if (Script_SeekToKeyword('w')) {
         controller->kindMask = Script_GetValue();
     } else {
         controller->kindMask = 0;
         controller->flags |= 8;
     }
-    if (Script_SeekToKeyword(97)) {
+    if (Script_SeekToKeyword('a')) {
         controller->flagMask = Script_GetValue();
     } else {
         controller->flagMask = 0;
         controller->flags |= 16;
     }
-    controller->hitScript = Script_GetKeywordValue(68, 0);
-    controller->deathScript = Script_GetKeywordValue(100, 0);
+    controller->hitScript = Script_GetKeywordValue('D', 0);
+    controller->deathScript = Script_GetKeywordValue('d', 0);
     controller->cooldown = 0;
-    controller->delay = Script_GetKeywordValue(105, 0);
+    controller->delay = Script_GetKeywordValue('i', 0);
     return 0;
 }
 
