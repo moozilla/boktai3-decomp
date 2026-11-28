@@ -30,8 +30,7 @@ void SceneTarget_BeginMove(void *object, struct ContactPosition *, struct Contac
                            u32, u32, u32);
 void ContactImpactEffect_BeginTimedPosition(void *object, struct ContactPosition *, u32);
 void PopInSprite_ClearState(struct ContactImpactEffect *);
-void ContactImpactEffect_BeginInterpolatedPosition(struct ContactImpactEffect *,
-                                                   struct ContactPosition *,
+void ContactImpactEffect_BeginInterpolatedPosition(void *object, struct ContactPosition *,
                                                    struct ContactPosition *, s32, u32, u32);
 void ContactImpactEffect_UpdateBlinkFrame(struct ContactImpactEffect *);
 void PopInSprite_StartAppearing(struct ContactImpactEffect *);

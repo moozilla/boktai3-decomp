@@ -66,3 +66,4 @@ src/effects/contact_impact.c	SpriteController_AnimateShrinking	minor	natural	2	-
 src/effects/contact_impact.c	ContactImpactEffect_BeginMotion	contrived	minor	2	typed local copy of a void * object parameter orders the argument copies
 src/effects/contact_impact.c	SceneTarget_BeginMove	contrived	minor	4	typed local copy of a void * object parameter orders the argument copies
 src/effects/contact_impact.c	ContactImpactEffect_BeginTimedPosition	contrived	minor	2	typed local copy of a void * object parameter orders the argument copies
+src/effects/contact_impact.c	ContactImpactEffect_BeginInterpolatedPosition	contrived	minor	2	typed local copy of a void * object parameter orders the argument copies

@@ -200,40 +200,34 @@ static inline void Project(u16 *screen, struct ContactPosition *world)
 
 // confidence=low: initializes linear world movement and a scale ramp without a motion track.
 
-void ContactImpactEffect_BeginInterpolatedPosition(struct ContactImpactEffect *input,
-                                                   struct ContactPosition *source,
-                                                   struct ContactPosition *destination,
-                                                   s32 initialScale, u32 finalScale, u32 duration)
+void ContactImpactEffect_BeginInterpolatedPosition(void *object, struct ContactPosition *from,
+                                                   struct ContactPosition *to, s32 rampFrom,
+                                                   u32 rampTo, u32 duration)
 {
-    struct ContactPosition *from = source;
-    s32 rampFrom = initialScale;
-    struct ContactImpactEffect *effect = input;
-    if (effect) {
-        if (!effect->coordinateMode) {
-            struct ContactPosition *out = (struct ContactPosition *)(&effect->world.x);
-            struct ContactPosition *origin;
-            origin = out;
-            FromScreen(out, from, 0);
-            FromScreen((struct ContactPosition *)(&effect->target.x), destination, 0);
-            Project((u16 *)&effect->sprite.position.x, (struct ContactPosition *)&effect->world.x);
-        } else if (effect->coordinateMode == 1) {
-            struct ContactPosition *origin = (struct ContactPosition *)(&effect->world.x);
-            *origin = *from;
-            *((struct ContactPosition *)(&effect->target.x)) = *destination;
-            Project((u16 *)&effect->sprite.position.x, (struct ContactPosition *)&effect->world.x);
-        }
-        effect->shakeThreshold = duration;
-        effect->moveTimer = 0;
-        if (rampFrom < 0)
-            effect->rampFrom = (s8)effect->sprite.scaleX;
-        else
-            effect->rampFrom = rampFrom;
-        effect->rampTo = finalScale;
-        effect->sprite.scaleX = effect->rampFrom;
-        effect->sprite.scaleY = effect->rampFrom;
-        effect->sprite.flags &= ~1;
-        ContactImpactEffect_EnterUpdate(effect, ContactImpactEffect_UpdateInterpolatedPosition);
+    struct ContactImpactEffect *effect = object;
+
+    if (!effect)
+        return;
+    if (!effect->coordinateMode) {
+        FromScreen(&effect->world, from, 0);
+        FromScreen(&effect->target, to, 0);
+        ToScreen(&effect->sprite.position, &effect->world);
+    } else if (effect->coordinateMode == 1) {
+        effect->world = *from;
+        effect->target = *to;
+        ToScreen(&effect->sprite.position, &effect->world);
     }
+    effect->shakeThreshold = duration;
+    effect->moveTimer = 0;
+    if (rampFrom < 0)
+        effect->rampFrom = (s8)effect->sprite.scaleX;
+    else
+        effect->rampFrom = rampFrom;
+    effect->rampTo = rampTo;
+    effect->sprite.scaleX = effect->rampFrom;
+    effect->sprite.scaleY = effect->rampFrom;
+    effect->sprite.flags &= ~1;
+    ContactImpactEffect_EnterUpdate(effect, ContactImpactEffect_UpdateInterpolatedPosition);
 }
 
 // confidence=low: alternates the displayed frame between zero and one on staggered timers.
