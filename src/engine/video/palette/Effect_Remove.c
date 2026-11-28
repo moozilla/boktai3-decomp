@@ -1,15 +1,8 @@
 #include "global.h"
+#include "engine/video/sprite_drawable_api.h"
 
-struct Obj {
-    u8 pad[4];
-    u8 f4;
-    u8 pad5[0xC];
-    u8 f11;
-};
-void Effect_UnlinkFromList(struct Obj *, u32);
-
-void Effect_Remove(struct Obj *o)
+void Effect_Remove(struct SpriteDrawable *sprite)
 {
-    if (o->f4 != 0)
-        Effect_UnlinkFromList(o, o->f11);
+    if (sprite->linked)
+        Effect_UnlinkFromList(sprite, sprite->list);
 }
