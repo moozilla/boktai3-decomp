@@ -189,3 +189,4 @@ src/engine/video/interrupts_video.c	InterruptsAndVideo_InitRuntime	contrived	min
 src/engine/video/interrupts_video.c	InterruptsAndVideo_Initialize	contrived	natural	1	
 src/engine/video/interrupts_video.c	InterruptsAndVideo_WaitFrames	minor	natural	1	
 src/engine/video/interrupts_video.c	InterruptsAndVideo_OnVideoUploadTask	contrived	natural	1	
+src/engine/video/interrupts_video.c	InterruptsAndVideo_OnGraphicsUpdateTask	contrived	natural	2	

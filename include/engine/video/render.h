@@ -220,7 +220,7 @@ extern u16 gObjFadeColor; /* object fade target color */
 /* 0x030051E0 */
 extern u16 *gBgPaletteSource; /* current background palette upload source */
 /* 0x030051E4 */
-extern u32 gGrayscaleControl; /* grayscale effect duration/control */
+extern s32 gGrayscaleControl; /* grayscale effect duration/control */
 /* 0x030051F0 */
 extern u16 gObjPaletteKeys[]; /* object palette key per bank (16) */
 /* 0x03005210 */

@@ -295,12 +295,12 @@ u32 InterruptsAndVideo_OnGraphicsUpdateTask(void)
     sub_08249238(gExtraRenderCallback);
     sub_08249238(gProjectedSpriteCallback);
     SpriteOam_FinalizeQueue();
-    if ((*(s32 *)&gGrayscaleControl)) {
+    if (gGrayscaleControl) {
         sub_08217C7C();
         sub_08217BBC();
-        if ((*(s32 *)&gGrayscaleControl) > 0)
-            (*(s32 *)&gGrayscaleControl)--;
-        if (!(*(s32 *)&gGrayscaleControl))
+        if (gGrayscaleControl > 0)
+            gGrayscaleControl--;
+        if (!gGrayscaleControl)
             Palette_RefreshObjectBanks();
     } else {
         Palette_ApplyBackgroundFade();
