@@ -1,55 +1,46 @@
 #include "global.h"
-struct Vm {
-    u8 pad[0x1C];
-    const u8 *pc;
-};
+#include "ui/dialogue/text_state.h"
 u16 Text_DecodeGlyphEscape(const u8 *);
-int TextState_MeasureTextColumns(struct Vm *p)
+int TextState_MeasureTextColumns(struct TextState *state)
 {
-    const u8 *s = p->pc;
-    int n = 0;
+    const u8 *text = state->pc;
+    int columns = 0;
     u32 c;
-    goto test;
-loop:
-    c <<= 24;
-    if ((s32)c < 0)
-        goto wide;
-    c >>= 24;
-    if (c == '<') {
-        do {
-            s++;
-            c = *s;
-        } while (c != '>' && c && c != '\n');
-        goto next;
-    }
-    if (c == 0x1F) {
-        u32 code = (u16)Text_DecodeGlyphEscape(s);
-        if (code == 0xFFFF) {
-            n++;
-            goto next;
+
+    while ((c = *text)) {
+        c <<= 24;
+        if ((s32)c >= 0) {
+            c >>= 24;
+            if (c == '<') {
+                do {
+                    c = *++text;
+                } while (c != '>' && c && c != '\n');
+                text++;
+            } else if (c == 0x1F) {
+                u16 code = Text_DecodeGlyphEscape(text);
+
+                if (code == 0xFFFF) {
+                    columns++;
+                    text++;
+                } else if (code & 0xFF00) {
+                    columns += 2;
+                    text += 2;
+                } else {
+                    columns++;
+                    text += 2;
+                }
+            } else {
+                columns++;
+                text++;
+            }
+        } else {
+            columns += 2;
+            text += 2;
         }
-        if ((u16)(code & 0xFF00))
-            goto wide;
-        n++;
-        goto nextWide;
+        if (columns > 254) {
+            columns = 255;
+            break;
+        }
     }
-    n++;
-next:
-    s++;
-    goto limit;
-wide:
-    n += 2;
-nextWide:
-    s += 2;
-limit:
-    if (n > 254) {
-        n = 255;
-        goto done;
-    }
-test:
-    c = *s;
-    if (c)
-        goto loop;
-done:
-    return n;
+    return columns;
 }

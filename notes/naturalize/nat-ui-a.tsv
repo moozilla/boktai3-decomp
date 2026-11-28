@@ -286,3 +286,4 @@ src/ui/dialogue/text_interpreter/Text_CopyStringPair.c	Text_CopyStringPair	contr
 src/ui/dialogue/text_interpreter/Text_DecodeGlyphEscape.c	Text_DecodeGlyphEscape	minor	natural	1	
 src/ui/dialogue/text_interpreter/Text_FormatDecimal.c	Text_FormatDecimal	minor	natural	1	
 src/ui/dialogue/text_interpreter/Text_ParseDecimal.c	Text_ParseDecimal	contrived	natural	6	
+src/ui/dialogue/text_interpreter/TextState_MeasureTextColumns.c	TextState_MeasureTextColumns	contrived	minor	70	shift pair around the high-bit test (c <<= 24 / c >>= 24): a plain test compiles to a mask
