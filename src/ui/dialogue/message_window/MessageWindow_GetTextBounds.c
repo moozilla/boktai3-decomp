@@ -1,25 +1,14 @@
-#include "global.h"
-#include "engine/ram.h"
-struct Actor {
-    u8 pad[0x1A];
-    u8 rect[4];
-};
-int MessageWindow_GetTextBounds(int *out)
+#include "ui/dialogue/message_window.h"
+
+int MessageWindow_GetTextBounds(int *bounds)
 {
-    struct Actor *p = gMessageWindow;
-    int result;
-    if (!p)
-        goto fail;
-    {
-        out[0] = p->rect[0];
-        out[1] = p->rect[1];
-        out[2] = p->rect[2];
-        out[3] = p->rect[3];
-        result = 0;
-        goto done;
-    }
-fail:
-    result = -1;
-done:
-    return result;
+    struct MessageWindow *window = (void *)gMessageWindow;
+
+    if (!window)
+        return -1;
+    bounds[0] = window->state.left;
+    bounds[1] = window->state.top;
+    bounds[2] = window->state.width;
+    bounds[3] = window->state.height;
+    return 0;
 }
