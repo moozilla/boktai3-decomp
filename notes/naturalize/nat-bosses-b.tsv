@@ -336,3 +336,11 @@ src/bosses/vanargand/VanargandPair_AdvancePairState.c	VanargandPair_AdvancePairS
 src/bosses/vanargand/VanargandPair_AdvanceConditionalPairState.c	VanargandPair_AdvanceConditionalPairState	near-natural	near-natural	1	
 src/bosses/vanargand/Vanargand_UpdateModeEffect.c	Vanargand_UpdateModeEffect	natural	natural	0	
 src/bosses/vanargand/VanargandPair_SelectPairTransition.c	VanargandPair_SelectPairTransition	natural	natural	0	
+src/bosses/vanargand/VanargandPair_RequestPairReaction.c	VanargandPair_RequestPairReaction	near-natural	near-natural	0	two local shared by the flag test and the phase argument
+src/bosses/vanargand/VanargandPair_UpdateDelayedPairState.c	VanargandPair_UpdateDelayedPairState	natural	natural	0	
+src/bosses/vanargand/VanargandPair_UpdateActiveTransition.c	VanargandPair_UpdateActiveTransition	natural	natural	0	
+src/bosses/vanargand/Vanargand_UpdatePairEntry.c	Vanargand_UpdatePairEntry	near-natural	near-natural	1	second boss alias keeps a register copy
+src/bosses/vanargand/Vanargand_UpdateTimedMode4.c	Vanargand_UpdateTimedMode4	near-natural	near-natural	1	second boss alias keeps a register copy
+src/bosses/vanargand/Vanargand_UpdateTimedMode5.c	Vanargand_UpdateTimedMode5	near-natural	near-natural	1	second boss alias keeps a register copy
+src/bosses/vanargand/Vanargand_UpdateTimedMode6.c	Vanargand_UpdateTimedMode6	near-natural	near-natural	1	second boss alias keeps a register copy
+src/bosses/vanargand/Vanargand_UpdateModeCycle.c	Vanargand_UpdateModeCycle	near-natural	near-natural	1	second boss alias keeps a register copy
