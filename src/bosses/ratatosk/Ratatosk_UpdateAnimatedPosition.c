@@ -1,29 +1,5 @@
 #include "global.h"
-#include "bosses/ratatosk/proximity_position_layout.h"
-struct RatatoskSprite {
-    u8 pad0[12];
-    struct ProximityPosition position;
-    u8 pad14[0x34];
-};
-struct Ratatosk {
-    u8 pad0[0x48];
-    struct RatatoskSprite sprite;
-    s32 timer;
-    u8 pad94[0x16];
-    u8 flagAA;
-    u8 padAB[0x1d];
-    s32 targetDistanceSquared;
-    u8 targetAngle;
-    u8 padCD[0x43];
-    struct ProximityPosition *target;
-    u8 pad114[0x218];
-    s32 animationDelta;
-    u8 pad330[0x1c];
-    u8 animation[0x20];
-    struct ProximityPosition colliderPosition;
-    u8 pad374[0xadc];
-    s16 scale;
-};
+#include "bosses/ratatosk/ratatosk.h"
 s32 Math_Atan2(s32, s32);
 s32 Mod(s32, s32);
 void Ratatosk_OscillateScale(struct Ratatosk *);
@@ -38,28 +14,28 @@ void Ratatosk_UpdateSunOrbPlayerTransfer(struct Ratatosk *);
 void Ratatosk_UpdateAnimatedPosition(struct Ratatosk *p)
 {
     struct Ratatosk *actor = p;
-    struct RatatoskSprite *sprite = &p->sprite;
-    p->flagAA = 0;
+    struct SceneActorBody *body = &p->body;
+    p->actionAnimation = 0;
     Ratatosk_DispatchSceneCommands(p);
-    Obj_StepPosition(sprite);
-    if (Mod(p->timer, 30) == 0) {
+    Obj_StepPosition(body);
+    if (Mod(p->callbackFrame, 30) == 0) {
         ActorProximity_UpdateSquaredDistances(p);
         SceneDistance_UpdateLinkedDistances(p);
     }
-    if (Mod(p->timer, 30) == 15) {
+    if (Mod(p->callbackFrame, 30) == 15) {
         Ratatosk_UpdatePointDistancesToPlayer(p);
         SceneDistance_UpdateLinkedTargetDistances(p);
     }
     Ratatosk_UpdateSunOrbPlayerTransfer(actor);
-    SceneActors_UpdateAnimation(actor, actor->animation, (s32)&actor->animationDelta);
+    SceneActors_UpdateAnimation(actor, actor->animationData, (s32)actor->animation);
     Ratatosk_OscillateScale(actor);
-    actor->colliderPosition.x = sprite->position.x;
-    actor->colliderPosition.y = sprite->position.y + (actor->scale >> 4);
-    actor->colliderPosition.z = sprite->position.z;
-    if (actor->target) {
-        s32 dx = actor->target->x - sprite->position.x;
-        s32 dz = actor->target->z - sprite->position.z;
-        actor->targetAngle = Math_Atan2(dx, dz);
-        actor->targetDistanceSquared = dx * dx + dz * dz;
+    actor->anchor.x = body->position.x;
+    actor->anchor.y = body->position.y + (actor->distance >> 4);
+    actor->anchor.z = body->position.z;
+    if (actor->playerPosition) {
+        s32 dx = actor->playerPosition->x - body->position.x;
+        s32 dz = actor->playerPosition->z - body->position.z;
+        actor->requestedAngle = Math_Atan2(dx, dz);
+        actor->playerDistance = dx * dx + dz * dz;
     }
 }
