@@ -1,19 +1,18 @@
 #include "global.h"
+#include "objects/deck_cannons/deck_cannon_battery.h"
 
-void ExplosionEffect_Create(u8 *, u32, u32, u32, u32);
-void Callback_InvokeActor(u8 *, u32);
+void ExplosionEffect_Create(struct ContactPosition *, s32, u32, u32, u32);
 
-void DeckCannon_OnProjectileCollision(u8 *p, u32 unused, u8 *q)
+void DeckCannon_OnProjectileCollision(struct ContactCollider *collider,
+                                      struct ContactCollider *other, void *owner)
 {
-    u8 *c = p + 0xC;
-    u16 a2 = *(u16 *)(p + 0x3C);
-    u16 a3 = *(u16 *)(p + 0x40);
-    u32 w;
-    ExplosionEffect_Create(c, 1, a2, a3, 0);
-    *(u32 *)q = 0;
-    w = *(u32 *)(q + 4);
-    if (w) {
-        Callback_InvokeActor(q, w);
-        *(u32 *)(q + 4) = 0;
+    struct DeckCannonShot *shot = owner;
+
+    ExplosionEffect_Create(&collider->position, 1, collider->unknown3C, collider->responseParameter,
+                           0);
+    shot->update = 0;
+    if (shot->destroy) {
+        Callback_InvokeActor(shot, shot->destroy);
+        shot->destroy = 0;
     }
 }
