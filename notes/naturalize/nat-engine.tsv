@@ -655,3 +655,17 @@ src/system/save/ChoiceMenu_GetHighlightColor.c	ChoiceMenu_GetHighlightColor	cont
 src/system/save/Save_GetContinuationData.c	Save_GetContinuationData	minor	minor	1	offset 0x778 falls inside an unnamed range of the shared header
 src/system/save/Save_GetContinuationDataEnd.c	Save_GetContinuationDataEnd	minor	natural	1	
 src/system/save/Save_GetMainStateSize.c	Save_GetMainStateSize	minor	natural	1	
+src/system/save/DelayedScript_OnDestroy.c	DelayedScript_OnDestroy	natural	natural	0	
+src/system/save/Script_ScheduleOnceFromScript.c	Script_ScheduleOnceFromScript	natural	natural	0	
+src/system/save/Script_ScheduleRepeatingFromScript.c	Script_ScheduleRepeatingFromScript	natural	natural	0	
+src/system/save/Clock_WaitCycles.c	Clock_WaitCycles	natural	natural	0	
+src/system/save/Clock_BeginRtcAccess.c	Clock_BeginRtcAccess	natural	natural	0	
+src/system/save/Clock_EndRtcAccess.c	Clock_EndRtcAccess	natural	natural	0	
+src/system/save/Save_GetPrimaryRegionBlock.c	Save_GetPrimaryRegionBlock	natural	natural	0	
+src/system/save/Save_GetContinuationRegionBlock.c	Save_GetContinuationRegionBlock	natural	natural	0	
+src/system/save/Save_GetContinuationSnapshot.c	Save_GetContinuationSnapshot	natural	natural	0	
+src/system/save/Save_GetContinuationSize.c	Save_GetContinuationSize	natural	natural	0	
+src/system/save/Save_SnapshotContinuation.c	Save_SnapshotContinuation	natural	natural	0	
+src/system/save/Save_WriteHeader.c	Save_WriteHeader	natural	natural	0	
+src/system/save/Save_ReadHeader.c	Save_ReadHeader	natural	natural	0	
+src/system/save/Save_WriteMainState.c	Save_WriteMainState	minor	minor	2	block number narrowed by explicit 16-bit shifts: a cast or u16 local folds them away
