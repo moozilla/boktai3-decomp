@@ -160,3 +160,8 @@ src/ui/title/password.c	Password_ApplyDecoded	contrived	contrived	9	field pointe
 src/ui/title/password.c	Password_DecodeWordList	minor	minor	1	PASSWORD_REQUIRE kept: removing it would leave the macro single-use
 src/ui/title/options.c	Options_UpdateScreen	contrived	natural	1	-
 src/ui/title/options.c	Options_InitScreen	contrived	natural	1	-
+src/ui/title/options.c	Options_Destroy	natural	natural	0	-
+src/ui/title/options.c	Options_SetParametersFromScript	natural	natural	0	-
+src/ui/title/options.c	Options_GetSecondaryChoice	natural	natural	0	-
+src/ui/title/options.c	Options_Create	natural	natural	0	-
+src/ui/title/name_entry.c	TextEntry_DrawName	contrived	natural	3	-

@@ -42,20 +42,16 @@ void Menu_EraseRect(u32, u32, u32, u32);
 void TextEntry_DrawName(const void *src)
 {
     u8 text[32];
-    u8 *p;
     s32 i;
-    CpuSet(src, text, 0x04000008);
-    p = text;
-    i = 4;
-    do {
-        if (!p[0] && !p[1]) {
+    CpuCopy32(src, text, 0x20);
+    for (i = 0; i < 5; i++) {
+        if (!text[i * 2] && !text[i * 2 + 1]) {
             u8 *placeholder = Text_LookupString(
                 Script_ParseStringRef((*(const void **)gNamePlaceholderScript)) + 0x54);
-            p[0] = placeholder[0];
-            p[1] = placeholder[1];
+            text[i * 2] = placeholder[0];
+            text[i * 2 + 1] = placeholder[1];
         }
-        p += 2;
-    } while (--i >= 0);
+    }
     Menu_EraseRect(18, 1, 10, 2);
     Menu_DrawText(18, 1, text);
 }
@@ -760,16 +756,19 @@ s32 NameEntry_Initialize(struct NameEntryTask *screen)
     ResourceHeader_Relocate(screen->widgets[0].resource, res);
     if (screen->slot == 0)
         AnimSprite_InitLinked(&screen->widgets[0], screen->widgets[0].resource, 0x33, 0x10, 0, 0, 0,
-                          NULL);
+                              NULL);
     else
         AnimSprite_InitLinked(&screen->widgets[0], screen->widgets[0].resource, 0x3D, 0x10, 0, 0, 0,
-                          NULL);
+                              NULL);
     ResourceHeader_Relocate(screen->widgets[1].resource, res);
-    AnimSprite_InitLinked(&screen->widgets[1], screen->widgets[1].resource, 0x16, 0x10, 0, 0, 0, NULL);
+    AnimSprite_InitLinked(&screen->widgets[1], screen->widgets[1].resource, 0x16, 0x10, 0, 0, 0,
+                          NULL);
     ResourceHeader_Relocate(screen->widgets[3].resource, res);
-    AnimSprite_InitLinked(&screen->widgets[3], screen->widgets[3].resource, 0x18, 0x10, 0, 0, 0, NULL);
+    AnimSprite_InitLinked(&screen->widgets[3], screen->widgets[3].resource, 0x18, 0x10, 0, 0, 0,
+                          NULL);
     ResourceHeader_Relocate(screen->widgets[2].resource, res);
-    AnimSprite_InitLinked(&screen->widgets[2], screen->widgets[2].resource, 0x17, 0x10, 0, 0, 0, NULL);
+    AnimSprite_InitLinked(&screen->widgets[2], screen->widgets[2].resource, 0x17, 0x10, 0, 0, 0,
+                          NULL);
     screen->widgets[2].flags |= 1;
     screen->savedKeyPalette = screen->widgets[1].palette;
     CpuSet(screen->savedKeyPalette, screen->keyColors, 0x10);
@@ -781,9 +780,11 @@ s32 NameEntry_Initialize(struct NameEntryTask *screen)
     screen->widgets[2].paletteBank = 0xE001;
     res = ScriptProc_Start(0xCB05, 0x530D);
     ResourceHeader_Relocate(screen->widgets[4].resource, res);
-    AnimSprite_InitLinked(&screen->widgets[4], screen->widgets[4].resource, 0x8C, 0x10, 1, 0, 0, NULL);
+    AnimSprite_InitLinked(&screen->widgets[4], screen->widgets[4].resource, 0x8C, 0x10, 1, 0, 0,
+                          NULL);
     ResourceHeader_Relocate(screen->widgets[5].resource, res);
-    AnimSprite_InitLinked(&screen->widgets[5], screen->widgets[5].resource, 0x8D, 0x10, 0, 0, 0, NULL);
+    AnimSprite_InitLinked(&screen->widgets[5], screen->widgets[5].resource, 0x8D, 0x10, 0, 0, 0,
+                          NULL);
     screen->widgets[4].flags &= ~1;
     screen->widgets[5].flags |= 1;
     screen->savedCursorPalette = screen->widgets[5].palette;
