@@ -1,4 +1,5 @@
 #include "player/player.h"
+#include "player/cues/player_cue.h"
 #include "player/cutscene/player_cue_sequence.h"
 
 s32 Player_ConsumeStateEntry(struct Player *);
@@ -9,6 +10,5 @@ void sub_081481E4(struct Player *p)
     p->statusFlags &= ~1;
     Anim_SetSequence(&p->cueCollider.sequence, p->cueCollider.setupResource, 0, p->heading,
                      p->side);
-    PlayerCue_StepSequence((struct ContactSwarmSprite *)&p->secondaryDrawFlags,
-                           &p->cueCollider.sequence);
+    PlayerCue_StepSequence(&PlayerCue_Graphics(p)->sprite, &p->cueCollider.sequence);
 }

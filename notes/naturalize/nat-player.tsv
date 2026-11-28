@@ -651,3 +651,5 @@ src/player/motions/Player_UpdateAlternateFormCue.c	Player_UpdateAlternateFormCue
 src/player/motions/Player_OnMotion10Exit.c	Player_OnMotion10Exit	contrived	natural	1	-
 src/player/motions/Player_UpdateFormChangeCue.c	Player_UpdateFormChangeCue	contrived	minor	4	TestModeFlags inline: the mask is loaded before the flag word
 src/player/motions/Player_UpdateSpiralRelease.c	Player_UpdateSpiralRelease	natural	natural	1	-
+src/player/motions/Player_UpdateSpiralAfterglow.c	Player_UpdateSpiralAfterglow	natural	natural	0	-
+src/player/motions/sub_081481E4.c	sub_081481E4	minor	natural	1	-
