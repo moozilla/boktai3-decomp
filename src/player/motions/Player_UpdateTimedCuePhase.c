@@ -1,4 +1,3 @@
-#define Player_CallActionScript Player_CallEventScript
 #include "global.h"
 #include "player/player.h"
 void Sound_PlaySong(u32);

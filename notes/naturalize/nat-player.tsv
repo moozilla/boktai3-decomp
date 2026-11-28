@@ -641,3 +641,4 @@ src/player/motions/Player_UpdateDefeatSlide.c	Player_UpdateDefeatSlide	natural	n
 src/player/motions/Player_UpdateDefeatRecoil.c	Player_UpdateDefeatRecoil	natural	natural	0	-
 src/player/motions/Player_UpdateDeathSequence.c	Player_UpdateDeathSequence	natural	natural	0	-
 src/player/motions/Player_UpdateTimedScreenTransition.c	Player_UpdateTimedScreenTransition	contrived	natural	1	-
+src/player/motions/Player_UpdateTimedCuePhase.c	Player_UpdateTimedCuePhase	minor	natural	1	-
