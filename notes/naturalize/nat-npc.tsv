@@ -566,3 +566,80 @@ src/script/script_virtual_machine.c	Script_BackupVariableOperand	contrived	minor
 src/script/script_virtual_machine.c	Script_ReadBackupVariableOperand	contrived	minor	10	reference index read as *(u16 *)(bytes + 6): ref.index moves the stack load relative to index = 0
 src/script/script_virtual_machine.c	Script_EvalExpression	contrived	natural	8	a copy of the slot pointer and the opcode category local around the assignment
 src/script/script_virtual_machine.c	Script_LoadScript	contrived	minor	14	(u32) cast on the block base: pointer-typed sums swap the add operands
+src/script/script_virtual_machine.c	ScriptProc_Start	minor	minor	3	u16 saved_context and the u32 third copy feed Script_LookupResource; direct arguments change one register (3 compiles)
+src/script/script_virtual_machine.c	Script_ExecuteBlock	minor	minor	3	goto stop/done around the shared RestoreArgumentStack exit: early return and break forms move branches
+src/script/script_virtual_machine.c	Script_SelectConditionalBlock	contrived	contrived	1	two goto labels re-enter the condition chain; nested for loops add branches
+src/script/script_virtual_machine.c	sub_0821AAF4	contrived	contrived	2	pc pointer and store of the zero type: plain gScriptVm.pc = 0 reloads the address after the loop
+src/script/script_virtual_machine.c	Script_ConvertTextToShiftJis	minor	minor	1	src/dest copies of the parameters keep their registers
+src/script/script_virtual_machine.c	Script_ReadTypedVariable	minor	minor	2	one-element array view struct: ((s16 *)p)[index] swaps the add operands
+src/script/script_virtual_machine.c	Script_WriteTypedVariable	minor	minor	2	array view structs and q pointer: plain casts change operand order and registers
+src/script/script_virtual_machine.c	Script_FindResourceKey	natural	natural	0	
+src/script/script_virtual_machine.c	Script_LookupResource	natural	natural	0	
+src/script/script_virtual_machine.c	Script_DecodePacket	natural	natural	0	
+src/script/script_virtual_machine.c	Script_DecodeCommandOffset	natural	natural	0	
+src/script/script_virtual_machine.c	Script_DecodeOperand	natural	natural	0	
+src/script/script_virtual_machine.c	Script_ResetArgumentStack	natural	natural	0	
+src/script/script_virtual_machine.c	Script_PushArgumentFrame	natural	natural	0	
+src/script/script_virtual_machine.c	Script_RestoreArgumentStack	natural	natural	0	
+src/script/script_virtual_machine.c	Script_GetCallArgument	natural	natural	0	
+src/script/script_virtual_machine.c	Script_ResetKeywordStack	natural	natural	0	
+src/script/script_virtual_machine.c	Script_PushCtrlNextKeyword	natural	natural	0	
+src/script/script_virtual_machine.c	Script_PopCtrlNextKeyword	natural	natural	0	
+src/script/script_virtual_machine.c	Script_SetPc	natural	natural	0	
+src/script/script_virtual_machine.c	Script_SeekToKeyword	natural	natural	0	
+src/script/script_virtual_machine.c	Script_ReadNextKeyword	natural	natural	0	
+src/script/script_virtual_machine.c	Script_ReadValue	natural	natural	0	
+src/script/script_virtual_machine.c	Script_ReadValueSafe	natural	natural	0	
+src/script/script_virtual_machine.c	Script_ReadString	natural	natural	0	
+src/script/script_virtual_machine.c	Script_ParseStringRef	natural	natural	0	
+src/script/script_virtual_machine.c	Script_ReadReference	natural	natural	0	
+src/script/script_virtual_machine.c	Script_GetPc	natural	natural	0	
+src/script/script_virtual_machine.c	Script_GetValue	natural	natural	0	
+src/script/script_virtual_machine.c	Script_GetVector32	natural	natural	0	
+src/script/script_virtual_machine.c	Script_GetVector	natural	natural	0	
+src/script/script_virtual_machine.c	sub_0821AB78	natural	natural	0	
+src/script/script_virtual_machine.c	Script_GetValueSafe	natural	natural	0	
+src/script/script_virtual_machine.c	Script_GetStringRef	natural	natural	0	
+src/script/script_virtual_machine.c	Script_GetKeywordValue	natural	natural	0	
+src/script/script_virtual_machine.c	Script_ResetStacks	natural	natural	0	
+src/script/script_virtual_machine.c	Script_ClearCommandTables	natural	natural	0	
+src/script/script_virtual_machine.c	Script_RegisterCommandTable	natural	natural	0	
+src/script/script_virtual_machine.c	sub_0821ABF8	natural	natural	0	
+src/script/script_virtual_machine.c	Script_FindCommand	natural	natural	0	
+src/script/script_virtual_machine.c	Script_ExecuteNativeCommand	natural	natural	0	
+src/script/script_virtual_machine.c	Script_GetProcedure	natural	natural	0	
+src/script/script_virtual_machine.c	Script_Call	natural	natural	0	
+src/script/script_virtual_machine.c	Script_CallInlineProcedure	natural	natural	0	
+src/script/script_virtual_machine.c	Script_GetSectionThreeData	natural	natural	0	
+src/script/script_virtual_machine.c	Script_SaveContext	minor	minor	0	block struct casts copy the context tables (arrays cannot be assigned)
+src/script/script_virtual_machine.c	Script_RestoreContext	minor	minor	0	block struct casts copy the context tables (arrays cannot be assigned)
+src/script/script_virtual_machine.c	Script_RunBlock	natural	natural	0	
+src/script/script_virtual_machine.c	Script_RunProcedureBlock	natural	natural	0	
+src/script/script_virtual_machine.c	Script_RunMainBlock	natural	natural	0	
+src/script/script_virtual_machine.c	Script_DiscardValueIfZero	natural	natural	0	
+src/script/script_virtual_machine.c	Script_SetEntryProcedure	natural	natural	0	
+src/script/script_virtual_machine.c	Script_InitRuntime	natural	natural	0	
+src/script/script_virtual_machine.c	Script_ResetLocalVariables	natural	natural	0	
+src/script/script_virtual_machine.c	GameState_SelectRamBase	natural	natural	0	
+src/script/script_virtual_machine.c	GameState_ClearActiveRegions	natural	natural	0	
+src/script/script_virtual_machine.c	GameState_ResetActiveRegions	natural	natural	0	
+src/script/script_virtual_machine.c	GameState_BackupActiveRegions	natural	natural	0	
+src/script/script_virtual_machine.c	GameState_RestoreActiveRegions	natural	natural	0	
+src/script/script_virtual_machine.c	GameState_BackupRegionRange	natural	natural	0	
+src/script/script_virtual_machine.c	GameState_GetBackupRegionPointer	natural	natural	0	
+src/script/script_virtual_machine.c	Script_ClearLocalVariables	natural	natural	0	
+src/script/script_virtual_machine.c	Script_DecodeVariableValue	natural	natural	0	
+src/script/script_virtual_machine.c	Script_AssignVariableOperand	natural	natural	0	
+src/script/script_virtual_machine.c	Script_DecodeVariableReference	natural	natural	0	
+src/script/script_virtual_machine.c	Script_WriteReferenceValue	natural	natural	0	
+src/script/script_virtual_machine.c	Script_ReadReferenceValue	natural	natural	0	
+src/script/script_virtual_machine.c	GameState_GetBackupStateBase	natural	natural	0	
+src/script/script_virtual_machine.c	GameState_GetBackupVariableBase	natural	natural	0	
+src/script/script_virtual_machine.c	Script_ExecuteIf	natural	natural	0	
+src/script/script_virtual_machine.c	Script_ExecuteSwitch	natural	natural	0	
+src/script/script_virtual_machine.c	Script_SetResultFromOperand	natural	natural	0	
+src/script/script_virtual_machine.c	Script_ExecuteReturn	natural	natural	0	
+src/script/script_virtual_machine.c	Script_ExecutePrint	natural	natural	0	
+src/script/script_virtual_machine.c	Script_CallFromOperands	natural	natural	0	
+src/script/script_virtual_machine.c	Script_RegisterBuiltinCommands	natural	natural	0	
+src/script/script_virtual_machine.c	Script_ApplyOperator	natural	natural	0	
