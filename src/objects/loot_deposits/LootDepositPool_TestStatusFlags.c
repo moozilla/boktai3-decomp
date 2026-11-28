@@ -1,8 +1,11 @@
 #include "global.h"
+#include "engine/engine.h"
+#include "engine/ram.h"
+#include "objects/loot_deposits/callback_pool.h"
 
-s32 LootDepositPool_TestStatusFlags(u8 *p, u32 mask)
+u8 LootDepositPool_TestStatusFlags(struct CallbackPoolEntry *entry, u32 mask)
 {
-    if (*(u16 *)(p + 0x156) & mask)
+    if (entry->statusFlags & mask)
         return 1;
     return 0;
 }
