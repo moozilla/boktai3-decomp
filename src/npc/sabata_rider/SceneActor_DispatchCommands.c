@@ -47,19 +47,18 @@ s32 SceneActor_DispatchCommands(struct RegistryActor *p)
     struct SceneEventReceiver *queue;
     s32 i;
     struct RegistryActorCommand *cmd;
+    struct ContactPosition *screen;
 
     if (!RegistryActor_TestMotionFlags(REGISTRY_ACTOR_MOTION_COMMANDS, m))
         return 0;
     p->control.attachmentOffsetX = 8;
     p->control.attachmentOffsetY = -16;
     SetAttachmentFlags((struct RegistryActorAttachment *)&p->control.owner, 4);
-    {
-        struct ContactPosition *v = (void *)&p->control.attachmentScreenX;
-        v->x = (self->stats.position.x >> 12) - gSceneCamera->x;
-        v->y =
-            ((self->stats.position.z + (self->stats.position.y + self->stats.height)) >> 12) + 90;
-        v->z = self->stats.position.z >> 12;
-    }
+    screen = (void *)&p->control.attachmentScreenX;
+    screen->x = (self->stats.position.x >> 12) - gSceneCamera->x;
+    screen->y =
+        ((self->stats.position.z + (self->stats.position.y + self->stats.height)) >> 12) + 90;
+    screen->z = self->stats.position.z >> 12;
     queue = (void *)p->control.messages;
     i = 0;
     if (i < queue->count[gSceneEventDispatchState->phase])
