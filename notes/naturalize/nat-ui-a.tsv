@@ -298,3 +298,4 @@ src/ui/dialogue/text_interpreter/TextState_ParseTagValue.c	TextState_ParseTagVal
 src/ui/dialogue/text_interpreter/TextState_ProcessTag.c	TextState_ProcessTag	contrived	minor	60	name copied through an int that is then zeroed before the last compare; speaker stored through an s8 pointer; delay temp; tag reassigned before return
 src/ui/dialogue/text_interpreter/TextState_StepPlayback.c	TextState_StepPlayback	contrived	natural	1	
 src/ui/dialogue/text_interpreter/TextState_GetActiveStream.c	TextState_GetActiveStream	contrived	natural	1	
+src/ui/dialogue/text_interpreter/TextState_SetBounds.c	TextState_SetBounds	minor	natural	1	

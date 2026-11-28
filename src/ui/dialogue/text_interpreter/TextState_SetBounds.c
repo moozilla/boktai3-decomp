@@ -1,11 +1,13 @@
-#include "global.h"
+#include "ui/dialogue/message_window.h"
 
-void TextState_SetBounds(u8 *p, u32 a, u32 b, u32 c, u32 d)
+void TextState_SetBounds(void *playback, u32 left, u32 top, u32 width, u32 height)
 {
-    p[2] = a;
-    p[3] = b;
-    p[4] = c;
-    p[5] = d;
-    p[0] = a;
-    p[1] = b;
+    struct MessagePlaybackState *state = playback;
+
+    state->left = left;
+    state->top = top;
+    state->width = width;
+    state->height = height;
+    state->x = left;
+    state->y = top;
 }
