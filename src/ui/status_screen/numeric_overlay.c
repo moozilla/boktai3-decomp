@@ -98,7 +98,6 @@ s32 sub_0800F6F8(struct NumericOverlay *p, u16 id)
     u8 *map;
     u8 *palette;
     u16 *tiles;
-    u16 *buffer;
     int row;
     gNumericOverlay = p;
     p->id = id;
@@ -121,10 +120,8 @@ s32 sub_0800F6F8(struct NumericOverlay *p, u16 id)
     }
     BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0);
     tiles = NumericOverlay_GetTileMapPtr(0, 0, 0);
-    row = 0;
-    for (; row < 15; row++) {
-        int col;
-        col = 0;
+    for (row = 0; row < 15; row++) {
+        int col = 0;
         if (col < gBgRecords[0].width * 2) {
             do {
                 *tiles++ = 0xD000;
@@ -133,9 +130,8 @@ s32 sub_0800F6F8(struct NumericOverlay *p, u16 id)
         }
     }
 
-    buffer = p->buffer;
     p->source = (u16 *)(palette + 0x1B4);
-    CpuSet(p->source, buffer, 0x04000018);
+    CpuCopy32(p->source, p->buffer, 0x60);
     return 0;
 }
 
