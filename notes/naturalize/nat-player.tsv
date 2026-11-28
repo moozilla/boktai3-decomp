@@ -334,3 +334,5 @@ src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateSideArrival	minor	minor
 src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateSideFade	minor	natural	1	-
 src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateSideRecoil	minor	natural	1	-
 src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateSpiralRecovery	minor	natural	1	-
+src/player/cutscene/player_cue_actions.c	PlayerCue_RestartAlternateAnimation	natural	natural	0	-
+src/player/cutscene/player_cue_actions.c	PlayerCue_UpdateAlternateFade	minor	natural	1	-
