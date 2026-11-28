@@ -73,8 +73,7 @@ void Armor_UpdatePartColliders(struct Obj *);
 void Armor_UpdatePart(struct Obj *p)
 {
     s32 mask = 16;
-    u8 flags = p->flags119;
-    if (!(flags & mask)) {
+    if (!(p->flags119 & mask)) {
         if (p->countdown)
             p->countdown--;
         gUnk_0824F158[p->state](p);
