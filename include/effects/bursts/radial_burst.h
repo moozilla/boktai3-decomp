@@ -38,6 +38,13 @@ struct RadialBurstFade {
     struct RadialBurst *owner;
 };
 
+struct RadialBurstEmitter {
+    u8 nextParticle, emitDelay, particlesActive;
+    u8 unk_03;
+    const struct SpriteEffectTileResource *graphics;
+    struct RadialBurstParticle particles[12];
+};
+
 struct RadialBurst {
     struct Task task;
     u8 kind, started;
@@ -45,10 +52,7 @@ struct RadialBurst {
     struct Player *player;
     u8 unk_20[0xA0];
     struct RadialBurstFade fade;
-    u8 nextParticle, emitDelay, particlesActive;
-    u8 unk_13B;
-    const struct SpriteEffectTileResource *graphics;
-    struct RadialBurstParticle particles[12];
+    struct RadialBurstEmitter emitter;
 };
 
 extern const s16 gUnk_086149C4[];
