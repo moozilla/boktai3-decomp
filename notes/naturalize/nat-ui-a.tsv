@@ -244,3 +244,4 @@ src/ui/dialogue/message_window/message_window.c	MessageWindow_SetChoicesFromScri
 src/ui/dialogue/message_window/message_window.c	MessageWindow_SetAutoAdvanceFromScript	natural	natural	1	
 src/ui/dialogue/message_window/message_window.c	MessageWindow_SetPalette	minor	natural	1	
 src/ui/dialogue/message_window/message_window.c	MessageWindow_OpenFromScript	minor	natural	1	
+src/ui/dialogue/message_window/message_window.c	MessageWindow_SetPageAdvanceDelay	minor	natural	5	

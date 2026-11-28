@@ -439,14 +439,12 @@ int MessageWindow_OpenFromScript(void)
 int MessageWindow_SetPageAdvanceDelay(u32 delay)
 {
     struct MessageWindow *window = (void *)gMessageWindow;
-    int result;
-    if (window) {
-        window->pageAdvanceDelay = delay;
-        window->pageAdvanceTimer = 0;
-        result = 0;
-    } else
-        result = -1;
-    return result;
+
+    if (!window)
+        return -1;
+    window->pageAdvanceDelay = delay;
+    window->pageAdvanceTimer = 0;
+    return 0;
 }
 
 u32 MessageWindow_SetPageAdvanceDelayFromScript(void)
