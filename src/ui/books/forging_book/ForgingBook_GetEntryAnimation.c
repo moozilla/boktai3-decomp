@@ -1,5 +1,7 @@
 #include "global.h"
-u8 *ForgingBook_GetEntryAnimation(u8 *p)
+#include "ui/books/forging_book.h"
+
+u32 ForgingBook_GetEntryAnimation(u32 entry)
 {
-    return p + 0xf0;
+    return entry + 0xf0;
 }

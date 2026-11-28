@@ -105,3 +105,4 @@ src/ui/books/collection/CollectionMenu_FinalizeState.c	CollectionMenu_FinalizeSt
 src/ui/books/collection/CollectionMenu_OnTaskDestroy.c	CollectionMenu_OnTaskDestroy	minor	minor	0	u32 parameter passed through
 src/ui/books/collection/CollectionMenu_Create.c	CollectionMenu_Create	natural	natural	0	
 src/ui/books/forging_book/ForgingBook_GetCategoryEntryCount.c	ForgingBook_GetCategoryEntryCount	natural	natural	1	
+src/ui/books/forging_book/ForgingBook_GetEntryAnimation.c	ForgingBook_GetEntryAnimation	contrived	natural	1	
