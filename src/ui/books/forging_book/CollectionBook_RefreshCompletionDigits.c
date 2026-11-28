@@ -1,15 +1,17 @@
 #include "global.h"
-s32 CollectionBook_CountCollectedEntries(void *);
+#include "ui/books/collection_book.h"
 s32 Div(s32, s32);
 s32 Mod(s32, s32);
-void Anim_LoadKeyframe(void *, void *, u16, u32);
-s32 CollectionBook_RefreshCompletionDigits(u8 *p)
+
+s32 CollectionBook_RefreshCompletionDigits(struct CollectionBook *book)
 {
-    s32 v = CollectionBook_CountCollectedEntries(p), a = Div(v, 10), b = Mod(v, 10),
-        c = Div(10, 10), d = Mod(10, 10);
-    Anim_LoadKeyframe(p + 0x1e4, p + 0x24, a, 0);
-    Anim_LoadKeyframe(p + 0x244, p + 0x24, b, 0);
-    Anim_LoadKeyframe(p + 0x2a4, p + 0x24, c, 0);
-    Anim_LoadKeyframe(p + 0x304, p + 0x24, d, 0);
+    s32 collected = CollectionBook_CountCollectedEntries();
+    s32 collectedTens = Div(collected, 10), collectedOnes = Mod(collected, 10);
+    s32 totalTens = Div(10, 10), totalOnes = Mod(10, 10);
+
+    Anim_LoadKeyframe(&book->countDigits[0], &book->resource, (u16)collectedTens, 0);
+    Anim_LoadKeyframe(&book->countDigits[1], &book->resource, (u16)collectedOnes, 0);
+    Anim_LoadKeyframe(&book->countDigits[2], &book->resource, (u16)totalTens, 0);
+    Anim_LoadKeyframe(&book->countDigits[3], &book->resource, (u16)totalOnes, 0);
     return 0;
 }
