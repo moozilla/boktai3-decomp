@@ -70,9 +70,8 @@ s32 Math_Atan2(s32, s32);
 
 void Armor_UpdateRandomFlankAction42(struct ArmorActor *p)
 {
-    u8 *q = &p->phase;
     u8 r;
-    switch (*q) {
+    switch (p->phase) {
         case 0: {
             struct ArmorTarget *g = gGameState;
             s32 a = Math_Atan2(g->x - p->x, g->y - p->y);
@@ -95,7 +94,7 @@ void Armor_UpdateRandomFlankAction42(struct ArmorActor *p)
         case 1:
             r = p->actionStatus;
             if (r == 0xff) {
-                *q = r;
+                p->phase = r;
             }
             break;
     }

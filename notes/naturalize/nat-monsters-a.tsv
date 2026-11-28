@@ -157,3 +157,4 @@ src/monsters/armor/actor_controller_requests.c	ActorController_SetBehaviorIfFini
 src/monsters/armor/actor_controller_requests.c	ActorController_UpdateTargetMovement	contrived	natural	1	
 src/monsters/armor/armor_actions.c	Armor_UpdateScriptedAttack	contrived	natural	1	
 src/monsters/armor/armor_actions.c	Armor_UpdateDelayedAction12	contrived	natural	1	
+src/monsters/armor/armor_behavior.c	Armor_UpdateRandomFlankAction42	contrived	minor	4	
