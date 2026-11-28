@@ -184,3 +184,4 @@ src/npc/story_character/Actor_UpdateAcceleratingBlink.c	Actor_UpdateAccelerating
 src/npc/story_character/Actor_UpdateKindNineteenEntryFour.c	Actor_UpdateKindNineteenEntryFour	minor	natural	1	
 src/npc/story_character/Actor_UpdateKindNineteenEntrySix.c	Actor_UpdateKindNineteenEntrySix	minor	natural	1	
 src/npc/story_character/Actor_UpdateKindNineteenEntrySeven.c	Actor_UpdateKindNineteenEntrySeven	minor	natural	1	
+src/npc/story_character/Actor_UpdateKindTwentyPairEntryFour.c	Actor_UpdateKindTwentyPairEntryFour	minor	natural	1	
