@@ -1,10 +1,12 @@
 #include "global.h"
 #include "engine/ram.h"
+#include "player/effects/player_attack_particles.h"
 
-void PlayerAttackEffect_SetDefaultPaletteSource(u32 v)
+void PlayerAttackEffect_SetDefaultPaletteSource(u32 palette)
 {
-    if (gPlayerAttackEffect != 0) {
-        if (*(u32 *)(gPlayerAttackEffect + 0x5A0) == 0)
-            *(u32 *)(gPlayerAttackEffect + 0x24) = v;
+    struct AttackParticleEffect *effect = (struct AttackParticleEffect *)gPlayerAttackEffect;
+    if (effect != NULL) {
+        if (effect->element == 0)
+            effect->graphics[0].palette = (void *)palette;
     }
 }

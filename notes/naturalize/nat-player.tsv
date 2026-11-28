@@ -509,3 +509,4 @@ src/player/effects/action_flash/sub_08236790.c	sub_08236790	contrived	natural	2	
 src/player/effects/action_flash/OrbitEffect_Initialize.c	OrbitEffect_Initialize	minor	minor	2	unchanged: one constant local and second sprite pointer fix register allocation
 src/player/effects/attack/PlayerEffect_SetPaletteSource.c	PlayerEffect_SetPaletteSource	contrived	natural	1	-
 src/player/effects/attack/PlayerAttackEffect_SetEmissionState.c	PlayerAttackEffect_SetEmissionState	contrived	minor	2	repeated singleton cast (a local effect pointer changes the reload)
+src/player/effects/attack/PlayerAttackEffect_SetDefaultPaletteSource.c	PlayerAttackEffect_SetDefaultPaletteSource	contrived	natural	2	-
