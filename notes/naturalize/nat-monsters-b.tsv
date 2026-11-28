@@ -172,3 +172,4 @@ src/monsters/ooze/Ooze_UpdateIdle.c	Ooze_UpdateIdle	natural	natural	0
 src/monsters/ooze/Ooze_Destroy.c	Ooze_Destroy	minor	minor	0	raw +0x20: s32 tail return needs Sprite_Remove declared s32, conflicts with the void prototype behind monsters/ooze.h
 src/monsters/ooze/SceneTask_DispatchUnlessPaused.c	SceneTask_DispatchUnlessPaused	natural	natural	0	
 src/monsters/poison_hand/PoisonHand_Update.c	PoisonHand_Update	contrived	minor	40	u16 amount copy of damage; dataOwner reused for the random bank and the final age++ (any plain form changes allocation across the particle loop)
+src/monsters/poison_hand/PoisonHand_InitializeFromScript.c	PoisonHand_InitializeFromScript	minor	natural	5	

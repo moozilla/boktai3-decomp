@@ -2,119 +2,112 @@
 #include "player/cutscene/player_cue_sequence.h"
 #include "engine/math/scene_vec.h"
 #include "engine/engine_globals.h"
+#include "scene/terrain/terrain_cell_probe.h"
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 void Sprite_Init(void *, void *, s32);
 void AnimData_SelectPaletteBank(void *, s32);
-void PoisonHand_InitCollider(void *);
+void PoisonHand_InitCollider(struct PoisonHand *);
 u32 PoisonHand_WaitForPlayerApproach(u8 *);
 void PoisonHand_UpdateDefeatBurst(void);
 void TerrainModifiers_RegisterCell(void *, s32, s32, s32, s32, s32);
 void SceneBody_Init(void *, void *, void *, u32, u32, void *);
 void SceneBody_SetSprite(void *, void *);
 void TerrainOverlay_QueueAddActor(void *);
-static inline s32 PoisonHand_CellIndex(struct ContactPosition *v)
-{
-    s32 x = (s16)v->x >> 8, z = (s16)v->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        return 0;
-    return gTerrainMap->rows[z] + x;
-}
-s32 PoisonHand_InitializeFromScript(struct PoisonHand *p, void *parent)
+s32 PoisonHand_InitializeFromScript(struct PoisonHand *hand, void *parent)
 {
     void *resource;
     if (Script_SeekToKeyword('p')) {
-        p->initialPosition.x = Script_GetValue();
-        p->initialPosition.y = Script_GetValue();
-        p->initialPosition.z = Script_GetValue();
+        hand->initialPosition.x = Script_GetValue();
+        hand->initialPosition.y = Script_GetValue();
+        hand->initialPosition.z = Script_GetValue();
     }
     if (Script_SeekToKeyword('r')) {
         s32 r = Script_GetValue();
-        p->attackDistanceSquared = r * r;
+        hand->attackDistanceSquared = r * r;
     } else
-        p->attackDistanceSquared = 0x40000;
+        hand->attackDistanceSquared = 0x40000;
     if (Script_SeekToKeyword('a')) {
-        p->effectX = Script_GetValue();
-        p->effectY = Script_GetValue();
-        p->effectZ = Script_GetValue();
+        hand->effectX = Script_GetValue();
+        hand->effectY = Script_GetValue();
+        hand->effectZ = Script_GetValue();
     } else {
-        p->effectX = 0;
-        p->effectY = 0;
-        p->effectZ = 30;
+        hand->effectX = 0;
+        hand->effectY = 0;
+        hand->effectZ = 30;
     }
     if (Script_SeekToKeyword('s'))
-        p->spread = Script_GetValue();
+        hand->spread = Script_GetValue();
     else
-        p->spread = 2;
+        hand->spread = 2;
     if (Script_SeekToKeyword('d'))
-        p->registerTerrain = Script_GetValue();
+        hand->registerTerrain = Script_GetValue();
     if (Script_SeekToKeyword('l')) {
         s32 health = Script_GetValue();
-        p->maxHealth = health;
-        p->health = health;
+        hand->maxHealth = health;
+        hand->health = health;
         if ((s16)health < 0)
-            p->initialDead = 1;
+            hand->initialDead = 1;
     } else {
-        p->maxHealth = 120;
-        p->health = 120;
+        hand->maxHealth = 120;
+        hand->health = 120;
     }
     if (Script_SeekToKeyword('S'))
-        p->showTerrainBody = Script_GetValue();
+        hand->showTerrainBody = Script_GetValue();
     if (Script_SeekToKeyword('z')) {
-        p->bodyReactionFlags = Script_GetValue();
-        p->sparkMask = Script_GetValue();
+        hand->bodyReactionFlags = Script_GetValue();
+        hand->sparkMask = Script_GetValue();
     }
     if (Script_SeekToKeyword('g'))
-        p->hudState = Script_GetValue();
+        hand->hudState = Script_GetValue();
     else
-        p->hudState = 2;
+        hand->hudState = 2;
     if (Script_SeekToKeyword('D'))
-        p->unknown164 = Script_GetValue();
+        hand->unknown164 = Script_GetValue();
     if (Script_SeekToKeyword('G')) {
-        p->unknown158 = Script_GetValue();
-        p->unknown15C = Script_GetValue();
-        p->unknown160 = Script_GetValue();
+        hand->unknown158 = Script_GetValue();
+        hand->unknown15C = Script_GetValue();
+        hand->unknown160 = Script_GetValue();
     }
     if (Script_SeekToKeyword('X')) {
-        p->unknown148 = Script_GetValue();
-        p->unknown14A = Script_GetValue();
+        hand->unknown148 = Script_GetValue();
+        hand->unknown14A = Script_GetValue();
     }
     if (Script_SeekToKeyword('V')) {
-        p->hudTimer = Script_GetValue();
-        if (p->hudTimer > 99)
-            p->hudTimer = 99;
-        if (p->hudTimer <= 0)
-            p->hudTimer = 1;
+        hand->hudTimer = Script_GetValue();
+        if (hand->hudTimer > 99)
+            hand->hudTimer = 99;
+        if (hand->hudTimer <= 0)
+            hand->hudTimer = 1;
     } else
-        p->hudTimer = 0;
-    p->hud = parent;
-    AnimData_Load(&p->graphics, 0x7e7d);
-    Sprite_Init(&p->sprite, &p->graphics, 1);
-    *(struct SceneVec *)&p->sprite.position = p->initialPosition;
-    AnimData_SelectPaletteBank(&p->graphics, 0x1c5);
+        hand->hudTimer = 0;
+    hand->hud = parent;
+    AnimData_Load(&hand->graphics, 0x7e7d);
+    Sprite_Init(&hand->sprite, &hand->graphics, 1);
+    *(struct SceneVec *)&hand->sprite.position = hand->initialPosition;
+    AnimData_SelectPaletteBank(&hand->graphics, 0x1c5);
     resource = ScriptProc_Start(0x922e, 0x5184);
-    p->animationResource = resource;
-    if (!p->initialDead) {
-        p->update = (void (*)(void))PoisonHand_WaitForPlayerApproach;
-        Anim_SetSequence(&p->sequence, resource, 0x17, 0, 0);
+    hand->animationResource = resource;
+    if (!hand->initialDead) {
+        hand->update = (void (*)(void))PoisonHand_WaitForPlayerApproach;
+        Anim_SetSequence(&hand->sequence, resource, 0x17, 0, 0);
     } else {
-        p->update = PoisonHand_UpdateDefeatBurst;
-        p->defeated = 1;
-        Anim_SetSequence(&p->sequence, p->animationResource, 0x19, 0, 0);
+        hand->update = PoisonHand_UpdateDefeatBurst;
+        hand->defeated = 1;
+        Anim_SetSequence(&hand->sequence, hand->animationResource, 0x19, 0, 0);
     }
-    PlayerCue_StepSequence((struct ContactSwarmSprite *)(&p->sprite),
-                           (struct DisplaySequenceState *)(&p->sequence));
-    if (!p->initialDead)
-        PoisonHand_InitCollider(p);
-    if (p->registerTerrain && !p->initialDead) {
-        s32 cell = PoisonHand_CellIndex(&p->sprite.position);
-        TerrainModifiers_RegisterCell(p->terrainRegistration, cell, 0, p->sprite.position.y >> 8, 0, 1);
+    PlayerCue_StepSequence(&hand->sprite, &hand->sequence);
+    if (!hand->initialDead)
+        PoisonHand_InitCollider(hand);
+    if (hand->registerTerrain && !hand->initialDead) {
+        TerrainModifiers_RegisterCell(hand->terrainRegistration,
+                                      cellIndexAt((struct Pos16 *)&hand->sprite.position), 0,
+                                      hand->sprite.position.y >> 8, 0, 1);
     }
-    if (p->showTerrainBody) {
-        u8 *body = p->terrainBody;
-        SceneBody_Init(body, p->hud, &p->sprite.position, 0, 4, p);
-        SceneBody_SetSprite(body, &p->sprite);
-        TerrainOverlay_QueueAddActor(body);
+    if (hand->showTerrainBody) {
+        SceneBody_Init(hand->terrainBody, hand->hud, &hand->sprite.position, 0, 4, hand);
+        SceneBody_SetSprite(hand->terrainBody, &hand->sprite);
+        TerrainOverlay_QueueAddActor(hand->terrainBody);
     }
 #ifdef UBFIX
     // falls off the end with r0 left over from its last statement; the creator only tests
