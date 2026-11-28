@@ -178,3 +178,4 @@ src/link/player/LinkPlayer_GetSessionPlayerData.c	LinkPlayer_GetSessionPlayerDat
 src/link/player/Player_GetActionIndex.c	Player_GetActionIndex	contrived	natural	2	
 src/link/player/LinkPlayer_InitAbilityState.c	LinkPlayer_InitAbilityState	contrived	minor	6	ability view overlays a signed id on the player fields
 src/link/player/LinkPlayer_ReadSlotFromScript.c	LinkPlayer_ReadSlotFromScript	contrived	natural	1	
+src/link/player/Player_InitializeActionState.c	Player_InitializeActionState	minor	natural	1	
