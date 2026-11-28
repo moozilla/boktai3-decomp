@@ -36,14 +36,11 @@ void SabataRider_ResetFromScript(void)
     if (manager &&
         (actor = SabataRider_FindEntryByName(manager, Script_GetKeywordValue('n', 0))) != 0) {
         struct RegistryActor *entry = actor;
-        struct ModifierDisplayObject *part = actor->model.view.parts;
-        s32 index;
-        for (index = 4; index >= 0; part++, index--)
-            Anim_Remove(part);
+        s32 i;
+        for (i = 0; i < 5; i++)
+            Anim_Remove((void *)&actor->model.view.parts[i]);
         SpatialIndex_RemoveEntry(entry->stats.contactHeader);
-        {
-            if (!RegistryActor_MessagePauseBits(REGISTRY_ACTOR_MESSAGES_PAUSED))
-                SceneMessages_UnregisterReceiver(actor->control.messages);
-        }
+        if (!RegistryActor_MessagePauseBits(REGISTRY_ACTOR_MESSAGES_PAUSED))
+            SceneMessages_UnregisterReceiver(actor->control.messages);
     }
 }

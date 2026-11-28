@@ -100,3 +100,8 @@ src/npc/sabata_rider/manager.c	SabataRider_UpdateAnimation	minor	minor	1	flags a
 src/npc/sabata_rider/manager.c	SabataRider_ResetUpdateState	natural	natural	0	
 src/npc/sabata_rider/manager.c	ActorAction_RunActiveCallbacks	natural	natural	0	
 src/npc/sabata_rider/manager.c	ActorManager_Destroy	contrived	natural	6	
+src/npc/sabata_rider/manager.c	SabataRider_InitManager	natural	natural	0	
+src/npc/sabata_rider/manager.c	SabataRider_EnsureManager	natural	natural	0	
+src/npc/sabata_rider/SabataRider_ClearManager.c	SabataRider_ClearManager	natural	natural	0	
+src/npc/sabata_rider/script.c	SabataRider_CreateFromScript	natural	natural	0	
+src/npc/sabata_rider/script.c	SabataRider_ResetFromScript	contrived	minor	5	entry alias of actor stays: ROM keeps a second copy of the pointer for the contact removal
