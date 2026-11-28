@@ -106,53 +106,32 @@ s32 Modifier_CollectSources(struct ModifierSelection *actor, struct ModifierSele
     struct ModifierRecord swap, scratch;
     s32 count = 0;
     s32 i;
-    i = 0;
-    if (count < selection->count) {
-        do {
-            ScriptRecord_FindModifierRecord(&scratch, ((s16 *)gGameState->modifierIdsBytes)[i]);
-            output[count] = scratch;
-            count++;
-            i++;
-        } while (i < selection->count);
+    for (i = 0; i < selection->count; i++) {
+        ScriptRecord_FindModifierRecord(&scratch, ((s16 *)gGameState->modifierIdsBytes)[i]);
+        output[count] = scratch;
+        count++;
     }
-    i = 0;
-    {
-        s32 selectedCount = selection->count;
-        if (i < selectedCount) {
-            struct GameState *state = gGameState;
-            s32 selectedId = actor->selectedId;
-            s16 *ids = (s16 *)state->modifierIdsBytes;
-            do {
-                if (*ids == selectedId)
-                    goto done;
-                ids++;
-                i++;
-            } while (i < selectedCount);
-        }
+    for (i = 0; i < selection->count; i++) {
+        if (((s16 *)gGameState->modifierIdsBytes)[i] == actor->selectedId)
+            return count;
     }
     if (includeSelected == 1) {
+        s32 pass;
+        s32 j;
         ScriptRecord_FindModifierRecord(&scratch, actor->selectedId);
         output[count] = scratch;
         count++;
-        {
-            s32 pass;
-            for (pass = 0; pass < 4; pass++) {
-                s32 j;
-                for (j = 0; j < 3; j++) {
-                    s32 leftOrder = output[j].order;
-                    if (leftOrder >= 0) {
-                        s32 rightOrder = output[j + 1].order;
-                        if (rightOrder >= 0 && leftOrder > rightOrder) {
-                            swap = output[j];
-                            output[j] = output[j + 1];
-                            output[j + 1] = swap;
-                        }
-                    }
+        for (pass = 0; pass < 4; pass++) {
+            for (j = 0; j < 3; j++) {
+                if (output[j].order >= 0 && output[j + 1].order >= 0 &&
+                    output[j].order > output[j + 1].order) {
+                    swap = output[j];
+                    output[j] = output[j + 1];
+                    output[j + 1] = swap;
                 }
             }
         }
     }
-done:
     return count;
 }
 
