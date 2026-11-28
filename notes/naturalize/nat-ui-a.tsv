@@ -33,3 +33,4 @@ src/ui/books/monster_book/PaletteTransition_Restart.c	PaletteTransition_Restart	
 src/ui/books/monster_book/sub_081D4CE0.c	sub_081D4CE0	contrived	minor	8	CpuSetArgs kept: argument evaluation order puts mov r0,sp before the control load
 src/ui/books/monster_book/BestiaryDisplay_CreateEntryAnimations.c	BestiaryDisplay_CreateEntryAnimations	contrived	minor	5	animation pointer used for create and priority while the other calls index the array (strength reduction of the two addresses)
 src/ui/books/monster_book/BestiaryDisplay_SetPresentationMode.c	BestiaryDisplay_SetPresentationMode	minor	natural	1	
+src/ui/books/monster_book/BestiaryDisplay_SetEntry.c	BestiaryDisplay_SetEntry	minor	natural	1	
