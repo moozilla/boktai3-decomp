@@ -53,3 +53,4 @@ src/monsters/ivy/ivy.c	Ivy_UpdateRedBrightening	natural	natural	1
 src/monsters/ivy/ivy.c	ColorPulse_UnpackColor	contrived	minor	1	u8* parameter kept for the prototype
 src/monsters/ivy/ivy.c	Ivy_UpdateBobbing	minor	natural	1	
 src/monsters/ivy/ivy.c	Armor_PlacePrimaryCollider	contrived	contrived	4	x and radius pointer temps: ROM forms the x address and loads the table base before scaling the index
+src/monsters/ivy/ivy.c	Armor_UpdateOrbitingColliders	contrived	contrived	1	trig/angle/radius/point pointer locals fix loop.c hoist order and register choice; table+slot pointer arithmetic likewise

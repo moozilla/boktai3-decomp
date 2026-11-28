@@ -1974,7 +1974,7 @@ void Armor_UpdateOrbitingColliders(struct PhaseObject *actor)
         u8 *angle = &actor->orbitAngle;
         const s16 *trig = gUnk_086149C4;
         u16 *point;
-        Armor_CopyRadius(&loopRadius, radius);
+        loopRadius = &table[slot];
         point = (void *)&position;
         point[0] =
             actor->entries[i].presentation.x + Div(trig[(*angle + 64) & 255] * *loopRadius, 4096);
