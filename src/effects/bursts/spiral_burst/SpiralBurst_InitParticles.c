@@ -9,11 +9,7 @@ void SpiralBurst_InitParticles(struct SpiralBurst *burst)
     u8 phase;
     struct SpriteDrawable *sprite;
     struct SpiralParticleFrame *frame;
-    {
-        const u16 *top = gRandomTable;
-        gRandomIndex = (gRandomIndex + 1) & 1023;
-        phase = *(const u8 *)(gRandomIndex * 2 + (u32)top);
-    }
+    phase = (u8)ParticleRandom_ReadDirectSample(gRandomTable);
     burst->resource = AnimData_FindEntry(0x1C1E);
     i = 0;
     /* Form the table copy after CSE has finished tracking constants. */
@@ -46,13 +42,11 @@ void SpiralBurst_InitParticles(struct SpiralBurst *burst)
             SceneVec_TruncateComponent(frame->motion.radius * gUnk_086149C4[frame->motion.angle]);
         sprite->priority = 2;
         frame->depthOffset = -20;
-        {
-            frame->motion.animationFrame = ParticleRandom_ReadDirectSample(table) & 7;
-            if (frame->motion.animationFrame <= 3)
-                SpriteDrawable_SelectTileFrame(sprite, burst->resource, 12);
-            else
-                SpriteDrawable_SelectTileFrame(sprite, burst->resource, 13);
-        }
+        frame->motion.animationFrame = ParticleRandom_ReadDirectSample(table) & 7;
+        if (frame->motion.animationFrame <= 3)
+            SpriteDrawable_SelectTileFrame(sprite, burst->resource, 12);
+        else
+            SpriteDrawable_SelectTileFrame(sprite, burst->resource, 13);
         frame->motion.lifetime = (ParticleRandom_ReadDirectSample(table) & 15) + 0x38;
         frame = (void *)((u8 *)frame + sizeof(struct SpiralParticle));
         sprite = (void *)((u8 *)sprite + sizeof(struct SpiralParticle));

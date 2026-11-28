@@ -197,3 +197,4 @@ src/effects/bursts/spiral_burst/SpiralBurst_OnTaskDestroy.c	SpiralBurst_OnTaskDe
 src/effects/bursts/spiral_burst/SpiralBurst_InitCollider.c	SpiralBurst_InitCollider	minor	natural	3	-
 src/effects/bursts/spiral_burst/SpiralBurst_Init.c	SpiralBurst_Init	contrived	natural	1	-
 src/effects/bursts/spiral_burst/SpiralBurst_Create.c	SpiralBurst_Create	minor	natural	1	-
+src/effects/bursts/spiral_burst/SpiralBurst_InitParticles.c	SpiralBurst_InitParticles	contrived	contrived	40	phase-masked table copy, sine union and walking sprite/frame pointers: cse constant tracking and register allocation
