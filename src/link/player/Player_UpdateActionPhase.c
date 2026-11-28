@@ -2,53 +2,43 @@
 #include "global.h"
 #include "scene/areas/area_effect_link.h"
 
-struct P2 {
-    u32 a, b;
-};
-struct Link {
-    u8 pad[0x5c];
-    u8 arr[1];
-};
 extern void *gUnk_08E87B0C[];
-void Player_AccumulateActionCharge(u8 *, s32);
-void sub_082420D4(u8 *);
-s32 sub_08242D30(u8 *);
-void sub_0823B728(u8 *, s32);
-void Callback_InvokeActor(u8 *, void *);
-void Player_SynchronizeColliderState(u8 *);
-void Player_SmoothCameraAnchor(u8 *);
-void LinkPlayer_ClampToRecoveryTerrainCell(u8 *);
-void Player_UpdateModifier08Drift(u8 *);
-void Player_SetSecondaryActionFlags(u8 *, s32);
+void Player_AccumulateActionCharge(struct Player *, s32);
+void sub_082420D4(struct Player *);
+s32 sub_08242D30(struct Player *);
+void sub_0823B728(struct Player *, s32);
+void Callback_InvokeActor(struct Player *, void *);
+void Player_SynchronizeColliderState(struct Player *);
+void Player_SmoothCameraAnchor(struct Player *);
+void LinkPlayer_ClampToRecoveryTerrainCell(struct Player *);
+void Player_UpdateModifier08Drift(struct Player *);
+void Player_SetSecondaryActionFlags(struct Player *, s32);
 
-static inline long long LinkGet(s32 i)
+static inline u8 Charge(s32 slot)
 {
-    u8 v;
-    if (((struct Link *)gLinkSession) == 0 || i < 0)
-        v = 0;
-    else
-        v = ((struct Link *)gLinkSession)->arr[i];
-    return v;
+    if (gLinkSession == NULL || slot < 0)
+        return 0;
+    return gLinkSession->playerValues[slot];
 }
 
-void Player_UpdateActionPhase(u8 *p)
+void Player_UpdateActionPhase(struct Player *p)
 {
-    Player_AddStatusFlags((struct Player *)p, 0x54000);
-    switch (*(s32 *)(p + 0x1c)) {
+    Player_AddStatusFlags(p, 0x54000);
+    switch (p->kind) {
         case 1: {
             s32 r;
-            if (((struct Player *)p)->statusFlags & 0x10) {
-                Player_AccumulateActionCharge(p, LinkGet(*(s32 *)(p + 0x18)));
+            if (p->statusFlags & 0x10) {
+                Player_AccumulateActionCharge(p, Charge(p->slot));
             }
             sub_082420D4(p);
             r = sub_08242D30(p);
             sub_0823B728(p, r);
             Callback_InvokeActor(p, gUnk_08E87B0C[r]);
-            if (p[0x48c] != 0) {
-                *(struct P2 *)(p + 0x38) = *(struct P2 *)(p + 0x490);
+            if (p->movementVelocityLocked != 0) {
+                *(struct SceneVec *)&p->velocityX = p->lockedVelocity;
             }
             Player_SynchronizeColliderState(p);
-            if (*(s16 *)(p + 0x4b6) != 0)
+            if (p->cameraOffsetActive != 0)
                 Player_SmoothCameraAnchor(p);
             LinkPlayer_ClampToRecoveryTerrainCell(p);
             Player_UpdateModifier08Drift(p);
@@ -56,7 +46,7 @@ void Player_UpdateActionPhase(u8 *p)
         }
         case 2:
             Player_SetSecondaryActionFlags(p, 8);
-            Callback_InvokeActor(p, *(void **)(p + 0x58c));
+            Callback_InvokeActor(p, (void *)p->triggerAnimationCallback);
             Player_SynchronizeColliderState(p);
             break;
     }
