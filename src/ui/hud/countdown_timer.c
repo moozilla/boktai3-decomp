@@ -24,9 +24,7 @@ void CountdownTimer_StopFromScript(void)
 
 s32 CountdownTimer_Update(struct CountdownTimer *timer)
 {
-    u32 value = timer->remaining - 1;
-    timer->remaining = value;
-    if (timer->remaining == 0) {
+    if (--timer->remaining == 0) {
         if (timer->completionScriptId)
             Script_Call(timer->completionScriptId, 0);
         CountdownTimer_Stop();
