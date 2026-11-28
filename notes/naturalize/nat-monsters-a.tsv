@@ -226,3 +226,4 @@ src/monsters/centipede/CentipedeBody_ReturnToCellCenter.c	CentipedeBody_ReturnTo
 src/monsters/centipede/Centipede_UpdateKnockbackSlide.c	Centipede_UpdateKnockbackSlide	contrived	minor	3	remaining: bytep
 src/monsters/centipede/Centipede_UpdateKnockback.c	Centipede_UpdateKnockback	contrived	contrived	6	remaining: bytep,constlocal
 src/monsters/centipede/CentipedeBody_InitSegmentAnimations.c	CentipedeBody_InitSegmentAnimations	contrived	contrived	3	remaining: rawoff,bytep,block,constlocal
+src/monsters/centipede/SpritePool_FlagEntries.c	SpritePool_FlagEntries	contrived	contrived	8	remaining: u8cast,bytep,do,constlocal,mask,ptrtemp

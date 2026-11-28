@@ -11,10 +11,9 @@ static inline u8 TestMask(u8 flags, u32 mask)
 void SpritePool_FlagEntries(struct TentacleBody *g)
 {
     s32 i = 0;
-    s16 *countPtr = &g->segmentCount;
-    if (i < *countPtr) {
+    if (i < g->segmentCount) {
         u32 mask = 1;
-        s16 *savedCountPtr = countPtr;
+        s16 *savedCountPtr = &g->segmentCount;
         struct TentacleAnimationSegment *e = g->segments;
         u8 *flagsPtr = &e->animation.status;
         u32 *fieldPtr = &e->flags;
