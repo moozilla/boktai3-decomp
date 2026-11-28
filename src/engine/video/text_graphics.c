@@ -265,7 +265,7 @@ void TextWindow_DrawWideGlyph(u16 glyph, s32 x, s32 y, u32 arg)
                 return;
             tile += 0x100;
             data += 0x20;
-            *(u16 *)(((((x + j) & 0x1F) + rowOff) * 2) + (u32)map) = tile | ~0xFFF;
+            map[rowOff + ((x + j) & 0x1F)] = tile | ~0xFFF;
         }
     }
 }
