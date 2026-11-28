@@ -648,8 +648,7 @@ void NidhoggrDuel_UpdateAnimationElevenState(struct GridAttackActor *s)
         NidhoggrDuel_SetAnimation(s, 11, 1, 8);
     }
     {
-        u32 *p = (u32 *)&s->damage;
-        *p = 0;
+        s->damage = 0;
         s->special = 0;
     }
     NidhoggrDuel_AddFlags(s, 12);
