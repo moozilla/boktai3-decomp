@@ -1,6 +1,13 @@
 #include "global.h"
 #include "link/selection/link_selection_mode.h"
 #include "scene/areas/area_effect_link.h"
+
+/* Session data is exchanged in 0x40-byte records: ours first, then one per participant. */
+struct LinkExchangeRecord {
+    u8 data[0x3E];
+    u16 crc;
+};
+
 u8 LinkSession_ConsumeStateEntry(void *);
 void LinkSession_ClearParticipantCounters(void *);
 s32 LinkSession_CheckSessionReady(void *);
@@ -14,13 +21,13 @@ void ScriptPanel_OpenTextWindow(void);
 void SessionMenu_WaitForSelection(void);
 s32 sub_0810A304(struct AreaEffectLinkState *p)
 {
-    u8 *session = p->sessionData;
+    struct LinkExchangeRecord *records = (struct LinkExchangeRecord *)p->sessionData;
     s32 count, i;
-    u8 *entry;
+
     if (LinkSession_ConsumeStateEntry(p)) {
         LinkSession_ClearParticipantCounters(p);
         ClockPanel_CaptureSnapshot(p);
-        *(u16 *)(session + 0x3e) = Crc_ComputeCcitt16(session, 0, 0x3e);
+        records[0].crc = Crc_ComputeCcitt16(records, 0, 0x3e);
     }
     if (LinkSession_CheckSessionReady(p) < 0) {
         LinkSession_BeginShutdown(p, ScriptPanel_OpenTextWindow);
@@ -30,23 +37,17 @@ s32 sub_0810A304(struct AreaEffectLinkState *p)
         LinkSession_SetState(p, 6, SessionMenu_WaitForSelection);
         return 0;
     }
-    ByteSequence_AdvanceEncodedValue(p, session, 0x40);
+    ByteSequence_AdvanceEncodedValue(p, records, 0x40);
     count = 0;
-    i = 0;
-    if (count < p->participantCount) {
-        entry = session + 0x40;
-        do {
-            if (LinkSession_ReceiveSelectionByte(p, entry, i, 0x40) == 1) {
-                Crc_ComputeCcitt16(entry, 0, 0x3e);
-                count++;
-            }
-            entry += 0x40;
-            i++;
-        } while (i < p->participantCount);
+    for (i = 0; i < p->participantCount; i++) {
+        if (LinkSession_ReceiveSelectionByte(p, &records[i + 1], i, 0x40) == 1) {
+            Crc_ComputeCcitt16(&records[i + 1], 0, 0x3e);
+            count++;
+        }
     }
-    if (count == p->participantCount && p->exchangeBusy == 0)
+    if (count == p->participantCount && !p->exchangeBusy)
         p->requestedMode = 0x1800;
-    if (p->menuElapsed > 0xe10) {
+    if (p->menuElapsed > 3600) {
         LinkSession_BeginShutdown(p, ScriptPanel_OpenTextWindow);
         return -1;
     }
