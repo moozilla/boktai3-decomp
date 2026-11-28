@@ -185,32 +185,31 @@ s32 EffectManager_DestroyManager(struct EffectManager *manager)
 
 s32 EffectManager_Init(struct EffectManager *manager, void *unused)
 {
+    struct Player *actor;
     s32 i, j;
-    struct EffectSprite *sprite;
+
     EffectManager_SetGlobal(manager);
-    manager->graphics = AnimData_FindEntry(0x1c1a);
-    manager->animation = ScriptProc_Start(0x922e, 0xd1b8);
+    manager->graphics = AnimData_FindEntry(0x1C1A);
+    manager->animation = ScriptProc_Start(0x922E, 0xD1B8);
     for (i = 0; i < 6; i++) {
         struct Effect *effect = &manager->effects[i];
+
         effect->active = 0;
         for (j = 0; j < 4; j++) {
-            sprite = &effect->particles[j].sprite;
-            Effect_Initialize(sprite, manager->graphics, 1);
-            Effect_SetPalette(sprite, 1);
+            Effect_Initialize(&effect->particles[j].sprite, manager->graphics, 1);
+            Effect_SetPalette(&effect->particles[j].sprite, 1);
         }
     }
     manager->counter = 0;
-    {
-        struct Player *actor = gPlayers[0];
-        manager->actor = actor;
-        if (!actor)
-            return -1;
-        if (actor->actionMode == 6)
-            manager->mode = 1;
-        else
-            manager->mode = 0;
-        return 0;
-    }
+    actor = gPlayers[0];
+    manager->actor = actor;
+    if (!actor)
+        return -1;
+    if (actor->actionMode == 6)
+        manager->mode = 1;
+    else
+        manager->mode = 0;
+    return 0;
 }
 
 void *EffectManager_Create(void *a, u32 unused)
