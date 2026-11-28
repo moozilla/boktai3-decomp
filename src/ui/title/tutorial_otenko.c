@@ -1321,33 +1321,22 @@ void TutorialOtenko_UpdateLargeRestAnimation(struct ActorAnimController *p)
 
 void TutorialOtenko_HideAndResetChildren(struct ActorAnimController *p)
 {
-    struct DisplaySequenceSprite *o;
-    struct DisplaySequenceState *a;
-    const u16 *entry;
-    u32 flag;
-    u16 n;
-    u8 done;
+    s32 i;
     if (take(p)) {
         ScriptUtility_ClearControlFlag();
         ActorShadow_Disable(p->p2);
         p->obj.flags |= 1;
         TutorialOtenko_SetState(p, 1, 2);
-        {
-            u32 active = 4;
-            void (*fn)(void *, void *) = TutorialOtenko_OnInteractionChildUpdate;
-            u32 reset = 1;
+        for (i = 0; i < 16; i++) {
             struct ActorChildCallbackView *child =
-                (struct ActorChildCallbackView *)&p->children[0].fn;
-            s32 i = 15;
-            do {
-                union DisplaySequenceControl control;
-                control.raw = child->flags;
-                if (active & control.raw) {
-                    child->fn = fn;
-                    child->flags = reset | control.raw;
-                }
-                child++;
-            } while (--i >= 0);
+                (struct ActorChildCallbackView *)&p->children[i].fn;
+            if (child->flags & 4) {
+                void (*fn)(void *, void *) =
+                    (void (*)(void *, void *))TutorialOtenko_OnInteractionChildUpdate;
+                u8 one = 1;
+                child->fn = fn;
+                child->flags |= one;
+            }
         }
     }
 }
