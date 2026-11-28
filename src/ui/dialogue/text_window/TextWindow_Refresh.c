@@ -1,41 +1,31 @@
 #include "global.h"
-struct P {
-    u8 pad[4];
-    u8 b4;
-    u8 b5;
-    u8 b6;
-    u8 b7;
-    u8 pad1[6];
-    u16 h0e;
-    u16 h10;
-    u8 pad2[2];
-    u32 w14;
-    u8 pad3[0x44];
-    void *w5c;
-    u8 q[0x1c];
-    u32 w7c;
-};
-struct P *TextWindow_Find(u32);
-void TextWindow_BlankRect(u32, u32, u32, u32);
-void TextState_SetBounds(u8 *, u32, u32, u32, u32);
-u32 TextWindow_ResolveString(struct P *, u32);
-void TextState_Reset(u8 *);
-void TextWindow_OnPlayback(void);
-s32 TextWindow_Refresh(u32 a, u32 b)
+#include "engine/ram.h"
+#include "ui/dialogue/text_window.h"
+#include "ui/dialogue/text_window_manager.h"
+
+struct TextWindow *TextWindow_Find(int);
+const u8 *TextWindow_ResolveString(struct TextWindow *, int);
+void TextState_Reset(struct TextState *);
+void TextWindow_BlankRect(int, int, int, int);
+void TextState_SetBounds(struct TextState *, int, int, int, int);
+void TextWindow_OnPlayback(struct WindowManager *, struct TextWindow *);
+
+int TextWindow_Refresh(int id, int index)
 {
-    struct P *p = TextWindow_Find(a);
-    u8 *q;
-    if (p == 0)
+    struct TextWindow *window = TextWindow_Find(id);
+    struct TextState *text;
+
+    if (!window)
         return -1;
-    q = p->q;
-    if (p->w14 != 0) {
-        TextWindow_BlankRect(p->b4, p->b5, p->b6, p->b7);
-        TextState_SetBounds(q, p->b4, p->b5, p->b6, p->b7);
-        p->h0e = b;
-        *(u32 *)(q + 0x1c) = TextWindow_ResolveString(p, p->h0e);
-        p->w5c = TextWindow_OnPlayback;
-        TextState_Reset(q);
-        p->h10 = 0xFFFF;
+    text = &window->text;
+    if (window->script) {
+        TextWindow_BlankRect(window->x, window->y, window->width, window->height);
+        TextState_SetBounds(text, window->x, window->y, window->width, window->height);
+        window->index = index;
+        text->pc = TextWindow_ResolveString(window, window->index);
+        window->callback = TextWindow_OnPlayback;
+        TextState_Reset(text);
+        window->symbol = 0xFFFF;
     }
     return 0;
 }
