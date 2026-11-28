@@ -197,7 +197,7 @@ struct OrbitingParticles *OrbitingParticles_Create(struct SceneVec *pos, int rad
 
 struct OrbitingParticles *OrbitingParticles_CreateFromScript(void)
 {
-    struct OrbitingParticles *p = Task_Create(11, 436);
+    struct OrbitingParticles *p = Task_Create(11, sizeof(*p));
     struct SceneVec pos;
     int radius, duration, count, type;
     if (p) {
