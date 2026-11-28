@@ -1,33 +1,17 @@
-#include "global.h"
+#include "effects/bursts/linked_effect.h"
 
-struct LargeEffectPoolSlot {
-    u8 unknown[0x177];
-    u8 index;
-    u8 tail[0x14];
-};
-struct LargeEffectPool {
-    u8 unknown[0x1C];
-    u32 used;
-    struct LargeEffectPoolSlot slots[8];
-};
-void Memory_Clear(void *, u32);
-static inline u8 LargeEffectPool_IsUsed(u32 *used, u32 mask)
+struct LinkedEffect *LargeEffectPool_AllocateSlot(struct LinkedEffectPool *pool)
 {
-    if (*used & mask)
-        return TRUE;
-    return FALSE;
-}
-struct LargeEffectPoolSlot *LargeEffectPool_AllocateSlot(u8 *poolArg)
-{
-    struct LargeEffectPool *pool = (void *)poolArg;
     s32 i;
+    struct LinkedEffect *effect;
+
     for (i = 0; i < 8; i++) {
-        if (!LargeEffectPool_IsUsed(&pool->used, 1U << i)) {
-            struct LargeEffectPoolSlot *slot = &pool->slots[i];
-            Memory_Clear(slot, sizeof(*slot));
-            pool->used |= 1U << i;
-            slot->index = i;
-            return slot;
+        if (!LinkedEffectPool_IsOccupied(pool, i)) {
+            effect = &pool->effects[i];
+            Memory_Clear(effect, sizeof(*effect));
+            pool->occupied |= 1 << i;
+            effect->slot = i;
+            return effect;
         }
     }
     return NULL;

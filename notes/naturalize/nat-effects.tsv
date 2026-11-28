@@ -160,3 +160,4 @@ src/effects/bursts/fragment_effect/FragmentEffect_ResetManagerReference.c	Fragme
 src/effects/bursts/linked_effect/LinkedEffect_ApplyVariant.c	LinkedEffect_ApplyVariant	contrived	natural	6	-
 src/effects/bursts/linked_effect/LinkedEffect_UpdateColliders.c	LinkedEffect_UpdateColliders	contrived	minor	8	u32-mask clear helper: a literal mask on the halfword loads a constant instead
 src/effects/bursts/linked_effect/LinkedEffect_FinishRemoval.c	LinkedEffect_FinishRemoval	minor	natural	1	-
+src/effects/bursts/linked_effect/LargeEffectPool_AllocateSlot.c	LargeEffectPool_AllocateSlot	minor	natural	1	-
