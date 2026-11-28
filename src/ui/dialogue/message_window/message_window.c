@@ -40,88 +40,50 @@ int MessageWindow_UpdateSpeakerPortrait(struct MessageWindow *window)
     if (state->speaker == -1) {
         window->portrait.flags |= 1;
     } else {
-        struct DisplaySequenceState *f;
-        struct DisplaySequenceState *initial;
-        struct ContactSwarmSprite *r;
-        const u16 *word;
         window->portrait.flags &= ~1;
-        {
-            switch ((s8)(state->speaker - 4)) {
-                case 26:
-                    AnimData_SelectPaletteBank(window->portraitGraphics, 506);
-                    break;
-                case 16:
-                case 21:
-                    AnimData_SelectPaletteBank(window->portraitGraphics, 504);
-                    break;
-                case 0:
-                case 1:
-                case 9:
-                    AnimData_SelectPaletteBank(window->portraitGraphics, 505);
-                    break;
-                case 15:
-                    AnimData_SelectPaletteBank(window->portraitGraphics, 507);
-                    break;
-                case 2:
-                case 3:
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 22:
-                case 23:
-                case 24:
-                case 25:
-                default:
-                    AnimData_SelectPaletteBank(window->portraitGraphics, 503);
-                    break;
-            }
+        switch ((s8)(state->speaker - 4)) {
+            case 26:
+                AnimData_SelectPaletteBank(window->portraitGraphics, 506);
+                break;
+            case 16:
+            case 21:
+                AnimData_SelectPaletteBank(window->portraitGraphics, 504);
+                break;
+            case 0:
+            case 1:
+            case 9:
+                AnimData_SelectPaletteBank(window->portraitGraphics, 505);
+                break;
+            case 15:
+                AnimData_SelectPaletteBank(window->portraitGraphics, 507);
+                break;
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+            case 7:
+            case 8:
+            case 10:
+            case 11:
+            case 12:
+            case 13:
+            case 14:
+            case 17:
+            case 18:
+            case 19:
+            case 20:
+            case 22:
+            case 23:
+            case 24:
+            case 25:
+            default:
+                AnimData_SelectPaletteBank(window->portraitGraphics, 503);
+                break;
         }
-        initial = &window->portraitSequence;
-        Anim_SetSequence(initial, window->portraitResource, (u16)state->speaker, 0, 0);
-        r = &window->portrait;
-        f = initial;
-        word = f->commands + f->index;
-        r->frame = *word >> 6;
-        {
-            union DisplaySequenceControl control;
-            u32 bit, first;
-            control.raw = f->flags;
-            bit = 1;
-            first = (u8)(control.raw & bit);
-            if (first != (((*word & 0x30) >> 4) & bit))
-                r->flags |= 4;
-            else
-                r->flags &= ~4;
-        }
-        {
-            union DisplaySequenceControl control;
-            u32 bit, first;
-            control.raw = f->flags;
-            bit = 2;
-            first = (u8)(control.raw & bit);
-            if (first != (((*word & 0x30) >> 4) & bit))
-                r->flags |= 8;
-            else
-                r->flags &= ~8;
-        }
-        if (++f->elapsed >= f->duration) {
-            DisplaySequence_SelectNext(f);
-            word = f->commands + f->index;
-            DisplaySequence_UpdateWeight(f, word);
-            if (f->duration == 0)
-                f->duration = 1;
-        }
+        Anim_SetSequence(&window->portraitSequence, window->portraitResource, (u16)state->speaker,
+                         0, 0);
+        PlayerCue_StepSequenceEnded(&window->portrait, &window->portraitSequence);
     }
     window->previousSpeaker = (u8)state->speaker;
 }
