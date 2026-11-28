@@ -478,7 +478,7 @@ u32 MonsterBook_UpdateNavigation(struct MonsterBook *book)
                 else
                     book->category = 13;
                 Sound_PlaySong(0x10A);
-                goto categoryChanged;
+                moved = 1;
             } else if (gPadState[1] & R_BUTTON) {
                 if (book->category <= 12)
                     book->category++;
@@ -488,9 +488,7 @@ u32 MonsterBook_UpdateNavigation(struct MonsterBook *book)
                 moved = 1;
             }
             if (moved) {
-            categoryChanged:
                 book->entry = Bestiary_GetCategoryFirstEntry(book->category);
-
                 book->selectedRow = 0;
                 changed = 1;
                 DrawListWindows(book);
@@ -500,33 +498,28 @@ u32 MonsterBook_UpdateNavigation(struct MonsterBook *book)
                 Bestiary_UpdateCompletionBadges(book);
             }
             if ((gPadState[1] & DPAD_UP) && MonsterBook_CurrentEntry(book)) {
-                u8 *selection = &book->selectedRow;
-                if (*selection) {
+                if (book->selectedRow) {
                     book->entry--;
-                    (*selection)--;
+                    book->selectedRow--;
                 } else {
-                    *selection = Bestiary_GetCategoryEntryCount(book->category) - 1;
-                    book->entry = Bestiary_GetCategoryFirstEntry(book->category) + (*selection);
+                    book->selectedRow = Bestiary_GetCategoryEntryCount(book->category) - 1;
+                    book->entry = Bestiary_GetCategoryFirstEntry(book->category) + book->selectedRow;
                 }
                 Sound_PlaySong(0xDC);
-                goto selectionChanged;
-            } else if ((gPadState[1] & DPAD_DOWN) && (MonsterBook_CurrentEntry(book) <= 0x51)) {
-                u8 *selection = &book->selectedRow;
-                s32 current = *selection;
-                if (current < (Bestiary_GetCategoryEntryCount(book->category) - 1)) {
+                changed = 1;
+            } else if ((gPadState[1] & DPAD_DOWN) && MonsterBook_CurrentEntry(book) <= 0x51) {
+                if (book->selectedRow < Bestiary_GetCategoryEntryCount(book->category) - 1) {
                     book->entry++;
-                    (*selection)++;
+                    book->selectedRow++;
                 } else {
                     book->entry = Bestiary_GetCategoryFirstEntry(book->category);
-                    *selection = 0;
+                    book->selectedRow = 0;
                 }
                 Sound_PlaySong(0xDC);
                 changed = 1;
             }
-            if (changed) {
-            selectionChanged:
+            if (changed)
                 book->selectionCursor.position.y = book->selectedRow << 4;
-            }
             if (gPadState[1] & A_BUTTON) {
                 MonsterBook_SetPage(book, 1);
                 Bestiary_UpdateCompletionBadges(book);
@@ -548,7 +541,7 @@ u32 MonsterBook_UpdateNavigation(struct MonsterBook *book)
                 else
                     book->detailTab = 3;
                 Sound_PlaySong(0xDC);
-                goto tabChanged;
+                changed = 1;
             } else if (gPadState[1] & DPAD_DOWN) {
                 if (book->detailTab <= 2)
                     book->detailTab++;
@@ -558,9 +551,7 @@ u32 MonsterBook_UpdateNavigation(struct MonsterBook *book)
                 changed = 1;
             }
             if (changed) {
-            tabChanged:
                 book->tabCursor.position.y = book->detailTab << 4;
-
                 MonsterBook_DrawEntryDetails(book);
             }
             if (gPadState[1] & R_BUTTON) {
@@ -569,7 +560,7 @@ u32 MonsterBook_UpdateNavigation(struct MonsterBook *book)
                 else
                     book->entry = 0;
                 Sound_PlaySong(0x10A);
-                goto entryChanged;
+                moved = 1;
             } else if (gPadState[1] & L_BUTTON) {
                 if (MonsterBook_CurrentEntry(book))
                     book->entry--;
@@ -579,36 +570,30 @@ u32 MonsterBook_UpdateNavigation(struct MonsterBook *book)
                 moved = 1;
             }
             if (moved) {
-            entryChanged:
                 MonsterBook_DrawEntryDetails(book);
-
                 DrawDetailNumber(book);
-                if (Bestiary_IsEntryUnlocked(MonsterBook_CurrentEntry(book))) {
+                if (Bestiary_IsEntryUnlocked(book->entry)) {
                     BestiaryDisplay_Show(book->display);
-                    BestiaryDisplay_SetEntry(book->display, MonsterBook_CurrentEntry(book));
+                    BestiaryDisplay_SetEntry(book->display, book->entry);
                 } else
                     BestiaryDisplay_Hide(book->display);
                 Bestiary_UpdateCompletionBadges(book);
             }
-            {
-                u8 *pending = &book->pendingExit;
-                switch (*pending) {
-                    default:
-                        MonsterBook_SetPage(book, 0);
-                        Bestiary_UpdateCompletionBadges(book);
-                        Sound_PlaySong(0xDE);
-                        break;
+            switch (book->pendingExit) {
+                default:
+                    MonsterBook_SetPage(book, 0);
+                    Bestiary_UpdateCompletionBadges(book);
+                    Sound_PlaySong(0xDE);
+                    break;
 
-                    case 0:
-                        if (gPadState[1] & B_BUTTON) {
-                            u16 *flags = &book->transitionFlags;
-                            *flags |= 1;
-                            Bestiary_SelectCategoryForEntry(book);
-                            book->selectionCursor.position.y = book->selectedRow << 4;
-                            *pending = 1;
-                        }
-                        break;
-                }
+                case 0:
+                    if (gPadState[1] & B_BUTTON) {
+                        book->transitionFlags |= 1;
+                        Bestiary_SelectCategoryForEntry(book);
+                        book->selectionCursor.position.y = book->selectedRow << 4;
+                        book->pendingExit = 1;
+                    }
+                    break;
             }
             break;
 
