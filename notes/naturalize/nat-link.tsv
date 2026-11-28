@@ -224,3 +224,4 @@ src/link/player/Player_GetMovementAnimationRate.c	Player_GetMovementAnimationRat
 src/link/player/Player_PlayActionCueSound.c	Player_PlayActionCueSound	natural	natural	0	
 src/link/player/Player_UpdateTerrainSidestep.c	Player_UpdateTerrainSidestep	contrived	minor	20	SetFlags mask param keeps mask loaded before flags (plain |= differs; shared accessor adds literal-param warnings); separate flags local; frame/delta locals for load order; cellProps cast for cell flags
 src/link/player/Player_IsFlaggedBelowResourceLimit.c	Player_IsFlaggedBelowResourceLimit	minor	natural	6	
+src/link/player/Player_IsUnflaggedBelowResourceLimit.c	Player_IsUnflaggedBelowResourceLimit	minor	natural	5	
