@@ -210,3 +210,5 @@ src/scene/actor/attachment/SceneActorAttachment_ReplaceResponseSlot.c	SceneActor
 src/scene/actor/attachment/SceneActorAttachment_TestPositionWindow.c	SceneActorAttachment_TestPositionWindow	natural	natural	0	-
 src/scene/actor/attachment/SceneActorEffect_SortCandidates.c	SceneActorEffect_SortCandidates	contrived	natural	3	-
 src/scene/actor/attachment/SceneActorAttachment_FindReachableNeighbor.c	SceneActorAttachment_FindReachableNeighbor	contrived	minor	8	flags local for the terrain mask test (plain & writes the other operand register)
+src/scene/actor/attachment/SceneActorPosition_ResolveTaggedPosition.c	SceneActorPosition_ResolveTaggedPosition	natural	natural	0	-
+src/scene/actor/attachment/SceneActorAttachment_RetargetNearestPlayer.c	SceneActorAttachment_RetargetNearestPlayer	contrived	minor	24	delta/position pointer locals and a count local keep the loop shape; mask local for the motion flag test; player address as gPlayers[i] + 0x24
