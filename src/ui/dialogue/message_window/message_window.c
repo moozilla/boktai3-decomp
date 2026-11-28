@@ -9,11 +9,6 @@ static inline s32 MessageWindow_GetCharacterDelay(void)
     return (s16)gGameState->unk12;
 }
 
-static inline void MessageWindow_SetPlayback(struct MessageWindow *window, void *callback)
-{
-    window->callback = callback;
-}
-
 u32 MessageWindow_IsCreated(void)
 {
     return gMessageWindow != 0;

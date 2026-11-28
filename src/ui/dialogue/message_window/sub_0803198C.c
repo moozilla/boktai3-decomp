@@ -7,108 +7,95 @@ void TextWindow_FillTileGraphics(void);
 void TextState_Init(void *, s32, s32, s32, s32);
 
 // confidence=low: opens a message window from script keywords (bounds, palette, text source, value list) and starts its script, sprite and animation setup.
+struct QueuedMessageView {
+    u16 value;
+};
+
 int sub_0803198C(void *arg0, void *arg1)
 {
-    struct MessageWindow *p = arg0;
-    struct MessagePlaybackState *st;
-    u32 buf[2];
-    struct AnimSpriteResource *proc;
-    s32 palette;
-    u32 bufferMask;
-    void **fnSlot;
+    struct MessageWindow *window = arg0;
+    struct MessagePlaybackState *state;
+    struct AnimSpriteResource *resource;
+    void *field;
+    struct ContactPosition position;
 
-    gMessageWindow = (void *)p;
-    st = &p->state;
+    gMessageWindow = (void *)window;
+    state = &window->state;
     TextWindow_InitializeGraphics();
     TextWindow_FillTileGraphics();
     if (Script_SeekToKeyword('r')) {
-        p->x = Script_GetValue();
-        p->y = Script_GetValue();
-        p->width = Script_GetValue();
-        p->height = Script_GetValue();
+        window->x = Script_GetValue();
+        window->y = Script_GetValue();
+        window->width = Script_GetValue();
+        window->height = Script_GetValue();
     } else {
-        p->x = 0;
-        p->y = 0;
-        p->width = 0;
-        p->height = 0;
+        window->x = 0;
+        window->y = 0;
+        window->width = 0;
+        window->height = 0;
     }
-    p->pageAdvanceTimer = 0;
-    p->pageAdvanceDelay = Script_GetKeywordValue('l', 0);
-    TextState_Init(st, p->x, p->y, p->width, p->height);
-    p->displayMode = 0;
+    window->pageAdvanceTimer = 0;
+    window->pageAdvanceDelay = Script_GetKeywordValue('l', 0);
+    TextState_Init(state, window->x, window->y, window->width, window->height);
+    window->displayMode = 0;
     if (Script_SeekToKeyword('s')) {
-        void *pc = Script_GetTextSourcePc();
-        p->messageTable = pc;
-        if (!pc)
+        if (!(window->messageTable = Script_GetTextSourcePc()))
             return -1;
-        st->pc = Text_LookupString(Script_ParseStringRef(pc));
-        if (!st->pc)
+        if (!(state->pc = Text_LookupString(Script_ParseStringRef(window->messageTable))))
             return -1;
     } else {
-        p->messageTable = 0;
-        st->pc = 0;
+        window->messageTable = 0;
+        state->pc = 0;
     }
-    palette = Script_GetKeywordValue('c', 0x519C);
-    if (MessageWindow_LoadPalette(p, palette) < 0)
+    if (MessageWindow_LoadPalette(window, Script_GetKeywordValue('c', 0x519C)) < 0)
         return -1;
-    MessageWindow_ApplyPalette(p);
-    st->spacing = 0;
-    p->unknown185 = 0;
-    p->messageIndex = Script_GetKeywordValue('i', 0);
-    p->inputDelay = 3;
-    p->fastPlayback = 0;
-    p->autoAdvance = 0;
-    p->autoAdvanceStep = 0;
-    st->choiceCount = 0;
+    MessageWindow_ApplyPalette(window);
+    state->spacing = 0;
+    window->unknown185 = 0;
+    window->messageIndex = Script_GetKeywordValue('i', 0);
+    window->inputDelay = 3;
+    window->fastPlayback = 0;
+    window->autoAdvance = 0;
+    window->autoAdvanceStep = 0;
+    state->choiceCount = 0;
     if (Script_SeekToKeyword('p')) {
-        fnSlot = &p->callback;
         while (Script_GetPc()) {
-            st->choices[st->choiceCount] = Script_GetValue();
-            st->choiceCount++;
+            state->choices[state->choiceCount] = Script_GetValue();
+            state->choiceCount++;
         }
     } else {
-        st->choiceCount = 0;
-        fnSlot = &p->callback;
+        state->choiceCount = 0;
     }
-    {
-        struct WaitView {
-            u16 value;
-        };
-        union {
-            struct WaitView *wait;
-            void *callback;
-        } value;
-        value.wait = (void *)&p->queuedMessage;
-        value.wait->value = 0xFFFF;
-        value.callback = MessageWindow_ClearTextCompletion;
-        *fnSlot = value.callback;
-        switch (p->displayMode) {
-            case 0:
-                proc = ScriptProc_Start(0xCB05, 0x530D);
-                break;
-            default:
-                proc = ScriptProc_Start(0xCB05, 0x530D);
-                break;
-        }
-        bufferMask = (u32)value.callback;
+    field = &window->queuedMessage;
+    ((struct QueuedMessageView *)field)->value = 0xFFFF;
+    field = MessageWindow_ClearTextCompletion;
+    MessageWindow_SetPlayback(window, field);
+    switch (window->displayMode) {
+        case 0:
+            resource = ScriptProc_Start(0xCB05, 0x530D);
+            break;
+        default:
+            resource = ScriptProc_Start(0xCB05, 0x530D);
+            break;
     }
-    if (!proc)
+    if (!resource)
         return -1;
-    p->resource = *proc;
-    ResourceHeader_Relocate(&p->resource, proc);
-    bufferMask = 0xFFFF0000;
-    buf[0] = 0;
-    buf[1] &= bufferMask;
-    AnimSprite_InitLinked(&p->animSprite, &p->resource, 0x3D, 0x3071, 0, 1, 0x3C, buf);
-    Anim_SetKeyframes(&p->animSprite, &p->resource, 0, 1, 0);
-    AnimData_Load(p->portraitGraphics, 0x593A);
-    p->portraitResource = ScriptProc_Start(0x922E, 0x4BBF);
-    Sprite_Init(&p->portrait, p->portraitGraphics, 0x1051);
-    p->portrait.priority = 0;
-    Anim_SetSequence(&p->portraitSequence, p->portraitResource, 0, 0, 0);
-    PlayerCue_StepSequence(&p->portrait, &p->portraitSequence);
-    p->portrait.position.x = 4;
-    p->portrait.position.y = 0x40;
-    p->portrait.position.z = 0;
+    window->resource = *resource;
+    ResourceHeader_Relocate(&window->resource, resource);
+    position.x = 0;
+    position.y = 0;
+    position.z = 0;
+    AnimSprite_InitLinked(&window->animSprite, &window->resource, 0x3D, 0x3071, 0, 1, 0x3C,
+                          &position);
+    Anim_SetKeyframes(&window->animSprite, &window->resource, 0, 1, 0);
+    AnimData_Load(window->portraitGraphics, 0x593A);
+    window->portraitResource = ScriptProc_Start(0x922E, 0x4BBF);
+    Sprite_Init(&window->portrait, window->portraitGraphics, 0x1051);
+    window->portrait.priority = 0;
+    Anim_SetSequence(&window->portraitSequence, window->portraitResource, 0, 0, 0);
+    PlayerCue_StepSequence(&window->portrait, &window->portraitSequence);
+    window->portrait.position.x = 4;
+    window->portrait.position.y = 0x40;
+    window->portrait.position.z = 0;
     return 0;
 }

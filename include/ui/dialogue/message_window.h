@@ -109,4 +109,9 @@ void MessageWindow_UpdateImmediatePlayback(struct MessageWindow *window);
 s32 MessageWindow_Update(struct MessageWindow *window);
 int MessageWindow_OnDestroy(struct MessageWindow *window);
 
+static inline void MessageWindow_SetPlayback(struct MessageWindow *window, void *callback)
+{
+    window->callback = callback;
+}
+
 #endif
