@@ -1,11 +1,12 @@
-#include "global.h"
+#include "effects/healing/healing_effect.h"
 #include "engine/video/render.h"
-void HealthRestoreEffect_UpdateParticles(void *);
-void Callback_InvokeActor(void *, u32);
-u32 HealthRestoreEffect_OnUpdate(u8 *s)
+
+void Callback_InvokeActor(void *, void *);
+
+u32 HealthRestoreEffect_OnUpdate(struct HealthRestoreEffect *effect)
 {
-    HealthRestoreEffect_UpdateParticles(s);
-    Callback_InvokeActor(s, *(u32 *)(s + 0x274));
+    HealthRestoreEffect_UpdateParticles(effect);
+    Callback_InvokeActor(effect, effect->state);
     gGrayscaleControl = 2;
     return 0;
 }
