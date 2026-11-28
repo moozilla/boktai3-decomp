@@ -29,21 +29,20 @@ void Player_UpdateSlashAction(struct Player *p)
             } else
                 p->tetherFrame++;
             break;
-        case 4: {
-            u8 *mode;
-            u16 *kind;
+        case 4:
             p->cameraInputProcessed = 0;
-            mode = &p->actionMode;
             Player_SetAnimationIndex(
-                p, ActorVariant_GetTableValue(*mode, *(kind = (u16 *)((u8 *)p + 0xC02))), speed);
-            if (*mode == 1) {
-                if (*kind == 0x1C) {
+                p,
+                ActorVariant_GetTableValue(p->actionMode, p->statModifierContext.attackAnimation),
+                speed);
+            if (p->actionMode == 1) {
+                if (p->statModifierContext.attackAnimation == 0x1C) {
                     if (p->animation.frameIndex == 1 && p->animation.elapsed == 0)
                         sub_08238CE0(p, p->facing, &p->position, 0);
-                } else if (*kind == 0x1B) {
+                } else if (p->statModifierContext.attackAnimation == 0x1B) {
                     if (p->animation.frameIndex == 1 && p->animation.elapsed == 0)
                         sub_08238CE0(p, p->facing, &p->position, 1);
-                } else if (*kind == 0x1A) {
+                } else if (p->statModifierContext.attackAnimation == 0x1A) {
                     if (p->animation.frameIndex == 0 && p->animation.elapsed == 1)
                         sub_08238CE0(p, p->facing, &p->position, 2);
                 }
@@ -51,7 +50,6 @@ void Player_UpdateSlashAction(struct Player *p)
             if (Player_UpdateSpinAction(p))
                 Player_SetTetherMode(p, 3, 5);
             break;
-        }
         case 5:
             p->cameraInputProcessed = 0;
             if (p->inputKeys[1] & 2)
@@ -59,7 +57,7 @@ void Player_UpdateSlashAction(struct Player *p)
             if (Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 0x18), speed))
                 Player_SetTetherMode(p, 3, 6);
             break;
-        case 6: {
+        case 6:
             p->cameraInputProcessed = 0;
             if (p->inputKeys[1] & 2)
                 p->statModifierContext.bufferedAttack = 1;
@@ -72,6 +70,5 @@ void Player_UpdateSlashAction(struct Player *p)
                 Player_SetTetherMode(p, 0, 0);
             }
             break;
-        }
     }
 }
