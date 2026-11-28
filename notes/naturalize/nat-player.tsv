@@ -184,3 +184,5 @@ src/player/control/Player_UpdateDirectionHistory.c	Player_UpdateDirectionHistory
 src/player/control/Player_StopMovementEffects.c	Player_StopMovementEffects	minor	natural	1	
 src/player/control/sub_08156C8C.c	sub_08156C8C	minor	natural	1	
 src/player/control/Player_TestNearbyInteraction.c	Player_TestNearbyInteraction	contrived	natural	1	
+src/player/control/Player_TestTetherActionInput.c	Player_TestTetherActionInput	natural	natural	0	
+src/player/control/Player_CheckFacingTerrainClearance.c	Player_CheckFacingTerrainClearance	contrived	minor	6	packed-vector copy of the position and pointer cast back to SceneVec
