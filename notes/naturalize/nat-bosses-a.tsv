@@ -166,3 +166,4 @@ src/bosses/count/CountBats_HideSlot.c	CountBats_HideSlot	minor	natural	3
 src/bosses/count/CountBats_SetDirectionalSequence.c	CountBats_SetDirectionalSequence	contrived	contrived	0	unchanged: same out-parameter flip pattern as ContactActor_SetDirectionalSequence
 src/bosses/count/CountBats_UpdateIdle.c	CountBats_UpdateIdle	natural	natural	0	
 src/bosses/count/CountBats_UpdateAdvance.c	CountBats_UpdateAdvance	contrived	minor	6	velocity pointer and position block stay: shared charge offset narrows direction
+src/bosses/count/CountBats_UpdateTracking.c	CountBats_UpdateTracking	contrived	minor	24	frame local and the duplicated Collider_SetPosition stay (ROM reloads stateFrame in both arms)
