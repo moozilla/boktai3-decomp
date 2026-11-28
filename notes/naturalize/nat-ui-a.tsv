@@ -479,3 +479,4 @@ src/ui/hud/stage_icon/StageIconDisplay_TickShake.c	StageIconDisplay_TickShake	fu
 src/ui/hud/stage_icon/StageIconDisplay_TickDelay.c	StageIconDisplay_TickDelay	fudged	natural	1	
 src/ui/hud/stage_icon/StageIconDisplay_InitAnimations.c	StageIconDisplay_InitAnimations	fudged	natural	1	
 src/ui/hud/stage_icon/StageIconDisplay_Initialize.c	StageIconDisplay_Initialize	fudged	natural	1	
+src/ui/hud/stage_icon/StageIconDisplay_Create.c	StageIconDisplay_Create	fudged	natural	1	
