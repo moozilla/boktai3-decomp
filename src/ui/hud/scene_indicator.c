@@ -202,16 +202,14 @@ struct SceneIndicator *SceneIndicators_FindFreeSlot(struct SceneIndicators *m)
     return 0;
 }
 
-struct SceneIndicator *SceneIndicators_FindById(struct SceneIndicators *p, u32 key)
+struct SceneIndicator *SceneIndicators_FindById(struct SceneIndicators *m, u32 key)
 {
-    struct SceneIndicator *q = p->indicators;
-    s32 i = 0;
-    while (i <= 15) {
-        if (q->active != 0 && q->id == key) {
-            return q;
-        }
-        i++;
-        q++;
+    struct SceneIndicator *p = m->indicators;
+    int i;
+
+    for (i = 0; i < 16; i++, p++) {
+        if (p->active && p->id == key)
+            return p;
     }
     return 0;
 }
