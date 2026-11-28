@@ -1,31 +1,20 @@
 #include "scene/actor/scene_actor_attachment.h"
 void SceneActorEffect_SortCandidates(struct SceneActorEffectCandidate *entries, s32 count)
 {
-    /* Count is a nonnegative element count within the supplied array. */
-    s32 i = 0, j, next, limit;
-    count--;
-    if (i < count) {
-        limit = count;
-        do {
-            next = i + 1;
-            if (count > 0) {
-                struct SceneActorEffectCandidate *entry = entries;
-                j = limit;
-                do {
-                    s32 key = entry[0].key;
-                    if (key > entry[1].key) {
-                        u32 value = entry[0].value;
-                        entry[0].key = entry[1].key;
-                        entry[0].value = entry[1].value;
-                        entry[1].key = key;
-                        entry[1].value = value;
-                    }
-                    entry++;
-                    j--;
-                } while (j != 0);
+    s32 i;
+    s32 j;
+
+    for (i = 0; i < count - 1; i++) {
+        for (j = 0; j < count - 1; j++) {
+            if (entries[j].key > entries[j + 1].key) {
+                s32 key = entries[j].key;
+                u32 value = entries[j].value;
+
+                entries[j].key = entries[j + 1].key;
+                entries[j].value = entries[j + 1].value;
+                entries[j + 1].key = key;
+                entries[j + 1].value = value;
             }
-            i = next;
-            count = limit;
-        } while (i < count);
+        }
     }
 }
