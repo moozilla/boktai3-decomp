@@ -148,3 +148,4 @@ src/link/player/sub_082392E8.c	sub_082392E8	contrived	minor	40	do/while(0) aroun
 src/link/player/ActorEffect_SelectModeFlag.c	ActorEffect_SelectModeFlag	minor	minor	9	mask local in the feature flag helper stays: the ROM loads the mask before gGameState
 src/link/player/LinkPlayer_LoadAnimationParameters.c	LinkPlayer_LoadAnimationParameters	contrived	natural	8	
 src/link/player/PaletteFade_ApplySelectiveBrightness.c	PaletteFade_ApplySelectiveBrightness	contrived	contrived	400	brightening loops keep the s16 casts, mask local and brightness pointer: every plain RGB555 channel helper tried changes register allocation
+src/link/player/sub_08239A20.c	sub_08239A20	contrived	natural	30	

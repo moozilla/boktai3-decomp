@@ -37,7 +37,11 @@ struct LinkPlayerFade {
     u16 fadeOut;
 };
 
+void sub_08239A20(struct LinkPlayerFade *actor, s32 mode);
 void LinkPlayer_BlendPalette(struct LinkPlayerFade *actor, const u16 *source, s32 sourceWeight,
                              s32 baseWeight, s32 shift);
+void LinkPlayer_LoadAnimationParameters(struct LinkPlayerFade *actor);
+s32 ActorEffect_SelectModeFlag(struct LinkPlayerFade *actor);
+void PaletteFade_ApplySelectiveBrightness(struct LinkPlayerFade *actor);
 
 #endif
