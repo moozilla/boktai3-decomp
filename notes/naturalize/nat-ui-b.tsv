@@ -67,7 +67,7 @@ src/ui/results/challenge_menu.c	ChallengeMenu_LoadPalette	minor	natural	1
 src/ui/results/time_result.c	TimeResult_HandleInput	minor	natural	2	
 src/ui/results/time_result.c	TimeResult_UpdateDigitReveal	contrived	minor	22	graphics, table and digit pointers: invariant addresses must be allocated in this order
 src/ui/results/time_result.c	TimeResult_Destroy	contrived	natural	1	
-src/ui/results/time_result.c	TimeResult_InitializeBackground	contrived	natural	6	
+src/ui/results/time_result.c	TimeResult_InitializeBackground	contrived	minor	6	Bg_DisableDisplay/Bg_EnableDisplay flag accessors: plain &= and |= on gDispCntShadow store twice differently
 src/ui/results/time_result.c	TimeResult_LoadPalette	minor	natural	1	
 src/ui/results/time_result.c	TimeResult_SetElapsedDigits	contrived	natural	1	
 src/ui/results/time_result.c	TimeResult_SetState	natural	natural	0	
