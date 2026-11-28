@@ -6,6 +6,7 @@ struct LinkScores {
     s16 points[4];
     s16 totals[4];
     u8 pad94[0x4c];
+    u8 sessionData[1];
 };
 struct LinkResults {
     u8 pad0[0x154];
@@ -18,12 +19,9 @@ s32 Div(s32, s32);
 static inline u8 Valid(s32 i)
 {
     if (i < 0)
-        goto no;
-    if (i <= 1)
-        goto yes;
-no:
-    return 0;
-yes:
+        return 0;
+    if (i > 1)
+        return 0;
     return 1;
 }
 static inline s32 Time(struct LinkResults *p, s32 i)
@@ -32,7 +30,7 @@ static inline s32 Time(struct LinkResults *p, s32 i)
         return 0;
     return p->elapsed[i];
 }
-static inline u16 Positive(struct LinkResults *p, s32 i)
+static inline s32 Positive(struct LinkResults *p, s32 i)
 {
     if (!p)
         return 0;
@@ -51,7 +49,7 @@ static inline u16 Negative(struct LinkResults *p, s32 i)
 // confidence=low: the formula combines two result counters and relative elapsed time into bounded points.
 void LinkSelection_UpdateParticipantScores(struct LinkScores *p)
 {
-    struct LinkResults *results = (void *)((u8 *)p + 0xe0);
+    struct LinkResults *results = (struct LinkResults *)p->sessionData;
     s32 times[2];
     s32 i;
     times[0] = Time(results, 0);
@@ -65,12 +63,7 @@ void LinkSelection_UpdateParticipantScores(struct LinkScores *p)
             bonus = -10;
             bonus -= Div(times[i] - times[1 - i], 120);
         }
-        if (!results)
-            positive = 0;
-        else if (!Valid(i))
-            positive = 0;
-        else
-            positive = results->positive[i];
+        positive = Positive(results, i);
         negative = Negative(results, i);
         p->points[i] = positive * 7 - (negative * 13 - 50) + bonus;
         score = p->points[i];
@@ -87,7 +80,7 @@ void LinkSelection_UpdateParticipantScores(struct LinkScores *p)
         p->totals[i] = total;
     }
     for (; i <= 3; i++) {
-        p->points[i] |= -1;
-        p->totals[i] |= -1;
+        p->points[i] = -1;
+        p->totals[i] = -1;
     }
 }
