@@ -1,21 +1,20 @@
 #include "global.h"
-struct S {
-    u8 f[0x18];
-    u32 a;
-    u32 b;
-    u32 c;
-};
-u32 ScriptProc_Start(u32, u32);
-void Bg_SetupLayers(u32, u32, u32, u32, u32, u32, void *);
-void LinkLobbyPanel_LoadBackground(struct S *s)
+#include "gba/syscall.h"
+#include "gba/macro.h"
+#include "engine/engine.h"
+#include "engine/video/render.h"
+#include "link/lobby/record_menu.h"
+
+void Bg_SetupLayers(u32, u32, void *, u32, u32, u32, u32 *);
+
+void LinkLobbyPanel_LoadBackground(struct RecordMenu *menu)
 {
-    u32 x;
-    u32 r;
-    s->a = ScriptProc_Start(0xC091, 0xCE15);
-    s->b = ScriptProc_Start(0xC091, 0xA597);
-    x = 2;
-    Bg_SetupLayers(2, 0, s->a, 0, 0, 1, &x);
-    r = ScriptProc_Start(0x92B3, 0xA2F6) + 0x14;
-    s->c = r;
-    CpuSet((void *)r, (void *)0x03004FC0, 0x100);
+    u32 layer;
+
+    menu->backgroundMap = ScriptProc_Start(0xC091, 0xCE15);
+    menu->otherMap = ScriptProc_Start(0xC091, 0xA597);
+    layer = 2;
+    Bg_SetupLayers(2, 0, menu->backgroundMap, 0, 0, 1, &layer);
+    menu->paletteResource = (u8 *)ScriptProc_Start(0x92B3, 0xA2F6) + 0x14;
+    CpuCopy16(menu->paletteResource, gBgPaletteBuffer, 0x200);
 }
