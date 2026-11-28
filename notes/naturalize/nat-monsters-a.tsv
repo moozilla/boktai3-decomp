@@ -87,3 +87,4 @@ src/monsters/armor/actor_controller_transitions.c	ActorController_UpdateFadeAnim
 src/monsters/armor/actor_controller_transitions.c	ActorController_UpdateSoundedAnimationTransition	contrived	natural	7	
 src/monsters/armor/actor_controller_transitions.c	ActorController_UpdatePaletteAnimationTransition	contrived	natural	7	
 src/monsters/armor/actor_controller_transitions.c	ActorController_UpdateLayeredAnimationTransition	contrived	natural	12	
+src/monsters/armor/actor_controller_transitions.c	DirectionalActor_UpdateSequence	contrived	natural	1	

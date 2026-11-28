@@ -475,19 +475,17 @@ extern const u32 gUnk_0824EDC8[];
 
 void DirectionalActor_UpdateSequence(struct SceneCombatActor *actor)
 {
-    u8 *phase = &actor->actionPhase;
-    u8 initialPhase = *phase;
-    switch (initialPhase) {
+    switch (actor->actionPhase) {
         case 0:
             Armor_SetAnimationFromStart(actor, &gUnk_0824EDC8[((actor->heading + 0x60) >> 6) & 3]);
-            (*phase)++;
-            actor->actionReady = initialPhase;
+            actor->actionPhase++;
+            actor->actionReady = 0;
             Armor_StartPaletteTransition(actor);
             break;
         case 1:
             if (actor->animationComplete != 0) {
-                *phase = 0xff;
-                actor->actionReady = initialPhase;
+                actor->actionPhase = 0xff;
+                actor->actionReady = 1;
             }
             break;
     }
