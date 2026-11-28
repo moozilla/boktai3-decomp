@@ -396,3 +396,4 @@ src/scene/actor/placement/SceneActorCollision_InitExternalAttack.c	SceneActorCol
 src/scene/actor/placement/SceneActorCollision_InitExternalAttackWithField34.c	SceneActorCollision_InitExternalAttackWithField34	minor	minor	0	flags local before Collider_Init: the literal argument reorders the constant load
 src/scene/actor/placement/SceneActorMovement_UpdateAirborne.c	SceneActorMovement_UpdateAirborne	contrived	contrived	20	goto into the shared cell setup and flag pointer blocks: structured if/else moves the airborne branch layout
 src/scene/actor/placement/SceneActorMovement_UpdateAnimationAndTerrain.c	SceneActorMovement_UpdateAnimationAndTerrain	contrived	contrived	18	enabled-bit local, flag marker helpers and cell pointer: plain stores and |= load the field before the mask and reload the terrain cell
+src/scene/actor/placement/SceneActorMovement_ProjectProbe.c	SceneActorMovement_ProjectProbe	contrived	natural	4	-
