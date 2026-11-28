@@ -1238,9 +1238,8 @@ void SceneActorAnimation_UpdateRouteWalk(void *unused, struct SceneActor *actor)
     }
 }
 
-void Actor_UpdateRunToPosition(void *unused, struct SceneActor *arg)
+void Actor_UpdateRunToPosition(void *unused, struct SceneActor *actor)
 {
-    struct SceneActor *actor = arg;
     if (actor->animationEntered) {
         actor->animationEntered = 0;
         actor->finished = 0;
@@ -1253,46 +1252,16 @@ void Actor_UpdateRunToPosition(void *unused, struct SceneActor *arg)
         int dz = target->z - pos->z;
         u32 distance = dx * dx + dz * dz;
         u32 limit = actor->distanceSquared;
-        struct ContactPosition *savedPos = pos;
-        struct ContactPosition *savedTarget = target;
-
+        struct ContactPosition *from = pos;
+        struct ContactPosition *to = target;
         if (distance <= limit) {
             actor->body.position = actor->target;
             actor->finished = 1;
         } else {
-            u8 *ap = &actor->body.direction;
-            struct ContactPosition *vel = &actor->body.motion;
-            int angle = *ap;
-            int speed = actor->distance;
-
-            s32 product = speed * gUnk_086149C4[(angle + 64) & 255];
-            u8 *savedAngle = ap;
-
-            vel->x = SceneActor_ScaleMotion(product);
-            vel->y = 0;
-            vel->z = SceneActor_ScaleMotion(speed * gUnk_086149C4[angle]);
-            {
-                struct ContactPosition *target = savedTarget;
-                s32 x;
-                struct ContactPosition *pos;
-                s32 z;
-
-                x = target->x;
-                pos = savedPos;
-
-                x -= pos->x;
-
-                z = target->z - pos->z;
-                actor->direction = Math_Atan2(x, z);
-            }
-            {
-                int value = actor->direction;
-                u8 *out = savedAngle;
-
-                *out = value;
-                actor->facing8 = SceneFacing_EightWay(value);
-                actor->facing4 = SceneFacing_FourWay(value);
-            }
+            SceneActor_OffsetAlongHeading(&actor->body.motion, actor->body.direction,
+                                          actor->distance);
+            actor->direction = Math_Atan2(to->x - from->x, to->z - from->z);
+            SceneActorAnimation_SetAngle(actor, actor->direction);
             Actor_PlayAnimationEntry(actor, 3, 1, 0, 1);
         }
         Actor_PlayFootstepSound(actor, 3);

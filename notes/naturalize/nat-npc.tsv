@@ -53,3 +53,4 @@ src/npc/manager/scene_actor_animation.c	Actor_OnTimedIdleUpdate	natural	natural	
 src/npc/manager/scene_actor_animation.c	Actor_UpdateNavigationStep	contrived	minor	8	distance/limit locals and from copy of pos: ROM keeps them across the range compare
 src/npc/manager/scene_actor_animation.c	SceneActorAnimation_UpdateRouteWalk	contrived	minor	6	distance/limit locals and from copy, as in Actor_UpdateNavigationStep
 src/npc/manager/scene_actor_animation.c	Actor_UpdateNavigationWalk	contrived	minor	1	distance/limit locals and from copy
+src/npc/manager/scene_actor_animation.c	Actor_UpdateRunToPosition	contrived	minor	2	distance/limit locals and from/to copies
