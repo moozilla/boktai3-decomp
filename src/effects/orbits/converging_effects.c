@@ -116,12 +116,10 @@ void ConvergingEffects_EmitFarParticle(struct Player *player, struct SceneVec *p
 
 void ConvergingEffects_RemoveSprites(struct Player *player)
 {
-    struct ConvergingParticle *particle = player->convergingEffects.particles;
-    s32 remaining;
-    for (remaining = 3; remaining >= 0; remaining--) {
-        Effect_Remove(particle);
-        particle++;
-    }
+    s32 i;
+
+    for (i = 0; i < 4; i++)
+        Effect_Remove(&player->convergingEffects.particles[i]);
 }
 
 void ParticleSprite_Initialize(void *, void *, u32);

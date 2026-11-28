@@ -291,3 +291,4 @@ src/effects/orbits/orbiting_particles.c	OrbitingParticles_Stop	natural	natural	0
 src/effects/orbits/converging_effects.c	ConvergingEffects_UpdateParticles	minor	minor	40	draw alias of the particle pointer: register copy
 src/effects/orbits/converging_effects.c	ConvergingEffects_EmitNearParticle	minor	minor	40	draw alias; u16 radius sample: modulo form
 src/effects/orbits/converging_effects.c	ConvergingEffects_EmitFarParticle	minor	minor	40	draw alias; u16 radius sample: modulo form
+src/effects/orbits/converging_effects.c	ConvergingEffects_RemoveSprites	minor	natural	40	
