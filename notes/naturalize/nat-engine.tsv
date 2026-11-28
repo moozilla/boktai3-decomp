@@ -682,3 +682,4 @@ src/system/save/SavedVariables_CaptureVariableValues.c	SavedVariables_CaptureVar
 src/system/save/SavedVariables_RestoreVariableValues.c	SavedVariables_RestoreVariableValues	contrived	natural	1	
 src/system/save/SavedVariables_RunFromScript.c	SavedVariables_RunFromScript	contrived	natural	1	
 src/system/save/Save_WriteContinuation.c	Save_WriteContinuation	contrived	natural	1	
+src/system/save/Save_ReadContinuation.c	Save_ReadContinuation	contrived	natural	1	
