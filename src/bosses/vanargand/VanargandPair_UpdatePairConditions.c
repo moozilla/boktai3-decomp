@@ -9,9 +9,9 @@ void VanargandPair_SelectPairTransition(void *, const u8 table[][3]);
 s32 VanargandPair_UpdatePairConditions(struct VanargandPairState *p)
 {
     struct VanargandPairState *q = p;
-    s32 d = __divsi3(p->gauge, 43);
-    if (3 - d != p->level) {
-        p->level = 3 - d;
+    s32 quotient = __divsi3(p->gauge, 43);
+    if (3 - quotient != p->level) {
+        p->level = 3 - quotient;
         p->state = 9;
         p->cursor = 0;
     } else if (p->counter > 127) {
@@ -20,14 +20,17 @@ s32 VanargandPair_UpdatePairConditions(struct VanargandPairState *p)
         p->counter = 0;
     }
     if (p->variant == 1) {
-        u32 m = q->mode;
-        if (m == 11) {
-            s32 n = ScenePair_CountPositiveCounters(p->pair);
-            if (n == 0) {
-                u8 s = p->state;
-                if (s != 2 && s != 6 && s != 11 && s != 12 && s != 9) {
-                    p->state = m;
-                    p->cursor = n;
+        u32 mode = q->mode;
+
+        if (mode == 11) {
+            s32 count = ScenePair_CountPositiveCounters(p->pair);
+
+            if (count == 0) {
+                u8 state = p->state;
+
+                if (state != 2 && state != 6 && state != 11 && state != 12 && state != 9) {
+                    p->state = mode;
+                    p->cursor = count;
                 }
             }
         }
