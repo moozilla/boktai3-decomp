@@ -390,3 +390,6 @@ src/engine/video/sprite_component/ArmorIndicator_DestroySprite.c	ArmorIndicator_
 src/engine/video/sprite_component/SpriteComponent_ConfigureCollider.c	SpriteComponent_ConfigureCollider	minor	natural	1	
 src/engine/video/sprite_component/SpriteComponent_GetCollisionStatus.c	SpriteComponent_GetCollisionStatus	natural	natural	1	
 src/engine/video/sprite_component/SpriteComponent_Init.c	SpriteComponent_Init	minor	minor	1	callback addresses held in locals so both load before the stores
+src/engine/video/sprite_component/SpriteComponent_Destroy.c	SpriteComponent_Destroy	minor	minor	1	returns the component or callback result left in r0
+src/engine/video/sprite_component/SceneActorAttachment_MarkContact.c	SceneActorAttachment_MarkContact	natural	natural		
+src/engine/video/sprite_component/ProximityVolume_InitializeCallbacks.c	ProximityVolume_InitializeCallbacks	minor	minor	1	file-local callback setter keeps both addresses loaded before the stores

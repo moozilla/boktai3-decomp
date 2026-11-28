@@ -5,7 +5,8 @@
 #include "scene/collision/contact_position.h"
 
 struct ProximityVolume {
-    u8 pad0[0x8];
+    void (*update)(struct ProximityVolume *);  /* confidence=low */
+    void (*destroy)(struct ProximityVolume *); /* confidence=low */
     struct ContactPosition position;
     void *emitter; /* confidence=low */
     u8 probe[0x1c]; /* confidence=low */
