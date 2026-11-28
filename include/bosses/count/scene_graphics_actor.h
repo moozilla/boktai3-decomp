@@ -8,6 +8,7 @@
 
 struct ContactActorPool;
 struct BackgroundFlashController;
+struct Player;
 
 /* 08021EA8-08024F2C: drawable setup, targeting, resource/health costs and the
  * recovery/action dispatch pipeline for struct StateActor (see state_actor.h
@@ -26,7 +27,8 @@ struct SceneActorGraphics {
     s32 stepTableKind;  /* 0x358: selects one of the gUnk_08604DC4 family tables. */
     s16 attackWidth0, attackHeight0, attackDepth0; /* 0x35C: variant-0 attack properties. */
     s16 attackWidth1, attackHeight1, attackDepth1; /* 0x362: variant-1 attack properties. */
-    u8 unk368[4];
+    s16 grabHealthAmount; /* 0x368: taken from the grabbed player (tentative). */
+    u8 unk36A[2];
     s16 chargeShotPower;
     u8 unk36E[0x378 - 0x36E];
     s16 routeProjectileAmount, routeProjectileKind;
@@ -43,7 +45,11 @@ struct SceneActorGraphics {
     u32 resourceId;    /* 0x390 */
     u8 particleFlag;   /* 0x394: cleared by SceneActorState_AdvanceToState06. */
     s8 trackedPlayer; /* 0x395: player slot selected by the contact box. */
-    u8 unk396[5];
+    u8 grabStartFacing; /* 0x396: the grabbed player's facing cue when seized. */
+    u8 grabLastFacing;
+    u8 grabInputAngle; /* 0x398 */
+    u8 grabInputFrames;
+    u8 grabFacingChanges; /* 0x39A */
     u8 reactionDelay; /* 0x39B: set by the anchored and death reactions. */
     s32 resourceCostAccumulator; /* 0x39C: SceneActors_AddResourceCost. */
     s32 healthCostAccumulator;   /* 0x3A0: SceneActors_AddHealthCost. */
@@ -62,7 +68,8 @@ struct SceneActorGraphics {
     u8 paletteBank1[0x200];  /* 0x5C4 */
     u8 paletteBank2[0x200];  /* 0x7C4 */
     struct ContactPosition snapPosition; /* 0x9C4: set by scene command 12. */
-    u8 unk9CC[0x9D8 - 0x9CC];
+    struct ContactPosition grabPosition; /* 0x9CC: the grabbed player's position. */
+    u8 unk9D4[0x9D8 - 0x9D4];
     struct ContactActorPool *contactPool; /* 0x9D8: SceneActors_RequestContactPoolClear. */
     struct BackgroundFlashController *backgroundFlash; /* 0x9DC: SceneActors_StopBackgroundFlash. */
 };
@@ -78,13 +85,17 @@ struct SceneGraphicsCommand {
 struct SceneGraphicsActor {
     u8 unk0[0x48];
     struct SceneActorBody body; /* 0x48 */
-    u8 unk90[0xBC - 0x90];
+    u8 unk90[0x94 - 0x90];
+    s16 health; /* 0x94 */
+    u8 unk96[0xBC - 0x96];
     u32 hitStatRewardFlags; /* 0xBC: copied from the collider that last hit the actor. */
     u32 hitReactionFlags;   /* 0xC0 */
     u8 unkC4[0xE2 - 0xC4];
     u8 contactHundredths; /* 0xE2 */
     u8 unkE3[0x10C - 0xE3];
-    const u8 *damageSource; /* 0x10C: the hit's angle is read at +0x2D (tentative) */
+    /* 0x10C: setup stores each player and then its position one slot later, so only
+     * entry zero stays paired. */
+    struct Player *players[1];
     struct ContactPosition *playerPositions[4]; /* 0x110 */
     u8 unk120[0x174 - 0x120];
     u8 playerCount; /* 0x174 */

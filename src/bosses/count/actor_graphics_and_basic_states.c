@@ -552,7 +552,7 @@ s32 sub_08022B18(struct StateActor *p, s32 kind, s32 damage)
             ((struct SceneGraphicsActor *)p)->hitAngle = body->direction + 0x80;
             break;
         case 1:
-            ((struct SceneGraphicsActor *)p)->hitAngle = actor->damageSource[0x2D];
+            ((struct SceneGraphicsActor *)p)->hitAngle = actor->players[0]->unk2D;
             SceneActorState_SetFlags(p, 2);
             SceneActorState_StartAction(p, 1, 0, 3);
             SceneActorState_EnterAction(p, sub_08027214, 0x19);

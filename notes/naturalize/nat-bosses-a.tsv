@@ -90,3 +90,4 @@ src/bosses/count/SceneActorAnimation_UpdateRecoilSlide.c	SceneActorAnimation_Upd
 src/bosses/count/SceneActorAnimation_UpdateChargeSlide.c	SceneActorAnimation_UpdateChargeSlide	contrived	natural	1	typed body, plain branches
 src/bosses/count/SceneActorAnimation_UpdateSwingLight.c	SceneActorAnimation_UpdateSwingLight	contrived	natural	1	fake ActorAnimation view and unused helpers removed
 src/bosses/count/SceneActorAnimation_UpdateSwingHeavy.c	SceneActorAnimation_UpdateSwingHeavy	contrived	natural	1	fake ActorAnimation view and unused helpers removed
+src/bosses/count/SceneActorAnimation_UpdatePlayerGrab.c	SceneActorAnimation_UpdatePlayerGrab	contrived	minor	60	real actor types and named grab fields; kept: unsigned tracked-slot accessor, facing-delta and angle helpers, byte-offset player index, facing pointers and angle locals (register allocation)

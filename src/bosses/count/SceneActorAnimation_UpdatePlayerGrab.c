@@ -1,242 +1,190 @@
 #include "global.h"
 #include "player/player.h"
 #include "player/player_slot_status.h"
+#include "scene/actor/scene_actors.h"
+#include "bosses/count/scene_graphics_actor.h"
 
-extern u32 gUnk_02000560;
-
-s32 Callback_InvokeActor(void *arg, void *function);
-void SceneActors_StartAnimation(void *, void *, void *, int, int, int);
 s32 Player_BeginPositionRequest(void *, void *, u32, u32, u32, u32, u32, u32, u32);
 s32 Player_ApplyPositionRequest(void *, void *, u32, u32, u32, u32, u32, u32);
-void SceneActors_SetHealth(void *, s32);
 void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
 void sub_08022694(void *);
 void Sound_PlaySongChecked(u32);
 u32 Player_GetInputDirection(void *);
 
-struct Sub0802592CSize {
+struct PackedOffset {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };
 
-struct Sub0802592CPair {
-    u32 first, second;
-};
-
-struct Sub0802592CActor {
-    u8 unk00[0x51];
-    u8 unk51;
-    u8 unk52[0x94 - 0x52];
-    s16 unk94;
-    u8 unk96[0xA8 - 0x96];
-    u8 unkA8;
-    u8 unkA9;
-    u8 unkAA[0xAF - 0xAA];
-    u8 unkAF;
-    u8 unkB0;
-    u8 unkB1;
-    u8 unkB2[0x104 - 0xB2];
-    void *unk104;
-    void *unk108;
-    /* The initializer advances by one word and writes the player's position
-     * after each player pointer. */
-    void *targetWords[26];
-    u8 pad174[0x220 - 0x174];
-    u8 unk220[0x24C - 0x220];
-    u16 unk24C;
-    u8 unk24E[0x254 - 0x24E];
-    u16 unk254;
-    u8 unk256[0x25D - 0x256];
-    u8 unk25D;
-    u8 unk25E[0x368 - 0x25E];
-    s16 unk368;
-    u8 unk36A[0x383 - 0x36A];
-    u8 unk383;
-    u8 unk384[0x395 - 0x384];
-    u8 unk395;
-    u8 unk396;
-    u8 unk397;
-    u8 unk398;
-    u8 unk399;
-    u8 unk39A;
-    u8 unk39B[0x3AC - 0x39B];
-    u32 unk3AC;
-    u8 unk3B0[0x9CC - 0x3B0];
-    struct Sub0802592CPair saved;
-};
-
-/* Track the selected player and apply contact health changes. */
-static inline u8 SceneTrail_TargetIndex(struct Sub0802592CActor *p)
+/* The tracked slot read back through an unsigned byte. */
+static inline u8 SceneGraphicsActor_GetTrackedPlayer(struct SceneGraphicsActor *actor)
 {
-    return p->unk395;
+    return actor->graphics.trackedPlayer;
 }
 
-static inline void SceneTrail_CopySavedPosition(struct Sub0802592CActor *actor)
-{
-    s32 idx;
-    u32 *pair;
-    idx = (s8)SceneTrail_TargetIndex(actor);
-    {
-        s32 offset = idx * sizeof(void *);
-        u8 *positions = (u8 *)&actor->targetWords[1];
-        pair = *(void **)(positions + offset);
-    }
-    actor->saved = *(struct Sub0802592CPair *)pair;
-}
-
-static inline s32 SceneTrail_WrappedDifference(s32 current, s32 previous)
+/* How far a facing cue has advanced past the value seen at the grab. */
+static inline s32 SceneGraphicsActor_FacingDelta(s32 current, s32 previous)
 {
     s32 before = previous - 0x100;
     return (current - before) & 0xff;
 }
 
-static inline u8 SceneTrail_DirectionToAngle(u8 direction)
+/* Quantize a player input direction to the matching body angle. */
+static inline u8 SceneGraphicsActor_DirectionToAngle(u8 direction)
 {
     return (((u32)direction << 29) + 0xA0000000) >> 24;
 }
 
-void SceneActorAnimation_UpdatePlayerGrab(struct Sub0802592CActor *base, s32 param)
+// confidence=low: hold the tracked player, taking health periodically, until the player
+// changes facing often enough or time runs out.
+void SceneActorAnimation_UpdatePlayerGrab(struct StateActor *p, int tick)
 {
-    struct Sub0802592CActor *actor = base;
-    struct Player *q;
-    struct Sub0802592CSize size;
-    s32 idx;
-    s32 state;
-    s32 animA;
-    s32 animB;
-    s32 anim;
-    s32 cb;
-    s32 cb2;
-    s32 reqRes;
-    s32 hp;
-    u32 v;
-    u32 w;
+    struct SceneGraphicsActor *actor = (struct SceneGraphicsActor *)p;
+    s32 slot;
+    s32 alternate;
+    s32 normal;
+    s32 sequence;
+    s32 updated;
+    s32 reset;
+    s32 amount;
+    s32 health;
 
-    if (base->unkB1) {
-        base->unkB1 = 0;
-        idx = (s8)SceneTrail_TargetIndex(base);
-        state = gPlayers[idx]->actionMode;
-        switch (state) {
+    if (p->actionChanged) {
+        p->actionChanged = 0;
+        slot = (s8)SceneGraphicsActor_GetTrackedPlayer(actor);
+        switch (gPlayers[slot]->actionMode) {
             case 0:
             default:
-                animA = 0x13;
-                animB = 0x39;
+                alternate = 19;
+                normal = 57;
                 break;
             case 2:
-                animA = 0x15;
-                animB = 0x3B;
+                alternate = 21;
+                normal = 59;
                 break;
             case 1:
-                animA = 0x14;
-                animB = 0x3A;
+                alternate = 20;
+                normal = 58;
                 break;
         }
-        if (actor->unk3AC & 1)
-            anim = animA;
+        if (actor->graphics.animationFlags & 1)
+            sequence = alternate;
         else
-            anim = animB;
-        SceneActors_StartAnimation(base, (u8 *)actor + 0x240, (u8 *)actor + 0x220, anim, 1, 4);
+            sequence = normal;
+        SceneActors_StartAnimation(p, &actor->animation, (int)&actor->animationResource, sequence,
+                                   1, 4);
         {
-            u8 *facingPtr = &base->unkA8;
+            u8 *facing4 = &p->animationFacing4;
             s32 facing;
-            if (*facingPtr <= 1) {
+            if (*facing4 <= 1) {
                 u32 angle = 0;
-                base->unk51 = angle;
+                p->bodyDirection = angle;
                 facing = 1;
             } else {
                 u32 angle = 0x40;
-                base->unk51 = angle;
+                p->bodyDirection = angle;
                 facing = 2;
             }
-            *facingPtr = facing;
+            *facing4 = facing;
         }
         {
-            s32 shift = (base->unk51 + 0x70) >> 5;
-            s32 direction = 7;
-            direction &= shift;
+            s32 shifted = (p->bodyDirection + 0x70) >> 5;
+            s32 facing8 = 7;
+            facing8 &= shifted;
             {
-                u8 *out = &base->unkA9;
-                *out = direction;
+                u8 *out = &p->animationFacing8;
+                *out = facing8;
             }
         }
-        SceneTrail_CopySavedPosition(actor);
-        idx = (s8)SceneTrail_TargetIndex(actor);
-        Player_BeginPositionRequest(gPlayers[idx], (u8 *)actor + 0x260, 0, 0, 0, 0, 1, 0, 2);
-        if ((s8)actor->unk395 >= 0) {
-            struct Player *player = base->targetWords[(s8)actor->unk395];
-            v = player->facingChangeEffects;
-            actor->unk396 = v;
-            actor->unk397 = v;
+        {
+            int tracked = (s8)SceneGraphicsActor_GetTrackedPlayer(actor);
+            struct ContactPosition *position = actor->playerPositions[tracked];
+            actor->graphics.grabPosition = *position;
         }
-        actor->unk399 = 0;
-        actor->unk39A = 0;
+        slot = (s8)SceneGraphicsActor_GetTrackedPlayer(actor);
+        Player_BeginPositionRequest(gPlayers[slot], &actor->animation.position, 0, 0, 0, 0, 1, 0,
+                                    2);
+        if (actor->graphics.trackedPlayer >= 0) {
+            u32 facing = ((struct SceneGraphicsActor *)p)
+                             ->players[actor->graphics.trackedPlayer]
+                             ->facingChangeEffects;
+            actor->graphics.grabStartFacing = facing;
+            actor->graphics.grabLastFacing = facing;
+        }
+        actor->graphics.grabInputFrames = 0;
+        actor->graphics.grabFacingChanges = 0;
     }
 
-    cb = (u8)Callback_InvokeActor(base, base->unk104);
-    if (cb != 0) {
-        idx = (s8)SceneTrail_TargetIndex(actor);
-        Player_ApplyPositionRequest(gPlayers[idx], &actor->saved, 0x32, actor->unk51, 0x32, 0, 0,
-                                    0);
+    updated = p->actionTryUpdate(p);
+    if (updated) {
+        slot = (s8)SceneGraphicsActor_GetTrackedPlayer(actor);
+        Player_ApplyPositionRequest(gPlayers[slot], &actor->graphics.grabPosition, 50,
+                                    actor->body.direction, 50, 0, 0, 0);
         return;
     }
 
-    cb2 = (u8)Callback_InvokeActor(base, base->unk108);
-    if (cb2 != 0) {
-        idx = (s8)SceneTrail_TargetIndex(actor);
-        Player_ApplyPositionRequest(gPlayers[idx], &actor->saved, 0x32, actor->unk51, 0x32, 0, 0,
-                                    0);
+    reset = p->actionReset(p);
+    if (reset) {
+        slot = (s8)SceneGraphicsActor_GetTrackedPlayer(actor);
+        Player_ApplyPositionRequest(gPlayers[slot], &actor->graphics.grabPosition, 50,
+                                    actor->body.direction, 50, 0, 0, 0);
         return;
     }
 
     {
-        u8 sample;
-        void **targets;
-        s8 *index = (s8 *)&actor->unk395;
-        idx = *index;
+        u8 facing;
+        u32 last;
+        struct Player **players;
+        struct Player *player;
+        s8 *tracked = &actor->graphics.trackedPlayer;
+        slot = *tracked;
         {
-            u32 offset = idx * 4;
-            void **references = base->targetWords;
-            q = *(void **)((u8 *)references + offset);
-            sample = q->facingChangeEffects;
-            w = actor->unk397;
-            targets = references;
+            u32 offset = slot * 4;
+            struct Player **list = ((struct SceneGraphicsActor *)p)->players;
+            player = *(struct Player **)((u8 *)list + offset);
+            facing = player->facingChangeEffects;
+            last = actor->graphics.grabLastFacing;
+            players = list;
         }
-        if (w != sample) {
-            actor->unk397 = sample;
-            actor->unk39A++;
+        if (last != facing) {
+            actor->graphics.grabLastFacing = facing;
+            actor->graphics.grabFacingChanges++;
         }
-        if (actor->unk39A > 3) {
-            actor->unk398 = SceneTrail_DirectionToAngle(Player_GetInputDirection(q));
-            actor->unk399 = 0x10;
-            actor->unk39A = cb2;
+        if (actor->graphics.grabFacingChanges > 3) {
+            actor->graphics.grabInputAngle =
+                SceneGraphicsActor_DirectionToAngle(Player_GetInputDirection(player));
+            actor->graphics.grabInputFrames = 16;
+            actor->graphics.grabFacingChanges = reset;
         }
-        if (actor->unk254 == 3 && actor->unk24C == 0) {
-            idx = *index;
-            reqRes = Player_BeginPositionRequest(gPlayers[idx], (u8 *)actor + 0x260, 0, 0, 0, 0, 1,
-                                                 actor->unk368, 2);
-            hp = actor->unk94;
-            SceneActors_SetHealth(actor, hp + reqRes);
-            if (hp != actor->unk94) {
-                void *contact = (u8 *)actor + 0x1cc;
-                size.x = 0x18;
-                size.y = 0;
-                size.z = 0x18;
-                DamageNumberDisplay_Show(contact, reqRes, 1, (u8 *)actor + 0x54, &size, 1);
+        if (actor->animation.frameIndex == 3 && actor->animation.elapsed == 0) {
+            slot = *tracked;
+            amount = Player_BeginPositionRequest(gPlayers[slot], &actor->animation.position, 0, 0,
+                                                 0, 0, 1, actor->graphics.grabHealthAmount, 2);
+            health = actor->health;
+            SceneActors_SetHealth((struct StateActor *)actor, health + amount);
+            if (health != actor->health) {
+                struct ContactCollider *contact = &actor->overlayCollider;
+                struct PackedOffset offset;
+                offset.x = 24;
+                offset.y = 0;
+                offset.z = 24;
+                DamageNumberDisplay_Show(contact, amount, 1,
+                                         &actor->body.position, &offset, 1);
             }
             sub_08022694(actor);
-            Sound_PlaySongChecked(0x34C);
+            Sound_PlaySongChecked(844);
         }
 
-        idx = (s8)SceneTrail_TargetIndex(actor);
+        slot = (s8)SceneGraphicsActor_GetTrackedPlayer(actor);
         {
-            struct Player *currentPlayer = targets[idx];
-            s32 previous = actor->unk396;
-            s32 current = currentPlayer->facingChangeEffects;
-            if (SceneTrail_WrappedDifference(current, previous) > 0xf)
-                actor->unk383 = 1;
+            struct Player *target = players[slot];
+            s32 previous = actor->graphics.grabStartFacing;
+            s32 current = target->facingChangeEffects;
+            if (SceneGraphicsActor_FacingDelta(current, previous) > 15)
+                actor->graphics.trackedPlayerEscaped = 1;
         }
-        if (actor->unk25D & 2) {
-            if (PlayerSlot_ReadStatus(0, 4) || actor->unk383 || param > 0x78)
-                base->unkAF = 1;
+        if (actor->animation.status & 2) {
+            if (PlayerSlot_ReadStatus(0, 4) || actor->graphics.trackedPlayerEscaped || tick > 120)
+                p->actionFinished = 1;
         }
     }
 }
