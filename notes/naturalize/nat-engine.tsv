@@ -6,3 +6,4 @@ src/engine/heap_memory.c	Heap_Alloc	contrived	natural	4
 src/engine/heap_memory.c	Heap_AllocFromEnd	contrived	natural	5	
 src/engine/heap_memory.c	BgGfx_LoadTiles	minor	natural	1	
 src/engine/task_scheduler.c	TaskSystem_InitLists	minor	natural	1	
+src/engine/task_scheduler.c	TaskSystem_KillBelowPersistenceLevel	contrived	natural	1	

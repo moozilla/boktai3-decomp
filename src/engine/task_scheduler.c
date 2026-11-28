@@ -129,22 +129,19 @@ s32 Task_TryDestroy(struct RuntimeTask *task)
 
 s32 Task_Kill(struct RuntimeTask *);
 
-void TaskSystem_KillBelowPersistenceLevel(s32 prio)
+void TaskSystem_KillBelowPersistenceLevel(s32 level)
 {
     struct TaskList *list = gTaskLists;
-    s32 i = 0;
-    do {
-        struct RuntimeTask *task = list->head;
-        s32 ni = i + 1;
-        struct TaskList *nl = list + 1;
-        for (; task != 0; task = task->next) {
+    s32 i;
+
+    for (i = 0; i <= 13; i++, list++) {
+        struct RuntimeTask *task;
+        for (task = list->head; task != 0; task = task->next) {
             /* unk16 is the persistence level in the shared task header. */
-            if (task->unk16 < prio)
+            if (task->unk16 < level)
                 Task_Kill(task);
         }
-        i = ni;
-        list = nl;
-    } while (i <= 13);
+    }
 }
 
 struct RuntimeTask *Task_FindById(u16 id)
