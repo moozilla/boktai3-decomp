@@ -327,11 +327,7 @@ void Trigger_UpdateFalling(struct TriggerManager *manager, struct Trigger *p)
 {
     s32 y = p->position->y, height = groundHeight(p->position), difference = y - height;
     if (difference > 0) {
-        struct SceneVec *position = p->position;
-        s32 step = difference;
-        if (step > 32)
-            step = 32;
-        position->y -= step;
+        p->position->y -= difference > 32 ? 32 : difference;
         Trigger_UpdateProximity(manager, p);
         p->timer++;
     } else {
