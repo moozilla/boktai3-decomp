@@ -1299,12 +1299,9 @@ u32 TetherActor_IsStateOne(void)
 s32 TetherActor_GetParameter(void)
 {
     struct TetherActor *p = gTetherActor;
-    s32 r;
-    if (p)
-        r = p->parameter;
-    else
-        r = -1;
-    return r;
+    if (!p)
+        return -1;
+    return p->parameter;
 }
 
 void TetherActor_SetParameter(u32 a)
