@@ -255,3 +255,10 @@ src/objects/floor_traps.c	FloorTrapPool_EnterStateThree	natural	natural	0
 src/objects/floor_traps.c	FloorTrap_SetStateFromScript	contrived	natural	7	
 src/objects/floor_traps.c	Tile_SetEnabledFromScript	minor	natural	1	
 src/objects/floor_traps.c	FloorTrap_CreateFromScript	contrived	contrived	345	inlined sequence step and countdown argument loops: PlayerCue_StepSequence() and index loops come within 9 instructions but gcse spill-slot order differs
+src/objects/floor_traps.c	FloorTrap_TickManager	minor	minor	1	mask local keeps the mask-first operand order of the pause flag test
+src/objects/floor_traps.c	FloorTrapPool_FindByName	natural	natural	0	
+src/objects/floor_traps.c	FloorTrapPool_IsReadyFromScript	natural	natural	0	
+src/objects/floor_traps.c	TilePool_Destroy	natural	natural	0	
+src/objects/floor_traps.c	FloorTrapPool_Init	natural	natural	0	
+src/objects/floor_traps.c	FloorTrapPool_Create	natural	natural	0	
+src/objects/floor_traps.c	FloorTrapPool_ResetInstance	natural	natural	0	
