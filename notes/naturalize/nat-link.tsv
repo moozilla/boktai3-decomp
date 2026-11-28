@@ -1,2 +1,3 @@
 path	function	verdict_before	verdict_after	compiles	what_stays_and_why
 src/link/encoded_records/EncodedRecord_WriteBits.c	EncodedRecord_WriteBits	contrived	natural	4	
+src/link/encoded_records/EncodedRecord_ReadBits.c	EncodedRecord_ReadBits	contrived	natural	2	

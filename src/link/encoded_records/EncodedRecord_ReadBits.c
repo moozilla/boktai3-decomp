@@ -1,30 +1,20 @@
-#include "global.h"
-s32 __divsi3(s32, s32);
-s32 sub_08249350(s32, s32);
-u32 EncodedRecord_ReadBits(const u8 *base, u32 *source, s32 count, s32 index)
+#include "link/encoded_records/encoded_record.h"
+
+u32 EncodedRecord_ReadBits(const u8 *buffer, u32 *bitPos, s32 count, s32 bitsPerByte)
 {
-    u32 p;
-    s32 value;
     s32 i;
     u32 result;
+    s32 pos;
+
     result = 0;
-    p = *source;
-    i = 0;
-    if (i < count) {
-        do {
-            s32 offset;
-            s32 shift;
-            offset = __divsi3((s32)p, index);
-            shift = sub_08249350((s32)p, index);
-            value = base[offset];
-            value >>= shift;
-            value &= 1;
-            value <<= i;
-            result |= value;
-            p++;
-            i++;
-        } while (i < count);
+    pos = *bitPos;
+    for (i = 0; i < count; i++) {
+        s32 byte = pos / bitsPerByte;
+        s32 shift = pos % bitsPerByte;
+
+        result |= ((buffer[byte] >> shift) & 1) << i;
+        pos++;
     }
-    *source = p;
+    *bitPos = pos;
     return result;
 }
