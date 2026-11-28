@@ -1,19 +1,23 @@
 #include "global.h"
+#include "engine/ram.h"
+#include "ui/dialogue/text_window.h"
+#include "ui/dialogue/text_window_manager.h"
 /* TextWindow_SetText: Sets the interpreter text pointer and clears script sequencing and entry state */
 
-u8 *TextWindow_Find(u32);
+struct TextWindow *TextWindow_Find(int);
 
-s32 TextWindow_SetText(u32 id, u32 value)
+int TextWindow_SetText(int id, const u8 *string)
 {
-    u8 *w = TextWindow_Find(id);
-    u8 *q;
-    if (w == NULL)
+    struct TextWindow *window = TextWindow_Find(id);
+    struct TextState *text;
+
+    if (!window)
         return -1;
-    q = w + 0x60;
-    *(u32 *)(w + 0x14) = 0;
-    *(u16 *)(w + 0x10) = 0;
-    *(u32 *)(q + 0x1c) = value;
-    q[8] = 0;
-    q[7] = 0;
+    text = &window->text;
+    window->script = 0;
+    window->symbol = 0;
+    text->pc = string;
+    text->entered = 0;
+    text->style = 0;
     return 0;
 }

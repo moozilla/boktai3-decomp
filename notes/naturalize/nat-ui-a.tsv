@@ -344,3 +344,4 @@ src/ui/dialogue/text_window/TextWindow_StopPlayback.c	TextWindow_StopPlayback	fu
 src/ui/dialogue/text_window/TextWindow_SetScript.c	TextWindow_SetScript	fudged	natural	1	
 src/ui/dialogue/text_window/sub_080338A8.c	sub_080338A8	fudged	natural	3	name kept (no renames)
 src/ui/dialogue/text_window/TextWindow_Refresh.c	TextWindow_Refresh	fudged	natural	2	
+src/ui/dialogue/text_window/TextWindow_SetText.c	TextWindow_SetText	fudged	natural	1	
